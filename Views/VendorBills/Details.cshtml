@@ -1,0 +1,302 @@
+@model RealEstateManager.Domain.VendorBill
+@{
+    ViewData["Title"] = $"Bill {Model.BillNumber}";
+
+    var company = ViewBag.Company as RealEstateManager.Domain.Company;
+    var currency = company?.BaseCurrency ?? "AED";
+    var periodClosed = Model.JournalEntry?.AccountingPeriod?.IsClosed ?? false;
+    var isPosted = Model.JournalEntry?.IsPosted ?? false;
+    var hasPayments = Model.Payments.Any(x => x.JournalEntryId != null);
+
+    string Money(decimal value) => value.ToString("N2");
+}
+
+<style>
+    .doc-table th { background: #0f2740; color: #fff; font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; }
+    .doc-table td, .doc-table th { vertical-align: middle; }
+    .doc-table .num { text-align: right; white-space: nowrap; }
+    .doc-meta dt { font-weight: 600; color: #5b6b7c; font-size: .8rem; }
+    .doc-meta dd { margin-bottom: .6rem; }
+    .totals-box { max-width: 360px; margin-left: auto; }
+    .totals-box .row { padding: .3rem 0; }
+    .totals-box .grand { border-top: 2px solid #0f2740; font-weight: 700; font-size: 1.08rem; }
+    @@media print { .no-print { display: none !important; } }
+</style>
+
+@if (TempData["BillSuccess"] != null)
+{
+    <div class="alert alert-success no-print">@TempData["BillSuccess"]</div>
+}
+@if (TempData["BillError"] != null)
+{
+    <div class="alert alert-danger no-print">@TempData["BillError"]</div>
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">
+            @Model.BillNumber
+            @if (isPosted)
+            {
+                <span class="badge bg-success align-middle">Posted</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark align-middle">Draft</span>
+            }
+            @if (periodClosed)
+            {
+                <span class="badge bg-dark align-middle">Period locked</span>
+            }
+        </h2>
+        <p class="text-muted mb-0">@Model.DocumentType from @Model.Vendor?.Name</p>
+    </div>
+
+    @* ----------------------------------------------------------------
+       Draft -> Post -> Reset to Draft. Both actions route through
+       JournalWorkflowService, so a closed period blocks them here for
+       exactly the same reason it does everywhere else.
+       ---------------------------------------------------------------- *@
+    <div class="d-flex gap-2 no-print">
+        @if (Model.IsEditable)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark">Edit</a>
+
+            <form asp-action="Post" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-dark">Post</button>
+            </form>
+        }
+        else if (periodClosed)
+        {
+            <button type="button" class="btn btn-outline-secondary" disabled
+                    title="@Model.JournalEntry?.AccountingPeriod?.Name is closed. Post a correcting journal instead.">
+                Reset to Draft
+            </button>
+        }
+        else if (hasPayments)
+        {
+            <button type="button" class="btn btn-outline-secondary" disabled
+                    title="Payments have been made against this bill. Reset those first.">
+                Reset to Draft
+            </button>
+        }
+        else
+        {
+            <form asp-action="ResetToDraft" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-outline-warning">Reset to Draft</button>
+            </form>
+        }
+
+        @if (Model.BalanceDue > 0 && isPosted)
+        {
+            <a asp-controller="VendorPayments" asp-action="Create" asp-route-billId="@Model.Id"
+               class="btn btn-success">Register Payment</a>
+        }
+
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (!Model.VendorIsVatRegistered)
+{
+    <div class="alert alert-warning">
+        <strong>Commercial invoice &mdash; no input tax.</strong>
+        @Model.Vendor?.Name is not VAT registered, so no tax was charged and none is recoverable.
+        The full amount is a direct cost.
+    </div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="row doc-meta">
+            <div class="col-md-4">
+                <dl class="mb-0">
+                    <dt>Supplier</dt>
+                    <dd>
+                        @Model.Vendor?.Code &mdash; @Model.Vendor?.Name<br />
+                        @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn))
+                        {
+                            <span class="small text-muted">TRN @Model.SupplierTrn</span>
+                        }
+                    </dd>
+                    <dt>Supplier's Bill No.</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(Model.VendorReference) ? "—" : Model.VendorReference)</dd>
+                </dl>
+            </div>
+            <div class="col-md-4">
+                <dl class="mb-0">
+                    <dt>Bill Date</dt>
+                    <dd>@Model.BillDate.ToString("dd/MM/yyyy")</dd>
+                    <dt>Accounting Date</dt>
+                    <dd>
+                        @((Model.AccountingDate == default ? Model.BillDate : Model.AccountingDate).ToString("dd/MM/yyyy"))
+                        @if (Model.JournalEntry?.AccountingPeriod != null)
+                        {
+                            <span class="small text-muted">(@Model.JournalEntry.AccountingPeriod.Name)</span>
+                        }
+                    </dd>
+                    <dt>Due Date</dt>
+                    <dd>@Model.DueDate.ToString("dd/MM/yyyy")</dd>
+                </dl>
+            </div>
+            <div class="col-md-4">
+                <dl class="mb-0">
+                    <dt>Category</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(Model.ExpenseCategory) ? "—" : Model.ExpenseCategory)</dd>
+                    <dt>Journal Entry</dt>
+                    <dd>
+                        @if (Model.JournalEntryId.HasValue)
+                        {
+                            var entryDate = Model.JournalEntry!.EntryDate;
+                            <a asp-controller="Journal" asp-action="Index"
+                               asp-route-fromDate="@entryDate.ToString("yyyy-MM-dd")"
+                               asp-route-toDate="@entryDate.ToString("yyyy-MM-dd")"
+                               asp-route-sourceType="VendorBill"
+                               asp-route-postedOnly="false">
+                                @Model.JournalEntry.EntryNumber
+                            </a>
+                            <span class="badge @(isPosted ? "bg-success" : "bg-warning text-dark")">
+                                @(isPosted ? "Posted" : "Draft")
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not journalised yet</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm mb-0 doc-table">
+            <thead>
+                <tr>
+                    <th style="width:3%">#</th>
+                    <th style="width:26%">Description</th>
+                    <th style="width:20%">Account</th>
+                    <th style="width:12%">Property</th>
+                    <th style="width:7%" class="num">Qty</th>
+                    <th style="width:10%" class="num">Unit Price</th>
+                    <th style="width:10%" class="num">Net</th>
+                    <th style="width:6%" class="num">VAT</th>
+                    <th style="width:10%" class="num">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Lines.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-muted">
+                            This bill was raised automatically and carries no detail lines.
+                            Its total is @Money(Model.TotalAmount) @currency.
+                        </td>
+                    </tr>
+                }
+                @foreach (var line in Model.Lines.OrderBy(x => x.LineNumber))
+                {
+                    <tr>
+                        <td>@line.LineNumber</td>
+                        <td>
+                            @line.Description
+                            @if (line.NonRecoverableVatAmount > 0m)
+                            {
+                                <div class="small text-muted">
+                                    Includes @Money(line.NonRecoverableVatAmount) irrecoverable VAT
+                                    (@RealEstateManager.Domain.InputTaxAttributions.Describe(line.InputTaxAttribution))
+                                </div>
+                            }
+                        </td>
+                        <td class="small">
+                            @if (line.Account != null)
+                            {
+                                <text>@line.Account.Code &mdash; @line.Account.Name</text>
+                            }
+                            else
+                            {
+                                <span class="text-danger">No account</span>
+                            }
+                        </td>
+                        <td class="small">@(line.Property?.Code ?? "—")</td>
+                        <td class="num">@line.Quantity.ToString("N2")</td>
+                        <td class="num">@line.UnitPrice.ToString("N2")</td>
+                        <td class="num">@Money(line.LineSubtotal)</td>
+                        <td class="num">@(line.IsTaxable ? Money(line.VatAmount) : "—")</td>
+                        <td class="num">@Money(line.LineTotal)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-7">
+        @if (!string.IsNullOrWhiteSpace(Model.Notes))
+        {
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="small text-uppercase text-muted mb-1">Notes</div>
+                    <div>@Model.Notes</div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body totals-box">
+                <div class="row"><div class="col">Subtotal</div><div class="col text-end">@Money(Model.Subtotal)</div></div>
+                <div class="row"><div class="col">VAT</div><div class="col text-end">@Money(Model.VatAmount)</div></div>
+                <div class="row grand"><div class="col">Total (@currency)</div><div class="col text-end">@Money(Model.TotalAmount)</div></div>
+                <div class="row"><div class="col">Paid</div><div class="col text-end">@Money(Model.AmountPaid)</div></div>
+                <div class="row fw-bold"><div class="col">Balance Due</div><div class="col text-end">@Money(Model.BalanceDue)</div></div>
+
+                @if (Model.VatAmount > 0m)
+                {
+                    <hr class="my-2" />
+                    <div class="row small text-muted">
+                        <div class="col">Recoverable input tax</div>
+                        <div class="col text-end">@Money(Model.RecoverableVatAmount)</div>
+                    </div>
+                    <div class="row small text-muted">
+                        <div class="col">Added to cost</div>
+                        <div class="col text-end">@Money(Model.NonRecoverableVatAmount)</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Payments.Any())
+{
+    <div class="card shadow-sm mt-3">
+        <div class="card-header bg-white"><strong>Payments</strong></div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr><th>Payment</th><th>Date</th><th class="text-end">Amount</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var payment in Model.Payments.OrderBy(x => x.PaymentDate))
+                    {
+                        <tr>
+                            <td>@payment.PaymentNumber</td>
+                            <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
+                            <td class="text-end">@Money(payment.Amount)</td>
+                            <td>@(payment.JournalEntryId.HasValue ? "Posted" : "Draft")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

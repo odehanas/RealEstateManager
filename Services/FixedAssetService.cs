@@ -649,7 +649,9 @@ namespace RealEstateManager.Services
                 VendorId = vendorId,
                 PropertyId = propertyId,
                 BillNumber = await GenerateAutoVendorBillNumberAsync(expenseCategory),
+                VendorReference = referenceNumber,
                 BillDate = billDate.Date,
+                AccountingDate = billDate.Date,
                 DueDate = billDate.Date,
                 Subtotal = amount,
                 VatAmount = 0m,
@@ -658,6 +660,21 @@ namespace RealEstateManager.Services
                 ExpenseCategory = expenseCategory,
                 Status = "Posted"
             };
+
+            // A single line so the document reads like any other bill on screen. Its
+            // accounting is done by the fixed asset routine that raised it, not by
+            // PostVendorBillAsync, so the line carries no account of its own.
+            bill.Lines.Add(new VendorBillLine
+            {
+                LineNumber = 1,
+                Description = $"{expenseCategory} - {sourceCode}",
+                PropertyId = propertyId,
+                Quantity = 1m,
+                UnitPrice = amount,
+                LineSubtotal = amount,
+                IsTaxable = false,
+                LineTotal = amount
+            });
 
             _db.VendorBills.Add(bill);
             await _db.SaveChangesAsync();

@@ -45,6 +45,18 @@
         </div>
 
         <div class="col-md-4">
+            <div class="form-check mt-4 pt-2">
+                <input asp-for="IsVatRegistered" class="form-check-input" type="checkbox" />
+                <label asp-for="IsVatRegistered" class="form-check-label">VAT registered (active)</label>
+            </div>
+            <div class="form-text">
+                Tick only while the registration is <strong>live</strong>. Bills from a supplier that is
+                not registered carry no VAT at all and are treated as commercial invoices, with the
+                whole amount charged direct to cost.
+            </div>
+        </div>
+
+        <div class="col-md-4">
             <label asp-for="TradeLicenseNumber" class="form-label">Trade Licence Number</label>
             <input asp-for="TradeLicenseNumber" class="form-control" />
             <div class="form-text">

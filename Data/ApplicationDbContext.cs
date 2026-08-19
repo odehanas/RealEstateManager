@@ -45,6 +45,7 @@ namespace RealEstateManager.Data
         public DbSet<CustomerInvoice> CustomerInvoices => Set<CustomerInvoice>();
         public DbSet<CustomerReceipt> CustomerReceipts => Set<CustomerReceipt>();
         public DbSet<VendorBill> VendorBills => Set<VendorBill>();
+        public DbSet<VendorBillLine> VendorBillLines => Set<VendorBillLine>();
         public DbSet<VendorPayment> VendorPayments => Set<VendorPayment>();
         public DbSet<SecurityDeposit> SecurityDeposits => Set<SecurityDeposit>();
         public DbSet<PrepaymentSchedule> PrepaymentSchedules => Set<PrepaymentSchedule>();
@@ -510,6 +511,63 @@ namespace RealEstateManager.Data
             modelBuilder.Entity<VendorBill>()
                 .Property(x => x.Status)
                 .HasMaxLength(30);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.VendorReference)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.Notes)
+                .HasMaxLength(1000);
+
+            // ---- Vendor bill lines ------------------------------------------
+            modelBuilder.Entity<VendorBillLine>()
+                .Property(x => x.Description)
+                .HasMaxLength(300);
+
+            modelBuilder.Entity<VendorBillLine>()
+                .Property(x => x.InputTaxAttribution)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.Quantity).HasPrecision(18, 4);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.UnitPrice).HasPrecision(18, 4);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.LineSubtotal).HasPrecision(18, 2);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.VatRate).HasPrecision(9, 4);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.VatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.RecoverableVatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.NonRecoverableVatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.AppliedRecoveryRate).HasPrecision(9, 4);
+            modelBuilder.Entity<VendorBillLine>().Property(x => x.LineTotal).HasPrecision(18, 2);
+
+            // Cascade is right here and nowhere else in this schema: a line has no
+            // meaning apart from its bill, and a draft bill is routinely re-saved with
+            // rows removed.
+            modelBuilder.Entity<VendorBillLine>()
+                .HasOne(x => x.VendorBill)
+                .WithMany(x => x.Lines)
+                .HasForeignKey(x => x.VendorBillId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<VendorBillLine>()
+                .HasOne(x => x.Account)
+                .WithMany()
+                .HasForeignKey(x => x.AccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBillLine>()
+                .HasOne(x => x.Property)
+                .WithMany()
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBillLine>()
+                .HasOne(x => x.Unit)
+                .WithMany()
+                .HasForeignKey(x => x.UnitId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBillLine>()
+                .HasIndex(x => new { x.VendorBillId, x.LineNumber });
 
             modelBuilder.Entity<VendorPayment>()
                 .Property(x => x.PaymentNumber)
@@ -1505,6 +1563,12 @@ namespace RealEstateManager.Data
 
             modelBuilder.Entity<VendorBill>()
                 .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            // A line carries no CompanyId of its own; it inherits the company of its
+            // bill. The filter has to be declared anyway, or EF warns that a filtered
+            // principal is reachable through an unfiltered dependent.
+            modelBuilder.Entity<VendorBillLine>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.VendorBill!.CompanyId == CurrentCompanyIdValue);
 
             modelBuilder.Entity<VendorPayment>()
                 .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);

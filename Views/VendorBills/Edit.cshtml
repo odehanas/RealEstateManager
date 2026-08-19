@@ -1,0 +1,446 @@
+@model RealEstateManager.Models.VendorBillEditViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "New Vendor Bill" : $"Edit Bill {Model.BillNumber}";
+
+    var vendors = ViewBag.Vendors as List<RealEstateManager.Models.VendorOptionViewModel>
+                  ?? new List<RealEstateManager.Models.VendorOptionViewModel>();
+    var properties = ViewBag.Properties as List<RealEstateManager.Domain.Property>
+                     ?? new List<RealEstateManager.Domain.Property>();
+    var accounts = ViewBag.Accounts as List<SelectListItem> ?? new List<SelectListItem>();
+    var attributions = ViewBag.Attributions as List<SelectListItem> ?? new List<SelectListItem>();
+}
+
+<style>
+    .bill-lines th { background: #0f2740; color: #fff; font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; }
+    .bill-lines td { vertical-align: middle; }
+    .bill-lines input, .bill-lines select { font-size: .86rem; }
+    .bill-lines .num { text-align: right; }
+    .line-removed { display: none; }
+    .totals-box { max-width: 380px; margin-left: auto; }
+    .totals-box .row { padding: .3rem 0; }
+    .totals-box .grand { border-top: 2px solid #0f2740; font-weight: 700; font-size: 1.05rem; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">@(isNew ? "New Vendor Bill" : $"Bill {Model.BillNumber}")</h2>
+        <p class="text-muted mb-0">
+            @if (isNew)
+            {
+                <text>The bill number is issued when you save. It stays a draft until you post it.</text>
+            }
+            else
+            {
+                <text>Draft &mdash; changes are free until this bill is posted.</text>
+            }
+        </p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+</div>
+
+@if (TempData["BillError"] != null)
+{
+    <div class="alert alert-danger">@TempData["BillError"]</div>
+}
+
+<form asp-action="@(isNew ? "Create" : "Edit")" method="post" id="billForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="VendorId" class="form-label">Supplier</label>
+                    <select asp-for="VendorId" class="form-select" id="vendorSelect" required>
+                        <option value="">-- select supplier --</option>
+                        @foreach (var vendor in vendors)
+                        {
+                            <option value="@vendor.Id"
+                                    data-vat="@(vendor.CanChargeVat ? "1" : "0")"
+                                    data-trn="@vendor.TrnNumber"
+                                    selected="@(vendor.Id == Model.VendorId ? "selected" : null)">
+                                @vendor.DisplayName
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="VendorReference" class="form-label">Supplier's Bill No.</label>
+                    <input asp-for="VendorReference" class="form-control" placeholder="As printed on their invoice" />
+                    <div class="form-text">Their number. Ours is @(isNew ? "issued on save" : Model.BillNumber).</div>
+                </div>
+
+                <div class="col-md-5">
+                    <label asp-for="ExpenseCategory" class="form-label">Category / Subject</label>
+                    <input asp-for="ExpenseCategory" class="form-control" placeholder="e.g. Building maintenance" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="BillDate" class="form-label">Bill Date</label>
+                    <input asp-for="BillDate" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="AccountingDate" class="form-label">Accounting Date</label>
+                    <input asp-for="AccountingDate" type="date" class="form-control" />
+                    <div class="form-text">Decides the period the journal lands in.</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="DueDate" class="form-label">Due Date</label>
+                    <input asp-for="DueDate" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="PropertyId" class="form-label">Default Property</label>
+                    <select asp-for="PropertyId" class="form-select" id="defaultProperty">
+                        <option value="">-- none --</option>
+                        @foreach (var property in properties)
+                        {
+                            <option value="@property.Id" selected="@(property.Id == Model.PropertyId ? "selected" : null)">
+                                @property.Code - @property.Name
+                            </option>
+                        }
+                    </select>
+                    <div class="form-text">Pre-fills new lines. Each line may differ.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* --------------------------------------------------------------------
+       The tax banner. This is the single most important thing on the form:
+       it tells the user, before they type an amount, whether this document
+       can carry VAT at all.
+       -------------------------------------------------------------------- *@
+    <div class="alert @(Model.VendorCanChargeVat ? "alert-info" : "alert-warning")" id="vatBanner">
+        <strong id="vatBannerTitle">
+            @(Model.VendorCanChargeVat ? "Tax Invoice - 5% VAT applies" : "Commercial Invoice - no VAT")
+        </strong>
+        <div class="small mt-1" id="vatBannerBody">
+            @if (Model.VendorCanChargeVat)
+            {
+                <text>
+                    This supplier holds an active VAT registration (TRN @Model.VendorTrn), so taxable lines
+                    carry 5% and the input tax is claimable to the extent the attribution allows.
+                </text>
+            }
+            else
+            {
+                <text>
+                    This supplier is not VAT registered, so no tax can be charged on the document and none
+                    can be reclaimed. The full amount is booked as a direct cost.
+                </text>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <strong>Bill Lines</strong>
+            <button type="button" class="btn btn-sm btn-dark" id="addLine">+ Add line</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm mb-0 bill-lines" id="linesTable">
+                <thead>
+                    <tr>
+                        <th style="width:26%">Description</th>
+                        <th style="width:20%">Account</th>
+                        <th style="width:14%">Property</th>
+                        <th style="width:8%" class="num">Qty</th>
+                        <th style="width:11%" class="num">Unit Price</th>
+                        <th style="width:6%">VAT</th>
+                        <th style="width:12%">Input Tax</th>
+                        <th style="width:10%" class="num">Line Total</th>
+                        <th style="width:3%"></th>
+                    </tr>
+                </thead>
+                <tbody id="linesBody">
+                    @for (var i = 0; i < Model.Lines.Count; i++)
+                    {
+                        var line = Model.Lines[i];
+                        <tr class="line-row">
+                            <td>
+                                <input type="hidden" name="Lines[@i].Id" value="@line.Id" />
+                                <input type="hidden" name="Lines[@i].IsDeleted" value="false" class="line-deleted" />
+                                <input type="text" name="Lines[@i].Description" value="@line.Description"
+                                       class="form-control form-control-sm" placeholder="What was supplied" />
+                            </td>
+                            <td>
+                                <select name="Lines[@i].AccountId" class="form-select form-select-sm">
+                                    <option value="">-- account --</option>
+                                    @foreach (var account in accounts)
+                                    {
+                                        <option value="@account.Value" selected="@(account.Value == line.AccountId?.ToString() ? "selected" : null)">
+                                            @account.Text
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <select name="Lines[@i].PropertyId" class="form-select form-select-sm">
+                                    <option value="">--</option>
+                                    @foreach (var property in properties)
+                                    {
+                                        <option value="@property.Id" selected="@(property.Id == line.PropertyId ? "selected" : null)">
+                                            @property.Code
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="Lines[@i].Quantity" value="@line.Quantity"
+                                       class="form-control form-control-sm num line-qty" />
+                            </td>
+                            <td>
+                                <input type="number" step="0.01" name="Lines[@i].UnitPrice" value="@line.UnitPrice"
+                                       class="form-control form-control-sm num line-price" />
+                            </td>
+                            <td class="text-center">
+                                @* The checkbox must come FIRST and the hidden fallback second: the
+                                   binder takes the first posted value, so the reverse order would
+                                   read false even when the box is ticked. *@
+                                <input type="checkbox" name="Lines[@i].IsTaxable" value="true"
+                                       class="form-check-input line-taxable" checked="@(line.IsTaxable ? "checked" : null)" />
+                                <input type="hidden" name="Lines[@i].IsTaxable" value="false" />
+                            </td>
+                            <td>
+                                <select name="Lines[@i].InputTaxAttribution" class="form-select form-select-sm line-attribution">
+                                    @foreach (var attribution in attributions)
+                                    {
+                                        <option value="@attribution.Value" selected="@(attribution.Value == line.InputTaxAttribution ? "selected" : null)">
+                                            @attribution.Text
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                            <td class="num line-total">0.00</td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-line" title="Remove line">&times;</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-7">
+            <label asp-for="Notes" class="form-label">Notes</label>
+            <textarea asp-for="Notes" class="form-control" rows="4"
+                      placeholder="Anything worth recording against this bill"></textarea>
+        </div>
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body totals-box">
+                    <div class="row"><div class="col">Subtotal</div><div class="col text-end" id="sumSubtotal">0.00</div></div>
+                    <div class="row"><div class="col">VAT 5%</div><div class="col text-end" id="sumVat">0.00</div></div>
+                    <div class="row grand"><div class="col">Total</div><div class="col text-end" id="sumTotal">0.00</div></div>
+                    <div class="row small text-muted">
+                        <div class="col">Recoverable input tax</div>
+                        <div class="col text-end" id="sumRecoverable">0.00</div>
+                    </div>
+                    <div class="row small text-muted">
+                        <div class="col">Added to cost (irrecoverable)</div>
+                        <div class="col text-end" id="sumIrrecoverable">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-dark">Save Draft</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const VAT_RATE = 5;
+            const body = document.getElementById('linesBody');
+            const vendorSelect = document.getElementById('vendorSelect');
+            const defaultProperty = document.getElementById('defaultProperty');
+
+            // The provisional recovery rate lives on the company; the browser shows a
+            // straight 50/50 indication for residual lines only so the user is not
+            // surprised by the split. The real figure is computed server-side on save.
+            const RESIDUAL_HINT = 0.5;
+
+            function vendorCanChargeVat() {
+                const option = vendorSelect.options[vendorSelect.selectedIndex];
+                return option ? option.getAttribute('data-vat') === '1' : false;
+            }
+
+            function updateVatBanner() {
+                const canCharge = vendorCanChargeVat();
+                const option = vendorSelect.options[vendorSelect.selectedIndex];
+                const trn = option ? (option.getAttribute('data-trn') || '') : '';
+                const banner = document.getElementById('vatBanner');
+
+                banner.classList.toggle('alert-info', canCharge);
+                banner.classList.toggle('alert-warning', !canCharge);
+
+                document.getElementById('vatBannerTitle').textContent = canCharge
+                    ? 'Tax Invoice - 5% VAT applies'
+                    : 'Commercial Invoice - no VAT';
+
+                document.getElementById('vatBannerBody').textContent = canCharge
+                    ? 'This supplier holds an active VAT registration (TRN ' + trn + '), so taxable lines carry 5% and the input tax is claimable to the extent the attribution allows.'
+                    : 'This supplier is not VAT registered, so no tax can be charged on the document and none can be reclaimed. The full amount is booked as a direct cost.';
+
+                // Tax controls are meaningless when the supplier cannot charge tax.
+                body.querySelectorAll('.line-taxable').forEach(function (box) {
+                    box.disabled = !canCharge;
+                    if (!canCharge) { box.checked = false; }
+                });
+                body.querySelectorAll('.line-attribution').forEach(function (sel) {
+                    sel.disabled = !canCharge;
+                });
+            }
+
+            function round2(value) {
+                return Math.round((value + Number.EPSILON) * 100) / 100;
+            }
+
+            function recalculate() {
+                const canCharge = vendorCanChargeVat();
+                let subtotal = 0, vat = 0, recoverable = 0, irrecoverable = 0;
+
+                body.querySelectorAll('.line-row').forEach(function (row) {
+                    if (row.classList.contains('line-removed')) { return; }
+
+                    const qty = parseFloat(row.querySelector('.line-qty').value) || 0;
+                    const price = parseFloat(row.querySelector('.line-price').value) || 0;
+                    const taxableBox = row.querySelector('.line-taxable');
+                    const taxable = canCharge && taxableBox.checked;
+
+                    const net = round2(qty * price);
+                    const lineVat = taxable ? round2(net * VAT_RATE / 100) : 0;
+
+                    let lineRecoverable = lineVat;
+                    if (taxable) {
+                        const attribution = row.querySelector('.line-attribution').value;
+                        if (attribution === 'Exempt') { lineRecoverable = 0; }
+                        else if (attribution === 'Residual') { lineRecoverable = round2(lineVat * RESIDUAL_HINT); }
+                    }
+
+                    subtotal += net;
+                    vat += lineVat;
+                    recoverable += lineRecoverable;
+                    irrecoverable += (lineVat - lineRecoverable);
+
+                    row.querySelector('.line-total').textContent = (net + lineVat).toFixed(2);
+                });
+
+                document.getElementById('sumSubtotal').textContent = subtotal.toFixed(2);
+                document.getElementById('sumVat').textContent = vat.toFixed(2);
+                document.getElementById('sumTotal').textContent = (subtotal + vat).toFixed(2);
+                document.getElementById('sumRecoverable').textContent = recoverable.toFixed(2);
+                document.getElementById('sumIrrecoverable').textContent = irrecoverable.toFixed(2);
+            }
+
+            // Row indexes must stay contiguous from zero or the model binder stops
+            // binding at the first gap. Renumber after every add or remove.
+            function renumber() {
+                let index = 0;
+                body.querySelectorAll('.line-row').forEach(function (row) {
+                    row.querySelectorAll('[name]').forEach(function (field) {
+                        field.name = field.name.replace(/Lines\[\d+\]/, 'Lines[' + index + ']');
+                    });
+                    index++;
+                });
+            }
+
+            function addLine() {
+                const rows = body.querySelectorAll('.line-row');
+                const template = rows[rows.length - 1];
+                if (!template) { return; }
+
+                const clone = template.cloneNode(true);
+                clone.classList.remove('line-removed');
+
+                clone.querySelectorAll('input').forEach(function (field) {
+                    if (field.type === 'checkbox') { field.checked = vendorCanChargeVat(); }
+                    else if (field.classList.contains('line-qty')) { field.value = '1'; }
+                    else if (field.classList.contains('line-price')) { field.value = '0'; }
+                    else if (field.classList.contains('line-deleted')) { field.value = 'false'; }
+                    else if (field.type === 'hidden' && /\.Id$/.test(field.name)) { field.value = '0'; }
+                    else if (field.type === 'text') { field.value = ''; }
+                });
+
+                // A new line inherits the header property, which is what makes entering
+                // a ten-line bill for one building bearable.
+                const propertySelect = clone.querySelector('select[name*="PropertyId"]');
+                if (propertySelect && defaultProperty) { propertySelect.value = defaultProperty.value; }
+
+                body.appendChild(clone);
+                bindRow(clone);
+                renumber();
+                recalculate();
+            }
+
+            function removeRow(row) {
+                const visible = Array.from(body.querySelectorAll('.line-row'))
+                    .filter(function (r) { return !r.classList.contains('line-removed'); });
+
+                if (visible.length <= 1) {
+                    // Never leave the grid empty - clear the row instead of removing it.
+                    row.querySelector('input[type="text"]').value = '';
+                    row.querySelector('.line-price').value = '0';
+                    recalculate();
+                    return;
+                }
+
+                if (parseInt(row.querySelector('input[name*=".Id"]').value || '0', 10) > 0) {
+                    // Existing row: flag it so the server deletes it, and keep it in the
+                    // form so the indexes stay contiguous.
+                    row.querySelector('.line-deleted').value = 'true';
+                    row.classList.add('line-removed');
+                } else {
+                    row.remove();
+                }
+
+                renumber();
+                recalculate();
+            }
+
+            function bindRow(row) {
+                row.querySelectorAll('.line-qty, .line-price, .line-taxable, .line-attribution')
+                    .forEach(function (field) {
+                        field.addEventListener('input', recalculate);
+                        field.addEventListener('change', recalculate);
+                    });
+
+                const removeButton = row.querySelector('.remove-line');
+                if (removeButton) {
+                    removeButton.addEventListener('click', function () { removeRow(row); });
+                }
+            }
+
+            body.querySelectorAll('.line-row').forEach(bindRow);
+            document.getElementById('addLine').addEventListener('click', addLine);
+            vendorSelect.addEventListener('change', function () { updateVatBanner(); recalculate(); });
+
+            // A disabled control posts nothing, which would silently flip every
+            // attribution back to the default. Re-enable them just before submit.
+            document.getElementById('billForm').addEventListener('submit', function () {
+                body.querySelectorAll('.line-taxable, .line-attribution').forEach(function (field) {
+                    field.disabled = false;
+                });
+            });
+
+            updateVatBanner();
+            recalculate();
+        })();
+    </script>
+}

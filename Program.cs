@@ -138,6 +138,7 @@ builder.Services.AddScoped<OwnerReportService>();
 builder.Services.AddScoped<CashFlowService>();
 builder.Services.AddScoped<CodeGenerationService>();
 builder.Services.AddScoped<MasterDataUniquenessService>();
+builder.Services.AddScoped<VendorBillService>();
 builder.Services.AddScoped<ContractQrService>();
 builder.Services.AddScoped<AccountingPostingService>();
 builder.Services.AddScoped<OpeningBalanceService>();

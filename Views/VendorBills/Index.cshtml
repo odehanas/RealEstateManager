@@ -2,76 +2,123 @@
 
 @{
     ViewData["Title"] = "Vendor Bills";
+
+    string Money(decimal value) => value.ToString("N2");
+}
+
+@if (TempData["BillSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["BillSuccess"]</div>
+}
+@if (TempData["BillError"] != null)
+{
+    <div class="alert alert-danger">@TempData["BillError"]</div>
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Vendor Bills</h2>
-    <a asp-action="Create" class="btn btn-dark">Add Vendor Bill</a>
+    <div>
+        <h2 class="mb-1">Vendor Bills</h2>
+        <p class="text-muted mb-0 small">
+            Bills are entered as drafts and have no effect on the accounts until posted.
+        </p>
+    </div>
+    <a asp-action="Create" class="btn btn-dark">New Bill</a>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Bill</th>
-            <th>Vendor</th>
-            <th>Property</th>
-            <th>Bill Date</th>
-            <th>Due Date</th>
-            <th>Category</th>
-            <th class="text-end">Total</th>
-            <th class="text-end">Paid</th>
-            <th class="text-end">Balance</th>
-            <th>Status</th>
-            <th>GL</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var bill in Model)
-        {
-            var balance = bill.TotalAmount - bill.AmountPaid;
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-sm mb-0">
+            <thead>
+                <tr>
+                    <th>Bill No.</th>
+                    <th>Supplier Ref.</th>
+                    <th>Supplier</th>
+                    <th>Bill Date</th>
+                    <th>Due Date</th>
+                    <th>Document</th>
+                    <th class="text-end">Net</th>
+                    <th class="text-end">VAT</th>
+                    <th class="text-end">Total</th>
+                    <th class="text-end">Balance</th>
+                    <th>Status</th>
+                    <th style="width:1%">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bill in Model)
+                {
+                    var posted = bill.JournalEntry?.IsPosted ?? false;
+                    var periodClosed = bill.JournalEntry?.AccountingPeriod?.IsClosed ?? false;
 
-            <tr>
-                <td>@bill.BillNumber</td>
-                <td>@bill.Vendor?.Name</td>
-                <td>@bill.Property?.Name</td>
-                <td>@bill.BillDate.ToString("dd/MM/yyyy")</td>
-                <td>@bill.DueDate.ToString("dd/MM/yyyy")</td>
-                <td>@bill.ExpenseCategory</td>
-                <td class="text-end">@bill.TotalAmount.ToString("N2")</td>
-                <td class="text-end">@bill.AmountPaid.ToString("N2")</td>
-                <td class="text-end">@balance.ToString("N2")</td>
-                <td>@bill.Status</td>
-                <td>
-                    @if (bill.JournalEntryId.HasValue)
-                    {
-                        <span class="badge bg-success">Posted</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark">Not Posted</span>
-                    }
-                </td>
-                <td>
-                    <div class="d-flex gap-2">
-                        @if (!bill.JournalEntryId.HasValue)
-                        {
-                            <form asp-action="Post" method="post">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@bill.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Post</button>
-                            </form>
-                        }
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@bill.Id">@bill.BillNumber</a>
+                        </td>
+                        <td class="small">@(string.IsNullOrWhiteSpace(bill.VendorReference) ? "—" : bill.VendorReference)</td>
+                        <td>@bill.Vendor?.Name</td>
+                        <td>@bill.BillDate.ToString("dd/MM/yyyy")</td>
+                        <td>@bill.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (bill.VendorIsVatRegistered && bill.VatAmount > 0m)
+                            {
+                                <span class="badge bg-info text-dark">Tax Invoice</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-dark border">Commercial</span>
+                            }
+                        </td>
+                        <td class="text-end">@Money(bill.Subtotal)</td>
+                        <td class="text-end">@Money(bill.VatAmount)</td>
+                        <td class="text-end">@Money(bill.TotalAmount)</td>
+                        <td class="text-end">@Money(bill.BalanceDue)</td>
+                        <td>
+                            @if (periodClosed)
+                            {
+                                <span class="badge bg-dark">Locked</span>
+                            }
+                            else if (posted)
+                            {
+                                <span class="badge bg-success">@bill.Status</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Draft</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-action="Details" asp-route-id="@bill.Id" class="btn btn-sm btn-outline-secondary">Open</a>
 
-                        @if (balance > 0)
-                        {
-                            <a asp-controller="VendorPayments" asp-action="Create" asp-route-billId="@bill.Id" class="btn btn-sm btn-outline-success">
-                                Pay
-                            </a>
-                        }
-                    </div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                @if (bill.IsEditable)
+                                {
+                                    <form asp-action="Post" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@bill.Id" />
+                                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                        <button type="submit" class="btn btn-sm btn-dark">Post</button>
+                                    </form>
+                                }
+                                else if (!periodClosed)
+                                {
+                                    <form asp-action="ResetToDraft" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@bill.Id" />
+                                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                        <button type="submit" class="btn btn-sm btn-outline-warning">Reset</button>
+                                    </form>
+                                }
+
+                                @if (bill.BalanceDue > 0 && posted)
+                                {
+                                    <a asp-controller="VendorPayments" asp-action="Create" asp-route-billId="@bill.Id"
+                                       class="btn btn-sm btn-outline-success">Pay</a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

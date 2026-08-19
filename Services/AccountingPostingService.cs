@@ -233,27 +233,44 @@ namespace RealEstateManager.Services
             return journalEntry;
         }
 
+        /// <summary>
+        /// Builds the journal for a multi-line vendor bill: one debit per bill line to
+        /// that line's own account carrying that line's property, one debit for the
+        /// total recoverable input tax, and one credit to Accounts Payable.
+        ///
+        /// Irrecoverable input tax is never shown separately - it is added to the line
+        /// it belongs to, because VAT that cannot be reclaimed is simply part of what
+        /// the thing cost.
+        ///
+        /// If a DRAFT journal already exists it is rebuilt rather than reused. A draft
+        /// bill can be edited after being reset, and reusing the old lines would post
+        /// figures the document no longer shows. A POSTED journal is returned untouched.
+        /// </summary>
         public async Task<JournalEntry> PostVendorBillAsync(int vendorBillId)
         {
             var bill = await _db.VendorBills
                 .Include(x => x.Vendor)
                 .Include(x => x.Property)
+                .Include(x => x.Lines)
                 .Include(x => x.JournalEntry)
                 .FirstOrDefaultAsync(x => x.Id == vendorBillId);
 
             if (bill == null)
                 throw new InvalidOperationException("Vendor bill was not found.");
 
-            if (bill.JournalEntryId.HasValue)
-            {
-                return await _db.JournalEntries
+            var existingEntry = bill.JournalEntryId.HasValue
+                ? await _db.JournalEntries
                     .Include(x => x.Lines)
-                    .FirstAsync(x => x.Id == bill.JournalEntryId.Value);
-            }
+                    .FirstOrDefaultAsync(x => x.Id == bill.JournalEntryId.Value)
+                : null;
+
+            if (existingEntry != null && existingEntry.IsPosted)
+                return existingEntry;
+
+            if (bill.Lines.Count == 0)
+                throw new InvalidOperationException($"Bill {bill.BillNumber} has no lines to post.");
 
             var settings = await GetCompanyAccountSettingAsync(bill.CompanyId);
-
-            var expenseAccount = await GetExpenseAccountForCategoryAsync(bill.CompanyId, bill.ExpenseCategory);
 
             var accountsPayableAccount = await GetMappedAccountAsync(
                 bill.CompanyId,
@@ -265,51 +282,48 @@ namespace RealEstateManager.Services
                 settings.VatRecoverableAccountId,
                 "VAT Recoverable");
 
-            // Split the input tax by attribution. Only the recoverable part is an
-            // asset; the rest is irrecoverable and must be capitalised into the
-            // expense, because VAT you cannot reclaim is simply part of what the
-            // thing cost you.
-            var company = await _db.Companies.FirstAsync(x => x.Id == bill.CompanyId);
-
-            var (recoverableVat, nonRecoverableVat, appliedRate) = VatDeterminationService.SplitInputTax(
-                bill.VatAmount,
-                bill.InputTaxAttribution,
-                company.ProvisionalVatRecoveryRate);
-
-            bill.RecoverableVatAmount = recoverableVat;
-            bill.NonRecoverableVatAmount = nonRecoverableVat;
-            bill.AppliedRecoveryRate = appliedRate;
+            // The line amounts were settled when the bill was saved. Recomputing the
+            // header here guards against a row edited directly in the database.
+            VendorBillService.RecalculateHeader(bill);
 
             var lines = new List<JournalEntryLine>();
 
-            var expenseDebit = bill.Subtotal + nonRecoverableVat;
-
-            if (expenseDebit > 0)
+            foreach (var billLine in bill.Lines.OrderBy(x => x.LineNumber))
             {
+                if (!billLine.AccountId.HasValue)
+                {
+                    throw new InvalidOperationException(
+                        $"Line {billLine.LineNumber} of bill {bill.BillNumber} has no account. " +
+                        "Open the bill and choose one before posting.");
+                }
+
+                var debit = billLine.ChargedToExpense;
+                if (debit == 0m)
+                    continue;
+
                 lines.Add(new JournalEntryLine
                 {
-                    AccountId = expenseAccount.Id,
-                    Debit = expenseDebit,
+                    AccountId = billLine.AccountId.Value,
+                    Debit = debit,
                     Credit = 0m,
-                    Description = nonRecoverableVat > 0m
-                        ? $"Expense for vendor bill {bill.BillNumber} (includes {nonRecoverableVat:N2} irrecoverable VAT)"
-                        : $"Expense for vendor bill {bill.BillNumber}",
-                    PropertyId = bill.PropertyId,
+                    Description = billLine.NonRecoverableVatAmount > 0m
+                        ? $"{billLine.Description} (includes {billLine.NonRecoverableVatAmount:N2} irrecoverable VAT)"
+                        : billLine.Description,
+                    PropertyId = billLine.PropertyId ?? bill.PropertyId,
+                    UnitId = billLine.UnitId,
                     VendorId = bill.VendorId,
                     VendorBillId = bill.Id
                 });
             }
 
-            if (recoverableVat > 0)
+            if (bill.RecoverableVatAmount > 0m)
             {
                 lines.Add(new JournalEntryLine
                 {
                     AccountId = vatRecoverableAccount.Id,
-                    Debit = recoverableVat,
+                    Debit = bill.RecoverableVatAmount,
                     Credit = 0m,
-                    Description = bill.InputTaxAttribution == InputTaxAttributions.Residual
-                        ? $"Recoverable VAT on vendor bill {bill.BillNumber} ({appliedRate:N2}% residual)"
-                        : $"Recoverable VAT on vendor bill {bill.BillNumber}",
+                    Description = $"Recoverable input tax on bill {bill.BillNumber}",
                     PropertyId = bill.PropertyId,
                     VendorId = bill.VendorId,
                     VendorBillId = bill.Id
@@ -321,22 +335,57 @@ namespace RealEstateManager.Services
                 AccountId = accountsPayableAccount.Id,
                 Debit = 0m,
                 Credit = bill.TotalAmount,
-                Description = $"Payable for vendor bill {bill.BillNumber}",
+                Description = string.IsNullOrWhiteSpace(bill.VendorReference)
+                    ? $"Payable for bill {bill.BillNumber}"
+                    : $"Payable for bill {bill.BillNumber} (supplier ref {bill.VendorReference})",
                 PropertyId = bill.PropertyId,
                 VendorId = bill.VendorId,
                 VendorBillId = bill.Id
             });
 
+            // The accounting date decides the period, not the supplier's document date.
+            var entryDate = bill.AccountingDate == default ? bill.BillDate : bill.AccountingDate;
+
+            var description = string.IsNullOrWhiteSpace(bill.VendorReference)
+                ? $"Vendor bill {bill.BillNumber}"
+                : $"Vendor bill {bill.BillNumber} - {bill.Vendor?.Name} ref {bill.VendorReference}";
+
+            if (existingEntry != null)
+            {
+                // Rebuild the existing draft in place, so the document keeps one journal
+                // for its whole life and Journal Inquiry does not fill with orphans.
+                _db.JournalEntryLines.RemoveRange(existingEntry.Lines);
+                existingEntry.Lines.Clear();
+
+                foreach (var line in lines)
+                {
+                    line.JournalEntryId = existingEntry.Id;
+                    existingEntry.Lines.Add(line);
+                }
+
+                existingEntry.EntryDate = entryDate;
+                existingEntry.Description = description;
+                existingEntry.AccountingPeriodId =
+                    (await ResolveAccountingPeriodAsync(bill.CompanyId, entryDate))?.Id;
+                existingEntry.DocumentNumber = bill.BillNumber;
+                existingEntry.ReferenceNumber = bill.VendorReference ?? bill.BillNumber;
+                existingEntry.Remarks = bill.Notes;
+
+                await _db.SaveChangesAsync();
+                return existingEntry;
+            }
+
             var journalEntry = await CreateJournalEntryAsync(
                 bill.CompanyId,
-                bill.BillDate,
-                $"Posting vendor bill {bill.BillNumber}",
+                entryDate,
+                description,
                 "VendorBill",
                 bill.Id,
                 lines,
                 journalType: "Auto",
                 documentNumber: bill.BillNumber,
-                referenceNumber: bill.BillNumber);
+                referenceNumber: bill.VendorReference ?? bill.BillNumber,
+                remarks: bill.Notes);
 
             bill.JournalEntryId = journalEntry.Id;
 
@@ -1135,44 +1184,6 @@ namespace RealEstateManager.Services
             return account;
         }
 
-        private async Task<Account> GetExpenseAccountForCategoryAsync(int companyId, string? category)
-        {
-            var settings = await GetCompanyAccountSettingAsync(companyId);
-            var normalized = (category ?? string.Empty).Trim().ToLowerInvariant();
-
-            if (normalized.Contains("depreci"))
-            {
-                return await GetMappedAccountAsync(
-                    companyId,
-                    settings.DepreciationExpenseAccountId,
-                    "Depreciation Expense");
-            }
-
-            if (normalized.Contains("finance") || normalized.Contains("interest"))
-            {
-                return await GetMappedAccountAsync(
-                    companyId,
-                    settings.FinanceCostAccountId,
-                    "Finance Cost");
-            }
-
-            if (normalized.Contains("admin") ||
-                normalized.Contains("office") ||
-                normalized.Contains("salary") ||
-                normalized.Contains("general"))
-            {
-                return await GetMappedAccountAsync(
-                    companyId,
-                    settings.GeneralExpenseDefaultAccountId,
-                    "General Expense Default");
-            }
-
-            return await GetMappedAccountAsync(
-                companyId,
-                settings.DirectExpenseDefaultAccountId,
-                "Direct Expense Default");
-        }
-
         private async Task<AccountingPeriod?> ResolveAccountingPeriodAsync(int companyId, DateTime entryDate)
         {
             return await _db.AccountingPeriods.FirstOrDefaultAsync(x =>
@@ -1280,7 +1291,9 @@ namespace RealEstateManager.Services
                 VendorId = vendorId,
                 PropertyId = propertyId,
                 BillNumber = await GenerateAutoVendorBillNumberAsync(expenseCategory),
+                VendorReference = referenceNumber,
                 BillDate = billDate.Date,
+                AccountingDate = billDate.Date,
                 DueDate = billDate.Date,
                 Subtotal = amount,
                 VatAmount = 0m,
@@ -1289,6 +1302,21 @@ namespace RealEstateManager.Services
                 ExpenseCategory = expenseCategory,
                 Status = "Posted"
             };
+
+            // A single line so the document reads like any other bill on screen. Its
+            // accounting is done by the routine that raised it, not by
+            // PostVendorBillAsync, so the line carries no account of its own.
+            bill.Lines.Add(new VendorBillLine
+            {
+                LineNumber = 1,
+                Description = $"{expenseCategory} - {sourceCode}",
+                PropertyId = propertyId,
+                Quantity = 1m,
+                UnitPrice = amount,
+                LineSubtotal = amount,
+                IsTaxable = false,
+                LineTotal = amount
+            });
 
             _db.VendorBills.Add(bill);
             await _db.SaveChangesAsync();

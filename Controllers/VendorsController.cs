@@ -52,6 +52,14 @@ namespace RealEstateManager.Controllers
             // The code is generated, never typed. Anything posted from the form is ignored.
             ModelState.Remove(nameof(model.Code));
 
+            // A registration with no number behind it cannot support an input tax claim,
+            // and would let bills charge VAT the supplier may not be entitled to.
+            if (model.IsVatRegistered && string.IsNullOrWhiteSpace(model.TrnNumber))
+            {
+                ModelState.AddModelError(nameof(model.TrnNumber),
+                    "A VAT registered supplier must have a TRN on file.");
+            }
+
             await _uniquenessService.ValidateVendorAsync(ModelState, companyId, model);
 
             if (!ModelState.IsValid)
@@ -103,6 +111,14 @@ namespace RealEstateManager.Controllers
             // never taken from the form.
             ModelState.Remove(nameof(model.Code));
 
+            // A registration with no number behind it cannot support an input tax claim,
+            // and would let bills charge VAT the supplier may not be entitled to.
+            if (model.IsVatRegistered && string.IsNullOrWhiteSpace(model.TrnNumber))
+            {
+                ModelState.AddModelError(nameof(model.TrnNumber),
+                    "A VAT registered supplier must have a TRN on file.");
+            }
+
             await _uniquenessService.ValidateVendorAsync(ModelState, companyId, model, id);
 
             if (!ModelState.IsValid)
@@ -119,6 +135,7 @@ namespace RealEstateManager.Controllers
             vendor.Email = model.Email;
             vendor.TrnNumber = model.TrnNumber;
             vendor.TradeLicenseNumber = model.TradeLicenseNumber;
+            vendor.IsVatRegistered = model.IsVatRegistered;
             vendor.OpeningBalance = model.OpeningBalance;
             vendor.IsActive = model.IsActive;
 

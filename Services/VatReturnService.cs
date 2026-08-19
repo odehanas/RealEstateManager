@@ -78,30 +78,38 @@ namespace RealEstateManager.Services
             report.OutputLines = report.OutputLines.OrderBy(x => x.VatCategory).ToList();
 
             // ----- INPUT TAX --------------------------------------------------
-            var bills = await _db.VendorBills
+            // Input tax is summed from the BILL LINES, not the header. One supplier
+            // document routinely mixes attributions - a contract covering a commercial
+            // tower and a residential block recovers on one line and not the other - so
+            // grouping by a single header attribution would misstate the claim.
+            var billLines = await _db.VendorBillLines
                 .AsNoTracking()
-                .Where(x => x.CompanyId == companyId
-                            && x.JournalEntryId != null
-                            && x.Status != "Cancelled"
-                            && x.BillDate >= startDate
-                            && x.BillDate <= endDate)
+                .Where(x => x.VendorBill != null
+                            && x.VendorBill.CompanyId == companyId
+                            && x.VendorBill.JournalEntryId != null
+                            && x.VendorBill.Status != "Cancelled"
+                            && x.VendorBill.BillDate >= startDate
+                            && x.VendorBill.BillDate <= endDate)
                 .Select(x => new
                 {
+                    x.VendorBillId,
                     x.InputTaxAttribution,
-                    x.Subtotal,
+                    x.LineSubtotal,
                     x.VatAmount,
                     x.RecoverableVatAmount,
                     x.NonRecoverableVatAmount
                 })
                 .ToListAsync();
 
-            foreach (var group in bills.GroupBy(x => x.InputTaxAttribution))
+            foreach (var group in billLines.GroupBy(x => x.InputTaxAttribution))
             {
                 report.InputLines.Add(new VatReturnInputLineDto
                 {
                     Attribution = group.Key,
-                    BillCount = group.Count(),
-                    NetAmount = group.Sum(x => x.Subtotal),
+
+                    // Documents, not lines - a five-line bill is one bill on the return.
+                    BillCount = group.Select(x => x.VendorBillId).Distinct().Count(),
+                    NetAmount = group.Sum(x => x.LineSubtotal),
                     VatAmount = group.Sum(x => x.VatAmount),
                     RecoverableVat = group.Sum(x => x.RecoverableVatAmount),
                     NonRecoverableVat = group.Sum(x => x.NonRecoverableVatAmount)
@@ -110,11 +118,11 @@ namespace RealEstateManager.Services
 
             report.InputLines = report.InputLines.OrderBy(x => x.Attribution).ToList();
 
-            report.InputVatTotal = bills.Sum(x => x.VatAmount);
-            report.InputVatRecoverable = bills.Sum(x => x.RecoverableVatAmount);
-            report.InputVatNonRecoverable = bills.Sum(x => x.NonRecoverableVatAmount);
+            report.InputVatTotal = billLines.Sum(x => x.VatAmount);
+            report.InputVatRecoverable = billLines.Sum(x => x.RecoverableVatAmount);
+            report.InputVatNonRecoverable = billLines.Sum(x => x.NonRecoverableVatAmount);
 
-            report.ResidualInputVat = bills
+            report.ResidualInputVat = billLines
                 .Where(x => x.InputTaxAttribution == InputTaxAttributions.Residual)
                 .Sum(x => x.VatAmount);
 

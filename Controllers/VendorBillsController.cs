@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
 using RealEstateManager.Domain;
@@ -7,18 +8,29 @@ using RealEstateManager.Services;
 
 namespace RealEstateManager.Controllers
 {
+    /// <summary>
+    /// Multi-line vendor bills on the Odoo document lifecycle: a bill is entered and
+    /// re-entered freely as a DRAFT, POSTED when it is agreed, and RESET TO DRAFT if it
+    /// turns out to be wrong. Only a draft may be edited, and the closed-period rules in
+    /// JournalWorkflowService govern both directions.
+    /// </summary>
     public class VendorBillsController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly AccountingPostingService _postingService;
         private readonly JournalWorkflowService _journalWorkflowService;
+        private readonly VendorBillService _vendorBillService;
 
-        public VendorBillsController(ApplicationDbContext db, AccountingPostingService postingService,
-            JournalWorkflowService journalWorkflowService)
+        public VendorBillsController(
+            ApplicationDbContext db,
+            AccountingPostingService postingService,
+            JournalWorkflowService journalWorkflowService,
+            VendorBillService vendorBillService)
         {
             _db = db;
             _postingService = postingService;
             _journalWorkflowService = journalWorkflowService;
+            _vendorBillService = vendorBillService;
         }
 
         [HttpGet]
@@ -27,6 +39,8 @@ namespace RealEstateManager.Controllers
             var bills = await _db.VendorBills
                 .Include(x => x.Vendor)
                 .Include(x => x.Property)
+                .Include(x => x.JournalEntry)
+                    .ThenInclude(x => x!.AccountingPeriod)
                 .Include(x => x.Payments)
                 .OrderByDescending(x => x.BillDate)
                 .ThenByDescending(x => x.Id)
@@ -35,81 +49,117 @@ namespace RealEstateManager.Controllers
             return View(bills);
         }
 
+        /// <summary>The bill as a document: header, lines, tax summary, printable.</summary>
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var bill = await _db.VendorBills
+                .AsNoTracking()
+                .Include(x => x.Vendor)
+                .Include(x => x.Property)
+                .Include(x => x.JournalEntry)
+                    .ThenInclude(x => x!.AccountingPeriod)
+                .Include(x => x.Lines)
+                    .ThenInclude(x => x.Account)
+                .Include(x => x.Lines)
+                    .ThenInclude(x => x.Property)
+                .Include(x => x.Payments)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (bill == null)
+                return NotFound();
+
+            ViewBag.Company = await _db.Companies.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == bill.CompanyId);
+
+            return View(bill);
+        }
+
+        // =====================================================================
+        //  CREATE / EDIT
+        // =====================================================================
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             await LoadListsAsync();
-            return View(new VendorBillCreateViewModel());
+            return View("Edit", _vendorBillService.BuildNew());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VendorBillCreateViewModel model)
+        public async Task<IActionResult> Create(VendorBillEditViewModel model)
         {
+            model.Id = 0;
+            return await SaveAsync(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var model = await _vendorBillService.BuildEditAsync(id);
+            if (model == null)
+                return NotFound();
+
+            if (!model.IsEditable)
+            {
+                TempData["BillError"] =
+                    "This bill is posted and cannot be edited. Reset it to draft first.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
             await LoadListsAsync();
-
-            var companyId = User.GetRequiredCurrentCompanyId();
-            var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
-            if (company == null)
-            {
-                ModelState.AddModelError(string.Empty, "No company record found.");
-            }
-
-            if (!await _db.Vendors.AnyAsync(x => x.Id == model.VendorId))
-            {
-                ModelState.AddModelError(nameof(model.VendorId), "Selected vendor was not found.");
-            }
-
-            if (model.PropertyId.HasValue && !await _db.Properties.AnyAsync(x => x.Id == model.PropertyId.Value))
-            {
-                ModelState.AddModelError(nameof(model.PropertyId), "Selected property was not found.");
-            }
-
-            if (await _db.VendorBills.AnyAsync(x => x.BillNumber == model.BillNumber))
-            {
-                ModelState.AddModelError(nameof(model.BillNumber), "Bill number already exists.");
-            }
-
-            if (model.Subtotal < 0 || model.VatAmount < 0)
-            {
-                ModelState.AddModelError(string.Empty, "Amounts cannot be negative.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var bill = new VendorBill
-            {
-                CompanyId = companyId,
-                VendorId = model.VendorId,
-                PropertyId = model.PropertyId,
-                BillNumber = model.BillNumber,
-                BillDate = model.BillDate,
-                DueDate = model.DueDate,
-                Subtotal = model.Subtotal,
-                VatAmount = model.VatAmount,
-                TotalAmount = model.Subtotal + model.VatAmount,
-                AmountPaid = 0m,
-                ExpenseCategory = model.ExpenseCategory,
-                InputTaxAttribution = model.InputTaxAttribution,
-                SupplierTrn = string.IsNullOrWhiteSpace(model.SupplierTrn) ? null : model.SupplierTrn.Trim(),
-                Status = "Draft"
-            };
-
-            _db.VendorBills.Add(bill);
-            await _db.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Post(int id)
+        public async Task<IActionResult> Edit(VendorBillEditViewModel model)
         {
-            // A bill is already a draft DOCUMENT, so Post writes the journal and posts
-            // it in one click. Reset to Draft is then available from Journal Inquiry.
+            if (model.Id == 0)
+                return NotFound();
+
+            return await SaveAsync(model);
+        }
+
+        private async Task<IActionResult> SaveAsync(VendorBillEditViewModel model)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+
+            var bill = await _vendorBillService.SaveAsync(ModelState, companyId, model);
+
+            if (bill == null)
+            {
+                await LoadListsAsync();
+                await RefreshVendorContextAsync(model);
+
+                // The grid clones its last row to add a new one, so a form redisplayed
+                // with no rows at all would be impossible to fill in.
+                if (model.Lines.Count == 0)
+                    model.Lines.Add(new VendorBillLineViewModel { Quantity = 1m });
+
+                return View("Edit", model);
+            }
+
+            TempData["BillSuccess"] =
+                $"Bill {bill.BillNumber} saved as a draft. Review it, then post it to book it to the accounts.";
+
+            return RedirectToAction(nameof(Details), new { id = bill.Id });
+        }
+
+        // =====================================================================
+        //  WORKFLOW
+        // =====================================================================
+
+        /// <summary>
+        /// Draft to Posted. The journal is built from the current lines - rebuilt if the
+        /// bill was reset and amended - and then posted through the workflow service, so
+        /// the closed-period rules apply here exactly as they do anywhere else.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Post(int id, string? returnUrl)
+        {
             try
             {
                 var journal = await _postingService.PostVendorBillAsync(id);
@@ -122,13 +172,102 @@ namespace RealEstateManager.Controllers
                 TempData["BillError"] = ex.Message;
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectBack(returnUrl, id);
+        }
+
+        /// <summary>
+        /// Posted back to Draft. Refused by the workflow service if the period is closed
+        /// or a payment has already been made against the bill.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetToDraft(int id, string? returnUrl)
+        {
+            var bill = await _db.VendorBills.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (bill?.JournalEntryId == null)
+            {
+                TempData["BillError"] = "This bill has no journal entry to reset.";
+                return RedirectBack(returnUrl, id);
+            }
+
+            var result = await _journalWorkflowService.ResetToDraftAsync(bill.JournalEntryId.Value);
+            TempData[result.Success ? "BillSuccess" : "BillError"] = result.Message;
+
+            return RedirectBack(returnUrl, id);
+        }
+
+        // =====================================================================
+        //  HELPERS
+        // =====================================================================
+
+        private IActionResult RedirectBack(string? returnUrl, int id)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        /// <summary>
+        /// Re-reads the supplier so a redisplayed form still shows the right tax
+        /// position - whether VAT may be charged at all is the first thing the user
+        /// needs to see, and it must not go stale because validation failed.
+        /// </summary>
+        private async Task RefreshVendorContextAsync(VendorBillEditViewModel model)
+        {
+            var vendor = await _db.Vendors.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == model.VendorId);
+
+            model.VendorCanChargeVat = vendor?.CanChargeVat ?? false;
+            model.VendorTrn = vendor?.TrnNumber;
         }
 
         private async Task LoadListsAsync()
         {
-            ViewBag.Vendors = await _db.Vendors.OrderBy(x => x.Code).ToListAsync();
-            ViewBag.Properties = await _db.Properties.OrderBy(x => x.Code).ToListAsync();
+            ViewBag.Vendors = await _db.Vendors
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Code)
+                .Select(x => new VendorOptionViewModel
+                {
+                    Id = x.Id,
+                    Code = x.Code,
+                    Name = x.Name,
+                    TrnNumber = x.TrnNumber,
+                    IsVatRegistered = x.IsVatRegistered
+                })
+                .ToListAsync();
+
+            ViewBag.Properties = await _db.Properties
+                .AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Code)
+                .ToListAsync();
+
+            // Only real, postable expense and asset accounts - a bill line cannot be
+            // charged to a heading, and never to a revenue or payable account.
+            ViewBag.Accounts = await _db.Accounts
+                .AsNoTracking()
+                .Where(x => x.IsActive
+                            && x.IsPostable
+                            && !x.IsGroup
+                            && (x.AccountType == "Expense" || x.AccountType == "Asset"))
+                .OrderBy(x => x.Code)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = x.Code + " - " + x.Name
+                })
+                .ToListAsync();
+
+            ViewBag.Attributions = InputTaxAttributions.All
+                .Select(x => new SelectListItem
+                {
+                    Value = x,
+                    Text = InputTaxAttributions.Describe(x)
+                })
+                .ToList();
         }
     }
 }
