@@ -1,0 +1,433 @@
+/* ===========================================================================
+   document-print.css
+
+   Print rules for the whole application, loaded with media="print" so it costs
+   nothing on screen.
+
+   Two parts:
+
+   1. A reset that strips the application away - navigation, buttons, cards,
+      the container's max width - so a page prints as a document rather than as
+      a screenshot of a web page.
+
+   2. The .doc-* classes, which lay a business document out properly: a
+      letterhead, a meta block, a lines table that repeats its header across
+      pages, a totals panel and a signature strip.
+
+   Deliberately built from rules and type rather than filled backgrounds. Heavy
+   dark blocks look striking on a monitor and print as a smear of toner; thin
+   rules and disciplined spacing read as expensive on paper.
+   =========================================================================== */
+
+@page {
+    size: A4 portrait;
+    margin: 12mm 12mm 14mm 12mm;
+}
+
+/* ---------------------------------------------------------------------------
+   1. STRIP THE APPLICATION
+   --------------------------------------------------------------------------- */
+
+body {
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* Chrome that has no business on paper. */
+header,
+nav,
+.navbar,
+footer,
+.no-print,
+.btn,
+form.d-inline,
+.dropdown-menu {
+    display: none !important;
+}
+
+/* Bootstrap's container caps the width for reading on a monitor. On paper the
+   page margin already does that job, so the cap only wastes the sheet. */
+.container,
+.container-fluid {
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Cards are a screen affordance. On paper they become plain sections. */
+.card,
+.card-body,
+.card-header {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.shadow-sm,
+.shadow {
+    box-shadow: none !important;
+}
+
+a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* Alerts are screen feedback and are dropped, unless the message is part of the
+   document itself - a bill that carries no VAT has to say so on paper. */
+.alert {
+    display: none !important;
+}
+
+.alert.print-keep {
+    display: block !important;
+    border: 0 !important;
+    border-left: 2.5pt solid #333 !important;
+    background: transparent !important;
+    color: #111 !important;
+    padding: 4pt 0 4pt 8pt !important;
+    margin: 0 0 8pt 0 !important;
+    border-radius: 0 !important;
+    font-size: 9pt;
+}
+
+/* Bootstrap stripes rows with an inset box-shadow, which prints as a grey wash.
+   Kill that everywhere, and soften the cell rules - but leave the padding alone,
+   because every other report in the application relies on it. The document
+   tables below override padding through their own, more specific selectors. */
+.table > :not(caption) > * > * {
+    box-shadow: none !important;
+    background-color: transparent !important;
+    border-color: #ccc !important;
+}
+
+.table,
+.table-sm {
+    --bs-table-accent-bg: transparent !important;
+    margin: 0 !important;
+}
+
+/* The horizontal scroller is meaningless on paper and can clip the last column. */
+.table-responsive {
+    overflow: visible !important;
+}
+
+/* Badges print as small caps text rather than coloured pills. */
+.badge {
+    background: transparent !important;
+    color: #111 !important;
+    border: 0.75pt solid #555 !important;
+    border-radius: 0 !important;
+    font-weight: 600 !important;
+    font-size: 7.5pt !important;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 1.5pt 4pt !important;
+}
+
+/* ---------------------------------------------------------------------------
+   2. THE DOCUMENT
+   --------------------------------------------------------------------------- */
+
+.doc {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #111;
+}
+
+/* ---- Letterhead ---------------------------------------------------------- */
+
+.doc-letterhead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12mm;
+    padding-bottom: 4mm;
+    border-bottom: 1.5pt solid #111;
+    margin-bottom: 5mm;
+}
+
+.doc-issuer-name {
+    font-size: 15pt;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    line-height: 1.1;
+    margin: 0 0 1.5mm 0;
+}
+
+.doc-issuer-detail {
+    font-size: 8.5pt;
+    color: #444;
+    line-height: 1.45;
+}
+
+.doc-title-block {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.doc-title {
+    font-size: 12pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin: 0 0 1mm 0;
+}
+
+.doc-number {
+    font-size: 13pt;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin: 0 0 1.5mm 0;
+}
+
+.doc-status {
+    font-size: 8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    border: 1pt solid #111;
+    padding: 1mm 2.5mm;
+    display: inline-block;
+}
+
+/* ---- Meta panels --------------------------------------------------------- */
+
+.doc-meta {
+    display: flex;
+    gap: 6mm;
+    margin-bottom: 5mm;
+    page-break-inside: avoid;
+}
+
+.doc-panel {
+    flex: 1;
+    border: 0.75pt solid #bbb;
+    padding: 3mm 3.5mm;
+}
+
+.doc-panel-title {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #666;
+    border-bottom: 0.5pt solid #ddd;
+    padding-bottom: 1.5mm;
+    margin-bottom: 2mm;
+}
+
+.doc-field {
+    display: flex;
+    justify-content: space-between;
+    gap: 4mm;
+    font-size: 9pt;
+    padding: .6mm 0;
+}
+
+.doc-field dt,
+.doc-field .label {
+    color: #666;
+    font-weight: 400;
+}
+
+.doc-field dd,
+.doc-field .value {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+}
+
+.doc-party-name {
+    font-size: 10.5pt;
+    font-weight: 700;
+    margin-bottom: .5mm;
+}
+
+.doc-party-line {
+    font-size: 8.5pt;
+    color: #444;
+}
+
+/* ---- Lines table --------------------------------------------------------- */
+
+.doc-lines {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 5mm;
+    font-size: 8.8pt;
+}
+
+.doc-lines thead {
+    /* Repeat the header on every sheet a long bill spills onto. */
+    display: table-header-group;
+}
+
+/* Written as full descendant chains on purpose. Bootstrap's cell rules are
+   `.table-bordered > :not(caption) > * > *`, which scores one class and one
+   element; `table.doc-lines > thead > tr > th` scores one class and four, so it
+   wins on specificity without needing !important on every declaration and
+   without a blanket reset that would hit every other table in the application.
+
+   No vertical rules: a column grid makes a document look like a spreadsheet.
+   Horizontal rules alone are what make it read as an invoice. */
+table.doc-lines > thead > tr > th {
+    background: #f0f2f5;
+    color: #111;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    text-align: left;
+    padding: 2mm;
+    border: 0;
+    border-top: 1pt solid #111;
+    border-bottom: 1pt solid #111;
+    white-space: nowrap;
+}
+
+table.doc-lines > thead > tr > th.num {
+    text-align: right;
+}
+
+table.doc-lines > tbody > tr > td {
+    padding: 2mm;
+    border: 0;
+    border-bottom: 0.5pt solid #ddd;
+    vertical-align: top;
+}
+
+.doc-lines tbody tr {
+    page-break-inside: avoid;
+}
+
+.doc-lines .num,
+.doc-lines th.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.doc-lines .seq {
+    color: #888;
+    width: 6mm;
+}
+
+.doc-line-note {
+    display: block;
+    font-size: 7.5pt;
+    color: #666;
+    margin-top: .6mm;
+}
+
+.doc-line-sub {
+    font-size: 7.8pt;
+    color: #555;
+}
+
+/* Reference codes are read as one token - breaking MNG-C-0001 across two lines
+   makes it harder to match against the paperwork, so they never wrap. */
+.doc-lines .code {
+    white-space: nowrap;
+}
+
+/* ---- Totals -------------------------------------------------------------- */
+
+.doc-close {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8mm;
+    page-break-inside: avoid;
+}
+
+.doc-close-left {
+    flex: 1;
+    font-size: 8.5pt;
+    color: #444;
+}
+
+.doc-totals {
+    width: 72mm;
+    flex-shrink: 0;
+}
+
+.doc-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.3mm 0;
+    font-size: 9.2pt;
+    border-bottom: 0.5pt solid #e5e5e5;
+}
+
+.doc-total-row .amount {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.doc-total-row.grand {
+    border-top: 1pt solid #111;
+    border-bottom: 1pt solid #111;
+    font-size: 11pt;
+    font-weight: 700;
+    padding: 2mm 0;
+    margin-top: .5mm;
+}
+
+.doc-total-row.balance {
+    font-weight: 700;
+    border-bottom: 0;
+}
+
+.doc-total-row.muted {
+    font-size: 8pt;
+    color: #666;
+    border-bottom: 0;
+    padding: .5mm 0;
+}
+
+.doc-total-row.muted .amount {
+    font-weight: 400;
+}
+
+/* ---- Notes, signatures, footer ------------------------------------------- */
+
+.doc-notes {
+    border: 0.75pt solid #bbb;
+    padding: 2.5mm 3mm;
+    font-size: 8.5pt;
+    margin-bottom: 4mm;
+}
+
+.doc-signatures {
+    display: flex;
+    gap: 10mm;
+    margin-top: 12mm;
+    page-break-inside: avoid;
+}
+
+.doc-signature {
+    flex: 1;
+    border-top: 0.75pt solid #111;
+    padding-top: 1.5mm;
+    font-size: 8pt;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.doc-footer {
+    margin-top: 6mm;
+    padding-top: 2mm;
+    border-top: 0.5pt solid #ccc;
+    font-size: 7.5pt;
+    color: #777;
+    display: flex;
+    justify-content: space-between;
+}
