@@ -1,0 +1,97 @@
+﻿@model IEnumerable<RealEstateManager.Domain.RevenueRecognitionSchedule>
+
+@{
+    ViewData["Title"] = "Revenue Recognition";
+    var asOfDate = (DateTime)ViewBag.AsOfDate;
+    var showPosted = (bool)ViewBag.ShowPosted;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Revenue Recognition</h2>
+</div>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <label class="form-label">As Of Date</label>
+        <input type="date" name="asOfDate" value="@asOfDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Show Posted</label>
+        <select name="showPosted" class="form-select">
+            @if (showPosted)
+            {
+                <option value="true" selected>Yes</option>
+                <option value="false">No</option>
+            }
+            else
+            {
+                <option value="true">Yes</option>
+                <option value="false" selected>No</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark">Refresh</button>
+    </div>
+</form>
+
+<form asp-action="PostDue" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="asOfDate" value="@asOfDate.ToString("yyyy-MM-dd")" />
+    <input type="hidden" name="showPosted" value="@showPosted.ToString().ToLower()" />
+    <button type="submit" class="btn btn-success">Post All Due Up To Selected Date</button>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Lease</th>
+            <th>Property</th>
+            <th>Unit</th>
+            <th>Tenant</th>
+            <th class="text-end">Amount</th>
+            <th>Status</th>
+            <th>GL</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.RecognitionDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.Lease?.ContractNumber</td>
+                <td>@item.Lease?.Unit?.Property?.Name</td>
+                <td>@item.Lease?.Unit?.UnitNumber</td>
+                <td>@item.Lease?.Tenant?.FullName</td>
+                <td class="text-end">@item.Amount.ToString("N2")</td>
+                <td>@item.Status</td>
+                <td>
+                    @if (item.JournalEntryId.HasValue)
+                    {
+                        <span class="badge bg-success">Posted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Not Posted</span>
+                    }
+                </td>
+                <td>
+                    @if (!item.JournalEntryId.HasValue)
+                    {
+                        <form asp-action="Post" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="asOfDate" value="@asOfDate.ToString("yyyy-MM-dd")" />
+                            <input type="hidden" name="showPosted" value="@showPosted.ToString().ToLower()" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Post</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

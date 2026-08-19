@@ -1,0 +1,125 @@
+@model List<RealEstateManager.Models.OwnerWithdrawalCategoryListItemViewModel>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Owner Withdrawal Categories";
+    var ownerAccounts = ViewBag.OwnerAccounts as List<Account> ?? new();
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Owner Withdrawal Categories</h2>
+        <p class="text-muted mb-0">
+            The analysis dimension for the owner's own expenditure &mdash; separate from the chart of accounts
+            and from unit cost centres.
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Reports" asp-action="OwnerWithdrawals" class="btn btn-outline-secondary btn-sm">Owner Withdrawals Report</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">New Category</a>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <strong>How this works.</strong>
+    Money the owner takes out of the business is not a company expense &mdash; it is a movement in equity.
+    The journal posts to a single equity account (an <em>owner's current account</em>) and carries a category
+    from this list to say what it was spent on. Company expense accounts stay clean, and the owner still gets
+    a full breakdown of their spending.
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <strong>Owner equity accounts</strong>
+        <span class="text-muted small ms-2">Accounts flagged as an owner's current account</span>
+    </div>
+    <div class="card-body py-3">
+        @if (ownerAccounts.Count == 0)
+        {
+            <div class="text-danger mb-0">
+                No account is currently flagged as an owner's current account. Open
+                <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the equity account you use
+                (for example <code>34100</code>), and tick <strong>Is Owner Account</strong>.
+                Until then the category column in the General Journal stays disabled on every line.
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-wrap gap-2 mb-0">
+                @foreach (var account in ownerAccounts)
+                {
+                    <span class="badge bg-dark fs-6 fw-normal">@account.Code &mdash; @account.Name</span>
+                }
+            </div>
+            <div class="text-muted small mt-2 mb-0">
+                Add one account per owner (<code>34200</code>, <code>34300</code>&hellip;) if you need to track
+                several owners separately. The same category list applies to all of them.
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">No categories have been created yet.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:110px">Code</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="text-end" style="width:90px">Order</th>
+                        <th class="text-end" style="width:110px">Lines Used</th>
+                        <th class="text-end" style="width:150px">Net Posted</th>
+                        <th class="text-center" style="width:90px">Status</th>
+                        <th style="width:80px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model)
+                    {
+                        <tr class="@(row.IsActive ? "" : "text-muted")">
+                            <td><code>@row.Code</code></td>
+                            <td class="fw-semibold">@row.Name</td>
+                            <td class="small">@row.Description</td>
+                            <td class="text-end">@row.SortOrder</td>
+                            <td class="text-end">@row.UsageCount</td>
+                            <td class="text-end">@row.NetAmount.ToString("N2")</td>
+                            <td class="text-center">
+                                @if (row.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@row.Id" class="btn btn-outline-secondary btn-sm">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="4">Total</th>
+                        <th class="text-end">@Model.Sum(x => x.UsageCount)</th>
+                        <th class="text-end">@Model.Sum(x => x.NetAmount).ToString("N2")</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-2 mb-0">
+        A category that has already been used cannot be removed, because posted journals reference it.
+        Deactivate it instead &mdash; it then disappears from the General Journal selector while its history
+        stays intact.
+    </p>
+}

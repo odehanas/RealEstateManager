@@ -1,0 +1,205 @@
+@model RealEstateManager.Services.PropertyProfitAndLossReportDto
+@{
+    ViewData["Title"] = "Profit & Loss by Property";
+    var propertyOptions = ViewBag.PropertyOptions as List<RealEstateManager.Services.PropertyColumnDto>
+        ?? new List<RealEstateManager.Services.PropertyColumnDto>();
+    var cols = Model.Columns;
+}
+
+<style>
+    .pnl-matrix { font-size: .85rem; }
+    .pnl-matrix th, .pnl-matrix td { white-space: nowrap; }
+    .pnl-matrix thead th { position: sticky; top: 0; background: #0f2740; color: #fff; z-index: 2; }
+    .pnl-matrix th.acct, .pnl-matrix td.acct { white-space: normal; min-width: 230px; }
+    .pnl-matrix .grp td {
+        background: #eef2f7; font-weight: 700; color: #0f2740;
+        text-transform: uppercase; letter-spacing: .04em; font-size: .74rem;
+    }
+    .pnl-matrix tfoot td, .pnl-matrix .subtotal td { font-weight: 700; background: #f7f9fb; }
+    .pnl-matrix .net td { background: #0f2740; color: #fff; font-weight: 700; }
+    .pnl-matrix .unalloc { background: #fff8e6 !important; }
+    .neg { color: #a3341f; }
+    .scroll-x { overflow-x: auto; }
+    @@media print { .no-print { display: none !important; } .pnl-matrix thead th { position: static; } }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Profit &amp; Loss by Property</h2>
+        <p class="text-muted mb-0">
+            General ledger revenue and expenses analysed over the property dimension carried on each journal line.
+        </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label mb-1" for="startDate">From Date</label>
+        <input type="date" class="form-control form-control-sm" id="startDate" name="startDate"
+               value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="endDate">To Date</label>
+        <input type="date" class="form-control form-control-sm" id="endDate" name="endDate"
+               value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="propertyId">Property</label>
+        <select class="form-select form-select-sm" id="propertyId" name="propertyId">
+            <option value="">All properties</option>
+            @foreach (var option in propertyOptions)
+            {
+                <option value="@option.PropertyId" selected="@(Model.FilteredPropertyId == option.PropertyId ? "selected" : null)">
+                    @option.PropertyCode - @option.PropertyName
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+    </div>
+</form>
+
+<div class="d-none d-print-block mb-3">
+    <strong>Period:</strong> @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Total Revenue</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalRevenue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Total Expenses</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalExpenses.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-0 @(Model.NetProfitOrLoss >= 0 ? "bg-primary" : "bg-danger") text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Net @(Model.NetProfitOrLoss >= 0 ? "Profit" : "Loss")</div>
+                <div class="h4 fw-bold mb-0">@Model.NetProfitOrLoss.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.HasUnallocatedActivity)
+{
+    <div class="alert alert-warning py-2 small">
+        <strong>Unallocated column present.</strong>
+        Some revenue or expense lines carry no property dimension &mdash; most commonly manual journals
+        posted without a unit / cost centre. Reopen those journals and set the unit so the amount is
+        attributed to a property. The matrix total always reconciles to the general ledger Profit &amp; Loss
+        for the same dates, whether or not lines are allocated.
+    </div>
+}
+
+@if (cols.Count == 0)
+{
+    <div class="alert alert-info">No revenue or expense activity was posted in this period.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm mb-0 pnl-matrix">
+                <thead>
+                    <tr>
+                        <th class="acct">Account</th>
+                        @foreach (var col in cols)
+                        {
+                            <th class="text-end @(col.PropertyId.HasValue ? "" : "unalloc")">
+                                @col.PropertyCode
+                                <div class="fw-normal opacity-75" style="font-size:.72rem">@col.PropertyName</div>
+                            </th>
+                        }
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="grp"><td colspan="@(cols.Count + 2)">Revenue</td></tr>
+                    @foreach (var row in Model.Revenue)
+                    {
+                        <tr>
+                            <td class="acct"><span class="text-muted">@row.AccountCode</span> @row.AccountName</td>
+                            @foreach (var col in cols)
+                            {
+                                var amount = row.AmountFor(col.Key);
+                                <td class="text-end @(col.PropertyId.HasValue ? "" : "unalloc") @(amount < 0 ? "neg" : "")">
+                                    @(amount == 0m ? "-" : amount.ToString("N2"))
+                                </td>
+                            }
+                            <td class="text-end fw-semibold @(row.Total < 0 ? "neg" : "")">@row.Total.ToString("N2")</td>
+                        </tr>
+                    }
+                    <tr class="subtotal">
+                        <td>Total Revenue</td>
+                        @foreach (var col in cols)
+                        {
+                            <td class="text-end">@Model.RevenueFor(col.Key).ToString("N2")</td>
+                        }
+                        <td class="text-end">@Model.TotalRevenue.ToString("N2")</td>
+                    </tr>
+
+                    <tr class="grp"><td colspan="@(cols.Count + 2)">Expenses</td></tr>
+                    @foreach (var row in Model.Expenses)
+                    {
+                        <tr>
+                            <td class="acct"><span class="text-muted">@row.AccountCode</span> @row.AccountName</td>
+                            @foreach (var col in cols)
+                            {
+                                var amount = row.AmountFor(col.Key);
+                                <td class="text-end @(col.PropertyId.HasValue ? "" : "unalloc") @(amount < 0 ? "neg" : "")">
+                                    @(amount == 0m ? "-" : amount.ToString("N2"))
+                                </td>
+                            }
+                            <td class="text-end fw-semibold @(row.Total < 0 ? "neg" : "")">@row.Total.ToString("N2")</td>
+                        </tr>
+                    }
+                    <tr class="subtotal">
+                        <td>Total Expenses</td>
+                        @foreach (var col in cols)
+                        {
+                            <td class="text-end">@Model.ExpensesFor(col.Key).ToString("N2")</td>
+                        }
+                        <td class="text-end">@Model.TotalExpenses.ToString("N2")</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="net">
+                        <td>Net Profit / (Loss)</td>
+                        @foreach (var col in cols)
+                        {
+                            <td class="text-end">@Model.NetFor(col.Key).ToString("N2")</td>
+                        }
+                        <td class="text-end">@Model.NetProfitOrLoss.ToString("N2")</td>
+                    </tr>
+                    <tr class="subtotal">
+                        <td>Net Margin %</td>
+                        @foreach (var col in cols)
+                        {
+                            <td class="text-end">@Model.MarginFor(col.Key).ToString("N1")%</td>
+                        }
+                        <td class="text-end">
+                            @((Model.TotalRevenue == 0m ? 0m : Math.Round(Model.NetProfitOrLoss / Model.TotalRevenue * 100m, 1)).ToString("N1"))%
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-2 mb-0">
+        Revenue is shown as credits less debits; expenses as debits less credits. A negative figure therefore
+        indicates a reversal or reclassification in the period.
+    </p>
+}

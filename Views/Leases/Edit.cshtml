@@ -1,0 +1,111 @@
+@model RealEstateManager.Models.LeaseCreateViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Edit Lease";
+    var units = ViewBag.Units as List<Unit> ?? new();
+    var tenants = ViewBag.Tenants as List<Tenant> ?? new();
+    var id = ViewBag.Id;
+}
+
+<h2>Edit Lease</h2>
+
+<form asp-action="Edit" asp-route-id="@id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="ContractNumber" class="form-label">Contract Code</label>
+            <input asp-for="ContractNumber" class="form-control bg-light" readonly />
+            <div class="form-text">Fixed once issued &mdash; it appears on the signed contract and in its QR code.</div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="UnitId" class="form-label"></label>
+            <select asp-for="UnitId" class="form-select">
+                <option value="">Select Unit</option>
+                @foreach (var unit in units)
+                {
+                    <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="TenantId" class="form-label"></label>
+            <select asp-for="TenantId" class="form-select">
+                <option value="">Select Tenant</option>
+                @foreach (var tenant in tenants)
+                {
+                    <option value="@tenant.Id">@tenant.Code - @tenant.FullName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="StartDate" class="form-label"></label>
+            <input asp-for="StartDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EndDate" class="form-label"></label>
+            <input asp-for="EndDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="AnnualRent" class="form-label"></label>
+            <input asp-for="AnnualRent" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="BillingFrequencyMonths" class="form-label"></label>
+            <select asp-for="BillingFrequencyMonths" class="form-select">
+                <option value="1">Monthly</option>
+                <option value="2">Every 2 Months</option>
+                <option value="3">Quarterly</option>
+                <option value="4">Every 4 Months</option>
+                <option value="6">Semi-Annual</option>
+                <option value="12">Annual</option>
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="VatCategoryOverride" class="form-label">VAT Treatment</label>
+            <select asp-for="VatCategoryOverride" class="form-select">
+                <option value="">Use the unit's treatment</option>
+                <option value="Standard">Override &mdash; Standard rated (5%)</option>
+                <option value="Exempt">Override &mdash; Exempt</option>
+                <option value="ZeroRated">Override &mdash; Zero rated (0%)</option>
+            </select>
+            <div class="form-text">
+                Changing this affects invoices generated <strong>from now on</strong>. Invoices already
+                raised keep the treatment they were issued under.
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="VatOverrideReason" class="form-label">Reason For Override</label>
+            <input asp-for="VatOverrideReason" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="SecurityDepositAmount" class="form-label"></label>
+            <input asp-for="SecurityDepositAmount" class="form-control" />
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Notes" class="form-label"></label>
+            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

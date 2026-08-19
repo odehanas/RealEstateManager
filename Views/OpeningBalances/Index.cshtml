@@ -1,0 +1,284 @@
+@model RealEstateManager.Models.OpeningBalanceReconciliationViewModel
+
+@{
+    ViewData["Title"] = "Opening Balances";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Opening Balances</h2>
+        <div class="text-muted">
+            Per-account opening balances combined with sub-ledger detail for
+            Accounts Receivable, Accounts Payable and Fixed Assets.
+        </div>
+    </div>
+    <div>
+        <a asp-controller="ChartOfAccounts" asp-action="Index" class="btn btn-sm btn-outline-secondary">Chart of Accounts</a>
+        <a asp-controller="Tenants" asp-action="Index" class="btn btn-sm btn-outline-secondary">Tenants</a>
+        <a asp-controller="Vendors" asp-action="Index" class="btn btn-sm btn-outline-secondary">Vendors</a>
+        <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-secondary">Fixed Assets</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Debit Opening Balance</div>
+                <div class="h4 mb-0 text-success">@Model.TotalDebitOpeningBalance.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Total Credit Opening Balance</div>
+                <div class="h4 mb-0 text-danger">@Model.TotalCreditOpeningBalance.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Net Imbalance (Dr - Cr)</div>
+                @if (Model.NetImbalance == 0m)
+                {
+                    <div class="h4 mb-0 text-success">0.00 &nbsp;<span class="badge bg-success">Balanced</span></div>
+                }
+                else
+                {
+                    <div class="h4 mb-0 text-danger">@Model.NetImbalance.ToString("N2") &nbsp;<span class="badge bg-danger">Out of Balance</span></div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.NetImbalance != 0m)
+{
+    <div class="alert alert-warning">
+        <strong>Opening balances are not balanced.</strong>
+        Total debit opening balances must equal total credit opening balances for the
+        Trial Balance and Balance Sheet to remain in balance from day one.
+        Review the manual opening balance on the equity / retained earnings account
+        (or the contra account you use for the opening journal) so that the difference
+        is zero.
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <strong>GL Account Opening Balances</strong>
+        <span class="text-muted small">Postable accounts only</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Account</th>
+                    <th>Type</th>
+                    <th>Source</th>
+                    <th class="text-end">Manual OB</th>
+                    <th class="text-end">Sub-ledger Total</th>
+                    <th class="text-end">Effective OB</th>
+                    <th class="text-end">Debit</th>
+                    <th class="text-end">Credit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td><code>@row.AccountCode</code></td>
+                        <td>@row.AccountName</td>
+                        <td><span class="badge bg-secondary">@row.AccountType</span></td>
+                        <td>
+                            @switch (row.Source)
+                            {
+                                case "AccountsReceivable":
+                                    <span class="badge bg-primary">AR Sub-ledger</span>
+                                    break;
+                                case "AccountsPayable":
+                                    <span class="badge bg-primary">AP Sub-ledger</span>
+                                    break;
+                                case "FixedAssetCost":
+                                    <span class="badge bg-primary">Fixed Asset Cost</span>
+                                    break;
+                                case "FixedAssetAccumDepreciation":
+                                    <span class="badge bg-primary">Fixed Asset Acc. Dep.</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">Manual</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (row.IsControlAccount)
+                            {
+                                <span class="text-muted">&mdash;</span>
+                            }
+                            else
+                            {
+                                @row.ManualOpeningBalance.ToString("N2")
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (row.IsControlAccount)
+                            {
+                                @row.SubLedgerTotal.ToString("N2")
+                            }
+                            else
+                            {
+                                <span class="text-muted">&mdash;</span>
+                            }
+                        </td>
+                        <td class="text-end fw-semibold">@row.EffectiveOpeningBalance.ToString("N2")</td>
+                        <td class="text-end">@(row.DebitOpeningBalance == 0m ? "" : row.DebitOpeningBalance.ToString("N2"))</td>
+                        <td class="text-end">@(row.CreditOpeningBalance == 0m ? "" : row.CreditOpeningBalance.ToString("N2"))</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-light fw-semibold">
+                    <td colspan="7" class="text-end">Totals</td>
+                    <td class="text-end">@Model.TotalDebitOpeningBalance.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalCreditOpeningBalance.ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <strong>Tenant Opening Balances (Accounts Receivable)</strong>
+        <a asp-controller="Tenants" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Tenants</a>
+    </div>
+    @if (Model.TenantOpeningBalances.Any(x => x.OpeningBalance != 0m))
+    {
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Tenant</th>
+                        <th class="text-end">Opening Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.TenantOpeningBalances.Where(x => x.OpeningBalance != 0m))
+                    {
+                        <tr>
+                            <td><code>@t.EntityCode</code></td>
+                            <td>@t.EntityName</td>
+                            <td class="text-end">@t.OpeningBalance.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-light fw-semibold">
+                        <td colspan="2" class="text-end">Total</td>
+                        <td class="text-end">@Model.TenantOpeningTotal.ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="card-body text-muted">No tenant opening balances captured.</div>
+    }
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <strong>Vendor Opening Balances (Accounts Payable)</strong>
+        <a asp-controller="Vendors" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Vendors</a>
+    </div>
+    @if (Model.VendorOpeningBalances.Any(x => x.OpeningBalance != 0m))
+    {
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Vendor</th>
+                        <th class="text-end">Opening Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.VendorOpeningBalances.Where(x => x.OpeningBalance != 0m))
+                    {
+                        <tr>
+                            <td><code>@v.EntityCode</code></td>
+                            <td>@v.EntityName</td>
+                            <td class="text-end">@v.OpeningBalance.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-light fw-semibold">
+                        <td colspan="2" class="text-end">Total</td>
+                        <td class="text-end">@Model.VendorOpeningTotal.ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="card-body text-muted">No vendor opening balances captured.</div>
+    }
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <strong>Fixed Asset Opening Balances</strong>
+        <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Fixed Assets</a>
+    </div>
+    @if (Model.FixedAssetOpeningBalances.Any(x => x.OpeningCost != 0m || x.OpeningAccumulatedDepreciation != 0m))
+    {
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Asset</th>
+                        <th>Asset Account</th>
+                        <th>Acc. Dep. Account</th>
+                        <th class="text-end">Opening Cost</th>
+                        <th class="text-end">Opening Acc. Dep.</th>
+                        <th class="text-end">Opening NBV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fa in Model.FixedAssetOpeningBalances.Where(x => x.OpeningCost != 0m || x.OpeningAccumulatedDepreciation != 0m))
+                    {
+                        <tr>
+                            <td><code>@fa.AssetCode</code></td>
+                            <td>@fa.AssetName</td>
+                            <td>@fa.AssetAccountDisplay</td>
+                            <td>@fa.AccumulatedDepreciationAccountDisplay</td>
+                            <td class="text-end">@fa.OpeningCost.ToString("N2")</td>
+                            <td class="text-end">@fa.OpeningAccumulatedDepreciation.ToString("N2")</td>
+                            <td class="text-end">@fa.OpeningNetBookValue.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-light fw-semibold">
+                        <td colspan="4" class="text-end">Totals</td>
+                        <td class="text-end">@Model.FixedAssetOpeningCostTotal.ToString("N2")</td>
+                        <td class="text-end">@Model.FixedAssetOpeningAccumDepTotal.ToString("N2")</td>
+                        <td class="text-end">@Model.FixedAssetOpeningNetBookValueTotal.ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="card-body text-muted">No fixed asset opening balances captured.</div>
+    }
+</div>

@@ -1,0 +1,222 @@
+@model RealEstateManager.Models.TaxInvoiceViewModel
+@using RealEstateManager.Domain
+@{
+    Layout = null;
+    var isTaxInvoice = Model.TaxInvoiceType != TaxInvoiceTypes.NotApplicable;
+    var title = isTaxInvoice
+        ? (Model.TaxInvoiceType == TaxInvoiceTypes.Simplified ? "Simplified Tax Invoice" : "Tax Invoice")
+        : "Invoice";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>@title @Model.DocumentNumber</title>
+<style>
+    @@page { size: A4 portrait; margin: 14mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; color: #1f2933; background: #f2f4f7; }
+    .sheet { max-width: 190mm; margin: 0 auto; background: #fff; padding: 18mm 16mm; box-shadow: 0 0 18px rgba(15,39,64,.12); }
+    h1 { font-size: 19pt; color: #0f2740; margin: 0 0 2px; letter-spacing: .3pt; }
+    .doc-type { font-size: 9pt; text-transform: uppercase; letter-spacing: 1.2pt; color: #1e6fd9; font-weight: 700; }
+    .muted { color: #5b6774; }
+    .small { font-size: 9pt; }
+    table { width: 100%; border-collapse: collapse; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 3px solid #0f2740; padding-bottom: 12px; margin-bottom: 16px; }
+    .parties { display: flex; gap: 18px; margin-bottom: 16px; }
+    .party { flex: 1; border: 1px solid #d8dee6; border-radius: 6px; padding: 10px 12px; }
+    .party h3 { margin: 0 0 6px; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .8pt; color: #5b6774; }
+    .party .nm { font-weight: 700; color: #0f2740; }
+    .trn { margin-top: 5px; font-weight: 700; }
+    .meta { border: 1px solid #d8dee6; border-radius: 6px; margin-bottom: 16px; }
+    .meta td { padding: 6px 10px; border-bottom: 1px solid #eceff3; font-size: 10pt; }
+    .meta tr:last-child td { border-bottom: 0; }
+    .meta td.k { color: #5b6774; width: 26%; }
+    .lines th { background: #0f2740; color: #fff; text-align: left; padding: 8px 10px; font-size: 9.5pt; }
+    .lines td { padding: 8px 10px; border: 1px solid #d8dee6; }
+    .num { text-align: right; white-space: nowrap; }
+    .totals { margin-top: 14px; margin-left: auto; width: 62%; }
+    .totals td { padding: 6px 10px; border-bottom: 1px solid #eceff3; }
+    .totals tr.grand td { background: #0f2740; color: #fff; font-weight: 700; font-size: 12pt; border: 0; }
+    .note { margin-top: 18px; padding: 10px 12px; border-left: 4px solid #1e6fd9; background: #eef4ff; font-size: 9.5pt; }
+    .note.exempt { border-left-color: #e0a800; background: #fff8e6; }
+    .foot { margin-top: 24px; padding-top: 10px; border-top: 1px solid #d8dee6; font-size: 8.5pt; color: #5b6774; }
+    .toolbar { max-width: 190mm; margin: 0 auto 12px; display: flex; justify-content: flex-end; gap: 8px; }
+    .toolbar button, .toolbar a { font: inherit; font-size: 10pt; padding: 7px 16px; border-radius: 4px; border: 1px solid #0f2740; background: #0f2740; color: #fff; cursor: pointer; text-decoration: none; }
+    .toolbar a { background: #fff; color: #0f2740; }
+    .warn { max-width: 190mm; margin: 0 auto 12px; padding: 10px 14px; border-radius: 6px; background: #fff8e6; border: 1px solid #e0a800; font-size: 10pt; }
+    @@media print { body { background: #fff; padding: 0; } .sheet { box-shadow: none; max-width: none; padding: 0; } .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+    <a href="@Url.Action("Index", "CustomerInvoices")">Back</a>
+    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+@if (Model.ComplianceWarnings.Count > 0)
+{
+    <div class="warn no-print">
+        <strong>This document is not yet compliant:</strong>
+        <ul style="margin:6px 0 0 18px;padding:0">
+            @foreach (var warning in Model.ComplianceWarnings)
+            {
+                <li>@warning</li>
+            }
+        </ul>
+    </div>
+}
+
+<div class="sheet">
+    <div class="head">
+        <div>
+            <div class="doc-type">@title</div>
+            <h1>@(string.IsNullOrWhiteSpace(Model.SupplierLegalName) ? Model.SupplierName : Model.SupplierLegalName)</h1>
+            <div class="small muted">
+                @Model.SupplierAddressLine1
+                @if (!string.IsNullOrWhiteSpace(Model.SupplierAddressLine2)) { <br />@Model.SupplierAddressLine2 }
+                @if (!string.IsNullOrWhiteSpace(Model.SupplierCity)) { <br />@Model.SupplierCity }
+                @if (!string.IsNullOrWhiteSpace(Model.SupplierCountry)) { <text>, </text>@Model.SupplierCountry }
+                @if (!string.IsNullOrWhiteSpace(Model.SupplierPhone)) { <br />@Model.SupplierPhone }
+                @if (!string.IsNullOrWhiteSpace(Model.SupplierEmail)) { <text> &middot; </text>@Model.SupplierEmail }
+            </div>
+        </div>
+        <div style="text-align:right">
+            <div class="small muted">Document No.</div>
+            <div style="font-size:14pt;font-weight:700;color:#0f2740">@Model.DocumentNumber</div>
+            @if (isTaxInvoice)
+            {
+                <div class="trn small">TRN: @Model.SupplierTrn</div>
+            }
+        </div>
+    </div>
+
+    <div class="parties">
+        <div class="party">
+            <h3>Billed To</h3>
+            <div class="nm">@Model.TenantName</div>
+            <div class="small muted">
+                @Model.TenantAddress
+                @if (!string.IsNullOrWhiteSpace(Model.TenantPhone)) { <br />@Model.TenantPhone }
+                @if (!string.IsNullOrWhiteSpace(Model.TenantEmail)) { <br />@Model.TenantEmail }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.RecipientTrn))
+            {
+                <div class="trn small">TRN: @Model.RecipientTrn</div>
+            }
+        </div>
+        <div class="party">
+            <h3>Property</h3>
+            <div class="nm">@Model.PropertyName</div>
+            <div class="small muted">
+                Unit @Model.UnitNumber
+                <br />Contract @Model.ContractNumber
+                <br />@Model.LeasePeriod
+            </div>
+        </div>
+    </div>
+
+    <table class="meta">
+        <tr>
+            <td class="k">Date of issue</td>
+            <td>@Model.InvoiceDate.ToString("dd MMMM yyyy")</td>
+            <td class="k">Date of supply</td>
+            <td>@Model.DateOfSupply.ToString("dd MMMM yyyy")</td>
+        </tr>
+        <tr>
+            <td class="k">Payment due</td>
+            <td>@Model.DueDate.ToString("dd MMMM yyyy")</td>
+            <td class="k">VAT treatment</td>
+            <td>@VatCategories.Describe(Model.VatCategory)</td>
+        </tr>
+        @if (!string.IsNullOrWhiteSpace(Model.SourceInvoiceNumber))
+        {
+            <tr>
+                <td class="k">Internal reference</td>
+                <td colspan="3">@Model.SourceInvoiceNumber</td>
+            </tr>
+        }
+    </table>
+
+    <table class="lines">
+        <thead>
+            <tr>
+                <th style="width:52%">Description</th>
+                <th class="num">Net Amount</th>
+                <th class="num">VAT Rate</th>
+                <th class="num">VAT Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <strong>@Model.LineDescription</strong>
+                    <div class="small muted">@Model.LineDetail</div>
+                </td>
+                <td class="num">@Model.Subtotal.ToString("N2")</td>
+                <td class="num">@(VatCategories.IsTaxable(Model.VatCategory) ? Model.VatRate.ToString("N0") + "%" : VatCategories.Describe(Model.VatCategory))</td>
+                <td class="num">@Model.VatAmount.ToString("N2")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="totals">
+        <tr>
+            <td>Total excluding VAT</td>
+            <td class="num">@Model.Currency @Model.Subtotal.ToString("N2")</td>
+        </tr>
+        <tr>
+            <td>VAT @(VatCategories.IsTaxable(Model.VatCategory) ? $"@ {Model.VatRate:N0}%" : "")</td>
+            <td class="num">@Model.Currency @Model.VatAmount.ToString("N2")</td>
+        </tr>
+        <tr class="grand">
+            <td>Total payable</td>
+            <td class="num">@Model.Currency @Model.TotalAmount.ToString("N2")</td>
+        </tr>
+        @if (Model.AmountPaid > 0m)
+        {
+            <tr>
+                <td>Received to date</td>
+                <td class="num">@Model.Currency @Model.AmountPaid.ToString("N2")</td>
+            </tr>
+            <tr>
+                <td><strong>Balance outstanding</strong></td>
+                <td class="num"><strong>@Model.Currency @((Model.TotalAmount - Model.AmountPaid).ToString("N2"))</strong></td>
+            </tr>
+        }
+    </table>
+
+    @if (Model.VatCategory == VatCategories.Exempt)
+    {
+        <div class="note exempt">
+            <strong>Exempt supply.</strong>
+            The lease of residential property is exempt from VAT, so no tax has been charged and this
+            document is not a tax invoice.
+        </div>
+    }
+    else if (Model.VatCategory == VatCategories.ZeroRated)
+    {
+        <div class="note">
+            <strong>Zero-rated supply.</strong>
+            The first supply of this residential building is zero rated, so VAT has been charged at 0%.
+        </div>
+    }
+    else if (Model.TaxInvoiceType == TaxInvoiceTypes.Simplified)
+    {
+        <div class="note">
+            <strong>Simplified tax invoice.</strong>
+            Issued because the recipient is not registered for VAT. If you are VAT registered, provide your
+            TRN and a full tax invoice will be issued instead.
+        </div>
+    }
+
+    <div class="foot">
+        @Model.SupplierName
+        @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn)) { <text> &middot; TRN @Model.SupplierTrn</text> }
+        <br />All amounts are stated in @Model.CurrencyName. This document was produced by RealEstateManager on @DateTime.Today.ToString("dd MMMM yyyy").
+    </div>
+</div>
+
+</body>
+</html>

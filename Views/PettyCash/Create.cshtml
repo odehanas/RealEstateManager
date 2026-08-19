@@ -1,0 +1,131 @@
+@model RealEstateManager.Models.PettyCashExpenseViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Petty Cash Expense Voucher";
+    var floats = ViewBag.FloatAccounts as List<Account> ?? new();
+    var expenseAccounts = ViewBag.ExpenseAccounts as List<Account> ?? new();
+    var properties = ViewBag.Properties as List<Property> ?? new();
+    var units = ViewBag.Units as List<Unit> ?? new();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Petty Cash Expense Voucher</h2>
+        <p class="text-muted mb-0">Posts <strong>Dr expense account</strong> / <strong>Cr petty cash</strong>.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Petty Cash</a>
+</div>
+
+<form asp-action="Create" method="post" class="col-lg-9">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="PettyCashAccountId" class="form-label"></label>
+                    <select asp-for="PettyCashAccountId" class="form-select" id="pettyCashAccountId">
+                        @foreach (var account in floats)
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    </select>
+                    <div class="form-text">
+                        Cash in hand now:
+                        <strong id="floatBalance">@Model.CurrentFloatBalance.ToString("N2")</strong>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="VoucherDate" class="form-label"></label>
+                    <input asp-for="VoucherDate" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Amount" class="form-label"></label>
+                    <input asp-for="Amount" type="number" step="0.01" min="0" class="form-control text-end" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ExpenseAccountId" class="form-label"></label>
+                    <select asp-for="ExpenseAccountId" class="form-select">
+                        <option value="0">Select expense account</option>
+                        @foreach (var account in expenseAccounts)
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    </select>
+                    <div class="form-text">The cost lands here and appears in the Profit &amp; Loss.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PaidTo" class="form-label"></label>
+                    <input asp-for="PaidTo" class="form-control" placeholder="Shop, driver, supplier..." />
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input asp-for="Description" class="form-control" placeholder="What was bought and why" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ReferenceNumber" class="form-label"></label>
+                    <input asp-for="ReferenceNumber" class="form-control" placeholder="Receipt no." />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light">
+            <strong>Optional analysis</strong>
+            <span class="text-muted small ms-2">Attributes the cost to a property or unit in the management reports</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="PropertyId" class="form-label"></label>
+                    <select asp-for="PropertyId" class="form-select">
+                        <option value="">Not property specific</option>
+                        @foreach (var property in properties)
+                        {
+                            <option value="@property.Id">@property.Code - @property.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="UnitId" class="form-label"></label>
+                    <select asp-for="UnitId" class="form-select">
+                        <option value="">No cost center</option>
+                        @foreach (var unit in units)
+                        {
+                            <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Post Voucher</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Keep the "cash in hand" figure honest when the custodian switches float.
+        document.getElementById("pettyCashAccountId").addEventListener("change", function () {
+            var id = this.value;
+            if (!id) return;
+
+            fetch('@Url.Action("FloatBalance", "PettyCash")' + '?pettyCashAccountId=' + encodeURIComponent(id))
+                .then(function (r) { return r.json(); })
+                .then(function (d) { document.getElementById("floatBalance").textContent = d.formatted; })
+                .catch(function () { /* leave the previous figure in place */ });
+        });
+    </script>
+}

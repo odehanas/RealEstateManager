@@ -1,0 +1,338 @@
+@model RealEstateManager.Models.FixedAssetAcquisitionViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Asset Acquisition and Capitalization";
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+    var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+    var canCapitalize = Model.Status == "Draft" && Model.OpenCapitalizableCost > 0m;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Asset Acquisition and Capitalization</h2>
+        <div class="text-muted">@Model.AssetCode - @Model.AssetName</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to Register</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Status</div>
+                <div class="fs-5 fw-bold">@Model.Status</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Capitalizable Cost</div>
+                <div class="fs-5 fw-bold">@Model.CapitalizableCost.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Open to Capitalize</div>
+                <div class="fs-5 fw-bold">@Model.OpenCapitalizableCost.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Capitalization Date</div>
+                <div class="fs-5 fw-bold">@(Model.CapitalizationDate.HasValue ? Model.CapitalizationDate.Value.ToString("dd/MM/yyyy") : "-")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <strong>Asset Profile</strong>
+    </div>
+    <div class="card-body row g-3">
+        <div class="col-md-3">
+            <div class="text-muted small">Category</div>
+            <div>@Model.AssetCategory</div>
+        </div>
+        <div class="col-md-3">
+            <div class="text-muted small">Property</div>
+            <div>@Model.PropertyDisplay</div>
+        </div>
+        <div class="col-md-2">
+            <div class="text-muted small">Acquisition Date</div>
+            <div>@Model.AcquisitionDate.ToString("dd/MM/yyyy")</div>
+        </div>
+        <div class="col-md-2">
+            <div class="text-muted small">In Service Date</div>
+            <div>@Model.InServiceDate.ToString("dd/MM/yyyy")</div>
+        </div>
+        <div class="col-md-2">
+            <div class="text-muted small">Useful Life</div>
+            <div>@Model.UsefulLifeMonths month(s)</div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <strong>Add Acquisition Cost</strong>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            Every acquisition cost posts immediately to accounting. Capitalizable costs post to the fixed asset clearing account, and the selected payment or payable account is credited.
+        </div>
+
+        <form asp-action="AddCost" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="FixedAssetId" value="@Model.FixedAssetId" />
+
+            <div class="col-md-2">
+                <label class="form-label">Cost Date</label>
+                <input type="date" name="CostDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Cost Type</label>
+                <select name="CostType" class="form-select">
+                    <option value="Purchase">Purchase</option>
+                    <option value="Freight">Freight</option>
+                    <option value="Installation">Installation</option>
+                    <option value="Customs">Customs</option>
+                    <option value="Testing">Testing</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Description</label>
+                <input type="text" name="Description" class="form-control" placeholder="Freight, installation, supplier invoice..." />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Amount</label>
+                <input type="number" step="0.01" min="0.01" name="Amount" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Capitalizable</label>
+                <select name="IsCapitalizable" class="form-select">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Source Document</label>
+                <input type="text" name="SourceDocumentNumber" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Reference</label>
+                <input type="text" name="ReferenceNumber" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Paid / Payable From</label>
+                <select name="CreditAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        if (Model.DefaultOffsetAccountId == account.Id)
+                        {
+                            <option value="@account.Id" selected>@account.Code - @account.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Vendor</label>
+                <select name="VendorId" class="form-select">
+                    <option value="">Select Vendor</option>
+                    @foreach (var vendor in vendors)
+                    {
+                        <option value="@vendor.Id">@vendor.Code - @vendor.Name</option>
+                    }
+                </select>
+                <div class="form-text">Required when the source account is Accounts Payable.</div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Expense Account</label>
+                <select name="ExpenseAccountId" class="form-select">
+                    <option value="">Use Default</option>
+                    @foreach (var account in accounts)
+                    {
+                        if (Model.DefaultExpenseAccountId == account.Id)
+                        {
+                            <option value="@account.Id" selected>@account.Code - @account.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    }
+                </select>
+                <div class="form-text">Used only when `Capitalizable = No`.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Notes</label>
+                <input type="text" name="Notes" class="form-control" />
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-dark" @(Model.Status != "Draft" ? "disabled" : null)>Add Cost</button>
+                @if (Model.Status != "Draft")
+                {
+                    <span class="text-muted ms-2">Only draft assets accept new acquisition cost allocations.</span>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <strong>Cost Allocation Lines</strong>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped table-bordered mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Source</th>
+                    <th>Reference</th>
+                    <th>Offset Account</th>
+                    <th>Vendor / Bill</th>
+                    <th>Status</th>
+                    <th>Journal</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Costs.Count == 0)
+                {
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-4">No acquisition costs have been recorded.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var cost in Model.Costs)
+                    {
+                        <tr>
+                            <td>@cost.CostDate.ToString("dd/MM/yyyy")</td>
+                            <td>@cost.CostType</td>
+                            <td>
+                                <div>@cost.Description</div>
+                                @if (!cost.IsCapitalizable)
+                                {
+                                    <small class="text-muted">Non-capitalizable</small>
+                                }
+                            </td>
+                            <td>@(string.IsNullOrWhiteSpace(cost.SourceDocumentNumber) ? "-" : cost.SourceDocumentNumber)</td>
+                            <td>@(string.IsNullOrWhiteSpace(cost.ReferenceNumber) ? "-" : cost.ReferenceNumber)</td>
+                            <td>
+                                <div>@(string.IsNullOrWhiteSpace(cost.OffsetAccountDisplay) ? "-" : cost.OffsetAccountDisplay)</div>
+                                @if (!string.IsNullOrWhiteSpace(cost.ExpenseAccountDisplay))
+                                {
+                                    <small class="text-muted">Exp: @cost.ExpenseAccountDisplay</small>
+                                }
+                            </td>
+                            <td>
+                                <div>@(string.IsNullOrWhiteSpace(cost.VendorDisplay) ? "-" : cost.VendorDisplay)</div>
+                                @if (!string.IsNullOrWhiteSpace(cost.VendorBillNumber))
+                                {
+                                    <small class="text-muted">@cost.VendorBillNumber</small>
+                                }
+                            </td>
+                            <td>@cost.Status</td>
+                            <td>@(string.IsNullOrWhiteSpace(cost.JournalEntryNumber) ? "-" : cost.JournalEntryNumber)</td>
+                            <td class="text-end">@cost.Amount.ToString("N2")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <strong>Capitalize Asset</strong>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            Capitalization posts the asset into the fixed asset account and clears the accumulated acquisition cost from the selected clearing account. Depreciation starts only after capitalization.
+        </div>
+
+        <form asp-action="Capitalize" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="FixedAssetId" value="@Model.FixedAssetId" />
+
+            <div class="col-md-3">
+                <label class="form-label">Capitalization Date</label>
+                <input type="date" name="CapitalizationDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">In Service Date</label>
+                <input type="date" name="InServiceDate" class="form-control" value="@Model.InServiceDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Credit Account (Fixed Asset Clearing / CWIP)</label>
+                <select name="CreditAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        if (Model.DefaultClearingAccountId == account.Id)
+                        {
+                            <option value="@account.Id" selected>@account.Code - @account.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Remarks</label>
+                <input type="text" name="Remarks" class="form-control" placeholder="Ready for use, capitalization approved..." />
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-success" @(!canCapitalize ? "disabled" : null)>Capitalize Asset</button>
+                @if (!canCapitalize)
+                {
+                    <span class="text-muted ms-2">A draft asset needs open capitalizable costs before it can be capitalized.</span>
+                }
+            </div>
+        </form>
+    </div>
+</div>

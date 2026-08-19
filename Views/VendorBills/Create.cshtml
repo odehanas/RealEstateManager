@@ -1,0 +1,104 @@
+﻿@model RealEstateManager.Models.VendorBillCreateViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Create Vendor Bill";
+    var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+    var properties = ViewBag.Properties as List<Property> ?? new();
+}
+
+<h2>Create Vendor Bill</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="VendorId" class="form-label"></label>
+            <select asp-for="VendorId" class="form-select">
+                <option value="">Select Vendor</option>
+                @foreach (var vendor in vendors)
+                {
+                    <option value="@vendor.Id">@vendor.Code - @vendor.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="PropertyId" class="form-label"></label>
+            <select asp-for="PropertyId" class="form-select">
+                <option value="">No Property</option>
+                @foreach (var property in properties)
+                {
+                    <option value="@property.Id">@property.Code - @property.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="BillNumber" class="form-label"></label>
+            <input asp-for="BillNumber" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="BillDate" class="form-label"></label>
+            <input asp-for="BillDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="DueDate" class="form-label"></label>
+            <input asp-for="DueDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Subtotal" class="form-label"></label>
+            <input asp-for="Subtotal" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="VatAmount" class="form-label"></label>
+            <input asp-for="VatAmount" class="form-control" />
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="ExpenseCategory" class="form-label"></label>
+            <input asp-for="ExpenseCategory" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="SupplierTrn" class="form-label">Supplier TRN</label>
+            <input asp-for="SupplierTrn" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="InputTaxAttribution" class="form-label">Input Tax Attribution</label>
+            <select asp-for="InputTaxAttribution" class="form-select">
+                <option value="Taxable">Taxable &mdash; fully recoverable</option>
+                <option value="Exempt">Exempt &mdash; not recoverable</option>
+                <option value="Residual">Residual &mdash; apportioned</option>
+            </select>
+        </div>
+
+        <div class="col-md-12">
+            <div class="alert alert-light border small mb-0">
+                <strong>Which attribution?</strong>
+                <ul class="mb-0 mt-1">
+                    <li><strong>Taxable</strong> &mdash; the cost relates to commercial (standard rated) property. The VAT is reclaimed in full.</li>
+                    <li><strong>Exempt</strong> &mdash; the cost relates to residential leasing. None of the VAT can be reclaimed, so it is <em>added to the expense</em> rather than held as an asset.</li>
+                    <li><strong>Residual</strong> &mdash; overheads serving both, such as head-office costs. The VAT is split using the company's provisional recovery rate and corrected at the annual wash-up.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

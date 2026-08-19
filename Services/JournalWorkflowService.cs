@@ -1,0 +1,537 @@
+using Microsoft.EntityFrameworkCore;
+using RealEstateManager.Data;
+using RealEstateManager.Domain;
+
+namespace RealEstateManager.Services
+{
+    /// <summary>
+    /// Draft / Posted state machine for journal entries, modelled on Odoo's
+    /// account.move workflow: an entry is a draft with no effect on the accounts until
+    /// it is posted, and a posted entry can be reset back to draft.
+    ///
+    /// Two things make this safe rather than dangerous:
+    ///
+    /// 1. RESET UNWINDS THE DOCUMENT, NOT JUST THE JOURNAL. Posting a receipt does more
+    ///    than write a journal - it also increases the invoice's AmountPaid and moves its
+    ///    status. Removing the journal alone would leave the invoice claiming to be paid
+    ///    with nothing behind it. Every source type therefore has an explicit rollback.
+    ///
+    /// 2. RESET IS REFUSED WHEN SOMETHING DEPENDS ON IT. An invoice with receipts against
+    ///    it, or a PDC that has already cleared, cannot be reset - the later transaction
+    ///    would be left dangling. Odoo does the same for reconciled entries.
+    ///
+    /// Closed periods are immovable in both directions: nothing can be posted into one
+    /// and nothing can be reset out of one, because those figures have been reported.
+    /// </summary>
+    public class JournalWorkflowService
+    {
+        private readonly ApplicationDbContext _db;
+
+        public JournalWorkflowService(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        // =====================================================================
+        //  STATE
+        // =====================================================================
+
+        /// <summary>
+        /// What the user is allowed to do with this entry, and why not when they are not.
+        /// Drives the buttons so the UI never offers an action that will fail.
+        /// </summary>
+        public async Task<JournalWorkflowState> GetStateAsync(int journalEntryId)
+        {
+            var entry = await _db.JournalEntries
+                .AsNoTracking()
+                .Include(x => x.AccountingPeriod)
+                .FirstOrDefaultAsync(x => x.Id == journalEntryId);
+
+            if (entry == null)
+                return new JournalWorkflowState { Exists = false };
+
+            var state = new JournalWorkflowState
+            {
+                Exists = true,
+                JournalEntryId = entry.Id,
+                EntryNumber = entry.EntryNumber,
+                EntryDate = entry.EntryDate,
+                IsPosted = entry.IsPosted,
+                SourceType = entry.SourceType,
+                PeriodName = entry.AccountingPeriod?.Name,
+                PeriodClosed = entry.AccountingPeriod?.IsClosed ?? false
+            };
+
+            if (entry.IsPosted)
+            {
+                var reason = await GetResetBlockReasonAsync(entry);
+                state.CanReset = reason == null;
+                state.BlockReason = reason;
+            }
+            else
+            {
+                var reason = GetPostBlockReason(entry);
+                state.CanPost = reason == null;
+                state.BlockReason = reason;
+            }
+
+            return state;
+        }
+
+        // =====================================================================
+        //  POST
+        // =====================================================================
+
+        public async Task<JournalWorkflowResult> PostAsync(int journalEntryId)
+        {
+            var entry = await LoadEntryAsync(journalEntryId);
+            if (entry == null)
+                return JournalWorkflowResult.Failed("Journal entry was not found.");
+
+            if (entry.IsPosted)
+                return JournalWorkflowResult.Failed("This entry is already posted.");
+
+            var blocked = GetPostBlockReason(entry);
+            if (blocked != null)
+                return JournalWorkflowResult.Failed(blocked);
+
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+
+            entry.IsPosted = true;
+            entry.Status = "Posted";
+            entry.PostedAt = DateTime.UtcNow;
+
+            // Re-apply whatever the document side of the transaction expects, so posting
+            // is the exact mirror of resetting.
+            await ApplyDocumentEffectsAsync(entry, posting: true);
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return JournalWorkflowResult.Succeeded(
+                $"Entry {entry.EntryNumber} posted. It now affects the accounts.");
+        }
+
+        /// <summary>
+        /// Posts every draft in a date range. Batch operations - a month of revenue
+        /// recognition, a depreciation run - produce many drafts at once, and posting
+        /// them one at a time is not realistic.
+        ///
+        /// Each entry is posted independently: one failure does not abandon the rest,
+        /// and the failures are reported so nothing fails silently.
+        /// </summary>
+        public async Task<JournalBatchResult> PostAllDraftsAsync(
+            DateTime? fromDate,
+            DateTime? toDate,
+            string? sourceType)
+        {
+            var query = _db.JournalEntries.Where(x => !x.IsPosted);
+
+            if (fromDate.HasValue)
+                query = query.Where(x => x.EntryDate >= fromDate.Value);
+
+            if (toDate.HasValue)
+                query = query.Where(x => x.EntryDate <= toDate.Value);
+
+            if (!string.IsNullOrWhiteSpace(sourceType))
+                query = query.Where(x => x.SourceType == sourceType);
+
+            var ids = await query
+                .OrderBy(x => x.EntryDate)
+                .ThenBy(x => x.Id)
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            var batch = new JournalBatchResult { Considered = ids.Count };
+
+            foreach (var id in ids)
+            {
+                var result = await PostAsync(id);
+
+                if (result.Success)
+                    batch.Posted++;
+                else
+                    batch.Failures.Add(result.Message);
+            }
+
+            return batch;
+        }
+
+        // =====================================================================
+        //  RESET TO DRAFT
+        // =====================================================================
+
+        public async Task<JournalWorkflowResult> ResetToDraftAsync(int journalEntryId)
+        {
+            var entry = await LoadEntryAsync(journalEntryId);
+            if (entry == null)
+                return JournalWorkflowResult.Failed("Journal entry was not found.");
+
+            if (!entry.IsPosted)
+                return JournalWorkflowResult.Failed("This entry is already a draft.");
+
+            var blocked = await GetResetBlockReasonAsync(entry);
+            if (blocked != null)
+                return JournalWorkflowResult.Failed(blocked);
+
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+
+            await ApplyDocumentEffectsAsync(entry, posting: false);
+
+            entry.IsPosted = false;
+            entry.Status = "Draft";
+            entry.PostedAt = null;
+
+            await _db.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return JournalWorkflowResult.Succeeded(
+                $"Entry {entry.EntryNumber} reset to draft. It no longer affects the accounts.");
+        }
+
+        // =====================================================================
+        //  GUARDS
+        // =====================================================================
+
+        private static string? GetPostBlockReason(JournalEntry entry)
+        {
+            if (entry.AccountingPeriod == null)
+                return $"No accounting period covers {entry.EntryDate:dd/MM/yyyy}.";
+
+            if (entry.AccountingPeriod.IsClosed)
+                return $"{entry.AccountingPeriod.Name} is closed. An entry cannot be posted into a closed period.";
+
+            var debit = entry.Lines.Sum(x => x.Debit);
+            var credit = entry.Lines.Sum(x => x.Credit);
+
+            if (debit != credit)
+                return $"The entry is not balanced: debits {debit:N2} against credits {credit:N2}.";
+
+            if (entry.Lines.Count < 2)
+                return "The entry has fewer than two lines.";
+
+            return null;
+        }
+
+        /// <summary>
+        /// Reasons an entry may not be reset. Ordered so the most fundamental objection
+        /// is reported first.
+        /// </summary>
+        private async Task<string?> GetResetBlockReasonAsync(JournalEntry entry)
+        {
+            if (entry.AccountingPeriod == null)
+                return $"No accounting period covers {entry.EntryDate:dd/MM/yyyy}.";
+
+            if (entry.AccountingPeriod.IsClosed)
+            {
+                return $"{entry.AccountingPeriod.Name} is closed. Entries in a closed period cannot be " +
+                       "reset - those figures have already been reported. Post a correcting journal instead.";
+            }
+
+            var sourceType = entry.SourceType ?? string.Empty;
+
+            // Some postings create schedules or clear whole years. Unwinding those is not
+            // a reset, it is a separate operation, so they are refused outright.
+            if (NonResettableSourceTypes.Contains(sourceType))
+            {
+                return $"A {DescribeSourceType(sourceType)} entry cannot be reset to draft. " +
+                       "Post a reversing journal instead.";
+            }
+
+            return sourceType switch
+            {
+                "CustomerInvoice" => await BlockIfInvoiceHasSettlementsAsync(entry.SourceId),
+                "VendorBill" => await BlockIfBillHasPaymentsAsync(entry.SourceId),
+                "PdcReceiptMemo" => await BlockIfPdcClearedAsync(entry.SourceId),
+                _ => null
+            };
+        }
+
+        private async Task<string?> BlockIfInvoiceHasSettlementsAsync(int? invoiceId)
+        {
+            if (!invoiceId.HasValue)
+                return null;
+
+            var receipts = await _db.CustomerReceipts
+                .CountAsync(x => x.CustomerInvoiceId == invoiceId.Value && x.JournalEntryId != null);
+
+            if (receipts > 0)
+                return $"This invoice has {receipts} posted receipt(s) against it. Reset those first.";
+
+            var pdcs = await _db.PdcReceipts
+                .CountAsync(x => x.CustomerInvoiceId == invoiceId.Value && x.Status == "Cleared");
+
+            if (pdcs > 0)
+                return $"This invoice has {pdcs} cleared cheque(s) against it. Reset those first.";
+
+            return null;
+        }
+
+        private async Task<string?> BlockIfBillHasPaymentsAsync(int? billId)
+        {
+            if (!billId.HasValue)
+                return null;
+
+            var payments = await _db.VendorPayments
+                .CountAsync(x => x.VendorBillId == billId.Value && x.JournalEntryId != null);
+
+            return payments > 0
+                ? $"This bill has {payments} posted payment(s) against it. Reset those first."
+                : null;
+        }
+
+        private async Task<string?> BlockIfPdcClearedAsync(int? pdcId)
+        {
+            if (!pdcId.HasValue)
+                return null;
+
+            var cleared = await _db.PdcReceipts
+                .AnyAsync(x => x.Id == pdcId.Value && x.ClearanceJournalEntryId != null);
+
+            return cleared
+                ? "This cheque has already cleared. Reset the clearance entry first."
+                : null;
+        }
+
+        // =====================================================================
+        //  DOCUMENT SIDE EFFECTS
+        // =====================================================================
+
+        /// <summary>
+        /// Applies or unwinds the non-journal consequences of a posting. Called with
+        /// posting:true when posting and posting:false when resetting, so the two are
+        /// exact mirrors of one another.
+        ///
+        /// NOTE: the document's JournalEntryId link is NOT touched here. The link is set
+        /// when the journal is created and survives a reset - the entry still belongs to
+        /// the document, it is simply a draft again. Clearing it would orphan the draft
+        /// and let the screen create a second journal for the same document.
+        /// </summary>
+        private async Task ApplyDocumentEffectsAsync(JournalEntry entry, bool posting)
+        {
+            var sourceType = entry.SourceType ?? string.Empty;
+            var sourceId = entry.SourceId;
+
+            if (!sourceId.HasValue)
+                return;
+
+            switch (sourceType)
+            {
+                case "CustomerInvoice":
+                {
+                    var invoice = await _db.CustomerInvoices.FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (invoice == null) break;
+
+
+                    invoice.Status = posting ? "Posted" : "Draft";
+                    break;
+                }
+
+                case "CustomerReceipt":
+                {
+                    var receipt = await _db.CustomerReceipts
+                        .Include(x => x.CustomerInvoice)
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+
+                    if (receipt == null) break;
+
+
+                    if (receipt.CustomerInvoice != null)
+                    {
+                        receipt.CustomerInvoice.AmountPaid += posting ? receipt.Amount : -receipt.Amount;
+                        RecomputeInvoiceStatus(receipt.CustomerInvoice);
+                    }
+
+                    break;
+                }
+
+                case "VendorBill":
+                {
+                    var bill = await _db.VendorBills.FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (bill == null) break;
+
+
+                    bill.Status = posting ? "Posted" : "Draft";
+                    break;
+                }
+
+                case "VendorPayment":
+                {
+                    var payment = await _db.VendorPayments
+                        .Include(x => x.VendorBill)
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+
+                    if (payment == null) break;
+
+
+                    if (payment.VendorBill != null)
+                    {
+                        payment.VendorBill.AmountPaid += posting ? payment.Amount : -payment.Amount;
+                        RecomputeBillStatus(payment.VendorBill);
+                    }
+
+                    break;
+                }
+
+                case "SecurityDeposit":
+                {
+                    var deposit = await _db.SecurityDeposits.FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (deposit == null) break;
+
+
+                    break;
+                }
+
+                case "RevenueRecognitionSchedule":
+                {
+                    var schedule = await _db.RevenueRecognitionSchedules
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+
+                    if (schedule == null) break;
+
+
+                    schedule.Status = posting ? "Posted" : "Planned";
+                    break;
+                }
+
+                case "PdcReceiptMemo":
+                {
+                    var pdc = await _db.PdcReceipts.FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (pdc == null) break;
+
+
+                    pdc.Status = posting ? "Received" : "Draft";
+                    break;
+                }
+
+                case "PdcClearance":
+                {
+                    var pdc = await _db.PdcReceipts
+                        .Include(x => x.CustomerInvoice)
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+
+                    if (pdc == null) break;
+
+
+                    pdc.ClearedDate = posting ? entry.EntryDate : null;
+                    pdc.Status = posting ? "Cleared" : "Received";
+
+                    // A cleared cheque in Receivable mode settles the invoice; an advance
+                    // does not touch it.
+                    if (pdc.SettlementMode == "Receivable" && pdc.CustomerInvoice != null)
+                    {
+                        pdc.CustomerInvoice.AmountPaid += posting ? pdc.Amount : -pdc.Amount;
+                        RecomputeInvoiceStatus(pdc.CustomerInvoice);
+                    }
+
+                    break;
+                }
+
+                // ManualJournal, PettyCashExpense, PettyCashReplenishment and anything
+                // else have no document state to keep in step.
+            }
+        }
+
+        private static void RecomputeInvoiceStatus(CustomerInvoice invoice)
+        {
+            if (invoice.AmountPaid <= 0m)
+                invoice.Status = invoice.JournalEntryId.HasValue ? "Posted" : "Draft";
+            else if (invoice.AmountPaid < invoice.TotalAmount)
+                invoice.Status = "PartiallyPaid";
+            else
+                invoice.Status = "Paid";
+        }
+
+        private static void RecomputeBillStatus(VendorBill bill)
+        {
+            if (bill.AmountPaid <= 0m)
+                bill.Status = bill.JournalEntryId.HasValue ? "Posted" : "Draft";
+            else if (bill.AmountPaid < bill.TotalAmount)
+                bill.Status = "PartiallyPaid";
+            else
+                bill.Status = "Paid";
+        }
+
+        // =====================================================================
+        //  HELPERS
+        // =====================================================================
+
+        /// <summary>
+        /// Postings that create schedules or close a year. Unwinding these is a distinct
+        /// operation, not a reset, so they are refused.
+        /// </summary>
+        private static readonly HashSet<string> NonResettableSourceTypes =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "FiscalYearClosing",
+                "PrepaymentSchedule",
+                "PrepaymentRecognition",
+                "FixedAssetAcquisition",
+                "FixedAssetCapitalization",
+                "FixedAssetDepreciation"
+            };
+
+        private static string DescribeSourceType(string sourceType) => sourceType switch
+        {
+            "FiscalYearClosing" => "fiscal year closing",
+            "PrepaymentSchedule" => "prepayment set-up",
+            "PrepaymentRecognition" => "prepayment amortisation",
+            "FixedAssetAcquisition" => "fixed asset acquisition",
+            "FixedAssetCapitalization" => "fixed asset capitalisation",
+            "FixedAssetDepreciation" => "depreciation",
+            _ => sourceType
+        };
+
+        private async Task<JournalEntry?> LoadEntryAsync(int journalEntryId)
+        {
+            return await _db.JournalEntries
+                .Include(x => x.Lines)
+                .Include(x => x.AccountingPeriod)
+                .FirstOrDefaultAsync(x => x.Id == journalEntryId);
+        }
+    }
+
+    public class JournalWorkflowState
+    {
+        public bool Exists { get; set; }
+        public int JournalEntryId { get; set; }
+        public string EntryNumber { get; set; } = string.Empty;
+        public DateTime EntryDate { get; set; }
+        public bool IsPosted { get; set; }
+        public string? SourceType { get; set; }
+        public string? PeriodName { get; set; }
+        public bool PeriodClosed { get; set; }
+
+        public bool CanPost { get; set; }
+        public bool CanReset { get; set; }
+
+        /// <summary>Why the available action is unavailable, for the tooltip.</summary>
+        public string? BlockReason { get; set; }
+    }
+
+    public class JournalBatchResult
+    {
+        public int Considered { get; set; }
+        public int Posted { get; set; }
+        public List<string> Failures { get; set; } = new();
+
+        public int FailedCount => Failures.Count;
+
+        public string Summary => Considered == 0
+            ? "There were no draft entries to post."
+            : $"Posted {Posted} of {Considered} draft entr{(Considered == 1 ? "y" : "ies")}." +
+              (FailedCount > 0 ? $" {FailedCount} could not be posted." : string.Empty);
+    }
+
+    public class JournalWorkflowResult
+    {
+        public bool Success { get; private init; }
+        public string Message { get; private init; } = string.Empty;
+
+        public static JournalWorkflowResult Succeeded(string message) =>
+            new() { Success = true, Message = message };
+
+        public static JournalWorkflowResult Failed(string message) =>
+            new() { Success = false, Message = message };
+    }
+}

@@ -1,0 +1,141 @@
+@model RealEstateManager.Models.VatSettingsViewModel
+@{
+    ViewData["Title"] = "VAT Settings";
+}
+
+<div class="mb-3">
+    <h2 class="mb-1">VAT Settings</h2>
+    <p class="text-muted mb-0">
+        The company's tax identity for <strong>@Model.CompanyName</strong>, and the recovery rate applied to
+        residual input tax.
+    </p>
+</div>
+
+@if (TempData["VatSettingsMessage"] is string message)
+{
+    <div class="alert alert-success py-2">@message</div>
+}
+
+@if (!Model.IsReadyToIssueTaxInvoices)
+{
+    <div class="alert alert-warning">
+        <strong>Tax invoices cannot be issued yet.</strong>
+        A tax invoice must show the supplier's TRN and address. Fill both in below and save.
+    </div>
+}
+
+<form asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>Tax Identity</strong> <span class="text-muted small ms-2">Printed on every tax invoice</span></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="LegalName" class="form-label"></label>
+                    <input asp-for="LegalName" class="form-control" placeholder="If different from the trading name" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="TrnNumber" class="form-label"></label>
+                    <input asp-for="TrnNumber" class="form-control" placeholder="15 digits" />
+                    <div class="form-text">Leave blank if the company is not VAT registered.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AddressLine1" class="form-label"></label>
+                    <input asp-for="AddressLine1" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AddressLine2" class="form-label"></label>
+                    <input asp-for="AddressLine2" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="City" class="form-label"></label>
+                    <input asp-for="City" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Country" class="form-label"></label>
+                    <input asp-for="Country" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>Input Tax Recovery</strong></div>
+        <div class="card-body">
+            <div class="row g-3 align-items-start">
+                <div class="col-md-4">
+                    <label asp-for="ProvisionalVatRecoveryRate" class="form-label"></label>
+                    <input asp-for="ProvisionalVatRecoveryRate" type="number" step="0.0001" min="0" max="100" class="form-control text-end" />
+                    <span asp-validation-for="ProvisionalVatRecoveryRate" class="text-danger"></span>
+                </div>
+                <div class="col-md-8">
+                    <div class="alert alert-light border small mb-0">
+                        Applied to bills attributed as <strong>Residual</strong> during the year. Set it to last
+                        year's actual recovery percentage. Bills attributed as <em>Taxable</em> recover in full
+                        and <em>Exempt</em> recover nothing, so this rate does not affect them.
+                        <br /><br />
+                        Leave it at <strong>100</strong> only if you have no exempt supplies at all. With a mix of
+                        commercial and residential property you almost certainly do.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Save VAT Settings</button>
+</form>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-light"><strong>Setup Readiness</strong></div>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0">
+            <tbody>
+                <tr>
+                    <td style="width:60%">Properties classified as standard rated (commercial)</td>
+                    <td class="text-end fw-semibold">@Model.StandardRatedProperties</td>
+                </tr>
+                <tr>
+                    <td>Properties classified as exempt (residential)</td>
+                    <td class="text-end fw-semibold">@Model.ExemptProperties</td>
+                </tr>
+                <tr>
+                    <td>Tenants with a TRN (these receive a full tax invoice)</td>
+                    <td class="text-end fw-semibold">@Model.TenantsWithTrn of @Model.TotalTenants</td>
+                </tr>
+                <tr>
+                    <td>Tax invoices issued to date</td>
+                    <td class="text-end fw-semibold">@Model.TaxInvoicesIssued</td>
+                </tr>
+                <tr class="@(Model.BillsAwaitingAttribution > 0 ? "table-warning" : "")">
+                    <td>Draft vendor bills carrying VAT, not yet posted</td>
+                    <td class="text-end fw-semibold">@Model.BillsAwaitingAttribution</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-body py-3 small text-muted">
+        Check the input tax attribution on those draft bills before posting them &mdash; once posted, the
+        recoverable and irrecoverable split is fixed in the journal.
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

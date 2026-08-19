@@ -1,0 +1,92 @@
+@model RealEstateManager.Models.UnitCreateViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Edit Unit";
+    var properties = ViewBag.Properties as List<Property> ?? new();
+    var id = ViewBag.Id;
+}
+
+<h2>Edit Unit</h2>
+
+<form asp-action="Edit" asp-route-id="@id" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="PropertyId" class="form-label"></label>
+            <select asp-for="PropertyId" class="form-select">
+                <option value="">Select Property</option>
+                @foreach (var property in properties)
+                {
+                    <option value="@property.Id">@property.Code - @property.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="UnitNumber" class="form-label">Unit Code</label>
+            <input asp-for="UnitNumber" class="form-control bg-light" readonly />
+            <div class="form-text">Fixed once issued &mdash; contracts are numbered from it.</div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Floor" class="form-label"></label>
+            <input asp-for="Floor" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="UsageType" class="form-label"></label>
+            <select asp-for="UsageType" class="form-select">
+                <option value="">Select</option>
+                <option>Residential</option>
+                <option>Commercial</option>
+                <option>Warehouse</option>
+                <option>Office</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="AreaSqFt" class="form-label"></label>
+            <input asp-for="AreaSqFt" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="StandardAnnualRent" class="form-label"></label>
+            <input asp-for="StandardAnnualRent" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select">
+                <option>Vacant</option>
+                <option>Reserved</option>
+                <option>Occupied</option>
+                <option>UnderMaintenance</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="VatCategory" class="form-label">VAT Treatment</label>
+            <select asp-for="VatCategory" class="form-select">
+                <option value="">Inherit from property</option>
+                <option value="Standard">Standard rated (5%)</option>
+                <option value="Exempt">Exempt</option>
+                <option value="ZeroRated">Zero rated (0%)</option>
+            </select>
+            <div class="form-text">
+                Affects <strong>new</strong> leases only. Invoices already issued keep their original treatment.
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

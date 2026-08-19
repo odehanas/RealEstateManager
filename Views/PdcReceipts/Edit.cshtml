@@ -1,0 +1,156 @@
+@model RealEstateManager.Models.PdcEditViewModel
+
+@{
+    ViewData["Title"] = "Edit PDC";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Edit PDC</h2>
+        <p class="text-muted mb-0">Correct a mis-keyed cheque. The memorandum entry is re-dated to match.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to PDCs</a>
+</div>
+
+@if (Model.IsOutOfStep)
+{
+    <div class="alert alert-danger">
+        <strong>The register and the ledger disagree.</strong>
+        This PDC says it was received on <strong>@Model.ReceivedDate.ToString("dd/MM/yyyy")</strong>, but its
+        memorandum entry is posted on <strong>@Model.MemoPostedOn!.Value.ToString("dd/MM/yyyy")</strong>.
+        Saving from this screen will bring them back into line.
+    </div>
+}
+
+@if (Model.MemoPeriodClosed)
+{
+    <div class="alert alert-warning">
+        <strong>The memorandum entry is in a closed period (@Model.MemoPeriodName).</strong>
+        The received date cannot be changed while that period is closed &mdash; moving a posted entry out of
+        a closed period would alter figures that have already been reported. Reopen the period first, or
+        leave the date as it is.
+    </div>
+}
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="PdcReceiptId" type="hidden" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light"><strong>Editable</strong></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label asp-for="ChequeNumber" class="form-label"></label>
+                    <input asp-for="ChequeNumber" class="form-control" />
+                    <span asp-validation-for="ChequeNumber" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="BankName" class="form-label"></label>
+                    <input asp-for="BankName" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="ChequeDate" class="form-label">Cheque Date</label>
+                    <input asp-for="ChequeDate" type="date" class="form-control" />
+                    <div class="form-text">The date written on the cheque. <strong>Not</strong> an accounting date.</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="ReceivedDate" class="form-label">Received Date &mdash; accounting date</label>
+                    <input asp-for="ReceivedDate" type="date" class="form-control" />
+                    <div class="form-text">
+                        Changing this <strong>re-dates the memorandum entry</strong> and moves it to the matching
+                        accounting period.
+                    </div>
+                    <span asp-validation-for="ReceivedDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light">
+            <strong>Fixed</strong>
+            <span class="text-muted small ms-2">These determined what was posted and cannot be changed here</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="text-muted small">Amount</div>
+                    <div class="fw-semibold">@Model.Amount.ToString("N2")</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-muted small">Settlement mode</div>
+                    <div class="fw-semibold">@Model.SettlementMode</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-muted small">Status</div>
+                    <div class="fw-semibold">@Model.Status</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-muted small">Cleared on</div>
+                    <div class="fw-semibold">@(Model.ClearedDate.HasValue ? Model.ClearedDate.Value.ToString("dd/MM/yyyy") : "-")</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Lease</div>
+                    <div class="fw-semibold">@Model.LeaseDisplay</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Invoice</div>
+                    <div class="fw-semibold">@Model.InvoiceDisplay</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Memorandum entry</div>
+                    <div class="fw-semibold">
+                        @(Model.MemoEntryNumber ?? "Not posted")
+                        @if (Model.MemoPostedOn.HasValue)
+                        {
+                            <text>&mdash; dated @Model.MemoPostedOn.Value.ToString("dd/MM/yyyy")</text>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Accounting period</div>
+                    <div class="fw-semibold">
+                        @(Model.MemoPeriodName ?? "-")
+                        @if (Model.MemoPeriodClosed)
+                        {
+                            <span class="badge bg-danger ms-1">Closed</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.IsCleared)
+            {
+                <div class="alert alert-info small mt-3 mb-0">
+                    This cheque has already cleared, so the received date cannot be moved later than
+                    @Model.ClearedDate!.Value.ToString("dd/MM/yyyy"). The clearance entry keeps its own date.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light border small mt-3 mb-0">
+                    To change the amount, lease, invoice or settlement mode, the posted entry would have to be
+                    reversed and re-entered. Raise a new PDC instead.
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Save Changes</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

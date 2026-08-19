@@ -1,0 +1,50 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+.card {
+    border-radius: 0.75rem;
+}
+
+.footer {
+    background-color: #fff;
+}
+.navbar-nav .dropdown-menu {
+    min-width: 240px;
+}
+
+.navbar .nav-link {
+    white-space: nowrap;
+}
+.coa-tree li {
+    position: relative;
+}
+
+    .coa-tree li::before {
+        content: "";
+        position: absolute;
+        top: 18px;
+        left: -14px;
+        width: 10px;
+        height: 1px;
+        background: #adb5bd;
+    }
+
+.coa-tree > li::before {
+    display: none;
+}

@@ -1,0 +1,100 @@
+﻿@model RealEstateManager.Models.PdcClearViewModel
+
+@{
+    ViewData["Title"] = "Clear PDC";
+}
+
+<h2>Clear PDC</h2>
+
+<div class="alert alert-warning">
+    Clearing this cheque will reverse the memorandum entry and post the real accounting entry to bank and the settlement account.
+</div>
+
+<form asp-action="Clear" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="PdcReceiptId" type="hidden" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="ChequeNumber" class="form-label">Cheque Number</label>
+            <input asp-for="ChequeNumber" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="BankName" class="form-label">Bank</label>
+            <input asp-for="BankName" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="SettlementMode" class="form-label">Settlement Mode</label>
+            <input asp-for="SettlementMode" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="LeaseDisplay" class="form-label">Lease</label>
+            <input asp-for="LeaseDisplay" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="InvoiceDisplay" class="form-label">Invoice</label>
+            <input asp-for="InvoiceDisplay" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Amount" class="form-label"></label>
+            <input asp-for="Amount" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ChequeDate" class="form-label"></label>
+            <input asp-for="ChequeDate" type="date" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ReceivedDate" class="form-label"></label>
+            <input asp-for="ReceivedDate" type="date" class="form-control" readonly />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ClearedDate" class="form-label">Cleared Date &mdash; accounting date</label>
+            <input asp-for="ClearedDate" type="date" class="form-control" />
+            <div class="form-text">The day the bank honoured the cheque. The cash entry posts on this date.</div>
+        </div>
+    </div>
+
+    @if (Model.RequiresEarlyClearanceConfirmation)
+    {
+        <div class="alert alert-warning border-warning mt-4">
+            <div class="fw-bold mb-2">Clearing @Model.DaysEarly day(s) before the cheque date</div>
+            <p class="mb-2">
+                The cheque is dated <strong>@Model.ChequeDate.ToString("dd/MM/yyyy")</strong> but you are
+                clearing it on <strong>@Model.ClearedDate.ToString("dd/MM/yyyy")</strong>. A bank will not
+                normally honour a post-dated cheque before its date.
+            </p>
+            <p class="mb-3 small">
+                If the cleared date is simply wrong, correct it above. If the cheque genuinely was presented
+                and honoured early &mdash; by agreement with the tenant, for example &mdash; tick below and
+                post. The cash entry will be dated @Model.ClearedDate.ToString("dd/MM/yyyy").
+            </p>
+            <div class="form-check">
+                <input asp-for="ConfirmEarlyClearance" class="form-check-input" id="confirmEarly" />
+                <label class="form-check-label fw-semibold" for="confirmEarly">
+                    I confirm this cheque was honoured on the cleared date shown above.
+                </label>
+            </div>
+        </div>
+    }
+
+    <div class="mt-4">
+        <button type="submit" class="btn @(Model.RequiresEarlyClearanceConfirmation ? "btn-warning" : "btn-dark")">
+            @(Model.RequiresEarlyClearanceConfirmation ? "Confirm and Post" : "Clear and Post")
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

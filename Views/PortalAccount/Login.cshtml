@@ -1,0 +1,42 @@
+@model RealEstateManager.Models.PortalLoginViewModel
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "Sign In";
+}
+
+<div class="card shadow-sm mx-auto mt-4" style="max-width:420px">
+    <div class="card-body p-4">
+        <h1 class="h5 mb-1">Sign in</h1>
+        <p class="text-muted small mb-4">
+            Use the username and password given to you by your property manager.
+        </p>
+
+        <form asp-action="Login" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control" autocomplete="username" autofocus />
+                <span asp-validation-for="Username" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" type="password" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-dark w-100">Sign in</button>
+        </form>
+
+        <p class="text-muted small mt-4 mb-0">
+            Forgotten your password, or no account yet? Contact your property manager &mdash;
+            they can issue new access for you.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

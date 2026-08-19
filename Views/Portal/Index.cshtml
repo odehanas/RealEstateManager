@@ -1,0 +1,144 @@
+@model RealEstateManager.Models.PortalDashboardViewModel
+@using RealEstateManager.Domain
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "My Account";
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3">
+        <div class="card stat shadow-sm h-100 @(Model.OutstandingBalance > 0 ? "bg-danger" : Model.IsInCredit ? "bg-info" : "bg-success") text-white">
+            <div class="card-body">
+                <div class="label">@(Model.IsInCredit ? "In Credit" : "Balance Due")</div>
+                <div class="value">@Math.Abs(Model.OutstandingBalance).ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat shadow-sm h-100 @(Model.OverdueAmount > 0 ? "bg-warning text-dark" : "bg-secondary text-white")">
+            <div class="card-body">
+                <div class="label">Overdue</div>
+                <div class="value">@Model.OverdueAmount.ToString("N2")</div>
+                <div class="small">@Model.OverdueCount invoice(s)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat shadow-sm h-100 bg-dark text-white">
+            <div class="card-body">
+                <div class="label">Cheques Held</div>
+                <div class="value">@Model.PdcsOnHandTotal.ToString("N2")</div>
+                <div class="small">@Model.PdcsOnHand.Count not yet presented</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat shadow-sm h-100 bg-primary text-white">
+            <div class="card-body">
+                <div class="label">Deposit Held</div>
+                <div class="value">@Model.SecurityDepositHeld.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.NextDueInvoice != null)
+{
+    var next = Model.NextDueInvoice;
+    <div class="card shadow-sm mb-3 @(next.IsOverdue ? "border-danger" : "")">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                    <div class="text-muted small text-uppercase">Next payment due</div>
+                    <div class="h4 mb-1">@next.Outstanding.ToString("N2")</div>
+                    <div class="small">
+                        Invoice <strong>@next.InvoiceNumber</strong> &middot; unit @next.UnitCode
+                        <br />
+                        Due @next.DueDate.ToString("dd MMMM yyyy")
+                        @if (next.IsOverdue)
+                        {
+                            <span class="badge bg-danger ms-1">@next.DaysOverdue days overdue</span>
+                        }
+                    </div>
+                </div>
+                <a asp-action="Invoices" class="btn btn-outline-dark btn-sm">All invoices</a>
+            </div>
+        </div>
+    </div>
+}
+else if (Model.IsSettled)
+{
+    <div class="alert alert-success">
+        <strong>Your account is fully settled.</strong> There is nothing outstanding.
+    </div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-light"><strong>My Tenancy</strong></div>
+    @if (Model.ActiveContracts.Count == 0)
+    {
+        <div class="card-body text-muted">You have no active contract at the moment.</div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var contract in Model.ActiveContracts)
+            {
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <div class="fw-semibold">@contract.PropertyName &mdash; unit @contract.UnitCode</div>
+                            <div class="small text-muted">
+                                @contract.ContractNumber<br />
+                                @contract.StartDate.ToString("dd/MM/yyyy") to @contract.EndDate.ToString("dd/MM/yyyy")
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-semibold">@contract.AnnualRent.ToString("N2")</div>
+                            <div class="small text-muted">per year</div>
+                            @if (contract.IsExpiringSoon)
+                            {
+                                <span class="badge bg-warning text-dark mt-1">Expires in @contract.DaysToExpiry days</span>
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body small">
+        <div class="row g-2">
+            <div class="col-6 col-md-3">
+                <div class="text-muted">Opening balance</div>
+                <div class="fw-semibold">@Model.OpeningBalance.ToString("N2")</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-muted">Total invoiced</div>
+                <div class="fw-semibold">@Model.TotalInvoiced.ToString("N2")</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-muted">Total paid</div>
+                <div class="fw-semibold">@Model.TotalPaid.ToString("N2")</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="text-muted">Balance</div>
+                <div class="fw-semibold">@Model.OutstandingBalance.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body small text-muted">
+        <strong class="text-dark">Need help?</strong>
+        Contact @Model.CompanyName
+        @if (!string.IsNullOrWhiteSpace(Model.CompanyPhone)) { <text>on @Model.CompanyPhone</text> }
+        @if (!string.IsNullOrWhiteSpace(Model.CompanyEmail)) { <text>or at @Model.CompanyEmail</text> }.
+        <br /><br />
+        Cheques you have given are shown under <strong>Payments</strong>. A cheque only reduces your balance
+        once it has been cleared by the bank.
+    </div>
+</div>

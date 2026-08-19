@@ -1,0 +1,83 @@
+﻿@model IEnumerable<RealEstateManager.Domain.CustomerInvoice>
+
+@{
+    ViewData["Title"] = "Customer Invoices";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Customer Invoices</h2>
+    <a asp-controller="CustomerReceipts" asp-action="Create" class="btn btn-dark">Receive Payment</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Invoice</th>
+            <th>Property</th>
+            <th>Unit</th>
+            <th>Tenant</th>
+            <th>Invoice Date</th>
+            <th>Due Date</th>
+            <th class="text-end">Total</th>
+            <th class="text-end">Paid</th>
+            <th class="text-end">Balance</th>
+            <th>Status</th>
+            <th>GL</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var invoice in Model)
+        {
+            var balance = invoice.TotalAmount - invoice.AmountPaid;
+
+            <tr>
+                <td>@invoice.InvoiceNumber</td>
+                <td>@invoice.Lease?.Unit?.Property?.Name</td>
+                <td>@invoice.Lease?.Unit?.UnitNumber</td>
+                <td>@invoice.Lease?.Tenant?.FullName</td>
+                <td>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</td>
+                <td>@invoice.DueDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-end">@invoice.TotalAmount.ToString("N2")</td>
+                <td class="text-end">@invoice.AmountPaid.ToString("N2")</td>
+                <td class="text-end">@balance.ToString("N2")</td>
+                <td>@invoice.Status</td>
+                <td>
+                    @if (invoice.JournalEntryId.HasValue)
+                    {
+                        <span class="badge bg-success">Posted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Not Posted</span>
+                    }
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        @if (!invoice.JournalEntryId.HasValue)
+                        {
+                            <form asp-action="Post" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@invoice.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Post</button>
+                            </form>
+                        }
+
+                        <a asp-action="TaxInvoice" asp-route-id="@invoice.Id" target="_blank"
+                           class="btn btn-sm btn-outline-dark"
+                           title="@(invoice.VatAmount > 0 ? "Print the tax invoice" : "Print the invoice — no output tax on this supply")">
+                            @(invoice.VatAmount > 0 ? "Tax Invoice" : "Invoice")
+                        </a>
+
+                        @if (balance > 0)
+                        {
+                            <a asp-controller="CustomerReceipts" asp-action="Create" asp-route-invoiceId="@invoice.Id" class="btn btn-sm btn-outline-success">
+                                Receive
+                            </a>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

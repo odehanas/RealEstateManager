@@ -1,0 +1,71 @@
+﻿@model RealEstateManager.Services.ProfitAndLossReportDto
+
+@{
+    ViewData["Title"] = "Profit and Loss";
+}
+
+<h2>Profit and Loss</h2>
+
+<form method="get" class="mb-3">
+    <label for="asOfDate">As Of Date</label>
+    <input type="date" id="asOfDate" name="asOfDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+    <button type="submit">Refresh</button>
+</form>
+
+<h4>Revenue</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Account</th>
+            <th class="text-end">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.Revenue)
+        {
+            <tr>
+                <td>@row.AccountCode</td>
+                <td>@row.AccountName</td>
+                <td class="text-end">@row.Amount.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total Revenue</th>
+            <th class="text-end">@Model.TotalRevenue.ToString("N2")</th>
+        </tr>
+    </tfoot>
+</table>
+
+<h4>Expenses</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Account</th>
+            <th class="text-end">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.Expenses)
+        {
+            <tr>
+                <td>@row.AccountCode</td>
+                <td>@row.AccountName</td>
+                <td class="text-end">@row.Amount.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total Expenses</th>
+            <th class="text-end">@Model.TotalExpenses.ToString("N2")</th>
+        </tr>
+        <tr>
+            <th colspan="2">Net Profit / Loss</th>
+            <th class="text-end">@Model.NetProfitOrLoss.ToString("N2")</th>
+        </tr>
+    </tfoot>
+</table>

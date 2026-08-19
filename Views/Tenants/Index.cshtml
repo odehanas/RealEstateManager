@@ -1,0 +1,62 @@
+﻿@model IEnumerable<RealEstateManager.Domain.Tenant>
+@inject PermissionService PermissionService
+
+@{
+    ViewData["Title"] = "Tenants";
+
+    // Master data is centralised - most users may look it up but not change it.
+    var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Tenants</h2>
+    @if (canEdit)
+    {
+        <a asp-controller="Tenants" asp-action="Create" class="btn btn-dark">Add Tenant</a>
+    }
+</div>
+
+@if (!canEdit)
+{
+    <div class="alert alert-secondary py-2 small">
+        You have read-only access to master data. Contact the master data owner to add or amend a tenant.
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Nationality</th>
+            <th>ID Number</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Code</td>
+                <td>@item.FullName</td>
+                <td>@item.Email</td>
+                <td>@item.Phone</td>
+                <td>@item.Nationality</td>
+                <td>@item.IdNumber</td>
+                <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                <td>
+                    @if (canEdit)
+                    {
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                            <a asp-action="PortalAccess" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark">Portal</a>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

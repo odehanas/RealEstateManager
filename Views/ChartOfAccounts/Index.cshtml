@@ -1,0 +1,199 @@
+@model RealEstateManager.Models.ChartOfAccountsIndexViewModel
+
+@{
+    ViewData["Title"] = "Chart of Accounts";
+    var ob = Model.OpeningBalances;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Chart of Accounts</h2>
+    <div class="d-flex gap-2">
+        <a asp-controller="OpeningBalances" asp-action="Index" class="btn btn-outline-secondary">Opening Balances Detail</a>
+        <a asp-action="Create" class="btn btn-dark">New Account</a>
+    </div>
+</div>
+
+@* ================= OPENING BALANCE STATUS ================= *@
+@if (!ob.HasAnyOpeningBalance)
+{
+    <div class="alert alert-secondary d-flex align-items-start gap-2">
+        <span style="font-size:1.3rem;line-height:1">&#9432;</span>
+        <div>
+            <strong>No opening balances have been entered.</strong>
+            That is correct if this company started from nothing. If you are migrating from another system,
+            enter each account's balance below &mdash; and remember that every debit needs a matching credit,
+            or the Trial Balance and Balance Sheet will not balance.
+        </div>
+    </div>
+}
+else if (ob.IsBalanced)
+{
+    <div class="alert alert-success d-flex align-items-start gap-2">
+        <span style="font-size:1.3rem;line-height:1">&#10004;</span>
+        <div>
+            <strong>Opening balances are complete and balanced.</strong>
+            @if (ob.HasControlAccount)
+            {
+                <text>
+                    <code>39999</code> Opening Balance Control Account is <strong>zero</strong>, which means every
+                    debit opening balance has a matching credit across @ob.AccountsWithOpeningBalance account(s).
+                </text>
+            }
+            else
+            {
+                <text>
+                    Total debits @ob.TotalDebit.ToString("N2") equal total credits @ob.TotalCredit.ToString("N2").
+                </text>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        <div class="d-flex align-items-start gap-2">
+            <span style="font-size:1.3rem;line-height:1">&#9888;</span>
+            <div>
+                <strong>Opening balances are incomplete.</strong>
+                @if (ob.HasControlAccount)
+                {
+                    <text>
+                        <code>39999</code> Opening Balance Control Account is holding
+                        <strong>@Math.Abs(ob.ControlAccountBalance).ToString("N2")</strong>
+                        @(ob.ControlAccountBalance > 0 ? "credit" : "debit").
+                        <div class="mt-2">
+                            Your Trial Balance and Balance Sheet <strong>still balance</strong> &mdash; the control
+                            account is absorbing the difference &mdash; but this amount is sitting in equity and
+                            does not belong there. It is the opening balance you have not entered yet.
+                            @if (ob.ControlAccountBalance > 0)
+                            {
+                                <text>
+                                    A credit balance means your debit-side opening balances (assets) exceed your
+                                    credit-side ones. The missing entry is usually equity &mdash;
+                                    <code>31100</code> Share Capital or <code>32100</code> Retained Earnings
+                                    &ndash; Prior Years &mdash; or a liability you have not recorded.
+                                </text>
+                            }
+                            else
+                            {
+                                <text>
+                                    A debit balance means your credit-side opening balances exceed your debit-side
+                                    ones. You are most likely missing an asset &mdash; a bank balance or a
+                                    receivable.
+                                </text>
+                            }
+                        </div>
+                        <div class="mt-2">
+                            Enter the missing balance and this account returns to zero on its own. It cannot be
+                            cleared by posting a journal &mdash; the figure is derived, not stored.
+                        </div>
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        Total debits are <strong>@ob.TotalDebit.ToString("N2")</strong> against total credits of
+                        <strong>@ob.TotalCredit.ToString("N2")</strong> &mdash; a difference of
+                        <strong>@Math.Abs(ob.Difference).ToString("N2")</strong>. Your Trial Balance will be out by
+                        exactly this amount.
+                        <div class="mt-2">
+                            Account <code>39999</code> Opening Balance Control Account has not been created yet.
+                            Restart the application and it will be added automatically, after which the reports
+                            will balance and this figure will appear there instead.
+                        </div>
+                    </text>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (ob.HasAnyOpeningBalance)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light">
+            <strong>Opening Balance Position</strong>
+            <span class="text-muted small ms-2">Assets should equal liabilities plus equity</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3 text-center">
+                    <div class="text-muted small text-uppercase">Assets</div>
+                    <div class="h4 mb-0">@ob.Assets.ToString("N2")</div>
+                    <div class="text-muted small">debit side</div>
+                </div>
+
+                <div class="col-md-1 text-center">
+                    <span class="h4 text-muted">@(ob.EquationGap == 0m ? "=" : "≠")</span>
+                </div>
+
+                <div class="col-md-3 text-center">
+                    <div class="text-muted small text-uppercase">Liabilities + Equity</div>
+                    <div class="h4 mb-0">@ob.LiabilitiesAndEquity.ToString("N2")</div>
+                    <div class="text-muted small">
+                        @ob.Liabilities.ToString("N2") + @ob.EquityExcludingControl.ToString("N2")
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td>Assets (debit side)</td>
+                            <td class="text-end fw-semibold">@ob.Assets.ToString("N2")</td>
+                        </tr>
+                        <tr>
+                            <td>Liabilities and equity (credit side)</td>
+                            <td class="text-end fw-semibold">@ob.LiabilitiesAndEquity.ToString("N2")</td>
+                        </tr>
+                        <tr class="@(ob.IsBalanced ? "table-success" : "table-danger")">
+                            <td>
+                                <strong>Held in <code>39999</code></strong>
+                                <div class="small text-muted">Still to be entered</div>
+                            </td>
+                            <td class="text-end fw-bold">@ob.ControlAccountBalance.ToString("N2")</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            @if (ob.HasProfitAndLossOpeningBalances)
+            {
+                <div class="alert alert-warning small mt-3 mb-0">
+                    <strong>Opening balances exist on revenue or expense accounts</strong>
+                    (revenue @ob.Revenue.ToString("N2"), expenses @ob.Expenses.ToString("N2")).
+                    That is unusual: prior-year trading results normally sit in
+                    <code>32100</code> Retained Earnings &ndash; Prior Years, not in the profit and loss
+                    accounts. Leaving them here will overstate the current year's result. This is why
+                    <em>Assets = Liabilities + Equity</em> can read as unbalanced above even when total debits
+                    equal total credits.
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@* ================= THE TREE ================= *@
+<div class="card shadow-sm">
+    <div class="card-body">
+        @if (!Model.Accounts.Any())
+        {
+            <p class="text-muted mb-0">No accounts found.</p>
+        }
+        else
+        {
+            <ul class="coa-tree list-unstyled mb-0">
+                @foreach (var account in Model.Accounts)
+                {
+                    <partial name="_AccountTreeNode" model="account" />
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<p class="text-muted small mt-2 mb-0">
+    Opening balances are shown in <strong>natural</strong> form: a positive figure is a debit balance on an
+    asset or expense account, and a credit balance on a liability, equity or revenue account. Accounts marked
+    <span class="badge bg-primary">Sub-ledger Control</span> take their opening balance from the tenants,
+    vendors or fixed assets beneath them and cannot be edited directly.
+</p>

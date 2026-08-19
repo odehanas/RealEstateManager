@@ -1,0 +1,364 @@
+@using RealEstateManager.Models
+@using RealEstateManager.Services
+@inject ICurrentCompanyAccessor CurrentCompanyAccessor
+@inject AppAuthService AppAuthService
+@inject PermissionService PermissionService
+@inject SubscriptionService SubscriptionService
+
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var currentCompanyId = CurrentCompanyAccessor.CompanyId;
+    var currentCompanyName = User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value ?? "No Company Selected";
+    var displayName = User.FindFirst(AppClaimTypes.DisplayName)?.Value ?? User.Identity?.Name ?? "User";
+    var isSystemAdmin = User.IsInRole("SystemAdmin");
+    var subscriptionStatus = isAuthenticated && currentCompanyId.HasValue
+        ? await SubscriptionService.GetStatusAsync(currentCompanyId.Value)
+        : null;
+    var subscriptionBlocked = subscriptionStatus != null && subscriptionStatus.IsExpired && !isSystemAdmin;
+    // Master data is centralised: reading it is broadly available, creating and
+    // amending it is not. The menu follows the read right; the Create/Edit controls
+    // inside each page follow the manage right.
+    var canViewMasterData = isAuthenticated && await PermissionService.HasAnyPermissionAsync(
+        User,
+        AppPermissions.MasterDataView,
+        AppPermissions.MasterDataManage);
+    var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
+    var canManageAccounting = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
+    var canViewReports = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ReportsView);
+    var canViewVendors = isAuthenticated && await PermissionService.HasAnyPermissionAsync(
+        User,
+        AppPermissions.MasterDataView,
+        AppPermissions.MasterDataManage,
+        AppPermissions.AccountingManage);
+    var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors;
+    var showAccountsMenu = canManageAccounting;
+    var showReportsMenu = canViewReports;
+    if (subscriptionBlocked)
+    {
+        showMasterDataMenu = false;
+        showAccountsMenu = false;
+        showReportsMenu = false;
+    }
+    var companies = isAuthenticated && CurrentCompanyAccessor.UserId.HasValue
+        ? await AppAuthService.GetAccessibleCompaniesAsync(CurrentCompanyAccessor.UserId.Value, currentCompanyId)
+        : new List<CompanyOptionViewModel>();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RealEstateManager</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-xl navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">RealEstateManager</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    @if (isAuthenticated)
+                    {
+                    @*
+                        Menu order follows the order the work is actually done:
+                        System Setup (configure the company once) -> Master Data (the
+                        things being managed) -> Operations (the daily transactions) ->
+                        Reporting (what came out of them).
+                    *@
+                    <ul class="navbar-nav me-auto mb-2 mb-xl-0">
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="setupDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                System Setup
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="setupDropdown">
+                                @if (canManageAccounting)
+                                {
+                                    <li><h6 class="dropdown-header">Accounting Setup</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="ChartOfAccounts" asp-action="Index">Chart of Accounts</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="AccountMappings" asp-action="Index">Account Mapping</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="OpeningBalances" asp-action="Index">Opening Balances</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="OwnerWithdrawalCategories" asp-action="Index">Owner Withdrawal Categories</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="VatSettings" asp-action="Index">VAT Settings</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="RevenueRecognition" asp-action="Index">Revenue Recognition</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Prepayments" asp-action="Index">Recurring Prepayments</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Closing" asp-action="Index">Period Closing</a>
+                                    </li>
+                                }
+                                @if (isSystemAdmin)
+                                {
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Administration</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Companies" asp-action="Index">Companies</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">Users &amp; Permissions</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="AuditLogs" asp-action="Index">Audit Logs</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Manage">Feedback Review</a>
+                                    </li>
+                                }
+                                @if (currentCompanyId.HasValue)
+                                {
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Subscription &amp; Help</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Subscription" asp-action="Index">Subscription</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Help" asp-action="Index">Help</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="~/manual/RealEstateManager-User-Manual.html" target="_blank">User Manual</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Index">Send Feedback</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+
+                        @if (showMasterDataMenu)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="masterDataDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Master Data
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="masterDataDropdown">
+                                    @if (canViewMasterData)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Properties" asp-action="Index">Properties</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Units" asp-action="Index">Units</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Tenants" asp-action="Index">Tenants</a>
+                                        </li>
+                                    }
+                                    @if (canManageLeases)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Leases" asp-action="Index">Leases</a>
+                                        </li>
+                                    }
+                                    @if (canViewVendors)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Vendors" asp-action="Index">Vendors</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showAccountsMenu)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="operationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Operations
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="operationsDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Workflow" asp-action="Index">Workflow Guide</a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Receivables &mdash; Tenants</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CustomerInvoices" asp-action="Index">Customer Invoices</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CustomerReceipts" asp-action="Index">Customer Receipts</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="PdcReceipts" asp-action="Index">PDC Receipts</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="SecurityDeposits" asp-action="Index">Security Deposits</a>
+                                    </li>
+
+                                    @* Vendors is master data, not an operation - it lives under Master Data only. *@
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Payables &mdash; Vendors</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="VendorBills" asp-action="Index">Vendor Bills</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="VendorPayments" asp-action="Index">Vendor Payments</a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">General Ledger</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="PettyCash" asp-action="Index">Petty Cash</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="FixedAssets" asp-action="Index">Fixed Assets</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="ManualJournals" asp-action="Index">Manual Journals</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Journal" asp-action="Index">Journal Inquiry</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showReportsMenu)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="reportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Reporting
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="reportingDropdown">
+                                    <li><h6 class="dropdown-header">Financial Reports</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TrialBalance">Trial Balance</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLoss">Profit &amp; Loss</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="BalanceSheet">Balance Sheet</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="CashFlow">Statement of Cash Flows</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Journal" asp-action="GeneralLedger">General Ledger</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="VatReturn">VAT Return</a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Management &mdash; Tenants &amp; Properties</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="TenantStatements" asp-action="Index">Tenant Statement</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TenantHealth">Tenant Health &amp; Ranking</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="PropertyUtilization">Property Utilization</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLossByProperty">P&amp;L by Property</a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Management &mdash; Owners</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerTenancySchedule">Owner Tenancy Schedule</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerWithdrawals">Owner Withdrawals</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                    }
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                        @if (isAuthenticated)
+                        {
+                            @if (companies.Count > 1)
+                            {
+                                <form asp-controller="Auth" asp-action="SwitchCompany" method="post" class="d-flex align-items-center gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <select name="companyId" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        @foreach (var company in companies)
+                                        {
+                                            <option value="@company.CompanyId" selected="@(company.IsCurrent ? "selected" : null)">
+                                                @company.CompanyName
+                                            </option>
+                                        }
+                                    </select>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="navbar-text text-light small">
+                                    @currentCompanyName
+                                </span>
+                            }
+
+                            <span class="navbar-text text-light small">
+                                @displayName
+                            </span>
+
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">Password</a>
+
+                            <form asp-controller="Auth" asp-action="Logout" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Auth" asp-action="Login">Login</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container py-4">
+        @if (subscriptionBlocked && subscriptionStatus != null)
+        {
+            <div class="alert alert-danger">
+                Subscription for <strong>@subscriptionStatus.CompanyName</strong> has expired. Enter an activation code to continue processing.
+                <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
+            </div>
+        }
+        @RenderBody()
+    </div>
+
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container py-3">
+            &copy; @DateTime.Now.Year - RealEstateManager
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

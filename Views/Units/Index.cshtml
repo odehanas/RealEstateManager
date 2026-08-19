@@ -1,0 +1,116 @@
+﻿@model IEnumerable<RealEstateManager.Models.PropertyUnitsHierarchyViewModel>
+@inject PermissionService PermissionService
+
+@{
+    ViewData["Title"] = "Units Hierarchy";
+
+    // Master data is centralised - most users may look it up but not change it.
+    var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Property and Unit Hierarchy</h2>
+    @if (canEdit)
+    {
+        <a asp-controller="Units" asp-action="Create" class="btn btn-dark">Add Unit</a>
+    }
+</div>
+
+@if (!canEdit)
+{
+    <div class="alert alert-secondary py-2 small">
+        You have read-only access to master data. Contact the master data owner to add or amend a unit.
+    </div>
+}
+
+@foreach (var property in Model)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@property.PropertyCode - @property.PropertyName</strong>
+                    <div class="small">
+                        @property.PropertyType | @property.OwnershipType
+                        @if (!string.IsNullOrWhiteSpace(property.OwnerName))
+                        {
+                            <span>| Owner: @property.OwnerName</span>
+                        }
+                    </div>
+                </div>
+                <span class="badge bg-light text-dark">@property.Units.Count unit(s)</span>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Unit</th>
+                        <th>Floor</th>
+                        <th>Usage</th>
+                        <th class="text-end">Area SqFt</th>
+                        <th class="text-end">Standard Rent</th>
+                        <th>Status</th>
+                        <th>Active Tenant</th>
+                        <th>Active Lease</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (property.Units.Any())
+                    {
+                        @foreach (var unit in property.Units)
+                        {
+                            <tr>
+                                <td>@unit.UnitNumber</td>
+                                <td>@unit.Floor</td>
+                                <td>@unit.UsageType</td>
+                                <td class="text-end">@unit.AreaSqFt.ToString("N2")</td>
+                                <td class="text-end">@unit.StandardAnnualRent.ToString("N2")</td>
+                                <td>@unit.Status</td>
+                                <td>
+                                    @if (unit.HasActiveLease)
+                                    {
+                                        <span>@unit.ActiveTenantName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Vacant</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (unit.HasActiveLease)
+                                    {
+                                        <div>@unit.ActiveContractNumber</div>
+                                        <small class="text-muted">
+                                            @unit.LeaseStartDate?.ToString("dd/MM/yyyy")
+                                            -
+                                            @unit.LeaseEndDate?.ToString("dd/MM/yyyy")
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No active lease</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (canEdit)
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@unit.UnitId" class="btn btn-sm btn-primary">Edit</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted">No units found for this property.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

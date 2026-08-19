@@ -1,0 +1,149 @@
+@model RealEstateManager.Models.FeedbackAdminListViewModel
+
+@{
+    ViewData["Title"] = "Feedback Review";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Feedback Review</h2>
+        <p class="text-muted mb-0">Review user suggestions and track what should be considered in future published versions.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <a asp-action="ExportCsv"
+           asp-route-status="@Model.Filter.Status"
+           asp-route-category="@Model.Filter.Category"
+           asp-route-username="@Model.Filter.Username"
+           asp-route-onlyOpenItems="@Model.Filter.OnlyOpenItems"
+           class="btn btn-outline-secondary btn-sm">Export CSV</a>
+        <span class="text-muted">Latest 500 items</span>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="small text-uppercase opacity-75">Total Feedback</div>
+                <div class="display-6 fw-bold">@Model.TotalItems</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 bg-warning h-100">
+            <div class="card-body">
+                <div class="small text-uppercase text-muted">Open Items</div>
+                <div class="display-6 fw-bold">@Model.OpenItems</div>
+                <div class="small text-muted">New: @Model.NewItems</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 bg-success text-white h-100">
+            <div class="card-body">
+                <div class="small text-uppercase opacity-75">Planned</div>
+                <div class="display-6 fw-bold">@Model.PlannedItems</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm border-0 bg-secondary text-white h-100">
+            <div class="card-body">
+                <div class="small text-uppercase opacity-75">Closed</div>
+                <div class="display-6 fw-bold">@Model.ClosedItems</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label asp-for="Filter.Status" class="form-label">Status</label>
+                <select asp-for="Filter.Status" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var status in Model.AvailableStatuses)
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Filter.Category" class="form-label">Category</label>
+                <select asp-for="Filter.Category" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var category in Model.AvailableCategories)
+                    {
+                        <option value="@category">@category</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Filter.Username" class="form-label">Username</label>
+                <input asp-for="Filter.Username" class="form-control" />
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input asp-for="Filter.OnlyOpenItems" class="form-check-input" />
+                    <label asp-for="Filter.OnlyOpenItems" class="form-check-label">Open items only</label>
+                </div>
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a asp-action="Manage" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>When</th>
+                <th>Company</th>
+                <th>User</th>
+                <th>Category</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Reviewed</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Count == 0)
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted">No feedback items found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.CompanyName</td>
+                        <td>@item.DisplayName (@item.Username)</td>
+                        <td>@item.Category</td>
+                        <td>
+                            <div class="fw-semibold">@item.Subject</div>
+                            <div class="small text-muted text-truncate" style="max-width: 340px;">@item.Message</div>
+                        </td>
+                        <td>@item.Status</td>
+                        <td>@(item.ReviewedAt.HasValue ? $"{item.ReviewedAt.Value.ToLocalTime():dd/MM/yyyy HH:mm} by {item.ReviewedByName ?? "-"}" : "-")</td>
+                        <td class="text-center">
+                            <a asp-action="Review" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Open</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

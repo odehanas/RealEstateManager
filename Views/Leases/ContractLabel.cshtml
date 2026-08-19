@@ -1,0 +1,130 @@
+@model RealEstateManager.Domain.Lease
+@{
+    Layout = null;
+    var companyName = ViewBag.CompanyName as string ?? "";
+    var qr = ViewBag.QrDataUri as string ?? "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contract @Model.ContractNumber</title>
+<style>
+    :root { --ink:#1f2933; --navy:#0f2740; --line:#d8dee6; --muted:#5b6774; }
+    * { box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body {
+        margin:0; padding:18px; background:#f2f4f7; color:var(--ink);
+        font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:11pt;
+    }
+    .label {
+        width:150mm; margin:0 auto; background:#fff; border:1px solid var(--line);
+        border-radius:8px; padding:14mm 14mm 12mm;
+    }
+    .head { display:flex; justify-content:space-between; align-items:flex-start; gap:14mm; }
+    .company { font-size:12pt; font-weight:700; color:var(--navy); }
+    .kicker {
+        font-size:8pt; text-transform:uppercase; letter-spacing:.1em;
+        color:var(--muted); font-weight:700; margin-bottom:3px;
+    }
+    .code {
+        font-family:"Cascadia Mono",Consolas,"Courier New",monospace;
+        font-size:19pt; font-weight:700; color:var(--navy);
+        letter-spacing:.5pt; margin:2mm 0 1mm;
+    }
+    .qr { width:38mm; height:38mm; flex:0 0 38mm; border:1px solid var(--line); border-radius:6px; padding:2mm; background:#fff; }
+    .qr img { width:100%; height:100%; display:block; }
+    table { width:100%; border-collapse:collapse; margin-top:8mm; font-size:10pt; }
+    th, td { text-align:left; padding:2.6mm 3mm; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { width:38%; color:var(--muted); font-weight:600; }
+    td { font-weight:600; color:var(--navy); }
+    .breakdown { margin-top:7mm; padding-top:4mm; border-top:2px solid var(--navy); font-size:8.5pt; color:var(--muted); }
+    .breakdown code { background:#eef2f7; padding:.1em .35em; border-radius:3px; font-size:.95em; }
+    .toolbar { width:150mm; margin:0 auto 12px; display:flex; justify-content:flex-end; gap:8px; }
+    .toolbar button, .toolbar a {
+        background:var(--navy); color:#fff; border:0; border-radius:4px; padding:7px 16px;
+        font-size:10pt; font-weight:600; cursor:pointer; text-decoration:none;
+    }
+    .toolbar a { background:#fff; color:var(--navy); border:1px solid var(--line); }
+    @@page { size:A4 portrait; margin:12mm; }
+    @@media print {
+        body { background:#fff; padding:0; }
+        .toolbar { display:none; }
+        .label { width:auto; border:0; border-radius:0; padding:0; }
+    }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+    <a href="@Url.Action("Index", "Leases")">Back to Leases</a>
+    <button type="button" onclick="window.print()">Print</button>
+</div>
+
+<div class="label">
+    <div class="head">
+        <div>
+            <div class="company">@companyName</div>
+            <div class="kicker" style="margin-top:6mm">Lease Contract</div>
+            <div class="code">@Model.ContractNumber</div>
+            <div style="font-size:9pt;color:var(--muted)">Scan to identify this contract</div>
+        </div>
+        @if (!string.IsNullOrEmpty(qr))
+        {
+            <div class="qr"><img src="@qr" alt="QR code for contract @Model.ContractNumber" /></div>
+        }
+    </div>
+
+    <table>
+        <tr>
+            <th>Property</th>
+            <td>@Model.Unit?.Property?.Code &mdash; @Model.Unit?.Property?.Name</td>
+        </tr>
+        <tr>
+            <th>Unit</th>
+            <td>@Model.Unit?.UnitNumber</td>
+        </tr>
+        <tr>
+            <th>Tenant</th>
+            <td>@Model.Tenant?.FullName</td>
+        </tr>
+        <tr>
+            <th>Term</th>
+            <td>@Model.StartDate.ToString("dd/MM/yyyy") &ndash; @Model.EndDate.ToString("dd/MM/yyyy")</td>
+        </tr>
+        <tr>
+            <th>Annual Rent</th>
+            <td>@Model.AnnualRent.ToString("N2")</td>
+        </tr>
+        <tr>
+            <th>Billing</th>
+            <td>Every @Model.BillingFrequencyMonths month(s)</td>
+        </tr>
+        <tr>
+            <th>VAT Treatment</th>
+            <td>@RealEstateManager.Domain.VatCategories.Describe(Model.VatCategory)</td>
+        </tr>
+        <tr>
+            <th>Security Deposit</th>
+            <td>@Model.SecurityDepositAmount.ToString("N2")</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>@Model.Status</td>
+        </tr>
+    </table>
+
+    <div class="breakdown">
+        <strong>Reading the code.</strong>
+        <code>@Model.ContractNumber</code> &mdash;
+        ownership and property type, the property sequence, the unit (<code>U</code>),
+        the tenancy on that unit (<code>C</code>), then the contract year.
+        A renewal by the same tenant keeps its <code>C</code> number and moves the year on,
+        so every year of a tenancy is a distinct contract while the tenancy itself stays
+        traceable through one number.
+    </div>
+</div>
+
+</body>
+</html>

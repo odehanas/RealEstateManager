@@ -1,0 +1,63 @@
+@model RealEstateManager.Models.HelpPageViewModel
+
+@{
+    ViewData["Title"] = "Help";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Help And User Guide</h2>
+        <p class="text-muted mb-0">A built-in guide for your current published version, with the main workflows users need most.</p>
+    </div>
+    <a asp-controller="Feedback" asp-action="Index" class="btn btn-outline-primary">Send Feedback</a>
+</div>
+
+<div class="alert alert-info">
+    This help page is the best first step for the current stage of the product. It gives users a stable guide for the published version while you continue improving the system.
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card shadow-sm sticky-top" style="top: 1rem;">
+            <div class="card-body">
+                <h5 class="card-title">Quick Navigation</h5>
+                <div class="list-group list-group-flush">
+                    @foreach (var helpSection in Model.Sections)
+                    {
+                        <a class="list-group-item list-group-item-action px-0" href="#@helpSection.Id">@helpSection.Title</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        @foreach (var helpSection in Model.Sections)
+        {
+            <div id="@helpSection.Id" class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3 class="h4 mb-2">@helpSection.Title</h3>
+                    <p class="text-muted">@helpSection.Summary</p>
+                    <ol class="mb-0">
+                        @foreach (var step in helpSection.Steps)
+                        {
+                            <li class="mb-2">@step</li>
+                        }
+                    </ol>
+                </div>
+            </div>
+        }
+
+        <div class="card shadow-sm border-primary">
+            <div class="card-body">
+                <h3 class="h5 text-primary">Future AI Assistant</h3>
+                <p class="mb-2">
+                    The recommended path is to keep this built-in help guide as the trusted product manual now, then add an AI assistant later using this guide and your business rules as the knowledge source.
+                </p>
+                <p class="mb-0">
+                    When you are ready, an <code>n8n</code> workflow can receive questions, pass them to an AI model with the system guide and selected context, and return guided answers or support tickets.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,194 @@
+﻿@model RealEstateManager.Models.AccountFormViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Edit Account";
+    var parentAccounts = ViewBag.ParentAccounts as List<Account> ?? new();
+}
+
+<h2>Edit Account</h2>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="Code" class="form-label">Account Number</label>
+            <input asp-for="Code" class="form-control" />
+        </div>
+
+        <div class="col-md-5">
+            <label asp-for="Name" class="form-label">Account Name</label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="AccountType" class="form-label">Account Type</label>
+            <select asp-for="AccountType" class="form-select">
+                <option value="">Select Type</option>
+                <option>Asset</option>
+                <option>Liability</option>
+                <option>Equity</option>
+                <option>Revenue</option>
+                <option>Expense</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ReportingGroup" class="form-label">Reporting Group</label>
+            <select asp-for="ReportingGroup" class="form-select">
+                <option value="">Select Group</option>
+                <option>Assets</option>
+                <option>Liabilities</option>
+                <option>Equity</option>
+                <option>Revenue</option>
+                <option>DirectExpense</option>
+                <option>GeneralExpense</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ParentAccountId" class="form-label">Parent Account</label>
+            <select asp-for="ParentAccountId" class="form-select">
+                <option value="">No Parent</option>
+                @foreach (var account in parentAccounts)
+                {
+                    if (Model.ParentAccountId == account.Id)
+                    {
+                        <option value="@account.Id" selected>@account.ReportingGroup - @account.Code - @account.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@account.Id">@account.ReportingGroup - @account.Code - @account.Name</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="SortOrder" class="form-label">Sort Order</label>
+            <input asp-for="SortOrder" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="IsGroup" class="form-label">Group</label>
+            <select asp-for="IsGroup" class="form-select">
+                @if (Model.IsGroup)
+                {
+                    <option value="false">No</option>
+                    <option value="true" selected>Yes</option>
+                }
+                else
+                {
+                    <option value="false" selected>No</option>
+                    <option value="true">Yes</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="IsPostable" class="form-label">Postable</label>
+            <select asp-for="IsPostable" class="form-select">
+                @if (Model.IsPostable)
+                {
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                }
+                else
+                {
+                    <option value="true">Yes</option>
+                    <option value="false" selected>No</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="IsActive" class="form-label">Active</label>
+            <select asp-for="IsActive" class="form-select">
+                @if (Model.IsActive)
+                {
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                }
+                else
+                {
+                    <option value="true">Yes</option>
+                    <option value="false" selected>No</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="IsOwnerAccount" class="form-label">Owner Account</label>
+            <select asp-for="IsOwnerAccount" class="form-select">
+                @if (Model.IsOwnerAccount)
+                {
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                }
+                else
+                {
+                    <option value="true">Yes</option>
+                    <option value="false" selected>No</option>
+                }
+            </select>
+            <div class="form-text">
+                Marks a postable <strong>Equity</strong> account as an owner's current account. Journal lines
+                posted to it can then carry an owner withdrawal category. Ignored on any other account type.
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="IsPettyCashAccount" class="form-label">Petty Cash Float</label>
+            <select asp-for="IsPettyCashAccount" class="form-select">
+                @if (Model.IsPettyCashAccount)
+                {
+                    <option value="true" selected>Yes</option>
+                    <option value="false">No</option>
+                }
+                else
+                {
+                    <option value="true">Yes</option>
+                    <option value="false" selected>No</option>
+                }
+            </select>
+            <div class="form-text">
+                Marks a postable <strong>Asset</strong> account as a petty cash float, so it appears in the
+                Petty Cash journal with its own balance. Ignored on any other account type.
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="OpeningBalance" class="form-label">Opening Balance</label>
+            @if (Model.IsOpeningBalanceReadOnly)
+            {
+                <input asp-for="OpeningBalance" type="number" step="0.01" class="form-control" readonly />
+                <div class="form-text text-muted">
+                    <strong>Computed from sub-ledger.</strong>
+                    Source: <code>@Model.OpeningBalanceSource</code>.
+                    Edit the underlying tenants, vendors or fixed assets to change this value.
+                </div>
+            }
+            else
+            {
+                <input asp-for="OpeningBalance" type="number" step="0.01" class="form-control" />
+                <div class="form-text">
+                    Natural balance (debit-positive for Asset / Expense, credit-positive for
+                    Liability / Equity / Revenue). Leave 0 if no opening balance applies.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Update</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

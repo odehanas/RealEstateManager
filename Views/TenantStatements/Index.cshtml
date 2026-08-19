@@ -1,0 +1,179 @@
+@model RealEstateManager.Models.TenantStatementViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Tenant Statement";
+    var tenants = ViewBag.Tenants as List<Tenant> ?? new();
+    var leases = ViewBag.Leases as List<Lease> ?? new();
+}
+
+<h2>Tenant Statement</h2>
+
+<div class="alert alert-info">
+    Real balance movements appear in the statement section below. Uncleared PDC remains in the separate noted-items section and does not affect the running balance until clearance.
+</div>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Tenant</label>
+        <select name="tenantId" class="form-select">
+            <option value="">Select Tenant</option>
+            @foreach (var tenant in tenants)
+            {
+                if (Model.TenantId == tenant.Id)
+                {
+                    <option value="@tenant.Id" selected>@tenant.Code - @tenant.FullName</option>
+                }
+                else
+                {
+                    <option value="@tenant.Id">@tenant.Code - @tenant.FullName</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label">Lease</label>
+        <select name="leaseId" class="form-select">
+            <option value="">All Leases</option>
+            @foreach (var lease in leases)
+            {
+                var leaseText = $"{lease.ContractNumber} - {lease.Unit?.Property?.Code}/{lease.Unit?.UnitNumber}";
+
+                if (Model.LeaseId == lease.Id)
+                {
+                    <option value="@lease.Id" selected>@leaseText</option>
+                }
+                else
+                {
+                    <option value="@lease.Id">@leaseText</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">From Date</label>
+        <input type="date" name="fromDate" value="@Model.FromDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">To Date</label>
+        <input type="date" name="toDate" value="@Model.ToDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-dark">View Statement</button>
+    </div>
+</form>
+
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+@if (!Model.TenantId.HasValue)
+{
+    <div class="alert alert-secondary">
+        Select a tenant to view the statement.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>@Model.TenantCode - @Model.TenantName</strong>
+        </div>
+        <div class="card-body">
+            <div><strong>Lease Scope:</strong> @Model.LeaseDisplay</div>
+            <div><strong>Statement Period:</strong> @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</div>
+            <div><strong>Opening Balance:</strong> @Model.OpeningBalance.ToString("N2")</div>
+            <div><strong>Total Charges:</strong> @Model.TotalCharges.ToString("N2")</div>
+            <div><strong>Total Credits:</strong> @Model.TotalCredits.ToString("N2")</div>
+            <div><strong>Closing Balance:</strong> @Model.ClosingBalance.ToString("N2")</div>
+        </div>
+    </div>
+
+    <h4>Statement Movements</h4>
+
+    <table class="table table-bordered table-striped table-sm mb-4">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Reference</th>
+                <th>Description</th>
+                <th class="text-end">Charge</th>
+                <th class="text-end">Credit</th>
+                <th class="text-end">Running Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Rows.Count == 0)
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No statement movements found for the selected period.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td>
+                        <td>@row.TransactionType</td>
+                        <td>@row.ReferenceNumber</td>
+                        <td>@row.Description</td>
+                        <td class="text-end">@row.Debit.ToString("N2")</td>
+                        <td class="text-end">@row.Credit.ToString("N2")</td>
+                        <td class="text-end">@row.RunningBalance.ToString("N2")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <h4>Noted Items PDC</h4>
+
+    <div class="mb-2">
+        <strong>Total Noted PDC:</strong> @Model.NotedPdcTotal.ToString("N2")
+    </div>
+
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Received Date</th>
+                <th>Cheque Date</th>
+                <th>Cheque No.</th>
+                <th>Lease</th>
+                <th>Invoice</th>
+                <th>Bank</th>
+                <th>Mode</th>
+                <th>Status</th>
+                <th class="text-end">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.NotedPdcItems.Count == 0)
+            {
+                <tr>
+                    <td colspan="9" class="text-center text-muted">No noted PDC items outstanding as of the selected statement date.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model.NotedPdcItems)
+                {
+                    <tr>
+                        <td>@item.ReceivedDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.ChequeDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.ChequeNumber</td>
+                        <td>@item.LeaseDisplay</td>
+                        <td>@item.InvoiceDisplay</td>
+                        <td>@(string.IsNullOrWhiteSpace(item.BankName) ? "-" : item.BankName)</td>
+                        <td>@item.SettlementMode</td>
+                        <td>@item.Status</td>
+                        <td class="text-end">@item.Amount.ToString("N2")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}

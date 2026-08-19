@@ -1,0 +1,1543 @@
+using Microsoft.EntityFrameworkCore;
+using RealEstateManager.Domain;
+using RealEstateManager.Services;
+
+namespace RealEstateManager.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        private readonly ICurrentCompanyAccessor _currentCompanyAccessor;
+        private readonly DatabaseConnectionOptions _databaseConnectionOptions;
+
+        private int CurrentCompanyIdValue => _currentCompanyAccessor.CompanyId ?? 0;
+        private bool IsCompanyFilterEnabled => _currentCompanyAccessor.CompanyId.HasValue;
+
+        public ApplicationDbContext(
+            DbContextOptions<ApplicationDbContext> options,
+            ICurrentCompanyAccessor currentCompanyAccessor,
+            DatabaseConnectionOptions databaseConnectionOptions)
+            : base(options)
+        {
+            _currentCompanyAccessor = currentCompanyAccessor;
+            _databaseConnectionOptions = databaseConnectionOptions;
+        }
+
+        public DbSet<AppUser> AppUsers => Set<AppUser>();
+        public DbSet<AppUserCompany> AppUserCompanies => Set<AppUserCompany>();
+        public DbSet<AppUserPermission> AppUserPermissions => Set<AppUserPermission>();
+        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+        public DbSet<UserFeedback> UserFeedback => Set<UserFeedback>();
+        public DbSet<Company> Companies => Set<Company>();
+        public DbSet<CompanySubscription> CompanySubscriptions => Set<CompanySubscription>();
+        public DbSet<SubscriptionActivationCode> SubscriptionActivationCodes => Set<SubscriptionActivationCode>();
+        public DbSet<Account> Accounts => Set<Account>();
+        public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+        public DbSet<JournalEntryLine> JournalEntryLines => Set<JournalEntryLine>();
+        public DbSet<AccountingPeriod> AccountingPeriods => Set<AccountingPeriod>();
+        public DbSet<FiscalYearClosing> FiscalYearClosings => Set<FiscalYearClosing>();
+
+        public DbSet<Property> Properties => Set<Property>();
+        public DbSet<Unit> Units => Set<Unit>();
+        public DbSet<Tenant> Tenants => Set<Tenant>();
+        public DbSet<Lease> Leases => Set<Lease>();
+
+        public DbSet<Vendor> Vendors => Set<Vendor>();
+        public DbSet<CustomerInvoice> CustomerInvoices => Set<CustomerInvoice>();
+        public DbSet<CustomerReceipt> CustomerReceipts => Set<CustomerReceipt>();
+        public DbSet<VendorBill> VendorBills => Set<VendorBill>();
+        public DbSet<VendorPayment> VendorPayments => Set<VendorPayment>();
+        public DbSet<SecurityDeposit> SecurityDeposits => Set<SecurityDeposit>();
+        public DbSet<PrepaymentSchedule> PrepaymentSchedules => Set<PrepaymentSchedule>();
+        public DbSet<PrepaymentScheduleLine> PrepaymentScheduleLines => Set<PrepaymentScheduleLine>();
+        public DbSet<RevenueRecognitionSchedule> RevenueRecognitionSchedules => Set<RevenueRecognitionSchedule>();
+        public DbSet<PdcReceipt> PdcReceipts => Set<PdcReceipt>();
+        public DbSet<FixedAsset> FixedAssets => Set<FixedAsset>();
+        public DbSet<FixedAssetAcquisitionCost> FixedAssetAcquisitionCosts => Set<FixedAssetAcquisitionCost>();
+        public DbSet<FixedAssetDepreciation> FixedAssetDepreciations => Set<FixedAssetDepreciation>();
+
+        public DbSet<CompanyAccountSetting> CompanyAccountSettings => Set<CompanyAccountSetting>();
+        public DbSet<OwnerWithdrawalCategory> OwnerWithdrawalCategories => Set<OwnerWithdrawalCategory>();
+        public DbSet<TenantPortalUser> TenantPortalUsers => Set<TenantPortalUser>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!string.IsNullOrWhiteSpace(_databaseConnectionOptions.ConnectionString))
+            {
+                optionsBuilder.UseSqlServer(_databaseConnectionOptions.ConnectionString);
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Company>()
+                .Property(x => x.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Company>()
+                .Property(x => x.BaseCurrency)
+                .HasMaxLength(10);
+
+            modelBuilder.Entity<AppUser>()
+                .Property(x => x.Username)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<AppUser>()
+                .Property(x => x.DisplayName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<AppUser>()
+                .Property(x => x.PasswordHash)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<AppUserPermission>()
+                .Property(x => x.PermissionKey)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<CompanySubscription>()
+                .Property(x => x.Notes)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<SubscriptionActivationCode>()
+                .Property(x => x.Code)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<SubscriptionActivationCode>()
+                .Property(x => x.Notes)
+                .HasMaxLength(300);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.Username)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.DisplayName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.CompanyName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.HttpMethod)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.RequestPath)
+                .HasMaxLength(300);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.QueryString)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.ControllerName)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.ActionName)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.ActivityName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.ErrorMessage)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<AuditLog>()
+                .Property(x => x.IpAddress)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.Username)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.DisplayName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.CompanyName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.Category)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.Subject)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.Message)
+                .HasMaxLength(2000);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.Status)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<UserFeedback>()
+                .Property(x => x.AdminNotes)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<Account>()
+                .Property(x => x.Code)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Account>()
+                .Property(x => x.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Account>()
+                .Property(x => x.AccountType)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Account>()
+                .Property(x => x.ReportingGroup)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Account>()
+                .Property(x => x.OpeningBalance)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<JournalEntry>()
+                .Property(x => x.EntryNumber)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<JournalEntry>()
+                .Property(x => x.Description)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<JournalEntry>()
+                .Property(x => x.SourceType)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .Property(x => x.Description)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .Property(x => x.Debit)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .Property(x => x.Credit)
+                .HasPrecision(18, 2);
+
+            // ----- VAT -------------------------------------------------------
+            modelBuilder.Entity<Company>().Property(x => x.LegalName).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.TrnNumber).HasMaxLength(30);
+            modelBuilder.Entity<Company>().Property(x => x.AddressLine1).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.AddressLine2).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.City).HasMaxLength(100);
+            modelBuilder.Entity<Company>().Property(x => x.Country).HasMaxLength(100);
+            modelBuilder.Entity<Company>().Property(x => x.Phone).HasMaxLength(50);
+            modelBuilder.Entity<Company>().Property(x => x.Email).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.ProvisionalVatRecoveryRate).HasPrecision(9, 4);
+
+            modelBuilder.Entity<Property>().Property(x => x.VatCategory).HasMaxLength(20);
+            modelBuilder.Entity<Unit>().Property(x => x.VatCategory).HasMaxLength(20);
+            modelBuilder.Entity<Tenant>().Property(x => x.TrnNumber).HasMaxLength(30);
+            modelBuilder.Entity<Vendor>().Property(x => x.TrnNumber).HasMaxLength(30);
+
+            // Bounded so the unique indexes below stay within SQL Server's key size.
+            modelBuilder.Entity<Tenant>().Property(x => x.TradeLicenseNumber).HasMaxLength(60);
+            modelBuilder.Entity<Vendor>().Property(x => x.TradeLicenseNumber).HasMaxLength(60);
+
+            modelBuilder.Entity<Lease>().Property(x => x.VatCategory).HasMaxLength(20);
+            modelBuilder.Entity<Lease>().Property(x => x.VatOverrideReason).HasMaxLength(300);
+
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.VatCategory).HasMaxLength(20);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.VatRate).HasPrecision(9, 4);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.TaxInvoiceNumber).HasMaxLength(40);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.TaxInvoiceType).HasMaxLength(20);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.RecipientTrn).HasMaxLength(30);
+
+            modelBuilder.Entity<VendorBill>().Property(x => x.InputTaxAttribution).HasMaxLength(20);
+            modelBuilder.Entity<VendorBill>().Property(x => x.RecoverableVatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<VendorBill>().Property(x => x.NonRecoverableVatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<VendorBill>().Property(x => x.AppliedRecoveryRate).HasPrecision(9, 4);
+            modelBuilder.Entity<VendorBill>().Property(x => x.SupplierTrn).HasMaxLength(30);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasIndex(x => new { x.CompanyId, x.TaxInvoiceNumber })
+                .IsUnique()
+                .HasFilter("[TaxInvoiceNumber] IS NOT NULL");
+
+            modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .Property(x => x.Code)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .Property(x => x.Name)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .Property(x => x.Description)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<TenantPortalUser>()
+                .Property(x => x.Username)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            modelBuilder.Entity<TenantPortalUser>()
+                .Property(x => x.PasswordHash)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            modelBuilder.Entity<AccountingPeriod>()
+                .Property(x => x.Name)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .Property(x => x.ProfitOrLossAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .Property(x => x.Notes)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.Code)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.Address)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.PropertyType)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.OwnershipType)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.OwnerName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.AssetValue)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Property>()
+                .Property(x => x.CommissionPercentage)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Unit>()
+                .Property(x => x.UnitNumber)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Unit>()
+                .Property(x => x.Floor)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Unit>()
+                .Property(x => x.UsageType)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Unit>()
+                .Property(x => x.AreaSqFt)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Unit>()
+                .Property(x => x.StandardAnnualRent)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Unit>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.Code)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.FullName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.Email)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.Phone)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.Nationality)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.IdNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.PassportNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.Address)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<Tenant>()
+                .Property(x => x.OpeningBalance)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.OpeningBalance)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Lease>()
+                .Property(x => x.ContractNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Lease>()
+                .Property(x => x.AnnualRent)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Lease>()
+                .Property(x => x.VatRate)
+                .HasPrecision(5, 2);
+
+            modelBuilder.Entity<Lease>()
+                .Property(x => x.SecurityDepositAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Lease>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<Lease>()
+                .Property(x => x.Notes)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.Code)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.ServiceType)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.ContactPerson)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.Email)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<Vendor>()
+                .Property(x => x.Phone)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .Property(x => x.InvoiceNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .Property(x => x.Subtotal)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .Property(x => x.VatAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .Property(x => x.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .Property(x => x.AmountPaid)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .Property(x => x.ReceiptNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .Property(x => x.PaymentMethod)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.BillNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.Subtotal)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.VatAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.AmountPaid)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.ExpenseCategory)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<VendorBill>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<VendorPayment>()
+                .Property(x => x.PaymentNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<VendorPayment>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<VendorPayment>()
+                .Property(x => x.PaymentMethod)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .Property(x => x.ReferenceNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .Property(x => x.PaymentMethod)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .Property(x => x.ChequeNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .Property(x => x.BankName)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .Property(x => x.SettlementMode)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .Property(x => x.Notes)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.AssetCode)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.Name)
+                .HasMaxLength(200);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.AssetCategory)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.Cost)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.ResidualValue)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.OpeningCost)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.OpeningAccumulatedDepreciation)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.DepreciationMethod)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<FixedAsset>()
+                .Property(x => x.Notes)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.CostType)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.Description)
+                .HasMaxLength(300);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.SourceDocumentNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.ReferenceNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .Property(x => x.Notes)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<FixedAssetDepreciation>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<FixedAssetDepreciation>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.ScheduleNumber)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.Description)
+                .HasMaxLength(300);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.PrepaymentType)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.ReferenceNumber)
+                .HasMaxLength(100);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .Property(x => x.Notes)
+                .HasMaxLength(1000);
+
+            modelBuilder.Entity<PrepaymentScheduleLine>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<PrepaymentScheduleLine>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<RevenueRecognitionSchedule>()
+                .Property(x => x.Amount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<RevenueRecognitionSchedule>()
+                .Property(x => x.Status)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<Account>()
+                .HasIndex(x => new { x.CompanyId, x.Code })
+                .IsUnique();
+
+            modelBuilder.Entity<AppUser>()
+                .HasIndex(x => x.Username)
+                .IsUnique();
+
+            modelBuilder.Entity<AppUserCompany>()
+                .HasIndex(x => new { x.AppUserId, x.CompanyId })
+                .IsUnique();
+
+            modelBuilder.Entity<AppUserPermission>()
+                .HasIndex(x => new { x.AppUserId, x.PermissionKey })
+                .IsUnique();
+
+            modelBuilder.Entity<CompanySubscription>()
+                .HasIndex(x => x.CompanyId)
+                .IsUnique();
+
+            modelBuilder.Entity<SubscriptionActivationCode>()
+                .HasIndex(x => x.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<SubscriptionActivationCode>()
+                .HasIndex(x => new { x.CompanyId, x.IssuedAt });
+
+            modelBuilder.Entity<AuditLog>()
+                .HasIndex(x => x.OccurredAt);
+
+            modelBuilder.Entity<UserFeedback>()
+                .HasIndex(x => new { x.CompanyId, x.SubmittedAt });
+
+            modelBuilder.Entity<UserFeedback>()
+                .HasIndex(x => x.Status);
+
+            modelBuilder.Entity<AccountingPeriod>()
+                .HasIndex(x => new { x.CompanyId, x.FiscalYear, x.PeriodNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .HasIndex(x => new { x.CompanyId, x.FiscalYear })
+                .IsUnique();
+
+            modelBuilder.Entity<Property>()
+                .HasIndex(x => new { x.CompanyId, x.Code })
+                .IsUnique();
+
+            modelBuilder.Entity<Unit>()
+                .HasIndex(x => new { x.PropertyId, x.UnitNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<Tenant>()
+                .HasIndex(x => new { x.CompanyId, x.Code })
+                .IsUnique();
+
+            // Legal identifiers of the party. Filtered so that records which have not
+            // captured the identifier yet - the common case - are all left alone; only
+            // supplied values have to be distinct. MasterDataUniquenessService checks
+            // the same rules first so the user gets a message naming the clash rather
+            // than a bare index violation.
+            modelBuilder.Entity<Tenant>()
+                .HasIndex(x => new { x.CompanyId, x.TradeLicenseNumber })
+                .IsUnique()
+                .HasFilter("[TradeLicenseNumber] IS NOT NULL AND [TradeLicenseNumber] <> ''");
+
+            modelBuilder.Entity<Tenant>()
+                .HasIndex(x => new { x.CompanyId, x.IdNumber })
+                .IsUnique()
+                .HasFilter("[IdNumber] IS NOT NULL AND [IdNumber] <> ''");
+
+            modelBuilder.Entity<Tenant>()
+                .HasIndex(x => new { x.CompanyId, x.PassportNumber })
+                .IsUnique()
+                .HasFilter("[PassportNumber] IS NOT NULL AND [PassportNumber] <> ''");
+
+            modelBuilder.Entity<Tenant>()
+                .HasIndex(x => new { x.CompanyId, x.TrnNumber })
+                .IsUnique()
+                .HasFilter("[TrnNumber] IS NOT NULL AND [TrnNumber] <> ''");
+
+            modelBuilder.Entity<Lease>()
+                .HasIndex(x => new { x.CompanyId, x.ContractNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<Vendor>()
+                .HasIndex(x => new { x.CompanyId, x.Code })
+                .IsUnique();
+
+            modelBuilder.Entity<Vendor>()
+                .HasIndex(x => new { x.CompanyId, x.TradeLicenseNumber })
+                .IsUnique()
+                .HasFilter("[TradeLicenseNumber] IS NOT NULL AND [TradeLicenseNumber] <> ''");
+
+            modelBuilder.Entity<Vendor>()
+                .HasIndex(x => new { x.CompanyId, x.TrnNumber })
+                .IsUnique()
+                .HasFilter("[TrnNumber] IS NOT NULL AND [TrnNumber] <> ''");
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasIndex(x => new { x.CompanyId, x.InvoiceNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .HasIndex(x => new { x.CompanyId, x.ReceiptNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<VendorBill>()
+                .HasIndex(x => new { x.CompanyId, x.BillNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<VendorPayment>()
+                .HasIndex(x => new { x.CompanyId, x.PaymentNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasIndex(x => new { x.CompanyId, x.ChequeNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasIndex(x => new { x.CompanyId, x.AssetCode })
+                .IsUnique();
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasIndex(x => new { x.FixedAssetId, x.CostDate, x.Id });
+
+            modelBuilder.Entity<FixedAssetDepreciation>()
+                .HasIndex(x => new { x.FixedAssetId, x.PeriodYear, x.PeriodMonth })
+                .IsUnique();
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasIndex(x => new { x.CompanyId, x.ScheduleNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<PrepaymentScheduleLine>()
+                .HasIndex(x => new { x.PrepaymentScheduleId, x.RecognitionDate })
+                .IsUnique();
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasIndex(x => x.CompanyId)
+                .IsUnique();
+
+            modelBuilder.Entity<Account>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.Accounts)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Account>()
+                .HasOne(x => x.ParentAccount)
+                .WithMany(x => x.Children)
+                .HasForeignKey(x => x.ParentAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany(x => x.Lines)
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .HasOne(x => x.Account)
+                .WithMany(x => x.JournalEntryLines)
+                .HasForeignKey(x => x.AccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .HasOne(x => x.OwnerWithdrawalCategory)
+                .WithMany(x => x.JournalEntryLines)
+                .HasForeignKey(x => x.OwnerWithdrawalCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .HasIndex(x => new { x.CompanyId, x.Code })
+                .IsUnique();
+
+            modelBuilder.Entity<TenantPortalUser>()
+                .HasOne(x => x.Tenant)
+                .WithMany()
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantPortalUser>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Login names are unique across the whole system, not per company - a tenant
+            // types only a username, with no company to disambiguate it.
+            modelBuilder.Entity<TenantPortalUser>()
+                .HasIndex(x => x.Username)
+                .IsUnique();
+
+            // One portal login per tenant.
+            modelBuilder.Entity<TenantPortalUser>()
+                .HasIndex(x => x.TenantId)
+                .IsUnique();
+
+            modelBuilder.Entity<AccountingPeriod>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.AccountingPeriods)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AppUserCompany>()
+                .HasOne(x => x.AppUser)
+                .WithMany(x => x.CompanyAccesses)
+                .HasForeignKey(x => x.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AppUserCompany>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AppUserPermission>()
+                .HasOne(x => x.AppUser)
+                .WithMany(x => x.Permissions)
+                .HasForeignKey(x => x.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CompanySubscription>()
+                .HasOne(x => x.Company)
+                .WithOne(x => x.Subscription)
+                .HasForeignKey<CompanySubscription>(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubscriptionActivationCode>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.SubscriptionActivationCodes)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AuditLog>()
+                .HasOne(x => x.AppUser)
+                .WithMany(x => x.AuditLogs)
+                .HasForeignKey(x => x.AppUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<AuditLog>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UserFeedback>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.FeedbackItems)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserFeedback>()
+                .HasOne(x => x.AppUser)
+                .WithMany(x => x.SubmittedFeedback)
+                .HasForeignKey(x => x.AppUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserFeedback>()
+                .HasOne(x => x.ReviewedByAppUser)
+                .WithMany(x => x.ReviewedFeedback)
+                .HasForeignKey(x => x.ReviewedByAppUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.FiscalYearClosings)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .HasOne(x => x.RetainedEarningsAccount)
+                .WithMany()
+                .HasForeignKey(x => x.RetainedEarningsAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Property>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.Properties)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Unit>()
+                .HasOne(x => x.Property)
+                .WithMany(x => x.Units)
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Tenant>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.Tenants)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Lease>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.Leases)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Lease>()
+                .HasOne(x => x.Unit)
+                .WithMany(x => x.Leases)
+                .HasForeignKey(x => x.UnitId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Lease>()
+                .HasOne(x => x.Tenant)
+                .WithMany(x => x.Leases)
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Vendor>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.Vendors)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.CustomerInvoices)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasOne(x => x.Lease)
+                .WithMany()
+                .HasForeignKey(x => x.LeaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.CustomerReceipts)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .HasOne(x => x.CustomerInvoice)
+                .WithMany(x => x.Receipts)
+                .HasForeignKey(x => x.CustomerInvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBill>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.VendorBills)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBill>()
+                .HasOne(x => x.Vendor)
+                .WithMany()
+                .HasForeignKey(x => x.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBill>()
+                .HasOne(x => x.Property)
+                .WithMany()
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorBill>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorPayment>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.VendorPayments)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorPayment>()
+                .HasOne(x => x.VendorBill)
+                .WithMany(x => x.Payments)
+                .HasForeignKey(x => x.VendorBillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<VendorPayment>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.SecurityDeposits)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .HasOne(x => x.Lease)
+                .WithMany()
+                .HasForeignKey(x => x.LeaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasOne(x => x.Lease)
+                .WithMany()
+                .HasForeignKey(x => x.LeaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasOne(x => x.Tenant)
+                .WithMany()
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasOne(x => x.CustomerInvoice)
+                .WithMany()
+                .HasForeignKey(x => x.CustomerInvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasOne(x => x.MemorandumJournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.MemorandumJournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasOne(x => x.ClearanceJournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.ClearanceJournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasOne(x => x.Property)
+                .WithMany()
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasOne(x => x.AssetAccount)
+                .WithMany()
+                .HasForeignKey(x => x.AssetAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasOne(x => x.AccumulatedDepreciationAccount)
+                .WithMany()
+                .HasForeignKey(x => x.AccumulatedDepreciationAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasOne(x => x.DepreciationExpenseAccount)
+                .WithMany()
+                .HasForeignKey(x => x.DepreciationExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasOne(x => x.CapitalizationJournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.CapitalizationJournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasOne(x => x.FixedAsset)
+                .WithMany(x => x.AcquisitionCosts)
+                .HasForeignKey(x => x.FixedAssetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasOne(x => x.OffsetAccount)
+                .WithMany()
+                .HasForeignKey(x => x.OffsetAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasOne(x => x.Vendor)
+                .WithMany()
+                .HasForeignKey(x => x.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasOne(x => x.VendorBill)
+                .WithMany()
+                .HasForeignKey(x => x.VendorBillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasOne(x => x.ExpenseAccount)
+                .WithMany()
+                .HasForeignKey(x => x.ExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FixedAssetDepreciation>()
+                .HasOne(x => x.FixedAsset)
+                .WithMany(x => x.DepreciationSchedules)
+                .HasForeignKey(x => x.FixedAssetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FixedAssetDepreciation>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.PrepaymentSchedules)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.PrepaidAccount)
+                .WithMany()
+                .HasForeignKey(x => x.PrepaidAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.ExpenseAccount)
+                .WithMany()
+                .HasForeignKey(x => x.ExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.OffsetAccount)
+                .WithMany()
+                .HasForeignKey(x => x.OffsetAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.Vendor)
+                .WithMany()
+                .HasForeignKey(x => x.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.VendorBill)
+                .WithMany()
+                .HasForeignKey(x => x.VendorBillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasOne(x => x.InitialJournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.InitialJournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PrepaymentScheduleLine>()
+                .HasOne(x => x.PrepaymentSchedule)
+                .WithMany(x => x.Lines)
+                .HasForeignKey(x => x.PrepaymentScheduleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PrepaymentScheduleLine>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RevenueRecognitionSchedule>()
+                .HasOne(x => x.Company)
+                .WithMany(x => x.RevenueRecognitionSchedules)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RevenueRecognitionSchedule>()
+                .HasOne(x => x.Lease)
+                .WithMany()
+                .HasForeignKey(x => x.LeaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RevenueRecognitionSchedule>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Company>()
+                .HasOne(x => x.AccountSetting)
+                .WithOne(x => x.Company)
+                .HasForeignKey<CompanyAccountSetting>(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.DefaultCashAccount)
+                .WithMany()
+                .HasForeignKey(x => x.DefaultCashAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.AccountsReceivableAccount)
+                .WithMany()
+                .HasForeignKey(x => x.AccountsReceivableAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.AccountsPayableAccount)
+                .WithMany()
+                .HasForeignKey(x => x.AccountsPayableAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.AdvancesFromCustomersAccount)
+                .WithMany()
+                .HasForeignKey(x => x.AdvancesFromCustomersAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.UnearnedRevenueAccount)
+                .WithMany()
+                .HasForeignKey(x => x.UnearnedRevenueAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.TenantSecurityDepositLiabilityAccount)
+                .WithMany()
+                .HasForeignKey(x => x.TenantSecurityDepositLiabilityAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.VatRecoverableAccount)
+                .WithMany()
+                .HasForeignKey(x => x.VatRecoverableAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.VatPayableAccount)
+                .WithMany()
+                .HasForeignKey(x => x.VatPayableAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.DueToLandlordsAccount)
+                .WithMany()
+                .HasForeignKey(x => x.DueToLandlordsAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.RentalRevenueOwnedAccount)
+                .WithMany()
+                .HasForeignKey(x => x.RentalRevenueOwnedAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.ManagementFeeRevenueAccount)
+                .WithMany()
+                .HasForeignKey(x => x.ManagementFeeRevenueAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.OtherIncomeAccount)
+                .WithMany()
+                .HasForeignKey(x => x.OtherIncomeAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.DirectExpenseDefaultAccount)
+                .WithMany()
+                .HasForeignKey(x => x.DirectExpenseDefaultAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.GeneralExpenseDefaultAccount)
+                .WithMany()
+                .HasForeignKey(x => x.GeneralExpenseDefaultAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.DepreciationExpenseAccount)
+                .WithMany()
+                .HasForeignKey(x => x.DepreciationExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.FinanceCostAccount)
+                .WithMany()
+                .HasForeignKey(x => x.FinanceCostAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.RetainedEarningsPriorYearsAccount)
+                .WithMany()
+                .HasForeignKey(x => x.RetainedEarningsPriorYearsAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.CurrentYearProfitOrLossAccount)
+                .WithMany()
+                .HasForeignKey(x => x.CurrentYearProfitOrLossAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.InvestmentPropertyAccount)
+                .WithMany()
+                .HasForeignKey(x => x.InvestmentPropertyAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.PdcOnHandAccount)
+                .WithMany()
+                .HasForeignKey(x => x.PdcOnHandAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.PrepaidExpenseDefaultAccount)
+                .WithMany()
+                .HasForeignKey(x => x.PrepaidExpenseDefaultAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.PdcContraAccount)
+                .WithMany()
+                .HasForeignKey(x => x.PdcContraAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.FixedAssetDefaultAccount)
+                .WithMany()
+                .HasForeignKey(x => x.FixedAssetDefaultAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.FixedAssetClearingAccount)
+                .WithMany()
+                .HasForeignKey(x => x.FixedAssetClearingAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasOne(x => x.AccumulatedDepreciationDefaultAccount)
+                .WithMany()
+                .HasForeignKey(x => x.AccumulatedDepreciationDefaultAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Account>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<AccountingPeriod>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<FiscalYearClosing>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<Property>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<Unit>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.Property != null && x.Property.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<Tenant>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<CompanySubscription>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<UserFeedback>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<Lease>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<JournalEntry>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.JournalEntry != null && x.JournalEntry.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<Vendor>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<CustomerReceipt>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<VendorBill>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<VendorPayment>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<SecurityDeposit>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<SubscriptionActivationCode>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<PdcReceipt>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<FixedAsset>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<FixedAssetAcquisitionCost>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.FixedAsset != null && x.FixedAsset.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<FixedAssetDepreciation>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.FixedAsset != null && x.FixedAsset.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<PrepaymentSchedule>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<PrepaymentScheduleLine>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.PrepaymentSchedule != null && x.PrepaymentSchedule.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<RevenueRecognitionSchedule>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<CompanyAccountSetting>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+        }
+    }
+}

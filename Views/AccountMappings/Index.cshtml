@@ -1,0 +1,332 @@
+@model RealEstateManager.Models.AccountMappingViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Account Mapping Setup";
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+}
+
+<h2>Account Mapping Setup</h2>
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success">@ViewBag.SuccessMessage</div>
+}
+
+<form asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Core Accounts</h5>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Default Cash / Bank</label>
+                <select asp-for="DefaultCashAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Accounts Receivable</label>
+                <select asp-for="AccountsReceivableAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Accounts Payable</label>
+                <select asp-for="AccountsPayableAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Advances From Customers</label>
+                <select asp-for="AdvancesFromCustomersAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Unearned Revenue</label>
+                <select asp-for="UnearnedRevenueAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Tenant Security Deposit Liability</label>
+                <select asp-for="TenantSecurityDepositLiabilityAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Tax and Landlord Accounts</h5>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">VAT Recoverable</label>
+                <select asp-for="VatRecoverableAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">VAT Payable</label>
+                <select asp-for="VatPayableAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Due To Landlords</label>
+                <select asp-for="DueToLandlordsAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Revenue and Expense Accounts</h5>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Rental Revenue - Owned</label>
+                <select asp-for="RentalRevenueOwnedAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Management Fee Revenue</label>
+                <select asp-for="ManagementFeeRevenueAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Other Income</label>
+                <select asp-for="OtherIncomeAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Default Direct Expense</label>
+                <select asp-for="DirectExpenseDefaultAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Default General Expense</label>
+                <select asp-for="GeneralExpenseDefaultAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Depreciation Expense</label>
+                <select asp-for="DepreciationExpenseAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Finance Cost</label>
+                <select asp-for="FinanceCostAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Equity and Asset Control</h5>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Retained Earnings - Prior Years</label>
+                <select asp-for="RetainedEarningsPriorYearsAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Current Year Profit or Loss</label>
+                <select asp-for="CurrentYearProfitOrLossAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Investment Property</label>
+                <select asp-for="InvestmentPropertyAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Prepaid Expense Default</label>
+                <select asp-for="PrepaidExpenseDefaultAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Fixed Asset Default</label>
+                <select asp-for="FixedAssetDefaultAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Fixed Asset Clearing</label>
+                <select asp-for="FixedAssetClearingAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Accumulated Depreciation Default</label>
+                <select asp-for="AccumulatedDepreciationDefaultAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">PDC Setup</h5>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">PDC On Hand</label>
+                <select asp-for="PdcOnHandAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">PDC Contra</label>
+                <select asp-for="PdcContraAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save Mapping</button>
+    </div>
+</form>

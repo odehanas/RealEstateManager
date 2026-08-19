@@ -1,0 +1,47 @@
+@model List<RealEstateManager.Models.AppUserListItemViewModel>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Users</h2>
+    <a asp-action="Create" class="btn btn-primary">Add User</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<table class="table table-striped table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Type</th>
+            <th>Companies</th>
+            <th>Permissions</th>
+            <th>Last Login</th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Username</td>
+                <td>@item.DisplayName</td>
+                <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                <td>@(item.IsSystemAdmin ? "System Admin" : "User")</td>
+                <td>@item.CompaniesDisplay</td>
+                <td>@(string.IsNullOrWhiteSpace(item.PermissionsDisplay) ? "-" : item.PermissionsDisplay)</td>
+                <td>@(item.LastLoginAt.HasValue ? item.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

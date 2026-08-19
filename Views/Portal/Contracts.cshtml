@@ -1,0 +1,82 @@
+@model List<RealEstateManager.Models.PortalContractViewModel>
+@using RealEstateManager.Domain
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "My Contracts";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">My Contracts</h1>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No contracts on record.</div>
+}
+else
+{
+    @foreach (var contract in Model)
+    {
+        <div class="card shadow-sm mb-3 @(contract.IsCurrent ? "border-primary" : "")">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 @(contract.IsCurrent ? "bg-primary text-white" : "bg-light")">
+                <div>
+                    <strong>@contract.ContractNumber</strong>
+                    <div class="small @(contract.IsCurrent ? "opacity-75" : "text-muted")">
+                        @contract.PropertyName &mdash; unit @contract.UnitCode
+                    </div>
+                </div>
+                <div>
+                    @if (contract.IsCurrent)
+                    {
+                        <span class="badge bg-light text-dark">Current</span>
+                        @if (contract.IsExpiringSoon)
+                        {
+                            <span class="badge bg-warning text-dark ms-1">Expires in @contract.DaysToExpiry days</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@contract.Status</span>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 small">
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted">Term</div>
+                        <div class="fw-semibold">@contract.StartDate.ToString("dd/MM/yyyy") &ndash; @contract.EndDate.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted">Annual rent</div>
+                        <div class="fw-semibold">@contract.AnnualRent.ToString("N2")</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted">Billing</div>
+                        <div class="fw-semibold">Every @contract.BillingFrequencyMonths month(s)</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted">Security deposit</div>
+                        <div class="fw-semibold">@contract.SecurityDepositAmount.ToString("N2")</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted">Area</div>
+                        <div class="fw-semibold">@contract.AreaSqFt.ToString("N0") sq ft</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted">Floor</div>
+                        <div class="fw-semibold">@(string.IsNullOrWhiteSpace(contract.Floor) ? "-" : contract.Floor)</div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="text-muted">Address</div>
+                        <div class="fw-semibold">@(string.IsNullOrWhiteSpace(contract.PropertyAddress) ? "-" : contract.PropertyAddress)</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="text-muted">VAT treatment</div>
+                        <div class="fw-semibold">@VatCategories.Describe(contract.VatCategory)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

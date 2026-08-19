@@ -1,0 +1,202 @@
+﻿@model RealEstateManager.Models.JournalInquiryViewModel
+
+@{
+    ViewData["Title"] = "Journal Inquiry";
+    var sourceTypes = ViewBag.SourceTypes as List<string> ?? new();
+}
+
+<style>
+    /* Odoo-style status trail: the stage you are in is solid, the rest are ghosted. */
+    .stage-trail { display: inline-flex; align-items: center; gap: 0; font-size: .72rem; font-weight: 700; }
+    .stage-trail .stage {
+        padding: .25rem .8rem; border: 1px solid #d8dee6; background: #fff; color: #9aa5b1;
+        text-transform: uppercase; letter-spacing: .05em;
+    }
+    .stage-trail .stage:first-child { border-radius: 14px 0 0 14px; }
+    .stage-trail .stage:last-child { border-radius: 0 14px 14px 0; border-left: 0; }
+    .stage-trail .stage.on { background: #0f2740; color: #fff; border-color: #0f2740; }
+    .stage-trail .stage.on.draft { background: #b8860b; border-color: #b8860b; }
+    .entry-card.is-draft { border-left: 4px solid #b8860b; }
+    .entry-card.is-posted { border-left: 4px solid #2e9e5b; }
+</style>
+
+<h2>Journal Inquiry</h2>
+
+@if (TempData["JournalSuccess"] is string journalSuccess)
+{
+    <div class="alert alert-success py-2">@journalSuccess</div>
+}
+@if (TempData["JournalError"] is string journalError)
+{
+    <div class="alert alert-danger py-2">
+        <strong>Cannot do that.</strong> @journalError
+    </div>
+}
+
+<div class="alert alert-light border small">
+    <strong>Draft entries do not affect the accounts.</strong>
+    Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet and General Ledger.
+    Use <strong>Reset to Draft</strong> to pull an entry back out of the accounts and correct it &mdash; this
+    also unwinds what the posting did to the underlying document, such as the amount paid on an invoice.
+    Entries in a <strong>closed period</strong> cannot be posted or reset.
+</div>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">From Date</label>
+        <input type="date" name="fromDate" value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">To Date</label>
+        <input type="date" name="toDate" value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Source Type</label>
+        <select name="sourceType" class="form-select">
+            <option value="">All</option>
+            @foreach (var type in sourceTypes)
+            {
+                if (Model.SourceType == type)
+                {
+                    <option value="@type" selected>@type</option>
+                }
+                else
+                {
+                    <option value="@type">@type</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <label class="form-label">Posted Only</label>
+        <select name="postedOnly" class="form-select">
+            @if (Model.PostedOnly)
+            {
+                <option value="true" selected>Yes</option>
+                <option value="false">No</option>
+            }
+            else
+            {
+                <option value="true">Yes</option>
+                <option value="false" selected>No</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-1 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark">Go</button>
+    </div>
+</form>
+
+@{
+    var draftCount = Model.Entries.Count(x => !x.IsPosted && !x.PeriodClosed);
+}
+@if (draftCount > 0)
+{
+    <form asp-action="PostAllDrafts" method="post" class="mb-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="fromDate" value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" />
+        <input type="hidden" name="toDate" value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" />
+        <input type="hidden" name="sourceType" value="@Model.SourceType" />
+        <button type="submit" class="btn btn-primary">
+            Post All Drafts (@draftCount)
+        </button>
+        <span class="text-muted small ms-2">
+            Posts every draft matching the filter above. Entries in a closed period are skipped, and any that
+            fail are listed individually rather than stopping the run.
+        </span>
+    </form>
+}
+
+@foreach (var entry in Model.Entries)
+{
+    <div class="card shadow-sm mb-4 entry-card @(entry.IsPosted ? "is-posted" : "is-draft")">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    @* Action first, top-left, the way Odoo places it. *@
+                    @if (entry.PeriodClosed)
+                    {
+                        <span class="badge bg-secondary" title="@entry.PeriodName is closed">Period locked</span>
+                    }
+                    else if (entry.IsPosted)
+                    {
+                        <form asp-action="ResetToDraft" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@entry.JournalEntryId" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                            <button type="submit" class="btn btn-sm btn-outline-warning">Reset to Draft</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="Post" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@entry.JournalEntryId" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                            <button type="submit" class="btn btn-sm btn-dark">Post</button>
+                        </form>
+                    }
+
+                    <span class="ms-1">
+                        <strong>@entry.EntryNumber</strong> | @entry.EntryDate.ToString("dd/MM/yyyy")
+                        @if (!string.IsNullOrWhiteSpace(entry.SourceType))
+                        {
+                            <span>| @entry.SourceType</span>
+                        }
+                        @if (entry.SourceId.HasValue)
+                        {
+                            <span>#@entry.SourceId</span>
+                        }
+                    </span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    @if (!string.IsNullOrWhiteSpace(entry.PeriodName))
+                    {
+                        <span class="text-muted small">@entry.PeriodName</span>
+                    }
+                    <span class="stage-trail">
+                        <span class="stage @(entry.IsPosted ? "" : "on draft")">Draft</span>
+                        <span class="stage @(entry.IsPosted ? "on" : "")">Posted</span>
+                    </span>
+                </div>
+            </div>
+            <div class="mt-1">@entry.Description</div>
+        </div>
+
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Description</th>
+                        <th class="text-end">Debit</th>
+                        <th class="text-end">Credit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in entry.Lines)
+                    {
+                        <tr>
+                            <td>@line.AccountCode - @line.AccountName</td>
+                            <td>@line.Description</td>
+                            <td class="text-end">@line.Debit.ToString("N2")</td>
+                            <td class="text-end">@line.Credit.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2">Entry Totals</th>
+                        <th class="text-end">@entry.TotalDebit.ToString("N2")</th>
+                        <th class="text-end">@entry.TotalCredit.ToString("N2")</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+}

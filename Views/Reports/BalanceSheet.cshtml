@@ -1,0 +1,108 @@
+﻿@model RealEstateManager.Services.BalanceSheetReportDto
+
+@{
+    ViewData["Title"] = "Balance Sheet";
+}
+
+<h2>Balance Sheet</h2>
+
+<form method="get" class="mb-3">
+    <label for="asOfDate">As Of Date</label>
+    <input type="date" id="asOfDate" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
+    <button type="submit">Refresh</button>
+</form>
+
+<h4>Assets</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Account</th>
+            <th class="text-end">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.Assets)
+        {
+            <tr>
+                <td>@row.AccountCode</td>
+                <td>@row.AccountName</td>
+                <td class="text-end">@row.Amount.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total Assets</th>
+            <th class="text-end">@Model.TotalAssets.ToString("N2")</th>
+        </tr>
+    </tfoot>
+</table>
+
+<h4>Liabilities</h4>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Account</th>
+            <th class="text-end">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.Liabilities)
+        {
+            <tr>
+                <td>@row.AccountCode</td>
+                <td>@row.AccountName</td>
+                <td class="text-end">@row.Amount.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total Liabilities</th>
+            <th class="text-end">@Model.TotalLiabilities.ToString("N2")</th>
+        </tr>
+    </tfoot>
+</table>
+
+<h4>Equity</h4>
+<table class="table table-bordered table-striped">
+    <tbody>
+        <tr>
+            <td>31100</td>
+            <td>Share Capital</td>
+            <td class="text-end">@Model.ShareCapital.ToString("N2")</td>
+        </tr>
+        <tr>
+            <td>32100</td>
+            <td>Retained Earnings - Prior Years</td>
+            <td class="text-end">@Model.RetainedEarningsPriorYears.ToString("N2")</td>
+        </tr>
+
+        @foreach (var row in Model.OtherEquityRows)
+        {
+            <tr>
+                <td>@row.AccountCode</td>
+                <td>@row.AccountName</td>
+                <td class="text-end">@row.Amount.ToString("N2")</td>
+            </tr>
+        }
+
+        <tr>
+            <td></td>
+            <td>Current Year Profit / Loss</td>
+            <td class="text-end">@Model.CurrentYearProfitOrLoss.ToString("N2")</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="2">Total Equity</th>
+            <th class="text-end">@Model.TotalEquity.ToString("N2")</th>
+        </tr>
+        <tr>
+            <th colspan="2">Total Liabilities and Equity</th>
+            <th class="text-end">@Model.TotalLiabilitiesAndEquity.ToString("N2")</th>
+        </tr>
+    </tfoot>
+</table>

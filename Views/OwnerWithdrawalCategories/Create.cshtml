@@ -1,0 +1,50 @@
+@model RealEstateManager.Models.OwnerWithdrawalCategoryViewModel
+@{
+    ViewData["Title"] = "New Owner Withdrawal Category";
+}
+
+<h2 class="mb-3">New Owner Withdrawal Category</h2>
+
+<form asp-action="Create" method="post" class="col-lg-7">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label"></label>
+        <input asp-for="Code" class="form-control" placeholder="OW-10" />
+        <div class="form-text">Unique within the company. Used to sort and identify the category.</div>
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" placeholder="Education" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="SortOrder" class="form-label"></label>
+            <input asp-for="SortOrder" class="form-control" />
+            <div class="form-text">Controls the order in the General Journal selector and reports.</div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check mt-4">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

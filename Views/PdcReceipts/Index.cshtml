@@ -1,0 +1,112 @@
+﻿@model IEnumerable<RealEstateManager.Domain.PdcReceipt>
+
+@{
+    ViewData["Title"] = "PDC Receipts";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>PDC Receipts</h2>
+    <a asp-action="Create" class="btn btn-dark">Receive PDC</a>
+</div>
+
+@if (TempData["PdcMessage"] is string pdcMessage)
+{
+    <div class="alert alert-success py-2">@pdcMessage</div>
+}
+
+<div class="alert alert-info">
+    <strong>PDCs hit the accounts on the day you receive them, not on the cheque date.</strong>
+    Receiving a cheque posts a memorandum entry dated on the <strong>Received</strong> date &mdash;
+    <code>Dr 11400 PDC On Hand / Cr 21600 PDC Contra</code>. Both are control accounts, so nothing touches
+    cash, revenue or the tenant's balance at that point; the pair nets to zero on the Balance Sheet while
+    still showing the cheques you hold.
+    <br /><br />
+    The cheque date only tells you when to present it. Clearing the cheque is what moves real cash, and that
+    entry is dated on the <strong>Cleared</strong> date.
+</div>
+
+<table class="table table-bordered table-striped table-sm align-middle">
+    <thead>
+        <tr>
+            <th>Cheque No.</th>
+            <th>Cheque Date <div class="fw-normal small opacity-75">not accounting</div></th>
+            <th>Received <div class="fw-normal small opacity-75">memo posts here</div></th>
+            <th>Cleared <div class="fw-normal small opacity-75">cash posts here</div></th>
+            <th>Lease</th>
+            <th>Property</th>
+            <th>Unit</th>
+            <th>Tenant</th>
+            <th>Invoice</th>
+            <th>Bank</th>
+            <th>Mode</th>
+            <th>Status</th>
+            <th class="text-end">Amount</th>
+            <th>GL</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pdc in Model)
+        {
+            var badgeClass = pdc.Status switch
+            {
+                "Cleared" => "bg-success",
+                "Received" => "bg-primary",
+                "Bounced" => "bg-danger",
+                "Cancelled" => "bg-secondary",
+                "Replaced" => "bg-secondary",
+                _ => "bg-warning text-dark"
+            };
+
+            <tr>
+                <td>@pdc.ChequeNumber</td>
+                <td>@pdc.ChequeDate.ToString("dd/MM/yyyy")</td>
+                <td>@pdc.ReceivedDate.ToString("dd/MM/yyyy")</td>
+                <td>@(pdc.ClearedDate.HasValue? pdc.ClearedDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                <td>@pdc.Lease?.ContractNumber</td>
+                <td>@pdc.Lease?.Unit?.Property?.Name</td>
+                <td>@pdc.Lease?.Unit?.UnitNumber</td>
+                <td>@pdc.Lease?.Tenant?.FullName</td>
+                <td>@(pdc.CustomerInvoice?.InvoiceNumber ?? "-")</td>
+                <td>@(string.IsNullOrWhiteSpace(pdc.BankName) ? "-" : pdc.BankName)</td>
+                <td>@pdc.SettlementMode</td>
+                <td>
+                    <span class="badge @badgeClass">@pdc.Status</span>
+                </td>
+                <td class="text-end">@pdc.Amount.ToString("N2")</td>
+                <td>
+                    <div class="d-flex flex-column gap-1">
+                        @if (pdc.MemorandumJournalEntryId.HasValue)
+                        {
+                            <span class="badge bg-info text-dark"
+                                  title="Memorandum journal dated @pdc.MemorandumJournalEntry?.EntryDate.ToString("dd/MM/yyyy")">
+                                Memo @pdc.MemorandumJournalEntry?.EntryDate.ToString("dd/MM/yyyy")
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Memo Pending</span>
+                        }
+
+                        @if (pdc.ClearanceJournalEntryId.HasValue)
+                        {
+                            <span class="badge bg-success"
+                                  title="Clearance journal dated @pdc.ClearanceJournalEntry?.EntryDate.ToString("dd/MM/yyyy")">
+                                Cash @pdc.ClearanceJournalEntry?.EntryDate.ToString("dd/MM/yyyy")
+                            </span>
+                        }
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a asp-action="Edit" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        @if (pdc.Status != "Cleared")
+                        {
+                            <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-dark">Clear</a>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,214 @@
+﻿@model RealEstateManager.Models.ManualJournalEntryViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Create Manual Journal";
+
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+    var units = ViewBag.Units as List<Unit> ?? new();
+    var tenants = ViewBag.Tenants as List<Tenant> ?? new();
+    var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+    var leases = ViewBag.Leases as List<Lease> ?? new();
+    var ownerCategories = ViewBag.OwnerWithdrawalCategories as List<OwnerWithdrawalCategory> ?? new();
+    var ownerAccountIds = ViewBag.OwnerAccountIds as List<int> ?? new();
+}
+
+<style>
+    .owner-cat-cell select:disabled { background-color: #f1f3f5; }
+    tr.owner-line { background-color: #fff8e6 !important; }
+    tr.owner-line td { border-color: #e8d9a8; }
+</style>
+
+<h2>Create Manual Journal</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label asp-for="EntryDate" class="form-label"></label>
+            <input asp-for="EntryDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-5">
+            <label asp-for="Description" class="form-label"></label>
+            <input asp-for="Description" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="DocumentNumber" class="form-label"></label>
+            <input asp-for="DocumentNumber" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="ReferenceNumber" class="form-label"></label>
+            <input asp-for="ReferenceNumber" class="form-control" />
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Remarks" class="form-label"></label>
+            <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Journal Lines</h4>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleAdvancedRefs">
+            Show / Hide Advanced References
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th style="min-width: 240px;">Account</th>
+                    <th style="min-width: 180px;">Line Memo</th>
+                    <th style="min-width: 140px;">Unit Cost Center</th>
+                    <th style="min-width: 190px;">Owner Withdrawal Category</th>
+                    <th class="text-end" style="min-width: 120px;">Debit</th>
+                    <th class="text-end" style="min-width: 120px;">Credit</th>
+                    <th class="advanced-ref d-none" style="min-width: 160px;">Tenant (AR)</th>
+                    <th class="advanced-ref d-none" style="min-width: 160px;">Vendor (AP)</th>
+                    <th class="advanced-ref d-none" style="min-width: 180px;">Lease</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.Lines.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <select asp-for="Lines[@i].AccountId" class="form-select">
+                                <option value="">Select Account</option>
+                                @foreach (var account in accounts)
+                                {
+                                    <option value="@account.Id">@account.Code - @account.Name</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td>
+                            <input asp-for="Lines[@i].LineDescription" class="form-control" />
+                        </td>
+
+                        <td>
+                            <select asp-for="Lines[@i].UnitId" class="form-select">
+                                <option value="">No Cost Center</option>
+                                @foreach (var unit in units)
+                                {
+                                    <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td class="owner-cat-cell">
+                            <select asp-for="Lines[@i].OwnerWithdrawalCategoryId" class="form-select owner-category">
+                                <option value="">Not applicable</option>
+                                @foreach (var category in ownerCategories)
+                                {
+                                    <option value="@category.Id">@category.Code - @category.Name</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td>
+                            <input asp-for="Lines[@i].Debit" class="form-control text-end" />
+                        </td>
+
+                        <td>
+                            <input asp-for="Lines[@i].Credit" class="form-control text-end" />
+                        </td>
+
+                        <td class="advanced-ref d-none">
+                            <select asp-for="Lines[@i].TenantId" class="form-select">
+                                <option value="">None</option>
+                                @foreach (var tenant in tenants)
+                                {
+                                    <option value="@tenant.Id">@tenant.Code - @tenant.FullName</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td class="advanced-ref d-none">
+                            <select asp-for="Lines[@i].VendorId" class="form-select">
+                                <option value="">None</option>
+                                @foreach (var vendor in vendors)
+                                {
+                                    <option value="@vendor.Id">@vendor.Code - @vendor.Name</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td class="advanced-ref d-none">
+                            <select asp-for="Lines[@i].LeaseId" class="form-select">
+                                <option value="">None</option>
+                                @foreach (var lease in leases)
+                                {
+                                    <option value="@lease.Id">@lease.ContractNumber - @lease.Tenant?.FullName</option>
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="alert alert-light border small">
+        <strong>Owner Withdrawal Category.</strong>
+        This column becomes available only on a line posted to an account flagged as an
+        <em>owner's current account</em> (equity). It is the analysis dimension for the owner's own
+        expenditure and is deliberately separate from both the chart of accounts &mdash; which belongs to the
+        company &mdash; and unit cost centres, which allocate rental revenue and property costs to space.
+        Leave it blank for capital introduced or for a transfer of the owner's balance.
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save and Post</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("toggleAdvancedRefs").addEventListener("click", function () {
+            document.querySelectorAll(".advanced-ref").forEach(function (el) {
+                el.classList.toggle("d-none");
+            });
+        });
+
+        // The owner expenditure dimension is only valid on owner equity accounts.
+        // Enable the selector on those lines and lock it everywhere else, so the rule
+        // is visible in the UI as well as enforced on the server.
+        (function () {
+            var ownerAccountIds = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ownerAccountIds));
+
+            function syncRow(row) {
+                var accountSelect = row.querySelector("select[name$='.AccountId']");
+                var categorySelect = row.querySelector("select.owner-category");
+                if (!accountSelect || !categorySelect) return;
+
+                var accountId = parseInt(accountSelect.value, 10);
+                var isOwnerAccount = ownerAccountIds.indexOf(accountId) !== -1;
+
+                categorySelect.disabled = !isOwnerAccount;
+                row.classList.toggle("owner-line", isOwnerAccount);
+
+                if (!isOwnerAccount) {
+                    categorySelect.value = "";
+                }
+            }
+
+            document.querySelectorAll("tbody tr").forEach(function (row) {
+                var accountSelect = row.querySelector("select[name$='.AccountId']");
+                if (!accountSelect) return;
+
+                accountSelect.addEventListener("change", function () { syncRow(row); });
+                syncRow(row);
+            });
+        })();
+    </script>
+}

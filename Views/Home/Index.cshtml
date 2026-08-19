@@ -1,0 +1,502 @@
+@model RealEstateManager.Models.HomeDashboardViewModel
+
+@{
+    ViewData["Title"] = "Home";
+    var dateValue = Model.Today.ToString("yyyy-MM-dd");
+}
+
+<style>
+    @@media print {
+        .dashboard-no-print {
+            display: none !important;
+        }
+
+        .dashboard-print-card {
+            break-inside: avoid;
+        }
+
+        .container {
+            max-width: 100% !important;
+        }
+    }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 dashboard-no-print">
+    <div>
+        <h1 class="fw-bold mb-1">Dashboard</h1>
+        <p class="text-muted mb-0">Portfolio, collections, liabilities, and tenant activity in one operational view.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="text-muted">
+            <strong>Today:</strong> @Model.Today.ToString("dd/MM/yyyy")
+        </div>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print Dashboard</button>
+    </div>
+</div>
+
+<div class="d-none d-print-block mb-4">
+    <h1 class="fw-bold mb-1">Management Dashboard Snapshot</h1>
+    <div>Printed on @Model.Today.ToString("dd/MM/yyyy")</div>
+    <div>Current Period: @Model.CurrentPeriodName</div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-primary text-white">
+            <div class="card-body">
+                <div class="small text-uppercase opacity-75">Properties</div>
+                <div class="display-6 fw-bold">@Model.PropertiesCount</div>
+                <div>Owned: @Model.OwnedPropertiesCount</div>
+                <div>Managed: @Model.ManagedPropertiesCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body">
+                <div class="small text-uppercase opacity-75">Occupancy</div>
+                <div class="display-6 fw-bold">@Model.OccupancyRate.ToString("N2")%</div>
+                <div>Occupied: @Model.OccupiedUnitsCount</div>
+                <div>Vacant: @Model.VacantUnitsCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-dark text-white">
+            <div class="card-body">
+                <div class="small text-uppercase opacity-75">Receivables</div>
+                <div class="display-6 fw-bold">@Model.OutstandingReceivables.ToString("N2")</div>
+                <div>Open invoices: @Model.OutstandingInvoicesCount</div>
+                <div>Overdue: @Model.OverdueReceivables.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-warning">
+            <div class="card-body">
+                <div class="small text-uppercase text-muted">Accounting Period</div>
+                <div class="fw-bold fs-4">@Model.CurrentPeriodName</div>
+                <div>Open periods: @Model.OpenPeriodsCount</div>
+                <div>Active leases: @Model.ActiveLeasesCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>Collection Trend</strong>
+            </div>
+            <div class="card-body">
+                <div class="fs-3 fw-bold">@Model.MonthlyCollectionRate.ToString("N2")%</div>
+                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.MonthlyCollectionRate" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-success" style="width:@Math.Min(Model.MonthlyCollectionRate, 100m).ToString("0.##")%"></div>
+                </div>
+                <div class="mt-3 text-muted small">Invoices this month: @Model.ThisMonthInvoices.ToString("N2")</div>
+                <div class="text-muted small">Receipts this month: @Model.ThisMonthReceipts.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>Overdue Pressure</strong>
+            </div>
+            <div class="card-body">
+                <div class="fs-3 fw-bold">@Model.OverdueReceivablesRate.ToString("N2")%</div>
+                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.OverdueReceivablesRate" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-danger" style="width:@Math.Min(Model.OverdueReceivablesRate, 100m).ToString("0.##")%"></div>
+                </div>
+                <div class="mt-3 text-muted small">Overdue invoices: @Model.OverdueInvoicesCount</div>
+                <div class="text-muted small">Overdue amount: @Model.OverdueReceivables.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>Vacancy KPI</strong>
+            </div>
+            <div class="card-body">
+                <div class="fs-3 fw-bold">@Model.VacancyRate.ToString("N2")%</div>
+                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.VacancyRate" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-secondary" style="width:@Math.Min(Model.VacancyRate, 100m).ToString("0.##")%"></div>
+                </div>
+                <div class="mt-3 text-muted small">Vacant units: @Model.VacantUnitsCount</div>
+                <div class="text-muted small">Maintenance: @Model.UnderMaintenanceUnitsCount | Reserved: @Model.ReservedUnitsCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>Managed Portfolio</strong>
+            </div>
+            <div class="card-body">
+                <div class="fs-3 fw-bold">@Model.ManagedPortfolioRate.ToString("N2")%</div>
+                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.ManagedPortfolioRate" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-info" style="width:@Math.Min(Model.ManagedPortfolioRate, 100m).ToString("0.##")%"></div>
+                </div>
+                <div class="mt-3 text-muted small">Managed properties: @Model.ManagedPropertiesCount</div>
+                <div class="text-muted small">Owned properties: @Model.OwnedPropertiesCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100 border-0 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>Cash KPI</strong>
+            </div>
+            <div class="card-body">
+                @if (Model.CashKpiAvailable)
+                {
+                    <div class="text-muted small">Mapped cash account</div>
+                    <div class="fw-semibold mb-2">@Model.CashAccountName</div>
+                    <div class="fs-3 fw-bold">@Model.CashBalance.ToString("N2")</div>
+                    <div class="text-muted small mt-2">Based on posted journal lines and account opening balance.</div>
+                }
+                else
+                {
+                    <div class="text-muted">Cash KPI is not available until the default cash account mapping is configured.</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100 border-0 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>Landlord KPI</strong>
+            </div>
+            <div class="card-body">
+                @if (Model.LandlordKpiAvailable)
+                {
+                    <div class="text-muted small">Mapped landlord liability account</div>
+                    <div class="fw-semibold mb-2">@Model.DueToLandlordsAccountName</div>
+                    <div class="fs-3 fw-bold">@Model.DueToLandlordsBalance.ToString("N2")</div>
+                    <div class="text-muted small mt-2">Shows current posted balance due to landlords.</div>
+                }
+                else
+                {
+                    <div class="text-muted">Landlord KPI is not available until the due-to-landlords account mapping is configured.</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100 border-0 dashboard-print-card">
+            <div class="card-header bg-light">
+                <strong>PDC Summary</strong>
+            </div>
+            <div class="card-body">
+                @if (Model.PdcDataAvailable)
+                {
+                    <div class="text-muted small">Uncleared PDC total</div>
+                    <div class="fs-3 fw-bold">@Model.UnclearedPdcAmount.ToString("N2")</div>
+                    <div>Uncleared cheques: @Model.UnclearedPdcCount</div>
+                    <div class="mt-3">
+                        <a class="btn btn-outline-dark btn-sm" href="/PdcReceipts">Open PDC Receipts</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted">PDC data is not available yet. Apply the `PdcReceipts` migration to enable this section.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4 dashboard-print-card">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <strong>Landlord Drilldown</strong>
+        <div class="dashboard-no-print">
+            <a class="btn btn-outline-dark btn-sm" href="/Properties">Open Properties</a>
+            <a class="btn btn-outline-dark btn-sm" href="/Leases">Open Leases</a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Owner</th>
+                        <th class="text-end">Units</th>
+                        <th class="text-end">Occupied</th>
+                        <th class="text-end">Active Leases</th>
+                        <th class="text-end">Occupancy</th>
+                        <th class="text-end">Open A/R</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ManagedPropertyDrilldown.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-3">No managed property drilldown data found.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var property in Model.ManagedPropertyDrilldown)
+                        {
+                            <tr>
+                                <td>
+                                    <div>@property.PropertyCode - @property.PropertyName</div>
+                                    <small class="text-muted dashboard-no-print">
+                                        <a href="/Properties">Properties</a> |
+                                        <a href="/Leases">Leases</a> |
+                                        <a href="/TenantStatements">Tenant Statements</a>
+                                    </small>
+                                </td>
+                                <td>@property.OwnerName</td>
+                                <td class="text-end">@property.UnitsCount</td>
+                                <td class="text-end">@property.OccupiedUnitsCount</td>
+                                <td class="text-end">@property.ActiveLeasesCount</td>
+                                <td class="text-end">@property.OccupancyRate.ToString("N2")%</td>
+                                <td class="text-end">@property.OutstandingReceivables.ToString("N2")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 dashboard-no-print">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-light">
+                <strong>Quick Reports</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h5>Trial Balance</h5>
+                            <p class="text-muted mb-3">Review debit and credit balances from posted journal entries.</p>
+                            <a class="btn btn-dark btn-sm" href="/Reports/TrialBalance?asOfDate=@dateValue">Open Trial Balance</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h5>Profit &amp; Loss</h5>
+                            <p class="text-muted mb-3">Review revenue, expenses, and current year result.</p>
+                            <a class="btn btn-dark btn-sm" href="/Reports/ProfitAndLoss?asOfDate=@dateValue">Open Profit &amp; Loss</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h5>Balance Sheet</h5>
+                            <p class="text-muted mb-3">Review assets, liabilities, equity, and current year result.</p>
+                            <a class="btn btn-dark btn-sm" href="/Reports/BalanceSheet?asOfDate=@dateValue">Open Balance Sheet</a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
+                            <h5>Tenant Statement</h5>
+                            <p class="text-muted mb-3">Review tenant balance movements and noted PDC items.</p>
+                            <a class="btn btn-dark btn-sm" href="/TenantStatements">Open Tenant Statement</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-light">
+                <strong>Quick Actions</strong>
+            </div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" href="/Properties">Manage Properties</a>
+                <a class="list-group-item list-group-item-action" href="/Units">Manage Units</a>
+                <a class="list-group-item list-group-item-action" href="/Leases">Manage Leases</a>
+                <a class="list-group-item list-group-item-action" href="/CustomerInvoices">Manage Customer Invoices</a>
+                <a class="list-group-item list-group-item-action" href="/CustomerReceipts">Manage Customer Receipts</a>
+                <a class="list-group-item list-group-item-action" href="/PdcReceipts">Manage PDC Receipts</a>
+                <a class="list-group-item list-group-item-action" href="/ManualJournals">Open Manual Journals</a>
+                <a class="list-group-item list-group-item-action" href="/AccountMappings">Open Account Mappings</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-light">
+                <strong>Recent Invoices</strong>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Date</th>
+                                <th>Tenant</th>
+                                <th>Status</th>
+                                <th class="text-end">Outstanding</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentInvoices.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">No invoices found.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var invoice in Model.RecentInvoices)
+                                {
+                                    var invoiceBadgeClass = invoice.Status switch
+                                    {
+                                        "Paid" => "bg-success",
+                                        "PartiallyPaid" => "bg-warning text-dark",
+                                        "Posted" => "bg-primary",
+                                        "Draft" => "bg-secondary",
+                                        "Cancelled" => "bg-danger",
+                                        _ => "bg-dark"
+                                    };
+
+                                    <tr>
+                                        <td>
+                                            <div>@invoice.InvoiceNumber</div>
+                                            <small class="text-muted">@invoice.LeaseDisplay</small>
+                                        </td>
+                                        <td>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@invoice.TenantName</td>
+                                        <td><span class="badge @invoiceBadgeClass">@invoice.Status</span></td>
+                                        <td class="text-end">@invoice.OutstandingAmount.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-light">
+                <strong>Recent Receipts</strong>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Receipt</th>
+                                <th>Date</th>
+                                <th>Tenant</th>
+                                <th>Method</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentReceipts.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">No receipts found.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var receipt in Model.RecentReceipts)
+                                {
+                                    var methodBadgeClass = receipt.PaymentMethod switch
+                                    {
+                                        "Cash" => "bg-success",
+                                        "Bank" => "bg-primary",
+                                        "Cheque" => "bg-warning text-dark",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    <tr>
+                                        <td>@receipt.ReceiptNumber</td>
+                                        <td>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</td>
+                                        <td>@receipt.TenantName</td>
+                                        <td><span class="badge @methodBadgeClass">@receipt.PaymentMethod</span></td>
+                                        <td class="text-end">@receipt.Amount.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-light">
+        <strong>Recent PDC Activity</strong>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.PdcDataAvailable)
+        {
+            <div class="p-3 text-muted">PDC activity will appear here after the `PdcReceipts` database migration is applied.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th>Cheque</th>
+                            <th>Received</th>
+                            <th>Tenant</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentPdcReceipts.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">No PDC activity found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var pdc in Model.RecentPdcReceipts)
+                            {
+                                var pdcBadgeClass = pdc.Status switch
+                                {
+                                    "Cleared" => "bg-success",
+                                    "Received" => "bg-primary",
+                                    "Draft" => "bg-warning text-dark",
+                                    "Bounced" => "bg-danger",
+                                    "Cancelled" => "bg-secondary",
+                                    "Replaced" => "bg-secondary",
+                                    _ => "bg-dark"
+                                };
+
+                                <tr>
+                                    <td>@pdc.ChequeNumber</td>
+                                    <td>@pdc.ReceivedDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@pdc.TenantName</td>
+                                    <td>@pdc.SettlementMode</td>
+                                    <td><span class="badge @pdcBadgeClass">@pdc.Status</span></td>
+                                    <td class="text-end">@pdc.Amount.ToString("N2")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

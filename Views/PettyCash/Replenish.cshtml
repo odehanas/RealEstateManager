@@ -1,0 +1,82 @@
+@model RealEstateManager.Models.PettyCashReplenishmentViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Replenish Petty Cash";
+    var floats = ViewBag.FloatAccounts as List<Account> ?? new();
+    var fundingAccounts = ViewBag.FundingAccounts as List<Account> ?? new();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Replenish Petty Cash</h2>
+        <p class="text-muted mb-0">Posts <strong>Dr petty cash</strong> / <strong>Cr bank or cash</strong>.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Petty Cash</a>
+</div>
+
+<div class="alert alert-info">
+    Topping up a float is a <strong>transfer between two asset accounts</strong>, not an expense. Nothing
+    reaches the Profit &amp; Loss here &mdash; the cost was already recorded when each expense voucher was posted.
+</div>
+
+<form asp-action="Replenish" method="post" class="col-lg-8">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="PettyCashAccountId" class="form-label"></label>
+                    <select asp-for="PettyCashAccountId" class="form-select">
+                        @foreach (var account in floats)
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    </select>
+                    <div class="form-text">The float receiving the cash.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="FundingAccountId" class="form-label"></label>
+                    <select asp-for="FundingAccountId" class="form-select">
+                        @foreach (var account in fundingAccounts)
+                        {
+                            <option value="@account.Id">@account.Code - @account.Name</option>
+                        }
+                    </select>
+                    <div class="form-text">The bank or cash account the money came from.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ReplenishmentDate" class="form-label"></label>
+                    <input asp-for="ReplenishmentDate" type="date" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Amount" class="form-label"></label>
+                    <input asp-for="Amount" type="number" step="0.01" min="0" class="form-control text-end" />
+                    <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="ReferenceNumber" class="form-label"></label>
+                    <input asp-for="ReferenceNumber" class="form-control" placeholder="Cheque / transfer ref." />
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Post Replenishment</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

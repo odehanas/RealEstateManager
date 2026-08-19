@@ -1,0 +1,92 @@
+@model List<RealEstateManager.Models.PortalInvoiceViewModel>
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "My Invoices";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">My Invoices</h1>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">You have no invoices yet.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Invoice</th>
+                        <th>Unit</th>
+                        <th>Date</th>
+                        <th>Due</th>
+                        <th class="text-end">Rent</th>
+                        <th class="text-end">VAT</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-end">Paid</th>
+                        <th class="text-end">Outstanding</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invoice in Model)
+                    {
+                        <tr class="@(invoice.IsOverdue ? "table-danger" : "")">
+                            <td>
+                                @(invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber)
+                                @if (invoice.TaxInvoiceNumber != null)
+                                {
+                                    <div class="small text-muted">Tax invoice</div>
+                                }
+                            </td>
+                            <td>@invoice.UnitCode</td>
+                            <td>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @invoice.DueDate.ToString("dd/MM/yyyy")
+                                @if (invoice.IsOverdue)
+                                {
+                                    <div class="small text-danger fw-semibold">@invoice.DaysOverdue days late</div>
+                                }
+                            </td>
+                            <td class="text-end">@invoice.Subtotal.ToString("N2")</td>
+                            <td class="text-end">@(invoice.VatAmount == 0m ? "-" : invoice.VatAmount.ToString("N2"))</td>
+                            <td class="text-end fw-semibold">@invoice.TotalAmount.ToString("N2")</td>
+                            <td class="text-end">@invoice.AmountPaid.ToString("N2")</td>
+                            <td class="text-end @(invoice.Outstanding > 0 ? "text-danger fw-semibold" : "")">
+                                @(invoice.Outstanding == 0m ? "-" : invoice.Outstanding.ToString("N2"))
+                            </td>
+                            <td>
+                                @{
+                                    var badge = invoice.Status switch
+                                    {
+                                        "Paid" => "bg-success",
+                                        "PartiallyPaid" => "bg-warning text-dark",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badge">@invoice.Status</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="6">Total</th>
+                        <th class="text-end">@Model.Sum(x => x.TotalAmount).ToString("N2")</th>
+                        <th class="text-end">@Model.Sum(x => x.AmountPaid).ToString("N2")</th>
+                        <th class="text-end">@Model.Sum(x => x.Outstanding).ToString("N2")</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-2">
+        Only issued invoices are shown. Amounts marked as paid include cheques that have already cleared.
+    </p>
+}

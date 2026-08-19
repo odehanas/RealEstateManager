@@ -1,0 +1,121 @@
+@model RealEstateManager.Models.CompanyListPageViewModel
+
+@{
+    ViewData["Title"] = "Companies / Branch Setup";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Companies / Branch Setup</h2>
+    <a asp-action="Create" class="btn btn-primary">Add Internal Company</a>
+</div>
+
+<div class="alert alert-info">
+    New customer onboarding now starts from the login page. Use this internal screen only for additional company records under administration and future branch-style expansion.
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0 text-danger">Expired Subscriptions</h5>
+                    <span class="badge bg-danger">@Model.ExpiredCompanies.Count</span>
+                </div>
+                @if (Model.ExpiredCompanies.Count == 0)
+                {
+                    <div class="text-muted small">No expired company subscriptions.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.ExpiredCompanies.Take(5))
+                        {
+                            <li class="list-group-item px-0">
+                                <div class="fw-semibold">@item.CompanyName</div>
+                                <div class="small text-muted">
+                                    Status: @item.SubscriptionStatus |
+                                    Access Until: @(item.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-warning shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0 text-warning-emphasis">Expiring In 15 Days</h5>
+                    <span class="badge bg-warning text-dark">@Model.ExpiringSoonCompanies.Count</span>
+                </div>
+                @if (Model.ExpiringSoonCompanies.Count == 0)
+                {
+                    <div class="text-muted small">No company subscriptions are close to expiry.</div>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.ExpiringSoonCompanies.Take(5))
+                        {
+                            <li class="list-group-item px-0">
+                                <div class="fw-semibold">@item.CompanyName</div>
+                                <div class="small text-muted">
+                                    @item.SubscriptionStatus |
+                                    @item.DaysRemaining day(s) remaining |
+                                    Access Until: @(item.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<table class="table table-striped table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Currency</th>
+            <th>Fiscal Start</th>
+            <th>Subscription</th>
+            <th>Access Until</th>
+            <th>Codes</th>
+            <th>Users</th>
+            <th>Created</th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.BaseCurrency</td>
+                <td>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.FiscalYearStartMonth)</td>
+                <td>@item.SubscriptionStatus</td>
+                <td>@(item.AccessEndDate.HasValue ? $"{item.AccessEndDate.Value:dd/MM/yyyy} ({item.DaysRemaining} days)" : "-")</td>
+                <td>@item.ActivationCodesUsed / @item.ActivationCodesIssued used</td>
+                <td>@item.UsersCount</td>
+                <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                <td class="text-center">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

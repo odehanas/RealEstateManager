@@ -1,0 +1,74 @@
+﻿@model IEnumerable<RealEstateManager.Domain.JournalEntry>
+@using RealEstateManager.Models
+
+@{
+    ViewData["Title"] = "Manual Journals";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Manual Journals</h2>
+    <a asp-action="Create" class="btn btn-dark">New Manual Journal</a>
+</div>
+
+@if (TempData["JournalSuccess"] is string journalSuccess)
+{
+    <div class="alert alert-success py-2">@journalSuccess</div>
+}
+@if (TempData["JournalError"] is string journalError)
+{
+    <div class="alert alert-danger py-2"><strong>Cannot do that.</strong> @journalError</div>
+}
+
+<div class="alert alert-light border small">
+    A journal is saved as a <strong>Draft</strong> and has no effect on the accounts until you press
+    <strong>Post</strong>. Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet
+    and General Ledger.
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Entry No.</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Document</th>
+            <th>Reference</th>
+            <th class="text-end">Debit</th>
+            <th class="text-end">Credit</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var totalDebit = item.Lines.Sum(x => x.Debit);
+            var totalCredit = item.Lines.Sum(x => x.Credit);
+
+            <tr>
+                <td>@item.EntryNumber</td>
+                <td>@item.EntryDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.JournalType</td>
+                <td>@item.Description</td>
+                <td>@item.DocumentNumber</td>
+                <td>@item.ReferenceNumber</td>
+                <td class="text-end">@totalDebit.ToString("N2")</td>
+                <td class="text-end">@totalCredit.ToString("N2")</td>
+                <td>
+                    @if (item.IsPosted)
+                    {
+                        <span class="badge bg-success">Posted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Draft</span>
+                    }
+                </td>
+                <td>
+                    <partial name="_JournalStateButtons" model="JournalStateButtonsViewModel.For(item)" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

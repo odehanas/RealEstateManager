@@ -1,0 +1,77 @@
+﻿@model RealEstateManager.Models.SecurityDepositCreateViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Receive Security Deposit";
+    var leases = ViewBag.Leases as List<Lease> ?? new();
+    var selectedLeaseId = ViewBag.SelectedLeaseId as int?;
+}
+
+<h2>Receive Security Deposit</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="LeaseId" class="form-label">Lease</label>
+            <select asp-for="LeaseId" class="form-select">
+                <option value="">Select Lease</option>
+                @foreach (var lease in leases)
+                {
+                    var isSelected = Model.LeaseId == lease.Id || selectedLeaseId == lease.Id;
+                    <option value="@lease.Id" selected="@(isSelected ? "selected" : null)">
+                        @lease.ContractNumber - @lease.Tenant?.FullName - @lease.Unit?.Property?.Code/@lease.Unit?.UnitNumber
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="ReferenceNumber" class="form-label"></label>
+            <input asp-for="ReferenceNumber" class="form-control" />
+            <small class="text-muted">Leave blank to auto-generate.</small>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="ReceiptDate" class="form-label"></label>
+            <input asp-for="ReceiptDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Amount" class="form-label"></label>
+            <input asp-for="Amount" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="PaymentMethod" class="form-label"></label>
+            <select asp-for="PaymentMethod" class="form-select">
+                <option>Bank</option>
+                <option>Cash</option>
+                <option>Cheque</option>
+                <option>Transfer</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select">
+                <option>Held</option>
+                <option>Applied</option>
+                <option>Refunded</option>
+                <option>Forfeited</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save and Post</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

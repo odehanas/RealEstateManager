@@ -1,0 +1,53 @@
+@model RealEstateManager.Models.OwnerWithdrawalCategoryViewModel
+@{
+    ViewData["Title"] = "Edit Owner Withdrawal Category";
+}
+
+<h2 class="mb-3">Edit Owner Withdrawal Category</h2>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="col-lg-7">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label"></label>
+        <input asp-for="Code" class="form-control" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label asp-for="SortOrder" class="form-label"></label>
+            <input asp-for="SortOrder" class="form-control" />
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check mt-4">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-light border small">
+        Deactivating a category removes it from the General Journal selector but keeps every journal
+        already posted against it, so historical reports are unaffected.
+    </div>
+
+    <button type="submit" class="btn btn-dark">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

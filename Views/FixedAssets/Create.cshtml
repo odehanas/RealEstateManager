@@ -1,0 +1,183 @@
+@model RealEstateManager.Models.FixedAssetCreateViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Add Fixed Asset";
+    var properties = ViewBag.Properties as List<Property> ?? new();
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+    var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+}
+
+<h2>Add Fixed Asset</h2>
+
+<div class="alert alert-info">
+    Save the asset as a draft first, then add acquisition and landed-cost style allocations, and capitalize it only when the asset is ready for use.
+</div>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>Asset Details</strong>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label asp-for="AssetCode" class="form-label">Asset Code</label>
+                <input asp-for="AssetCode" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Name" class="form-label">Asset Name</label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="AssetCategory" class="form-label">Category</label>
+                <input asp-for="AssetCategory" class="form-control" placeholder="Furniture, Equipment, Vehicles..." />
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="PropertyId" class="form-label">Property</label>
+                <select asp-for="PropertyId" class="form-select">
+                    <option value="">Not Property-Specific</option>
+                    @foreach (var property in properties)
+                    {
+                        <option value="@property.Id">@property.Code - @property.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="AcquisitionDate" class="form-label">Acquisition Date</label>
+                <input asp-for="AcquisitionDate" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="InServiceDate" class="form-label">In Service Date</label>
+                <input asp-for="InServiceDate" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Cost" class="form-label">Initial Acquisition Cost</label>
+                <input asp-for="Cost" class="form-control" />
+                <div class="form-text">Optional. If entered, you must also select the payment or payable account.</div>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="InitialCreditAccountId" class="form-label">Paid / Payable From</label>
+                <select asp-for="InitialCreditAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="InitialVendorId" class="form-label">Vendor</label>
+                <select asp-for="InitialVendorId" class="form-select">
+                    <option value="">Select Vendor</option>
+                    @foreach (var vendor in vendors)
+                    {
+                        <option value="@vendor.Id">@vendor.Code - @vendor.Name</option>
+                    }
+                </select>
+                <div class="form-text">Required when the source account is Accounts Payable.</div>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="ResidualValue" class="form-label">Residual Value</label>
+                <input asp-for="ResidualValue" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="UsefulLifeMonths" class="form-label">Useful Life (Months)</label>
+                <input asp-for="UsefulLifeMonths" class="form-control" />
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Notes" class="form-label">Notes</label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>Opening Balance (brought forward)</strong>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-12">
+                <div class="alert alert-secondary mb-0">
+                    Use these fields only when migrating from a legacy system. They feed the
+                    Fixed Asset Cost and Accumulated Depreciation control accounts as opening
+                    balances and do <strong>not</strong> generate any journal entry. Leave both
+                    at zero for assets newly acquired through this system.
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="OpeningCost" class="form-label">Opening Cost</label>
+                <input asp-for="OpeningCost" type="number" step="0.01" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="OpeningAccumulatedDepreciation" class="form-label">Opening Accumulated Depreciation</label>
+                <input asp-for="OpeningAccumulatedDepreciation" type="number" step="0.01" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>Account Mapping</strong>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label asp-for="AssetAccountId" class="form-label">Asset Account</label>
+                <select asp-for="AssetAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="AccumulatedDepreciationAccountId" class="form-label">Accumulated Depreciation Account</label>
+                <select asp-for="AccumulatedDepreciationAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="DepreciationExpenseAccountId" class="form-label">Depreciation Expense Account</label>
+                <select asp-for="DepreciationExpenseAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save Draft Asset</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

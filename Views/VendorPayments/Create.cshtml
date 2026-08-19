@@ -1,0 +1,69 @@
+﻿@model RealEstateManager.Models.VendorPaymentCreateViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Vendor Payment";
+    var bills = ViewBag.Bills as List<VendorBill> ?? new();
+    var selectedBillId = ViewBag.SelectedBillId as int?;
+}
+
+<h2>Vendor Payment</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="VendorBillId" class="form-label">Vendor Bill</label>
+            <select asp-for="VendorBillId" class="form-select">
+                <option value="">Select Bill</option>
+                @foreach (var bill in bills)
+                {
+                    var outstanding = bill.TotalAmount - bill.AmountPaid;
+                    var isSelected = Model.VendorBillId == bill.Id || selectedBillId == bill.Id;
+
+                    <option value="@bill.Id" selected="@(isSelected ? "selected" : null)">
+                        @bill.BillNumber - @bill.Vendor?.Name - Outstanding: @outstanding.ToString("N2")
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="PaymentNumber" class="form-label"></label>
+            <input asp-for="PaymentNumber" class="form-control" />
+            <small class="text-muted">Leave blank to auto-generate.</small>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="PaymentDate" class="form-label"></label>
+            <input asp-for="PaymentDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Amount" class="form-label"></label>
+            <input asp-for="Amount" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="PaymentMethod" class="form-label"></label>
+            <select asp-for="PaymentMethod" class="form-select">
+                <option>Bank</option>
+                <option>Cash</option>
+                <option>Cheque</option>
+                <option>Transfer</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save and Post</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

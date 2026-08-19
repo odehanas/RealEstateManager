@@ -1,0 +1,116 @@
+@model RealEstateManager.Models.AppUserFormViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<h2>Edit User</h2>
+
+<form asp-action="Edit" method="post" class="row g-3">
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-4">
+        <label asp-for="Username" class="form-label"></label>
+        <input asp-for="Username" class="form-control" />
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label asp-for="DisplayName" class="form-label"></label>
+        <input asp-for="DisplayName" class="form-control" />
+        <span asp-validation-for="DisplayName" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+        <div class="form-text">Leave blank to keep the current password.</div>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DefaultCompanyId" class="form-label"></label>
+        <select asp-for="DefaultCompanyId" class="form-select">
+            <option value="">Select default company</option>
+            @foreach (var company in Model.Companies)
+            {
+                <option value="@company.CompanyId">@company.CompanyName</option>
+            }
+        </select>
+        <span asp-validation-for="DefaultCompanyId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3 form-check ms-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+
+    <div class="col-md-3 form-check ms-3">
+        <input asp-for="IsSystemAdmin" class="form-check-input" />
+        <label asp-for="IsSystemAdmin" class="form-check-label"></label>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">Company Access</label>
+        <div class="row">
+            @for (var i = 0; i < Model.Companies.Count; i++)
+            {
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input asp-for="Companies[i].IsSelected" class="form-check-input" />
+                        <input asp-for="Companies[i].CompanyId" type="hidden" />
+                        <input asp-for="Companies[i].CompanyName" type="hidden" />
+                        <label class="form-check-label" asp-for="Companies[i].IsSelected">@Model.Companies[i].CompanyName</label>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-12">
+        <label class="form-label">Permission Assignment</label>
+        <div class="alert alert-info py-2">
+            System Admin ignores the permission matrix and always has full access.
+        </div>
+        @for (var groupIndex = 0; groupIndex < Model.PermissionGroups.Count; groupIndex++)
+        {
+            <div class="border rounded p-3 mb-3">
+                <h5 class="mb-3">@Model.PermissionGroups[groupIndex].GroupName</h5>
+                <input asp-for="PermissionGroups[groupIndex].GroupName" type="hidden" />
+                <div class="row">
+                    @for (var permissionIndex = 0; permissionIndex < Model.PermissionGroups[groupIndex].Permissions.Count; permissionIndex++)
+                    {
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input asp-for="PermissionGroups[groupIndex].Permissions[permissionIndex].IsSelected" class="form-check-input" />
+                                <input asp-for="PermissionGroups[groupIndex].Permissions[permissionIndex].PermissionKey" type="hidden" />
+                                <input asp-for="PermissionGroups[groupIndex].Permissions[permissionIndex].PermissionName" type="hidden" />
+                                <input asp-for="PermissionGroups[groupIndex].Permissions[permissionIndex].Description" type="hidden" />
+                                <label class="form-check-label" asp-for="PermissionGroups[groupIndex].Permissions[permissionIndex].IsSelected">
+                                    @Model.PermissionGroups[groupIndex].Permissions[permissionIndex].PermissionName
+                                </label>
+                                <div class="form-text">@Model.PermissionGroups[groupIndex].Permissions[permissionIndex].Description</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,50 @@
+﻿@model IEnumerable<RealEstateManager.Domain.Lease>
+
+@{
+    ViewData["Title"] = "Leases";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Leases</h2>
+    <a asp-controller="Leases" asp-action="Create" class="btn btn-dark">Create Lease</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Contract</th>
+            <th>Property</th>
+            <th>Unit</th>
+            <th>Tenant</th>
+            <th>Start</th>
+            <th>End</th>
+            <th class="text-end">Annual Rent</th>
+            <th>Billing Frequency</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lease in Model)
+        {
+            <tr>
+                <td>@lease.ContractNumber</td>
+                <td>@lease.Unit?.Property?.Name</td>
+                <td>@lease.Unit?.UnitNumber</td>
+                <td>@lease.Tenant?.FullName</td>
+                <td>@lease.StartDate.ToString("dd/MM/yyyy")</td>
+                <td>@lease.EndDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-end">@lease.AnnualRent.ToString("N2")</td>
+                <td>@lease.BillingFrequencyMonths month(s)</td>
+                <td>@lease.Status</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="ContractLabel" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-dark">QR Label</a>
+                        <a asp-action="ContractDraft" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-secondary">Draft Contract</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

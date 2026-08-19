@@ -1,0 +1,111 @@
+@model RealEstateManager.Models.AuditLogListViewModel
+
+@{
+    ViewData["Title"] = "Audit Logs";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Audit Logs</h2>
+    <span class="text-muted">Latest 500 records</span>
+</div>
+
+<form method="get" class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label asp-for="Filter.FromDate" class="form-label">From</label>
+                <input asp-for="Filter.FromDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Filter.ToDate" class="form-label">To</label>
+                <input asp-for="Filter.ToDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Filter.Username" class="form-label">Username</label>
+                <input asp-for="Filter.Username" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Filter.ControllerName" class="form-label">Controller</label>
+                <select asp-for="Filter.ControllerName" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var controller in Model.AvailableControllers)
+                    {
+                        <option value="@controller">@controller</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Filter.HttpMethod" class="form-label">Method</label>
+                <select asp-for="Filter.HttpMethod" class="form-select">
+                    <option value="">All</option>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input asp-for="Filter.OnlyFailures" class="form-check-input" />
+                    <label asp-for="Filter.OnlyFailures" class="form-check-label">Failures only</label>
+                </div>
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>When</th>
+                <th>User</th>
+                <th>Company</th>
+                <th>Activity</th>
+                <th>Method</th>
+                <th>Path</th>
+                <th>Status</th>
+                <th>IP</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Items.Count == 0)
+            {
+                <tr>
+                    <td colspan="9" class="text-center text-muted">No audit records found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.OccurredAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                        <td>@(!string.IsNullOrWhiteSpace(item.DisplayName) ? $"{item.DisplayName} ({item.Username})" : item.Username ?? "-")</td>
+                        <td>@(string.IsNullOrWhiteSpace(item.CompanyName) ? "-" : item.CompanyName)</td>
+                        <td>@(string.IsNullOrWhiteSpace(item.ActivityName) ? "-" : item.ActivityName)</td>
+                        <td>@item.HttpMethod</td>
+                        <td class="small">@item.RequestPath</td>
+                        <td>
+                            @if (item.IsSuccess)
+                            {
+                                <span class="badge text-bg-success">@item.StatusCode</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-danger">@item.StatusCode</span>
+                            }
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(item.IpAddress) ? "-" : item.IpAddress)</td>
+                        <td class="small">@(!string.IsNullOrWhiteSpace(item.ErrorMessage) ? item.ErrorMessage : "-")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

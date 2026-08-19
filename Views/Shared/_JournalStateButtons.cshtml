@@ -1,0 +1,36 @@
+@model RealEstateManager.Models.JournalStateButtonsViewModel
+@*
+    Post / Reset to Draft buttons for a journal entry, usable from any document list.
+    Both actions go to JournalController and return to the page they were pressed on,
+    so a list screen does not have to implement the workflow itself.
+*@
+@{
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+}
+
+@if (!Model.JournalEntryId.HasValue)
+{
+    <span class="badge bg-secondary" title="No journal entry has been created yet">Not journalised</span>
+}
+else if (Model.PeriodClosed)
+{
+    <span class="badge bg-dark" title="@Model.PeriodName is closed, so this entry is locked">Period locked</span>
+}
+else if (Model.IsPosted)
+{
+    <form asp-controller="Journal" asp-action="ResetToDraft" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.JournalEntryId" />
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <button type="submit" class="btn btn-sm btn-outline-warning">Reset to Draft</button>
+    </form>
+}
+else
+{
+    <form asp-controller="Journal" asp-action="Post" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.JournalEntryId" />
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <button type="submit" class="btn btn-sm btn-dark">Post</button>
+    </form>
+}

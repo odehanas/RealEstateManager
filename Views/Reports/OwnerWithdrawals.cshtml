@@ -1,0 +1,281 @@
+@model RealEstateManager.Services.OwnerWithdrawalReportDto
+@{
+    ViewData["Title"] = "Owner Withdrawals by Category";
+    var accounts = Model.Accounts;
+}
+
+<style>
+    .ow-table { font-size: .86rem; }
+    .ow-table th { background: #0f2740; color: #fff; white-space: nowrap; }
+    .ow-table td { white-space: nowrap; }
+    .ow-table td.cat { white-space: normal; min-width: 220px; }
+    .ow-table tfoot td { font-weight: 700; background: #eef2f7; }
+    .ow-table tr.uncat td { background: #fff8e6; }
+    .mix-bar { height: 6px; border-radius: 3px; background: #e3e8ee; overflow: hidden; margin-top: 3px; }
+    .mix-bar span { display: block; height: 100%; background: #1e6fd9; }
+    .scroll-x { overflow-x: auto; }
+    @@media print { .no-print { display: none !important; } }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Owner Withdrawals by Category</h2>
+        <p class="text-muted mb-0">
+            Movements on the owner's equity account, analysed by what the money was spent on &mdash;
+            without touching the company's expense accounts.
+        </p>
+    </div>
+    <div class="d-flex gap-2 no-print">
+        <a asp-controller="OwnerWithdrawalCategories" asp-action="Index" class="btn btn-outline-secondary btn-sm">Manage Categories</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label mb-1" for="startDate">From Date</label>
+        <input type="date" class="form-control form-control-sm" id="startDate" name="startDate"
+               value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="endDate">To Date</label>
+        <input type="date" class="form-control form-control-sm" id="endDate" name="endDate"
+               value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+    </div>
+</form>
+
+<div class="d-none d-print-block mb-3">
+    <strong>Period:</strong> @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")
+</div>
+
+@if (!Model.HasOwnerAccounts)
+{
+    <div class="alert alert-warning">
+        <strong>No owner equity account is configured.</strong>
+        Open <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the equity account you want to use for
+        owner drawings (the standard chart seeds <code>34100 Owner's Current Account</code>), and set
+        <strong>Owner Account</strong> to <em>Yes</em>. Until then the owner withdrawal dimension is inactive
+        and this report has nothing to show.
+    </div>
+    return;
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Opening Balance</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalOpeningBalance.ToString("N2")</div>
+                <div class="small opacity-75">Credit balance owed to the owner</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-danger text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Withdrawals</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalWithdrawals.ToString("N2")</div>
+                <div class="small opacity-75">Taken out in the period</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Contributions</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalContributions.ToString("N2")</div>
+                <div class="small opacity-75">Put in during the period</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-primary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Closing Balance</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalClosingBalance.ToString("N2")</div>
+                <div class="small opacity-75">Net movement @Model.NetMovement.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.HasUncategorisedActivity)
+{
+    <div class="alert alert-warning py-2 small">
+        <strong>Uncategorised activity present.</strong>
+        Some movement on the owner account carries no category. That is expected for capital introduced or
+        for a transfer of the owner's balance, but if it represents spending, reopen the journal in the
+        General Journal and set the category so it appears in the breakdown below.
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light"><strong>Owner Account Movement</strong></div>
+    <div class="scroll-x">
+        <table class="table table-bordered table-sm mb-0 ow-table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th class="text-end">Opening</th>
+                    <th class="text-end">Withdrawals</th>
+                    <th class="text-end">Contributions</th>
+                    <th class="text-end">Closing</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var account in accounts)
+                {
+                    <tr>
+                        <td><span class="text-muted">@account.AccountCode</span> @account.AccountName</td>
+                        <td class="text-end">@account.OpeningBalance.ToString("N2")</td>
+                        <td class="text-end text-danger">@account.Withdrawals.ToString("N2")</td>
+                        <td class="text-end text-success">@account.Contributions.ToString("N2")</td>
+                        <td class="text-end fw-semibold">@account.ClosingBalance.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td class="text-end">@Model.TotalOpeningBalance.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalWithdrawals.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalContributions.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalClosingBalance.ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+@if (Model.Categories.Count == 0)
+{
+    <div class="alert alert-info">No movement was posted to the owner accounts in this period.</div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>Breakdown by Category</strong></div>
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm mb-0 ow-table">
+                <thead>
+                    <tr>
+                        <th class="cat">Category</th>
+                        @foreach (var account in accounts)
+                        {
+                            <th class="text-end">
+                                @account.AccountCode
+                                <div class="fw-normal opacity-75" style="font-size:.74rem">@account.AccountName</div>
+                            </th>
+                        }
+                        <th class="text-end">Total</th>
+                        <th class="text-end" style="min-width:110px">Mix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Categories)
+                    {
+                        <tr class="@(row.CategoryId.HasValue ? "" : "uncat")">
+                            <td class="cat">
+                                <span class="text-muted">@row.CategoryCode</span> <strong>@row.CategoryName</strong>
+                            </td>
+                            @foreach (var account in accounts)
+                            {
+                                var amount = row.AmountFor(account.AccountId);
+                                <td class="text-end">@(amount == 0m ? "-" : amount.ToString("N2"))</td>
+                            }
+                            <td class="text-end fw-semibold">@row.Total.ToString("N2")</td>
+                            <td class="text-end">
+                                @if (row.CategoryId.HasValue && row.Total > 0m)
+                                {
+                                    var share = Model.ShareOfCategorised(row.Total);
+                                    <span>@share.ToString("N1")%</span>
+                                    <div class="mix-bar"><span style="width:@share.ToString("N1")%"></span></div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">&mdash;</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total Movement</td>
+                        @foreach (var account in accounts)
+                        {
+                            <td class="text-end">@Model.ColumnTotal(account.AccountId).ToString("N2")</td>
+                        }
+                        <td class="text-end">@Model.Categories.Sum(x => x.Total).ToString("N2")</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <strong>Detail</strong>
+            <span class="text-muted small ms-2">Every line posted to an owner account in the period</span>
+        </div>
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm table-hover mb-0 ow-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Entry</th>
+                        <th class="cat">Description</th>
+                        <th>Category</th>
+                        <th class="text-end">Withdrawal</th>
+                        <th class="text-end">Contribution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in Model.Details)
+                    {
+                        <tr>
+                            <td>@line.EntryDate.ToString("dd/MM/yyyy")</td>
+                            <td><code>@line.EntryNumber</code></td>
+                            <td class="cat">@line.Description</td>
+                            <td>
+                                @if (line.CategoryId.HasValue)
+                                {
+                                    <span class="badge bg-dark fw-normal">@line.CategoryCode &mdash; @line.CategoryName</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark fw-normal">Uncategorised</span>
+                                }
+                            </td>
+                            <td class="text-end">@(line.Debit == 0m ? "-" : line.Debit.ToString("N2"))</td>
+                            <td class="text-end">@(line.Credit == 0m ? "-" : line.Credit.ToString("N2"))</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">Total</td>
+                        <td class="text-end">@Model.TotalWithdrawals.ToString("N2")</td>
+                        <td class="text-end">@Model.TotalContributions.ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body py-3 small text-muted">
+            <strong class="text-dark">How to read this</strong>
+            <ul class="mb-0 mt-2">
+                <li>The owner account is <strong>equity</strong>, so a credit balance means the business owes the owner. A withdrawal is a <strong>debit</strong> and reduces that balance.</li>
+                <li>None of these amounts appear in the company Profit &amp; Loss. That is the point &mdash; owner spending is a distribution, not a business cost.</li>
+                <li>Category amounts are debits less credits, so a refund of a personal expense back into the business shows as a negative in that category.</li>
+                <li>Add one owner account per owner if you need to separate them; the same category list serves all of them and each gets its own column here.</li>
+            </ul>
+        </div>
+    </div>
+}

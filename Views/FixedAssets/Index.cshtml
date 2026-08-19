@@ -1,0 +1,139 @@
+@model RealEstateManager.Models.FixedAssetRegisterViewModel
+
+@{
+    ViewData["Title"] = "Fixed Asset Register";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Fixed Asset Register</h2>
+        <div class="text-muted">Maintain depreciable assets and run monthly depreciation posting.</div>
+    </div>
+    <a asp-action="Create" class="btn btn-dark">Add Fixed Asset</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Asset Cost</div>
+                <div class="fs-4 fw-bold">@Model.TotalCost.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Accumulated Depreciation</div>
+                <div class="fs-4 fw-bold">@Model.TotalAccumulatedDepreciation.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Net Book Value</div>
+                <div class="fs-4 fw-bold">@Model.TotalNetBookValue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Due to Post</div>
+                <div class="fs-4 fw-bold">@Model.PendingDepreciationAmount.ToString("N2")</div>
+                <div>@Model.PendingDepreciationCount schedule(s)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <strong>Monthly Depreciation Run</strong>
+    </div>
+    <div class="card-body">
+        <form asp-action="RunMonthly" method="post" class="row g-3 align-items-end">
+            @Html.AntiForgeryToken()
+            <div class="col-md-4">
+                <label class="form-label">Posting Date</label>
+                <input type="date" name="postingDate" class="form-control" value="@Model.PostingDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-8">
+                <button type="submit" class="btn btn-dark">Post Due Depreciation</button>
+                <span class="text-muted ms-2">Posts all planned schedules up to the month-end of the selected date.</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Asset</th>
+            <th>Category</th>
+            <th>Property</th>
+            <th>In Service</th>
+                    <th>Capitalized</th>
+            <th>Status</th>
+            <th class="text-end">Cost</th>
+            <th class="text-end">Accum. Dep.</th>
+            <th class="text-end">NBV</th>
+            <th class="text-end">Monthly</th>
+            <th class="text-end">Due</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Assets.Count == 0)
+        {
+            <tr>
+                <td colspan="12" class="text-center text-muted py-4">No fixed assets found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var asset in Model.Assets)
+            {
+                var badgeClass = asset.Status switch
+                {
+                    "FullyDepreciated" => "bg-success",
+                    "Disposed" => "bg-secondary",
+                    "Draft" => "bg-warning text-dark",
+                    _ => "bg-primary"
+                };
+
+                <tr>
+                    <td>
+                        <div>@asset.AssetCode - @asset.Name</div>
+                        <small class="text-muted">Acquired @asset.AcquisitionDate.ToString("dd/MM/yyyy")</small>
+                    </td>
+                    <td>@asset.AssetCategory</td>
+                    <td>@asset.PropertyDisplay</td>
+                    <td>@asset.InServiceDate.ToString("dd/MM/yyyy")</td>
+                    <td>@(asset.CapitalizationDate.HasValue ? asset.CapitalizationDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                    <td><span class="badge @badgeClass">@asset.Status</span></td>
+                    <td class="text-end">@asset.Cost.ToString("N2")</td>
+                    <td class="text-end">@asset.AccumulatedDepreciation.ToString("N2")</td>
+                    <td class="text-end">@asset.NetBookValue.ToString("N2")</td>
+                    <td class="text-end">@asset.MonthlyDepreciation.ToString("N2")</td>
+                    <td class="text-end">@asset.PendingDepreciationAmount.ToString("N2")</td>
+                    <td>
+                        <a asp-action="Acquisition" asp-route-id="@asset.FixedAssetId" class="btn btn-outline-dark btn-sm">Acquisition</a>
+                        <a asp-action="Depreciation" asp-route-id="@asset.FixedAssetId" class="btn btn-outline-secondary btn-sm">Depreciation</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

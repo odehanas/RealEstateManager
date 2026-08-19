@@ -1,0 +1,111 @@
+﻿@model RealEstateManager.Models.ClosingDashboardViewModel
+
+@{
+    ViewData["Title"] = "Closing";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Closing Dashboard</h2>
+</div>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Fiscal Year</label>
+        <input type="number" name="fiscalYear" value="@Model.FiscalYear" class="form-control" />
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark">Refresh</button>
+    </div>
+</form>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Accounting Periods - @Model.FiscalYear</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Name</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th>Closed At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var period in Model.Periods)
+                {
+                    <tr>
+                        <td>@period.PeriodNumber</td>
+                        <td>@period.Name</td>
+                        <td>@period.StartDate.ToString("dd/MM/yyyy")</td>
+                        <td>@period.EndDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (period.IsClosed)
+                            {
+                                <span class="badge bg-success">Closed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Open</span>
+                            }
+                        </td>
+                        <td>@(period.ClosedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                        <td>
+                            @if (!period.IsClosed)
+                            {
+                                <form asp-action="ClosePeriod" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="fiscalYear" value="@Model.FiscalYear" />
+                                    <input type="hidden" name="periodNumber" value="@period.PeriodNumber" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Close Period</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="mb-4">
+    <form asp-action="CloseYear" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="fiscalYear" value="@Model.FiscalYear" />
+        <button type="submit" class="btn btn-danger">Close Fiscal Year @Model.FiscalYear</button>
+    </form>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Fiscal Year Closing History</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-bordered table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Fiscal Year</th>
+                    <th class="text-end">Profit / Loss</th>
+                    <th>Closed At</th>
+                    <th>Journal Entry</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.FiscalYearClosings)
+                {
+                    <tr>
+                        <td>@item.FiscalYear</td>
+                        <td class="text-end">@item.ProfitOrLossAmount.ToString("N2")</td>
+                        <td>@item.ClosedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@item.JournalEntryNumber</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

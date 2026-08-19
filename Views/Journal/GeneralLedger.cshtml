@@ -1,0 +1,86 @@
+﻿@model RealEstateManager.Models.GeneralLedgerViewModel?
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "General Ledger";
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+}
+
+<h2>General Ledger</h2>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <label class="form-label">Account</label>
+        <select name="accountId" class="form-select">
+            <option value="">Select Account</option>
+            @foreach (var account in accounts)
+            {
+                if (Model?.AccountId == account.Id)
+                {
+                    <option value="@account.Id" selected>@account.Code - @account.Name</option>
+                }
+                else
+                {
+                    <option value="@account.Id">@account.Code - @account.Name</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">From Date</label>
+        <input type="date" name="fromDate" value="@(Model?.FromDate.ToString("yyyy-MM-dd"))" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">To Date</label>
+        <input type="date" name="toDate" value="@(Model?.ToDate.ToString("yyyy-MM-dd"))" class="form-control" />
+    </div>
+
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark">View</button>
+    </div>
+</form>
+
+@if (Model != null)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>@Model.AccountCode - @Model.AccountName</strong> | @Model.AccountType
+        </div>
+        <div class="card-body">
+            <div><strong>Opening Balance:</strong> @Model.OpeningBalance.ToString("N2")</div>
+            <div><strong>Total Debit:</strong> @Model.TotalDebit.ToString("N2")</div>
+            <div><strong>Total Credit:</strong> @Model.TotalCredit.ToString("N2")</div>
+            <div><strong>Closing Balance:</strong> @Model.ClosingBalance.ToString("N2")</div>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Entry No.</th>
+                <th>Source</th>
+                <th>Description</th>
+                <th class="text-end">Debit</th>
+                <th class="text-end">Credit</th>
+                <th class="text-end">Running Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    <td>@row.EntryDate.ToString("dd/MM/yyyy")</td>
+                    <td>@row.EntryNumber</td>
+                    <td>@row.SourceType</td>
+                    <td>@row.Description</td>
+                    <td class="text-end">@row.Debit.ToString("N2")</td>
+                    <td class="text-end">@row.Credit.ToString("N2")</td>
+                    <td class="text-end">@row.RunningBalance.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

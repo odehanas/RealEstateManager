@@ -1,0 +1,268 @@
+@model RealEstateManager.Models.PettyCashDashboardViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Petty Cash";
+    var floats = ViewBag.FloatAccounts as List<Account> ?? new();
+}
+
+<style>
+    .pc-table { font-size: .86rem; }
+    .pc-table th { background: #0f2740; color: #fff; white-space: nowrap; }
+    .pc-table td { white-space: nowrap; vertical-align: middle; }
+    .pc-table td.memo { white-space: normal; min-width: 220px; }
+    .pc-table tfoot td { font-weight: 700; background: #eef2f7; }
+    .pc-table tr.replenish td { background: #eefaf1; }
+    .mix-bar { height: 6px; border-radius: 3px; background: #e3e8ee; overflow: hidden; margin-top: 3px; }
+    .mix-bar span { display: block; height: 100%; background: #1e6fd9; }
+    .scroll-x { overflow-x: auto; }
+    @@media print { .no-print { display: none !important; } }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Petty Cash</h2>
+        <p class="text-muted mb-0">
+            Float control and expense journal. Every voucher posts straight to the general ledger.
+        </p>
+    </div>
+    <div class="d-flex gap-2 no-print">
+        <a asp-action="Create" asp-route-pettyCashAccountId="@Model.SelectedPettyCashAccountId" class="btn btn-primary btn-sm">New Expense Voucher</a>
+        <a asp-action="Replenish" asp-route-pettyCashAccountId="@Model.SelectedPettyCashAccountId" class="btn btn-outline-success btn-sm">Replenish Float</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+@if (TempData["PettyCashMessage"] != null)
+{
+    <div class="alert alert-success py-2">@TempData["PettyCashMessage"]</div>
+}
+
+@if (!Model.HasFloats)
+{
+    <div class="alert alert-warning">
+        <strong>No petty cash float is configured.</strong>
+        Open <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the asset account you use for petty cash
+        (the standard chart seeds <code>11150 Petty Cash</code>), and set <strong>Petty Cash Float</strong>
+        to <em>Yes</em>. Enter the cash you started with as that account's <strong>Opening Balance</strong>.
+    </div>
+    return;
+}
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label mb-1" for="startDate">From Date</label>
+        <input type="date" class="form-control form-control-sm" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="endDate">To Date</label>
+        <input type="date" class="form-control form-control-sm" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="pettyCashAccountId">Float</label>
+        <select class="form-select form-select-sm" id="pettyCashAccountId" name="pettyCashAccountId">
+            <option value="">All floats</option>
+            @foreach (var account in floats)
+            {
+                <option value="@account.Id" selected="@(Model.SelectedPettyCashAccountId == account.Id ? "selected" : null)">
+                    @account.Code - @account.Name
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+    </div>
+</form>
+
+<div class="d-none d-print-block mb-3">
+    <strong>Period:</strong> @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Opening Balance</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalOpeningBalance.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Replenished</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalReplenishments.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-danger text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Spent</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalExpenses.ToString("N2")</div>
+                <div class="small opacity-75">@Model.VoucherCount voucher(s)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 @(Model.TotalClosingBalance >= 0 ? "bg-primary" : "bg-dark") text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Cash In Hand</div>
+                <div class="h4 fw-bold mb-0">@Model.TotalClosingBalance.ToString("N2")</div>
+                <div class="small opacity-75">Balance to count in the box</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light"><strong>Float Balances</strong></div>
+    <div class="scroll-x">
+        <table class="table table-bordered table-sm mb-0 pc-table">
+            <thead>
+                <tr>
+                    <th>Float</th>
+                    <th class="text-end">Opening</th>
+                    <th class="text-end">Replenished</th>
+                    <th class="text-end">Spent</th>
+                    <th class="text-end">Cash In Hand</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Floats)
+                {
+                    <tr>
+                        <td>
+                            <span class="text-muted">@item.AccountCode</span> @item.AccountName
+                            @if (!item.IsActive)
+                            {
+                                <span class="badge bg-secondary ms-1">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end">@item.OpeningBalance.ToString("N2")</td>
+                        <td class="text-end text-success">@item.Replenishments.ToString("N2")</td>
+                        <td class="text-end text-danger">@item.Expenses.ToString("N2")</td>
+                        <td class="text-end fw-semibold @(item.ClosingBalance < 0 ? "text-danger" : "")">@item.ClosingBalance.ToString("N2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td class="text-end">@Model.TotalOpeningBalance.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalReplenishments.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalExpenses.ToString("N2")</td>
+                    <td class="text-end">@Model.TotalClosingBalance.ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+@if (Model.ExpenseSummary.Count > 0)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>Expenses by Account</strong></div>
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm mb-0 pc-table">
+                <thead>
+                    <tr>
+                        <th>Expense Account</th>
+                        <th class="text-end">Vouchers</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-end" style="min-width:110px">Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.ExpenseSummary)
+                    {
+                        var share = Model.ShareOfExpenses(row.Amount);
+                        <tr>
+                            <td><span class="text-muted">@row.AccountCode</span> @row.AccountName</td>
+                            <td class="text-end">@row.VoucherCount</td>
+                            <td class="text-end fw-semibold">@row.Amount.ToString("N2")</td>
+                            <td class="text-end">
+                                @share.ToString("N1")%
+                                <div class="mix-bar"><span style="width:@share.ToString("N1")%"></span></div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total</td>
+                        <td class="text-end">@Model.ExpenseSummary.Sum(x => x.VoucherCount)</td>
+                        <td class="text-end">@Model.ExpenseSummary.Sum(x => x.Amount).ToString("N2")</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        <strong>Petty Cash Journal</strong>
+        <span class="text-muted small ms-2">Green rows are replenishments; the rest are expenses</span>
+    </div>
+    @if (Model.Vouchers.Count == 0)
+    {
+        <div class="card-body text-muted">No petty cash activity in this period.</div>
+    }
+    else
+    {
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm table-hover mb-0 pc-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Voucher</th>
+                        <th class="memo">Description</th>
+                        <th>Charged To</th>
+                        <th>Float</th>
+                        <th>Reference</th>
+                        <th class="text-end">Spent</th>
+                        <th class="text-end">Replenished</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var voucher in Model.Vouchers)
+                    {
+                        <tr class="@(voucher.IsReplenishment ? "replenish" : "")">
+                            <td>@voucher.EntryDate.ToString("dd/MM/yyyy")</td>
+                            <td><code>@voucher.VoucherNumber</code></td>
+                            <td class="memo">@voucher.Description</td>
+                            <td>@voucher.CounterpartDisplay</td>
+                            <td>@voucher.PettyCashAccountDisplay</td>
+                            <td>@voucher.ReferenceNumber</td>
+                            <td class="text-end">@(voucher.ExpenseAmount == 0m ? "-" : voucher.ExpenseAmount.ToString("N2"))</td>
+                            <td class="text-end">@(voucher.ReplenishmentAmount == 0m ? "-" : voucher.ReplenishmentAmount.ToString("N2"))</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6">Total</td>
+                        <td class="text-end">@Model.TotalExpenses.ToString("N2")</td>
+                        <td class="text-end">@Model.TotalReplenishments.ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="card shadow-sm mt-3">
+    <div class="card-body py-3 small text-muted">
+        <strong class="text-dark">How petty cash works here</strong>
+        <ul class="mb-0 mt-2">
+            <li>A float is an ordinary asset account flagged as <em>Petty Cash Float</em>. Flag more than one account to run a separate float per office or custodian.</li>
+            <li><strong>Opening balance</strong> is the cash you started with, entered on the account in the Chart of Accounts.</li>
+            <li>An expense voucher posts <strong>Dr expense account / Cr petty cash</strong> &mdash; the float falls and the cost lands in the Profit &amp; Loss.</li>
+            <li>A replenishment posts <strong>Dr petty cash / Cr bank or cash</strong> &mdash; the float rises and no expense is recorded, because topping up is a transfer, not a cost.</li>
+            <li><strong>Cash In Hand</strong> is what should physically be in the box. Count it and compare; any difference is a shortage to investigate.</li>
+            <li>A voucher that would take the float below zero is rejected &mdash; that almost always means a replenishment was never recorded.</li>
+        </ul>
+    </div>
+</div>

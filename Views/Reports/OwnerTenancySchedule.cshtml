@@ -1,0 +1,269 @@
+@model RealEstateManager.Services.OwnerTenancyScheduleDto
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Owner Tenancy Schedule";
+    var ownerNames = ViewBag.OwnerNames as List<string> ?? new();
+}
+
+<style>
+    .own-table { font-size: .84rem; }
+    .own-table th { background: #0f2740; color: #fff; white-space: nowrap; }
+    .own-table td { white-space: nowrap; vertical-align: middle; }
+    .own-table td.wrap { white-space: normal; min-width: 170px; }
+    .own-table tfoot td { font-weight: 700; background: #eef2f7; }
+    .own-table tr.vacant td { background: #fff8e6; }
+    .owner-head {
+        background: #0f2740; color: #fff; padding: .6rem .9rem;
+        border-radius: 6px 6px 0 0; display: flex;
+        justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem;
+    }
+    .owner-head .name { font-weight: 700; font-size: 1rem; }
+    .owner-head .stats { font-size: .8rem; opacity: .85; }
+    .scroll-x { overflow-x: auto; }
+    @@media print {
+        .no-print { display: none !important; }
+        .owner-block { break-inside: avoid; }
+    }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Owner Tenancy Schedule</h2>
+        <p class="text-muted mb-0">
+            Who occupies each unit, on what terms, and what they owe &mdash; grouped by the owner of the property.
+        </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label mb-1" for="asOfDate">As Of Date</label>
+        <input type="date" class="form-control form-control-sm" id="asOfDate" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="ownershipType">Ownership</label>
+        <select class="form-select form-select-sm" id="ownershipType" name="ownershipType">
+            <option value="">Owned and Managed</option>
+            <option value="Owned" selected="@(Model.OwnershipTypeFilter == "Owned" ? "selected" : null)">Owned only</option>
+            <option value="Managed" selected="@(Model.OwnershipTypeFilter == "Managed" ? "selected" : null)">Managed only</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label mb-1" for="ownerName">Owner</label>
+        <select class="form-select form-select-sm" id="ownerName" name="ownerName">
+            <option value="">All owners</option>
+            @foreach (var owner in ownerNames)
+            {
+                <option value="@owner" selected="@(Model.OwnerNameFilter == owner ? "selected" : null)">@owner</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <div class="form-check mb-1">
+            <input class="form-check-input" type="checkbox" id="includeVacant" name="includeVacant" value="true"
+                   checked="@(Model.IncludeVacant ? "checked" : null)" />
+            <label class="form-check-label" for="includeVacant">Show vacant units</label>
+        </div>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+    </div>
+</form>
+
+<div class="d-none d-print-block mb-3">
+    <strong>@Model.CompanyName</strong> &mdash; tenancy schedule as at @Model.AsOfDate.ToString("dd/MM/yyyy")
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-primary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Occupancy</div>
+                <div class="h3 fw-bold mb-1">@Model.OccupancyRate.ToString("N1")%</div>
+                <div class="small">@Model.OccupiedUnits let of @Model.TotalUnits units</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Contracted Annual Rent</div>
+                <div class="h3 fw-bold mb-1">@Model.TotalAnnualRent.ToString("N0")</div>
+                <div class="small">Deposits held @Model.TotalDepositHeld.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-danger text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Outstanding</div>
+                <div class="h3 fw-bold mb-1">@Model.TotalOutstanding.ToString("N0")</div>
+                <div class="small">Owed across all contracts</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-dark text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Attention</div>
+                <div class="h3 fw-bold mb-1">@Model.VacantUnits vacant</div>
+                <div class="small">@Model.ExpiringSoon expiring in 90 days &middot; @Model.TotalVacancyCost.ToString("N0") rent forgone</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Rows.Count == 0)
+{
+    <div class="alert alert-info">No properties match this filter.</div>
+}
+else
+{
+    @foreach (var ownerGroup in Model.ByOwner)
+    {
+        var groupRows = ownerGroup.ToList();
+        var occupied = groupRows.Count(x => x.IsOccupied);
+        var isManaged = groupRows.First().OwnershipType == "Managed";
+        var commission = groupRows.First().CommissionPercentage;
+
+        <div class="owner-block mb-4">
+            <div class="owner-head">
+                <div>
+                    <div class="name">@ownerGroup.Key</div>
+                    <div class="stats">
+                        @(isManaged ? "Managed" : "Owned")
+                        @if (isManaged && commission > 0)
+                        {
+                            <text>&middot; commission @commission.ToString("N2")%</text>
+                        }
+                    </div>
+                </div>
+                <div class="stats text-end">
+                    @occupied of @groupRows.Count units let &middot;
+                    rent @groupRows.Sum(x => x.AnnualRent).ToString("N0") &middot;
+                    outstanding @groupRows.Sum(x => x.Outstanding).ToString("N0")
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-top-0" style="border-radius:0 0 6px 6px">
+                <div class="scroll-x">
+                    <table class="table table-bordered table-sm mb-0 own-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Unit</th>
+                                <th class="text-end">Area</th>
+                                <th>Tenant</th>
+                                <th>Contact</th>
+                                <th>Contract</th>
+                                <th>Term</th>
+                                <th class="text-end">Annual Rent</th>
+                                <th>VAT</th>
+                                <th class="text-end">Deposit</th>
+                                <th class="text-end">Outstanding</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in groupRows)
+                            {
+                                <tr class="@(row.IsOccupied ? "" : "vacant")">
+                                    <td class="wrap">
+                                        <span class="text-muted">@row.PropertyCode</span> @row.PropertyName
+                                    </td>
+                                    <td>@row.UnitCode</td>
+                                    <td class="text-end">@row.AreaSqFt.ToString("N0")</td>
+                                    <td class="wrap">
+                                        @if (row.IsOccupied)
+                                        {
+                                            <strong>@row.TenantName</strong>
+                                            <div class="small text-muted">@row.TenantCode</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Vacant</span>
+                                        }
+                                    </td>
+                                    <td class="wrap small">
+                                        @row.TenantPhone
+                                        @if (!string.IsNullOrWhiteSpace(row.TenantEmail))
+                                        {
+                                            <div class="text-muted">@row.TenantEmail</div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (row.LeaseId.HasValue)
+                                        {
+                                            <a asp-controller="Leases" asp-action="ContractLabel" asp-route-id="@row.LeaseId" target="_blank">
+                                                @row.ContractNumber
+                                            </a>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (row.StartDate.HasValue)
+                                        {
+                                            @row.StartDate.Value.ToString("dd/MM/yyyy")<text> &ndash; </text>@row.EndDate!.Value.ToString("dd/MM/yyyy")
+                                            @if (row.IsExpiringSoon)
+                                            {
+                                                <span class="badge bg-warning text-dark ms-1">@row.DaysToExpiry d</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (row.IsOccupied)
+                                        {
+                                            @row.AnnualRent.ToString("N2")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">@row.StandardAnnualRent.ToString("N2") asking</span>
+                                        }
+                                    </td>
+                                    <td class="small">@VatCategories.Describe(row.VatCategory)</td>
+                                    <td class="text-end">@(row.DepositHeld == 0m ? "-" : row.DepositHeld.ToString("N2"))</td>
+                                    <td class="text-end @(row.Outstanding > 0 ? "text-danger fw-semibold" : "")">
+                                        @(row.Outstanding == 0m ? "-" : row.Outstanding.ToString("N2"))
+                                    </td>
+                                    <td>
+                                        @if (row.IsOccupied)
+                                        {
+                                            <span class="badge bg-success">Occupied</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">@row.UnitStatus</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7">Total for @ownerGroup.Key</td>
+                                <td class="text-end">@groupRows.Sum(x => x.AnnualRent).ToString("N2")</td>
+                                <td></td>
+                                <td class="text-end">@groupRows.Sum(x => x.DepositHeld).ToString("N2")</td>
+                                <td class="text-end">@groupRows.Sum(x => x.Outstanding).ToString("N2")</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<div class="card shadow-sm mt-3">
+    <div class="card-body py-3 small text-muted">
+        <strong class="text-dark">How owners are decided</strong>
+        <ul class="mb-0 mt-2">
+            <li>A <strong>Managed</strong> property is grouped under the landlord named on the property record, with the management commission shown.</li>
+            <li>An <strong>Owned</strong> property is grouped under the company itself, since the company is the owner.</li>
+            <li>A managed property with no landlord recorded is flagged rather than quietly grouped with the company's own portfolio &mdash; fix it on the property record.</li>
+            <li><strong>Vacant units are included</strong> with their asking rent, because the empty ones are usually the owner's first question. Untick the box to hide them.</li>
+            <li>Outstanding is from posted invoices only; drafts carry no ledger balance.</li>
+        </ul>
+    </div>
+</div>

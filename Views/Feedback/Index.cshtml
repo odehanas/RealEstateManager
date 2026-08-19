@@ -1,0 +1,109 @@
+@model RealEstateManager.Models.FeedbackPageViewModel
+
+@{
+    ViewData["Title"] = "Feedback";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Feedback</h2>
+        <p class="text-muted mb-0">Share your ideas, improvement requests, or pain points so they can be considered in future releases.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Submit New Feedback</h5>
+                <form asp-action="Submit" method="post" class="row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="col-12">
+                        <label asp-for="Form.Category" class="form-label"></label>
+                        <select asp-for="Form.Category" class="form-select">
+                            <option value="General">General</option>
+                            <option value="Feature Request">Feature Request</option>
+                            <option value="Usability">Usability</option>
+                            <option value="Bug Report">Bug Report</option>
+                            <option value="Reporting">Reporting</option>
+                        </select>
+                        <span asp-validation-for="Form.Category" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Form.Subject" class="form-label"></label>
+                        <input asp-for="Form.Subject" class="form-control" />
+                        <span asp-validation-for="Form.Subject" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Form.Message" class="form-label"></label>
+                        <textarea asp-for="Form.Message" class="form-control" rows="7"></textarea>
+                        <span asp-validation-for="Form.Message" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Send Feedback</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">Recent Company Feedback</h5>
+                    <span class="text-muted small">Latest 10 items</span>
+                </div>
+
+                @if (Model.RecentItems.Count == 0)
+                {
+                    <div class="text-muted">No feedback has been submitted for this company yet.</div>
+                }
+                else
+                {
+                    <div class="list-group">
+                        @foreach (var item in Model.RecentItems)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <div class="fw-semibold">@item.Subject</div>
+                                        <div class="small text-muted">
+                                            @item.Category |
+                                            @item.DisplayName (@item.Username) |
+                                            @item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        </div>
+                                    </div>
+                                    <span class="badge @(item.Status == "Closed" ? "text-bg-secondary" : item.Status == "Planned" ? "text-bg-success" : "text-bg-warning")">
+                                        @item.Status
+                                    </span>
+                                </div>
+                                <div class="mt-2">@item.Message</div>
+                                @if (!string.IsNullOrWhiteSpace(item.AdminNotes))
+                                {
+                                    <div class="alert alert-light border mt-3 mb-0">
+                                        <div class="fw-semibold small">Admin Notes</div>
+                                        <div class="small">@item.AdminNotes</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

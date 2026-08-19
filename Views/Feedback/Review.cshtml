@@ -1,0 +1,84 @@
+@model RealEstateManager.Models.FeedbackReviewViewModel
+
+@{
+    ViewData["Title"] = "Review Feedback";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Review Feedback</h2>
+        <p class="text-muted mb-0">Track the status of this suggestion and capture internal notes for future versions.</p>
+    </div>
+    <a asp-action="Manage" class="btn btn-outline-secondary">Back To Review List</a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Company</dt>
+            <dd class="col-sm-9">@Model.CompanyName</dd>
+
+            <dt class="col-sm-3">User</dt>
+            <dd class="col-sm-9">@Model.DisplayName (@Model.Username)</dd>
+
+            <dt class="col-sm-3">Category</dt>
+            <dd class="col-sm-9">@Model.Category</dd>
+
+            <dt class="col-sm-3">Subject</dt>
+            <dd class="col-sm-9">@Model.Subject</dd>
+
+            <dt class="col-sm-3">Submitted</dt>
+            <dd class="col-sm-9">@Model.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Feedback</dt>
+            <dd class="col-sm-9" style="white-space: pre-wrap;">@Model.Message</dd>
+
+            <dt class="col-sm-3">Last Reviewed</dt>
+            <dd class="col-sm-9">@(Model.ReviewedAt.HasValue ? $"{Model.ReviewedAt.Value.ToLocalTime():dd/MM/yyyy HH:mm} by {Model.ReviewedByName ?? "-"}" : "-")</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Review" method="post" class="card shadow-sm">
+    <div class="card-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="Id" type="hidden" />
+        <input asp-for="Username" type="hidden" />
+        <input asp-for="DisplayName" type="hidden" />
+        <input asp-for="CompanyName" type="hidden" />
+        <input asp-for="Category" type="hidden" />
+        <input asp-for="Subject" type="hidden" />
+        <input asp-for="Message" type="hidden" />
+        <input asp-for="SubmittedAt" type="hidden" />
+        <input asp-for="ReviewedAt" type="hidden" />
+        <input asp-for="ReviewedByName" type="hidden" />
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-select">
+                    <option value="New">New</option>
+                    <option value="Reviewed">Reviewed</option>
+                    <option value="Planned">Planned</option>
+                    <option value="Closed">Closed</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="AdminNotes" class="form-label"></label>
+                <textarea asp-for="AdminNotes" class="form-control" rows="6"></textarea>
+                <span asp-validation-for="AdminNotes" class="text-danger"></span>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save Review</button>
+                <a asp-action="Manage" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

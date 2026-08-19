@@ -1,0 +1,144 @@
+@model RealEstateManager.Models.PrepaymentScheduleListViewModel
+
+@{
+    ViewData["Title"] = "Recurring Prepayments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Recurring Prepayments</h2>
+        <div class="text-muted">Automate monthly release of prepaid rent, insurance, and similar items.</div>
+    </div>
+    <a asp-action="Create" class="btn btn-dark">New Prepayment Setup</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Open Prepaid Balance</div>
+                <div class="fs-4 fw-bold">@Model.OpenPrepaidBalance.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Due Recognition Amount</div>
+                <div class="fs-4 fw-bold">@Model.DueRecognitionAmount.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Due Lines</div>
+                <div class="fs-4 fw-bold">@Model.DueLineCount</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <label class="form-label">As Of Date</label>
+        <input type="date" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Show Completed</label>
+        <select name="showPosted" class="form-select">
+            @if (Model.ShowPosted)
+            {
+                <option value="true" selected>Yes</option>
+                <option value="false">No</option>
+            }
+            else
+            {
+                <option value="true">Yes</option>
+                <option value="false" selected>No</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-6 d-flex align-items-end gap-2">
+        <button type="submit" class="btn btn-outline-secondary">Refresh</button>
+    </div>
+</form>
+
+<form asp-action="PostDue" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
+    <input type="hidden" name="showPosted" value="@Model.ShowPosted.ToString().ToLower()" />
+    <button type="submit" class="btn btn-success">Post All Due Up To Selected Date</button>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Schedule</th>
+            <th>Type</th>
+            <th>Payment</th>
+            <th>First Recognition</th>
+            <th>Accounts</th>
+            <th>GL</th>
+            <th>Status</th>
+            <th class="text-end">Total</th>
+            <th class="text-end">Recognized</th>
+            <th class="text-end">Remaining</th>
+            <th class="text-end">Due</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Schedules.Count == 0)
+        {
+            <tr>
+                <td colspan="11" class="text-center text-muted py-4">No prepayment schedules found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model.Schedules)
+            {
+                <tr>
+                    <td>
+                        <div>@item.ScheduleNumber</div>
+                        <small class="text-muted">@item.Description</small>
+                    </td>
+                    <td>@item.PrepaymentType</td>
+                    <td>@item.PaymentDate.ToString("dd/MM/yyyy")</td>
+                    <td>@item.FirstRecognitionDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <div>Prepaid: @item.PrepaidAccountDisplay</div>
+                        <div>Expense: @item.ExpenseAccountDisplay</div>
+                        <div>Source: @item.OffsetAccountDisplay</div>
+                        @if (!string.IsNullOrWhiteSpace(item.VendorDisplay))
+                        {
+                            <div>Vendor: @item.VendorDisplay</div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(item.VendorBillNumber))
+                        {
+                            <div>Bill: @item.VendorBillNumber</div>
+                        }
+                    </td>
+                    <td>@(string.IsNullOrWhiteSpace(item.InitialJournalEntryNumber) ? "-" : item.InitialJournalEntryNumber)</td>
+                    <td>@item.Status</td>
+                    <td class="text-end">@item.TotalAmount.ToString("N2")</td>
+                    <td class="text-end">@item.RecognizedAmount.ToString("N2")</td>
+                    <td class="text-end">@item.RemainingAmount.ToString("N2")</td>
+                    <td class="text-end">@item.DueLineAmount.ToString("N2")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

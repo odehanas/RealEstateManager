@@ -1,0 +1,222 @@
+@model RealEstateManager.Models.CompanyFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Company";
+}
+
+<h2>Edit Company</h2>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (TempData["GeneratedActivationCode"] is string generatedCode)
+{
+    var generatedMessage = TempData["GeneratedActivationMessage"] as string ?? string.Empty;
+
+    <div class="card border-success shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                <div>
+                    <h4 class="mb-1 text-success">Activation Code Ready</h4>
+                    <div class="text-muted small">Copy the code or send the prepared message to the customer.</div>
+                </div>
+                <button type="button" class="btn btn-outline-success btn-sm js-copy-text" data-copy="@generatedCode">Copy Code</button>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Generated Code</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="@generatedCode" readonly />
+                        <button type="button" class="btn btn-outline-secondary js-copy-text" data-copy="@generatedCode">Copy</button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Ready-To-Send Message</label>
+                    <div class="input-group">
+                        <textarea class="form-control" rows="7" readonly>@generatedMessage</textarea>
+                        <button type="button" class="btn btn-outline-secondary js-copy-text" data-copy="@generatedMessage">Copy Message</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<form asp-action="Edit" method="post" class="row g-3">
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="BaseCurrency" class="form-label"></label>
+        <input asp-for="BaseCurrency" class="form-control" />
+        <span asp-validation-for="BaseCurrency" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="FiscalYearStartMonth" class="form-label"></label>
+        <select asp-for="FiscalYearStartMonth" class="form-select">
+            @for (var month = 1; month <= 12; month++)
+            {
+                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)</option>
+            }
+        </select>
+        <span asp-validation-for="FiscalYearStartMonth" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </div>
+</form>
+
+<div class="card mt-4 shadow-sm">
+    <div class="card-body">
+        <h4 class="mb-3">Subscription</h4>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <input class="form-control" value="@Model.SubscriptionStatus" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Trial Start</label>
+                <input class="form-control" value="@(Model.TrialStartDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Trial End</label>
+                <input class="form-control" value="@(Model.TrialEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Paid Until</label>
+                <input class="form-control" value="@(Model.SubscriptionEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Access Until</label>
+                <input class="form-control" value="@(Model.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Days Remaining</label>
+                <input class="form-control" value="@Model.DaysRemaining" readonly />
+            </div>
+        </div>
+
+        <form asp-action="GenerateActivationCode" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <input asp-for="Id" type="hidden" />
+
+            <div class="col-md-3">
+                <label asp-for="ActivationCodeDurationDays" class="form-label"></label>
+                <input asp-for="ActivationCodeDurationDays" class="form-control" />
+                <span asp-validation-for="ActivationCodeDurationDays" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ActivationCodeNotes" class="form-label"></label>
+                <input asp-for="ActivationCodeNotes" class="form-control" />
+                <span asp-validation-for="ActivationCodeNotes" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-primary w-100">Generate Code</button>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+            <h5 class="mb-0">Activation History</h5>
+            <span class="text-muted small">Latest 50 generated codes</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Days</th>
+                        <th>Status</th>
+                        <th>Issued</th>
+                        <th>Activated</th>
+                        <th>Notes</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ActivationCodes.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No activation codes generated yet.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var code in Model.ActivationCodes)
+                        {
+                            <tr>
+                                <td><code>@code.Code</code></td>
+                                <td>@code.DurationDays</td>
+                                <td>
+                                    @if (code.IsCancelled)
+                                    {
+                                        <span class="badge bg-secondary">Cancelled</span>
+                                    }
+                                    else if (code.ActivatedAt.HasValue)
+                                    {
+                                        <span class="badge bg-success">Used</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Available</span>
+                                    }
+                                </td>
+                                <td>@code.IssuedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(code.ActivatedAt.HasValue ? code.ActivatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Not used")</td>
+                                <td>@(string.IsNullOrWhiteSpace(code.Notes) ? "-" : code.Notes)</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary js-copy-text" data-copy="@code.Code">Copy</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelectorAll('.js-copy-text').forEach(function (button) {
+            button.addEventListener('click', async function () {
+                const text = button.getAttribute('data-copy') || '';
+                if (!text) {
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied';
+                    setTimeout(function () {
+                        button.textContent = originalText;
+                    }, 1500);
+                } catch {
+                    alert('Copy failed. Please copy the text manually.');
+                }
+            });
+        });
+    </script>
+}

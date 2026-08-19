@@ -1,0 +1,112 @@
+﻿@model RealEstateManager.Models.AccountFormViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Create Account";
+    var parentAccounts = ViewBag.ParentAccounts as List<Account> ?? new();
+}
+
+<h2>Create Account</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="Code" class="form-label">Account Number</label>
+            <input asp-for="Code" class="form-control" />
+        </div>
+
+        <div class="col-md-5">
+            <label asp-for="Name" class="form-label">Account Name</label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="AccountType" class="form-label">Account Type</label>
+            <select asp-for="AccountType" class="form-select">
+                <option value="">Select Type</option>
+                <option>Asset</option>
+                <option>Liability</option>
+                <option>Equity</option>
+                <option>Revenue</option>
+                <option>Expense</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ReportingGroup" class="form-label">Reporting Group</label>
+            <select asp-for="ReportingGroup" class="form-select">
+                <option value="">Select Group</option>
+                <option>Assets</option>
+                <option>Liabilities</option>
+                <option>Equity</option>
+                <option>Revenue</option>
+                <option>DirectExpense</option>
+                <option>GeneralExpense</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ParentAccountId" class="form-label">Parent Account</label>
+            <select asp-for="ParentAccountId" class="form-select">
+                <option value="">No Parent</option>
+                @foreach (var account in parentAccounts)
+                {
+                    <option value="@account.Id">@account.ReportingGroup - @account.Code - @account.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="SortOrder" class="form-label">Sort Order</label>
+            <input asp-for="SortOrder" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="IsGroup" class="form-label">Group</label>
+            <select asp-for="IsGroup" class="form-select">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="IsPostable" class="form-label">Postable</label>
+            <select asp-for="IsPostable" class="form-select">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="IsActive" class="form-label">Active</label>
+            <select asp-for="IsActive" class="form-select">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="OpeningBalance" class="form-label">Opening Balance</label>
+            <input asp-for="OpeningBalance" type="number" step="0.01" class="form-control" />
+            <div class="form-text">
+                Natural balance (debit-positive for Asset / Expense, credit-positive for
+                Liability / Equity / Revenue). Leave at 0 if no opening balance applies.
+                Sub-ledger control accounts (Accounts Receivable, Accounts Payable, Fixed
+                Assets) automatically derive their opening balance from sub-ledger detail.
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,208 @@
+@model RealEstateManager.Services.PropertyUtilizationReportDto
+@{
+    ViewData["Title"] = "Property Utilization";
+
+    string RateClass(decimal rate) => rate >= 85m ? "bg-success"
+        : rate >= 60m ? "bg-warning text-dark"
+        : rate > 0m ? "bg-danger"
+        : "bg-secondary";
+}
+
+<style>
+    .util-table { font-size: .85rem; }
+    .util-table th { background: #0f2740; color: #fff; white-space: nowrap; }
+    .util-table tfoot td { font-weight: 700; background: #eef2f7; }
+    .util-bar { height: 6px; border-radius: 3px; background: #e3e8ee; overflow: hidden; margin-top: 3px; }
+    .util-bar span { display: block; height: 100%; }
+    .scroll-x { overflow-x: auto; }
+    @@media print { .no-print { display: none !important; } }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Property Utilization</h2>
+        <p class="text-muted mb-0">
+            Occupancy, leased area and rent realisation for every property as at the selected date.
+        </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label mb-1" for="asOfDate">As Of Date</label>
+        <input type="date" class="form-control form-control-sm" id="asOfDate" name="asOfDate"
+               value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+    </div>
+</form>
+
+<div class="d-none d-print-block mb-3">
+    <strong>As at:</strong> @Model.AsOfDate.ToString("dd/MM/yyyy")
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-primary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Unit Occupancy</div>
+                <div class="h3 fw-bold mb-1">@Model.OccupancyRate.ToString("N1")%</div>
+                <div class="small">@Model.OccupiedUnits occupied of @Model.TotalUnits units</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-info text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Area Utilization</div>
+                <div class="h3 fw-bold mb-1">@Model.AreaUtilizationRate.ToString("N1")%</div>
+                <div class="small">@Model.LeasedAreaSqFt.ToString("N0") of @Model.TotalAreaSqFt.ToString("N0") sq ft</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Rent Realisation</div>
+                <div class="h3 fw-bold mb-1">@Model.RentRealisationRate.ToString("N1")%</div>
+                <div class="small">Contracted @Model.ContractedAnnualRent.ToString("N0") of @Model.StandardAnnualRent.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-dark text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Annual Rent Gap</div>
+                <div class="h3 fw-bold mb-1">@Model.RentGap.ToString("N0")</div>
+                <div class="small">@Model.VacantUnits vacant &middot; @Model.LeasesExpiringIn90Days expiring in 90 days</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Rows.Count == 0)
+{
+    <div class="alert alert-info">No properties have been registered yet.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm mb-0 util-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Property</th>
+                        <th>Ownership</th>
+                        <th class="text-end">Units</th>
+                        <th class="text-end">Occ.</th>
+                        <th class="text-end">Vac.</th>
+                        <th class="text-end">Mnt.</th>
+                        <th class="text-end">Rsv.</th>
+                        <th class="text-end" style="min-width:110px">Occupancy</th>
+                        <th class="text-end">Total Area</th>
+                        <th class="text-end">Leased Area</th>
+                        <th class="text-end" style="min-width:110px">Area Util.</th>
+                        <th class="text-end">Standard Rent</th>
+                        <th class="text-end">Contracted Rent</th>
+                        <th class="text-end">Rent Gap</th>
+                        <th class="text-end">Realisation</th>
+                        <th class="text-end">Rent / sq ft</th>
+                        <th class="text-end">Expiring 90d</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr class="@(row.IsActive ? "" : "text-muted")">
+                            <td>@row.PropertyCode</td>
+                            <td>
+                                @row.PropertyName
+                                @if (!row.IsActive)
+                                {
+                                    <span class="badge bg-secondary ms-1">Inactive</span>
+                                }
+                                <div class="small text-muted">@row.PropertyType</div>
+                            </td>
+                            <td>
+                                <span class="badge @(row.OwnershipType == "Owned" ? "bg-primary" : "bg-info text-dark")">
+                                    @row.OwnershipType
+                                </span>
+                            </td>
+                            <td class="text-end">@row.TotalUnits</td>
+                            <td class="text-end">@row.OccupiedUnits</td>
+                            <td class="text-end">@row.VacantUnits</td>
+                            <td class="text-end">@row.UnderMaintenanceUnits</td>
+                            <td class="text-end">@row.ReservedUnits</td>
+                            <td class="text-end">
+                                <strong>@row.OccupancyRate.ToString("N1")%</strong>
+                                <div class="util-bar">
+                                    <span class="@RateClass(row.OccupancyRate)" style="width:@row.OccupancyRate.ToString("N1")%"></span>
+                                </div>
+                            </td>
+                            <td class="text-end">@row.TotalAreaSqFt.ToString("N0")</td>
+                            <td class="text-end">@row.LeasedAreaSqFt.ToString("N0")</td>
+                            <td class="text-end">
+                                <strong>@row.AreaUtilizationRate.ToString("N1")%</strong>
+                                <div class="util-bar">
+                                    <span class="@RateClass(row.AreaUtilizationRate)" style="width:@row.AreaUtilizationRate.ToString("N1")%"></span>
+                                </div>
+                            </td>
+                            <td class="text-end">@row.StandardAnnualRent.ToString("N2")</td>
+                            <td class="text-end">@row.ContractedAnnualRent.ToString("N2")</td>
+                            <td class="text-end @(row.RentGap > 0 ? "text-danger" : "")">@row.RentGap.ToString("N2")</td>
+                            <td class="text-end">@row.RentRealisationRate.ToString("N1")%</td>
+                            <td class="text-end">@row.RentPerSqFt.ToString("N2")</td>
+                            <td class="text-end">
+                                @if (row.LeasesExpiringIn90Days > 0)
+                                {
+                                    <span class="badge bg-warning text-dark">@row.LeasesExpiringIn90Days</span>
+                                }
+                                else
+                                {
+                                    <span>0</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Portfolio Total</td>
+                        <td class="text-end">@Model.TotalUnits</td>
+                        <td class="text-end">@Model.OccupiedUnits</td>
+                        <td class="text-end">@Model.VacantUnits</td>
+                        <td class="text-end">@Model.UnderMaintenanceUnits</td>
+                        <td class="text-end">@Model.ReservedUnits</td>
+                        <td class="text-end">@Model.OccupancyRate.ToString("N1")%</td>
+                        <td class="text-end">@Model.TotalAreaSqFt.ToString("N0")</td>
+                        <td class="text-end">@Model.LeasedAreaSqFt.ToString("N0")</td>
+                        <td class="text-end">@Model.AreaUtilizationRate.ToString("N1")%</td>
+                        <td class="text-end">@Model.StandardAnnualRent.ToString("N2")</td>
+                        <td class="text-end">@Model.ContractedAnnualRent.ToString("N2")</td>
+                        <td class="text-end">@Model.RentGap.ToString("N2")</td>
+                        <td class="text-end">@Model.RentRealisationRate.ToString("N1")%</td>
+                        <td class="text-end">&mdash;</td>
+                        <td class="text-end">@Model.LeasesExpiringIn90Days</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body py-3 small text-muted">
+            <strong class="text-dark">How these measures are built</strong>
+            <ul class="mb-0 mt-2">
+                <li><strong>Occupancy</strong> &mdash; units with status <em>Occupied</em> divided by total units. Driven by unit status, which is set automatically when a lease becomes active.</li>
+                <li><strong>Area utilization</strong> &mdash; area of units under a lease that is active and current at the as-of date, divided by total area. This measures let space rather than unit count, so a large vacant unit shows a bigger impact.</li>
+                <li><strong>Standard rent</strong> &mdash; the sum of each unit's asking rent. <strong>Contracted rent</strong> &mdash; the annual rent on leases active at the as-of date.</li>
+                <li><strong>Rent realisation</strong> &mdash; contracted against standard. Below 100% means vacancy or leases signed below the asking rent; above 100% means units are let above asking.</li>
+                <li><strong>Rent gap</strong> &mdash; annualised revenue forgone. This is the number to attack first.</li>
+                <li><strong>Expiring 90d</strong> &mdash; active leases ending within 90 days of the as-of date; your renewal pipeline.</li>
+            </ul>
+        </div>
+    </div>
+}

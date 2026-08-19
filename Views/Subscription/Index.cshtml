@@ -1,0 +1,95 @@
+@model RealEstateManager.Models.CurrentSubscriptionViewModel
+
+@{
+    ViewData["Title"] = "Subscription";
+    var expiredMessage = ViewBag.ExpiredMessage is true;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h2 class="mb-3">Subscription Control</h2>
+
+        @if (expiredMessage || Model.IsExpired)
+        {
+            <div class="alert alert-danger">
+                Your company subscription has expired. Enter a valid activation code to continue using the processing screens.
+            </div>
+        }
+        else if (Model.IsInTrial)
+        {
+            <div class="alert alert-warning">
+                Trial mode is active for this company. Remaining days: <strong>@Model.DaysRemaining</strong>.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success">
+                Subscription is active. Remaining days: <strong>@Model.DaysRemaining</strong>.
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] is string successMessage)
+        {
+            <div class="alert alert-success">@successMessage</div>
+        }
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">@Model.CompanyName</h4>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Status</label>
+                        <input class="form-control" value="@Model.StatusLabel" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Trial Start</label>
+                        <input class="form-control" value="@Model.TrialStartDate.ToString("dd/MM/yyyy")" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Trial End</label>
+                        <input class="form-control" value="@Model.TrialEndDate.ToString("dd/MM/yyyy")" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Paid Until</label>
+                        <input class="form-control" value="@(Model.SubscriptionEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Access Until</label>
+                        <input class="form-control" value="@(Model.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Days Remaining</label>
+                        <input class="form-control" value="@Model.DaysRemaining" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="mb-3">Activate Subscription</h4>
+                <form asp-action="Activate" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+
+                    <div class="col-md-8">
+                        <label asp-for="ActivationCode" class="form-label"></label>
+                        <input asp-for="ActivationCode" class="form-control" autocomplete="off" />
+                        <span asp-validation-for="ActivationCode" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Apply Code</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

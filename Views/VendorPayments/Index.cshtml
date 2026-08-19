@@ -1,0 +1,49 @@
+﻿@model IEnumerable<RealEstateManager.Domain.VendorPayment>
+
+@{
+    ViewData["Title"] = "Vendor Payments";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Vendor Payments</h2>
+    <a asp-action="Create" class="btn btn-dark">New Vendor Payment</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Payment</th>
+            <th>Date</th>
+            <th>Bill</th>
+            <th>Vendor</th>
+            <th>Property</th>
+            <th>Method</th>
+            <th class="text-end">Amount</th>
+            <th>GL</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model)
+        {
+            <tr>
+                <td>@payment.PaymentNumber</td>
+                <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
+                <td>@payment.VendorBill?.BillNumber</td>
+                <td>@payment.VendorBill?.Vendor?.Name</td>
+                <td>@payment.VendorBill?.Property?.Name</td>
+                <td>@payment.PaymentMethod</td>
+                <td class="text-end">@payment.Amount.ToString("N2")</td>
+                <td>
+                    @if (payment.JournalEntryId.HasValue)
+                    {
+                        <span class="badge bg-success">Posted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Not Posted</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

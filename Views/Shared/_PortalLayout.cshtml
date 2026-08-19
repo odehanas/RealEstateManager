@@ -1,0 +1,108 @@
+@using RealEstateManager.Services
+@{
+    var tenantName = User.GetPortalTenantName();
+    var isSignedIn = User.IsTenantPortalUser();
+    string Active(string controller, string action) =>
+        string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), controller, StringComparison.OrdinalIgnoreCase)
+        && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), action, StringComparison.OrdinalIgnoreCase)
+            ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Tenant Portal</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root { --navy:#0f2740; --accent:#1e6fd9; --line:#d8dee6; }
+        body { background:#f2f4f7; padding-bottom:78px; }
+        .portal-bar { background:var(--navy); color:#fff; padding:.7rem 1rem; }
+        .portal-bar .who { font-size:.78rem; opacity:.8; }
+        .portal-bar .name { font-weight:700; line-height:1.2; }
+        .content { max-width:900px; margin:0 auto; padding:1rem; }
+
+        /* Bottom tab bar - tenants are on phones. */
+        .tabbar {
+            position:fixed; bottom:0; left:0; right:0; background:#fff;
+            border-top:1px solid var(--line); display:flex; z-index:50;
+            box-shadow:0 -2px 10px rgba(15,39,64,.06);
+        }
+        .tabbar a {
+            flex:1; text-align:center; padding:.55rem .2rem .45rem; text-decoration:none;
+            color:#5b6774; font-size:.68rem; line-height:1.2;
+        }
+        .tabbar a.active { color:var(--accent); font-weight:700; }
+        .tabbar svg { width:21px; height:21px; display:block; margin:0 auto .15rem;
+                      stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+        .stat { border:0; border-radius:10px; }
+        .stat .label { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; opacity:.8; }
+        .stat .value { font-size:1.5rem; font-weight:700; line-height:1.2; }
+        .card { border-radius:10px; }
+        .table { font-size:.86rem; }
+        .table th { background:var(--navy); color:#fff; white-space:nowrap; }
+        .scroll-x { overflow-x:auto; }
+        @@media print { .tabbar, .portal-bar .btn, .no-print { display:none !important; } body { padding-bottom:0; background:#fff; } }
+    </style>
+</head>
+<body>
+
+<div class="portal-bar">
+    <div class="content d-flex justify-content-between align-items-center py-0">
+        <div>
+            <div class="who">Tenant Portal</div>
+            <div class="name">@tenantName</div>
+        </div>
+        @if (isSignedIn)
+        {
+            <div class="d-flex gap-2">
+                <a asp-controller="PortalAccount" asp-action="ChangePassword" class="btn btn-sm btn-outline-light">Password</a>
+                <form asp-controller="PortalAccount" asp-action="Logout" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-light">Sign out</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="content">
+    @if (TempData["PortalMessage"] is string message)
+    {
+        <div class="alert alert-success py-2">@message</div>
+    }
+    @RenderBody()
+</div>
+
+@if (isSignedIn)
+{
+    <nav class="tabbar">
+        <a class="@Active("Portal","Index")" asp-controller="Portal" asp-action="Index">
+            <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+            Account
+        </a>
+        <a class="@Active("Portal","Invoices")" asp-controller="Portal" asp-action="Invoices">
+            <svg viewBox="0 0 24 24"><path d="M6 2.5h12v19l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M9 8h6M9 11.5h6M9 15h3"/></svg>
+            Invoices
+        </a>
+        <a class="@Active("Portal","Payments")" asp-controller="Portal" asp-action="Payments">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.8"/></svg>
+            Payments
+        </a>
+        <a class="@Active("Portal","Statement")" asp-controller="Portal" asp-action="Statement">
+            <svg viewBox="0 0 24 24"><path d="M3 20.5h18"/><rect x="5" y="11" width="3.6" height="8"/><rect x="10.2" y="6.5" width="3.6" height="12.5"/><rect x="15.4" y="3" width="3.6" height="16"/></svg>
+            Statement
+        </a>
+        <a class="@Active("Portal","Contracts")" asp-controller="Portal" asp-action="Contracts">
+            <svg viewBox="0 0 24 24"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M14 2.5V7h4"/><path d="M9 12h6M9 15.5h4"/></svg>
+            Contracts
+        </a>
+    </nav>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

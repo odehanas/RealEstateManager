@@ -1,0 +1,306 @@
+@model RealEstateManager.Domain.Lease
+@using RealEstateManager.Domain
+@using RealEstateManager.Models
+@{
+    Layout = null;
+    var company = ViewBag.Company as Company;
+    var instalments = ViewBag.Instalments as List<ContractInstalmentViewModel> ?? new();
+    var qr = ViewBag.QrDataUri as string ?? "";
+
+    var landlordName = Model.Unit?.Property?.OwnershipType == "Managed"
+        ? (string.IsNullOrWhiteSpace(Model.Unit?.Property?.OwnerName) ? "[OWNER NAME NOT RECORDED]" : Model.Unit!.Property!.OwnerName!)
+        : (company?.LegalName ?? company?.Name ?? "");
+
+    var isManaged = Model.Unit?.Property?.OwnershipType == "Managed";
+    var months = (int)Math.Round((Model.EndDate - Model.StartDate).TotalDays / 30.4375);
+    var blank = "________________";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Draft Tenancy Agreement @Model.ContractNumber</title>
+<style>
+    :root { --ink:#1f2933; --navy:#0f2740; --line:#d8dee6; --muted:#5b6774; --warn:#b8860b; }
+    * { box-sizing:border-box; }
+    html { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    body { margin:0; padding:16px; background:#f2f4f7; color:var(--ink);
+           font-family:"Segoe UI",Roboto,Arial,sans-serif; font-size:10.5pt; line-height:1.55; }
+    .sheet { max-width:210mm; margin:0 auto; background:#fff; padding:16mm 16mm 20mm; border:1px solid var(--line); }
+    h1 { font-size:16pt; color:var(--navy); margin:0 0 2mm; text-align:center; }
+    h2 { font-size:11pt; color:var(--navy); margin:7mm 0 2mm; border-bottom:1.5px solid var(--navy); padding-bottom:1mm; }
+    p { margin:0 0 2.5mm; }
+    ol.clauses { padding-left:5mm; margin:0; }
+    ol.clauses > li { margin-bottom:2.5mm; }
+    table { width:100%; border-collapse:collapse; margin:2mm 0 3mm; font-size:9.5pt; }
+    th, td { border:1px solid var(--line); padding:2mm 2.5mm; text-align:left; vertical-align:top; }
+    th { background:#eef2f7; color:var(--navy); font-weight:600; }
+    td.num, th.num { text-align:right; white-space:nowrap; }
+    .parties td:first-child { width:32%; background:#f7f9fb; font-weight:600; }
+    .banner { border:2px solid var(--warn); background:#fff8e6; padding:3mm 4mm; margin-bottom:6mm; border-radius:4px; }
+    .banner strong { color:var(--warn); }
+    .head { display:flex; justify-content:space-between; align-items:flex-start; gap:8mm; margin-bottom:5mm; }
+    .code { font-family:Consolas,"Courier New",monospace; font-size:12pt; font-weight:700; color:var(--navy); }
+    .qr { width:26mm; height:26mm; flex:0 0 26mm; }
+    .qr img { width:100%; height:100%; display:block; }
+    .fill { color:#a3341f; font-weight:700; }
+    .sign { display:flex; gap:12mm; margin-top:12mm; }
+    .sign > div { flex:1; }
+    .sign .line { border-bottom:1px solid var(--ink); height:16mm; }
+    .sign .cap { font-size:9pt; color:var(--muted); margin-top:1.5mm; }
+    .toolbar { max-width:210mm; margin:0 auto 12px; display:flex; justify-content:flex-end; gap:8px; }
+    .toolbar button, .toolbar a { background:var(--navy); color:#fff; border:0; border-radius:4px;
+        padding:7px 16px; font-size:10pt; font-weight:600; cursor:pointer; text-decoration:none; }
+    .toolbar a { background:#fff; color:var(--navy); border:1px solid var(--line); }
+    @@page { size:A4 portrait; margin:14mm; }
+    @@media print {
+        body { background:#fff; padding:0; font-size:10pt; }
+        .sheet { max-width:none; border:0; padding:0; }
+        .toolbar { display:none; }
+        h2 { break-after:avoid; }
+        table, .banner, .sign { break-inside:avoid; }
+    }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+    <a href="@Url.Action("Index", "Leases")">Back to Leases</a>
+    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+<div class="sheet">
+
+    <div class="banner">
+        <strong>DRAFT &mdash; FOR LEGAL REVIEW.</strong>
+        This document is generated from the data held in RealEstateManager. It is <strong>not</strong> the
+        official tenancy contract form issued and registered by the relevant authority, and it does not by
+        itself satisfy any registration requirement. Have it reviewed and adapted by a qualified lawyer, and
+        register the tenancy on the official form as required in your emirate.
+        Values shown as <span class="fill">[TO BE COMPLETED]</span> are commercial decisions the parties must agree.
+    </div>
+
+    <div class="head">
+        <div>
+            <h1 style="text-align:left">Tenancy Agreement</h1>
+            <div class="code">@Model.ContractNumber</div>
+            <div style="font-size:9pt;color:var(--muted)">Drafted @DateTime.Today.ToString("dd MMMM yyyy")</div>
+        </div>
+        @if (!string.IsNullOrEmpty(qr))
+        {
+            <div class="qr"><img src="@qr" alt="Contract @Model.ContractNumber" /></div>
+        }
+    </div>
+
+    <p>
+        This Agreement is made on @blank between the parties described below in respect of the premises
+        identified below, on the terms set out in this Agreement.
+    </p>
+
+    <h2>1. The Parties</h2>
+    <table class="parties">
+        <tr>
+            <td>Landlord</td>
+            <td>
+                <strong>@landlordName</strong>
+                @if (isManaged)
+                {
+                    <div style="font-size:9pt;color:var(--muted)">
+                        Represented by @(company?.LegalName ?? company?.Name) as managing agent
+                        @if (Model.Unit?.Property?.CommissionPercentage > 0)
+                        {
+                            <text>(management commission @Model.Unit!.Property!.CommissionPercentage.ToString("N2")%)</text>
+                        }
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(company?.TrnNumber))
+                {
+                    <div style="font-size:9pt;color:var(--muted)">Agent TRN: @company!.TrnNumber</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(company?.AddressLine1))
+                {
+                    <div style="font-size:9pt;color:var(--muted)">@company!.AddressLine1 @company.City @company.Country</div>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Tenant</td>
+            <td>
+                <strong>@Model.Tenant?.FullName</strong>
+                <div style="font-size:9pt;color:var(--muted)">
+                    Reference: @Model.Tenant?.Code
+                    @if (!string.IsNullOrWhiteSpace(Model.Tenant?.Nationality)) { <text>&middot; Nationality: @Model.Tenant.Nationality</text> }
+                </div>
+                <div style="font-size:9pt;color:var(--muted)">
+                    ID: @(string.IsNullOrWhiteSpace(Model.Tenant?.IdNumber) ? blank : Model.Tenant!.IdNumber)
+                    &middot; Passport: @(string.IsNullOrWhiteSpace(Model.Tenant?.PassportNumber) ? blank : Model.Tenant!.PassportNumber)
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.Tenant?.TrnNumber))
+                {
+                    <div style="font-size:9pt;color:var(--muted)">Tenant TRN: @Model.Tenant.TrnNumber</div>
+                }
+                <div style="font-size:9pt;color:var(--muted)">
+                    @Model.Tenant?.Phone @(string.IsNullOrWhiteSpace(Model.Tenant?.Email) ? "" : "· " + Model.Tenant!.Email)
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>2. The Premises</h2>
+    <table class="parties">
+        <tr><td>Property</td><td>@Model.Unit?.Property?.Code &mdash; @Model.Unit?.Property?.Name</td></tr>
+        <tr><td>Address</td><td>@(string.IsNullOrWhiteSpace(Model.Unit?.Property?.Address) ? blank : Model.Unit!.Property!.Address!)</td></tr>
+        <tr><td>Unit</td><td>@Model.Unit?.UnitNumber @(string.IsNullOrWhiteSpace(Model.Unit?.Floor) ? "" : $"(floor {Model.Unit!.Floor})")</td></tr>
+        <tr><td>Area</td><td>@Model.Unit?.AreaSqFt.ToString("N0") sq ft</td></tr>
+        <tr><td>Permitted use</td><td>@(string.IsNullOrWhiteSpace(Model.Unit?.UsageType) ? Model.Unit?.Property?.PropertyType : Model.Unit!.UsageType) purposes only</td></tr>
+    </table>
+
+    <h2>3. Term and Rent</h2>
+    <table class="parties">
+        <tr><td>Commencement</td><td>@Model.StartDate.ToString("dd MMMM yyyy")</td></tr>
+        <tr><td>Expiry</td><td>@Model.EndDate.ToString("dd MMMM yyyy")</td></tr>
+        <tr><td>Duration</td><td>@months month(s)</td></tr>
+        <tr><td>Annual rent</td><td><strong>@Model.AnnualRent.ToString("N2")</strong></td></tr>
+        <tr><td>Payable</td><td>Every @Model.BillingFrequencyMonths month(s), in advance</td></tr>
+        <tr>
+            <td>VAT treatment</td>
+            <td>
+                @VatCategories.Describe(Model.VatCategory)
+                @if (Model.VatCategory == VatCategories.Standard)
+                {
+                    <text> &mdash; VAT at @Model.VatRate.ToString("N2")% is payable in addition to the rent.</text>
+                }
+                else
+                {
+                    <text> &mdash; no VAT is chargeable on the rent.</text>
+                }
+            </td>
+        </tr>
+        <tr><td>Security deposit</td><td><strong>@Model.SecurityDepositAmount.ToString("N2")</strong>, refundable under clause 8</td></tr>
+    </table>
+
+    @if (instalments.Count > 0)
+    {
+        <h2>4. Payment Schedule</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th><th>Reference</th><th>Due date</th>
+                    <th class="num">Rent</th><th class="num">VAT</th><th class="num">Total due</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ var n = 1; }
+                @foreach (var item in instalments)
+                {
+                    <tr>
+                        <td>@n</td>
+                        <td>@item.InvoiceNumber</td>
+                        <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
+                        <td class="num">@item.Subtotal.ToString("N2")</td>
+                        <td class="num">@item.VatAmount.ToString("N2")</td>
+                        <td class="num">@item.TotalAmount.ToString("N2")</td>
+                    </tr>
+                    n++;
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3">Total payable over the term</th>
+                    <th class="num">@instalments.Sum(x => x.Subtotal).ToString("N2")</th>
+                    <th class="num">@instalments.Sum(x => x.VatAmount).ToString("N2")</th>
+                    <th class="num">@instalments.Sum(x => x.TotalAmount).ToString("N2")</th>
+                </tr>
+            </tfoot>
+        </table>
+    }
+
+    <h2>5. Schedule of Charges</h2>
+    <p>The following charges apply in addition to the rent. They are liquidated amounts agreed between the
+    parties as a genuine pre-estimate of the Landlord's loss, and are payable on demand.</p>
+    <table>
+        <thead><tr><th style="width:44%">Event</th><th class="num" style="width:26%">Charge</th><th>Basis</th></tr></thead>
+        <tbody>
+            <tr><td>Late payment of rent</td><td class="num"><span class="fill">[TO BE COMPLETED]</span></td><td>Per month or part month overdue</td></tr>
+            <tr><td>Returned or dishonoured cheque</td><td class="num"><span class="fill">[TO BE COMPLETED]</span></td><td>Per cheque, plus any bank charges incurred</td></tr>
+            <tr><td>Early termination by the Tenant</td><td class="num"><span class="fill">[TO BE COMPLETED]</span></td><td>Notice period and compensation under clause 9</td></tr>
+            <tr><td>Damage beyond fair wear and tear</td><td class="num">At cost</td><td>Cost of reinstatement, evidenced by invoice</td></tr>
+            <tr><td>Unauthorised alteration</td><td class="num">At cost</td><td>Cost of removal and reinstatement</td></tr>
+            <tr><td>Replacement keys or access cards</td><td class="num"><span class="fill">[TO BE COMPLETED]</span></td><td>Per item</td></tr>
+            <tr><td>Cleaning on vacating, if required</td><td class="num">At cost</td><td>Only if the Premises are not returned clean</td></tr>
+            <tr><td>Contract renewal or amendment</td><td class="num"><span class="fill">[TO BE COMPLETED]</span></td><td>Administration fee</td></tr>
+        </tbody>
+    </table>
+
+    <h2>6. Use of the Premises</h2>
+    <ol class="clauses">
+        <li>The Tenant shall use the Premises solely for the permitted use stated in clause 2 and for no other purpose.</li>
+        <li>The Tenant shall not assign, sublet, share or part with possession of the Premises, in whole or in part, without the Landlord's prior written consent.</li>
+        <li>The Tenant shall not use the Premises for any unlawful purpose, nor in any way that causes nuisance, annoyance, damage or disturbance to other occupiers or neighbours.</li>
+        <li>The Tenant shall observe the rules of the building and the requirements of the relevant authorities, and shall not exceed the occupancy permitted for the Premises.</li>
+        <li>The Tenant shall not store hazardous, flammable or prohibited materials in the Premises.</li>
+    </ol>
+
+    <h2>7. Condition, Maintenance and Damage</h2>
+    <ol class="clauses" start="6">
+        <li>The Premises are accepted in the condition recorded in the check-in inventory signed by both parties. Where no inventory is signed, the Premises are deemed accepted in good and tenantable condition.</li>
+        <li>The Tenant shall keep the Premises clean and in good condition and shall be responsible for minor maintenance and for replacing consumable items.</li>
+        <li>The Landlord shall be responsible for major structural and mechanical maintenance, unless the need arises from the Tenant's misuse, negligence or breach.</li>
+        <li><strong>Damage caused by misuse.</strong> Any damage to the Premises, its fixtures, fittings or common areas caused by the Tenant, their family, employees, guests or contractors, other than fair wear and tear, shall be made good by the Tenant at their own cost. If the Tenant fails to do so within @blank days of written notice, the Landlord may carry out the works and recover the full cost from the Tenant, including from the security deposit.</li>
+        <li>The Tenant shall make no alteration, addition or change to the Premises, including to any partition, flooring, wiring or plumbing, without the Landlord's prior written consent. Unauthorised works shall be removed and the Premises reinstated at the Tenant's cost.</li>
+        <li>The Tenant shall report any defect, leak or damage to the Landlord promptly. Loss aggravated by a failure to report shall be to the Tenant's account.</li>
+    </ol>
+
+    <h2>8. Security Deposit</h2>
+    <ol class="clauses" start="12">
+        <li>The Tenant shall pay a security deposit of <strong>@Model.SecurityDepositAmount.ToString("N2")</strong> on or before the commencement date. The deposit is held by the Landlord as security for the Tenant's obligations and does not bear interest.</li>
+        <li>The Landlord may apply the deposit towards unpaid rent, unpaid charges under clause 5, the cost of making good damage under clause 9, and any other sum properly due.</li>
+        <li>The deposit, less any proper deduction, shall be refunded within @blank days of the Tenant vacating, returning all keys, and settling all accounts including final utility bills.</li>
+        <li>Application of the deposit does not limit the Landlord's right to recover any shortfall from the Tenant.</li>
+    </ol>
+
+    <h2>9. Breach and Termination</h2>
+    <ol class="clauses" start="16">
+        <li>Each of the following is a material breach by the Tenant: non-payment of any sum due for more than @blank days; dishonour of any cheque given for rent; use of the Premises other than for the permitted use; assignment or subletting without consent; and any other breach not remedied within @blank days of written notice.</li>
+        <li>On a material breach the Landlord may, subject to the applicable law and any required authority procedure, terminate this Agreement and require the Tenant to vacate, and recover all arrears, charges, the cost of making good damage, and reasonable legal and recovery costs.</li>
+        <li>Termination does not release the Tenant from liability for sums accrued or for damage caused before vacating.</li>
+        <li>If the Tenant terminates early without the Landlord's written agreement, the compensation stated in clause 5 applies, without prejudice to the Landlord's other remedies.</li>
+        <li>If the Tenant remains in occupation after expiry without a renewal agreed in writing, the Tenant shall pay for the period of overstay at @blank of the daily rent, and shall indemnify the Landlord against any loss arising from the delay.</li>
+    </ol>
+
+    <h2>10. Utilities, Insurance and Access</h2>
+    <ol class="clauses" start="21">
+        <li>The Tenant is responsible for registering and paying all utility accounts for the Premises for the duration of the term, and for closing them on vacating.</li>
+        <li>The Tenant shall insure their own contents. The Landlord is not liable for loss or damage to the Tenant's property except to the extent caused by the Landlord's negligence.</li>
+        <li>The Landlord or its agent may enter the Premises at reasonable times on reasonable prior notice to inspect, maintain, or show the Premises to prospective tenants or purchasers, and at any time without notice in an emergency.</li>
+    </ol>
+
+    <h2>11. General</h2>
+    <ol class="clauses" start="24">
+        <li>This Agreement, together with any signed inventory and annexes, is the entire agreement between the parties and supersedes any prior understanding.</li>
+        <li>No variation is effective unless made in writing and signed by both parties.</li>
+        <li>This Agreement is governed by the laws of the United Arab Emirates and the emirate in which the Premises are situated, and the parties submit to the jurisdiction of the competent authority and courts of that emirate.</li>
+        <li>Notices shall be given in writing to the addresses and contact details stated in clause 1 or as later notified in writing.</li>
+        <li>Where this Agreement is executed in Arabic and English and there is any conflict, the Arabic text shall prevail.</li>
+    </ol>
+
+    <div class="sign">
+        <div>
+            <div class="line"></div>
+            <div class="cap"><strong>Landlord</strong><br />@landlordName<br />Name, signature, date and stamp</div>
+        </div>
+        <div>
+            <div class="line"></div>
+            <div class="cap"><strong>Tenant</strong><br />@Model.Tenant?.FullName<br />Name, signature and date</div>
+        </div>
+    </div>
+
+    <p style="margin-top:10mm;font-size:8.5pt;color:var(--muted);border-top:1px solid var(--line);padding-top:3mm">
+        Generated from RealEstateManager contract @Model.ContractNumber on @DateTime.Today.ToString("dd/MM/yyyy").
+        Draft for legal review &mdash; not the official registered tenancy form.
+    </p>
+
+</div>
+</body>
+</html>

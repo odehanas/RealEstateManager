@@ -1,0 +1,120 @@
+﻿@model RealEstateManager.Domain.Property
+
+@{
+    ViewData["Title"] = "Create Property";
+}
+
+<h2>Create Property</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="row g-3">
+        <div class="col-md-12">
+            <label class="form-label">Property Code</label>
+            <input type="text" class="form-control bg-light" id="codePreview" value="Select ownership and type" readonly />
+            <div class="form-text">
+                Generated automatically on save &mdash; ownership, property type, then a sequence
+                (<code>OWN-R-0001</code>). Units and contracts are built on top of it, so it cannot be typed or changed.
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="PropertyType" class="form-label"></label>
+            <select asp-for="PropertyType" class="form-select" id="propertyType">
+                <option value="">Select</option>
+                <option>Residential</option>
+                <option>Commercial</option>
+                <option>Warehouse</option>
+                <option>MixedUse</option>
+            </select>
+            <span asp-validation-for="PropertyType" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="OwnershipType" class="form-label"></label>
+            <select asp-for="OwnershipType" class="form-select" id="ownershipType">
+                <option>Owned</option>
+                <option>Managed</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="VatCategory" class="form-label">VAT Treatment</label>
+            <select asp-for="VatCategory" class="form-select">
+                <option value="Standard">Standard rated (5%)</option>
+                <option value="Exempt">Exempt</option>
+                <option value="ZeroRated">Zero rated (0%)</option>
+            </select>
+            <div class="form-text">
+                Commercial is standard rated; residential leasing is exempt. Units inherit this &mdash;
+                set a unit's own treatment only in a mixed-use building.
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="OwnerName" class="form-label"></label>
+            <input asp-for="OwnerName" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="AssetValue" class="form-label"></label>
+            <input asp-for="AssetValue" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="CommissionPercentage" class="form-label"></label>
+            <input asp-for="CommissionPercentage" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Show the code the property will receive, so the user sees it before saving.
+        (function () {
+            var ownership = document.getElementById("ownershipType");
+            var type = document.getElementById("propertyType");
+            var preview = document.getElementById("codePreview");
+
+            function refresh() {
+                if (!type.value) {
+                    preview.value = "Select ownership and type";
+                    return;
+                }
+
+                var url = '@Url.Action("PreviewCode", "Properties")'
+                    + '?ownershipType=' + encodeURIComponent(ownership.value)
+                    + '&propertyType=' + encodeURIComponent(type.value);
+
+                fetch(url)
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) { preview.value = d.code; })
+                    .catch(function () { preview.value = "Will be generated on save"; });
+            }
+
+            ownership.addEventListener("change", refresh);
+            type.addEventListener("change", refresh);
+            refresh();
+        })();
+    </script>
+}

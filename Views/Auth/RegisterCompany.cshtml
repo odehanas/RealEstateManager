@@ -1,0 +1,144 @@
+@model RealEstateManager.Models.RegisterCompanyViewModel
+
+@{
+    ViewData["Title"] = "Create Company";
+    Layout = "_Layout";
+}
+
+<div class="row g-4 justify-content-center mt-2">
+    <div class="col-xl-10">
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card shadow-sm h-100 border-0 bg-light">
+                    <div class="card-body p-4">
+                        <span class="badge bg-primary-subtle text-primary mb-3">New Customer Onboarding</span>
+                        <h1 class="h3 mb-3">Start Your Company Setup</h1>
+                        <p class="text-muted mb-4">
+                            Create your company, create the first admin account, and start using the system immediately with a 15-day trial.
+                        </p>
+
+                        <div class="card border-primary-subtle mb-4">
+                            <div class="card-body">
+                                <h2 class="h6 text-primary mb-3">What Happens Next</h2>
+                                <ul class="mb-0 ps-3">
+                                    <li>Your company record is created automatically.</li>
+                                    <li>Your first admin user gets full access for that company.</li>
+                                    <li>The default chart of accounts and setup are prepared.</li>
+                                    <li>The 15-day trial starts immediately after registration.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="border rounded p-3 h-100 bg-white">
+                                    <div class="fw-semibold">Trial Period</div>
+                                    <div class="text-muted small">15 days of full system access</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="border rounded p-3 h-100 bg-white">
+                                    <div class="fw-semibold">Activation</div>
+                                    <div class="text-muted small">Continue later using subscription codes</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 small text-muted">
+                            Already have an account?
+                            <a asp-action="Login" class="text-decoration-none">Return to login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <h2 class="h4 mb-1">Company Registration</h2>
+                                <p class="text-muted mb-0">Fill in the company details and the first admin account.</p>
+                            </div>
+                            <a asp-action="Login" class="btn btn-outline-secondary btn-sm">Back To Login</a>
+                        </div>
+
+                        <form asp-action="RegisterCompany" method="post" class="row g-3">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="col-12">
+                                <h3 class="h6 text-uppercase text-muted border-bottom pb-2 mb-1">Company Details</h3>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="CompanyName" class="form-label"></label>
+                                <input asp-for="CompanyName" class="form-control" />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="BaseCurrency" class="form-label"></label>
+                                <input asp-for="BaseCurrency" class="form-control" />
+                                <span asp-validation-for="BaseCurrency" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label asp-for="FiscalYearStartMonth" class="form-label"></label>
+                                <select asp-for="FiscalYearStartMonth" class="form-select">
+                                    @for (var month = 1; month <= 12; month++)
+                                    {
+                                        <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="FiscalYearStartMonth" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12 pt-2">
+                                <h3 class="h6 text-uppercase text-muted border-bottom pb-2 mb-1">First Admin User</h3>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DisplayName" class="form-label"></label>
+                                <input asp-for="DisplayName" class="form-control" />
+                                <span asp-validation-for="DisplayName" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Username" class="form-label"></label>
+                                <input asp-for="Username" class="form-control" autocomplete="username" />
+                                <span asp-validation-for="Username" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label"></label>
+                                <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">
+                                    After registration, the system signs you in automatically and opens your new company with the active trial.
+                                </div>
+                            </div>
+
+                            <div class="col-12 d-flex gap-2 flex-wrap">
+                                <button type="submit" class="btn btn-primary">Create Company</button>
+                                <a asp-action="Login" class="btn btn-outline-secondary">Back To Login</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

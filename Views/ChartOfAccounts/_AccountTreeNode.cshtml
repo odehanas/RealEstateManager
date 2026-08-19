@@ -1,0 +1,56 @@
+﻿@model RealEstateManager.Models.AccountTreeViewModel
+
+<li class="mb-2">
+    <div class="border rounded p-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>@Model.Code</strong> - @Model.Name
+                <span class="badge bg-secondary ms-2">@Model.AccountType</span>
+                <span class="badge bg-info text-dark ms-1">@Model.ReportingGroup</span>
+
+                @if (Model.IsGroup)
+                {
+                    <span class="badge bg-dark ms-1">Group</span>
+                }
+
+                @if (Model.IsPostable)
+                {
+                    <span class="badge bg-success ms-1">Postable</span>
+                }
+
+                @if (!Model.IsActive)
+                {
+                    <span class="badge bg-warning text-dark ms-1">Inactive</span>
+                }
+
+                @if (Model.IsControlAccount)
+                {
+                    <span class="badge bg-primary ms-1" title="Opening balance is computed from sub-ledger detail">Sub-ledger Control</span>
+                }
+            </div>
+
+            <div class="text-end">
+                @if (Model.IsPostable && Model.OpeningBalance != 0m)
+                {
+                    <div class="text-muted small">
+                        Opening Balance:
+                        <strong class="@(Model.OpeningBalance >= 0 ? "text-success" : "text-danger")">
+                            @Model.OpeningBalance.ToString("N2")
+                        </strong>
+                    </div>
+                }
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary mt-1">Edit</a>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Children.Any())
+    {
+        <ul class="coa-tree list-unstyled ms-4 mt-2">
+            @foreach (var child in Model.Children)
+            {
+                <partial name="_AccountTreeNode" model="child" />
+            }
+        </ul>
+    }
+</li>

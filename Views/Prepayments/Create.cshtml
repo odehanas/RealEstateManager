@@ -1,0 +1,139 @@
+@model RealEstateManager.Models.PrepaymentCreateViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "New Prepayment Setup";
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+    var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+}
+
+<h2>New Prepayment Setup</h2>
+
+<div class="alert alert-info">
+    Save a prepayment once and the system will post the initial prepaid entry immediately, then release the expense automatically at each month-end.
+</div>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>Setup Details</strong>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label asp-for="ScheduleNumber" class="form-label">Schedule Number</label>
+                <input asp-for="ScheduleNumber" class="form-control" />
+                <div class="form-text">Leave blank to auto-generate.</div>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="PrepaymentType" class="form-label">Type</label>
+                <select asp-for="PrepaymentType" class="form-select">
+                    <option value="PrepaidRent">Prepaid Rent</option>
+                    <option value="PrepaidInsurance">Prepaid Insurance</option>
+                    <option value="ServiceContract">Service Contract</option>
+                    <option value="OtherPrepayment">Other Prepayment</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="RecognitionMonths" class="form-label">Recognition Months</label>
+                <input asp-for="RecognitionMonths" class="form-control" />
+            </div>
+
+            <div class="col-md-8">
+                <label asp-for="Description" class="form-label">Description</label>
+                <input asp-for="Description" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="TotalAmount" class="form-label">Total Amount</label>
+                <input asp-for="TotalAmount" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="PaymentDate" class="form-label">Payment Date</label>
+                <input asp-for="PaymentDate" type="date" class="form-control" />
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="FirstRecognitionDate" class="form-label">First Recognition Month</label>
+                <input asp-for="FirstRecognitionDate" type="date" class="form-control" />
+                <div class="form-text">The system posts on the month-end of the selected month.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="ReferenceNumber" class="form-label">Reference Number</label>
+                <input asp-for="ReferenceNumber" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Notes" class="form-label">Notes</label>
+                <input asp-for="Notes" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>Accounting</strong>
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label asp-for="PrepaidAccountId" class="form-label">Prepaid Asset Account</label>
+                <select asp-for="PrepaidAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="ExpenseAccountId" class="form-label">Expense Account</label>
+                <select asp-for="ExpenseAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="OffsetAccountId" class="form-label">Paid / Payable From</label>
+                <select asp-for="OffsetAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="VendorId" class="form-label">Vendor</label>
+                <select asp-for="VendorId" class="form-select">
+                    <option value="">Select Vendor</option>
+                    @foreach (var vendor in vendors)
+                    {
+                        <option value="@vendor.Id">@vendor.Code - @vendor.Name</option>
+                    }
+                </select>
+                <div class="form-text">Required when `Paid / Payable From` is the Accounts Payable control account.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-dark">Save Prepayment Setup</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

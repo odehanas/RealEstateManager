@@ -1,0 +1,90 @@
+@model RealEstateManager.Models.FixedAssetDepreciationViewModel
+
+@{
+    ViewData["Title"] = "Asset Depreciation";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Asset Depreciation</h2>
+        <div class="text-muted">@Model.AssetCode - @Model.AssetName</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to Register</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Cost</div>
+                <div class="fs-4 fw-bold">@Model.Cost.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Residual Value</div>
+                <div class="fs-4 fw-bold">@Model.ResidualValue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Monthly Depreciation</div>
+                <div class="fs-4 fw-bold">@Model.MonthlyDepreciation.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small">Net Book Value</div>
+                <div class="fs-4 fw-bold">@Model.NetBookValue.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Period</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Journal Entry</th>
+            <th>Posted At</th>
+            <th class="text-end">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Schedules.Count == 0)
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">No depreciation schedules found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model.Schedules)
+            {
+                var badgeClass = item.Status switch
+                {
+                    "Posted" => "bg-success",
+                    "Skipped" => "bg-secondary",
+                    _ => "bg-warning text-dark"
+                };
+
+                <tr>
+                    <td>@item.PeriodName</td>
+                    <td>@item.DepreciationDate.ToString("dd/MM/yyyy")</td>
+                    <td><span class="badge @badgeClass">@item.Status</span></td>
+                    <td>@(string.IsNullOrWhiteSpace(item.JournalEntryNumber) ? "-" : item.JournalEntryNumber)</td>
+                    <td>@(item.PostedAt.HasValue ? item.PostedAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                    <td class="text-end">@item.Amount.ToString("N2")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

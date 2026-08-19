@@ -1,0 +1,77 @@
+﻿@model IEnumerable<RealEstateManager.Domain.VendorBill>
+
+@{
+    ViewData["Title"] = "Vendor Bills";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Vendor Bills</h2>
+    <a asp-action="Create" class="btn btn-dark">Add Vendor Bill</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Bill</th>
+            <th>Vendor</th>
+            <th>Property</th>
+            <th>Bill Date</th>
+            <th>Due Date</th>
+            <th>Category</th>
+            <th class="text-end">Total</th>
+            <th class="text-end">Paid</th>
+            <th class="text-end">Balance</th>
+            <th>Status</th>
+            <th>GL</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bill in Model)
+        {
+            var balance = bill.TotalAmount - bill.AmountPaid;
+
+            <tr>
+                <td>@bill.BillNumber</td>
+                <td>@bill.Vendor?.Name</td>
+                <td>@bill.Property?.Name</td>
+                <td>@bill.BillDate.ToString("dd/MM/yyyy")</td>
+                <td>@bill.DueDate.ToString("dd/MM/yyyy")</td>
+                <td>@bill.ExpenseCategory</td>
+                <td class="text-end">@bill.TotalAmount.ToString("N2")</td>
+                <td class="text-end">@bill.AmountPaid.ToString("N2")</td>
+                <td class="text-end">@balance.ToString("N2")</td>
+                <td>@bill.Status</td>
+                <td>
+                    @if (bill.JournalEntryId.HasValue)
+                    {
+                        <span class="badge bg-success">Posted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Not Posted</span>
+                    }
+                </td>
+                <td>
+                    <div class="d-flex gap-2">
+                        @if (!bill.JournalEntryId.HasValue)
+                        {
+                            <form asp-action="Post" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@bill.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Post</button>
+                            </form>
+                        }
+
+                        @if (balance > 0)
+                        {
+                            <a asp-controller="VendorPayments" asp-action="Create" asp-route-billId="@bill.Id" class="btn btn-sm btn-outline-success">
+                                Pay
+                            </a>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

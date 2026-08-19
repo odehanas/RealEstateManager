@@ -1,0 +1,256 @@
+@model RealEstateManager.Services.TenantHealthReportDto
+@{
+    ViewData["Title"] = "Tenant Health & Ranking";
+
+    string GradeClass(string grade) => grade switch
+    {
+        "A" => "bg-success",
+        "B" => "bg-primary",
+        "C" => "bg-warning text-dark",
+        "D" => "bg-danger",
+        "E" => "bg-dark",
+        _ => "bg-secondary"
+    };
+}
+
+<style>
+    .th-table { font-size: .84rem; }
+    .th-table th { background: #0f2740; color: #fff; white-space: nowrap; }
+    .th-table td { white-space: nowrap; vertical-align: middle; }
+    .th-table td.name { white-space: normal; min-width: 190px; }
+    .th-table tfoot td { font-weight: 700; background: #eef2f7; }
+    .score-bar { height: 6px; border-radius: 3px; background: #e3e8ee; overflow: hidden; margin-top: 3px; width: 74px; }
+    .score-bar span { display: block; height: 100%; }
+    .rank-badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 26px; height: 26px; border-radius: 50%;
+        background: #eef2f7; color: #0f2740; font-weight: 700; font-size: .76rem;
+    }
+    .rank-badge.top { background: #0f2740; color: #fff; }
+    .scroll-x { overflow-x: auto; }
+    @@media print { .no-print { display: none !important; } }
+</style>
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">Tenant Health &amp; Ranking</h2>
+        <p class="text-muted mb-0">
+            Every tenant scored on collections, overdue exposure, cheque reliability and tenure &mdash; ranked best first.
+        </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label mb-1" for="asOfDate">As Of Date</label>
+        <input type="date" class="form-control form-control-sm" id="asOfDate" name="asOfDate"
+               value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+    </div>
+</form>
+
+<div class="d-none d-print-block mb-3">
+    <strong>As at:</strong> @Model.AsOfDate.ToString("dd/MM/yyyy")
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-primary text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Collection Ratio</div>
+                <div class="h3 fw-bold mb-1">@Model.PortfolioCollectionRatio.ToString("N1")%</div>
+                <div class="small">@Model.TotalCollected.ToString("N0") collected of @Model.TotalInvoiced.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-danger text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Overdue</div>
+                <div class="h3 fw-bold mb-1">@Model.TotalOverdue.ToString("N2")</div>
+                <div class="small">Total outstanding @Model.TotalOutstanding.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-success text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Average Health Score</div>
+                <div class="h3 fw-bold mb-1">@Model.AverageHealthScore.ToString("N1")</div>
+                <div class="small">@Model.ScoredTenants of @Model.Rows.Count tenants scored</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card shadow-sm h-100 border-0 bg-dark text-white">
+            <div class="card-body py-3">
+                <div class="small text-uppercase opacity-75">Grade Mix</div>
+                <div class="h5 fw-bold mb-1">
+                    A @Model.GradeCount("A") &middot; B @Model.GradeCount("B") &middot; C @Model.GradeCount("C")
+                </div>
+                <div class="small">D @Model.GradeCount("D") &middot; E @Model.GradeCount("E") &middot; deposits held @Model.TotalDepositHeld.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Rows.Count == 0)
+{
+    <div class="alert alert-info">No tenants have been registered yet.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="scroll-x">
+            <table class="table table-bordered table-sm mb-0 th-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th>Code</th>
+                        <th class="name">Tenant</th>
+                        <th class="text-center">Grade</th>
+                        <th class="text-end" style="min-width:94px">Score</th>
+                        <th class="text-end">Invoiced</th>
+                        <th class="text-end">Collected</th>
+                        <th class="text-end">Collection %</th>
+                        <th class="text-end">Outstanding</th>
+                        <th class="text-end">Overdue</th>
+                        <th class="text-end">Oldest (days)</th>
+                        <th class="text-end">Avg Days To Pay</th>
+                        <th class="text-end">PDC Cleared</th>
+                        <th class="text-end">PDC Bounced</th>
+                        <th class="text-end">PDC On Hand</th>
+                        <th class="text-end">Deposit Held</th>
+                        <th class="text-end">Tenure (yrs)</th>
+                        <th class="text-end">Leases</th>
+                        <th>Current Contract</th>
+                        <th class="text-end">Term (mo)</th>
+                        <th class="text-end">Annual Rent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr class="@(row.IsActive ? "" : "text-muted")">
+                            <td class="text-center">
+                                <span class="rank-badge @(row.Rank <= 3 ? "top" : "")">@row.Rank</span>
+                            </td>
+                            <td>@row.TenantCode</td>
+                            <td class="name">
+                                @row.TenantName
+                                @if (!row.IsActive)
+                                {
+                                    <span class="badge bg-secondary ms-1">Inactive</span>
+                                }
+                                @if (row.CurrentUnitDisplay != null)
+                                {
+                                    <div class="small text-muted">@row.CurrentUnitDisplay</div>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="badge @GradeClass(row.HealthGrade)">@row.HealthGrade</span>
+                            </td>
+                            <td class="text-end">
+                                @if (row.IsScored)
+                                {
+                                    <strong>@row.HealthScore.ToString("N1")</strong>
+                                    <div class="score-bar ms-auto">
+                                        <span class="@GradeClass(row.HealthGrade)" style="width:@row.HealthScore.ToString("N1")%"></span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No activity</span>
+                                }
+                            </td>
+                            <td class="text-end">@row.TotalInvoiced.ToString("N2")</td>
+                            <td class="text-end">@row.TotalCollected.ToString("N2")</td>
+                            <td class="text-end">@row.CollectionRatio.ToString("N1")%</td>
+                            <td class="text-end @(row.OutstandingBalance > 0 ? "fw-semibold" : "")">@row.OutstandingBalance.ToString("N2")</td>
+                            <td class="text-end @(row.OverdueAmount > 0 ? "text-danger fw-semibold" : "")">
+                                @row.OverdueAmount.ToString("N2")
+                                @if (row.OverdueInvoiceCount > 0)
+                                {
+                                    <div class="small text-muted">@row.OverdueInvoiceCount inv.</div>
+                                }
+                            </td>
+                            <td class="text-end">@(row.OldestOverdueDays > 0 ? row.OldestOverdueDays.ToString() : "-")</td>
+                            <td class="text-end">@(row.AverageDaysToPay.HasValue ? row.AverageDaysToPay.Value.ToString("N1") : "-")</td>
+                            <td class="text-end">
+                                @row.PdcClearedAmount.ToString("N2")
+                                <div class="small text-muted">@row.PdcClearedCount chq.</div>
+                            </td>
+                            <td class="text-end @(row.PdcBouncedCount > 0 ? "text-danger fw-semibold" : "")">
+                                @row.PdcBouncedAmount.ToString("N2")
+                                @if (row.PdcBouncedCount > 0)
+                                {
+                                    <div class="small">@row.PdcBouncedCount chq.</div>
+                                }
+                            </td>
+                            <td class="text-end">@row.PdcOnHandAmount.ToString("N2")</td>
+                            <td class="text-end">@row.SecurityDepositHeld.ToString("N2")</td>
+                            <td class="text-end">@row.TenureYears.ToString("N2")</td>
+                            <td class="text-end">@row.LeaseCount</td>
+                            <td>
+                                @if (row.CurrentContractNumber != null)
+                                {
+                                    @row.CurrentContractNumber
+                                    <div class="small text-muted">ends @row.CurrentContractEnd!.Value.ToString("dd/MM/yyyy")</div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No active contract</span>
+                                }
+                            </td>
+                            <td class="text-end">@(row.CurrentContractTermMonths > 0 ? row.CurrentContractTermMonths.ToString() : "-")</td>
+                            <td class="text-end">@row.CurrentAnnualRent.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5">Portfolio Total</td>
+                        <td class="text-end">@Model.TotalInvoiced.ToString("N2")</td>
+                        <td class="text-end">@Model.TotalCollected.ToString("N2")</td>
+                        <td class="text-end">@Model.PortfolioCollectionRatio.ToString("N1")%</td>
+                        <td class="text-end">@Model.TotalOutstanding.ToString("N2")</td>
+                        <td class="text-end">@Model.TotalOverdue.ToString("N2")</td>
+                        <td colspan="5"></td>
+                        <td class="text-end">@Model.TotalDepositHeld.ToString("N2")</td>
+                        <td colspan="5"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body py-3 small text-muted">
+            <strong class="text-dark">How the health score is calculated</strong>
+            <p class="mb-2 mt-2">
+                Four components, each scored 0&ndash;100 and combined by weight. A component that cannot be
+                measured for a tenant &mdash; for example a tenant who has never issued a post-dated cheque &mdash;
+                is dropped and its weight is shared across the remaining components, so nobody is penalised for
+                the absence of a behaviour rather than for the behaviour itself.
+            </p>
+            <ul class="mb-2">
+                <li><strong>Collection ratio &mdash; 40%.</strong> Total collected divided by total invoiced. The single strongest signal of a paying tenant.</li>
+                <li><strong>Overdue exposure &mdash; 30%.</strong> Overdue balance against total invoiced, inverted, then reduced by an ageing penalty of up to 30 points as the oldest overdue invoice passes 120 days.</li>
+                <li><strong>PDC reliability &mdash; 15%.</strong> Cleared cheque value divided by cleared plus bounced value. Measured only where cheques have actually been presented.</li>
+                <li><strong>Tenure &amp; commitment &mdash; 15%.</strong> Years occupied, capped at five years (70% of the component), plus current contract length, capped at 36 months (30%).</li>
+            </ul>
+            <p class="mb-0">
+                Grades: <span class="badge bg-success">A</span> 85+ &middot;
+                <span class="badge bg-primary">B</span> 70&ndash;84 &middot;
+                <span class="badge bg-warning text-dark">C</span> 55&ndash;69 &middot;
+                <span class="badge bg-danger">D</span> 40&ndash;54 &middot;
+                <span class="badge bg-dark">E</span> below 40.
+                Outstanding includes the tenant's opening balance. Draft and cancelled invoices are excluded
+                because they carry no ledger balance.
+            </p>
+        </div>
+    </div>
+}
