@@ -1,0 +1,46 @@
+<p>The figures for your UAE VAT return for a tax period: VAT you charged tenants, VAT you can reclaim on costs, and
+the difference you owe. Use it to fill in the return on the FTA portal.</p>
+
+<h3>Running the report</h3>
+<ol class="steps">
+    <li>Enter the tax period <strong>From</strong> and <strong>To</strong> dates. The default is the calendar quarter you
+        are in, the usual period for a business of this size.</li>
+    <li>Refresh.</li>
+</ol>
+<p>If no TRN is set, the report warns you first — see <a href="#vat-settings">VAT Settings</a>.</p>
+
+<h3>What it shows</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Section</th><th>Contents</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Output Tax Due</strong></td><td>VAT charged on posted customer invoices in the period.</td></tr>
+        <tr><td><strong>Input Tax Recoverable</strong></td><td>VAT you can reclaim on posted vendor bills in the period.</td></tr>
+        <tr><td><strong>Output Tax — Supplies Made</strong></td><td>Invoices grouped by VAT treatment (standard, exempt, zero-rated): number of invoices, net amount, VAT.</td></tr>
+        <tr><td><strong>Input Tax — Purchases</strong></td><td>Bill lines grouped by attribution (taxable, exempt, residual): number of bills, net amount, VAT charged, recoverable and irrecoverable.</td></tr>
+        <tr><td><strong>Recovery Rate</strong></td><td>The actual recovery rate for the period — taxable supplies as a share of all supplies made — with the provisional rate from VAT Settings shown underneath for comparison.</td></tr>
+    </tbody>
+</table>
+<p><strong>Net VAT payable</strong> is Output Tax Due less Input Tax Recoverable. A negative figure is a refund due to you.</p>
+
+<div class="box warn">
+    <div class="box-title">Only posted documents count</div>
+    <p>Draft invoices and draft bills are left out, because they are not in the accounts. Post everything for the
+    period before you run the return. Bills from suppliers who are not VAT registered carry no VAT and do not appear in
+    the input tax figures at all.</p>
+</div>
+
+<h3>The annual apportionment wash-up</h3>
+<p>Residual input VAT is reclaimed during the year at the <em>provisional</em> recovery rate. At the end of the
+fiscal year the report compares that with the <strong>actual recovery rate</strong> — your taxable supplies as a
+share of all supplies for the year — and shows the difference:</p>
+<ul>
+    <li>A <strong>positive</strong> figure is additional VAT you may reclaim.</li>
+    <li>A <strong>negative</strong> figure is VAT reclaimed too generously that must be repaid.</li>
+</ul>
+<p>This figure is <strong>not posted automatically</strong>. Enter it on the return for the first period after year end,
+and record it with a <a href="#manual-journals">manual journal</a> between <code>11300</code> VAT Recoverable and the
+expense account the residual costs were charged to. Then update the provisional rate in VAT Settings for the new year.</p>
+
+<h3>Settling with the FTA</h3>
+<p>When you pay the VAT due, post a manual journal: Dr <code>21400</code> VAT Payable for the output tax, Cr
+<code>11300</code> VAT Recoverable for the input tax, Cr <code>11100</code> Cash for the net amount paid.</p>

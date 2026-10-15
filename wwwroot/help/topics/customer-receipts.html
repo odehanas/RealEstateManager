@@ -1,0 +1,51 @@
+<p><strong>Workflow step 7.</strong> A customer receipt records money collected from a tenant against a specific
+invoice — cash, bank transfer, or a cheque you are banking directly. Cheques handled through the PDC register
+clear themselves and do <strong>not</strong> need a receipt.</p>
+
+<h3>Recording a receipt</h3>
+<ol class="steps">
+    <li>Select <strong>New Receipt</strong>, or <strong>Receive</strong> on the invoice in Customer Invoices.</li>
+    <li>Choose the <strong>Invoice</strong> being paid. Its outstanding balance is shown.</li>
+    <li>Enter the <strong>Receipt Number</strong> — unique within the company.</li>
+    <li>Enter the <strong>Receipt Date</strong> — the date the money actually arrived.</li>
+    <li>Enter the <strong>Amount</strong>. Part payments are allowed.</li>
+    <li>Choose the <strong>Payment Method</strong> and save.</li>
+</ol>
+
+<div class="box warn">
+    <div class="box-title">The receipt is saved as a draft</div>
+    <p>It does not reduce the invoice or the tenant's balance until its journal is posted. Post it from
+    <span class="path">Operations ▸ Journal Inquiry</span> — see <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Only posted invoices can be received against</div>
+    <p>The invoice list shows posted invoices with a balance. A draft invoice is not yet a receivable, so a receipt
+    against one is refused with <em>"Invoice … has not been posted yet"</em>. Post the invoice first; the
+    <strong>Receive</strong> button on the invoice list only appears once it is posted.</p>
+</div>
+
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+
+<h3>Effect on the invoice</h3>
+<p>When the receipt's journal is posted, the amount is added to the invoice's <em>Amount Paid</em> and its status moves
+to <strong>PartiallyPaid</strong> or <strong>Paid</strong>. Resetting the journal to draft takes it back off again.</p>
+
+<div class="box">
+    <div class="box-title">One receipt, one invoice</div>
+    <p>Each receipt settles a single invoice. If a tenant pays one amount covering three invoices, enter three
+    receipts with the same date and reference, splitting the amount. This keeps the tenant statement accurate at
+    invoice level.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">If saving fails</div>
+    <p>If the posting cannot be prepared — a missing account mapping, or a date in a closed period — nothing is
+    saved and the message tells you why. You will not be left with a half-recorded receipt.</p>
+</div>

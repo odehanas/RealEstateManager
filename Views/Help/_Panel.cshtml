@@ -1,0 +1,16 @@
+@model RealEstateManager.Models.HelpTopicViewModel
+@*
+    Loaded into the help panel by fetch. A fragment, not a page: no layout.
+    The data-* attributes tell the panel script what title to show in its header.
+*@
+<div data-help-title="@Model.Topic.Title" data-help-path="@Model.Topic.Path">
+    <article class="help-content">
+        @Html.Raw(Model.Content)
+    </article>
+
+    <div class="border-top pt-3 mt-4 small d-flex flex-wrap gap-3">
+        <a href="/Help/Topic/@Model.Topic.Key" target="_blank">Open full page</a>
+        <a href="/Help" data-help-topic="">All help topics</a>
+        <a href="/Help/Manual" target="_blank">Full manual</a>
+    </div>
+</div>

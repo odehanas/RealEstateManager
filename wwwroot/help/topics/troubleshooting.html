@@ -1,0 +1,92 @@
+<h3>A transaction I saved is missing from a report</h3>
+<p>It is almost certainly still a <strong>draft</strong>. Receipts, PDCs, deposits, payments, petty cash, manual journals,
+revenue recognition and prepayments all save drafts.</p>
+<ol class="steps">
+    <li>Open <span class="path">Operations ▸ Journal Inquiry</span>.</li>
+    <li>Set <strong>Posted Only</strong> to <strong>No</strong>, set the dates and select <strong>Go</strong>.</li>
+    <li>Post the entry, or use <strong>Post All Drafts</strong>.</li>
+</ol>
+<p>See <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+
+<h3>"Reset to Draft" is greyed out or refused</h3>
+<p>Either the period is closed, or something depends on the entry — a receipt against the invoice, a payment against
+the bill, a posted PDC clearance. Reset the later transaction first, or post a correcting journal in an open period.</p>
+
+<h3>I cannot see the Add or Edit buttons on master data</h3>
+<p>Your account has <em>View Master Data</em> only. Ask the master data owner, or an administrator to change your
+permissions — see <a href="#master-data-rules">Master Data rules</a>.</p>
+
+<h3>"…is already registered to…" when saving a tenant or vendor</h3>
+<p>The trade licence, ID, passport or TRN you entered belongs to an existing record, which the message names. Open
+that record instead of creating a duplicate. If it is genuinely a different party, check the number was typed correctly.</p>
+
+<h3>A vendor bill will not let me enter VAT</h3>
+<p>The supplier is not marked <strong>VAT registered</strong>, or has no TRN on file. Correct the vendor record if they are
+in fact registered — see <a href="#vendors">Vendors</a>. A bill already saved keeps the treatment it was saved with.</p>
+
+<h3>The Trial Balance does not balance</h3>
+<p>Because the system rejects any unbalanced journal, transactions cannot cause this. The cause is
+opening balances.</p>
+<ol class="steps">
+    <li>Open <span class="path">System Setup ▸ Opening Balances</span>.</li>
+    <li>Read the <strong>Net Imbalance (Dr − Cr)</strong> card. It will equal the Trial Balance difference exactly.</li>
+    <li>Identify the missing side. Debits exceeding credits means a credit-side opening balance is missing —
+        almost always equity.</li>
+    <li>Open <span class="path">System Setup ▸ Chart of Accounts</span>, edit <code>31100</code> Share Capital or
+        <code>32100</code> Retained Earnings – Prior Years, and enter the balancing figure.</li>
+    <li>Return to Opening Balances and confirm the green <strong>Balanced</strong> badge, then re-run the
+        Trial Balance.</li>
+</ol>
+<div class="box">
+    <div class="box-title">Worked diagnosis</div>
+    <p>Trial Balance shows debits 375,000 and credits 175,000 — a difference of 200,000. The credit side
+    contains only transaction balances, and Share Capital and Retained Earnings are both nil. The conclusion
+    is that 200,000 of asset opening balances were entered with no matching equity opening balance. Entering
+    200,000 on <code>31100</code> or <code>32100</code> balances both the Trial Balance and the Balance Sheet.</p>
+</div>
+
+<h3>The Balance Sheet does not balance</h3>
+<ul>
+    <li>Check opening balances as in D.1 — the same difference appears in both reports.</li>
+    <li>Check that every prior fiscal year has been closed. Unclosed prior-year profit sits in revenue and
+        expense accounts, which the Balance Sheet does not present.</li>
+</ul>
+
+<h3>Revenue is missing from the Profit &amp; Loss</h3>
+<ul>
+    <li>Run <span class="path">System Setup ▸ Revenue Recognition</span> up to the report date. Invoicing alone does
+        not create revenue.</li>
+    <li>Confirm the invoices themselves are <strong>Posted</strong>, not still in Draft.</li>
+    <li>For a managed property, remember only the commission is revenue — the rent belongs to the landlord.</li>
+</ul>
+
+<h3>A transaction will not post</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:44%">Message</th><th>Cause and fix</th></tr></thead>
+    <tbody>
+        <tr><td>"Journal entry is not balanced."</td><td>A manual journal line has an amount in both the debit and credit columns, or the totals differ. Correct the line.</td></tr>
+        <tr><td>"A journal entry must contain at least two lines."</td><td>Add the counterpart line.</td></tr>
+        <tr><td>"Account mapping for … is not configured."</td><td>Open <span class="path">System Setup ▸ Account Mapping</span> and select a valid, active account for that mapping.</td></tr>
+        <tr><td>"Contract number already exists."</td><td>Contract numbers are unique per company. Use a different one.</td></tr>
+        <tr><td>"This unit already has an overlapping active lease."</td><td>Terminate or adjust the existing lease first.</td></tr>
+        <tr><td>"Cheque number already exists."</td><td>Cheque numbers are unique per company. Check whether the PDC was already logged.</td></tr>
+        <tr><td>"PDC amount cannot exceed the outstanding invoice balance."</td><td>Reduce the amount, or split the cheque across invoices.</td></tr>
+        <tr><td>"Billing frequency must be 1, 2, 3, 4, 6, or 12."</td><td>Billing frequency must divide 12 exactly.</td></tr>
+    </tbody>
+</table>
+
+<h3>A menu is not visible</h3>
+<ul>
+    <li>Confirm the permission with your administrator (<a href="#companies-users">Companies, Users &amp; Permissions</a>).</li>
+    <li>Check that the company's subscription has not expired — expiry withdraws the processing menus.</li>
+    <li>Confirm you are in the right company using the company selector.</li>
+</ul>
+
+<h3>A tenant's balance looks wrong</h3>
+<ol class="steps">
+    <li>Run <span class="path">Reporting ▸ Tenant Statement</span> for the tenant across the full period.</li>
+    <li>Check for invoices still in Draft — they are not in the ledger.</li>
+    <li>Check for PDCs still in Received status — the cash has not arrived yet.</li>
+    <li>Check for a security deposit wrongly entered as a customer receipt.</li>
+    <li>Confirm the tenant's opening balance was entered on the tenant record, not on the AR account.</li>
+</ol>

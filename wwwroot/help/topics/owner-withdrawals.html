@@ -1,0 +1,89 @@
+<p>Money the owner takes out of the business for personal use is not a company expense. It is a
+<strong>distribution</strong> — a movement in equity. Putting it through the company's expense accounts
+would understate profit and misstate the Profit &amp; Loss.</p>
+
+<p>But the owner still wants to know what they spent it on. RealEstateManager solves this with a
+dedicated analysis dimension: the posting goes to a single equity account, and each line carries an
+<strong>owner withdrawal category</strong> that says what the money was for.</p>
+
+<div class="box">
+    <div class="box-title">Why this is not a chart-of-accounts problem</div>
+    <p>Adding expense accounts for "school fees" or "personal travel" would put the owner's private life
+    into the company's books and inflate its cost base. Adding them as unit cost centres would be worse
+    still — cost centres in this system are <em>units</em>, used to allocate rental revenue and property
+    costs to the space that generated them. Owner spending relates to no unit at all.</p>
+    <p>A separate dimension keeps the chart of accounts clean, keeps cost centres meaningful, and still
+    gives the owner a full breakdown.</p>
+</div>
+
+<h3>The owner's current account</h3>
+<p>The standard chart seeds one equity account for this purpose:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:14%">Code</th><th style="width:36%">Account</th><th>Type</th></tr></thead>
+    <tbody>
+        <tr><td><code>34100</code></td><td>Owner's Current Account</td><td>Equity, flagged as an owner account</td></tr>
+    </tbody>
+</table>
+
+<p>Because it is equity, a <strong>credit</strong> balance means the business owes the owner, and a
+<strong>withdrawal is a debit</strong> that reduces that balance. Capital the owner puts in is a credit.</p>
+
+<p>If you have more than one owner, add one account per owner — <code>34200</code>, <code>34300</code> and
+so on — under <span class="path">System Setup ▸ Chart of Accounts</span>, setting <strong>Owner Account</strong>
+to <em>Yes</em> on each. The same category list serves all of them, and each gets its own column in the
+report. Only a postable Equity account can be flagged this way; the setting is ignored on any other type.</p>
+
+<h3>Posting owner expenditure</h3>
+<p><span class="path">Operations ▸ Manual Journals ▸ New Manual Journal</span></p>
+
+<p>The General Journal has an <strong>Owner Withdrawal Category</strong> column. It activates only on a
+line posted to an account flagged as an owner account; on every other line it stays locked and empty, and
+the row is highlighted when the dimension becomes available.</p>
+
+<ol class="steps">
+    <li>Enter the <strong>Entry Date</strong> and a clear <strong>Description</strong>.</li>
+    <li>On the first line choose the <strong>owner's current account</strong> and enter the amount as a
+        <strong>Debit</strong>.</li>
+    <li>Choose the <strong>Owner Withdrawal Category</strong> — the column is now enabled on that line.</li>
+    <li>On the second line credit whatever the money came out of, normally
+        <code>11100</code> Cash and Cash Equivalents.</li>
+    <li>Select <strong>Save as Draft</strong>, then post it from Journal Inquiry.</li>
+</ol>
+
+<h4>Owner pays school fees of 25,000 from the company bank account</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th>Category</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>34100</code> Owner's Current Account</td><td>OW-30 Education</td><td class="num dr">25,000.00</td><td class="num">—</td></tr>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td>—</td><td class="num">—</td><td class="num cr">25,000.00</td></tr>
+    </tbody>
+</table>
+<p class="small muted">No expense account is touched, so company profit is unaffected. The owner's equity
+balance falls by 25,000 and the spend is tagged as Education.</p>
+
+<h4>Owner introduces 100,000 of capital</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th>Category</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td>—</td><td class="num dr">100,000.00</td><td class="num">—</td></tr>
+        <tr><td><code>34100</code> Owner's Current Account</td><td>leave blank</td><td class="num">—</td><td class="num cr">100,000.00</td></tr>
+    </tbody>
+</table>
+<p class="small muted">Leave the category blank on money coming <em>in</em>. Categories describe
+expenditure; a contribution is not expenditure.</p>
+
+<div class="box warn">
+    <div class="box-title">The category is refused on any other account</div>
+    <p>If you try to save a category against an account that is not flagged as an owner account, the
+    journal is rejected with a message naming the offending account. This is enforced on the server, not
+    just hidden in the screen — it is what guarantees personal spending can never reach a company account
+    by accident.</p>
+</div>
+
+<h3>Clearing the balance at year end</h3>
+<p>The owner's current account carries forward like any equity account. If you want to clear it against
+retained earnings — for example when drawings are formally treated as a distribution of profit — post a
+manual journal debiting <code>32100</code> Retained Earnings – Prior Years and crediting
+<code>34100</code> Owner's Current Account. Leave the category blank: it is a transfer, not expenditure.</p>
+
+<p>The categories themselves are maintained under <a href="#owner-withdrawal-categories">Owner Withdrawal Categories</a>, and the spending is reported in <a href="#owner-reports">Owner Reports</a>.</p>

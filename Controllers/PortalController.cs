@@ -21,13 +21,28 @@ namespace RealEstateManager.Controllers
     {
         private readonly TenantPortalService _portalService;
         private readonly ServiceRequestService _serviceRequestService;
+        private readonly HelpCatalogService _help;
 
         public PortalController(
             TenantPortalService portalService,
-            ServiceRequestService serviceRequestService)
+            ServiceRequestService serviceRequestService,
+            HelpCatalogService help)
         {
             _portalService = portalService;
             _serviceRequestService = serviceRequestService;
+            _help = help;
+        }
+
+        /// <summary>
+        /// The guide written for tenants. Rendered inside the portal rather than linking to
+        /// the staff Help Center, which a tenant cannot open - and its cross-references are
+        /// switched off for the same reason.
+        /// </summary>
+        [HttpGet("help")]
+        public IActionResult Help()
+        {
+            ViewBag.HelpHtml = _help.GetContent("tenant-guide", HelpLinkMode.Plain);
+            return View();
         }
 
         [HttpGet("")]

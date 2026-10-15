@@ -1,0 +1,40 @@
+<p><strong>Workflow step 1.</strong> A property is a building or a site. It is the top of the portfolio hierarchy and
+the anchor for every unit, lease, invoice and expense beneath it.</p>
+
+<h3>Creating a property</h3>
+<ol class="steps">
+    <li>Select <strong>Add Property</strong>.</li>
+    <li>Choose the <strong>Ownership Type</strong> — <em>this is the field that drives the accounting</em>.</li>
+    <li>Choose the <strong>Property Type</strong>: Residential, Commercial, Warehouse or Mixed Use. The screen
+        previews the code the property will receive, such as <code>OWN-R-0001</code>.</li>
+    <li>Enter the <strong>Name</strong> and <strong>Address</strong>. The name must be unique in the company.</li>
+    <li>Choose the default <strong>VAT Category</strong> for its units — Standard for commercial, Exempt for residential.</li>
+    <li>For a managed property, enter the <strong>Owner Name</strong> and the <strong>Commission Percentage</strong> you earn.</li>
+    <li>Enter the <strong>Asset Value</strong> if you track the property's book value, then save.</li>
+</ol>
+
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Code</strong></td><td>Issued by the system and fixed once saved. Built from ownership and type — see <a href="#master-data-rules">Master Data rules</a>.</td></tr>
+        <tr><td><strong>Ownership Type</strong></td><td><strong>Owned</strong> — rent is your revenue.<br/><strong>Managed</strong> — rent belongs to the landlord; only your commission is revenue.</td></tr>
+        <tr><td><strong>Property Type</strong></td><td>Classification for reporting, and part of the code.</td></tr>
+        <tr><td><strong>VAT Category</strong></td><td>Default VAT treatment for units in this property. A unit can override it, which is what makes a mixed-use building work: commercial units at 5%, residential units exempt, under one roof.</td></tr>
+        <tr><td><strong>Owner Name</strong></td><td>The landlord. Used to group the <a href="#owner-reports">Owner Tenancy Schedule</a>.</td></tr>
+        <tr><td><strong>Commission Percentage</strong></td><td>Your management fee rate on a managed property.</td></tr>
+        <tr><td><strong>Asset Value</strong></td><td>Reference book value. Does not itself post to the ledger.</td></tr>
+        <tr><td><strong>Is Active</strong></td><td>Untick to remove a disposed property from selection lists while keeping its history.</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Ownership type is decisive</div>
+    <p>Owned and Managed produce entirely different journals for the same invoice. Confirm the ownership type before
+    you create any lease under the property — see <a href="#entries-reference">Accounting Entries Reference</a>.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Read only?</div>
+    <p>If you can see the list but not the <strong>Add</strong> and <strong>Edit</strong> buttons, your account has
+    <em>View Master Data</em> only. Ask the master data owner to make the change.</p>
+</div>

@@ -1,0 +1,54 @@
+<table class="t-compact">
+    <thead><tr><th style="width:24%">Record</th><th style="width:22%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="4"><strong>Unit</strong></td><td>Vacant</td><td>Available to lease.</td></tr>
+        <tr><td>Occupied</td><td>Under an active lease. Set automatically.</td></tr>
+        <tr><td>UnderMaintenance</td><td>Temporarily out of service.</td></tr>
+        <tr><td>Reserved</td><td>Held for a prospective tenant.</td></tr>
+
+        <tr><td rowspan="5"><strong>Lease</strong></td><td>Draft</td><td>Being prepared.</td></tr>
+        <tr><td>Active</td><td>In force. Set on creation.</td></tr>
+        <tr><td>Terminated</td><td>Ended early.</td></tr>
+        <tr><td>Expired</td><td>Ran to its end date.</td></tr>
+        <tr><td>Renewed</td><td>Replaced by a successor contract.</td></tr>
+
+        <tr><td rowspan="5"><strong>Customer invoice</strong></td><td>Draft</td><td>Generated, not posted. No ledger impact.</td></tr>
+        <tr><td>Posted</td><td>Journal written; fully outstanding.</td></tr>
+        <tr><td>PartiallyPaid</td><td>Part settled.</td></tr>
+        <tr><td>Paid</td><td>Fully settled.</td></tr>
+        <tr><td>Cancelled</td><td>Voided.</td></tr>
+
+        <tr><td rowspan="3"><strong>PDC receipt</strong></td><td>Draft</td><td>Transient state during creation.</td></tr>
+        <tr><td>Received</td><td>In custody; memorandum posted.</td></tr>
+        <tr><td>Cleared</td><td>Honoured by the bank; cash recorded.</td></tr>
+
+        <tr><td rowspan="4"><strong>Vendor bill</strong></td><td>Draft</td><td>Entered, not posted.</td></tr>
+        <tr><td>Posted</td><td>Journal written; payable outstanding.</td></tr>
+        <tr><td>PartiallyPaid</td><td>Part settled.</td></tr>
+        <tr><td>Paid</td><td>Fully settled.</td></tr>
+
+        <tr><td rowspan="2"><strong>Revenue recognition</strong></td><td>Planned</td><td>Scheduled, not yet posted.</td></tr>
+        <tr><td>Posted</td><td>Journal written; revenue earned.</td></tr>
+
+        <tr><td rowspan="2"><strong>Prepayment schedule</strong></td><td>Active</td><td>Instalments still to release.</td></tr>
+        <tr><td>Completed</td><td>Fully amortised.</td></tr>
+
+        <tr><td rowspan="3"><strong>Journal entry</strong></td><td>Draft</td><td>Saved, not in any report. Can be posted.</td></tr>
+        <tr><td>Posted</td><td>In the accounts. Can be reset to draft unless locked or depended on.</td></tr>
+        <tr><td>Period locked</td><td>Shown when the entry's period is closed. Cannot be posted or reset.</td></tr>
+
+        <tr><td rowspan="7"><strong>Tenant request</strong></td><td>Submitted</td><td>New; not yet seen.</td></tr>
+        <tr><td>Acknowledged</td><td>Seen by staff. Tenant can still withdraw.</td></tr>
+        <tr><td>InProgress</td><td>Work started.</td></tr>
+        <tr><td>Resolved</td><td>Done, with a response to the tenant.</td></tr>
+        <tr><td>Rejected</td><td>Shown as <em>Declined</em>; will not be done, with the reason.</td></tr>
+        <tr><td>Cancelled</td><td>Shown as <em>Withdrawn</em>; cancelled by the tenant.</td></tr>
+        <tr><td>Closed</td><td>Finished; no more messages.</td></tr>
+
+        <tr><td rowspan="2"><strong>Tenant portal login</strong></td><td>Active</td><td>Can sign in.</td></tr>
+        <tr><td>Suspended</td><td>Sign-in blocked; account and history kept.</td></tr>
+
+        <tr><td rowspan="2"><strong>Accounting period</strong></td><td>Open</td><td>Accepts postings.</td></tr>
+        <tr><td>Closed</td><td>Locked; figures are final.</td></tr>
+    </tbody>
+</table>

@@ -1,0 +1,34 @@
+<p><strong>Workflow step 2.</strong> A unit is an individually rentable space inside a property: an apartment, an
+office, a shop, a warehouse bay. Leases are signed against units, not against properties.</p>
+
+<h3>Creating a unit</h3>
+<ol class="steps">
+    <li>Select <strong>Add Unit</strong>.</li>
+    <li>Choose the <strong>Property</strong>. The unit receives the next code under it, such as <code>OWN-R-0001-U01</code>.</li>
+    <li>Enter the <strong>Floor</strong> and the <strong>Usage Type</strong>.</li>
+    <li>Enter the <strong>Area (sq ft)</strong> and the <strong>Standard Annual Rent</strong>.</li>
+    <li>Leave <strong>VAT Category</strong> blank to inherit the property's, or set it for a unit that is treated
+        differently — a shop on the ground floor of a residential tower, for example.</li>
+    <li>Leave <strong>Status</strong> as <em>Vacant</em>; the system changes it automatically. Save.</li>
+</ol>
+
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Unit code</strong></td><td>Issued by the system, unique within its property.</td></tr>
+        <tr><td><strong>Area (sq ft)</strong></td><td>Used for rent-per-square-foot and area utilization.</td></tr>
+        <tr><td><strong>Standard Annual Rent</strong></td><td>The asking rent. Offered as the default when a lease is created, and editable there.</td></tr>
+        <tr><td><strong>VAT Category</strong></td><td>Blank means inherit the property's. Set it only to override.</td></tr>
+        <tr><td><strong>Status</strong></td><td>Vacant · Occupied · Under Maintenance · Reserved.</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Status is maintained for you</div>
+    <p>An active lease sets the unit to <strong>Occupied</strong> automatically. Set the status yourself only for
+    <em>Under Maintenance</em> or <em>Reserved</em>, which keep the unit out of the leasing flow.</p>
+</div>
+
+<p>The list is grouped by property so you can see each building's units and their occupancy together. Occupancy
+figures on the dashboard and in <a href="#management-reports">Property Utilization</a> come from unit status,
+so keeping it accurate keeps the reporting accurate.</p>

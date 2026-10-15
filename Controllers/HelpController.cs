@@ -1,72 +1,96 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RealEstateManager.Models;
+using RealEstateManager.Services;
 
 namespace RealEstateManager.Controllers
 {
+    /// <summary>
+    /// The Help Center, single help topics, the panel that opens beside any screen, and
+    /// the full printable manual. All four read the same topic files through
+    /// HelpCatalogService.
+    /// </summary>
     [Authorize]
     public class HelpController : Controller
     {
-        [HttpGet]
-        public IActionResult Index()
+        private readonly HelpCatalogService _help;
+
+        public HelpController(HelpCatalogService help)
         {
-            var model = new HelpPageViewModel
+            _help = help;
+        }
+
+        /// <summary>Every topic, grouped the way the menus are, with search.</summary>
+        [HttpGet]
+        public IActionResult Index(string? q)
+        {
+            var model = new HelpCenterViewModel
             {
-                Sections =
-                [
-                    new HelpSectionViewModel
-                    {
-                        Id = "getting-started",
-                        Title = "Getting Started",
-                        Summary = "Basic steps for a new customer company after registration.",
-                        Steps =
-                        [
-                            "Sign in with your company admin account created during registration.",
-                            "Review the 15-day trial status from the Subscription page.",
-                            "Confirm your company settings, fiscal year, and chart of accounts setup.",
-                            "Create users and assign rights only for the tasks each user should perform."
-                        ]
-                    },
-                    new HelpSectionViewModel
-                    {
-                        Id = "daily-operations",
-                        Title = "Daily Operations",
-                        Summary = "Common usage flow for leases, accounting, and reporting.",
-                        Steps =
-                        [
-                            "Set up properties, units, tenants, and vendors from Master Data.",
-                            "Create lease contracts and related billing transactions.",
-                            "Record receipts, vendor bills, vendor payments, fixed assets, and prepayments from Accounts.",
-                            "Review Trial Balance, Profit and Loss, Balance Sheet, and Tenant Statements from Reports."
-                        ]
-                    },
-                    new HelpSectionViewModel
-                    {
-                        Id = "security-access",
-                        Title = "Security And Access",
-                        Summary = "How permissions and audit tracking work in the system.",
-                        Steps =
-                        [
-                            "System admin manages users, permissions, audit logs, and subscription activation across all companies.",
-                            "Company admins should give users only the permissions they need, such as leases, accounting, or reports.",
-                            "If access is denied, review the assigned permissions or ask the system admin to update rights.",
-                            "Audit Logs help track who opened or processed actions inside the application."
-                        ]
-                    },
-                    new HelpSectionViewModel
-                    {
-                        Id = "subscription-support",
-                        Title = "Subscription And Support",
-                        Summary = "How trial, activation, help, and feedback work.",
-                        Steps =
-                        [
-                            "A new company starts with a 15-day trial automatically.",
-                            "When you receive an activation code, open Subscription, enter the code, and apply it.",
-                            "Use the Feedback page to suggest improvements or report usability issues for future releases.",
-                            "Use this Help page as the standard guide until an AI assistant is introduced later."
-                        ]
-                    }
-                ]
+                Query = q?.Trim(),
+                Groups = _help.Groups,
+                Results = _help.Search(q)
+            };
+
+            return View(model);
+        }
+
+        /// <summary>One topic as a full page.</summary>
+        [HttpGet]
+        public IActionResult Topic(string id)
+        {
+            var topic = _help.GetTopic(id);
+            if (topic == null)
+                return NotFound();
+
+            var (previous, next) = _help.Neighbours(topic.Key);
+
+            return View(new HelpTopicViewModel
+            {
+                Topic = topic,
+                Content = _help.GetContent(topic.Key, HelpLinkMode.Page),
+                Group = _help.Groups.First(x => x.Key == topic.GroupKey),
+                Previous = previous,
+                Next = next
+            });
+        }
+
+        /// <summary>
+        /// The help panel's contents. Returns a fragment, not a page - the panel loads it
+        /// into itself with fetch, and loads linked topics the same way, so following a
+        /// cross-reference never takes the user away from the screen they are working on.
+        /// </summary>
+        [HttpGet]
+        public IActionResult Panel(string? id)
+        {
+            var topic = _help.GetTopic(id);
+
+            if (topic == null)
+                return PartialView("_PanelIndex", _help.Groups);
+
+            return PartialView("_Panel", new HelpTopicViewModel
+            {
+                Topic = topic,
+                Content = _help.GetContent(topic.Key, HelpLinkMode.Page),
+                Group = _help.Groups.First(x => x.Key == topic.GroupKey)
+            });
+        }
+
+        /// <summary>
+        /// The whole manual as one printable document, in catalog order, with a cover and
+        /// contents. Open to anyone: it is documentation of the product, carries no company
+        /// data, and being anonymous lets the PDF be produced straight from this page. The
+        /// previous static manual was publicly readable for the same reason.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Manual()
+        {
+            var model = new HelpManualViewModel
+            {
+                Groups = _help.Groups,
+                Content = _help.AllTopics.ToDictionary(
+                    x => x.Key,
+                    x => _help.GetContent(x.Key, HelpLinkMode.Anchor))
             };
 
             return View(model);

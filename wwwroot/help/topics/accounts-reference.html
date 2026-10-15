@@ -1,0 +1,55 @@
+<p>The standard chart created for every new company. Group accounts are shown in bold and cannot be posted to.</p>
+
+<table class="t-compact">
+    <thead><tr><th style="width:12%">Code</th><th style="width:40%">Account</th><th style="width:16%">Type</th><th>Reporting group</th></tr></thead>
+    <tbody>
+        <tr><td><strong>10000</strong></td><td><strong>Assets</strong></td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11100</td><td>Cash and Cash Equivalents</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11200</td><td>Accounts Receivable <span class="small muted">(control)</span></td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11300</td><td>VAT Recoverable</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11400</td><td>PDC On Hand</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11500</td><td>Prepaid Expenses</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>15100</td><td>Investment Property</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>15200</td><td>Fixed Assets</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>15300</td><td>Accumulated Depreciation <span class="small muted">(contra)</span></td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>15400</td><td>Fixed Asset Clearing</td><td>Asset</td><td>Assets</td></tr>
+
+        <tr><td><strong>20000</strong></td><td><strong>Liabilities</strong></td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21100</td><td>Accounts Payable <span class="small muted">(control)</span></td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21200</td><td>Advances from Customers <span class="small muted">(unearned revenue)</span></td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21300</td><td>Tenant Security Deposits</td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21400</td><td>VAT Payable</td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21500</td><td>Due to Landlords</td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21600</td><td>PDC Contra</td><td>Liability</td><td>Liabilities</td></tr>
+
+        <tr><td><strong>30000</strong></td><td><strong>Equity</strong></td><td>Equity</td><td>Equity</td></tr>
+        <tr><td>31100</td><td>Share Capital</td><td>Equity</td><td>Equity</td></tr>
+        <tr><td>32100</td><td>Retained Earnings – Prior Years</td><td>Equity</td><td>Equity</td></tr>
+        <tr><td>33100</td><td>Current Year Profit or Loss</td><td>Equity</td><td>Equity</td></tr>
+        <tr><td>34100</td><td>Owner's Current Account <span class="small muted">(owner account)</span></td><td>Equity</td><td>Equity</td></tr>
+
+        <tr><td><strong>40000</strong></td><td><strong>Revenue</strong></td><td>Revenue</td><td>Revenue</td></tr>
+        <tr><td>41100</td><td>Rental Revenue – Owned</td><td>Revenue</td><td>Revenue</td></tr>
+        <tr><td>42100</td><td>Management Fee Revenue</td><td>Revenue</td><td>Revenue</td></tr>
+        <tr><td>43100</td><td>Other Income</td><td>Revenue</td><td>Revenue</td></tr>
+
+        <tr><td><strong>50000</strong></td><td><strong>Direct Expenses</strong></td><td>Expense</td><td>DirectExpense</td></tr>
+        <tr><td>51100</td><td>Property Operating Expenses</td><td>Expense</td><td>DirectExpense</td></tr>
+        <tr><td>52100</td><td>Property Maintenance</td><td>Expense</td><td>DirectExpense</td></tr>
+
+        <tr><td><strong>60000</strong></td><td><strong>General Expenses</strong></td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>61100</td><td>Administrative Expenses</td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>62100</td><td>Depreciation Expense</td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>63100</td><td>Finance Costs</td><td>Expense</td><td>GeneralExpense</td></tr>
+    </tbody>
+</table>
+
+<h3>Accounts you add yourself</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:12%">Code</th><th style="width:40%">Account</th><th>Purpose</th></tr></thead>
+    <tbody>
+        <tr><td>e.g. 11150</td><td>Petty Cash – <em>site name</em></td><td>One Asset account per petty cash float, with <strong>Petty Cash Float</strong> set to Yes. See <a href="#petty-cash">Petty Cash</a>.</td></tr>
+        <tr><td>34200…</td><td>Owner's Current Account – <em>owner name</em></td><td>One Equity account per additional owner, with <strong>Owner Account</strong> set to Yes. See <a href="#owner-withdrawals">Owner Withdrawals Explained</a>.</td></tr>
+        <tr><td>39999</td><td>Opening Balance Control Account</td><td>Equity. Absorbs any imbalance in opening balances. Should return to zero. See <a href="#opening-balances">Opening Balances</a>.</td></tr>
+    </tbody>
+</table>

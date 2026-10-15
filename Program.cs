@@ -37,6 +37,8 @@ builder.Services.AddScoped<PortalBoundaryFilter>();
 builder.Services.AddScoped<TenantPortalAuthService>();
 builder.Services.AddScoped<TenantPortalService>();
 builder.Services.AddScoped<ServiceRequestService>();
+// Singleton: the help files only change on deployment, which restarts the app.
+builder.Services.AddSingleton<HelpCatalogService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 

@@ -166,8 +166,15 @@
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save and Post</button>
+        @* Saved as a DRAFT - it reaches the accounts only when posted from Journal Inquiry.
+           The button used to say "Save and Post", which is why posted-looking journals were
+           missing from the Trial Balance. *@
+        <button type="submit" class="btn btn-dark">Save as Draft</button>
         <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <div class="form-text mt-2">
+            The journal is saved as a draft. Post it from <strong>Operations &rsaquo; Journal Inquiry</strong>
+            to put it into the accounts.
+        </div>
     </div>
 </form>
 

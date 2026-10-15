@@ -1,0 +1,48 @@
+<p>Closing locks a period so that its reported figures cannot change afterwards. The screen shows the
+twelve monthly periods of the selected fiscal year with their status, and the history of fiscal years
+already closed.</p>
+
+<h3>Month-end checklist</h3>
+<ol class="steps">
+    <li>Post every customer invoice dated in the month.</li>
+    <li>Record every customer receipt and clear every PDC that the bank honoured.</li>
+    <li>Post every vendor bill and vendor payment.</li>
+    <li>Run <strong>Revenue Recognition</strong> to the month-end date.</li>
+    <li>Run <strong>Depreciation</strong> to the month-end date.</li>
+    <li>Process <strong>Prepayment</strong> amortisation for the month.</li>
+    <li>Post any accruals or adjustments as manual journals.</li>
+    <li>In <span class="path">Operations ▸ Journal Inquiry</span>, set <strong>Posted Only</strong> to <strong>No</strong> for the
+        month and <strong>Post All Drafts</strong>. Nothing left in draft is in the figures you are about to lock.</li>
+    <li>Run the <strong>Trial Balance</strong> and confirm debits equal credits.</li>
+    <li>Review the <strong>Profit &amp; Loss</strong> and <strong>Balance Sheet</strong>.</li>
+    <li>Return to <span class="path">System Setup ▸ Period Closing</span> and <strong>Close Period</strong>.</li>
+</ol>
+
+<div class="box warn">
+    <div class="box-title">Closing locks the period both ways</div>
+    <p>After a period is closed, nothing can be posted into it and nothing in it can be reset to draft. Late documents
+    go into the next open period — for vendor bills, use the <strong>Accounting Date</strong>. Corrections are made with a
+    journal in an open period.</p>
+</div>
+
+<h3>Closing the fiscal year</h3>
+<p>After the final period of the year is closed and reviewed, use <strong>Close Year</strong>. The system
+posts a closing journal that transfers the net result of every revenue and expense account into equity:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Each revenue account <span class="small muted">(cleared to nil)</span></td><td class="num dr">Balance</td><td class="num">—</td></tr>
+        <tr><td>Each expense account <span class="small muted">(cleared to nil)</span></td><td class="num">—</td><td class="num cr">Balance</td></tr>
+        <tr><td><code>32100</code> Retained Earnings – Prior Years</td><td class="num">Net loss</td><td class="num cr">Net profit</td></tr>
+    </tbody>
+</table>
+<p>The closing is recorded with its fiscal year, the profit or loss amount, the timestamp and a link to the
+journal, so it is fully auditable.</p>
+
+<div class="box warn">
+    <div class="box-title">Close each year before reporting on the next</div>
+    <p>The Balance Sheet presents the current fiscal year's profit as a separate equity line and takes prior
+    years from Retained Earnings. If a year is never closed, its profit stays in the revenue and expense
+    accounts — which the Balance Sheet does not present — and the Balance Sheet will not balance once you
+    cross into the following year.</p>
+</div>

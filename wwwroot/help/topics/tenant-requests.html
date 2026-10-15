@@ -1,0 +1,73 @@
+<p>Everything tenants raise through the self-service portal lands here: maintenance calls, requests for more time
+to pay, contract renewal questions, complaints and anything else. You need the <strong>Handle Tenant Requests</strong>
+permission to see this screen.</p>
+
+<h3>The queue</h3>
+<p>The screen opens on the <strong>Open</strong> requests — the work still outstanding. The buttons across the top
+filter it: <strong>New</strong> (not yet acknowledged), <strong>In progress</strong>, <strong>Closed</strong> and
+<strong>All</strong>, each with a count. The <strong>Type</strong> filter narrows it further.</p>
+<ul>
+    <li>Requests are listed <strong>worst first</strong>: Urgent, then High, then oldest first.</li>
+    <li>The <strong>Age</strong> column turns red once a request is 7 days old.</li>
+    <li>An amber badge marks a payment postponement that was agreed but not yet applied to the invoice.</li>
+</ul>
+
+<h3>Working a request</h3>
+<ol class="steps">
+    <li>Select <strong>Open</strong> on the request. You see what the tenant asked, their contact details, the property,
+        unit and contract, and the full conversation.</li>
+    <li>Under <strong>Update</strong>, set the status to <strong>Acknowledged</strong> so the tenant knows it has been seen.
+        Adjust the <strong>Priority</strong> if the tenant's own rating was off, and choose who it is
+        <strong>Assigned to</strong>.</li>
+    <li>Use the <strong>Conversation</strong> box to reply. The tenant sees your reply in their portal.</li>
+    <li>Move it to <strong>In progress</strong> when work starts.</li>
+    <li>When done, set <strong>Resolved</strong> and write the <strong>Response to the tenant</strong> — what was done.
+        It is required, because the tenant reads it. Use <strong>Declined</strong> if you will not do it, again with
+        the reason.</li>
+    <li>Set <strong>Closed</strong> once nothing further is expected.</li>
+</ol>
+
+<div class="box warn">
+    <div class="box-title">Internal notes</div>
+    <p>Tick <strong>Internal note</strong> before posting a message to keep it among staff — for instance, a note about the
+    tenant's payment history. Internal notes are shown with an amber background and are <strong>never</strong> sent to
+    the portal. Anything not ticked is visible to the tenant.</p>
+</div>
+
+<h3>Payment postponement requests</h3>
+<p>A tenant asking for more time names the invoice and the date they could pay by. Agreeing to it and actually
+moving the date are two separate, deliberate steps:</p>
+<ol class="steps">
+    <li>Decide, and set the request to <strong>Resolved</strong> with your response — for example
+        <em>"Agreed, invoice INV-… may be paid by 20 November."</em></li>
+    <li>A button appears: <strong>Apply new due date to INV-…</strong>. Press it and confirm.</li>
+</ol>
+<p>Only the invoice's <strong>due date</strong> changes. The amount owed, the VAT and the journal are untouched —
+giving more time to pay is not a credit note, so no figure in any financial report moves. The change is recorded
+in the conversation, the tenant sees it, and the button cannot be pressed twice.</p>
+
+<h3>What the tenant can and cannot do</h3>
+<ul>
+    <li>Raise a request and add messages to it until it is closed.</li>
+    <li>Withdraw it, but only while it is <em>Submitted</em> or <em>Acknowledged</em> — once work is under way, it stays.</li>
+    <li>They cannot change its status, priority or assignment, and cannot see internal notes.</li>
+</ul>
+
+<h3>Statuses</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Submitted</strong></td><td>New. Nobody has looked at it yet.</td></tr>
+        <tr><td><strong>Acknowledged</strong></td><td>Seen by staff. The tenant can still withdraw it.</td></tr>
+        <tr><td><strong>In progress</strong></td><td>Work has started.</td></tr>
+        <tr><td><strong>Resolved</strong></td><td>Done, with a response to the tenant.</td></tr>
+        <tr><td><strong>Declined</strong></td><td>Will not be done, with the reason.</td></tr>
+        <tr><td><strong>Withdrawn</strong></td><td>Cancelled by the tenant.</td></tr>
+        <tr><td><strong>Closed</strong></td><td>Finished. No more messages can be added.</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Nobody is notified automatically</div>
+    <p>There are no emails yet. Check this queue daily, and remind tenants to look at the portal for your replies.</p>
+</div>

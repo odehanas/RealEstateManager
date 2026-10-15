@@ -1,0 +1,69 @@
+@model RealEstateManager.Models.HelpTopicViewModel
+@{
+    ViewData["Title"] = $"Help: {Model.Topic.Title}";
+}
+
+<nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a asp-action="Index">Help Center</a></li>
+        <li class="breadcrumb-item">@Model.Group.Title</li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Topic.Title</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <h2 class="mb-1">@Model.Topic.Title</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.Topic.Path))
+        {
+            <p class="text-muted mb-4"><span class="badge bg-light text-dark border">@Model.Topic.Path</span></p>
+        }
+        else
+        {
+            <div class="mb-4"></div>
+        }
+
+        <article class="help-content">
+            @Html.Raw(Model.Content)
+        </article>
+
+        <div class="d-flex justify-content-between gap-2 border-top pt-3 mt-4 no-print">
+            @if (Model.Previous != null)
+            {
+                <a asp-action="Topic" asp-route-id="@Model.Previous.Key" class="btn btn-outline-secondary btn-sm">
+                    &larr; @Model.Previous.Title
+                </a>
+            }
+            else
+            {
+                <span></span>
+            }
+            @if (Model.Next != null)
+            {
+                <a asp-action="Topic" asp-route-id="@Model.Next.Key" class="btn btn-outline-secondary btn-sm">
+                    @Model.Next.Title &rarr;
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-4 no-print">
+        <div class="card shadow-sm sticky-top" style="top: 1rem;">
+            <div class="card-header bg-white"><strong>@Model.Group.Title</strong></div>
+            <div class="list-group list-group-flush">
+                @foreach (var topic in Model.Group.Topics)
+                {
+                    <a asp-action="Topic" asp-route-id="@topic.Key"
+                       class="list-group-item list-group-item-action small @(topic.Key == Model.Topic.Key ? "active" : "")">
+                        @topic.Title
+                    </a>
+                }
+            </div>
+            <div class="card-footer bg-white small">
+                <a asp-action="Index">All topics</a> &middot;
+                <a asp-action="Manual" target="_blank">Full manual</a> &middot;
+                <a href="#" onclick="window.print(); return false;">Print this topic</a>
+            </div>
+        </div>
+    </div>
+</div>

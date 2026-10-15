@@ -1,0 +1,62 @@
+<p>The tenant portal is a separate, mobile-friendly site where each tenant sees their own account and sends you
+requests. Tenants cannot register themselves: you issue each one a login.</p>
+
+<h3>Giving a tenant access</h3>
+<ol class="steps">
+    <li>Open <span class="path">Master Data ▸ Tenants</span> and select <strong>Portal</strong> on the tenant's row.</li>
+    <li>Under <strong>Issue Access</strong>, check the <strong>username</strong>. The tenant's email is filled in when it
+        is on file; it must be unique across all tenants.</li>
+    <li>Select <strong>Issue portal access</strong>.</li>
+    <li>A green box shows the <strong>username</strong> and a <strong>temporary password</strong>. Copy both now — the
+        password is shown only once and cannot be looked up later, by anyone.</li>
+    <li>Send the tenant the address <code>https://realestatemanager.odehanas.com/portal/login</code> with their
+        username and temporary password.</li>
+</ol>
+<p>On first sign-in the tenant must choose their own password before going any further.</p>
+
+<h3>Managing an existing login</h3>
+<p>The <strong>Current Status</strong> panel shows the username, whether the account is active, whether the
+temporary password has been changed yet, the last sign-in, and any lock-out.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Situation</th><th>What to do</th></tr></thead>
+    <tbody>
+        <tr><td>Tenant forgot the password</td><td><strong>Reset password</strong> issues a new temporary password and the old one stops working.</td></tr>
+        <tr><td>Tenant is locked out</td><td>Too many wrong passwords lock the account for a while. Wait, or reset the password.</td></tr>
+        <tr><td>Tenancy has ended</td><td><strong>Suspend access</strong> blocks sign-in immediately. The account and its history are kept, and <strong>Re-enable access</strong> restores it.</td></tr>
+    </tbody>
+</table>
+<p>Only users with <em>Create &amp; Edit Master Data</em> can issue or change portal logins.</p>
+
+<h3>What the tenant sees</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:20%">Tab</th><th>Contents</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Account</strong></td><td>Balance due, overdue amount, cheques held, deposit held, and their tenancy.</td></tr>
+        <tr><td><strong>Invoices</strong></td><td>Every invoice with its total, paid and outstanding amounts; overdue ones highlighted.</td></tr>
+        <tr><td><strong>Payments</strong></td><td>Receipts, and their post-dated cheques with each one's status.</td></tr>
+        <tr><td><strong>Statement</strong></td><td>Their running account over a chosen date range.</td></tr>
+        <tr><td><strong>Contracts</strong></td><td>Their contracts, terms and expiry.</td></tr>
+        <tr><td><strong>Requests</strong></td><td>Requests they have raised, and the conversation with you.</td></tr>
+    </tbody>
+</table>
+<div class="box">
+    <div class="box-title">Tenants see posted transactions only</div>
+    <p>Invoices, receipts, cheques and deposits appear in the portal once their journal is posted, so what a tenant
+    sees always agrees with their balance. A receipt you have saved but not yet posted does not show — post receipts
+    and cheques the same day so tenants see their payments promptly.</p>
+</div>
+<p>Send tenants the <a href="#tenant-guide">Guide for Tenants</a>; it is also available to them from the portal.</p>
+
+<div class="box ok">
+    <div class="box-title">A tenant only ever sees their own account</div>
+    <p>Every portal screen takes the tenant from their sign-in, never from the address bar, so changing a number in the
+    URL cannot open another tenant's data. A tenant who tries to open a staff page is sent back to their portal.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Testing it yourself</div>
+    <p>Issue a login to a test tenant and sign in as them in a <strong>private window</strong> (Ctrl + Shift + N). In the
+    same window as your staff session, each kind of sign-in would keep sending you back to its own side.</p>
+</div>
+
+<p>Requests that tenants raise are handled in <a href="#tenant-requests">Tenant Requests</a>.</p>

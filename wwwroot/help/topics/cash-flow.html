@@ -1,0 +1,46 @@
+<p>The Statement of Cash Flows shows where cash came from and where it went over a period, prepared under
+<strong>IAS 7</strong> using the <strong>direct method</strong>. It answers the question the Profit &amp; Loss cannot:
+the business made a profit, so why is there less cash?</p>
+
+<h3>Running the report</h3>
+<ol class="steps">
+    <li>Enter the <strong>From</strong> and <strong>To</strong> dates. The default is the fiscal year to date.</li>
+    <li>Refresh. <strong>Print</strong> gives a clean copy.</li>
+</ol>
+
+<h3>How to read it</h3>
+<p>Four cards summarise the period: <strong>Opening Cash</strong>, <strong>Operating</strong> cash flow,
+<strong>Net Movement</strong> and <strong>Closing Cash</strong>. The statement below splits the movement three ways:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Section</th><th>What lands there</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Operating</strong></td><td>Rent collected, suppliers and expenses paid, VAT paid or refunded, deposits taken or returned — the day-to-day business.</td></tr>
+        <tr><td><strong>Investing</strong></td><td>Buying or selling long-term assets — property, fixed assets (accounts coded 15000 and above).</td></tr>
+        <tr><td><strong>Financing</strong></td><td>Capital put in by owners, owner drawings, loans — anything touching equity.</td></tr>
+    </tbody>
+</table>
+<p>Each line is the account on the other side of the cash movement, with a <strong>Movements</strong> count of the
+journals behind it, so a surprising figure can be traced in <a href="#journal-inquiry">Journal Inquiry</a>.</p>
+<p>The statement ends: net increase or decrease in cash + cash at the beginning = cash at the end.</p>
+
+<h3>What counts as cash</h3>
+<ul>
+    <li><strong>Included:</strong> the account mapped as Default Cash, plus every petty cash float.</li>
+    <li><strong>Excluded: PDC On Hand.</strong> A post-dated cheque in the drawer has not been banked, so it is not a cash
+        equivalent. It enters the statement when it clears.</li>
+    <li><strong>Excluded: transfers between cash accounts.</strong> Topping up petty cash from the bank moves cash between
+        pockets; it is not a cash flow.</li>
+</ul>
+
+<div class="box ok">
+    <div class="box-title">It always reconciles</div>
+    <p>Every movement is read from the ledger itself, so the closing figure always agrees with the cash accounts in the
+    Trial Balance. If it ever does not, a red warning appears at the top with the difference. That would mean a journal
+    shape the report did not expect — report it through <span class="path">System Setup ▸ Send Feedback</span>.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Nothing appears?</div>
+    <p>If the report says no cash accounts are configured, set the <strong>Default Cash</strong> mapping in
+    <a href="#account-mapping">Account Mapping</a>. Like every report, it includes posted journals only.</p>
+</div>

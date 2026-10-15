@@ -1,0 +1,60 @@
+<p>Account Mapping is the bridge between the operational side of the system and the ledger. When you post
+a customer receipt, the system needs to know <em>which</em> account is "cash" and <em>which</em> is
+"accounts receivable". Account Mapping answers exactly that question, once, for the whole company.</p>
+
+<p>Defaults are applied automatically when a company is created, so the system works out of the box.
+You change a mapping only when your chart of accounts differs from the standard one — for example if you
+open a dedicated bank account and want receipts to land there instead of in <code>11100</code>.</p>
+
+<h3>The mappings</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:38%">Mapping</th><th style="width:14%">Default</th><th>Used by</th></tr></thead>
+    <tbody>
+        <tr><td>Default Cash</td><td><code>11100</code></td><td>Customer receipts, security deposits, PDC clearance, vendor payments</td></tr>
+        <tr><td>Accounts Receivable</td><td><code>11200</code></td><td>Customer invoices, receipts, PDC settlement</td></tr>
+        <tr><td>VAT Recoverable</td><td><code>11300</code></td><td>Vendor bills</td></tr>
+        <tr><td>PDC On Hand</td><td><code>11400</code></td><td>PDC memorandum and clearance</td></tr>
+        <tr><td>Prepaid Expense (default)</td><td><code>11500</code></td><td>Recurring prepayments</td></tr>
+        <tr><td>Investment Property</td><td><code>15100</code></td><td>Property capitalisation</td></tr>
+        <tr><td>Fixed Asset (default)</td><td><code>15200</code></td><td>Fixed asset capitalisation</td></tr>
+        <tr><td>Accumulated Depreciation (default)</td><td><code>15300</code></td><td>Depreciation postings</td></tr>
+        <tr><td>Fixed Asset Clearing</td><td><code>15400</code></td><td>Acquisition cost accumulation before capitalisation</td></tr>
+        <tr><td>Accounts Payable</td><td><code>21100</code></td><td>Vendor bills and payments</td></tr>
+        <tr><td>Advances from Customers</td><td><code>21200</code></td><td>PDC cleared as an advance</td></tr>
+        <tr><td>Unearned Revenue</td><td><code>21200</code></td><td>Owned-property invoicing and revenue release</td></tr>
+        <tr><td>Tenant Security Deposit Liability</td><td><code>21300</code></td><td>Security deposits</td></tr>
+        <tr><td>VAT Payable</td><td><code>21400</code></td><td>Customer invoices</td></tr>
+        <tr><td>Due to Landlords</td><td><code>21500</code></td><td>Managed-property invoicing and commission release</td></tr>
+        <tr><td>PDC Contra</td><td><code>21600</code></td><td>PDC memorandum and its reversal</td></tr>
+        <tr><td>Retained Earnings – Prior Years</td><td><code>32100</code></td><td>Fiscal year closing</td></tr>
+        <tr><td>Current Year Profit or Loss</td><td><code>33100</code></td><td>Fiscal year closing</td></tr>
+        <tr><td>Rental Revenue – Owned</td><td><code>41100</code></td><td>Revenue recognition (owned)</td></tr>
+        <tr><td>Management Fee Revenue</td><td><code>42100</code></td><td>Revenue recognition (managed)</td></tr>
+        <tr><td>Other Income</td><td><code>43100</code></td><td>Miscellaneous income</td></tr>
+        <tr><td>Direct Expense (default)</td><td><code>51100</code></td><td>Vendor bills with a direct expense category</td></tr>
+        <tr><td>General Expense (default)</td><td><code>61100</code></td><td>Vendor bills with a general expense category</td></tr>
+        <tr><td>Depreciation Expense</td><td><code>62100</code></td><td>Depreciation postings</td></tr>
+        <tr><td>Finance Cost</td><td><code>63100</code></td><td>Interest and bank charges</td></tr>
+    </tbody>
+</table>
+
+<h3>Changing a mapping</h3>
+<ol class="steps">
+    <li>Open <span class="path">System Setup ▸ Account Mapping</span>.</li>
+    <li>Choose the replacement account from the dropdown beside the mapping you want to change.</li>
+    <li><strong>Save</strong>.</li>
+</ol>
+
+<div class="box warn">
+    <div class="box-title">Mapping changes are not retrospective</div>
+    <p>Changing a mapping affects <strong>future</strong> postings only. Journals already posted keep the
+    account they were posted to. If you re-point "Default Cash" to a new bank account mid-year, the earlier
+    balance stays in the old account and must be moved with a manual journal.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">If a posting fails with a mapping error</div>
+    <p>A message such as <em>"Account mapping for Default Cash is not configured"</em> means the mapping is
+    empty or points at an account that has been deleted or deactivated. Open Account Mapping, select a
+    valid account, save, and retry the posting.</p>
+</div>

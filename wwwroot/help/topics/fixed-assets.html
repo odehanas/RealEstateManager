@@ -1,0 +1,60 @@
+<p>The fixed asset register tracks long-lived items — lifts, generators, air-conditioning plant, vehicles,
+fit-out — from acquisition through capitalisation to monthly depreciation.</p>
+
+<h3>Creating an asset</h3>
+<ol class="steps">
+    <li>Select <strong>New Fixed Asset</strong>.</li>
+    <li>Enter the <strong>Asset Code</strong> and <strong>Name</strong>.</li>
+    <li>Select the <strong>Asset Account</strong> and the <strong>Accumulated Depreciation Account</strong>
+        (defaults <code>15200</code> and <code>15300</code>).</li>
+    <li>Enter the <strong>Useful Life (months)</strong> and the <strong>Depreciation Start Date</strong>.</li>
+    <li>For assets migrated from a previous system, enter the <strong>Opening Cost</strong> and
+        <strong>Opening Accumulated Depreciation</strong>.</li>
+    <li><strong>Save</strong>.</li>
+</ol>
+
+<h3>Acquisition costs</h3>
+<p>Open an asset and select <strong>Acquisition</strong> to accumulate the costs that make up its value —
+the supplier invoice, freight, installation, professional fees. Each entry posts:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>15400</code> Fixed Asset Clearing <span class="small muted">(capitalisable)</span><br/>or the expense account <span class="small muted">(not capitalisable)</span></td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td>Offset account — <code>11100</code> Cash or <code>21100</code> Accounts Payable</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p>Choosing a vendor with an Accounts Payable offset also raises the vendor bill automatically, so the
+payable appears in the vendor's sub-ledger.</p>
+
+<h3>Capitalisation</h3>
+<p>When the asset is complete and in use, capitalise it. The accumulated clearing balance moves to the
+asset account and the depreciation schedule is generated over the useful life:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>15200</code> Fixed Assets</td><td class="num dr">Capitalised cost</td><td class="num">—</td></tr>
+        <tr><td><code>15400</code> Fixed Asset Clearing</td><td class="num">—</td><td class="num cr">Capitalised cost</td></tr>
+    </tbody>
+</table>
+
+<h3>Running depreciation</h3>
+<ol class="steps">
+    <li>Open <strong>Depreciation</strong> from the fixed asset screen.</li>
+    <li>Enter the <strong>posting date</strong> — normally the month end being closed.</li>
+    <li>Select <strong>Post Depreciation</strong>. Every scheduled instalment on or before that date is posted.</li>
+</ol>
+
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>62100</code> Depreciation Expense</td><td class="num dr">Monthly charge</td><td class="num">—</td></tr>
+        <tr><td><code>15300</code> Accumulated Depreciation</td><td class="num">—</td><td class="num cr">Monthly charge</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Accumulated Depreciation presentation</div>
+    <p>In this chart of accounts, <code>15300</code> is classified as an asset and carries a credit balance,
+    acting as a contra-asset. It therefore reduces Total Assets on the Balance Sheet, which is the correct
+    presentation. Do not "correct" its sign.</p>
+</div>

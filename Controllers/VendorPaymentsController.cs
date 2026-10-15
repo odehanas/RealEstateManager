@@ -42,7 +42,9 @@ namespace RealEstateManager.Controllers
 
             if (billId.HasValue)
             {
-                var bill = await _db.VendorBills.FirstOrDefaultAsync(x => x.Id == billId.Value);
+                var bill = await _db.VendorBills
+                    .FirstOrDefaultAsync(x => x.Id == billId.Value && x.JournalEntry != null && x.JournalEntry.IsPosted);
+
                 if (bill != null)
                 {
                     model.VendorBillId = bill.Id;
@@ -68,11 +70,20 @@ namespace RealEstateManager.Controllers
 
             var bill = await _db.VendorBills
                 .Include(x => x.Vendor)
+                .Include(x => x.JournalEntry)
                 .FirstOrDefaultAsync(x => x.Id == model.VendorBillId);
 
             if (bill == null)
             {
                 ModelState.AddModelError(nameof(model.VendorBillId), "Selected vendor bill was not found.");
+            }
+            else if (bill.JournalEntry == null || !bill.JournalEntry.IsPosted)
+            {
+                // A payment debits Accounts Payable. A draft bill has not credited it yet,
+                // so paying one would reduce a payable that was never recorded and leave
+                // Accounts Payable understated - or negative - until the bill was posted.
+                ModelState.AddModelError(nameof(model.VendorBillId),
+                    $"Bill {bill.BillNumber} has not been posted yet. Post it from Vendor Bills first, then pay it.");
             }
 
             if (model.Amount <= 0)
@@ -103,15 +114,15 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            if (!bill!.JournalEntryId.HasValue)
-            {
-                await _postingService.PostVendorBillAsync(bill.Id);
-            }
+            // This used to build the bill's journal on the fly when it had none. Under
+            // draft-first that journal was only ever a draft, so the payment went through
+            // against a bill that was not in the accounts. The bill must now be posted
+            // beforehand, which the check above enforces.
 
             var payment = new VendorPayment
             {
                 CompanyId = companyId,
-                VendorBillId = bill.Id,
+                VendorBillId = bill!.Id,
                 PaymentNumber = string.IsNullOrWhiteSpace(model.PaymentNumber)
                     ? await GeneratePaymentNumberAsync()
                     : model.PaymentNumber.Trim(),
@@ -130,10 +141,14 @@ namespace RealEstateManager.Controllers
 
         private async Task LoadBillsAsync(int? selectedBillId = null)
         {
+            // Posted bills with something left to pay. Drafts are not offered: they are
+            // not yet in Accounts Payable, so there is nothing to pay off.
             var bills = await _db.VendorBills
                 .Include(x => x.Vendor)
                 .Include(x => x.Property)
-                .Where(x => x.TotalAmount > x.AmountPaid)
+                .Where(x => x.TotalAmount > x.AmountPaid
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted)
                 .OrderByDescending(x => x.BillDate)
                 .ToListAsync();
 

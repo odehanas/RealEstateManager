@@ -1,0 +1,108 @@
+<p>Every journal the system posts automatically. All are generated with balanced debits and credits;
+the system rejects any entry that does not balance.</p>
+
+<table class="t-compact">
+    <thead>
+        <tr><th style="width:22%">Transaction</th><th style="width:39%">Debit</th><th>Credit</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Customer invoice</strong><br/><span class="small muted">owned property</span></td>
+            <td>11200 Accounts Receivable — total</td>
+            <td>21200 Advances from Customers — subtotal<br/>21400 VAT Payable — VAT</td>
+        </tr>
+        <tr>
+            <td><strong>Customer invoice</strong><br/><span class="small muted">managed property</span></td>
+            <td>11200 Accounts Receivable — total</td>
+            <td>21500 Due to Landlords — subtotal<br/>21400 VAT Payable — VAT</td>
+        </tr>
+        <tr>
+            <td><strong>Customer receipt</strong></td>
+            <td>11100 Cash and Cash Equivalents</td>
+            <td>11200 Accounts Receivable</td>
+        </tr>
+        <tr>
+            <td><strong>PDC received</strong><br/><span class="small muted">memorandum</span></td>
+            <td>11400 PDC On Hand</td>
+            <td>21600 PDC Contra</td>
+        </tr>
+        <tr>
+            <td><strong>PDC cleared</strong><br/><span class="small muted">receivable mode</span></td>
+            <td>21600 PDC Contra <span class="small muted">(reversal)</span><br/>11100 Cash and Cash Equivalents</td>
+            <td>11400 PDC On Hand <span class="small muted">(reversal)</span><br/>11200 Accounts Receivable</td>
+        </tr>
+        <tr>
+            <td><strong>PDC cleared</strong><br/><span class="small muted">advance mode</span></td>
+            <td>21600 PDC Contra <span class="small muted">(reversal)</span><br/>11100 Cash and Cash Equivalents</td>
+            <td>11400 PDC On Hand <span class="small muted">(reversal)</span><br/>21200 Advances from Customers</td>
+        </tr>
+        <tr>
+            <td><strong>Security deposit</strong></td>
+            <td>11100 Cash and Cash Equivalents</td>
+            <td>21300 Tenant Security Deposits</td>
+        </tr>
+        <tr>
+            <td><strong>Revenue recognition</strong><br/><span class="small muted">owned property</span></td>
+            <td>21200 Advances from Customers</td>
+            <td>41100 Rental Revenue – Owned</td>
+        </tr>
+        <tr>
+            <td><strong>Revenue recognition</strong><br/><span class="small muted">managed property</span></td>
+            <td>21500 Due to Landlords</td>
+            <td>42100 Management Fee Revenue</td>
+        </tr>
+        <tr>
+            <td><strong>Vendor bill</strong><br/><span class="small muted">one debit per line</span></td>
+            <td>Each line's account — line net + any irrecoverable VAT<br/>11300 VAT Recoverable — recoverable VAT</td>
+            <td>21100 Accounts Payable — total</td>
+        </tr>
+        <tr>
+            <td><strong>Vendor payment</strong></td>
+            <td>21100 Accounts Payable</td>
+            <td>11100 Cash and Cash Equivalents</td>
+        </tr>
+        <tr>
+            <td><strong>Petty cash voucher</strong></td>
+            <td>Expense account on the voucher</td>
+            <td>The petty cash float account</td>
+        </tr>
+        <tr>
+            <td><strong>Petty cash replenishment</strong></td>
+            <td>The petty cash float account</td>
+            <td>Funding account — bank or main cash</td>
+        </tr>
+        <tr>
+            <td><strong>Fixed asset acquisition cost</strong></td>
+            <td>15400 Fixed Asset Clearing <span class="small muted">(capitalisable)</span><br/>or expense account <span class="small muted">(not capitalisable)</span></td>
+            <td>11100 Cash or 21100 Accounts Payable</td>
+        </tr>
+        <tr>
+            <td><strong>Fixed asset capitalisation</strong></td>
+            <td>15200 Fixed Assets</td>
+            <td>15400 Fixed Asset Clearing</td>
+        </tr>
+        <tr>
+            <td><strong>Depreciation</strong></td>
+            <td>62100 Depreciation Expense</td>
+            <td>15300 Accumulated Depreciation</td>
+        </tr>
+        <tr>
+            <td><strong>Prepayment setup</strong></td>
+            <td>11500 Prepaid Expenses</td>
+            <td>11100 Cash or 21100 Accounts Payable</td>
+        </tr>
+        <tr>
+            <td><strong>Prepayment amortisation</strong></td>
+            <td>Expense account on the schedule</td>
+            <td>11500 Prepaid Expenses</td>
+        </tr>
+        <tr>
+            <td><strong>Fiscal year closing</strong></td>
+            <td>Each revenue account — its balance<br/>32100 Retained Earnings — if a net loss</td>
+            <td>Each expense account — its balance<br/>32100 Retained Earnings — if a net profit</td>
+        </tr>
+    </tbody>
+</table>
+
+<p class="small muted">Every entry above except fixed asset postings is created as a draft (customer invoices and vendor
+bills are posted in the same click). See <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>

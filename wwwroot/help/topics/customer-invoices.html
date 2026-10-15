@@ -1,0 +1,77 @@
+<p><strong>Workflow step 6.</strong> Rent invoices are created for you when the lease is saved. Your job on this screen
+is to post them when they fall due, print them for the tenant, and receive payment against them.</p>
+
+<h3>The invoice list</h3>
+<p>The list shows the invoice number, date, tenant, unit, subtotal, VAT, total, amount paid and status. Invoices
+generated from a lease begin in <strong>Draft</strong>: they exist as documents but have not touched the ledger.</p>
+
+<h3>Posting an invoice</h3>
+<ol class="steps">
+    <li>Locate the invoice in the list.</li>
+    <li>Select <strong>Post</strong>. The journal is built and posted in one step, and the status becomes <strong>Posted</strong>.</li>
+</ol>
+<p>The journal takes the <strong>invoice date</strong>, not the date you press Post. An invoice dated in a closed
+period cannot be posted.</p>
+
+<h4>Owned property</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num dr">Total (rent + VAT)</td><td class="num">—</td></tr>
+        <tr><td><code>21200</code> Advances from Customers <span class="small muted">(unearned revenue)</span></td><td class="num">—</td><td class="num cr">Subtotal</td></tr>
+        <tr><td><code>21400</code> VAT Payable <span class="small muted">(only if VAT &gt; 0)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
+    </tbody>
+</table>
+
+<h4>Managed property</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num dr">Total (rent + VAT)</td><td class="num">—</td></tr>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num">—</td><td class="num cr">Subtotal</td></tr>
+        <tr><td><code>21400</code> VAT Payable <span class="small muted">(only if VAT &gt; 0)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Why invoicing does not create revenue</div>
+    <p>Billing and earning are different events. Issuing a rent invoice creates a receivable and an obligation to
+    provide occupancy — not revenue. Revenue arrives month by month through
+    <a href="#revenue-recognition">Revenue Recognition</a>, which is what keeps the Profit &amp; Loss smooth even when a
+    tenant is billed a year in advance.</p>
+</div>
+
+<h3>Printing the invoice</h3>
+<p>The <strong>Tax Invoice</strong> button (or <strong>Invoice</strong>, when no VAT is charged) opens the printable
+document in a new tab.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Document</th><th>When it is issued</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Full tax invoice</strong></td><td>VAT is charged and the tenant has a TRN on file. Shows both TRNs.</td></tr>
+        <tr><td><strong>Simplified tax invoice</strong></td><td>VAT is charged and the tenant has no TRN.</td></tr>
+        <tr><td><strong>Invoice</strong></td><td>No VAT is charged — an exempt residential letting, for example.</td></tr>
+    </tbody>
+</table>
+<p>Tax invoices are numbered in a <strong>single sequence for the whole company</strong>, as UAE law requires. The VAT
+treatment is fixed on the invoice when it is generated, so a later change to the property or unit never rewrites an
+invoice already issued. Your own TRN, legal name and address come from
+<a href="#vat-settings">VAT Settings</a>.</p>
+
+<h3>Receiving payment</h3>
+<p><strong>Receive</strong> on an invoice row opens a customer receipt already pointing at that invoice — see
+<a href="#customer-receipts">Customer Receipts</a>.</p>
+
+<h3>Invoice statuses</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Draft</strong></td><td>Generated but not posted. No ledger impact.</td></tr>
+        <tr><td><strong>Posted</strong></td><td>Journal posted; receivable outstanding in full.</td></tr>
+        <tr><td><strong>PartiallyPaid</strong></td><td>Some payment posted; a balance remains.</td></tr>
+        <tr><td><strong>Paid</strong></td><td>Fully settled.</td></tr>
+        <tr><td><strong>Cancelled</strong></td><td>Voided. Excluded from PDC and receipt selection.</td></tr>
+    </tbody>
+</table>
+<p>To correct a posted invoice, reset its journal to draft from Journal Inquiry — see
+<a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>. This is refused while receipts or cleared cheques are
+posted against it.</p>

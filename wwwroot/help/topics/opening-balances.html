@@ -1,0 +1,64 @@
+<p>Opening balances carry your position from a previous system into RealEstateManager. This screen is both
+the place where you verify them and the single most important control in the whole setup.</p>
+
+<h3>Where each opening balance is entered</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:32%">Balance</th><th style="width:30%">Entered on</th><th>Screen</th></tr></thead>
+    <tbody>
+        <tr><td>Ordinary GL accounts (cash, equity, loans…)</td><td>The account itself</td><td><span class="path">System Setup ▸ Chart of Operations ▸ Edit</span></td></tr>
+        <tr><td>Accounts Receivable</td><td>Each tenant</td><td><span class="path">Master Data ▸ Tenants ▸ Edit</span></td></tr>
+        <tr><td>Accounts Payable</td><td>Each vendor</td><td><span class="path">Master Data ▸ Vendors ▸ Edit</span></td></tr>
+        <tr><td>Fixed asset cost and accumulated depreciation</td><td>Each asset</td><td><span class="path">Operations ▸ Fixed Assets</span></td></tr>
+    </tbody>
+</table>
+
+<p>The control accounts are deliberately not editable directly. Their opening balance is always the sum of
+the sub-ledger beneath them, which guarantees that the receivables ledger and the AR control account can
+never drift apart.</p>
+
+<h3>Reading the reconciliation screen</h3>
+<p>The screen shows three summary cards — <strong>Total Debit Opening Balance</strong>,
+<strong>Total Credit Opening Balance</strong> and <strong>Net Imbalance (Dr − Cr)</strong> — followed by a
+per-account table showing, for each account, the manual opening balance, the sub-ledger total, the
+effective opening balance actually used, and its debit/credit presentation. Beneath the table are the
+tenant, vendor and fixed-asset detail lists that make up the control account totals.</p>
+
+<div class="box warn">
+    <div class="box-title">Net Imbalance must be 0.00</div>
+    <p>Opening balances are added into the Trial Balance and Balance Sheet as figures, not as a posted
+    journal. Nothing forces the debit side to equal the credit side. If the Net Imbalance card shows any
+    value other than zero, <strong>your Trial Balance will be out of balance by exactly that amount</strong>,
+    and your Balance Sheet will not balance either.</p>
+    <p>The usual cause is entering asset opening balances (cash, receivables) without entering the
+    matching credit-side opening balance on <code>31100</code> Share Capital or <code>32100</code> Retained
+    Earnings – Prior Years.</p>
+</div>
+
+<h3>Procedure for entering opening balances</h3>
+<ol class="steps">
+    <li>Obtain the closing trial balance from your previous system as at the day before you go live.</li>
+    <li>Enter each <strong>tenant's</strong> outstanding balance on the tenant record. A positive value is
+        an amount owed to you; a negative value is an advance you are holding.</li>
+    <li>Enter each <strong>vendor's</strong> outstanding balance on the vendor record.</li>
+    <li>Enter each <strong>fixed asset's</strong> opening cost and opening accumulated depreciation on the asset.</li>
+    <li>Enter every other balance directly on its <strong>GL account</strong> (cash, bank, loans, share capital,
+        retained earnings).</li>
+    <li>Open <span class="path">System Setup ▸ Opening Balances</span> and confirm <strong>Net Imbalance = 0.00</strong>
+        with a green <em>Balanced</em> badge.</li>
+    <li>Run <span class="path">Reporting ▸ Trial Balance</span> and confirm total debit equals total credit.</li>
+</ol>
+
+<div class="box">
+    <div class="box-title">Balancing figure</div>
+    <p>If your legacy trial balance was itself balanced, the figure that makes the Net Imbalance zero is your
+    retained earnings. Post it to <code>32100</code> Retained Earnings – Prior Years, not to a suspense account.</p>
+</div>
+
+<h3>The opening balance control account (39999)</h3>
+<p>If you create account <code>39999</code> <em>Opening Balance Control Account</em> (Equity), the system uses it to
+keep the opening position balanced automatically: any difference between the debit and credit opening balances is
+placed on <code>39999</code>, so the Trial Balance and Balance Sheet always balance.</p>
+<p>Treat a balance on <code>39999</code> as a <strong>to-do list, not an answer</strong>. It means something was entered
+on one side only. When the missing figure is found and entered, <code>39999</code> returns to zero. Before closing the
+first year, clear whatever is left to <code>32100</code> Retained Earnings – Prior Years with a manual journal, once you
+are satisfied it really is retained earnings.</p>

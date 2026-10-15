@@ -1,0 +1,45 @@
+<p>Use a prepayment schedule when you pay once for something consumed over many months — annual insurance,
+a trade licence, a maintenance contract. The cost is parked on the balance sheet and released to the
+Profit &amp; Loss evenly.</p>
+
+<h3>Creating a schedule</h3>
+<ol class="steps">
+    <li>Select <strong>New Prepayment</strong>.</li>
+    <li>Enter a <strong>Description</strong> and choose the <strong>Prepayment Type</strong>.</li>
+    <li>Enter the <strong>Payment Date</strong> and the <strong>Total Amount</strong>.</li>
+    <li>Enter the <strong>First Recognition Date</strong> (normalised to a month end) and the
+        <strong>Recognition Months</strong>.</li>
+    <li>Choose the <strong>Prepaid Account</strong> (default <code>11500</code>) and the
+        <strong>Expense Account</strong> the cost belongs in.</li>
+    <li>Choose the <strong>Offset Account</strong> — cash if you paid directly, or Accounts Payable with a
+        <strong>Vendor</strong> if it is on credit.</li>
+    <li><strong>Save</strong>.</li>
+</ol>
+
+<p>Saving creates the setup journal as a draft; post it from Journal Inquiry:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11500</code> Prepaid Expenses</td><td class="num dr">Total amount</td><td class="num">—</td></tr>
+        <tr><td>Offset — <code>11100</code> Cash or <code>21100</code> Accounts Payable</td><td class="num">—</td><td class="num cr">Total amount</td></tr>
+    </tbody>
+</table>
+
+<h3>Monthly amortisation</h3>
+<p>Each month end, select <strong>Post All Due Up To Selected Date</strong> to release the instalments due, then post
+the resulting drafts from Journal Inquiry:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Expense account chosen on the schedule</td><td class="num dr">Monthly amount</td><td class="num">—</td></tr>
+        <tr><td><code>11500</code> Prepaid Expenses</td><td class="num">—</td><td class="num cr">Monthly amount</td></tr>
+    </tbody>
+</table>
+<p>When the final instalment posts, the schedule is marked <strong>Completed</strong> and the prepaid
+balance for it is nil.</p>
+
+<div class="box">
+    <div class="box-title">Prepayment postings cannot be reset to draft</div>
+    <p>Once posted, set-up and amortisation entries create and consume a schedule, so they cannot simply be reset. To
+    correct one, post a reversing <a href="#manual-journals">manual journal</a>.</p>
+</div>

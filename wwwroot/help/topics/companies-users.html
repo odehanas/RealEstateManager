@@ -1,0 +1,62 @@
+<h3>Companies</h3>
+<p><span class="path">System Setup ▸ Companies</span> — system administrators only.</p>
+<p>Each company is a completely separate set of books with its own chart of accounts, master data and
+ledger. Creating a company automatically seeds its chart of accounts, its account mapping and its monthly
+accounting periods.</p>
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Name</strong></td><td>Appears in the company selector and on reports.</td></tr>
+        <tr><td><strong>Base Currency</strong></td><td>Reporting currency, e.g. AED.</td></tr>
+        <tr><td><strong>Fiscal Year Start Month</strong></td><td>1 for a January–December year. Drives accounting periods and the Balance Sheet's current-year profit calculation.</td></tr>
+    </tbody>
+</table>
+
+<h3>Users</h3>
+<p><span class="path">System Setup ▸ Users &amp; Permissions</span> — system administrators only.</p>
+<ol class="steps">
+    <li>Select <strong>New User</strong>.</li>
+    <li>Enter the <strong>Username</strong>, <strong>Display Name</strong> and an initial <strong>Password</strong>.</li>
+    <li>Grant access to one or more <strong>Companies</strong>.</li>
+    <li>Tick the <strong>Permissions</strong> the user needs.</li>
+    <li><strong>Save</strong> and give the user their credentials. They should change the password at first login.</li>
+</ol>
+
+<h3>The permissions</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:28%">Permission</th><th style="width:16%">Group</th><th>Grants access to</th></tr></thead>
+    <tbody>
+        <tr><td><strong>View Master Data</strong></td><td>Master Data</td><td>Look up properties, units, tenants and vendors. Read only.</td></tr>
+        <tr><td><strong>Create &amp; Edit Master Data</strong></td><td>Master Data</td><td>Add and amend properties, units, tenants and vendors; issue tenant portal logins. Implies View.</td></tr>
+        <tr><td><strong>Manage Leases</strong></td><td>Operations</td><td>Lease contracts, the draft contract and QR label.</td></tr>
+        <tr><td><strong>Handle Tenant Requests</strong></td><td>Operations</td><td>The Tenant Requests queue: replying, changing status, applying agreed postponements.</td></tr>
+        <tr><td><strong>Manage Accounting</strong></td><td>Accounting</td><td>Invoices, receipts, PDCs, bills, payments, deposits, petty cash, fixed assets, prepayments, revenue recognition, journals, accounting setup and closing. Also lets the user look vendors up.</td></tr>
+        <tr><td><strong>View Reports</strong></td><td>Reporting</td><td>All financial and management reports.</td></tr>
+    </tbody>
+</table>
+
+<h3>Suggested role profiles</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Role</th><th>Permissions</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Master data owner</strong></td><td>Create &amp; Edit Master Data · Manage Leases</td></tr>
+        <tr><td><strong>Leasing officer</strong></td><td>View Master Data · Manage Leases · Handle Tenant Requests</td></tr>
+        <tr><td><strong>Property / facilities manager</strong></td><td>View Master Data · Handle Tenant Requests</td></tr>
+        <tr><td><strong>Accountant</strong></td><td>View Master Data · Manage Accounting · View Reports</td></tr>
+        <tr><td><strong>Owner / auditor</strong></td><td>View Reports only</td></tr>
+        <tr><td><strong>Administrator</strong></td><td>The System Administrator role, which bypasses every permission check</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Keep Create &amp; Edit Master Data to a few people</div>
+    <p>Master data is centralised so the same tenant or supplier is never set up twice. Give most users
+    <em>View Master Data</em>, and <em>Create &amp; Edit</em> only to the people who own the data. See
+    <a href="#master-data-rules">Master Data rules</a>.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Permissions are enforced at the server</div>
+    <p>Hiding a menu is not the control — the server independently refuses any request the user is not
+    entitled to make. Typing a URL directly will not bypass a permission.</p>
+</div>

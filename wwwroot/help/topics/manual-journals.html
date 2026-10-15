@@ -1,0 +1,46 @@
+<p>Manual journals cover what the automatic postings cannot: accruals, corrections, deposit refunds,
+bank charges, reclassifications, and opening entries that do not belong to a sub-ledger.</p>
+
+<h3>Creating a journal</h3>
+<ol class="steps">
+    <li>Select <strong>New Manual Journal</strong>.</li>
+    <li>Enter the <strong>Entry Date</strong> — the accounting date, which is the date the reports will use.</li>
+    <li>Enter a clear <strong>Description</strong> explaining why the entry exists.</li>
+    <li>Enter the <strong>Document Number</strong> and <strong>Reference Number</strong> where relevant.</li>
+    <li>For each line: choose the <strong>Account</strong>, enter either a <strong>Debit</strong> or a
+        <strong>Credit</strong> (never both), and add a line <strong>Description</strong>. Choose a
+        <strong>Unit</strong> on lines that relate to a building, so they appear against the right property in
+        <a href="#management-reports">P&amp;L by Property</a>.</li>
+    <li>Add lines until total debits equal total credits. The running totals are displayed as you type.</li>
+    <li>Select <strong>Save as Draft</strong>.</li>
+    <li>Post it from <span class="path">Operations ▸ Journal Inquiry</span>. Until then it is not in any report —
+        see <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</li>
+</ol>
+
+<div class="box warn">
+    <div class="box-title">The balance rule is absolute</div>
+    <p>The system will not save a journal whose debits do not equal its credits, and will not accept a
+    journal with fewer than two lines. If you see <em>"Journal entry is not balanced"</em>, check for a line
+    with an amount in both columns, or a typing error in one figure.</p>
+</div>
+
+<h3>Common manual journals</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:34%">Purpose</th><th>Entry</th></tr></thead>
+    <tbody>
+        <tr><td>Refund a security deposit</td><td>Dr <code>21300</code> Tenant Security Deposits · Cr <code>11100</code> Cash</td></tr>
+        <tr><td>Bank charges</td><td>Dr <code>63100</code> Finance Costs · Cr <code>11100</code> Cash</td></tr>
+        <tr><td>Accrue an unbilled expense</td><td>Dr expense account · Cr <code>21100</code> Accounts Payable</td></tr>
+        <tr><td>Write off an irrecoverable receivable</td><td>Dr <code>61100</code> Administrative Expenses · Cr <code>11200</code> Accounts Receivable</td></tr>
+        <tr><td>Settle VAT with the authority</td><td>Dr <code>21400</code> VAT Payable · Cr <code>11300</code> VAT Recoverable and/or <code>11100</code> Cash</td></tr>
+        <tr><td>Pay a landlord their share</td><td>Dr <code>21500</code> Due to Landlords · Cr <code>11100</code> Cash</td></tr>
+        <tr><td>Owner takes money for personal use</td><td>Dr <code>34100</code> Owner's Current Account <em>with a withdrawal category</em> · Cr <code>11100</code> Cash — see <a href="#owner-withdrawals">Owner Withdrawals</a></td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Write the narration for someone else</div>
+    <p>Six months from now, an auditor will read the description without any of today's context. Write it
+    so that it explains itself: <em>"Refund of security deposit, lease LSE-0042, tenant Al Noor Trading,
+    cheque 100233"</em>, not <em>"deposit refund"</em>.</p>
+</div>

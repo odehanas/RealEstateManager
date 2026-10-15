@@ -1,0 +1,77 @@
+<p>A vendor bill records a cost you have incurred and the obligation to pay the supplier. Bills are entered the way
+Odoo does it: a header for the supplier and the dates, and as many lines as the supplier's document has, each
+charged to its own account and property.</p>
+
+<h3>Entering a bill</h3>
+<ol class="steps">
+    <li>Select <strong>New Bill</strong> and choose the <strong>Supplier</strong>. A coloured banner immediately tells you
+        whether this supplier can charge VAT (see below).</li>
+    <li>Enter the <strong>Supplier's Bill No.</strong> — the number printed on their invoice. Your own bill number,
+        such as <code>BILL-2026-0001</code>, is issued when you save.</li>
+    <li>Enter a <strong>Category / Subject</strong> to describe the bill on lists, e.g. <em>Building maintenance</em>.</li>
+    <li>Enter the <strong>Bill Date</strong> (the date on their document), the <strong>Accounting Date</strong> and the
+        <strong>Due Date</strong>.</li>
+    <li>Optionally choose a <strong>Default Property</strong>. New lines pick it up automatically.</li>
+    <li>Fill in the <strong>lines</strong>: description, account, property, quantity, unit price, and for a VAT-registered
+        supplier whether the line is taxable and its input tax attribution. <strong>+ Add line</strong> adds a row and
+        <strong>×</strong> removes one. Totals update as you type.</li>
+    <li>Add any <strong>Notes</strong> and select <strong>Save Draft</strong>.</li>
+    <li>Review the bill, then select <strong>Post</strong>.</li>
+</ol>
+
+<div class="box">
+    <div class="box-title">Bill date and accounting date</div>
+    <p>They are usually the same. They differ when a supplier's document arrives after its month has been closed:
+    keep the supplier's date as the <strong>bill date</strong>, and set the <strong>accounting date</strong> in the
+    open period. The accounting date decides which period the journal lands in.</p>
+</div>
+
+<h3>VAT is decided by the supplier</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Supplier</th><th>What happens on the bill</th></tr></thead>
+    <tbody>
+        <tr><td><strong>VAT registered</strong> with a TRN</td><td>Blue banner: <em>Tax Invoice — 5% VAT applies</em>. Taxable lines get 5% VAT, calculated for you.</td></tr>
+        <tr><td><strong>Not</strong> registered</td><td>Amber banner: <em>Commercial Invoice — no VAT</em>. The VAT controls switch off, no VAT is calculated anywhere, and the full amount is charged to cost.</td></tr>
+    </tbody>
+</table>
+<p>The supplier's registration is set on the vendor record — see <a href="#vendors">Vendors</a>. It is copied onto the
+bill when you save, so a later change to the vendor never alters a bill already entered.</p>
+
+<h3>Input tax attribution, line by line</h3>
+<p>How much of the VAT you can reclaim depends on what the cost was for. Set it on each line:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:20%">Attribution</th><th>Use for</th><th style="width:34%">Result</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Taxable</strong></td><td>Costs of commercial (standard-rated) property</td><td>VAT reclaimed in full.</td></tr>
+        <tr><td><strong>Exempt</strong></td><td>Costs of residential lettings</td><td>None reclaimed; the VAT is added to the cost of that line.</td></tr>
+        <tr><td><strong>Residual</strong></td><td>Overheads serving both, e.g. head office</td><td>Split by the provisional recovery rate in <a href="#vat-settings">VAT Settings</a>, corrected at year end.</td></tr>
+    </tbody>
+</table>
+<p>Because attribution is per line, one supplier invoice covering a commercial tower and a residential block is
+handled correctly: one line reclaims, the other does not.</p>
+
+<h3>The journal</h3>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Each line's own account, tagged with that line's property</td><td class="num dr">Line net + any irrecoverable VAT</td><td class="num">—</td></tr>
+        <tr><td><code>11300</code> VAT Recoverable <span class="small muted">(only if any)</span></td><td class="num dr">Total recoverable VAT</td><td class="num">—</td></tr>
+        <tr><td><code>21100</code> Accounts Payable</td><td class="num">—</td><td class="num cr">Bill total</td></tr>
+    </tbody>
+</table>
+<p class="small muted">VAT you cannot reclaim is never shown on its own line. It is part of what the item cost, so it
+is added to the line it belongs to.</p>
+
+<h3>Draft, post and reset</h3>
+<ul>
+    <li>A <strong>draft</strong> bill can be edited freely and has no effect on the accounts.</li>
+    <li><strong>Post</strong> builds the journal from the current lines and posts it, subject to the closed-period rules.</li>
+    <li><strong>Reset to Draft</strong> takes it back out of the accounts so it can be edited, then posted again. This is
+        refused if the period is closed or a payment has been posted against the bill.</li>
+</ul>
+<p>See <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+
+<h3>Printing</h3>
+<p><strong>Print</strong> on the bill produces an A4 document with your letterhead, the supplier and bill details, the
+lines, the totals and a signature strip for <em>Prepared by / Checked by / Approved by</em>. If the supplier is not
+VAT registered, the printed copy says so.</p>

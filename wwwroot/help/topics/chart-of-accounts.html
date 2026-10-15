@@ -1,0 +1,71 @@
+<p>The chart of accounts is the backbone of the ledger. A complete five-digit chart is created
+automatically for every new company, so in most cases you review it rather than build it.</p>
+
+<h3>How the codes are organised</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:18%">Range</th><th style="width:24%">Group</th><th>Nature</th></tr></thead>
+    <tbody>
+        <tr><td><code>10000</code></td><td>Assets</td><td>Debit</td></tr>
+        <tr><td><code>20000</code></td><td>Liabilities</td><td>Credit</td></tr>
+        <tr><td><code>30000</code></td><td>Equity</td><td>Credit</td></tr>
+        <tr><td><code>40000</code></td><td>Revenue</td><td>Credit</td></tr>
+        <tr><td><code>50000</code></td><td>Direct Expenses</td><td>Debit</td></tr>
+        <tr><td><code>60000</code></td><td>General Expenses</td><td>Debit</td></tr>
+    </tbody>
+</table>
+<p>The six codes above are <strong>group</strong> headers: they organise the tree and cannot be posted to.
+Detail accounts sit beneath them. The full seeded list is in <a href="#accounts-reference"><a href="#accounts-reference">Chart of Accounts Reference</a></a>.</p>
+
+<h3>Reading the tree</h3>
+<p>Accounts are shown as an expandable tree with the account code, name, type, reporting group and
+current balance. Group rows are shown in bold and have no <strong>Edit</strong> action for posting purposes.</p>
+
+<h3>Adding an account</h3>
+<ol class="steps">
+    <li>Select <strong>New Account</strong>.</li>
+    <li>Enter a <strong>Code</strong> that fits the range of its parent — a new expense account under
+        General Expenses should begin with <code>6</code>.</li>
+    <li>Enter the <strong>Name</strong>, choose the <strong>Account Type</strong> and the
+        <strong>Reporting Group</strong>. These two drive how the account behaves in the reports.</li>
+    <li>Choose the <strong>Parent Account</strong> so the account appears in the right branch of the tree.</li>
+    <li>Leave <strong>Is Postable</strong> ticked for a detail account; untick it (and tick <strong>Is Group</strong>)
+        for a heading.</li>
+    <li>Set the <strong>Opening Balance</strong> only if you are migrating from another system — see <a href="#opening-balances">Opening Balances</a>.</li>
+    <li><strong>Save</strong>.</li>
+</ol>
+
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Code</strong></td><td>Unique five-digit identifier within the company. Determines sort order in every report.</td></tr>
+        <tr><td><strong>Account Type</strong></td><td>Asset, Liability, Equity, Revenue or Expense. Determines the account's natural balance side and whether it appears on the Balance Sheet or the P&amp;L.</td></tr>
+        <tr><td><strong>Reporting Group</strong></td><td>Assets, Liabilities, Equity, Revenue, DirectExpense or GeneralExpense. Controls the section the account is presented in.</td></tr>
+        <tr><td><strong>Is Control Account</strong></td><td>Marks an account whose balance is owned by a sub-ledger (Accounts Receivable, Accounts Payable, Fixed Assets). See the warning below.</td></tr>
+        <tr><td><strong>Is Group / Is Postable</strong></td><td>A group account is a heading and cannot receive journal lines. A postable account can.</td></tr>
+        <tr><td><strong>Owner Account</strong> <span class="small muted">(Edit screen)</span></td><td>Equity accounts only. Set to <em>Yes</em> for an owner's current account, so its journal lines can carry an <a href="#owner-withdrawals">owner withdrawal category</a>.</td></tr>
+        <tr><td><strong>Petty Cash Float</strong> <span class="small muted">(Edit screen)</span></td><td>Asset accounts only. Set to <em>Yes</em> for a petty cash float, so it appears on the <a href="#petty-cash">Petty Cash</a> screen.</td></tr>
+        <tr><td><strong>Is Active</strong></td><td>Untick to retire an account without deleting its history.</td></tr>
+        <tr><td><strong>Opening Balance</strong></td><td>Manual opening balance in natural form: positive means a debit balance for asset/expense accounts and a credit balance for liability/equity/revenue accounts.</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Control accounts take their opening balance from the sub-ledger</div>
+    <p>For Accounts Receivable, Accounts Payable and the fixed-asset accounts, the opening balance is
+    <em>calculated</em> from the tenants, vendors and assets beneath them. Typing an opening balance
+    directly onto those accounts has no effect — enter it on the tenant, vendor or asset instead.</p>
+</div>
+
+<h3>The opening balance check</h3>
+<p>The top of the screen totals every account's opening balance and checks the accounting equation:
+<strong>Assets = Liabilities + Equity</strong>.</p>
+<ul>
+    <li>A <strong>green</strong> banner means the opening balances agree.</li>
+    <li>A <strong>red</strong> banner means they do not, and shows the difference. Your Trial Balance and Balance Sheet will
+        be out by exactly that amount until it is fixed — see <a href="#opening-balances">Opening Balances</a>.</li>
+</ul>
+
+<h3>Accounts you should not remove</h3>
+<p>Several accounts are referenced by the automatic postings. Deactivating one of them will cause the
+related transaction to fail with a mapping error. Before retiring any account, check Account Mapping
+(<a href="#account-mapping">Account Mapping</a>) to confirm it is not in use.</p>

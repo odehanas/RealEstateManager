@@ -1,15 +1,33 @@
+using RealEstateManager.Services;
+
 namespace RealEstateManager.Models
 {
-    public class HelpPageViewModel
+    public class HelpCenterViewModel
     {
-        public List<HelpSectionViewModel> Sections { get; set; } = new();
+        public string? Query { get; set; }
+        public IReadOnlyList<HelpGroup> Groups { get; set; } = Array.Empty<HelpGroup>();
+        public List<HelpSearchResult> Results { get; set; } = new();
+
+        public bool IsSearching => !string.IsNullOrWhiteSpace(Query);
     }
 
-    public class HelpSectionViewModel
+    public class HelpTopicViewModel
     {
-        public string Id { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Summary { get; set; } = string.Empty;
-        public List<string> Steps { get; set; } = new();
+        public HelpTopic Topic { get; set; } = new();
+
+        /// <summary>The topic's HTML, cross-references already rewritten for this page.</summary>
+        public string Content { get; set; } = string.Empty;
+
+        public HelpGroup Group { get; set; } = new();
+        public HelpTopic? Previous { get; set; }
+        public HelpTopic? Next { get; set; }
+    }
+
+    public class HelpManualViewModel
+    {
+        public IReadOnlyList<HelpGroup> Groups { get; set; } = Array.Empty<HelpGroup>();
+
+        /// <summary>Topic key to its HTML, cross-references left as in-page anchors.</summary>
+        public Dictionary<string, string> Content { get; set; } = new();
     }
 }

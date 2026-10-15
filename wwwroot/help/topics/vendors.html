@@ -1,0 +1,34 @@
+<p>Vendors are your suppliers and service providers — maintenance contractors, utilities, agencies. The vendor
+register is the payables sub-ledger and rolls up into <code>21100</code> Accounts Payable.</p>
+
+<h3>Creating a vendor</h3>
+<ol class="steps">
+    <li>Select <strong>Add Vendor</strong>. The vendor code, such as <code>VEN-0001</code>, is issued when you save.</li>
+    <li>Enter the <strong>Name</strong>, <strong>Service Type</strong>, <strong>Contact Person</strong>, <strong>Phone</strong>
+        and <strong>Email</strong>.</li>
+    <li>Enter the <strong>Trade Licence Number</strong>.</li>
+    <li>Enter the <strong>TRN</strong>, and tick <strong>VAT registered (active)</strong> only if their registration is
+        currently live.</li>
+    <li>Enter the <strong>Opening Balance</strong> only when migrating — positive means you owe the vendor. Save.</li>
+</ol>
+
+<h3>Why "VAT registered" matters</h3>
+<p>This tick box decides how every bill from this supplier is treated:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Vendor is…</th><th>Their bills</th></tr></thead>
+    <tbody>
+        <tr><td><strong>VAT registered</strong> and has a TRN</td><td>Are <strong>tax invoices</strong>. Taxable lines carry 5% VAT, which you can reclaim to the extent the cost relates to taxable supplies.</td></tr>
+        <tr><td><strong>Not</strong> registered</td><td>Are <strong>commercial invoices</strong>. No VAT is calculated anywhere on the bill, and the whole amount is a direct cost.</td></tr>
+    </tbody>
+</table>
+<p>A registered supplier must have a TRN on file — the system will not save the tick without one. Untick it when a
+supplier's registration is cancelled; bills already entered keep the treatment they were entered with.</p>
+
+<div class="box">
+    <div class="box-title">No duplicates</div>
+    <p>A trade licence number or TRN can belong to only one vendor in the company. If you try to enter an existing
+    supplier again, the save is refused and the existing vendor is named.</p>
+</div>
+
+<p>Accounting users can look vendors up to enter bills, but only users with <em>Create &amp; Edit Master Data</em> can
+add or change one — see <a href="#master-data-rules">Master Data rules</a>.</p>

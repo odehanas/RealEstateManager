@@ -1,0 +1,40 @@
+<p>The Profit &amp; Loss reports performance <strong>over a period</strong>: revenue earned less expenses
+incurred between two dates.</p>
+
+<h3>Running the report</h3>
+<ol class="steps">
+    <li>Enter the <strong>As Of Date</strong> — the end of the period you want.</li>
+    <li>Select <strong>Refresh</strong>. The report covers <strong>1 January of that year to the as-of date</strong>.</li>
+</ol>
+
+<h3>What it contains</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Section</th><th>Contents</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Revenue</strong></td><td>Every revenue account with a movement in the period, shown as credits less debits. Includes rental revenue released by revenue recognition, management fees and other income.</td></tr>
+        <tr><td><strong>Expenses</strong></td><td>Every expense account with a movement, shown as debits less credits. Direct property costs, administrative costs, depreciation, finance costs.</td></tr>
+        <tr><td><strong>Net Profit / Loss</strong></td><td>Total revenue less total expenses. This is the figure the Balance Sheet shows as Current Year Profit / Loss.</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Revenue appears only after recognition</div>
+    <p>Invoicing a tenant does not create revenue. If the Profit &amp; Loss shows less rent than you expect,
+    the usual reason is that revenue recognition has not been processed up to the report date. Run
+    <span class="path">System Setup ▸ Revenue Recognition</span> and refresh.</p>
+</div>
+
+<div class="box warn">
+    <div class="box-title">Non-calendar fiscal years</div>
+    <p>The report currently starts the period at 1 January of the as-of year. If your company's fiscal year
+    starts in another month, the Profit &amp; Loss period and the Balance Sheet's Current Year Profit / Loss
+    will not agree. In that case, read the year-to-date result from the Balance Sheet, which follows the
+    company's configured fiscal year start.</p>
+    <p>The <strong>Profit &amp; Loss by Property</strong> report (<a href="#management-reports">Management Reports</a>) does not have this limitation:
+    it takes an explicit From and To date and defaults to the company's configured fiscal year. Use it when
+    you need a period other than calendar year to date.</p>
+</div>
+
+<h3>Analysing the result by property</h3>
+<p>This report presents the company as a whole. To see the same revenue and expenses broken down per
+property, use <span class="path">Reporting ▸ P&amp;L by Property</span> — see <a href="#management-reports">Management Reports</a>.</p>

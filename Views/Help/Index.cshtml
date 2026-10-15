@@ -1,63 +1,83 @@
-@model RealEstateManager.Models.HelpPageViewModel
-
+@model RealEstateManager.Models.HelpCenterViewModel
 @{
-    ViewData["Title"] = "Help";
+    ViewData["Title"] = "Help Center";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <h2 class="mb-1">Help And User Guide</h2>
-        <p class="text-muted mb-0">A built-in guide for your current published version, with the main workflows users need most.</p>
+        <h2 class="mb-1">Help Center</h2>
+        <p class="text-muted mb-0">
+            Every screen's instructions in one place. On any screen, the <strong>Help</strong> button at the top right
+            opens just that screen's topic.
+        </p>
     </div>
-    <a asp-controller="Feedback" asp-action="Index" class="btn btn-outline-primary">Send Feedback</a>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-action="Manual" target="_blank" class="btn btn-dark">Full manual</a>
+        <a href="~/manual/RealEstateManager-User-Manual.pdf" target="_blank" class="btn btn-outline-dark">Download PDF</a>
+    </div>
 </div>
 
-<div class="alert alert-info">
-    This help page is the best first step for the current stage of the product. It gives users a stable guide for the published version while you continue improving the system.
-</div>
+<form method="get" class="mb-4" role="search">
+    <div class="input-group input-group-lg">
+        <input type="search" name="q" value="@Model.Query" class="form-control"
+               placeholder="Search the help — e.g. post draft, VAT, PDC, petty cash" aria-label="Search help" autofocus />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+</form>
+
+@if (Model.IsSearching)
+{
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h3 class="h6 mb-0 text-muted">
+            @Model.Results.Count result@(Model.Results.Count == 1 ? "" : "s") for &ldquo;@Model.Query&rdquo;
+        </h3>
+        <a asp-action="Index" class="small">Clear search</a>
+    </div>
+
+    @if (Model.Results.Count == 0)
+    {
+        <div class="alert alert-light border">
+            Nothing matches every word you typed. Try fewer or different words, or browse the topics below.
+        </div>
+    }
+    else
+    {
+        <div class="list-group shadow-sm mb-5">
+            @foreach (var result in Model.Results)
+            {
+                <a asp-action="Topic" asp-route-id="@result.Topic.Key" class="list-group-item list-group-item-action py-3">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <strong>@result.Topic.Title</strong>
+                        <span class="badge bg-light text-dark border">@result.Topic.GroupTitle</span>
+                    </div>
+                    <div class="small text-muted mt-1">@result.Excerpt</div>
+                </a>
+            }
+        </div>
+    }
+}
 
 <div class="row g-4">
-    <div class="col-lg-3">
-        <div class="card shadow-sm sticky-top" style="top: 1rem;">
-            <div class="card-body">
-                <h5 class="card-title">Quick Navigation</h5>
+    @foreach (var group in Model.Groups)
+    {
+        <div class="col-md-6 col-xl-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white"><strong>@group.Title</strong></div>
                 <div class="list-group list-group-flush">
-                    @foreach (var helpSection in Model.Sections)
+                    @foreach (var topic in group.Topics)
                     {
-                        <a class="list-group-item list-group-item-action px-0" href="#@helpSection.Id">@helpSection.Title</a>
+                        <a asp-action="Topic" asp-route-id="@topic.Key" class="list-group-item list-group-item-action">
+                            <div class="fw-semibold">@topic.Title</div>
+                            <div class="small text-muted">@topic.Summary</div>
+                        </a>
                     }
                 </div>
             </div>
         </div>
-    </div>
+    }
+</div>
 
-    <div class="col-lg-9">
-        @foreach (var helpSection in Model.Sections)
-        {
-            <div id="@helpSection.Id" class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h3 class="h4 mb-2">@helpSection.Title</h3>
-                    <p class="text-muted">@helpSection.Summary</p>
-                    <ol class="mb-0">
-                        @foreach (var step in helpSection.Steps)
-                        {
-                            <li class="mb-2">@step</li>
-                        }
-                    </ol>
-                </div>
-            </div>
-        }
-
-        <div class="card shadow-sm border-primary">
-            <div class="card-body">
-                <h3 class="h5 text-primary">Future AI Assistant</h3>
-                <p class="mb-2">
-                    The recommended path is to keep this built-in help guide as the trusted product manual now, then add an AI assistant later using this guide and your business rules as the knowledge source.
-                </p>
-                <p class="mb-0">
-                    When you are ready, an <code>n8n</code> workflow can receive questions, pass them to an AI model with the system guide and selected context, and return guided answers or support tickets.
-                </p>
-            </div>
-        </div>
-    </div>
+<div class="text-center text-muted small mt-5">
+    Can't find what you need?
+    <a asp-controller="Feedback" asp-action="Index">Send feedback</a> and say which screen you were on.
 </div>

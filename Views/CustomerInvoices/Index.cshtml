@@ -30,6 +30,7 @@
         @foreach (var invoice in Model)
         {
             var balance = invoice.TotalAmount - invoice.AmountPaid;
+            var invoicePosted = invoice.JournalEntry?.IsPosted == true;
 
             <tr>
                 <td>@invoice.InvoiceNumber</td>
@@ -42,8 +43,11 @@
                 <td class="text-end">@invoice.AmountPaid.ToString("N2")</td>
                 <td class="text-end">@balance.ToString("N2")</td>
                 <td>@invoice.Status</td>
+                @* Posted means the journal is POSTED, not merely that one exists. A journal
+                   can exist as a draft - after Reset to Draft, or one created by an older
+                   version of the receipt screen - and such an invoice is not in the accounts. *@
                 <td>
-                    @if (invoice.JournalEntryId.HasValue)
+                    @if (invoicePosted)
                     {
                         <span class="badge bg-success">Posted</span>
                     }
@@ -54,7 +58,7 @@
                 </td>
                 <td>
                     <div class="d-flex gap-2">
-                        @if (!invoice.JournalEntryId.HasValue)
+                        @if (!invoicePosted)
                         {
                             <form asp-action="Post" method="post">
                                 @Html.AntiForgeryToken()
@@ -69,7 +73,7 @@
                             @(invoice.VatAmount > 0 ? "Tax Invoice" : "Invoice")
                         </a>
 
-                        @if (balance > 0)
+                        @if (balance > 0 && invoicePosted)
                         {
                             <a asp-controller="CustomerReceipts" asp-action="Create" asp-route-invoiceId="@invoice.Id" class="btn btn-sm btn-outline-success">
                                 Receive

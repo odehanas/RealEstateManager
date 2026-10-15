@@ -136,11 +136,18 @@ namespace RealEstateManager.Services
             if (pdc.CustomerInvoiceId.HasValue && pdc.SettlementMode == "Receivable")
             {
                 var invoice = await _db.CustomerInvoices
+                    .Include(x => x.JournalEntry)
                     .FirstOrDefaultAsync(x => x.Id == pdc.CustomerInvoiceId.Value);
 
-                if (invoice != null && !invoice.JournalEntryId.HasValue)
+                // Clearing in Receivable mode credits Accounts Receivable, so the invoice it
+                // settles must already have debited it. This used to build the invoice's
+                // journal on the fly, which under draft-first produced only a draft and let
+                // the clearance settle a receivable that was not in the accounts.
+                if (invoice != null && (invoice.JournalEntry == null || !invoice.JournalEntry.IsPosted))
                 {
-                    await _accountingPostingService.PostCustomerInvoiceAsync(invoice.Id);
+                    throw new InvalidOperationException(
+                        $"Invoice {invoice.InvoiceNumber} has not been posted yet. Post it from Customer Invoices, " +
+                        "then clear this cheque.");
                 }
             }
 

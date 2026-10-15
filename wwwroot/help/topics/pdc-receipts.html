@@ -1,0 +1,92 @@
+<p><strong>Workflow step 5.</strong> Post-dated cheques are the normal way rent is secured in the region. A PDC is a
+cheque you hold today that the bank will only honour on a future date. The system tracks it in two stages, each
+with its own journal, so the cheque is visible in the accounts from the day you receive it without overstating
+cash.</p>
+
+<div class="box ok">
+    <div class="box-title">Two dates, two different jobs</div>
+    <p>The <strong>Received Date</strong> is when the cheque came into your hands. The <strong>Cheque Date</strong> is
+    the date written on it. The accounts record the cheque on the <strong>received date</strong> — that is when you
+    hold it — not on the cheque date. The cheque date only matters when the cheque is banked.</p>
+</div>
+
+<h3>Stage one — receiving the cheque</h3>
+<ol class="steps">
+    <li>Select <strong>New PDC</strong> and choose the <strong>Lease</strong>. Only active leases are listed.</li>
+    <li>Choose the <strong>Settlement Mode</strong>:
+        <ul>
+            <li><strong>Receivable</strong> — the cheque pays a specific invoice, which you then select. Only invoices
+                with an outstanding balance appear.</li>
+            <li><strong>Advance</strong> — the cheque is taken before any invoice exists and will sit as a customer advance.</li>
+        </ul>
+    </li>
+    <li>Enter the <strong>Cheque Number</strong> (unique in the company) and the <strong>Bank Name</strong>.</li>
+    <li>Enter the <strong>Received Date</strong> — it cannot be in the future — and the <strong>Cheque Date</strong>,
+        which cannot be earlier than the received date.</li>
+    <li>Enter the <strong>Amount</strong> and any <strong>Notes</strong>, then save.</li>
+</ol>
+<p>Saving creates the memorandum journal, dated on the received date, as a <strong>draft</strong>. Post it from
+<span class="path">Operations ▸ Journal Inquiry</span>; the cheque then shows as <strong>Received</strong>.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11400</code> PDC On Hand</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>21600</code> PDC Contra</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p class="small muted">A memorandum pair: it records custody of the cheque without touching cash or receivables. Its
+net effect on the balance sheet is nil.</p>
+
+<h3>Correcting a cheque's details</h3>
+<p><strong>Edit</strong> on a cheque lets you correct the received date, cheque date, cheque number, bank and notes —
+the usual fix when a cheque was keyed with the wrong date. Changing the received date re-dates the memorandum
+journal to match. The amount, lease and settlement mode cannot be changed here; if those are wrong, reset the
+journal and record the cheque again.</p>
+
+<h3>Stage two — clearing the cheque</h3>
+<ol class="steps">
+    <li>When the bank honours the cheque, select <strong>Clear</strong> on it.</li>
+    <li>Enter the <strong>Cleared Date</strong>. It cannot be earlier than the received date.</li>
+    <li>If the cleared date is <strong>before the cheque date</strong>, you are warned that a bank will not normally
+        honour a post-dated cheque early, and asked to confirm. Confirm only if the cheque really was presented early
+        by agreement.</li>
+    <li>Save, then post the clearance journal from Journal Inquiry. The cheque becomes <strong>Cleared</strong>.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21600</code> PDC Contra <span class="small muted">(reverse memo)</span></td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11400</code> PDC On Hand <span class="small muted">(reverse memo)</span></td><td class="num">—</td><td class="num cr">Amount</td></tr>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11200</code> Accounts Receivable <span class="small muted">(Receivable mode)</span><br/><code>21200</code> Advances from Customers <span class="small muted">(Advance mode)</span></td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p>In Receivable mode, posting the clearance also settles the invoice — its <em>Amount Paid</em> rises and its status
+moves to PartiallyPaid or Paid.</p>
+
+<div class="box warn">
+    <div class="box-title">The invoice must be posted before the cheque clears</div>
+    <p>In Receivable mode, clearing settles the invoice, so the invoice has to be in the accounts already. If it is
+    still a draft, clearing is refused with <em>"Invoice … has not been posted yet"</em>. Post the invoice, then clear
+    the cheque. You can still <em>receive</em> a cheque against a draft invoice — the memorandum entry does not touch
+    the receivable.</p>
+</div>
+
+<h3>Validation rules</h3>
+<ul>
+    <li>Cheque number must be unique within the company.</li>
+    <li>Amount must be greater than zero.</li>
+    <li>In Receivable mode an invoice is required, it must belong to the selected lease, and the cheque cannot exceed
+        the invoice's outstanding balance.</li>
+    <li>A cheque cannot be cleared twice.</li>
+</ul>
+
+<h3>PDC statuses</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:20%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Draft</strong></td><td>Saved; memorandum journal not yet posted.</td></tr>
+        <tr><td><strong>Received</strong></td><td>Memorandum posted; the cheque is in your custody.</td></tr>
+        <tr><td><strong>Cleared</strong></td><td>Clearance posted; cash recorded and the memorandum reversed.</td></tr>
+    </tbody>
+</table>

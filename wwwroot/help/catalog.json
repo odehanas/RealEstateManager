@@ -1,0 +1,94 @@
+{
+  "_about": "Single source of truth for the in-app help. Each topic is wwwroot/help/topics/<key>.html. 'screens' maps a topic to the screens that open it from the Help button: 'Controller' matches every action of that controller, 'Controller.Action' matches one action and wins over the controller-wide entry. The in-screen panel, the Help Center, the full manual and the PDF are all built from this file and those fragments, so they cannot disagree. Groups and topics appear in the manual in the order listed here.",
+  "groups": [
+    {
+      "key": "getting-started",
+      "title": "Getting Started",
+      "topics": [
+        { "key": "introduction", "title": "About This System", "path": "", "summary": "What the system covers and how owned and managed properties differ.", "screens": [] },
+        { "key": "getting-started", "title": "Signing In & Finding Your Way", "path": "Home", "summary": "Signing in, the menus, switching company, changing your password, the dashboard.", "screens": ["Home", "Profile"] },
+        { "key": "workflow", "title": "The System Workflow", "path": "Operations ▸ Workflow Guide", "summary": "The order work is done in, from property to payment received.", "screens": ["Workflow"] },
+        { "key": "draft-post-reset", "title": "Draft, Post & Reset to Draft", "path": "Operations ▸ Journal Inquiry", "summary": "Why most transactions are saved as drafts, how to post them, and how to correct a posted one.", "screens": [] },
+        { "key": "master-data-rules", "title": "Master Data: Codes, Uniqueness & Who Can Edit", "path": "Master Data", "summary": "Automatic codes, duplicate protection and the View/Manage split.", "screens": [] }
+      ]
+    },
+    {
+      "key": "system-setup",
+      "title": "System Setup",
+      "topics": [
+        { "key": "chart-of-accounts", "title": "Chart of Accounts", "path": "System Setup ▸ Chart of Accounts", "summary": "The account tree, adding accounts and the opening-balance check.", "screens": ["ChartOfAccounts"] },
+        { "key": "account-mapping", "title": "Account Mapping", "path": "System Setup ▸ Account Mapping", "summary": "Which account each automatic posting uses.", "screens": ["AccountMappings"] },
+        { "key": "opening-balances", "title": "Opening Balances", "path": "System Setup ▸ Opening Balances", "summary": "Bringing balances across from a previous system and keeping them balanced.", "screens": ["OpeningBalances"] },
+        { "key": "owner-withdrawal-categories", "title": "Owner Withdrawal Categories", "path": "System Setup ▸ Owner Withdrawal Categories", "summary": "The list used to tag what owner drawings were spent on.", "screens": ["OwnerWithdrawalCategories"] },
+        { "key": "vat-settings", "title": "VAT Settings", "path": "System Setup ▸ VAT Settings", "summary": "Your TRN, tax invoice details and the input-tax recovery rate.", "screens": ["VatSettings"] },
+        { "key": "revenue-recognition", "title": "Revenue Recognition", "path": "System Setup ▸ Revenue Recognition", "summary": "Releasing billed rent into revenue month by month.", "screens": ["RevenueRecognition"] },
+        { "key": "prepayments", "title": "Recurring Prepayments", "path": "System Setup ▸ Recurring Prepayments", "summary": "Spreading an up-front payment over the months it covers.", "screens": ["Prepayments"] },
+        { "key": "closing", "title": "Period & Year Closing", "path": "System Setup ▸ Period Closing", "summary": "Month-end checklist, closing a period and closing the fiscal year.", "screens": ["Closing"] },
+        { "key": "companies-users", "title": "Companies, Users & Permissions", "path": "System Setup ▸ Users & Permissions", "summary": "Companies, user accounts and what each permission allows.", "screens": ["Companies", "Users"] },
+        { "key": "subscription-support", "title": "Subscription, Audit Log & Feedback", "path": "System Setup ▸ Subscription & Help", "summary": "Trial and activation, the audit trail, help and feedback.", "screens": ["Subscription", "AuditLogs", "Feedback"] }
+      ]
+    },
+    {
+      "key": "master-data",
+      "title": "Master Data",
+      "topics": [
+        { "key": "properties", "title": "Properties", "path": "Master Data ▸ Properties", "summary": "Registering a building, its ownership type and its VAT treatment.", "screens": ["Properties"] },
+        { "key": "units", "title": "Units", "path": "Master Data ▸ Units", "summary": "The rentable spaces inside a property.", "screens": ["Units"] },
+        { "key": "tenants", "title": "Tenants", "path": "Master Data ▸ Tenants", "summary": "The tenant register, identifiers and opening balances.", "screens": ["Tenants"] },
+        { "key": "vendors", "title": "Vendors", "path": "Master Data ▸ Vendors", "summary": "Suppliers, their TRN and whether they may charge VAT.", "screens": ["Vendors"] },
+        { "key": "leases", "title": "Lease Contracts", "path": "Master Data ▸ Leases", "summary": "Contracts, contract codes, VAT, the invoice schedule and the printed contract.", "screens": ["Leases"] }
+      ]
+    },
+    {
+      "key": "operations",
+      "title": "Operations",
+      "topics": [
+        { "key": "customer-invoices", "title": "Customer Invoices", "path": "Operations ▸ Customer Invoices", "summary": "Posting rent invoices and printing tax invoices.", "screens": ["CustomerInvoices"] },
+        { "key": "customer-receipts", "title": "Customer Receipts", "path": "Operations ▸ Customer Receipts", "summary": "Recording money received against an invoice.", "screens": ["CustomerReceipts"] },
+        { "key": "pdc-receipts", "title": "PDC Receipts", "path": "Operations ▸ PDC Receipts", "summary": "Post-dated cheques: receiving, correcting and clearing them.", "screens": ["PdcReceipts"] },
+        { "key": "security-deposits", "title": "Security Deposits", "path": "Operations ▸ Security Deposits", "summary": "Holding and releasing tenant deposits.", "screens": ["SecurityDeposits"] },
+        { "key": "vendor-bills", "title": "Vendor Bills", "path": "Operations ▸ Vendor Bills", "summary": "Multi-line supplier bills, VAT by supplier registration, draft and post.", "screens": ["VendorBills"] },
+        { "key": "vendor-payments", "title": "Vendor Payments", "path": "Operations ▸ Vendor Payments", "summary": "Paying a posted bill.", "screens": ["VendorPayments"] },
+        { "key": "petty-cash", "title": "Petty Cash", "path": "Operations ▸ Petty Cash", "summary": "Cash floats, petty cash vouchers and replenishment.", "screens": ["PettyCash"] },
+        { "key": "fixed-assets", "title": "Fixed Assets & Depreciation", "path": "Operations ▸ Fixed Assets", "summary": "Acquisition costs, capitalisation and monthly depreciation.", "screens": ["FixedAssets"] },
+        { "key": "manual-journals", "title": "Manual Journals", "path": "Operations ▸ Manual Journals", "summary": "Adjustments, accruals, corrections and owner drawings.", "screens": ["ManualJournals"] },
+        { "key": "journal-inquiry", "title": "Journal Inquiry", "path": "Operations ▸ Journal Inquiry", "summary": "Finding journals, posting drafts and resetting posted entries.", "screens": ["Journal.Index", "Journal.Post", "Journal.ResetToDraft", "Journal.PostAllDrafts"] },
+        { "key": "tenant-requests", "title": "Tenant Requests", "path": "Operations ▸ Tenant Requests", "summary": "Answering maintenance, payment postponement and other tenant requests.", "screens": ["ServiceRequests"] }
+      ]
+    },
+    {
+      "key": "reporting",
+      "title": "Reporting",
+      "topics": [
+        { "key": "trial-balance", "title": "Trial Balance", "path": "Reporting ▸ Trial Balance", "summary": "Every account's balance at a date, and proof the ledger balances.", "screens": ["Reports.TrialBalance"] },
+        { "key": "profit-and-loss", "title": "Profit & Loss", "path": "Reporting ▸ Profit & Loss", "summary": "Revenue less expenses for the year to date.", "screens": ["Reports.ProfitAndLoss"] },
+        { "key": "balance-sheet", "title": "Balance Sheet", "path": "Reporting ▸ Balance Sheet", "summary": "Assets, liabilities and equity at a date.", "screens": ["Reports.BalanceSheet"] },
+        { "key": "cash-flow", "title": "Statement of Cash Flows", "path": "Reporting ▸ Statement of Cash Flows", "summary": "Cash in and out by operating, investing and financing activity (IAS 7).", "screens": ["Reports.CashFlow"] },
+        { "key": "general-ledger", "title": "General Ledger & Tenant Statement", "path": "Reporting ▸ General Ledger", "summary": "Movement on one account, and one tenant's running account.", "screens": ["Journal.GeneralLedger", "TenantStatements"] },
+        { "key": "vat-return", "title": "VAT Return", "path": "Reporting ▸ VAT Return", "summary": "Output and input tax for a tax period, and the annual wash-up.", "screens": ["Reports.VatReturn"] },
+        { "key": "management-reports", "title": "Tenant & Property Reports", "path": "Reporting ▸ Management — Tenants & Properties", "summary": "P&L by property, property utilization, tenant health and ranking.", "screens": ["Reports.ProfitAndLossByProperty", "Reports.PropertyUtilization", "Reports.TenantHealth"] },
+        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule and owner withdrawals.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals"] }
+      ]
+    },
+    {
+      "key": "tenant-portal",
+      "title": "Tenant Self-Service",
+      "topics": [
+        { "key": "tenant-portal-staff", "title": "The Tenant Portal: Staff Guide", "path": "Master Data ▸ Tenants ▸ Portal", "summary": "Giving a tenant a login, resetting it, and what tenants can see and do.", "screens": ["Tenants.PortalAccess", "Tenants.IssuePortalAccess", "Tenants.SetPortalAccessActive"] },
+        { "key": "tenant-guide", "title": "Guide for Tenants", "path": "Tenant portal", "summary": "Written for tenants: signing in, checking your account, making a request.", "screens": [] }
+      ]
+    },
+    {
+      "key": "reference",
+      "title": "Reference",
+      "topics": [
+        { "key": "owner-withdrawals", "title": "Owner Withdrawals Explained", "path": "", "summary": "Why owner spending is equity, not expense, and how it is recorded.", "screens": [] },
+        { "key": "accounts-reference", "title": "Chart of Accounts Reference", "path": "", "summary": "The standard accounts created for every company.", "screens": [] },
+        { "key": "entries-reference", "title": "Accounting Entries Reference", "path": "", "summary": "Every journal the system writes for you.", "screens": [] },
+        { "key": "status-reference", "title": "Status Values Reference", "path": "", "summary": "What each status means on every kind of record.", "screens": [] },
+        { "key": "troubleshooting", "title": "Troubleshooting", "path": "", "summary": "Common problems and how to fix them.", "screens": [] },
+        { "key": "glossary", "title": "Glossary", "path": "", "summary": "Accounting and system terms in plain language.", "screens": [] }
+      ]
+    }
+  ]
+}

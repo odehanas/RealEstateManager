@@ -1,0 +1,38 @@
+<p><strong>Workflow step 3.</strong> The tenant register is the receivables sub-ledger. Every tenant's balance rolls
+up into the <code>11200</code> Accounts Receivable control account.</p>
+
+<h3>Creating a tenant</h3>
+<ol class="steps">
+    <li>Select <strong>Add Tenant</strong>. The tenant code, such as <code>TNT-00001</code>, is issued when you save.</li>
+    <li>Enter the <strong>Full Name</strong> exactly as it should appear on contracts, invoices and statements.</li>
+    <li>Enter <strong>Email</strong>, <strong>Phone</strong>, <strong>Nationality</strong> and <strong>Address</strong>.</li>
+    <li>Enter the identifiers you hold: <strong>Trade Licence Number</strong> for a company,
+        <strong>Emirates ID / ID Number</strong> and <strong>Passport Number</strong> for an individual.</li>
+    <li>Enter the <strong>TRN</strong> if the tenant is VAT registered.</li>
+    <li>Enter the <strong>Opening Balance</strong> only when migrating from another system. Save.</li>
+</ol>
+
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Trade licence, Emirates ID, passport, TRN</strong></td><td>Each must be unique in the company. If another tenant already holds one, the save is refused and that tenant is named — open the existing record rather than creating a second one.</td></tr>
+        <tr><td><strong>TRN</strong></td><td>A tenant with a TRN receives a <strong>full tax invoice</strong> showing it; without one, a <strong>simplified tax invoice</strong>.</td></tr>
+        <tr><td><strong>Opening Balance</strong></td><td><strong>Positive</strong> — the tenant owes you at go-live.<br/><strong>Negative</strong> — an advance you are holding for them.<br/>Feeds the AR control account.</td></tr>
+        <tr><td><strong>Is Active</strong></td><td>Untick when the tenant leaves. History and statements are kept.</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Opening balances need a credit counterpart</div>
+    <p>Tenant opening balances add to the debit side of the opening trial balance. Check
+    <span class="path">System Setup ▸ Opening Balances</span> afterwards — see <a href="#opening-balances">Opening Balances</a>.</p>
+</div>
+
+<h3>Giving the tenant portal access</h3>
+<p>The <strong>Portal</strong> button on a tenant's row issues them a login to the self-service portal, where they
+can see their account and send requests. See <a href="#tenant-portal-staff">The Tenant Portal: Staff Guide</a>.</p>
+
+<h3>The tenant's statement</h3>
+<p><span class="path">Reporting ▸ Tenant Statement</span> produces the tenant's running account: opening balance,
+every charge and payment in date order, and the closing balance. Use it for collection calls and for confirming a
+balance with the tenant.</p>

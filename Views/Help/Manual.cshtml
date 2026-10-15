@@ -1,0 +1,108 @@
+@model RealEstateManager.Models.HelpManualViewModel
+@{
+    // A standalone document, not an application page: no navigation, its own print
+    // layout, and the PDF is produced straight from it.
+    Layout = null;
+    var chapter = 0;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RealEstateManager — User Manual</title>
+    <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/help/manual.css" asp-append-version="true" />
+</head>
+<body>
+
+<div class="toolbar">
+    <div><strong>RealEstateManager</strong> &nbsp;— User Manual</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="ghost" href="/Help">Help Center</a>
+        <a class="ghost" href="/manual/RealEstateManager-User-Manual.pdf" target="_blank">Download PDF</a>
+        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+</div>
+
+<div class="sheet">
+
+    <section class="cover">
+        <div>
+            <div class="brandmark">
+                <svg viewBox="0 0 24 24" width="34" height="34" style="stroke:#8ec2ff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round">
+                    <path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/>
+                </svg>
+                RealEstateManager
+            </div>
+        </div>
+
+        <div>
+            <div class="rule"></div>
+            <h1>User Manual</h1>
+            <div class="sub">Property, lease and accounting management —<br/>the complete operating guide</div>
+            <div class="chips">
+                <span class="chip">Properties &amp; Units</span>
+                <span class="chip">Tenants &amp; Contracts</span>
+                <span class="chip">PDC Management</span>
+                <span class="chip">Invoicing &amp; VAT</span>
+                <span class="chip">Double-Entry Accounting</span>
+                <span class="chip">Financial Reporting</span>
+                <span class="chip">Tenant Self-Service</span>
+            </div>
+        </div>
+
+        <div class="meta">
+            Applies to: the RealEstateManager web application<br/>
+            Audience: property administrators, leasing staff, accountants, system administrators<br/>
+            Edition: @DateTime.Today.ToString("MMMM yyyy") &nbsp;·&nbsp; The same topics appear under the
+            <strong>Help</strong> button on every screen
+        </div>
+    </section>
+
+    <section class="contents" style="break-before: page; page-break-before: always;">
+        <h2>Contents</h2>
+        <p class="small" style="color:#5b6774">Every line is a link. In the PDF, click a line to jump to that chapter.</p>
+        <div class="toc">
+            @{ var tocNumber = 0; }
+            @foreach (var group in Model.Groups)
+            {
+                <div class="grp">
+                    <div class="grp-title">@group.Title</div>
+                    @foreach (var topic in group.Topics)
+                    {
+                        tocNumber++;
+                        <a href="#@topic.Key"><span class="num">@tocNumber</span>@topic.Title</a>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+
+    @foreach (var group in Model.Groups)
+    {
+        foreach (var topic in group.Topics)
+        {
+            chapter++;
+            <section class="chapter" id="@topic.Key">
+                <div class="chapter-tag">@group.Title &nbsp;·&nbsp; @chapter</div>
+                <h2>@topic.Title</h2>
+                @if (!string.IsNullOrWhiteSpace(topic.Path))
+                {
+                    <p class="where">Where: <strong>@topic.Path</strong></p>
+                }
+                <div class="help-content">
+                    @Html.Raw(Model.Content.GetValueOrDefault(topic.Key, string.Empty))
+                </div>
+            </section>
+        }
+    }
+
+    <div class="end-note">
+        <strong style="color:#0f2740">RealEstateManager — User Manual</strong><br/>
+        End of document. To print or save: <strong>Ctrl + P</strong> → <strong>Save as PDF</strong> → paper size <strong>A4</strong>.
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<p>Every accounting transaction in RealEstateManager goes through three states, the same way Odoo works.
+Understanding this one idea explains why a transaction you have just saved may not yet appear in the
+Trial Balance.</p>
+
+<table class="t-compact">
+    <thead><tr><th style="width:18%">State</th><th>What it means</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Draft</strong></td><td>The journal exists and can be reviewed, but it has <strong>no effect on any report</strong>. The Trial Balance, Balance Sheet, Profit &amp; Loss, ledgers and statements all ignore drafts.</td></tr>
+        <tr><td><strong>Posted</strong></td><td>The journal is in the accounts. Every report includes it.</td></tr>
+        <tr><td><strong>Reset to Draft</strong></td><td>A posted journal pulled back out of the accounts so it can be corrected, then posted again.</td></tr>
+    </tbody>
+</table>
+
+<h3>Which screens post straight away, and which leave a draft</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:44%">Screen</th><th>What Save / Post does</th></tr></thead>
+    <tbody>
+        <tr><td>Customer Invoices, Vendor Bills</td><td>The <strong>Post</strong> button builds the journal <em>and</em> posts it in one click.</td></tr>
+        <tr><td>Customer Receipts, PDC Receipts, Security Deposits, Vendor Payments, Petty Cash, Manual Journals, Revenue Recognition, Recurring Prepayments</td><td>Saving creates a <strong>draft</strong> journal. You then post it from <span class="path">Operations ▸ Journal Inquiry</span>.</td></tr>
+        <tr><td>Fixed Assets (acquisition, capitalisation, depreciation)</td><td>Posted immediately.</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">"I saved it but it is not in the Trial Balance"</div>
+    <p>That is almost always a draft waiting to be posted. Open <span class="path">Operations ▸ Journal Inquiry</span>,
+    set <strong>Posted Only</strong> to <strong>No</strong>, find the entry and press <strong>Post</strong>.</p>
+</div>
+
+<h3>Posting drafts</h3>
+<ol class="steps">
+    <li>Open <span class="path">Operations ▸ Journal Inquiry</span>.</li>
+    <li>Set <strong>Posted Only</strong> to <strong>No</strong> so drafts are listed. Narrow it by date or source type
+        if you like — for example only <code>CustomerReceipt</code> — and select <strong>Go</strong>.</li>
+    <li>Review each draft. Press <strong>Post</strong> on one entry, or <strong>Post All Drafts</strong> to post every
+        draft that matches the current filter.</li>
+</ol>
+<p><strong>Post All Drafts</strong> posts each entry separately. If one cannot be posted — for example because its
+date falls in a closed period — the others still go through, and the message lists the ones that failed and why.</p>
+
+<h3>When Post is refused</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:44%">Situation</th><th>What to do</th></tr></thead>
+    <tbody>
+        <tr><td>The entry's date is in a <strong>closed period</strong></td><td>Nothing can be posted into a closed period. Re-date the document into an open one, or post a journal there.</td></tr>
+        <tr><td>A <strong>receipt</strong> or <strong>cheque clearance</strong> whose invoice is still a draft</td><td>Post the invoice first, then the receipt or clearance.</td></tr>
+        <tr><td>A <strong>vendor payment</strong> whose bill is still a draft</td><td>Post the bill first, then the payment.</td></tr>
+    </tbody>
+</table>
+<p>A settlement must never reach the accounts before the invoice or bill it settles, or Accounts Receivable or
+Accounts Payable would be reduced by an amount that was never added. In <strong>Post All Drafts</strong> the invoice
+or bill is normally dated earlier and so is posted first, and its settlement follows in the same run.</p>
+
+<h3>Correcting a posted transaction</h3>
+<ol class="steps">
+    <li>Find the journal in Journal Inquiry and press <strong>Reset to Draft</strong>. It leaves the accounts
+        immediately.</li>
+    <li>Correct the source document. A vendor bill, for instance, becomes editable again once its journal is a draft.</li>
+    <li>Post it again.</li>
+</ol>
+<p>Resetting also undoes what posting did to the document. Resetting a receipt takes its amount back off the
+invoice it paid; resetting a cleared PDC puts the cheque back to <em>Received</em>.</p>
+
+<h3>When Reset to Draft is refused</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:44%">Situation</th><th>Why, and what to do instead</th></tr></thead>
+    <tbody>
+        <tr><td>The entry is in a <strong>closed period</strong></td><td>Those figures have already been reported. Post a correcting journal in an open period.</td></tr>
+        <tr><td>An invoice has posted receipts or cleared cheques against it</td><td>The later transaction depends on it. Reset the receipts first, then the invoice.</td></tr>
+        <tr><td>A vendor bill has posted payments against it</td><td>Reset the payments first.</td></tr>
+        <tr><td>A PDC whose clearance has been posted</td><td>Reset the clearance entry first.</td></tr>
+        <tr><td>Year closing, prepayment set-up or amortisation, fixed asset postings</td><td>These create schedules or close a year, so unwinding them is not a simple reset. Post a reversing journal.</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">Closed periods are locked in both directions</div>
+    <p>Nothing can be posted <em>into</em> a closed period and nothing can be reset <em>out of</em> one. The
+    list screens show a <strong>Period locked</strong> badge instead of the buttons when this applies.</p>
+</div>

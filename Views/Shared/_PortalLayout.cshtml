@@ -14,6 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tenant Portal</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
     <style>
         :root { --navy:#0f2740; --accent:#1e6fd9; --line:#d8dee6; }
         body { background:#f2f4f7; padding-bottom:78px; }
@@ -57,6 +58,7 @@
         @if (isSignedIn)
         {
             <div class="d-flex gap-2">
+                <a asp-controller="Portal" asp-action="Help" class="btn btn-sm btn-outline-light">Help</a>
                 <a asp-controller="PortalAccount" asp-action="ChangePassword" class="btn btn-sm btn-outline-light">Password</a>
                 <form asp-controller="PortalAccount" asp-action="Logout" method="post" class="d-inline">
                     @Html.AntiForgeryToken()

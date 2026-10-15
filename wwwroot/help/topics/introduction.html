@@ -1,0 +1,57 @@
+<p>RealEstateManager is a web-based system that manages a real-estate portfolio end to end: the
+<strong>properties</strong> you own or manage, the <strong>units</strong> inside them, the
+<strong>tenants</strong> who occupy them, the <strong>lease contracts</strong> that bind the two,
+and the <strong>complete accounting</strong> that results from all of it.</p>
+
+<p>Its distinguishing characteristic is that operations and accounting are not two separate systems.
+Every operational action you take — signing a lease, receiving a cheque, issuing an invoice —
+produces a balanced double-entry journal automatically. You are never asked to write the accounting
+entry yourself, and the system refuses to save any journal whose debits do not equal its credits.</p>
+
+<h3>What the system covers</h3>
+<table class="t-compact">
+    <thead>
+        <tr><th style="width:26%">Area</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Portfolio</strong></td><td>Properties (owned or managed), units within each property, occupancy status, standard rents and areas.</td></tr>
+        <tr><td><strong>Leasing</strong></td><td>Tenant register, lease contracts with billing frequency and VAT, automatic generation of the full invoice schedule and the monthly revenue-recognition plan.</td></tr>
+        <tr><td><strong>Collections</strong></td><td>Post-dated cheque (PDC) register with memorandum and clearance postings, customer invoices and UAE tax invoices, customer receipts, security deposits.</td></tr>
+        <tr><td><strong>Payables</strong></td><td>Vendor register, multi-line vendor bills with VAT decided by the supplier's registration, vendor payments, petty cash floats.</td></tr>
+        <tr><td><strong>Assets &amp; deferrals</strong></td><td>Fixed asset register with acquisition-cost accumulation, capitalisation and automatic depreciation schedules; recurring prepayment amortisation.</td></tr>
+        <tr><td><strong>General ledger</strong></td><td>Five-digit chart of accounts, account mapping, opening balances, manual journals, journal inquiry, monthly period close and fiscal year close.</td></tr>
+        <tr><td><strong>Reporting</strong></td><td>Trial Balance, Profit &amp; Loss, Balance Sheet, Statement of Cash Flows, General Ledger, Tenant Statement, VAT Return, P&amp;L by Property, Property Utilization, Tenant Health, Owner Tenancy Schedule, Owner Withdrawals.</td></tr>
+        <tr><td><strong>Tenant self-service</strong></td><td>A portal where tenants see their account and raise maintenance, payment-postponement and other requests, with a staff queue to answer them.</td></tr>
+        <tr><td><strong>Administration</strong></td><td>Multi-company support, per-user permissions with centralised master data, subscription control, audit logging, user feedback.</td></tr>
+    </tbody>
+</table>
+
+<h3>Two ownership models</h3>
+<p>Every property is flagged as either <strong>Owned</strong> or <strong>Managed</strong>, and this single
+flag changes the accounting for every lease under it:</p>
+<ul>
+    <li><strong>Owned</strong> — the rent is your revenue. Invoiced rent sits in <em>Advances from Customers</em>
+        and is released monthly into <em>Rental Revenue – Owned</em>.</li>
+    <li><strong>Managed</strong> — the rent belongs to the landlord. Invoiced rent sits in <em>Due to Landlords</em>,
+        and only your commission is released into <em>Management Fee Revenue</em>.</li>
+</ul>
+
+<div class="box">
+    <div class="box-title">Set the ownership type correctly the first time</div>
+    <p>Ownership type is read at the moment an invoice or a revenue-recognition entry is posted.
+    Changing it after transactions exist will not restate what has already been posted.</p>
+</div>
+
+<h3>How to use this help</h3>
+<ul>
+    <li>Every screen has a <strong>Help</strong> button at the top right. It opens the help for the screen you are on,
+        in a panel beside your work.</li>
+    <li><span class="path">System Setup ▸ Help</span> opens the Help Center, where you can search all topics or read them
+        by menu.</li>
+    <li><span class="path">Menu ▸ Screen</span> notation shows where to find each function, e.g.
+        <span class="path">Master Data ▸ Properties</span>.</li>
+    <li>Green/red <strong>Dr</strong> / <strong>Cr</strong> tables show the exact journal the system posts. They are for
+        reference — the system writes them for you.</li>
+    <li>Read <a href="#workflow">The System Workflow</a> and <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>
+        first. Between them they explain most of what you will see.</li>
+</ul>

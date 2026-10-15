@@ -4,6 +4,7 @@
 @inject AppAuthService AppAuthService
 @inject PermissionService PermissionService
 @inject SubscriptionService SubscriptionService
+@inject HelpCatalogService HelpCatalog
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
@@ -46,6 +47,12 @@
     var companies = isAuthenticated && CurrentCompanyAccessor.UserId.HasValue
         ? await AppAuthService.GetAccessibleCompaniesAsync(CurrentCompanyAccessor.UserId.Value, currentCompanyId)
         : new List<CompanyOptionViewModel>();
+
+    // The help topic for the screen being shown. The Help button opens it in a side
+    // panel; on a screen with no topic of its own the panel lists every topic instead.
+    var helpTopic = HelpCatalog.ForScreen(
+        ViewContext.RouteData.Values["controller"]?.ToString(),
+        ViewContext.RouteData.Values["action"]?.ToString());
 }
 
 <!DOCTYPE html>
@@ -56,6 +63,8 @@
     <title>@ViewData["Title"] - RealEstateManager</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @* Help topic typography. Every rule is scoped under .help-content, so it cannot touch the application's own tables. *@
+    <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
     @* Print rules for the whole application. media="print" so it costs nothing on screen. *@
     <link rel="stylesheet" href="~/css/document-print.css" media="print" asp-append-version="true" />
 </head>
@@ -145,7 +154,7 @@
                                         <a class="dropdown-item" asp-controller="Help" asp-action="Index">Help</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="~/manual/RealEstateManager-User-Manual.html" target="_blank">User Manual</a>
+                                        <a class="dropdown-item" asp-controller="Help" asp-action="Manual" target="_blank">User Manual</a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item" asp-controller="Feedback" asp-action="Index">Send Feedback</a>
@@ -345,6 +354,13 @@
                                 @displayName
                             </span>
 
+                            <button type="button" class="btn btn-light btn-sm fw-semibold"
+                                    data-bs-toggle="offcanvas" data-bs-target="#helpPanel" aria-controls="helpPanel"
+                                    data-help-key="@helpTopic?.Key"
+                                    title="@(helpTopic != null ? $"Help: {helpTopic.Title}" : "Help")">
+                                <span aria-hidden="true">?</span> Help
+                            </button>
+
                             <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">Password</a>
 
                             <form asp-controller="Auth" asp-action="Logout" method="post">
@@ -379,9 +395,89 @@
         </div>
     </footer>
 
+    @if (isAuthenticated)
+    {
+        @* ------------------------------------------------------------------
+           The help panel. Slides in from the right over the current screen,
+           so the user can follow the steps while doing them. Its contents are
+           fetched on first open; links inside it load in place rather than
+           navigating away from the user's work.
+           ------------------------------------------------------------------ *@
+        <div class="offcanvas offcanvas-end help-panel" tabindex="-1" id="helpPanel" aria-labelledby="helpPanelTitle">
+            <div class="offcanvas-header">
+                <div>
+                    <div class="help-panel-path" id="helpPanelPath">Help</div>
+                    <h5 class="offcanvas-title mb-0" id="helpPanelTitle">Help</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body" id="helpPanelBody">
+                <div class="text-muted small">Loading…</div>
+            </div>
+        </div>
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        (function () {
+            var panel = document.getElementById('helpPanel');
+            if (!panel) { return; }
+
+            var body = document.getElementById('helpPanelBody');
+            var title = document.getElementById('helpPanelTitle');
+            var path = document.getElementById('helpPanelPath');
+            var trigger = document.querySelector('[data-help-key]');
+            var screenKey = trigger ? (trigger.getAttribute('data-help-key') || '') : '';
+            var loadedKey = null;
+
+            function load(key) {
+                body.innerHTML = '<div class="text-muted small">Loading…</div>';
+
+                fetch('/Help/Panel/' + encodeURIComponent(key), { credentials: 'same-origin' })
+                    .then(function (response) {
+                        if (!response.ok) { throw new Error(response.status); }
+                        return response.text();
+                    })
+                    .then(function (html) {
+                        body.innerHTML = html;
+                        body.scrollTop = 0;
+                        loadedKey = key;
+
+                        var root = body.querySelector('[data-help-title]');
+                        title.textContent = root ? root.getAttribute('data-help-title') : 'Help';
+                        path.textContent = root ? (root.getAttribute('data-help-path') || 'Help') : 'Help';
+                    })
+                    .catch(function () {
+                        body.innerHTML = '<div class="alert alert-warning">Help could not be loaded. ' +
+                            '<a href="/Help" target="_blank">Open the Help Center</a> instead.</div>';
+                    });
+            }
+
+            // Load the screen's own topic the first time the panel opens. Reopening keeps
+            // whatever the user last navigated to inside the panel.
+            panel.addEventListener('show.bs.offcanvas', function () {
+                if (loadedKey === null) { load(screenKey); }
+            });
+
+            // Cross-references between topics open inside the panel.
+            body.addEventListener('click', function (event) {
+                var link = event.target.closest('a[data-help-topic]');
+                if (!link || event.ctrlKey || event.metaKey || event.shiftKey) { return; }
+                event.preventDefault();
+                load(link.getAttribute('data-help-topic'));
+            });
+
+            // F1 opens help on the current screen, as in most desktop accounting software.
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'F1') {
+                    event.preventDefault();
+                    bootstrap.Offcanvas.getOrCreateInstance(panel).toggle();
+                }
+            });
+        })();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

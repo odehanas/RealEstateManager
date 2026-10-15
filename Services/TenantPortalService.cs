@@ -7,6 +7,12 @@ namespace RealEstateManager.Services
     /// <summary>
     /// Read-only data for the tenant portal.
     ///
+    /// ONLY POSTED TRANSACTIONS ARE SHOWN. A draft is not in the accounts, so showing
+    /// one would put the tenant's screens out of step with their balance - a draft
+    /// receipt listed as "received" while the amount still shows as owing. Invoices,
+    /// receipts, cheques and deposits all appear once their journal is posted. A journal
+    /// that has been reset to draft disappears again until it is re-posted.
+    ///
     /// Every method takes the tenant id from the signed-in principal and filters on it.
     /// Nothing here accepts a tenant id from a route or a form, which is what prevents
     /// one tenant reading another's account by editing a number in the URL.
@@ -37,7 +43,10 @@ namespace RealEstateManager.Services
 
             var depositsHeld = await _db.SecurityDeposits
                 .AsNoTracking()
-                .Where(x => x.Lease!.TenantId == tenantId && x.Status == "Held")
+                .Where(x => x.Lease!.TenantId == tenantId
+                            && x.Status == "Held"
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted)
                 .SumAsync(x => (decimal?)x.Amount) ?? 0m;
 
             var invoiced = invoices.Sum(x => x.TotalAmount);
@@ -112,7 +121,8 @@ namespace RealEstateManager.Services
             return await _db.CustomerInvoices
                 .AsNoTracking()
                 .Where(x => x.Lease!.TenantId == tenantId
-                            && x.JournalEntryId != null
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted
                             && x.Status != "Cancelled")
                 .OrderByDescending(x => x.InvoiceDate)
                 .Select(x => new PortalInvoiceViewModel
@@ -137,7 +147,9 @@ namespace RealEstateManager.Services
         {
             return await _db.CustomerReceipts
                 .AsNoTracking()
-                .Where(x => x.CustomerInvoice!.Lease!.TenantId == tenantId)
+                .Where(x => x.CustomerInvoice!.Lease!.TenantId == tenantId
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted)
                 .OrderByDescending(x => x.ReceiptDate)
                 .Select(x => new PortalReceiptViewModel
                 {
@@ -154,7 +166,9 @@ namespace RealEstateManager.Services
         {
             return await _db.PdcReceipts
                 .AsNoTracking()
-                .Where(x => x.Lease!.TenantId == tenantId)
+                .Where(x => x.Lease!.TenantId == tenantId
+                            && x.MemorandumJournalEntry != null
+                            && x.MemorandumJournalEntry.IsPosted)
                 .OrderBy(x => x.ChequeDate)
                 .Select(x => new PortalPdcViewModel
                 {
@@ -184,7 +198,8 @@ namespace RealEstateManager.Services
             var invoices = await _db.CustomerInvoices
                 .AsNoTracking()
                 .Where(x => x.Lease!.TenantId == tenantId
-                            && x.JournalEntryId != null
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted
                             && x.Status != "Cancelled"
                             && x.InvoiceDate <= toDate)
                 .Select(x => new { x.InvoiceDate, x.InvoiceNumber, x.TotalAmount, ContractNumber = x.Lease!.ContractNumber })
@@ -192,7 +207,10 @@ namespace RealEstateManager.Services
 
             var receipts = await _db.CustomerReceipts
                 .AsNoTracking()
-                .Where(x => x.CustomerInvoice!.Lease!.TenantId == tenantId && x.ReceiptDate <= toDate)
+                .Where(x => x.CustomerInvoice!.Lease!.TenantId == tenantId
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted
+                            && x.ReceiptDate <= toDate)
                 .Select(x => new { x.ReceiptDate, x.ReceiptNumber, x.Amount, Invoice = x.CustomerInvoice!.InvoiceNumber })
                 .ToListAsync();
 

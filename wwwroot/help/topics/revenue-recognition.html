@@ -1,0 +1,52 @@
+<p>This screen turns billed rent into earned revenue, one month at a time. It is the mechanism that keeps
+the Profit &amp; Loss faithful to the period rather than to the billing cycle.</p>
+
+<h3>How the schedule is built</h3>
+<p>When a lease is saved, one planned entry is created for the last day of every month in the lease term,
+each for one-twelfth of the annual rent. Every entry starts with status <strong>Planned</strong>.</p>
+
+<h3>Running the recognition</h3>
+<ol class="steps">
+    <li>Open <span class="path">System Setup ▸ Revenue Recognition</span>. Planned and posted entries are listed.</li>
+    <li>Enter the <strong>cut-off date</strong> — normally the last day of the month you are closing.</li>
+    <li>Select <strong>Post All Due Up To Selected Date</strong>, or <strong>Post</strong> on a single entry. A journal is
+        created for every planned entry dated on or before the cut-off, oldest first.</li>
+    <li>Post those journals from Journal Inquiry. Each entry's status then changes to <strong>Posted</strong>.</li>
+</ol>
+
+<div class="box warn">
+    <div class="box-title">These buttons create draft journals</div>
+    <p>They reach the Profit &amp; Loss only once posted from <span class="path">Operations ▸ Journal Inquiry</span> —
+    filter the Source Type to <code>RevenueRecognitionSchedule</code> and use <strong>Post All Drafts</strong>. See
+    <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+</div>
+
+<h4>Owned property</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21200</code> Advances from Customers</td><td class="num dr">Monthly amount</td><td class="num">—</td></tr>
+        <tr><td><code>41100</code> Rental Revenue – Owned</td><td class="num">—</td><td class="num cr">Monthly amount</td></tr>
+    </tbody>
+</table>
+
+<h4>Managed property</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num dr">Monthly amount</td><td class="num">—</td></tr>
+        <tr><td><code>42100</code> Management Fee Revenue</td><td class="num">—</td><td class="num cr">Monthly amount</td></tr>
+    </tbody>
+</table>
+
+<div class="box ok">
+    <div class="box-title">Make this the first task of every month-end</div>
+    <p>Run revenue recognition before printing the Profit &amp; Loss. If you skip it, revenue for the month
+    is missing and the deferred-income balance is overstated by the same amount. Running it late is safe:
+    each entry keeps its own month-end date, so the figures land in the correct period.</p>
+</div>
+
+<h3>Reading the deferred balance</h3>
+<p>At any date, the balance on <code>21200</code> Advances from Customers is the rent you have billed but
+not yet earned. It should equal the sum of all planned (unposted) recognition entries for invoices already
+posted. This is a useful monthly reconciliation.</p>

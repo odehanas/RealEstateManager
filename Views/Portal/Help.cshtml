@@ -1,0 +1,17 @@
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = "Help";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">How to use your portal</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <article class="help-content">
+            @Html.Raw(ViewBag.HelpHtml as string ?? string.Empty)
+        </article>
+    </div>
+</div>

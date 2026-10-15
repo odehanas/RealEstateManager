@@ -1,0 +1,48 @@
+<p>Journal Inquiry is the audit trail and the place where drafts become postings. Every journal in the company —
+automatic or manual, draft or posted — is listed here with its entry number, date, description, source and value.</p>
+
+<h3>Finding journals</h3>
+<ol class="steps">
+    <li>Set the <strong>From</strong> and <strong>To</strong> dates.</li>
+    <li>Optionally choose a <strong>Source Type</strong> to see only one kind of transaction.</li>
+    <li>Set <strong>Posted Only</strong> to <strong>No</strong> to include drafts, or <strong>Yes</strong> to see only what is in the accounts.</li>
+    <li>Select <strong>Go</strong>.</li>
+</ol>
+<p>Every journal line carries the property, unit, tenant, lease, vendor and source document it came from, so any
+figure in a report can be traced back to the transaction that caused it.</p>
+
+<h3>Posting and resetting</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Button</th><th>What it does</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Post</strong></td><td>Puts one draft into the accounts.</td></tr>
+        <tr><td><strong>Post All Drafts (n)</strong></td><td>Posts every draft matching the current filter. Each is posted separately; any that cannot be posted are listed with the reason, and the rest still go through.</td></tr>
+        <tr><td><strong>Reset to Draft</strong></td><td>Takes one posted entry back out of the accounts so its document can be corrected.</td></tr>
+        <tr><td><strong>Period locked</strong> badge</td><td>Shown instead of the buttons when the entry's period is closed.</td></tr>
+    </tbody>
+</table>
+<p>Read <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a> for which screens leave drafts and when a reset is refused.</p>
+
+<div class="box ok">
+    <div class="box-title">A good end-of-day habit</div>
+    <p>Filter today's date with <strong>Posted Only = No</strong> and post what is waiting. Drafts left behind are the
+    commonest reason a report looks short.</p>
+</div>
+
+<h3>Source types</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:36%">Source type</th><th>Created by</th></tr></thead>
+    <tbody>
+        <tr><td><code>CustomerInvoice</code></td><td>Posting a customer invoice</td></tr>
+        <tr><td><code>CustomerReceipt</code></td><td>Saving a customer receipt</td></tr>
+        <tr><td><code>PdcReceiptMemo</code> / <code>PdcClearance</code></td><td>Receiving and clearing a PDC</td></tr>
+        <tr><td><code>SecurityDeposit</code></td><td>Saving a security deposit</td></tr>
+        <tr><td><code>RevenueRecognitionSchedule</code></td><td>Processing revenue recognition</td></tr>
+        <tr><td><code>VendorBill</code> / <code>VendorPayment</code></td><td>Posting a bill or saving a payment</td></tr>
+        <tr><td><code>PettyCashExpense</code> / <code>PettyCashReplenishment</code></td><td>Petty cash vouchers and top-ups</td></tr>
+        <tr><td><code>FixedAsset…</code></td><td>Acquisition, capitalisation, depreciation</td></tr>
+        <tr><td><code>PrepaymentSchedule</code> / <code>PrepaymentRecognition</code></td><td>Prepayment setup and amortisation</td></tr>
+        <tr><td><code>ManualJournal</code></td><td>A manual journal</td></tr>
+        <tr><td><code>FiscalYearClosing</code></td><td>Closing the fiscal year</td></tr>
+    </tbody>
+</table>

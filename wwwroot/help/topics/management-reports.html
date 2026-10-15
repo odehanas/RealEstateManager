@@ -1,0 +1,121 @@
+<p>The three reports in this chapter answer management questions rather than accounting questions:
+<em>which property is making money</em>, <em>how hard is the portfolio working</em>, and
+<em>which tenants can we rely on</em>. They are listed under
+<span class="path">Reporting ▸ Management</span> and require the <strong>View Reports</strong>
+permission.</p>
+
+<h3>Profit &amp; Loss by Property</h3>
+<p><span class="path">Reporting ▸ P&amp;L by Property</span></p>
+
+<p>This is the general ledger Profit &amp; Loss analysed across the <strong>property dimension</strong>
+that every journal line already carries. Accounts run down the rows, properties across the columns, so
+you can read one property's result down a column or one account across the whole portfolio along a row.</p>
+
+<ol class="steps">
+    <li>Enter the <strong>From Date</strong> and <strong>To Date</strong>. The default is the current
+        fiscal year to date, honouring the company's fiscal year start month.</li>
+    <li>Optionally choose a single <strong>Property</strong> to narrow the report to one column.</li>
+    <li>Select <strong>Refresh</strong>.</li>
+</ol>
+
+<p>Each column shows total revenue, total expenses, net profit or loss and net margin percentage.
+The final column totals the row across all properties and reconciles to the general ledger Profit &amp;
+Loss for the same dates.</p>
+
+<div class="box warn">
+    <div class="box-title">The Unallocated column</div>
+    <p>A journal line only carries a property if the source transaction identified one. Invoices,
+    receipts, PDCs, revenue recognition and security deposits always do, because they descend from a
+    lease. Vendor bills do when a property is chosen on the bill. <strong>Manual journals only do when a
+    unit / cost centre is selected on the line</strong> — the property is then derived from that unit.</p>
+    <p>Anything without a property is collected into a highlighted <strong>Unallocated</strong> column so
+    the report still reconciles to the GL. If that column is large, the fix is to reopen those manual
+    journals and set the unit.</p>
+</div>
+
+<p>Revenue is presented as credits less debits and expenses as debits less credits, so a negative figure
+means a reversal or reclassification occurred in the period rather than an error.</p>
+
+<h3>Property Utilization</h3>
+<p><span class="path">Reporting ▸ Property Utilization</span></p>
+
+<p>A single-page view of how hard each property is working at a chosen date.</p>
+
+<table class="t-compact">
+    <thead><tr><th style="width:28%">Measure</th><th>How it is calculated</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Occupancy %</strong></td><td>Units with status <em>Occupied</em> ÷ total units. Driven by unit status, which is set automatically when a lease becomes active.</td></tr>
+        <tr><td><strong>Area utilization %</strong></td><td>Area of units under a lease that is active and current at the as-of date ÷ total area. Measures let space rather than unit count, so one large vacant unit shows its true weight.</td></tr>
+        <tr><td><strong>Standard annual rent</strong></td><td>Sum of each unit's asking rent.</td></tr>
+        <tr><td><strong>Contracted annual rent</strong></td><td>Sum of the annual rent on leases active at the as-of date.</td></tr>
+        <tr><td><strong>Rent realisation %</strong></td><td>Contracted ÷ standard. Below 100% means vacancy or leases signed under the asking rent; above 100% means units are let above asking.</td></tr>
+        <tr><td><strong>Rent gap</strong></td><td>Standard less contracted — annualised revenue being forgone. The number to attack first.</td></tr>
+        <tr><td><strong>Rent per sq ft</strong></td><td>Contracted rent ÷ leased area. Compares pricing across properties of different sizes.</td></tr>
+        <tr><td><strong>Expiring 90d</strong></td><td>Active leases ending within 90 days of the as-of date — the renewal pipeline.</td></tr>
+    </tbody>
+</table>
+
+<p>Summary cards at the top give the portfolio position, and a total row closes the table. Occupancy and
+area utilization each carry a colour bar: green at 85% and above, amber from 60%, red below.</p>
+
+<div class="box">
+    <div class="box-title">Occupancy and area utilization can disagree — and that is useful</div>
+    <p>High unit occupancy with low area utilization means your small units are let and your large ones
+    are empty. That single comparison usually points straight at where the revenue is being lost.</p>
+</div>
+
+<h3>Tenant Health &amp; Ranking</h3>
+<p><span class="path">Reporting ▸ Tenant Health &amp; Ranking</span></p>
+
+<p>Every tenant scored from 0 to 100 and ranked best first, with the underlying figures shown alongside
+the score so the ranking can always be explained to the tenant or to management.</p>
+
+<h4>The four components</h4>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Component</th><th style="width:10%">Weight</th><th>Basis</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Collection ratio</strong></td><td>40%</td><td>Total collected ÷ total invoiced. The strongest single signal of a paying tenant. Collections include cleared PDCs, because clearance updates the invoice.</td></tr>
+        <tr><td><strong>Overdue exposure</strong></td><td>30%</td><td>Overdue balance ÷ total invoiced, inverted, then reduced by an ageing penalty of up to 30 points as the oldest overdue invoice passes 120 days.</td></tr>
+        <tr><td><strong>PDC reliability</strong></td><td>15%</td><td>Cleared cheque value ÷ (cleared + bounced) value.</td></tr>
+        <tr><td><strong>Tenure &amp; commitment</strong></td><td>15%</td><td>Years occupied since the first lease start, capped at five years (70% of the component), plus current contract length capped at 36 months (30%).</td></tr>
+    </tbody>
+</table>
+
+<div class="box ok">
+    <div class="box-title">Missing data never counts against a tenant</div>
+    <p>A component that cannot be measured — a tenant who has never issued a post-dated cheque, or one
+    with no invoices yet — is dropped, and its weight is shared across the components that can be
+    measured. Nobody is penalised for the absence of a behaviour rather than for the behaviour itself.
+    A tenant with no measurable activity at all is shown as <em>No activity</em> and graded N/A.</p>
+</div>
+
+<h4>Grades</h4>
+<table class="t-compact">
+    <thead><tr><th style="width:14%">Grade</th><th style="width:16%">Score</th><th>Reading</th></tr></thead>
+    <tbody>
+        <tr><td><strong>A</strong></td><td>85 – 100</td><td>Pays in full and on time, long tenure. Prioritise renewal.</td></tr>
+        <tr><td><strong>B</strong></td><td>70 – 84</td><td>Reliable with minor slippage.</td></tr>
+        <tr><td><strong>C</strong></td><td>55 – 69</td><td>Watch list. Follow up before the next billing date.</td></tr>
+        <tr><td><strong>D</strong></td><td>40 – 54</td><td>Material arrears or a short, unproven relationship. Secure additional cover.</td></tr>
+        <tr><td><strong>E</strong></td><td>Below 40</td><td>Serious exposure. Check deposit cover and consider legal steps.</td></tr>
+    </tbody>
+</table>
+
+<h4>Columns worth knowing</h4>
+<ul>
+    <li><strong>Outstanding</strong> includes the tenant's opening balance, so it agrees with the tenant statement.</li>
+    <li><strong>Overdue</strong> counts only posted invoices past their due date and not fully paid. Draft and cancelled invoices are excluded because they carry no ledger balance.</li>
+    <li><strong>Oldest (days)</strong> is the age of the earliest unpaid overdue invoice — often more telling than the amount.</li>
+    <li><strong>Avg days to pay</strong> is the average of receipt date less invoice due date. A negative figure means the tenant pays early.</li>
+    <li><strong>PDC on hand</strong> is cheque value held but not yet cleared — future cash, not yet collected.</li>
+    <li><strong>Deposit held</strong> is the security deposit still in <em>Held</em> status, i.e. your cover against the arrears in the same row.</li>
+    <li><strong>Tenure (yrs)</strong> runs from the tenant's earliest lease start date to the as-of date, across all their contracts.</li>
+</ul>
+
+<div class="box warn">
+    <div class="box-title">PDC reliability needs a bounce workflow to discriminate</div>
+    <p>The PDC register supports a <em>Bounced</em> status, but no screen currently sets it — a cheque is
+    either <em>Received</em> or <em>Cleared</em>. Until a bounce action exists, the PDC reliability
+    component scores 100% for every tenant who has had a cheque clear, and therefore does not yet
+    separate good payers from bad ones. The other three components carry the ranking in the meantime.</p>
+</div>

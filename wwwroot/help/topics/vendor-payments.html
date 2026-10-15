@@ -1,0 +1,25 @@
+<h3>Paying a bill</h3>
+<ol class="steps">
+    <li>Select <strong>New Payment</strong>, or <strong>Pay</strong> / <strong>Register Payment</strong> on a posted vendor bill.</li>
+    <li>Choose the <strong>Vendor Bill</strong> being paid. Its outstanding balance is shown.</li>
+    <li>Enter the <strong>Payment Number</strong> and the <strong>Payment Date</strong>.</li>
+    <li>Enter the <strong>Amount</strong>. Part payments are allowed.</li>
+    <li>Choose the <strong>Payment Method</strong> and save.</li>
+    <li>Post the draft journal from <span class="path">Operations ▸ Journal Inquiry</span>.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21100</code> Accounts Payable</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<div class="box">
+    <div class="box-title">Only posted bills can be paid</div>
+    <p>The bill list shows posted bills with something left to pay. A draft bill is not offered, and if one is
+    chosen another way the payment is refused with <em>"Bill … has not been posted yet"</em>. A draft has not been
+    added to Accounts Payable, so there is nothing to pay off. Post the bill first.</p>
+</div>
+<p>When the payment is posted, the bill's <em>Amount Paid</em> rises and its status moves to
+<strong>PartiallyPaid</strong> or <strong>Paid</strong>. While a payment is posted against a bill, the bill itself cannot
+be reset to draft — reset the payment first.</p>

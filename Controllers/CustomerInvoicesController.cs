@@ -31,6 +31,8 @@ namespace RealEstateManager.Controllers
                 .Include(x => x.Lease)
                     .ThenInclude(x => x!.Tenant)
                 .Include(x => x.Receipts)
+                // Needed to tell a posted invoice from one whose journal is only a draft.
+                .Include(x => x.JournalEntry)
                 .OrderByDescending(x => x.InvoiceDate)
                 .ThenByDescending(x => x.Id)
                 .ToListAsync();

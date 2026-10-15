@@ -80,7 +80,9 @@ namespace RealEstateManager.Controllers
             try
             {
                 await _pettyCashService.PostExpenseAsync(model);
-                TempData["PettyCashMessage"] = $"Voucher posted: {model.Description} for {model.Amount:N2}.";
+                TempData["PettyCashMessage"] =
+                    $"Voucher saved as a draft: {model.Description} for {model.Amount:N2}. " +
+                    "Post it from Journal Inquiry to reduce the float.";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
             catch (Exception ex)
@@ -123,7 +125,9 @@ namespace RealEstateManager.Controllers
             try
             {
                 await _pettyCashService.PostReplenishmentAsync(model);
-                TempData["PettyCashMessage"] = $"Replenishment posted: {model.Amount:N2}.";
+                TempData["PettyCashMessage"] =
+                    $"Replenishment saved as a draft: {model.Amount:N2}. " +
+                    "Post it from Journal Inquiry to top up the float.";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
             catch (Exception ex)

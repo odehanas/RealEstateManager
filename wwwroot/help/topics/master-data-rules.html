@@ -1,0 +1,43 @@
+<p>Properties, units, tenants, vendors and contracts are <strong>master data</strong>: the records everything else
+refers to. Three rules keep them clean.</p>
+
+<h3>1. The system issues the codes</h3>
+<p>You never type a code. It is generated when the record is saved, and it never changes afterwards because it is
+already printed on contracts, invoices and statements.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Record</th><th style="width:30%">Example</th><th>How it is built</th></tr></thead>
+    <tbody>
+        <tr><td>Property</td><td><code>OWN-R-0001</code></td><td><strong>OWN</strong> (owned) or <strong>MNG</strong> (managed), then the type — <strong>R</strong> residential, <strong>C</strong> commercial, <strong>W</strong> warehouse, <strong>M</strong> mixed use — then a running number.</td></tr>
+        <tr><td>Unit</td><td><code>OWN-R-0001-U01</code></td><td>The property code plus a unit number within that property.</td></tr>
+        <tr><td>Contract</td><td><code>OWN-R-0001-U01-C001-2026</code></td><td>The unit code, a tenancy number and the contract year. A <strong>renewal</strong> by the same tenant keeps the C number with the new year; a <strong>new tenant</strong> on the unit gets the next C number.</td></tr>
+        <tr><td>Tenant</td><td><code>TNT-00001</code></td><td>A running number for the company.</td></tr>
+        <tr><td>Vendor</td><td><code>VEN-0001</code></td><td>A running number for the company.</td></tr>
+        <tr><td>Vendor bill</td><td><code>BILL-2026-0001</code></td><td>Year and running number. The supplier's own number is stored separately.</td></tr>
+        <tr><td>Tenant request</td><td><code>REQ-2026-0001</code></td><td>Year and running number.</td></tr>
+    </tbody>
+</table>
+<p>The property create screen previews the code it will issue as you choose the ownership and type.</p>
+
+<h3>2. The same party cannot be entered twice</h3>
+<p>A tenant or supplier set up twice under two codes splits their balance in two, so statements are wrong and the
+same debt gets chased twice. The system refuses a duplicate of any of these, within a company:</p>
+<ul>
+    <li><strong>Tenants</strong> — trade licence number, Emirates ID / ID number, passport number, TRN.</li>
+    <li><strong>Vendors</strong> — trade licence number, TRN.</li>
+    <li><strong>Properties</strong> — the property name.</li>
+</ul>
+<p>The message names the record that already holds the value, for example <em>Trade licence number "1234" is
+already registered to TNT-00007 – Al Noor Trading</em>. Open that record instead of creating a second one.</p>
+<p>Blank values are never treated as duplicates. Any number of records may have no passport number on file.</p>
+
+<h3>3. Only the master data owners can create or change records</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:34%">Permission</th><th>What the user can do</th></tr></thead>
+    <tbody>
+        <tr><td><strong>View Master Data</strong></td><td>Open the lists and look records up. The <strong>Add</strong> and <strong>Edit</strong> buttons are not shown, and a note explains why.</td></tr>
+        <tr><td><strong>Create &amp; Edit Master Data</strong></td><td>Add and amend properties, units, tenants and vendors, and issue tenant portal logins.</td></tr>
+    </tbody>
+</table>
+<p>Accounting users can always look vendors up, because they need to find the supplier to enter a bill, but they
+cannot create one. Grant <strong>Create &amp; Edit</strong> only to the small group responsible for master data —
+see <a href="#companies-users">Companies, Users &amp; Permissions</a>.</p>

@@ -1,0 +1,36 @@
+<p>Your company's VAT identity and one recovery setting. Fill this in once, before you issue the first tax invoice.</p>
+
+<h3>Tax identity</h3>
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Why it matters</th></tr></thead>
+    <tbody>
+        <tr><td><strong>TRN</strong></td><td>Your Tax Registration Number. Printed on every tax invoice. <strong>Leave it blank if the company is not VAT registered</strong> — the system then issues ordinary invoices with no VAT.</td></tr>
+        <tr><td><strong>Legal Name</strong></td><td>The registered name, if it differs from the trading name. A tax invoice must show it.</td></tr>
+        <tr><td><strong>Address, City, Country</strong></td><td>Required on a tax invoice.</td></tr>
+        <tr><td><strong>Phone, Email</strong></td><td>Printed in the invoice header.</td></tr>
+    </tbody>
+</table>
+<p>Until a TRN and address are entered, the screen shows <em>Tax invoices cannot be issued yet</em> and the
+<strong>Setup Readiness</strong> panel lists what is missing.</p>
+
+<h3>Input tax recovery</h3>
+<p>A business that lets both commercial property (VAT at 5%) and residential property (exempt) can reclaim VAT on
+its costs only in proportion to its taxable activity. Costs clearly belonging to one side are handled on the bill
+line — <em>Taxable</em> or <em>Exempt</em>. Shared overheads such as head-office costs are <strong>Residual</strong>, and
+for those a percentage is used during the year:</p>
+<table class="fields t-compact">
+    <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Provisional recovery rate (%)</strong></td><td>The share of residual input VAT reclaimed on each bill during the year. Normally last year's actual rate. <strong>100</strong> if all your lettings are commercial.</td></tr>
+    </tbody>
+</table>
+<p>At year end the <a href="#vat-return">VAT Return</a> works out the rate you actually earned and shows the
+correction (the <em>wash-up</em>).</p>
+
+<div class="box">
+    <div class="box-title">Where VAT is decided</div>
+    <ul>
+        <li><strong>On rent</strong> — by the VAT category of the property or unit, copied to the contract and then onto each invoice. See <a href="#leases">Lease Contracts</a>.</li>
+        <li><strong>On costs</strong> — by whether the supplier is VAT registered, and by each bill line's attribution. See <a href="#vendor-bills">Vendor Bills</a>.</li>
+    </ul>
+</div>

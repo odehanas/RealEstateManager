@@ -1,0 +1,59 @@
+<p>Petty cash is the small float kept on site to pay for minor items — cleaning supplies, a plumber's call-out,
+courier fees. Each float is its own asset account with its own running balance, so you always know how much cash
+should be in the box.</p>
+
+<h3>Setting up a float</h3>
+<ol class="steps">
+    <li>In <span class="path">System Setup ▸ Chart of Accounts</span>, create an <strong>Asset</strong> account for the float —
+        for example <code>11150</code> Petty Cash – Marina Tower. Then <strong>Edit</strong> it and set
+        <strong>Petty Cash Float</strong> to <em>Yes</em>.</li>
+    <li>Give it an <strong>Opening Balance</strong> if cash is already in the box on go-live, or fund it with a first
+        replenishment.</li>
+</ol>
+<p>Create one account per float if you keep cash at more than one site. Each appears in the float selector on
+this screen.</p>
+
+<h3>Recording an expense voucher</h3>
+<ol class="steps">
+    <li>Choose the float at the top of the screen, then select <strong>New Expense Voucher</strong>.</li>
+    <li>Enter the <strong>Voucher Date</strong>, <strong>Paid To</strong> and a <strong>Description</strong> of what was bought.</li>
+    <li>Choose the <strong>Expense Account</strong> the cost belongs in.</li>
+    <li>Optionally choose the <strong>Property</strong> and <strong>Unit</strong>, so the cost appears against the right
+        building in <a href="#management-reports">P&amp;L by Property</a>.</li>
+    <li>Enter the <strong>Amount</strong> and any <strong>Reference Number</strong> (the receipt number), then save.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Expense account chosen on the voucher</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td>The petty cash float account</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+
+<h3>Replenishing the float</h3>
+<p>When the box runs low, top it back up from the bank with <strong>Replenish Float</strong>: enter the date,
+choose the <strong>Funding Account</strong> (normally your bank or main cash account), the amount and a reference.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>The petty cash float account</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td>Funding account — bank or main cash</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Vouchers and replenishments are saved as drafts</div>
+    <p>They do not reduce the float balance until posted. Post them from
+    <span class="path">Operations ▸ Journal Inquiry</span> — see <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+</div>
+
+<h3>Counting the cash</h3>
+<p>The screen shows the float's opening balance, every voucher and replenishment in the date range, and the
+closing balance. Count the box and compare it with the closing balance. A shortfall means a voucher is missing
+or a slip was lost. <strong>Print</strong> gives a signed-off petty cash report.</p>
+
+<div class="box">
+    <div class="box-title">Replenishing is not an expense</div>
+    <p>Moving cash from the bank into the box changes where the cash is, not how much the company has. The
+    Statement of Cash Flows leaves these transfers out for that reason.</p>
+</div>

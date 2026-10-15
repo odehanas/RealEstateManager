@@ -72,11 +72,19 @@ namespace RealEstateManager.Controllers
             var invoice = await _db.CustomerInvoices
                 .Include(x => x.Lease)
                     .ThenInclude(x => x!.Tenant)
+                .Include(x => x.JournalEntry)
                 .FirstOrDefaultAsync(x => x.Id == model.CustomerInvoiceId);
 
             if (invoice == null)
             {
                 ModelState.AddModelError(nameof(model.CustomerInvoiceId), "Selected invoice was not found.");
+            }
+            else if (invoice.JournalEntry == null || !invoice.JournalEntry.IsPosted)
+            {
+                // A receipt credits Accounts Receivable. A draft invoice has not debited it,
+                // so receiving against one would reduce a receivable that was never raised.
+                ModelState.AddModelError(nameof(model.CustomerInvoiceId),
+                    $"Invoice {invoice.InvoiceNumber} has not been posted yet. Post it from Customer Invoices first.");
             }
 
             if (model.Amount <= 0)
@@ -117,15 +125,13 @@ namespace RealEstateManager.Controllers
             {
                 await using var transaction = await _db.Database.BeginTransactionAsync();
 
-                if (!invoice!.JournalEntryId.HasValue)
-                {
-                    await _postingService.PostCustomerInvoiceAsync(invoice.Id);
-                }
+                // The invoice is guaranteed posted by the check above. This used to build
+                // its journal on the fly, which under draft-first produced only a draft.
 
                 var receipt = new CustomerReceipt
                 {
                     CompanyId = companyId,
-                    CustomerInvoiceId = invoice.Id,
+                    CustomerInvoiceId = invoice!.Id,
                     ReceiptNumber = string.IsNullOrWhiteSpace(model.ReceiptNumber)
                         ? await GenerateReceiptNumberAsync()
                         : model.ReceiptNumber.Trim(),
@@ -160,7 +166,10 @@ namespace RealEstateManager.Controllers
                         .ThenInclude(x => x!.Property)
                 .Include(x => x.Lease)
                     .ThenInclude(x => x!.Tenant)
-                .Where(x => x.TotalAmount > x.AmountPaid)
+                // Posted invoices with a balance. A draft is not yet a receivable.
+                .Where(x => x.TotalAmount > x.AmountPaid
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted)
                 .OrderByDescending(x => x.InvoiceDate)
                 .ToListAsync();
 

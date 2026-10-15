@@ -1,0 +1,36 @@
+<p>A security deposit is money you hold on the tenant's behalf and expect to return at the end of the lease. It is
+never income. The system records it as a liability from the moment it is received.</p>
+
+<h3>Recording a deposit</h3>
+<ol class="steps">
+    <li>Select <strong>New Security Deposit</strong> and choose the <strong>Lease</strong>.</li>
+    <li>Enter the <strong>Reference Number</strong>, the <strong>Receipt Date</strong> and the <strong>Payment Method</strong>.</li>
+    <li>Enter the <strong>Amount</strong> — normally the deposit agreed on the lease — and save.</li>
+    <li>Post the draft journal from <span class="path">Operations ▸ Journal Inquiry</span>.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>21300</code> Tenant Security Deposits</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Never treat a deposit as rent</div>
+    <p>Recording a deposit as a customer receipt would reduce the tenant's receivable and eventually show as revenue.
+    Always use this screen. At the end of the lease, refund or forfeit the deposit with a
+    <a href="#manual-journals">manual journal</a> that debits <code>21300</code>.</p>
+</div>
+
+<h3>Releasing a deposit at lease end</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:32%">Situation</th><th>Manual journal to post</th></tr></thead>
+    <tbody>
+        <tr><td>Refunded in full</td><td>Dr <code>21300</code> Tenant Security Deposits · Cr <code>11100</code> Cash</td></tr>
+        <tr><td>Forfeited to cover damages</td><td>Dr <code>21300</code> Tenant Security Deposits · Cr <code>43100</code> Other Income</td></tr>
+        <tr><td>Applied against unpaid rent</td><td>Dr <code>21300</code> Tenant Security Deposits · Cr <code>11200</code> Accounts Receivable</td></tr>
+    </tbody>
+</table>
+<p>The draft tenancy contract's <strong>Schedule of Charges</strong> sets out what may be deducted from the deposit,
+which is your basis for a forfeiture — see <a href="#leases">Lease Contracts</a>.</p>

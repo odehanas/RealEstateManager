@@ -1,0 +1,257 @@
+/* ===========================================================================
+   help.css - typography for help topics.
+
+   EVERY rule is scoped under .help-content. The topics use plain tags - table,
+   th, h3, ol - and these pages share the screen with the application's own
+   Bootstrap tables. An unscoped "th { background: navy }" would repaint every
+   table in the application the moment the help panel loaded.
+   =========================================================================== */
+
+.help-content {
+    --hc-navy: #0f2740;
+    --hc-navy-soft: #1b3a5c;
+    --hc-accent: #1e6fd9;
+    --hc-accent-soft: #e8f1fd;
+    --hc-ink: #1f2933;
+    --hc-muted: #5b6774;
+    --hc-line: #d8dee6;
+    --hc-line-soft: #eceff3;
+
+    color: var(--hc-ink);
+    font-size: .95rem;
+    line-height: 1.6;
+}
+
+.help-content h3 {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: var(--hc-navy-soft);
+    margin: 1.6em 0 .55em;
+}
+
+.help-content h3:first-child { margin-top: 0; }
+
+.help-content h4 {
+    font-size: .98rem;
+    font-weight: 700;
+    color: var(--hc-navy-soft);
+    margin: 1.2em 0 .45em;
+}
+
+.help-content p { margin: 0 0 .8em; }
+.help-content ul,
+.help-content ol { margin: 0 0 .9em; padding-left: 1.35em; }
+.help-content li { margin-bottom: .3em; }
+
+.help-content code {
+    font-size: .88em;
+    color: var(--hc-navy);
+    background: var(--hc-line-soft);
+    border: 1px solid var(--hc-line);
+    border-radius: 3px;
+    padding: .05em .35em;
+}
+
+.help-content a { color: var(--hc-accent); }
+.help-content .path { font-weight: 600; color: var(--hc-navy); }
+.help-content .muted { color: var(--hc-muted); }
+.help-content .small { font-size: .85em; }
+
+/* ---- Tables ---------------------------------------------------------------- */
+.help-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: .6em 0 1.1em;
+    font-size: .88rem;
+}
+
+.help-content th {
+    background: var(--hc-navy);
+    color: #fff;
+    text-align: left;
+    padding: 6px 8px;
+    font-weight: 600;
+    border: 1px solid var(--hc-navy);
+}
+
+.help-content td {
+    padding: 5px 8px;
+    border: 1px solid var(--hc-line);
+    vertical-align: top;
+}
+
+.help-content tbody tr:nth-child(even) td { background: #f7f9fb; }
+.help-content td.num,
+.help-content th.num { text-align: right; white-space: nowrap; }
+
+.help-content .je th { background: var(--hc-navy-soft); }
+.help-content .je td:first-child { width: 46%; }
+.help-content .je .dr { color: #0a6b33; font-weight: 600; }
+.help-content .je .cr { color: #a3341f; font-weight: 600; }
+.help-content .fields th:first-child { width: 30%; }
+
+/* ---- Callouts -------------------------------------------------------------- */
+.help-content .box {
+    border-left: 4px solid var(--hc-accent);
+    background: #eef4ff;
+    padding: 10px 14px;
+    margin: 1em 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.help-content .box .box-title { font-weight: 700; color: var(--hc-navy); margin-bottom: 3px; }
+.help-content .box.warn { border-left-color: #e0a800; background: #fff8e6; }
+.help-content .box.ok { border-left-color: #2e9e5b; background: #eefaf1; }
+.help-content .box p:last-child,
+.help-content .box ul:last-child { margin-bottom: 0; }
+
+/* ---- Numbered steps -------------------------------------------------------- */
+.help-content ol.steps { counter-reset: step; list-style: none; padding-left: 0; }
+
+.help-content ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 .55em 30px;
+    margin-bottom: .2em;
+}
+
+.help-content ol.steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--hc-accent);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---- Workflow diagram ------------------------------------------------------ */
+.help-content .wf-canvas {
+    border: 1px solid var(--hc-line);
+    border-radius: 8px;
+    background: #fbfcfe;
+    padding: 16px 14px;
+    margin: 12px 0 18px;
+}
+
+.help-content .wf-band-title {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 700;
+    color: var(--hc-muted);
+    border-bottom: 1px solid var(--hc-line);
+    padding-bottom: 4px;
+    margin: 4px 0 12px;
+}
+
+.help-content .wf-row {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    margin-bottom: 6px;
+}
+
+.help-content .wf-node {
+    width: 108px;
+    text-align: center;
+    border: 1px solid var(--hc-line);
+    border-radius: 8px;
+    background: #fff;
+    padding: 10px 6px 8px;
+    box-shadow: 0 1px 2px rgba(15, 39, 64, .06);
+}
+
+.help-content .wf-node .tile {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 7px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hc-accent-soft);
+    border: 1px solid #c8ddf8;
+}
+
+.help-content .wf-node .tile svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--hc-accent);
+    fill: none;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.help-content .wf-node .lbl { font-weight: 700; font-size: .78rem; color: var(--hc-navy); line-height: 1.25; }
+.help-content .wf-node .hint { font-size: .66rem; color: var(--hc-muted); line-height: 1.3; margin-top: 3px; }
+
+.help-content .wf-node .step-no {
+    display: inline-block;
+    background: var(--hc-navy);
+    color: #fff;
+    font-size: .6rem;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 7px;
+    margin-bottom: 6px;
+}
+
+.help-content .wf-arrow {
+    align-self: center;
+    width: 30px;
+    flex: 0 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-content .wf-arrow svg { width: 24px; height: 14px; stroke: #7f9dbd; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.help-content .wf-elbow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: var(--hc-muted);
+    font-size: .7rem;
+    margin: 2px 0 10px;
+}
+
+.help-content .wf-elbow .line { height: 1px; background: #b9cbdd; width: 70px; }
+.help-content .wf-elbow svg { width: 14px; height: 14px; stroke: #7f9dbd; fill: none; stroke-width: 1.8; }
+
+.help-content .wf-node.support .tile { background: #f3f5f8; border-color: var(--hc-line); }
+.help-content .wf-node.support .tile svg { stroke: var(--hc-navy-soft); }
+.help-content .wf-node.support .lbl { color: var(--hc-navy-soft); }
+
+.help-content .wf-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: .72rem; color: var(--hc-muted); margin-top: 10px; }
+.help-content .wf-legend .k { display: inline-flex; align-items: center; gap: 6px; }
+.help-content .wf-legend .sw { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #c8ddf8; background: var(--hc-accent-soft); }
+.help-content .wf-legend .sw.s2 { background: #f3f5f8; border-color: var(--hc-line); }
+
+/* ---- The in-screen help panel ---------------------------------------------- */
+.help-panel.offcanvas-end { width: min(560px, 100vw); }
+.help-panel .offcanvas-header { background: #0f2740; color: #fff; }
+.help-panel .offcanvas-header .btn-close { filter: invert(1) grayscale(1) brightness(2); }
+.help-panel .help-panel-path { font-size: .78rem; opacity: .8; }
+.help-panel .help-content { font-size: .9rem; }
+.help-panel .help-content table { font-size: .8rem; }
+.help-panel .help-content .wf-node { width: 92px; }
+
+/* Wide tables scroll inside a narrow panel rather than squashing their columns. */
+.help-panel .help-content table { display: block; overflow-x: auto; }
+
+@media print {
+    .help-panel { display: none !important; }
+}

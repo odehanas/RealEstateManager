@@ -1,0 +1,40 @@
+<p>The Trial Balance lists every account with a balance as at a chosen date and proves that the ledger is
+internally consistent. It is the first report to run and the last one to check.</p>
+
+<h3>Running the report</h3>
+<ol class="steps">
+    <li>Enter the <strong>As Of Date</strong>.</li>
+    <li>Select <strong>Refresh</strong>.</li>
+</ol>
+
+<p>The report is <strong>cumulative</strong>: it includes every posted journal from the beginning of the
+ledger up to and including the as-of date, plus opening balances. That is the correct behaviour for a trial
+balance — it shows a position, not a movement. To see movement between two dates, use the
+<strong>General Ledger</strong> report (<a href="#general-ledger">General Ledger &amp; Tenant Statement</a>), which shows opening balance, period debits, period
+credits and closing balance per account.</p>
+
+<div class="box">
+    <div class="box-title">Posted journals only</div>
+    <p>Drafts are left out of this and every other report. If a figure is missing, look for a draft in
+    <a href="#journal-inquiry">Journal Inquiry</a>.</p>
+</div>
+
+<h3>Columns</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:20%">Column</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Code / Account</strong></td><td>The account, sorted by code.</td></tr>
+        <tr><td><strong>Type</strong></td><td>Asset, Liability, Equity, Revenue or Expense.</td></tr>
+        <tr><td><strong>Debit</strong></td><td>Shown when the account's net balance is on the debit side.</td></tr>
+        <tr><td><strong>Credit</strong></td><td>Shown when the account's net balance is on the credit side.</td></tr>
+    </tbody>
+</table>
+<p>Each account appears once, with its net balance on one side only. Accounts with a nil balance are omitted.</p>
+
+<div class="box ok">
+    <div class="box-title">Totals must be equal</div>
+    <p>Total Debit must equal Total Credit. Because the system refuses to post an unbalanced journal, any
+    difference comes from opening balances, not from transactions. Go to
+    <span class="path">System Setup ▸ Opening Balances</span> and check the Net Imbalance card — the difference on
+    the Trial Balance will match it exactly. <a href="#troubleshooting">Troubleshooting</a> walks through the diagnosis.</p>
+</div>

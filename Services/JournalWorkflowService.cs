@@ -70,7 +70,7 @@ namespace RealEstateManager.Services
             }
             else
             {
-                var reason = GetPostBlockReason(entry);
+                var reason = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry);
                 state.CanPost = reason == null;
                 state.BlockReason = reason;
             }
@@ -91,7 +91,7 @@ namespace RealEstateManager.Services
             if (entry.IsPosted)
                 return JournalWorkflowResult.Failed("This entry is already posted.");
 
-            var blocked = GetPostBlockReason(entry);
+            var blocked = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry);
             if (blocked != null)
                 return JournalWorkflowResult.Failed(blocked);
 
@@ -211,6 +211,86 @@ namespace RealEstateManager.Services
                 return "The entry has fewer than two lines.";
 
             return null;
+        }
+
+        /// <summary>
+        /// A settlement may only be posted once the document it settles is in the accounts.
+        ///
+        /// A receipt credits Accounts Receivable and a vendor payment debits Accounts
+        /// Payable. If the invoice or bill behind it is still a draft, that balance was
+        /// never raised, and posting the settlement first would leave the control account
+        /// understated - or negative - with nothing in the sub-ledger to explain it.
+        ///
+        /// The entry screens now refuse an unposted invoice or bill. This check is the net
+        /// beneath them: it also catches drafts saved by older versions of those screens,
+        /// which built the invoice or bill journal as a draft on the fly. In a Post All
+        /// Drafts run the invoice is normally dated first and therefore posted first, so
+        /// the settlement goes through on the same run; if not, it is reported and the
+        /// next run picks it up.
+        /// </summary>
+        private async Task<string?> GetDependencyBlockReasonAsync(JournalEntry entry)
+        {
+            if (!entry.SourceId.HasValue)
+                return null;
+
+            var id = entry.SourceId.Value;
+
+            switch (entry.SourceType)
+            {
+                case "CustomerReceipt":
+                {
+                    var invoice = await _db.CustomerReceipts
+                        .Where(x => x.Id == id)
+                        .Select(x => new
+                        {
+                            x.CustomerInvoice!.InvoiceNumber,
+                            Posted = x.CustomerInvoice.JournalEntry != null && x.CustomerInvoice.JournalEntry.IsPosted
+                        })
+                        .FirstOrDefaultAsync();
+
+                    return invoice is { Posted: false }
+                        ? $"Invoice {invoice.InvoiceNumber} is not posted yet. Post the invoice before this receipt."
+                        : null;
+                }
+
+                case "VendorPayment":
+                {
+                    var bill = await _db.VendorPayments
+                        .Where(x => x.Id == id)
+                        .Select(x => new
+                        {
+                            x.VendorBill!.BillNumber,
+                            Posted = x.VendorBill.JournalEntry != null && x.VendorBill.JournalEntry.IsPosted
+                        })
+                        .FirstOrDefaultAsync();
+
+                    return bill is { Posted: false }
+                        ? $"Bill {bill.BillNumber} is not posted yet. Post the bill before this payment."
+                        : null;
+                }
+
+                case "PdcClearance":
+                {
+                    // Only a cheque settling an invoice touches Accounts Receivable. One
+                    // taken as an advance credits Advances from Customers and needs nothing.
+                    var pdc = await _db.PdcReceipts
+                        .Where(x => x.Id == id && x.SettlementMode == "Receivable" && x.CustomerInvoiceId != null)
+                        .Select(x => new
+                        {
+                            x.ChequeNumber,
+                            x.CustomerInvoice!.InvoiceNumber,
+                            Posted = x.CustomerInvoice.JournalEntry != null && x.CustomerInvoice.JournalEntry.IsPosted
+                        })
+                        .FirstOrDefaultAsync();
+
+                    return pdc is { Posted: false }
+                        ? $"Invoice {pdc.InvoiceNumber} is not posted yet. Post it before clearing cheque {pdc.ChequeNumber}."
+                        : null;
+                }
+
+                default:
+                    return null;
+            }
         }
 
         /// <summary>
