@@ -20,6 +20,14 @@ namespace RealEstateManager.Services
         public const string LeasesManage = "Leases.Manage";
         public const string AccountingManage = "Accounting.Manage";
         public const string ReportsView = "Reports.View";
+
+        /// <summary>
+        /// Handle what tenants submit through the self-service portal: maintenance
+        /// calls, requests for more time to pay, complaints. Kept separate from the
+        /// accounting permissions because the people who answer tenants are usually not
+        /// the people who keep the books.
+        /// </summary>
+        public const string ServiceRequestsManage = "ServiceRequests.Manage";
     }
 
     public sealed class PermissionDefinition
@@ -56,6 +64,15 @@ namespace RealEstateManager.Services
                 Group = "Operations",
                 Name = "Manage Leases",
                 Description = "Lease contracts and related operations."
+            },
+            new()
+            {
+                Key = AppPermissions.ServiceRequestsManage,
+                Group = "Operations",
+                Name = "Handle Tenant Requests",
+                Description =
+                    "Answer maintenance calls, payment postponement requests and complaints raised " +
+                    "by tenants through the self-service portal."
             },
             new()
             {
@@ -117,6 +134,7 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 ["Leases"] = new[] { AppPermissions.LeasesManage },
+                ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["AccountMappings"] = new[] { AppPermissions.AccountingManage },
                 ["OwnerWithdrawalCategories"] = new[] { AppPermissions.AccountingManage },

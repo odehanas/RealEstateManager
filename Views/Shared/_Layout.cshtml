@@ -23,6 +23,7 @@
         AppPermissions.MasterDataView,
         AppPermissions.MasterDataManage);
     var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
+    var canHandleServiceRequests = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
     var canManageAccounting = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
     var canViewReports = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ReportsView);
     var canViewVendors = isAuthenticated && await PermissionService.HasAnyPermissionAsync(
@@ -32,11 +33,14 @@
         AppPermissions.AccountingManage);
     var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors;
     var showAccountsMenu = canManageAccounting;
+    // Operations opens for either job: keeping the books, or answering tenants.
+    var showOperationsMenu = canManageAccounting || canHandleServiceRequests;
     var showReportsMenu = canViewReports;
     if (subscriptionBlocked)
     {
         showMasterDataMenu = false;
         showAccountsMenu = false;
+        showOperationsMenu = false;
         showReportsMenu = false;
     }
     var companies = isAuthenticated && CurrentCompanyAccessor.UserId.HasValue
@@ -185,17 +189,33 @@
                             </li>
                         }
 
-                        @if (showAccountsMenu)
+                        @if (showOperationsMenu)
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="operationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Operations
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="operationsDropdown">
+                                    @if (showAccountsMenu)
+                                    {
                                     <li>
                                         <a class="dropdown-item" asp-controller="Workflow" asp-action="Index">Workflow Guide</a>
                                     </li>
+                                    }
 
+                                    @if (canHandleServiceRequests)
+                                    {
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><h6 class="dropdown-header">Tenant Services</h6></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="ServiceRequests" asp-action="Index">
+                                                Tenant Requests
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (showAccountsMenu)
+                                    {
                                     <li><hr class="dropdown-divider" /></li>
                                     <li><h6 class="dropdown-header">Receivables &mdash; Tenants</h6></li>
                                     <li>
@@ -235,6 +255,7 @@
                                     <li>
                                         <a class="dropdown-item" asp-controller="Journal" asp-action="Index">Journal Inquiry</a>
                                     </li>
+                                    }
                                 </ul>
                             </li>
                         }

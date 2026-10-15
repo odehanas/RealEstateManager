@@ -59,6 +59,8 @@ namespace RealEstateManager.Data
         public DbSet<CompanyAccountSetting> CompanyAccountSettings => Set<CompanyAccountSetting>();
         public DbSet<OwnerWithdrawalCategory> OwnerWithdrawalCategories => Set<OwnerWithdrawalCategory>();
         public DbSet<TenantPortalUser> TenantPortalUsers => Set<TenantPortalUser>();
+        public DbSet<TenantServiceRequest> TenantServiceRequests => Set<TenantServiceRequest>();
+        public DbSet<TenantServiceRequestComment> TenantServiceRequestComments => Set<TenantServiceRequestComment>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -946,6 +948,78 @@ namespace RealEstateManager.Data
                 .HasIndex(x => x.TenantId)
                 .IsUnique();
 
+            // ---- Tenant service requests ------------------------------------
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.RequestNumber).HasMaxLength(30);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.RequestType).HasMaxLength(30);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Category).HasMaxLength(50);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Subject).HasMaxLength(200);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Description).HasMaxLength(4000);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Priority).HasMaxLength(20);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Status).HasMaxLength(30);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.ResolutionNotes).HasMaxLength(4000);
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasIndex(x => new { x.CompanyId, x.RequestNumber })
+                .IsUnique();
+
+            // The staff queue filters on status and the tenant's list filters on tenant.
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasIndex(x => new { x.CompanyId, x.Status });
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasIndex(x => new { x.TenantId, x.SubmittedAt });
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.Tenant)
+                .WithMany()
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.Lease)
+                .WithMany()
+                .HasForeignKey(x => x.LeaseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.Property)
+                .WithMany()
+                .HasForeignKey(x => x.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.Unit)
+                .WithMany()
+                .HasForeignKey(x => x.UnitId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.RelatedInvoice)
+                .WithMany()
+                .HasForeignKey(x => x.RelatedInvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TenantServiceRequestComment>().Property(x => x.AuthorType).HasMaxLength(20);
+            modelBuilder.Entity<TenantServiceRequestComment>().Property(x => x.AuthorName).HasMaxLength(200);
+            modelBuilder.Entity<TenantServiceRequestComment>().Property(x => x.Body).HasMaxLength(4000);
+
+            // A comment has no meaning apart from its request, and a request is never
+            // deleted in practice - but if one ever is, its thread goes with it.
+            modelBuilder.Entity<TenantServiceRequestComment>()
+                .HasOne(x => x.TenantServiceRequest)
+                .WithMany(x => x.Comments)
+                .HasForeignKey(x => x.TenantServiceRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TenantServiceRequestComment>()
+                .HasIndex(x => new { x.TenantServiceRequestId, x.CreatedAt });
+
             modelBuilder.Entity<AccountingPeriod>()
                 .HasOne(x => x.Company)
                 .WithMany(x => x.AccountingPeriods)
@@ -1602,6 +1676,17 @@ namespace RealEstateManager.Data
 
             modelBuilder.Entity<CompanyAccountSetting>()
                 .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            // Service requests are read by STAFF, who carry a company claim, and by
+            // TENANTS, who do not - a tenant principal has no current company, so this
+            // filter switches itself off for portal traffic. That is why every portal
+            // query filters on TenantId explicitly and must never rely on this one.
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<TenantServiceRequestComment>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled
+                                     || x.TenantServiceRequest!.CompanyId == CurrentCompanyIdValue);
         }
     }
 }

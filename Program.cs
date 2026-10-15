@@ -36,6 +36,7 @@ builder.Services.AddScoped<PermissionEnforcementFilter>();
 builder.Services.AddScoped<PortalBoundaryFilter>();
 builder.Services.AddScoped<TenantPortalAuthService>();
 builder.Services.AddScoped<TenantPortalService>();
+builder.Services.AddScoped<ServiceRequestService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 

@@ -1,0 +1,148 @@
+@model RealEstateManager.Models.ServiceRequestDetailViewModel
+@using RealEstateManager.Domain
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = Model.RequestNumber;
+
+    var isFinished = Model.Status == ServiceRequestStatuses.Closed
+                     || Model.Status == ServiceRequestStatuses.Cancelled;
+}
+
+@if (TempData["PortalSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["PortalSuccess"]</div>
+}
+@if (TempData["PortalError"] != null)
+{
+    <div class="alert alert-danger">@TempData["PortalError"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h5 mb-0">@Model.RequestNumber</h1>
+    <a asp-action="Requests" class="btn btn-outline-secondary btn-sm">Back</a>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <h2 class="h6 mb-0">@Model.Subject</h2>
+            <span class="badge @ServiceRequestStatuses.BadgeClass(Model.Status)">
+                @ServiceRequestStatuses.Describe(Model.Status)
+            </span>
+        </div>
+
+        <div class="small text-muted mb-3">
+            @ServiceRequestTypes.Describe(Model.RequestType)
+            @if (!string.IsNullOrWhiteSpace(Model.Category))
+            {
+                <text>&middot; @Model.Category</text>
+            }
+            &middot; sent @Model.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+            @if (!string.IsNullOrWhiteSpace(Model.ContractNumber))
+            {
+                <text>&middot; @Model.ContractNumber</text>
+            }
+        </div>
+
+        <p class="mb-0" style="white-space: pre-wrap">@Model.Description</p>
+
+        @if (Model.PreferredVisitDate.HasValue)
+        {
+            <div class="small text-muted mt-2">
+                Preferred visit date: @Model.PreferredVisitDate.Value.ToString("dd/MM/yyyy")
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.RequestType == ServiceRequestTypes.PaymentPostponement && Model.RelatedInvoiceNumber != null)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="small text-uppercase text-muted mb-2">Payment request</div>
+            <div class="d-flex justify-content-between"><span>Invoice</span><strong>@Model.RelatedInvoiceNumber</strong></div>
+            <div class="d-flex justify-content-between">
+                <span>Outstanding</span>
+                <strong>@Model.RelatedInvoiceOutstanding?.ToString("N2")</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Current due date</span>
+                <strong>@Model.RelatedInvoiceDueDate?.ToString("dd/MM/yyyy")</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>You asked to pay by</span>
+                <strong>@Model.RequestedNewDueDate?.ToString("dd/MM/yyyy")</strong>
+            </div>
+
+            @if (Model.PostponementApplied)
+            {
+                <div class="alert alert-success mt-3 mb-0 small">
+                    <strong>Agreed and applied.</strong> The due date on invoice @Model.RelatedInvoiceNumber
+                    has been moved. The amount you owe has not changed.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning mt-3 mb-0 small">
+                    The current due date still applies until we confirm a change.
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ResolutionNotes))
+{
+    <div class="card shadow-sm mb-3 border-success">
+        <div class="card-body">
+            <div class="small text-uppercase text-muted mb-1">Our response</div>
+            <div style="white-space: pre-wrap">@Model.ResolutionNotes</div>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-white"><strong>Messages</strong></div>
+    <div class="card-body">
+        @if (Model.Comments.Count == 0)
+        {
+            <p class="text-muted small mb-0">No messages yet.</p>
+        }
+        else
+        {
+            foreach (var comment in Model.Comments)
+            {
+                <div class="mb-3 p-2 rounded @(comment.IsFromTenant ? "bg-light" : "bg-white border")">
+                    <div class="small text-muted mb-1">
+                        <strong>@(comment.IsFromTenant ? "You" : comment.AuthorName)</strong>
+                        &middot; @comment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                    <div style="white-space: pre-wrap">@comment.Body</div>
+                </div>
+            }
+        }
+    </div>
+
+    @if (!isFinished)
+    {
+        <div class="card-footer bg-white">
+            <form asp-action="ReplyToRequest" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-2">
+                    <textarea name="body" class="form-control" rows="3" maxlength="4000" required
+                              placeholder="Add a message..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark btn-sm">Send message</button>
+            </form>
+        </div>
+    }
+</div>
+
+@if (Model.CanTenantCancel)
+{
+    <form asp-action="CancelRequest" asp-route-id="@Model.Id" method="post"
+          onsubmit="return confirm('Withdraw this request?');">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-danger btn-sm">Withdraw this request</button>
+    </form>
+}

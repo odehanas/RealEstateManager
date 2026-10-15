@@ -98,6 +98,14 @@
             <svg viewBox="0 0 24 24"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M14 2.5V7h4"/><path d="M9 12h6M9 15.5h4"/></svg>
             Contracts
         </a>
+        @* Requests, NewRequest and RequestDetails are all "the requests tab". *@
+        <a class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Portal"
+                    && (ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty).Contains("Request")
+                    ? "active" : "")"
+           asp-controller="Portal" asp-action="Requests">
+            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4L3 21l1.1-4.6A8.4 8.4 0 1 1 21 11.5z"/><path d="M12 7.5v4M12 14.6v.1"/></svg>
+            Requests
+        </a>
     </nav>
 }
 

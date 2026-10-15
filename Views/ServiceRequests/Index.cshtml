@@ -1,0 +1,149 @@
+@model RealEstateManager.Models.ServiceRequestQueueViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Tenant Requests";
+
+    string ChipClass(string? value) =>
+        (Model.StatusFilter ?? "Open") == value ? "btn-dark" : "btn-outline-secondary";
+}
+
+@if (TempData["RequestSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["RequestSuccess"]</div>
+}
+@if (TempData["RequestError"] != null)
+{
+    <div class="alert alert-danger">@TempData["RequestError"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">Tenant Requests</h2>
+        <p class="text-muted mb-0 small">
+            Everything tenants have raised through the self-service portal.
+        </p>
+    </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-action="Index" asp-route-status="Open" asp-route-type="@Model.TypeFilter"
+       class="btn btn-sm @ChipClass("Open")">
+        Open <span class="badge bg-light text-dark">@Model.OpenCount</span>
+    </a>
+    <a asp-action="Index" asp-route-status="Submitted" asp-route-type="@Model.TypeFilter"
+       class="btn btn-sm @ChipClass("Submitted")">
+        New <span class="badge bg-light text-dark">@Model.SubmittedCount</span>
+    </a>
+    <a asp-action="Index" asp-route-status="InProgress" asp-route-type="@Model.TypeFilter"
+       class="btn btn-sm @ChipClass("InProgress")">
+        In progress <span class="badge bg-light text-dark">@Model.InProgressCount</span>
+    </a>
+    <a asp-action="Index" asp-route-status="Closed" asp-route-type="@Model.TypeFilter"
+       class="btn btn-sm @ChipClass("Closed")">Closed</a>
+    <a asp-action="Index" asp-route-status="" asp-route-type="@Model.TypeFilter"
+       class="btn btn-sm @ChipClass("")">All</a>
+
+    @if (Model.AwaitingPostponementCount > 0)
+    {
+        <span class="btn btn-sm btn-warning disabled">
+            @Model.AwaitingPostponementCount postponement@(Model.AwaitingPostponementCount == 1 ? "" : "s")
+            agreed but not yet applied
+        </span>
+    }
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <input type="hidden" name="status" value="@Model.StatusFilter" />
+    <div class="col-auto">
+        <label class="form-label mb-1 small" for="type">Type</label>
+        <select class="form-select form-select-sm" id="type" name="type" onchange="this.form.submit()">
+            <option value="">All types</option>
+            @foreach (var type in ServiceRequestTypes.All)
+            {
+                <option value="@type" selected="@(type == Model.TypeFilter ? "selected" : null)">
+                    @ServiceRequestTypes.Describe(type)
+                </option>
+            }
+        </select>
+    </div>
+</form>
+
+@if (Model.Requests.Count == 0)
+{
+    <div class="alert alert-info">Nothing matches this filter.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-sm mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Request</th>
+                        <th>Tenant</th>
+                        <th>Unit</th>
+                        <th>Type</th>
+                        <th>Subject</th>
+                        <th>Priority</th>
+                        <th class="text-end">Age</th>
+                        <th>Status</th>
+                        <th style="width:1%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var request in Model.Requests)
+                    {
+                        <tr>
+                            <td class="small">@request.RequestNumber</td>
+                            <td>
+                                @request.TenantName
+                                <div class="small text-muted">@request.TenantCode</div>
+                            </td>
+                            <td class="small">@(request.UnitDisplay ?? "—")</td>
+                            <td class="small">
+                                @ServiceRequestTypes.Describe(request.RequestType)
+                                @if (!string.IsNullOrWhiteSpace(request.Category))
+                                {
+                                    <div class="text-muted">@request.Category</div>
+                                }
+                            </td>
+                            <td>
+                                @request.Subject
+                                @if (request.AwaitingPostponementAction)
+                                {
+                                    <span class="badge bg-warning text-dark">Due date not yet applied</span>
+                                }
+                            </td>
+                            <td>
+                                @if (request.Priority == ServiceRequestPriorities.Urgent)
+                                {
+                                    <span class="badge bg-danger">Urgent</span>
+                                }
+                                else if (request.Priority == ServiceRequestPriorities.High)
+                                {
+                                    <span class="badge bg-warning text-dark">High</span>
+                                }
+                                else
+                                {
+                                    <span class="small text-muted">@request.Priority</span>
+                                }
+                            </td>
+                            <td class="text-end small @(request.AgeInDays >= 7 ? "text-danger fw-bold" : "")">
+                                @request.AgeInDays d
+                            </td>
+                            <td>
+                                <span class="badge @ServiceRequestStatuses.BadgeClass(request.Status)">
+                                    @ServiceRequestStatuses.Describe(request.Status)
+                                </span>
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@request.Id"
+                                   class="btn btn-sm btn-outline-secondary">Open</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
