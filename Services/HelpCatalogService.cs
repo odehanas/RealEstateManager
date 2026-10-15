@@ -14,27 +14,62 @@ namespace RealEstateManager.Services
     /// manual and the PDF are all built from those, so editing one topic file updates
     /// every place that topic appears and they can never disagree.
     ///
-    /// Registered as a singleton: the files only change on deployment, which restarts
-    /// the application, so they are read once and cached.
+    /// Help is CONTENT, not code. Every file is cached in memory but re-read the moment
+    /// its last-modified time changes, so editing a topic, adding a screenshot or
+    /// re-ordering the catalog takes effect as soon as the file reaches the server - no
+    /// rebuild and no restart. (An earlier version read the files once at start-up, which
+    /// meant a text correction stayed invisible until the next full deployment.)
     /// </summary>
     public class HelpCatalogService
     {
+        private const string CatalogPath = "help/catalog.json";
+        private const string ShotsPath = "help/images/shots.json";
+
         private readonly IWebHostEnvironment _environment;
-        private readonly ConcurrentDictionary<string, string> _contentCache = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Lazy<HelpCatalog> _catalog;
+        private readonly ConcurrentDictionary<string, (DateTimeOffset TopicStamp, DateTimeOffset ShotsStamp, string Html)> _contentCache =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        private readonly object _catalogLock = new();
+        private HelpCatalog _catalog = new();
+        private DateTimeOffset _catalogStamp = DateTimeOffset.MinValue;
+
+        private readonly object _shotsLock = new();
+        private Dictionary<string, HelpShot> _shots = new(StringComparer.OrdinalIgnoreCase);
+        private DateTimeOffset _shotsStamp = DateTimeOffset.MinValue;
 
         public HelpCatalogService(IWebHostEnvironment environment)
         {
             _environment = environment;
-            _catalog = new Lazy<HelpCatalog>(LoadCatalog);
         }
 
-        public IReadOnlyList<HelpGroup> Groups => _catalog.Value.Groups;
+        public IReadOnlyList<HelpGroup> Groups => Catalog.Groups;
 
-        public IReadOnlyList<HelpTopic> AllTopics => _catalog.Value.AllTopics;
+        public IReadOnlyList<HelpTopic> AllTopics => Catalog.AllTopics;
 
         public HelpTopic? GetTopic(string? key) =>
-            string.IsNullOrWhiteSpace(key) ? null : _catalog.Value.ByKey.GetValueOrDefault(key);
+            string.IsNullOrWhiteSpace(key) ? null : Catalog.ByKey.GetValueOrDefault(key);
+
+        /// <summary>The catalog, reloaded whenever catalog.json changes on disk.</summary>
+        private HelpCatalog Catalog
+        {
+            get
+            {
+                var stamp = _environment.WebRootFileProvider.GetFileInfo(CatalogPath).LastModified;
+                if (stamp == _catalogStamp)
+                    return _catalog;
+
+                lock (_catalogLock)
+                {
+                    if (stamp != _catalogStamp)
+                    {
+                        _catalog = LoadCatalog();
+                        _catalogStamp = stamp;
+                    }
+
+                    return _catalog;
+                }
+            }
+        }
 
         /// <summary>
         /// The topic for a screen. An entry naming the action ("Reports.CashFlow") wins
@@ -46,7 +81,7 @@ namespace RealEstateManager.Services
             if (string.IsNullOrWhiteSpace(controller))
                 return null;
 
-            var screens = _catalog.Value.ByScreen;
+            var screens = Catalog.ByScreen;
 
             if (!string.IsNullOrWhiteSpace(action) &&
                 screens.TryGetValue($"{controller}.{action}", out var exact))
@@ -82,10 +117,15 @@ namespace RealEstateManager.Services
             if (topic == null)
                 return string.Empty;
 
-            var html = _contentCache.GetOrAdd(topic.Key, ReadTopicFile);
+            var html = RawTopicHtml(topic.Key);
 
             if (linkMode == HelpLinkMode.Anchor)
-                return html;
+            {
+                // The single-page manual is what the PDF is printed from. Chrome copies a
+                // JPEG into a PDF unchanged but expands a WebP about fivefold, so the
+                // manual uses each screenshot's JPEG twin.
+                return ManualImagePattern.Replace(html, "$1.jpg?");
+            }
 
             return TopicLinkPattern.Replace(html, match =>
             {
@@ -123,7 +163,7 @@ namespace RealEstateManager.Services
             {
                 var title = topic.Title.ToLowerInvariant();
                 var summary = topic.Summary.ToLowerInvariant();
-                var text = PlainText(_contentCache.GetOrAdd(topic.Key, ReadTopicFile));
+                var text = PlainText(RawTopicHtml(topic.Key));
                 var lowerText = text.ToLowerInvariant();
 
                 if (!words.All(w => title.Contains(w) || summary.Contains(w) || lowerText.Contains(w)))
@@ -197,17 +237,130 @@ namespace RealEstateManager.Services
         }
 
         /// <summary>
-        /// Reads a topic file. Only ever called with a key that exists in the catalog,
-        /// so a request can never be steered to an arbitrary file on disk.
+        /// A topic's HTML with its screenshots in place. Cached, but re-read whenever the
+        /// topic file or the screenshot list changes. Only ever called with a key that
+        /// exists in the catalog, so a request can never be steered to an arbitrary file.
         /// </summary>
-        private string ReadTopicFile(string key)
+        private string RawTopicHtml(string key)
         {
             var file = _environment.WebRootFileProvider.GetFileInfo($"help/topics/{key}.html");
             if (!file.Exists)
-                return $"<p class=\"text-muted\">This help topic has not been written yet.</p>";
+                return "<p class=\"text-muted\">This help topic has not been written yet.</p>";
 
-            using var reader = new StreamReader(file.CreateReadStream());
-            return reader.ReadToEnd();
+            // Both files are tracked separately: a re-captured screenshot must refresh every
+            // topic that shows it even though the topic text did not change, and an edited
+            // topic must refresh even if its file time is older than the screenshot list's.
+            var shots = Shots;
+            var shotsStamp = _shotsStamp;
+
+            if (_contentCache.TryGetValue(key, out var cached)
+                && cached.TopicStamp == file.LastModified
+                && cached.ShotsStamp == shotsStamp)
+            {
+                return cached.Html;
+            }
+
+            string html;
+            using (var reader = new StreamReader(file.CreateReadStream()))
+                html = reader.ReadToEnd();
+
+            html = ShotPattern.Replace(html, match => RenderShot(match.Groups[1].Value, shots));
+
+            _contentCache[key] = (file.LastModified, shotsStamp, html);
+            return html;
+        }
+
+        // =====================================================================
+        //  SCREENSHOTS
+        // =====================================================================
+
+        /// <summary>
+        /// A topic places a screenshot with one tag: &lt;figure data-shot="vendor-bills-edit"&gt;&lt;/figure&gt;.
+        /// The picture, its size, caption and numbered call-outs all come from
+        /// images/shots.json, which the capture tool writes - so re-capturing the screens
+        /// after a design change refreshes every topic without touching its text.
+        /// </summary>
+        private static readonly Regex ShotPattern =
+            new("<figure\\s+data-shot=\"([a-z0-9-]+)\"\\s*>\\s*</figure>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private Dictionary<string, HelpShot> Shots
+        {
+            get
+            {
+                var file = _environment.WebRootFileProvider.GetFileInfo(ShotsPath);
+                var stamp = file.Exists ? file.LastModified : DateTimeOffset.MinValue;
+
+                if (stamp == _shotsStamp)
+                    return _shots;
+
+                lock (_shotsLock)
+                {
+                    if (stamp == _shotsStamp)
+                        return _shots;
+
+                    var loaded = new Dictionary<string, HelpShot>(StringComparer.OrdinalIgnoreCase);
+
+                    if (file.Exists)
+                    {
+                        using var stream = file.CreateReadStream();
+                        var list = JsonSerializer.Deserialize<List<HelpShot>>(stream, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        }) ?? new List<HelpShot>();
+
+                        foreach (var shot in list.Where(x => !string.IsNullOrWhiteSpace(x.Key)))
+                            loaded[shot.Key] = shot;
+                    }
+
+                    _shots = loaded;
+                    _shotsStamp = stamp;
+                    return _shots;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Builds the framed screenshot. Desktop screens get a browser window, portal
+        /// screens a phone. Call-outs are positioned in percentages of the picture, so
+        /// they stay on target at any width - in the narrow help panel, on the full
+        /// topic page and in the printed manual alike.
+        /// </summary>
+        private static string RenderShot(string key, Dictionary<string, HelpShot> shots)
+        {
+            if (!shots.TryGetValue(key, out var shot))
+                return string.Empty; // Not captured yet: show nothing rather than a broken image.
+
+            var enc = (Func<string?, string>)(value => WebUtility.HtmlEncode(value ?? string.Empty));
+
+            // The capture time is appended so a re-captured image is never served from a
+            // browser's cache under the old name.
+            var src = $"/help/images/{enc(shot.File)}?v={shot.Version}";
+            var frame = shot.Frame == "phone" ? "shot-phone" : "shot-browser";
+
+            var markers = string.Concat(shot.Markers.Select(m =>
+                $"<span class=\"shot-marker\" style=\"left:{m.X.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%;" +
+                $"top:{m.Y.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%\" " +
+                $"aria-hidden=\"true\">{m.Number}</span>"));
+
+            var legend = shot.Markers.Count == 0
+                ? string.Empty
+                : "<ol class=\"shot-legend\">" +
+                  string.Concat(shot.Markers.Select(m =>
+                      $"<li value=\"{m.Number}\"><span class=\"shot-legend-no\">{m.Number}</span>{enc(m.Label)}</li>")) +
+                  "</ol>";
+
+            var address = shot.Frame == "phone"
+                ? string.Empty
+                : $"<div class=\"shot-bar\"><span class=\"shot-dots\"><i></i><i></i><i></i></span>" +
+                  $"<span class=\"shot-address\">{enc(shot.Address)}</span></div>";
+
+            return
+                $"<figure class=\"shot {frame}\">" +
+                $"<div class=\"shot-window\">{address}" +
+                $"<div class=\"shot-canvas\">" +
+                $"<img src=\"{src}\" width=\"{shot.Width}\" height=\"{shot.Height}\" loading=\"lazy\" " +
+                $"alt=\"{enc(shot.Caption)}\" data-shot-zoom=\"{src}\" />{markers}</div></div>" +
+                $"<figcaption>{enc(shot.Caption)}</figcaption>{legend}</figure>";
         }
 
         // =====================================================================
@@ -218,6 +371,9 @@ namespace RealEstateManager.Services
             new("href=\"#([a-z0-9-]+)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex TagPattern = new("<[^>]+>", RegexOptions.Compiled);
+
+        private static readonly Regex ManualImagePattern =
+            new(@"(/help/images/[a-z0-9-]+)\.webp\?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex SpacePattern = new(@"\s+", RegexOptions.Compiled);
 
         private static string PlainText(string html)
@@ -325,6 +481,38 @@ namespace RealEstateManager.Services
 
         /// <summary>Position in the manual, 1-based.</summary>
         public int Order { get; set; }
+    }
+
+    /// <summary>One screenshot, as described in wwwroot/help/images/shots.json.</summary>
+    public class HelpShot
+    {
+        public string Key { get; set; } = string.Empty;
+        public string File { get; set; } = string.Empty;
+        public int Width { get; set; }
+        public int Height { get; set; }
+
+        /// <summary>"browser" for staff screens, "phone" for the tenant portal.</summary>
+        public string Frame { get; set; } = "browser";
+
+        /// <summary>Shown in the browser frame's address bar, e.g. "Operations ▸ Vendor Bills".</summary>
+        public string Address { get; set; } = string.Empty;
+
+        public string Caption { get; set; } = string.Empty;
+
+        /// <summary>Capture time in ticks, used to bust browser caches.</summary>
+        public long Version { get; set; }
+
+        public List<HelpShotMarker> Markers { get; set; } = new();
+    }
+
+    public class HelpShotMarker
+    {
+        public int Number { get; set; }
+        public string Label { get; set; } = string.Empty;
+
+        /// <summary>Centre of the call-out as a percentage of the picture's width and height.</summary>
+        public double X { get; set; }
+        public double Y { get; set; }
     }
 
     public class HelpSearchResult

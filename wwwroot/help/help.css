@@ -255,3 +255,240 @@
 @media print {
     .help-panel { display: none !important; }
 }
+
+/* ===========================================================================
+   SCREENSHOTS
+   A topic places one with <figure data-shot="key"></figure>; the help service
+   expands it into the markup styled here. Desktop screens sit in a browser
+   window, tenant-portal screens in a phone. Numbered call-outs are positioned
+   in percentages, so they stay on target at any width.
+   =========================================================================== */
+
+.help-content .shot {
+    margin: 1.6em 0 1.8em;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.help-content .shot-window {
+    position: relative;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow:
+        0 0 0 1px rgba(15, 39, 64, .10),
+        0 2px 4px rgba(15, 39, 64, .06),
+        0 18px 38px -14px rgba(15, 39, 64, .38);
+}
+
+/* ---- Browser frame ---- */
+.help-content .shot-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 30px;
+    padding: 0 12px;
+    background: linear-gradient(#f6f8fa, #eaeef3);
+    border-bottom: 1px solid #d8dee6;
+}
+
+.help-content .shot-dots { display: inline-flex; gap: 6px; flex: 0 0 auto; }
+
+.help-content .shot-dots i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff5f57;
+}
+
+.help-content .shot-dots i:nth-child(2) { background: #febc2e; }
+.help-content .shot-dots i:nth-child(3) { background: #28c840; }
+
+.help-content .shot-address {
+    flex: 1 1 auto;
+    max-width: 62%;
+    margin: 0 auto;
+    padding: 3px 12px;
+    background: #fff;
+    border: 1px solid #dfe4ea;
+    border-radius: 7px;
+    color: #5b6774;
+    font-size: .72rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.help-content .shot-address::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    border-radius: 50%;
+    background: #2e9e5b;
+    vertical-align: 1px;
+}
+
+.help-content .shot-canvas {
+    position: relative;
+    line-height: 0;
+}
+
+.help-content .shot-canvas img {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: zoom-in;
+}
+
+/* ---- Phone frame ---- */
+.help-content .shot-phone { text-align: center; }
+
+.help-content .shot-phone .shot-window {
+    display: inline-block;
+    width: min(300px, 100%);
+    padding: 11px;
+    border-radius: 38px;
+    background: linear-gradient(145deg, #1f2937, #0b1220);
+    box-shadow:
+        0 0 0 1px #0b1220,
+        0 22px 44px -14px rgba(15, 39, 64, .55);
+    text-align: left;
+}
+
+.help-content .shot-phone .shot-canvas {
+    border-radius: 28px;
+    overflow: hidden;
+    background: #0f2740;
+}
+
+/* A status bar the colour of the portal header, so the camera notch sits above the
+   screen rather than over its buttons - the way a real phone shows it. */
+.help-content .shot-phone .shot-canvas::before {
+    content: "";
+    display: block;
+    height: 30px;
+    background: #0f2740;
+}
+
+/* The camera notch. */
+.help-content .shot-phone .shot-window::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 74px;
+    height: 18px;
+    border-radius: 12px;
+    background: #0b1220;
+    z-index: 2;
+}
+
+/* ---- Call-outs ---- */
+.help-content .shot-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e8590c;
+    color: #fff;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 4px rgba(232, 89, 12, .22), 0 3px 8px rgba(0, 0, 0, .28);
+    font-size: .74rem;
+    font-weight: 800;
+    line-height: 22px;
+    text-align: center;
+    pointer-events: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ---- Caption and legend ---- */
+.help-content .shot figcaption {
+    margin-top: .85em;
+    color: #5b6774;
+    font-size: .82rem;
+    text-align: center;
+}
+
+.help-content .shot-legend {
+    list-style: none;
+    padding: 0;
+    margin: .8em auto 0;
+    max-width: 640px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: .35em 1.2em;
+    font-size: .82rem;
+}
+
+.help-content .shot-legend li { display: flex; gap: .55em; align-items: flex-start; margin: 0; }
+
+.help-content .shot-legend-no {
+    flex: 0 0 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e8590c;
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 800;
+    line-height: 20px;
+    text-align: center;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* Smaller in the narrow help panel. */
+.help-panel .help-content .shot-marker { width: 22px; height: 22px; line-height: 18px; font-size: .66rem; }
+.help-panel .help-content .shot-phone .shot-window { width: min(240px, 100%); }
+.help-panel .help-content .shot-legend { grid-template-columns: 1fr; }
+
+/* ---- Enlarged view (click a screenshot) ---- */
+.shot-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 3vw;
+    background: rgba(11, 18, 32, .82);
+    backdrop-filter: blur(3px);
+    cursor: zoom-out;
+    animation: shot-fade .15s ease-out;
+}
+
+.shot-lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+    background: #fff;
+}
+
+@keyframes shot-fade { from { opacity: 0; } to { opacity: 1; } }
+
+@media print {
+    .help-content .shot-window { box-shadow: 0 0 0 1px #c9d1db; }
+    .help-content .shot-phone .shot-window { box-shadow: none; }
+    .help-content .shot-canvas img { cursor: default; }
+}
+
+/* Two phone screens side by side - e.g. "before" and "after" in the tenant guide. */
+.help-content .shot-pair {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 28px;
+    margin: 1.6em 0 1.8em;
+}
+
+.help-content .shot-pair .shot { margin: 0; flex: 0 1 300px; }
+.help-panel .help-content .shot-pair .shot { flex-basis: 240px; }

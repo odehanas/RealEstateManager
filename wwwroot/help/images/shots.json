@@ -1,0 +1,736 @@
+[
+  {
+    "key": "home-dashboard",
+    "file": "home-dashboard.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Home",
+    "caption": "The dashboard: portfolio, occupancy, collections and receivables at a glance.",
+    "version": 1792055421,
+    "markers": []
+  },
+  {
+    "key": "help-panel",
+    "file": "help-panel.webp",
+    "width": 1366,
+    "height": 760,
+    "frame": "browser",
+    "address": "Operations ▸ Vendor Bills",
+    "caption": "The Help button opens the instructions for the screen you are on, beside your work.",
+    "version": 1792055424,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Help button — or press F1",
+        "x": 82.6,
+        "y": 3.68
+      },
+      {
+        "number": 2,
+        "label": "The topic for this screen",
+        "x": 59.15,
+        "y": 6.54
+      }
+    ]
+  },
+  {
+    "key": "chart-of-accounts",
+    "file": "chart-of-accounts.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "System Setup ▸ Chart of Accounts",
+    "caption": "The chart of accounts, with the opening-balance check at the top.",
+    "version": 1792055425,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Green when opening balances agree, red with the difference when not",
+        "x": 8.05,
+        "y": 15.24
+      }
+    ]
+  },
+  {
+    "key": "account-mapping",
+    "file": "account-mapping.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "System Setup ▸ Account Mapping",
+    "caption": "Account Mapping: which account each automatic posting uses.",
+    "version": 1792055426,
+    "markers": []
+  },
+  {
+    "key": "opening-balances",
+    "file": "opening-balances.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "System Setup ▸ Opening Balances",
+    "caption": "The opening balance reconciliation. Net Imbalance must be 0.00.",
+    "version": 1792055427,
+    "markers": []
+  },
+  {
+    "key": "vat-settings",
+    "file": "vat-settings.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "System Setup ▸ VAT Settings",
+    "caption": "VAT Settings: your TRN, tax invoice details and the provisional recovery rate.",
+    "version": 1792055428,
+    "markers": []
+  },
+  {
+    "key": "closing",
+    "file": "closing.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "System Setup ▸ Period Closing",
+    "caption": "Period Closing: the twelve monthly periods and their status.",
+    "version": 1792055429,
+    "markers": []
+  },
+  {
+    "key": "users",
+    "file": "users.webp",
+    "width": 1366,
+    "height": 800,
+    "frame": "browser",
+    "address": "System Setup ▸ Users & Permissions",
+    "caption": "Users and the permissions each one holds.",
+    "version": 1792055430,
+    "markers": []
+  },
+  {
+    "key": "properties",
+    "file": "properties.webp",
+    "width": 1366,
+    "height": 700,
+    "frame": "browser",
+    "address": "Master Data ▸ Properties",
+    "caption": "The property list. Codes are issued by the system.",
+    "version": 1792055431,
+    "markers": []
+  },
+  {
+    "key": "properties-create",
+    "file": "properties-create.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Master Data ▸ Properties ▸ Add Property",
+    "caption": "Adding a property. The code is previewed as you choose ownership and type.",
+    "version": 1792055433,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Ownership — drives the accounting",
+        "x": 70.2,
+        "y": 42.42
+      },
+      {
+        "number": 2,
+        "label": "Type — part of the code",
+        "x": 49.49,
+        "y": 42.42
+      },
+      {
+        "number": 3,
+        "label": "The code the property will receive",
+        "x": 8.05,
+        "y": 20.49
+      }
+    ]
+  },
+  {
+    "key": "units",
+    "file": "units.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Master Data ▸ Units",
+    "caption": "Units grouped by property, with their status and asking rent.",
+    "version": 1792055434,
+    "markers": []
+  },
+  {
+    "key": "tenants",
+    "file": "tenants.webp",
+    "width": 1366,
+    "height": 800,
+    "frame": "browser",
+    "address": "Master Data ▸ Tenants",
+    "caption": "The tenant register. The Portal button issues a tenant their login.",
+    "version": 1792055435,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Portal — issue or reset the tenant's login",
+        "x": 85.16,
+        "y": 27.05
+      }
+    ]
+  },
+  {
+    "key": "vendor-edit",
+    "file": "vendor-edit.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Master Data ▸ Vendors ▸ Edit",
+    "caption": "A supplier record. 'VAT registered (active)' decides whether their bills carry VAT.",
+    "version": 1792055436,
+    "markers": [
+      {
+        "number": 1,
+        "label": "TRN — required for a registered supplier",
+        "x": 8.05,
+        "y": 44.71
+      },
+      {
+        "number": 2,
+        "label": "VAT registered (active)",
+        "x": 35.68,
+        "y": 44.04
+      },
+      {
+        "number": 3,
+        "label": "Trade licence — must be unique",
+        "x": 63.3,
+        "y": 44.71
+      }
+    ]
+  },
+  {
+    "key": "leases",
+    "file": "leases.webp",
+    "width": 1366,
+    "height": 800,
+    "frame": "browser",
+    "address": "Master Data ▸ Leases",
+    "caption": "Lease contracts with their system-issued contract codes.",
+    "version": 1792055437,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Draft Contract — the printable tenancy agreement",
+        "x": 83.28,
+        "y": 30.55
+      },
+      {
+        "number": 2,
+        "label": "QR Label for the contract file",
+        "x": 78.54,
+        "y": 30.55
+      }
+    ]
+  },
+  {
+    "key": "contract-draft",
+    "file": "contract-draft.webp",
+    "width": 1366,
+    "height": 1100,
+    "frame": "browser",
+    "address": "Master Data ▸ Leases ▸ Draft Contract",
+    "caption": "The draft tenancy agreement, filled in from the lease.",
+    "version": 1792055438,
+    "markers": []
+  },
+  {
+    "key": "tenant-portal-access",
+    "file": "tenant-portal-access.webp",
+    "width": 1366,
+    "height": 760,
+    "frame": "browser",
+    "address": "Master Data ▸ Tenants ▸ Portal",
+    "caption": "A tenant's portal login: its status, and where to issue or reset it.",
+    "version": 1792055439,
+    "markers": []
+  },
+  {
+    "key": "journal-inquiry",
+    "file": "journal-inquiry.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "Operations ▸ Journal Inquiry",
+    "caption": "Journal Inquiry with drafts showing. Drafts are not in any report until posted.",
+    "version": 1792055440,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Posted Only = No lists drafts",
+        "x": 70.2,
+        "y": 28.94
+      },
+      {
+        "number": 2,
+        "label": "Post All Drafts matching the filter",
+        "x": 8.05,
+        "y": 35.14
+      },
+      {
+        "number": 3,
+        "label": "Post one entry",
+        "x": 9.52,
+        "y": 41.99
+      }
+    ]
+  },
+  {
+    "key": "customer-invoices",
+    "file": "customer-invoices.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Operations ▸ Customer Invoices",
+    "caption": "Customer invoices. Draft invoices carry a Post button; posted ones can be printed and received against.",
+    "version": 1792055441,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Post — puts the invoice into the accounts",
+        "x": 79.25,
+        "y": 34.71
+      },
+      {
+        "number": 2,
+        "label": "Print the tax invoice",
+        "x": 83.07,
+        "y": 34.71
+      },
+      {
+        "number": 3,
+        "label": "Receive a payment",
+        "x": 84.37,
+        "y": 98.0
+      }
+    ]
+  },
+  {
+    "key": "tax-invoice",
+    "file": "tax-invoice.webp",
+    "width": 1366,
+    "height": 965,
+    "frame": "browser",
+    "address": "Operations ▸ Customer Invoices ▸ Tax Invoice",
+    "caption": "A full tax invoice — the tenant is VAT registered, so both TRNs are shown.",
+    "version": 1792055442,
+    "markers": []
+  },
+  {
+    "key": "customer-receipt-create",
+    "file": "customer-receipt-create.webp",
+    "width": 1366,
+    "height": 760,
+    "frame": "browser",
+    "address": "Operations ▸ Customer Receipts ▸ New Receipt",
+    "caption": "Recording a receipt against an invoice. It is saved as a draft.",
+    "version": 1792055443,
+    "markers": []
+  },
+  {
+    "key": "pdc-receipts",
+    "file": "pdc-receipts.webp",
+    "width": 1366,
+    "height": 760,
+    "frame": "browser",
+    "address": "Operations ▸ PDC Receipts",
+    "caption": "The post-dated cheque register: received, cleared and still in hand.",
+    "version": 1792055444,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Clear — when the bank honours the cheque",
+        "x": 93.4,
+        "y": 67.42
+      },
+      {
+        "number": 2,
+        "label": "Edit — correct dates or cheque details",
+        "x": 90.07,
+        "y": 67.42
+      }
+    ]
+  },
+  {
+    "key": "security-deposits",
+    "file": "security-deposits.webp",
+    "width": 1366,
+    "height": 700,
+    "frame": "browser",
+    "address": "Operations ▸ Security Deposits",
+    "caption": "Security deposits held, each a liability until refunded or forfeited.",
+    "version": 1792055445,
+    "markers": []
+  },
+  {
+    "key": "vendor-bills",
+    "file": "vendor-bills.webp",
+    "width": 1366,
+    "height": 700,
+    "frame": "browser",
+    "address": "Operations ▸ Vendor Bills",
+    "caption": "Vendor bills: tax invoices and commercial invoices, drafts and posted.",
+    "version": 1792055446,
+    "markers": []
+  },
+  {
+    "key": "vendor-bill-edit",
+    "file": "vendor-bill-edit.webp",
+    "width": 1366,
+    "height": 1050,
+    "frame": "browser",
+    "address": "Operations ▸ Vendor Bills ▸ Edit",
+    "caption": "A draft bill from a supplier who is not VAT registered: no VAT anywhere, and the full amount is a cost.",
+    "version": 1792055447,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Supplier — decides whether VAT applies",
+        "x": 9.3,
+        "y": 21.85
+      },
+      {
+        "number": 2,
+        "label": "The supplier's own bill number",
+        "x": 36.09,
+        "y": 21.85
+      },
+      {
+        "number": 3,
+        "label": "Accounting date — the period it lands in",
+        "x": 29.39,
+        "y": 32.42
+      },
+      {
+        "number": 4,
+        "label": "Tax invoice or commercial invoice",
+        "x": 8.05,
+        "y": 41.56
+      },
+      {
+        "number": 5,
+        "label": "Add a line",
+        "x": 82.45,
+        "y": 51.61
+      },
+      {
+        "number": 6,
+        "label": "Save Draft",
+        "x": 8.05,
+        "y": 94.67
+      }
+    ]
+  },
+  {
+    "key": "vendor-bill-details",
+    "file": "vendor-bill-details.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Operations ▸ Vendor Bills ▸ BILL-2026-0001",
+    "caption": "A posted multi-line tax invoice, partly paid. Irrecoverable VAT is shown on the line it belongs to.",
+    "version": 1792055448,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Register a payment",
+        "x": 69.13,
+        "y": 10.02
+      },
+      {
+        "number": 2,
+        "label": "Print with letterhead and sign-off strip",
+        "x": 80.56,
+        "y": 10.02
+      }
+    ]
+  },
+  {
+    "key": "vendor-payment-create",
+    "file": "vendor-payment-create.webp",
+    "width": 1366,
+    "height": 760,
+    "frame": "browser",
+    "address": "Operations ▸ Vendor Payments ▸ New Payment",
+    "caption": "Paying a posted bill. Only posted bills are offered.",
+    "version": 1792055449,
+    "markers": []
+  },
+  {
+    "key": "petty-cash",
+    "file": "petty-cash.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "Operations ▸ Petty Cash",
+    "caption": "A petty cash float: vouchers, the top-up and the running balance.",
+    "version": 1792055450,
+    "markers": [
+      {
+        "number": 1,
+        "label": "New Expense Voucher",
+        "x": 65.69,
+        "y": 11.32
+      },
+      {
+        "number": 2,
+        "label": "Replenish Float",
+        "x": 77.58,
+        "y": 11.32
+      }
+    ]
+  },
+  {
+    "key": "manual-journal-create",
+    "file": "manual-journal-create.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "Operations ▸ Manual Journals ▸ New",
+    "caption": "A manual journal. It is saved as a draft and posted from Journal Inquiry.",
+    "version": 1792055451,
+    "markers": []
+  },
+  {
+    "key": "tenant-requests",
+    "file": "tenant-requests.webp",
+    "width": 1366,
+    "height": 700,
+    "frame": "browser",
+    "address": "Operations ▸ Tenant Requests",
+    "caption": "The tenant request queue: urgent first, oldest first, with ageing.",
+    "version": 1792055452,
+    "markers": []
+  },
+  {
+    "key": "tenant-request-detail",
+    "file": "tenant-request-detail.webp",
+    "width": 1366,
+    "height": 1118,
+    "frame": "browser",
+    "address": "Operations ▸ Tenant Requests ▸ REQ-2026-0001",
+    "caption": "Working a request: the conversation, an internal staff note, and the update panel.",
+    "version": 1792055453,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Internal note — never shown to the tenant",
+        "x": 9.3,
+        "y": 57.79
+      },
+      {
+        "number": 2,
+        "label": "Tick to keep a message among staff",
+        "x": 9.3,
+        "y": 83.0
+      },
+      {
+        "number": 3,
+        "label": "Move the request along",
+        "x": 64.54,
+        "y": 60.9
+      },
+      {
+        "number": 4,
+        "label": "Response the tenant reads",
+        "x": 64.54,
+        "y": 78.84
+      }
+    ]
+  },
+  {
+    "key": "trial-balance",
+    "file": "trial-balance.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Reporting ▸ Trial Balance",
+    "caption": "The trial balance: total debits equal total credits.",
+    "version": 1792055454,
+    "markers": []
+  },
+  {
+    "key": "profit-and-loss",
+    "file": "profit-and-loss.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Reporting ▸ Profit & Loss",
+    "caption": "Profit & Loss for the year to date.",
+    "version": 1792055455,
+    "markers": []
+  },
+  {
+    "key": "balance-sheet",
+    "file": "balance-sheet.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Reporting ▸ Balance Sheet",
+    "caption": "The balance sheet: assets equal liabilities plus equity.",
+    "version": 1792055456,
+    "markers": []
+  },
+  {
+    "key": "cash-flow",
+    "file": "cash-flow.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Reporting ▸ Statement of Cash Flows",
+    "caption": "The Statement of Cash Flows (IAS 7, direct method).",
+    "version": 1792055457,
+    "markers": []
+  },
+  {
+    "key": "general-ledger",
+    "file": "general-ledger.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "Reporting ▸ General Ledger",
+    "caption": "The general ledger for Accounts Receivable: opening balance, movements and running balance.",
+    "version": 1792055457,
+    "markers": []
+  },
+  {
+    "key": "tenant-statement",
+    "file": "tenant-statement.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Reporting ▸ Tenant Statement",
+    "caption": "A tenant statement with an overdue balance.",
+    "version": 1792055458,
+    "markers": []
+  },
+  {
+    "key": "vat-return",
+    "file": "vat-return.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Reporting ▸ VAT Return",
+    "caption": "The VAT return for the third quarter: output tax, recoverable input tax and the recovery rate.",
+    "version": 1792055459,
+    "markers": []
+  },
+  {
+    "key": "pnl-by-property",
+    "file": "pnl-by-property.webp",
+    "width": 1366,
+    "height": 963,
+    "frame": "browser",
+    "address": "Reporting ▸ P&L by Property",
+    "caption": "Profit & Loss by property, with the portfolio total.",
+    "version": 1792055460,
+    "markers": []
+  },
+  {
+    "key": "property-utilization",
+    "file": "property-utilization.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Reporting ▸ Property Utilization",
+    "caption": "Occupancy, area utilization and the rent gap per property.",
+    "version": 1792055461,
+    "markers": []
+  },
+  {
+    "key": "tenant-health",
+    "file": "tenant-health.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "Reporting ▸ Tenant Health & Ranking",
+    "caption": "Every tenant scored and ranked, with the figures behind each score.",
+    "version": 1792055462,
+    "markers": []
+  },
+  {
+    "key": "owner-tenancy-schedule",
+    "file": "owner-tenancy-schedule.webp",
+    "width": 1366,
+    "height": 1150,
+    "frame": "browser",
+    "address": "Reporting ▸ Owner Tenancy Schedule",
+    "caption": "The owner tenancy schedule, grouped by owner, including vacant units.",
+    "version": 1792055463,
+    "markers": []
+  },
+  {
+    "key": "owner-withdrawals",
+    "file": "owner-withdrawals.webp",
+    "width": 1366,
+    "height": 1000,
+    "frame": "browser",
+    "address": "Reporting ▸ Owner Withdrawals",
+    "caption": "Owner withdrawals analysed by category — company profit untouched.",
+    "version": 1792055464,
+    "markers": []
+  },
+  {
+    "key": "portal-account",
+    "file": "portal-account.webp",
+    "width": 780,
+    "height": 1688,
+    "frame": "phone",
+    "address": "",
+    "caption": "The tenant's account page on a phone.",
+    "version": 1792055468,
+    "markers": []
+  },
+  {
+    "key": "portal-invoices",
+    "file": "portal-invoices.webp",
+    "width": 780,
+    "height": 1688,
+    "frame": "phone",
+    "address": "",
+    "caption": "The tenant's invoices, overdue ones highlighted.",
+    "version": 1792055469,
+    "markers": []
+  },
+  {
+    "key": "portal-requests",
+    "file": "portal-requests.webp",
+    "width": 780,
+    "height": 1688,
+    "frame": "phone",
+    "address": "",
+    "caption": "The tenant's requests and their status.",
+    "version": 1792055470,
+    "markers": []
+  },
+  {
+    "key": "portal-new-request",
+    "file": "portal-new-request.webp",
+    "width": 780,
+    "height": 1688,
+    "frame": "phone",
+    "address": "",
+    "caption": "Raising a request from a phone.",
+    "version": 1792055471,
+    "markers": []
+  },
+  {
+    "key": "portal-request-detail",
+    "file": "portal-request-detail.webp",
+    "width": 780,
+    "height": 1688,
+    "frame": "phone",
+    "address": "",
+    "caption": "The same request as the tenant sees it — the staff internal note is not there.",
+    "version": 1792055472,
+    "markers": []
+  }
+]

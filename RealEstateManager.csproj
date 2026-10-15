@@ -20,4 +20,16 @@
     <PackageReference Include="QRCoder" Version="1.6.0" />
   </ItemGroup>
 
+  <!--
+    Tools/ holds developer utilities - the screenshot capture, the PDF export and the demo
+    company builder (a separate small program). None of it is part of the application:
+    it must not be compiled into it and must not be published to the server.
+  -->
+  <ItemGroup>
+    <Compile Remove="Tools\**" />
+    <Content Remove="Tools\**" />
+    <None Remove="Tools\**" />
+    <EmbeddedResource Remove="Tools\**" />
+  </ItemGroup>
+
 </Project>
