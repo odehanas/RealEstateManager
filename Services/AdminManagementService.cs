@@ -10,15 +10,18 @@ namespace RealEstateManager.Services
         private readonly ApplicationDbContext _db;
         private readonly PasswordHashingService _passwordHashingService;
         private readonly SubscriptionService _subscriptionService;
+        private readonly PlatformOwnerService _platformOwnerService;
 
         public AdminManagementService(
             ApplicationDbContext db,
             PasswordHashingService passwordHashingService,
-            SubscriptionService subscriptionService)
+            SubscriptionService subscriptionService,
+            PlatformOwnerService platformOwnerService)
         {
             _db = db;
             _passwordHashingService = passwordHashingService;
             _subscriptionService = subscriptionService;
+            _platformOwnerService = platformOwnerService;
         }
 
         public async Task<CompanyListPageViewModel> GetCompaniesAsync()
@@ -286,12 +289,25 @@ namespace RealEstateManager.Services
             };
         }
 
-        public async Task<int> CreateUserAsync(AppUserFormViewModel model)
+        /// <param name="actingUserIsOwner">
+        /// Whether the person saving the form is the platform owner. Only the owner may
+        /// make someone a System Admin or create an owner account.
+        /// </param>
+        public async Task<int> CreateUserAsync(AppUserFormViewModel model, bool actingUserIsOwner)
         {
             var normalizedUsername = model.Username.Trim().ToUpperInvariant();
 
             if (await _db.AppUsers.IgnoreQueryFilters().AnyAsync(x => x.Username == normalizedUsername))
                 throw new InvalidOperationException("Username already exists.");
+
+            if (!actingUserIsOwner)
+            {
+                if (_platformOwnerService.IsOwnerUsername(normalizedUsername))
+                    throw new InvalidOperationException("That username is reserved for the platform owner.");
+
+                if (model.IsSystemAdmin)
+                    throw new InvalidOperationException("Only the platform owner can make a user a System Admin.");
+            }
 
             if (string.IsNullOrWhiteSpace(model.Password))
                 throw new InvalidOperationException("Password is required for a new user.");
@@ -318,7 +334,13 @@ namespace RealEstateManager.Services
             return user.Id;
         }
 
-        public async Task UpdateUserAsync(AppUserFormViewModel model)
+        /// <param name="actingUserIsOwner">
+        /// Whether the person saving the form is the platform owner. A System Admin who
+        /// is not the owner may not change anyone's System Admin flag, nor touch an owner
+        /// account at all - otherwise they could reset its password, or rename it and take
+        /// its name, and become the owner.
+        /// </param>
+        public async Task UpdateUserAsync(AppUserFormViewModel model, bool actingUserIsOwner)
         {
             if (!model.Id.HasValue)
                 throw new InvalidOperationException("User id is required.");
@@ -338,6 +360,33 @@ namespace RealEstateManager.Services
                 .AnyAsync(x => x.Username == normalizedUsername && x.Id != user.Id))
             {
                 throw new InvalidOperationException("Username already exists.");
+            }
+
+            var targetIsOwner = _platformOwnerService.IsOwnerUsername(user.Username);
+
+            if (!actingUserIsOwner)
+            {
+                if (targetIsOwner)
+                    throw new InvalidOperationException("Only the platform owner can change the owner account.");
+
+                if (_platformOwnerService.IsOwnerUsername(normalizedUsername))
+                    throw new InvalidOperationException("That username is reserved for the platform owner.");
+
+                if (model.IsSystemAdmin != user.IsSystemAdmin)
+                    throw new InvalidOperationException("Only the platform owner can grant or remove System Admin.");
+            }
+
+            // The owner is recognised by username, and must be an active System Admin.
+            // Renaming, deactivating or demoting the account here would leave the system
+            // without an owner; that is done by changing the setting on the server.
+            if (targetIsOwner &&
+                (!string.Equals(normalizedUsername, user.Username, StringComparison.OrdinalIgnoreCase) ||
+                 !model.IsActive ||
+                 !model.IsSystemAdmin))
+            {
+                throw new InvalidOperationException(
+                    "The owner account must keep its username and stay an active System Admin. " +
+                    "To change the owner, edit PlatformOwner:Usernames in appsettings.json on the server.");
             }
 
             var selectedCompanyIds = GetSelectedCompanyIds(model);

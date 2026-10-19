@@ -5,7 +5,9 @@ using RealEstateManager.Services;
 
 namespace RealEstateManager.Controllers
 {
-    [Authorize(Roles = "SystemAdmin")]
+    // Companies and their subscriptions are the platform owner's business, not a
+    // System Admin's: whoever can issue an activation code can give away paid time.
+    [Authorize(Policy = PlatformOwnerRequirement.PolicyName)]
     public class CompaniesController : Controller
     {
         private readonly AdminManagementService _adminManagementService;

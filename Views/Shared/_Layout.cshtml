@@ -5,6 +5,7 @@
 @inject PermissionService PermissionService
 @inject SubscriptionService SubscriptionService
 @inject HelpCatalogService HelpCatalog
+@inject PlatformOwnerService PlatformOwnerService
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
@@ -12,6 +13,7 @@
     var currentCompanyName = User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value ?? "No Company Selected";
     var displayName = User.FindFirst(AppClaimTypes.DisplayName)?.Value ?? User.Identity?.Name ?? "User";
     var isSystemAdmin = User.IsInRole("SystemAdmin");
+    var isPlatformOwner = PlatformOwnerService.IsOwner(User);
     var subscriptionStatus = isAuthenticated && currentCompanyId.HasValue
         ? await SubscriptionService.GetStatusAsync(currentCompanyId.Value)
         : null;
@@ -133,9 +135,12 @@
                                 {
                                     <li><hr class="dropdown-divider" /></li>
                                     <li><h6 class="dropdown-header">Administration</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Companies" asp-action="Index">Companies</a>
-                                    </li>
+                                    @if (isPlatformOwner)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Companies" asp-action="Index">Companies &amp; Subscriptions</a>
+                                        </li>
+                                    }
                                     <li>
                                         <a class="dropdown-item" asp-controller="Users" asp-action="Index">Users &amp; Permissions</a>
                                     </li>

@@ -9,10 +9,14 @@ namespace RealEstateManager.Controllers
     public class UsersController : Controller
     {
         private readonly AdminManagementService _adminManagementService;
+        private readonly PlatformOwnerService _platformOwnerService;
 
-        public UsersController(AdminManagementService adminManagementService)
+        public UsersController(
+            AdminManagementService adminManagementService,
+            PlatformOwnerService platformOwnerService)
         {
             _adminManagementService = adminManagementService;
+            _platformOwnerService = platformOwnerService;
         }
 
         [HttpGet]
@@ -42,7 +46,7 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await _adminManagementService.CreateUserAsync(model);
+                await _adminManagementService.CreateUserAsync(model, _platformOwnerService.IsOwner(User));
                 TempData["SuccessMessage"] = "User created successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -82,7 +86,7 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await _adminManagementService.UpdateUserAsync(model);
+                await _adminManagementService.UpdateUserAsync(model, _platformOwnerService.IsOwner(User));
                 TempData["SuccessMessage"] = "User updated successfully.";
                 return RedirectToAction(nameof(Index));
             }

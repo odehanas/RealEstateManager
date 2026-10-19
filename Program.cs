@@ -19,6 +19,8 @@ builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 });
 
 builder.Services.Configure<FeedbackNotificationOptions>(builder.Configuration.GetSection("FeedbackNotifications"));
+builder.Services.Configure<PlatformOwnerOptions>(builder.Configuration.GetSection("PlatformOwner"));
+builder.Services.AddSingleton<PlatformOwnerService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentCompanyAccessor, CurrentCompanyAccessor>();
@@ -41,6 +43,7 @@ builder.Services.AddScoped<ServiceRequestService>();
 builder.Services.AddSingleton<HelpCatalogService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, PlatformOwnerAuthorizationHandler>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -112,7 +115,12 @@ builder.Services
 static bool IsPortalRequest(HttpRequest request) =>
     request.Path.StartsWithSegments("/portal", StringComparison.OrdinalIgnoreCase);
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PlatformOwnerRequirement.PolicyName, policy => policy
+        .RequireAuthenticatedUser()
+        .AddRequirements(new PlatformOwnerRequirement()));
+});
 
 builder.Services.AddControllersWithViews(options =>
 {

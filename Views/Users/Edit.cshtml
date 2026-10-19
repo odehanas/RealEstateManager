@@ -1,7 +1,9 @@
 @model RealEstateManager.Models.AppUserFormViewModel
+@inject RealEstateManager.Services.PlatformOwnerService PlatformOwnerService
 
 @{
     ViewData["Title"] = "Edit User";
+    var canGrantSystemAdmin = PlatformOwnerService.IsOwner(User);
 }
 
 <h2>Edit User</h2>
@@ -53,8 +55,21 @@
     </div>
 
     <div class="col-md-3 form-check ms-3">
-        <input asp-for="IsSystemAdmin" class="form-check-input" />
+        @if (canGrantSystemAdmin)
+        {
+            <input asp-for="IsSystemAdmin" class="form-check-input" />
+        }
+        else
+        {
+            @* Shown but not changeable; the current value is posted back unchanged. *@
+            <input type="checkbox" class="form-check-input" id="IsSystemAdmin" disabled checked="@Model.IsSystemAdmin" />
+            <input type="hidden" name="IsSystemAdmin" value="@(Model.IsSystemAdmin ? "true" : "false")" />
+        }
         <label asp-for="IsSystemAdmin" class="form-check-label"></label>
+        @if (!canGrantSystemAdmin)
+        {
+            <div class="form-text">Only the platform owner can change this.</div>
+        }
     </div>
 
     <div class="col-12">

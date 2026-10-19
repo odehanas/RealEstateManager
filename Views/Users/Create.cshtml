@@ -1,7 +1,9 @@
 @model RealEstateManager.Models.AppUserFormViewModel
+@inject RealEstateManager.Services.PlatformOwnerService PlatformOwnerService
 
 @{
     ViewData["Title"] = "Add User";
+    var canGrantSystemAdmin = PlatformOwnerService.IsOwner(User);
 }
 
 <h2>Add User</h2>
@@ -50,10 +52,13 @@
         <label asp-for="IsActive" class="form-check-label"></label>
     </div>
 
-    <div class="col-md-3 form-check ms-3">
-        <input asp-for="IsSystemAdmin" class="form-check-input" />
-        <label asp-for="IsSystemAdmin" class="form-check-label"></label>
-    </div>
+    @if (canGrantSystemAdmin)
+    {
+        <div class="col-md-3 form-check ms-3">
+            <input asp-for="IsSystemAdmin" class="form-check-input" />
+            <label asp-for="IsSystemAdmin" class="form-check-label"></label>
+        </div>
+    }
 
     <div class="col-12">
         <label class="form-label">Company Access</label>
