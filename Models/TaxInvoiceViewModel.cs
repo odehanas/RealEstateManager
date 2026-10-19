@@ -27,6 +27,13 @@ namespace RealEstateManager.Models
         // Document
         public string DocumentNumber { get; set; } = string.Empty;
         public string? SourceInvoiceNumber { get; set; }
+
+        /// <summary>The e-invoice identifier, once the file has been produced.</summary>
+        public Guid? EInvoiceUuid { get; set; }
+        public string? EInvoiceStatus { get; set; }
+
+        /// <summary>Credit notes posted against this invoice, which the reprint should mention.</summary>
+        public decimal CreditedAmount { get; set; }
         public string TaxInvoiceType { get; set; } = Domain.TaxInvoiceTypes.NotApplicable;
         public DateTime InvoiceDate { get; set; }
         public DateTime DateOfSupply { get; set; }

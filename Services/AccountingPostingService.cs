@@ -126,10 +126,12 @@ namespace RealEstateManager.Services
             // The link is permanent; the status moves only when the journal is posted.
             invoice.JournalEntryId = journalEntry.Id;
 
-            // A tax invoice number is allocated only when output tax is actually
-            // charged, and only once - the series must stay sequential and gap-free,
-            // so re-posting never issues a second number for the same supply.
-            if (invoice.VatAmount > 0m && string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
+            // A tax invoice number is allocated only to a taxable supply - standard rated,
+            // or zero rated, which is taxable at 0% and still needs a tax invoice - and
+            // only once: the series must stay sequential and gap-free, so re-posting never
+            // issues a second number for the same supply.
+            var isTaxableSupply = invoice.VatAmount > 0m || invoice.VatCategory == VatCategories.ZeroRated;
+            if (isTaxableSupply && string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
             {
                 var tenant = invoice.Lease!.Tenant!;
 
@@ -141,6 +143,142 @@ namespace RealEstateManager.Services
                     .GenerateTaxInvoiceNumberAsync(invoice.CompanyId, invoice.InvoiceDate);
             }
 
+            await _db.SaveChangesAsync();
+            return journalEntry;
+        }
+
+        /// <summary>
+        /// The account an invoice credited for its net amount: the landlord liability for
+        /// a managed property, unearned revenue for an owned one. A credit note reverses
+        /// into the same account by default.
+        /// </summary>
+        public async Task<int?> GetInvoiceNetAccountIdAsync(int companyId, string ownershipType)
+        {
+            var settings = await GetCompanyAccountSettingAsync(companyId);
+            return ownershipType == "Managed"
+                ? settings.DueToLandlordsAccountId
+                : settings.UnearnedRevenueAccountId;
+        }
+
+        /// <summary>
+        /// Builds the journal for a credit note - the mirror of the invoice it reduces:
+        ///
+        ///   Dr  net account (unearned revenue / due to landlord, or the account chosen)
+        ///   Dr  VAT payable                                   output tax reversed
+        ///       Cr  Accounts receivable                       the tenant owes less
+        ///
+        /// If a DRAFT journal exists it is rebuilt, because a draft credit note may have
+        /// been amended. A posted journal is returned untouched.
+        /// </summary>
+        public async Task<JournalEntry> PostCustomerCreditNoteAsync(int creditNoteId)
+        {
+            var note = await _db.CustomerCreditNotes
+                .Include(x => x.JournalEntry)!.ThenInclude(x => x!.Lines)
+                .Include(x => x.CustomerInvoice)!.ThenInclude(x => x!.Lease)!.ThenInclude(x => x!.Unit)!.ThenInclude(x => x!.Property)
+                .FirstOrDefaultAsync(x => x.Id == creditNoteId);
+
+            if (note?.CustomerInvoice?.Lease?.Unit?.Property == null)
+                throw new InvalidOperationException("Credit note was not found.");
+
+            if (note.JournalEntry is { IsPosted: true })
+                return note.JournalEntry;
+
+            var invoice = note.CustomerInvoice;
+            var lease = invoice.Lease!;
+            var settings = await GetCompanyAccountSettingAsync(note.CompanyId);
+
+            var receivableAccount = await GetMappedAccountAsync(note.CompanyId, settings.AccountsReceivableAccountId, "Accounts Receivable");
+
+            var netAccountId = note.DebitAccountId
+                               ?? await GetInvoiceNetAccountIdAsync(note.CompanyId, lease.Unit!.Property!.OwnershipType);
+            var netAccount = await GetMappedAccountAsync(note.CompanyId, netAccountId, "Credit note account");
+
+            var propertyId = lease.Unit!.Property!.Id;
+            var unitId = lease.Unit.Id;
+            var tenantId = lease.TenantId;
+
+            var lines = new List<JournalEntryLine>
+            {
+                new()
+                {
+                    AccountId = netAccount.Id,
+                    Debit = note.Subtotal,
+                    Credit = 0m,
+                    Description = $"Credit note {note.CreditNoteNumber} against {invoice.InvoiceNumber}",
+                    PropertyId = propertyId,
+                    UnitId = unitId,
+                    TenantId = tenantId,
+                    LeaseId = lease.Id,
+                    CustomerInvoiceId = invoice.Id
+                }
+            };
+
+            if (note.VatAmount > 0m)
+            {
+                var vatPayableAccount = await GetMappedAccountAsync(note.CompanyId, settings.VatPayableAccountId, "VAT Payable");
+
+                lines.Add(new JournalEntryLine
+                {
+                    AccountId = vatPayableAccount.Id,
+                    Debit = note.VatAmount,
+                    Credit = 0m,
+                    Description = $"Output VAT reversed - credit note {note.CreditNoteNumber}",
+                    PropertyId = propertyId,
+                    UnitId = unitId,
+                    TenantId = tenantId,
+                    LeaseId = lease.Id,
+                    CustomerInvoiceId = invoice.Id
+                });
+            }
+
+            lines.Add(new JournalEntryLine
+            {
+                AccountId = receivableAccount.Id,
+                Debit = 0m,
+                Credit = note.TotalAmount,
+                Description = $"Credit note {note.CreditNoteNumber} - {invoice.InvoiceNumber} reduced",
+                PropertyId = propertyId,
+                UnitId = unitId,
+                TenantId = tenantId,
+                LeaseId = lease.Id,
+                CustomerInvoiceId = invoice.Id
+            });
+
+            // A draft from an earlier attempt is rebuilt in place from the figures the
+            // credit note now carries, so the document keeps one journal for its life.
+            if (note.JournalEntry != null)
+            {
+                var existingEntry = note.JournalEntry;
+                _db.JournalEntryLines.RemoveRange(existingEntry.Lines);
+                existingEntry.Lines.Clear();
+
+                foreach (var line in lines)
+                {
+                    line.JournalEntryId = existingEntry.Id;
+                    existingEntry.Lines.Add(line);
+                }
+
+                existingEntry.EntryDate = note.CreditNoteDate;
+                existingEntry.AccountingPeriodId =
+                    (await ResolveAccountingPeriodAsync(note.CompanyId, note.CreditNoteDate))?.Id;
+                existingEntry.DocumentNumber = note.CreditNoteNumber;
+
+                await _db.SaveChangesAsync();
+                return existingEntry;
+            }
+
+            var journalEntry = await CreateJournalEntryAsync(
+                note.CompanyId,
+                note.CreditNoteDate,
+                $"Posting credit note {note.CreditNoteNumber}",
+                "CustomerCreditNote",
+                note.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: note.CreditNoteNumber,
+                referenceNumber: invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber);
+
+            note.JournalEntryId = journalEntry.Id;
             await _db.SaveChangesAsync();
             return journalEntry;
         }

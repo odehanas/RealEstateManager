@@ -1,0 +1,73 @@
+<p>From 2027 every invoice and credit note a UAE business issues to <strong>another business or a government
+entity</strong> must be an <strong>e-invoice</strong>: a structured file in the official UAE format (PINT AE), sent
+through an <strong>Accredited Service Provider</strong> (ASP) that delivers it to your customer's provider and reports
+it to the FTA. This screen holds everything the system needs to produce those files for your company.</p>
+
+<div class="box">
+    <div class="box-title">Who does what</div>
+    <p><strong>This system</strong> produces each e-invoice in the official format, checks the data behind it, keeps the
+    file and tracks what your provider said about it. <strong>Your provider</strong> validates it, delivers it and reports
+    it to the FTA. You must appoint a provider yourself &mdash; it cannot be replaced by software.</p>
+</div>
+
+<h3>Is my company in scope, and from when?</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:34%">Revenue band</th><th>Appoint a provider by</th><th>E-invoices mandatory from</th></tr></thead>
+    <tbody>
+        <tr><td>AED 50 million or more</td><td>30 October 2026</td><td>1 January 2027</td></tr>
+        <tr><td>Below AED 50 million</td><td>31 March 2027</td><td>1 July 2027</td></tr>
+        <tr><td>Government entity</td><td>31 March 2027</td><td>1 October 2027</td></tr>
+    </tbody>
+</table>
+<p>The mandate covers every business, whether or not it is VAT registered. Invoices to <strong>individuals</strong>
+(B2C) are outside it for now, so a residential tenant who is a private person is not affected.</p>
+
+<figure data-shot="einvoicing-settings"></figure>
+
+<h3>Setting up</h3>
+<ol class="steps">
+    <li>Open <span class="path">System Setup ▸ E-Invoicing Settings</span>.</li>
+    <li>Choose the <strong>Revenue band</strong>. The appointment deadline and start date appear underneath. Enter a
+        <strong>start date</strong> only to join earlier, voluntarily.</li>
+    <li>Complete the <strong>Company identity</strong>: registered legal name, TRN (the 10-digit TIN is taken from it),
+        trade licence number and the authority that issued it, and the address with its <strong>emirate</strong>.</li>
+    <li>Under <strong>Payment</strong>, choose how tenants pay. Bank transfer needs your <strong>IBAN</strong>, which is
+        printed on every e-invoice.</li>
+    <li>Check the <strong>Readiness check</strong> at the top. It lists anything missing from the company and from any
+        business tenant, with a link to the record to fix.</li>
+    <li>Once your provider is appointed, enter its name, tick <strong>E-invoicing is switched on</strong> and save.</li>
+</ol>
+<p>Switching on re-assesses every invoice already posted: those to business and government tenants dated on or after
+the start date are queued in the <a href="#e-invoice-monitor">E-Invoice Monitor</a>.</p>
+
+<h3>Which invoices become e-invoices</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Customer type</th><th>Treatment</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Business</strong></td><td>E-invoice required &mdash; even if the tenant is not VAT registered.</td></tr>
+        <tr><td><strong>Government</strong></td><td>E-invoice required.</td></tr>
+        <tr><td><strong>Individual</strong></td><td>Not required. Printed invoices continue as today.</td></tr>
+    </tbody>
+</table>
+<p>The customer type is set on each tenant &mdash; see <a href="#tenants">Tenants</a>. A tenant holding a trade licence
+or TRN was classed as a Business when this feature was installed; the readiness check flags anyone who looks
+misclassified.</p>
+
+<h3>How each lease is described</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Supply</th><th>E-invoice type</th></tr></thead>
+    <tbody>
+        <tr><td>Commercial lease (5%)</td><td>Tax invoice (380), standard rated</td></tr>
+        <tr><td>Zero-rated residential (first supply)</td><td>Tax invoice (380), zero rated</td></tr>
+        <tr><td>Residential lease (exempt)</td><td>Out-of-scope invoice (480), exempt &mdash; residential units</td></tr>
+        <tr><td>Company not VAT registered</td><td>Out-of-scope invoice (480), identified by its TIN</td></tr>
+    </tbody>
+</table>
+<p>Every rent invoice is marked as a <strong>continuous supply</strong> and carries the rent period, the contract
+number and the contract value, as the UAE format expects for leases.</p>
+
+<div class="box ok">
+    <div class="box-title">Checked against the official rules</div>
+    <p>The files follow PINT AE Billing 1.0.4, published for the Ministry of Finance. Before release they were checked
+    against the official validation rules and the UBL 2.1 schema &mdash; the same checks your provider runs.</p>
+</div>

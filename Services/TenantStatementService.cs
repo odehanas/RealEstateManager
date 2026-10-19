@@ -82,6 +82,26 @@ namespace RealEstateManager.Services
                     (!leaseId.HasValue || x.LeaseId == leaseId.Value))
                 .ToListAsync();
 
+            // A posted credit note reduces what the tenant owes, exactly as a payment does.
+            var creditNotes = await _db.CustomerCreditNotes
+                .AsNoTracking()
+                .Include(x => x.CustomerInvoice)
+                    .ThenInclude(x => x!.Lease)
+                        .ThenInclude(x => x!.Unit)
+                            .ThenInclude(x => x!.Property)
+                .Where(x =>
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
+                    x.CustomerInvoice != null &&
+                    x.CustomerInvoice.Lease != null &&
+                    x.CustomerInvoice.Lease.TenantId == tenantId &&
+                    (!leaseId.HasValue || x.CustomerInvoice.LeaseId == leaseId.Value))
+                .ToListAsync();
+
+            var openingCredits = creditNotes
+                .Where(x => x.CreditNoteDate.Date < fromDate.Date)
+                .Sum(x => x.TotalAmount);
+
             var openingCharges = invoices
                 .Where(x => x.InvoiceDate.Date < fromDate.Date)
                 .Sum(x => x.TotalAmount);
@@ -143,13 +163,26 @@ namespace RealEstateManager.Services
                     Credit = x.Amount
                 }));
 
+            rows.AddRange(creditNotes
+                .Where(x => x.CreditNoteDate.Date >= fromDate.Date && x.CreditNoteDate.Date <= toDate.Date)
+                .Select(x => new TenantStatementRowViewModel
+                {
+                    TransactionDate = x.CreditNoteDate.Date,
+                    TransactionType = "Credit Note",
+                    ReferenceNumber = x.CreditNoteNumber,
+                    Description = $"Credit against {x.CustomerInvoice!.InvoiceNumber} - {BuildLeaseDisplay(x.CustomerInvoice.Lease)}",
+                    Debit = 0m,
+                    Credit = x.TotalAmount
+                }));
+
             rows = rows
                 .OrderBy(x => x.TransactionDate)
                 .ThenBy(x => GetTransactionOrder(x.TransactionType))
                 .ThenBy(x => x.ReferenceNumber)
                 .ToList();
 
-            var runningBalance = openingCharges - openingReceipts - openingClearedPdc;
+            var openingBalance = openingCharges - openingReceipts - openingClearedPdc - openingCredits;
+            var runningBalance = openingBalance;
 
             foreach (var row in rows)
             {
@@ -189,7 +222,7 @@ namespace RealEstateManager.Services
                 TenantCode = tenant.Code,
                 TenantName = tenant.FullName,
                 LeaseDisplay = selectedLease != null ? BuildLeaseDisplay(selectedLease) : "All Leases",
-                OpeningBalance = openingCharges - openingReceipts - openingClearedPdc,
+                OpeningBalance = openingBalance,
                 TotalCharges = rows.Sum(x => x.Debit),
                 TotalCredits = rows.Sum(x => x.Credit),
                 ClosingBalance = runningBalance,

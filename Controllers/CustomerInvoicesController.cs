@@ -90,6 +90,9 @@ namespace RealEstateManager.Controllers
 
                 DocumentNumber = invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber,
                 SourceInvoiceNumber = invoice.TaxInvoiceNumber != null ? invoice.InvoiceNumber : null,
+                EInvoiceUuid = invoice.EInvoiceUuid,
+                EInvoiceStatus = invoice.EInvoiceStatus,
+                CreditedAmount = invoice.CreditedAmount,
                 TaxInvoiceType = invoice.TaxInvoiceType,
                 InvoiceDate = invoice.InvoiceDate,
                 DateOfSupply = invoice.DateOfSupply ?? invoice.InvoiceDate,
@@ -115,7 +118,7 @@ namespace RealEstateManager.Controllers
 
             // Surface anything that would make this document non-compliant, on screen
             // only, so it is never handed over unknowingly.
-            if (VatCategories.IsTaxable(invoice.VatCategory))
+            if (VatCategories.IsTaxable(invoice.VatCategory) || invoice.VatCategory == VatCategories.ZeroRated)
             {
                 if (string.IsNullOrWhiteSpace(company.TrnNumber))
                     model.ComplianceWarnings.Add("The company has no TRN. Set it under Setup ▸ Companies before issuing tax invoices.");

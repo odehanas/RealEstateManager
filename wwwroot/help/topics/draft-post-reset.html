@@ -15,7 +15,7 @@ Trial Balance.</p>
 <table class="t-compact">
     <thead><tr><th style="width:44%">Screen</th><th>What Save / Post does</th></tr></thead>
     <tbody>
-        <tr><td>Customer Invoices, Vendor Bills</td><td>The <strong>Post</strong> button builds the journal <em>and</em> posts it in one click.</td></tr>
+        <tr><td>Customer Invoices, Vendor Bills, Credit Notes</td><td>The <strong>Post</strong> button builds the journal <em>and</em> posts it in one click.</td></tr>
         <tr><td>Customer Receipts, PDC Receipts, Security Deposits, Vendor Payments, Petty Cash, Manual Journals, Revenue Recognition, Recurring Prepayments</td><td>Saving creates a <strong>draft</strong> journal. You then post it from <span class="path">Operations ▸ Journal Inquiry</span>.</td></tr>
         <tr><td>Fixed Assets (acquisition, capitalisation, depreciation)</td><td>Posted immediately.</td></tr>
     </tbody>
@@ -68,7 +68,8 @@ invoice it paid; resetting a cleared PDC puts the cheque back to <em>Received</e
     <thead><tr><th style="width:44%">Situation</th><th>Why, and what to do instead</th></tr></thead>
     <tbody>
         <tr><td>The entry is in a <strong>closed period</strong></td><td>Those figures have already been reported. Post a correcting journal in an open period.</td></tr>
-        <tr><td>An invoice has posted receipts or cleared cheques against it</td><td>The later transaction depends on it. Reset the receipts first, then the invoice.</td></tr>
+        <tr><td>An invoice has posted receipts, cleared cheques or credit notes against it</td><td>The later transaction depends on it. Reset those first, then the invoice.</td></tr>
+        <tr><td>An invoice or credit note has been <strong>sent to your e-invoicing provider</strong></td><td>It is part of the FTA's record and can never be withdrawn. Correct an invoice with a <a href="#credit-notes">credit note</a>.</td></tr>
         <tr><td>A vendor bill has posted payments against it</td><td>Reset the payments first.</td></tr>
         <tr><td>A PDC whose clearance has been posted</td><td>Reset the clearance entry first.</td></tr>
         <tr><td>Year closing, prepayment set-up or amortisation, fixed asset postings</td><td>These create schedules or close a year, so unwinding them is not a simple reset. Post a reversing journal.</td></tr>

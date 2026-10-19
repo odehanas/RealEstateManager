@@ -100,7 +100,7 @@
             <thead>
                 <tr>
                     <th class="lbl">VAT Treatment</th>
-                    <th class="text-end">Invoices</th>
+                    <th class="text-end">Documents</th>
                     <th class="text-end">Net Amount</th>
                     <th class="text-end">VAT</th>
                 </tr>
@@ -112,8 +112,17 @@
                 }
                 @foreach (var line in Model.OutputLines)
                 {
-                    <tr>
-                        <td class="lbl">@VatCategories.Describe(line.VatCategory)</td>
+                    <tr class="@(line.IsCreditNote ? "text-danger" : "")">
+                        <td class="lbl">
+                            @if (line.IsCreditNote)
+                            {
+                                <text>&nbsp;&nbsp;Less credit notes &mdash; @VatCategories.Describe(line.VatCategory)</text>
+                            }
+                            else
+                            {
+                                @VatCategories.Describe(line.VatCategory)
+                            }
+                        </td>
                         <td class="text-end">@line.SupplyCount</td>
                         <td class="text-end">@line.NetAmount.ToString("N2")</td>
                         <td class="text-end">@line.VatAmount.ToString("N2")</td>

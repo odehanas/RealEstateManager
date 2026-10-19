@@ -269,6 +269,34 @@ namespace RealEstateManager.Services
                         : null;
                 }
 
+                case "CustomerCreditNote":
+                {
+                    var note = await _db.CustomerCreditNotes
+                        .Where(x => x.Id == id)
+                        .Select(x => new
+                        {
+                            x.CreditNoteNumber,
+                            x.TotalAmount,
+                            x.CustomerInvoice!.InvoiceNumber,
+                            Outstanding = x.CustomerInvoice.TotalAmount - x.CustomerInvoice.AmountPaid,
+                            Posted = x.CustomerInvoice.JournalEntry != null && x.CustomerInvoice.JournalEntry.IsPosted
+                        })
+                        .FirstOrDefaultAsync();
+
+                    if (note == null)
+                        return null;
+
+                    if (!note.Posted)
+                        return $"Invoice {note.InvoiceNumber} is not posted yet. Post the invoice before crediting it.";
+
+                    // Checked again at posting, because a receipt may have been posted
+                    // against the invoice since the credit note was drafted.
+                    return note.TotalAmount > note.Outstanding
+                        ? $"Credit note {note.CreditNoteNumber} is for {note.TotalAmount:N2}, but only " +
+                          $"{note.Outstanding:N2} is still outstanding on invoice {note.InvoiceNumber}."
+                        : null;
+                }
+
                 case "PdcClearance":
                 {
                     // Only a cheque settling an invoice touches Accounts Receivable. One
@@ -320,7 +348,9 @@ namespace RealEstateManager.Services
 
             return sourceType switch
             {
-                "CustomerInvoice" => await BlockIfInvoiceHasSettlementsAsync(entry.SourceId),
+                "CustomerInvoice" => await BlockIfReportedAsync(entry.SourceId, isCreditNote: false)
+                                     ?? await BlockIfInvoiceHasSettlementsAsync(entry.SourceId),
+                "CustomerCreditNote" => await BlockIfReportedAsync(entry.SourceId, isCreditNote: true),
                 "VendorBill" => await BlockIfBillHasPaymentsAsync(entry.SourceId),
                 "PdcReceiptMemo" => await BlockIfPdcClearedAsync(entry.SourceId),
                 _ => null
@@ -344,7 +374,36 @@ namespace RealEstateManager.Services
             if (pdcs > 0)
                 return $"This invoice has {pdcs} cleared cheque(s) against it. Reset those first.";
 
+            var creditNotes = await _db.CustomerCreditNotes
+                .CountAsync(x => x.CustomerInvoiceId == invoiceId.Value && x.JournalEntry != null && x.JournalEntry.IsPosted);
+
+            if (creditNotes > 0)
+                return $"This invoice has {creditNotes} posted credit note(s) against it. Reset those first.";
+
             return null;
+        }
+
+        /// <summary>
+        /// A document handed to the e-invoicing provider is part of the FTA's record. It
+        /// cannot be withdrawn from the accounts; the law allows only a credit note.
+        /// </summary>
+        private async Task<string?> BlockIfReportedAsync(int? sourceId, bool isCreditNote)
+        {
+            if (!sourceId.HasValue)
+                return null;
+
+            var status = isCreditNote
+                ? await _db.CustomerCreditNotes.Where(x => x.Id == sourceId.Value).Select(x => x.EInvoiceStatus).FirstOrDefaultAsync()
+                : await _db.CustomerInvoices.Where(x => x.Id == sourceId.Value).Select(x => x.EInvoiceStatus).FirstOrDefaultAsync();
+
+            if (!EInvoiceStatuses.IsLocked(status))
+                return null;
+
+            return isCreditNote
+                ? "This credit note has been sent to the FTA through your e-invoicing provider and can no longer be reset. " +
+                  "If it was wrong, raise a new invoice for the difference."
+                : "This invoice has been sent to the FTA through your e-invoicing provider and can no longer be reset. " +
+                  "Correct it with a credit note (Operations ▸ Customer Invoices ▸ Credit Note).";
         }
 
         private async Task<string?> BlockIfBillHasPaymentsAsync(int? billId)
@@ -399,11 +458,66 @@ namespace RealEstateManager.Services
             {
                 case "CustomerInvoice":
                 {
-                    var invoice = await _db.CustomerInvoices.FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    var invoice = await _db.CustomerInvoices
+                        .Include(x => x.Lease)!.ThenInclude(x => x!.Tenant)
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
                     if (invoice == null) break;
 
-
                     invoice.Status = posting ? "Posted" : "Draft";
+
+                    // Posting is the moment an invoice is issued, so it is the moment its
+                    // e-invoicing obligation is decided. Resetting withdraws a file that was
+                    // produced but never sent - it must be produced again once re-posted.
+                    if (posting)
+                    {
+                        if (invoice.EInvoiceStatus is EInvoiceStatuses.NotRequired or EInvoiceStatuses.Pending
+                            && invoice.Lease?.Tenant != null)
+                        {
+                            var company = await _db.Companies.FirstAsync(x => x.Id == invoice.CompanyId);
+                            invoice.EInvoiceStatus = EInvoiceService.DetermineStatus(
+                                company, invoice.Lease.Tenant, EInvoiceService.SupplyDateOf(invoice));
+                        }
+                    }
+                    else if (invoice.EInvoiceStatus == EInvoiceStatuses.Generated)
+                    {
+                        invoice.EInvoiceStatus = EInvoiceStatuses.Pending;
+                    }
+
+                    break;
+                }
+
+                case "CustomerCreditNote":
+                {
+                    var note = await _db.CustomerCreditNotes
+                        .Include(x => x.CustomerInvoice)!.ThenInclude(x => x!.Lease)!.ThenInclude(x => x!.Tenant)
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (note?.CustomerInvoice == null) break;
+
+                    var invoice = note.CustomerInvoice;
+                    var sign = posting ? 1m : -1m;
+
+                    // A credit note settles part of the invoice, exactly as a receipt does,
+                    // so outstanding stays TotalAmount - AmountPaid everywhere.
+                    invoice.AmountPaid += sign * note.TotalAmount;
+                    invoice.CreditedAmount += sign * note.TotalAmount;
+                    RecomputeInvoiceStatus(invoice);
+
+                    note.Status = posting ? "Posted" : "Draft";
+
+                    if (posting)
+                    {
+                        if (note.EInvoiceStatus is EInvoiceStatuses.NotRequired or EInvoiceStatuses.Pending
+                            && invoice.Lease?.Tenant != null)
+                        {
+                            var company = await _db.Companies.FirstAsync(x => x.Id == note.CompanyId);
+                            note.EInvoiceStatus = EInvoiceService.DetermineCreditNoteStatus(company, invoice.Lease.Tenant, note);
+                        }
+                    }
+                    else if (note.EInvoiceStatus == EInvoiceStatuses.Generated)
+                    {
+                        note.EInvoiceStatus = EInvoiceStatuses.Pending;
+                    }
+
                     break;
                 }
 
@@ -514,7 +628,9 @@ namespace RealEstateManager.Services
 
         private static void RecomputeInvoiceStatus(CustomerInvoice invoice)
         {
-            if (invoice.AmountPaid <= 0m)
+            if (invoice.CreditedAmount > 0m && invoice.CreditedAmount >= invoice.TotalAmount)
+                invoice.Status = "Credited";
+            else if (invoice.AmountPaid <= 0m)
                 invoice.Status = invoice.JournalEntryId.HasValue ? "Posted" : "Draft";
             else if (invoice.AmountPaid < invoice.TotalAmount)
                 invoice.Status = "PartiallyPaid";

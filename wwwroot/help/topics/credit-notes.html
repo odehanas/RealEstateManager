@@ -1,0 +1,46 @@
+<p>A credit note reduces or cancels a customer invoice: a rent discount, a lease ended early, tax charged in error.
+Under e-invoicing it is the <strong>only</strong> lawful way to correct an invoice once it has been reported &mdash;
+invoices can no longer be edited, deleted or issued with negative amounts.</p>
+
+<h3>Raising a credit note</h3>
+<ol class="steps">
+    <li>In <span class="path">Operations ▸ Customer Invoices</span>, select <strong>Credit Note</strong> on the invoice.</li>
+    <li>Enter the <strong>Credit note date</strong>. It decides which VAT return the reduction falls in.</li>
+    <li>Choose the <strong>Reason</strong> from the statutory list, and write a one-line <strong>Explanation</strong>
+        &mdash; it is printed on the document.</li>
+    <li>Enter the <strong>Net amount to credit</strong>, or tick <strong>Credit everything still outstanding</strong>.
+        VAT is reversed automatically at the invoice's own rate.</li>
+    <li>Leave <strong>Reverse into account</strong> as it is to undo the invoice exactly, or choose a revenue account
+        for a discount on rent already recognised.</li>
+    <li>Select <strong>Save &amp; Post</strong>, or <strong>Save as Draft</strong> to post later from
+        <span class="path">Operations ▸ Credit Notes</span>.</li>
+</ol>
+
+<figure data-shot="credit-note-edit"></figure>
+
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21200</code> Advances from Customers, or <code>21500</code> Due to Landlords <span class="small muted">(the account the invoice credited)</span></td><td class="num dr">Net</td><td class="num">—</td></tr>
+        <tr><td><code>21400</code> VAT Payable <span class="small muted">(only if VAT was charged)</span></td><td class="num dr">VAT</td><td class="num">—</td></tr>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num">—</td><td class="num cr">Total</td></tr>
+    </tbody>
+</table>
+
+<h3>What a posted credit note changes</h3>
+<ul>
+    <li>The invoice's balance falls by the credit. The invoice list shows it as <em>credited</em> under the amount paid,
+        and a fully credited invoice shows the status <strong>Credited</strong>.</li>
+    <li>The <a href="#vat-return">VAT return</a> for the credit note's period shows it as <em>Less credit notes</em>,
+        reducing both the supplies and the output tax.</li>
+    <li>The tenant's statement, in the system and in the portal, lists it as a credit.</li>
+    <li>If the invoice was e-invoiced, the credit note is queued in the <a href="#e-invoice-monitor">E-Invoice
+        Monitor</a> too. It can only be sent after the invoice it reduces.</li>
+</ul>
+
+<div class="box warn">
+    <div class="box-title">Only what is still owed</div>
+    <p>A credit note cannot exceed the invoice's outstanding balance. Money the tenant has already paid is refunded, not
+    credited. A posted credit note can be reset to draft until it has been sent to your provider; an invoice with a
+    posted credit note cannot be reset until the credit note is.</p>
+</div>

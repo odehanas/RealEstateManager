@@ -55,7 +55,13 @@ else
                             <td class="text-end">@invoice.Subtotal.ToString("N2")</td>
                             <td class="text-end">@(invoice.VatAmount == 0m ? "-" : invoice.VatAmount.ToString("N2"))</td>
                             <td class="text-end fw-semibold">@invoice.TotalAmount.ToString("N2")</td>
-                            <td class="text-end">@invoice.AmountPaid.ToString("N2")</td>
+                            <td class="text-end">
+                                @invoice.CashPaid.ToString("N2")
+                                @if (invoice.CreditedAmount > 0m)
+                                {
+                                    <div class="small text-muted">+ @invoice.CreditedAmount.ToString("N2") credited</div>
+                                }
+                            </td>
                             <td class="text-end @(invoice.Outstanding > 0 ? "text-danger fw-semibold" : "")">
                                 @(invoice.Outstanding == 0m ? "-" : invoice.Outstanding.ToString("N2"))
                             </td>
@@ -77,7 +83,7 @@ else
                     <tr>
                         <th colspan="6">Total</th>
                         <th class="text-end">@Model.Sum(x => x.TotalAmount).ToString("N2")</th>
-                        <th class="text-end">@Model.Sum(x => x.AmountPaid).ToString("N2")</th>
+                        <th class="text-end">@Model.Sum(x => x.CashPaid).ToString("N2")</th>
                         <th class="text-end">@Model.Sum(x => x.Outstanding).ToString("N2")</th>
                         <th></th>
                     </tr>

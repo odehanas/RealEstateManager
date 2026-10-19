@@ -61,6 +61,8 @@ namespace RealEstateManager.Data
         public DbSet<TenantPortalUser> TenantPortalUsers => Set<TenantPortalUser>();
         public DbSet<TenantServiceRequest> TenantServiceRequests => Set<TenantServiceRequest>();
         public DbSet<TenantServiceRequestComment> TenantServiceRequestComments => Set<TenantServiceRequestComment>();
+        public DbSet<CustomerCreditNote> CustomerCreditNotes => Set<CustomerCreditNote>();
+        public DbSet<ReceivedEInvoice> ReceivedEInvoices => Set<ReceivedEInvoice>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -269,6 +271,119 @@ namespace RealEstateManager.Data
                 .HasIndex(x => new { x.CompanyId, x.TaxInvoiceNumber })
                 .IsUnique()
                 .HasFilter("[TaxInvoiceNumber] IS NOT NULL");
+
+            // ----- E-invoicing -----------------------------------------------
+            modelBuilder.Entity<Company>().Property(x => x.TaxIdentificationNumber).HasMaxLength(20);
+            modelBuilder.Entity<Company>().Property(x => x.TradeLicenseNumber).HasMaxLength(60);
+            modelBuilder.Entity<Company>().Property(x => x.LegalRegistrationType).HasMaxLength(10);
+            modelBuilder.Entity<Company>().Property(x => x.LicensingAuthority).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.Emirate).HasMaxLength(10);
+            modelBuilder.Entity<Company>().Property(x => x.CountryCode).HasMaxLength(2);
+            modelBuilder.Entity<Company>().Property(x => x.BankIban).HasMaxLength(40);
+            modelBuilder.Entity<Company>().Property(x => x.BankAccountName).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.EInvoicingRevenueBand).HasMaxLength(20);
+            modelBuilder.Entity<Company>().Property(x => x.EInvoicingProviderName).HasMaxLength(200);
+            modelBuilder.Entity<Company>().Property(x => x.EInvoicePaymentMeansCode).HasMaxLength(10);
+
+            modelBuilder.Entity<Tenant>().Property(x => x.PartyType).HasMaxLength(20);
+            modelBuilder.Entity<Tenant>().Property(x => x.TaxIdentificationNumber).HasMaxLength(20);
+            modelBuilder.Entity<Tenant>().Property(x => x.LegalRegistrationType).HasMaxLength(10);
+            modelBuilder.Entity<Tenant>().Property(x => x.LicensingAuthority).HasMaxLength(200);
+            modelBuilder.Entity<Tenant>().Property(x => x.PassportIssuingCountry).HasMaxLength(2);
+            modelBuilder.Entity<Tenant>().Property(x => x.City).HasMaxLength(100);
+            modelBuilder.Entity<Tenant>().Property(x => x.Emirate).HasMaxLength(10);
+            modelBuilder.Entity<Tenant>().Property(x => x.CountryCode).HasMaxLength(2);
+
+            modelBuilder.Entity<Vendor>().Property(x => x.TaxIdentificationNumber).HasMaxLength(20);
+
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.CreditedAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.EInvoiceStatus).HasMaxLength(20);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.EInvoiceProviderReference).HasMaxLength(200);
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.EInvoiceRejectionReason).HasMaxLength(2000);
+
+            // The monitor lists what is still to be sent, company by company.
+            modelBuilder.Entity<CustomerInvoice>()
+                .HasIndex(x => new { x.CompanyId, x.EInvoiceStatus });
+
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.CreditNoteNumber).HasMaxLength(40);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.ReasonCode).HasMaxLength(20);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.Reason).HasMaxLength(500);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.VatCategory).HasMaxLength(20);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.VatRate).HasPrecision(9, 4);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.Subtotal).HasPrecision(18, 2);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.VatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.TotalAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.Status).HasMaxLength(20);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.EInvoiceStatus).HasMaxLength(20);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.EInvoiceProviderReference).HasMaxLength(200);
+            modelBuilder.Entity<CustomerCreditNote>().Property(x => x.EInvoiceRejectionReason).HasMaxLength(2000);
+
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasIndex(x => new { x.CompanyId, x.CreditNoteNumber })
+                .IsUnique();
+
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasIndex(x => new { x.CompanyId, x.EInvoiceStatus });
+
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasOne(x => x.CustomerInvoice)
+                .WithMany(x => x.CreditNotes)
+                .HasForeignKey(x => x.CustomerInvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasOne(x => x.DebitAccount)
+                .WithMany()
+                .HasForeignKey(x => x.DebitAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasOne(x => x.JournalEntry)
+                .WithMany()
+                .HasForeignKey(x => x.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.Uuid).HasMaxLength(100);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.DocumentTypeCode).HasMaxLength(10);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.DocumentNumber).HasMaxLength(100);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.SupplierName).HasMaxLength(300);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.SupplierTrn).HasMaxLength(30);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.SupplierTin).HasMaxLength(20);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.Currency).HasMaxLength(3);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.NetAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.VatAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.TotalAmount).HasPrecision(18, 2);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.FileName).HasMaxLength(260);
+            modelBuilder.Entity<ReceivedEInvoice>().Property(x => x.Status).HasMaxLength(20);
+
+            // The same supplier document can never be booked twice.
+            modelBuilder.Entity<ReceivedEInvoice>()
+                .HasIndex(x => new { x.CompanyId, x.Uuid })
+                .IsUnique();
+
+            modelBuilder.Entity<ReceivedEInvoice>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReceivedEInvoice>()
+                .HasOne(x => x.Vendor)
+                .WithMany()
+                .HasForeignKey(x => x.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReceivedEInvoice>()
+                .HasOne(x => x.VendorBill)
+                .WithMany()
+                .HasForeignKey(x => x.VendorBillId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OwnerWithdrawalCategory>()
                 .Property(x => x.Code)
@@ -1687,6 +1802,14 @@ namespace RealEstateManager.Data
             modelBuilder.Entity<TenantServiceRequestComment>()
                 .HasQueryFilter(x => !IsCompanyFilterEnabled
                                      || x.TenantServiceRequest!.CompanyId == CurrentCompanyIdValue);
+
+            // Credit notes are read by tenants in the portal too, so - as with service
+            // requests - portal queries filter on the tenant explicitly.
+            modelBuilder.Entity<CustomerCreditNote>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<ReceivedEInvoice>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
         }
     }
 }

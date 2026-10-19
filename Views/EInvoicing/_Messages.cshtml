@@ -1,0 +1,30 @@
+@if (TempData["EInvoiceSuccess"] is string success)
+{
+    <div class="alert alert-success py-2">@success</div>
+}
+@if (TempData["EInvoiceError"] is string error)
+{
+    <div class="alert alert-danger py-2">
+        <strong>@error</strong>
+        @if (TempData["EInvoiceProblems"] is string problems)
+        {
+            <ul class="mb-0 mt-2 small">
+                @foreach (var problem in problems.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    <li>@problem</li>
+                }
+            </ul>
+        }
+    </div>
+}
+else if (TempData["EInvoiceProblems"] is string notes)
+{
+    <div class="alert alert-warning py-2">
+        <ul class="mb-0 small">
+            @foreach (var note in notes.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                <li>@note</li>
+            }
+        </ul>
+    </div>
+}

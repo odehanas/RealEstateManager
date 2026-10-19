@@ -11,6 +11,13 @@
     { "key": "account-mapping", "url": "/AccountMappings", "address": "System Setup ▸ Account Mapping", "caption": "Account Mapping: which account each automatic posting uses.", "maxHeight": 1000 },
     { "key": "opening-balances", "url": "/OpeningBalances", "address": "System Setup ▸ Opening Balances", "caption": "The opening balance reconciliation. Net Imbalance must be 0.00.", "maxHeight": 1000 },
     { "key": "vat-settings", "url": "/VatSettings", "address": "System Setup ▸ VAT Settings", "caption": "VAT Settings: your TRN, tax invoice details and the provisional recovery rate.", "maxHeight": 1000 },
+    { "key": "einvoicing-settings", "url": "/EInvoicing/Settings", "address": "System Setup ▸ E-Invoicing Settings", "caption": "E-Invoicing Settings: the readiness check, your revenue band and provider, and the identity printed on every e-invoice.", "maxHeight": 1250,
+      "markers": [
+        { "selector": ".card-header.bg-success-subtle, .card-header.bg-warning-subtle", "label": "Readiness check — what is still missing" },
+        { "selector": "#band", "label": "Revenue band — sets your deadlines" },
+        { "selector": "#EInvoicingEnabled", "label": "Switch on once the provider is appointed" },
+        { "selector": "#EInvoicingProviderName", "label": "Your Accredited Service Provider" },
+        { "selector": "#Emirate", "label": "Emirate — required on every e-invoice" } ] },
     { "key": "closing", "url": "/Closing", "address": "System Setup ▸ Period Closing", "caption": "Period Closing: the twelve monthly periods and their status.", "maxHeight": 1000 },
     { "key": "users", "url": "/Users", "address": "System Setup ▸ Users & Permissions", "caption": "Users and the permissions each one holds.", "maxHeight": 800 },
 
@@ -30,8 +37,27 @@
 
     { "key": "journal-inquiry", "url": "/Journal?fromDate=2026-10-01&toDate=2026-10-31&postedOnly=false", "address": "Operations ▸ Journal Inquiry", "caption": "Journal Inquiry with drafts showing. Drafts are not in any report until posted.", "maxHeight": 1000,
       "markers": [ { "selector": "select[name='postedOnly']", "label": "Posted Only = No lists drafts" }, { "selector": "form[action*='PostAllDrafts'] button", "label": "Post All Drafts matching the filter" }, { "selector": "form[action$='/Journal/Post'] button", "label": "Post one entry" } ] },
-    { "key": "customer-invoices", "url": "/CustomerInvoices", "address": "Operations ▸ Customer Invoices", "caption": "Customer invoices. Draft invoices carry a Post button; posted ones can be printed and received against.", "maxHeight": 900,
-      "markers": [ { "selector": "form[action*='/CustomerInvoices/Post'] button", "label": "Post — puts the invoice into the accounts" }, { "selector": "a[href*='TaxInvoice']", "label": "Print the tax invoice" }, { "selector": "a[href*='CustomerReceipts/Create?invoiceId']", "label": "Receive a payment" } ] },
+    { "key": "customer-invoices", "url": "/CustomerInvoices", "address": "Operations ▸ Customer Invoices", "caption": "Customer invoices. Draft invoices carry a Post button; posted ones can be printed, received against or credited, and show where they stand for e-invoicing.", "maxHeight": 900,
+      "markers": [ { "selector": "form[action*='/CustomerInvoices/Post'] button", "label": "Post — puts the invoice into the accounts" }, { "selector": "a[href*='TaxInvoice']", "label": "Print the tax invoice" }, { "selector": "a[href*='CustomerReceipts/Create?invoiceId']", "label": "Receive a payment" }, { "selector": "a[href*='CustomerCreditNotes/Create']", "label": "Credit note — reduce or cancel the invoice" }, { "selector": "td span.badge.bg-primary", "label": "E-invoice status" } ] },
+    { "key": "credit-note-edit", "url": "/CustomerCreditNotes/Create?invoiceId=18", "address": "Operations ▸ Customer Invoices ▸ Credit Note", "caption": "A credit note against one invoice: the statutory reason, the amount, and the VAT reversed automatically.", "maxHeight": 900,
+      "before": "document.getElementById('Reason').value = 'Rent-free fortnight agreed for shop-front refurbishment works'; var n = document.getElementById('netAmount'); n.value = '1250'; n.dispatchEvent(new Event('input'));",
+      "markers": [
+        { "selector": "#ReasonCode", "label": "Reason, from the statutory list" },
+        { "selector": "#fullCredit", "label": "Or credit everything outstanding" },
+        { "selector": "#netAmount", "label": "Net amount — VAT is added for you" },
+        { "selector": "button[name='PostNow']", "label": "Save & Post" } ] },
+    { "key": "einvoice-monitor", "url": "/EInvoicing", "address": "Operations ▸ E-Invoice Monitor", "caption": "The E-Invoice Monitor: every document to send, ordered by its 14-day deadline.", "maxHeight": 1250,
+      "markers": [
+        { "selector": ".einv-kpi", "label": "Deadlines at a glance" },
+        { "selector": "form[action*='GenerateAll'] button", "label": "Generate all" },
+        { "selector": "button[formaction*='DownloadBatch']", "label": "Download the files for your provider" },
+        { "selector": "button[formaction*='MarkSubmitted']", "label": "Record them as sent — this locks them" },
+        { "selector": "form[action*='RecordResponse'] button", "label": "Record the provider's answer" } ] },
+    { "key": "received-einvoices", "url": "/EInvoicing/Received", "address": "Operations ▸ Received E-Invoices", "caption": "Suppliers' e-invoices: matched to the vendor by TRN, then booked as a bill in one click.", "maxHeight": 650,
+      "markers": [
+        { "selector": "input[type='file']", "label": "Upload the files from your provider" },
+        { "selector": "a.badge.bg-success", "label": "Already booked as a vendor bill" },
+        { "selector": "td .text-danger", "label": "No vendor with this TRN yet" } ] },
     { "key": "tax-invoice", "url": "/CustomerInvoices/TaxInvoice/11", "address": "Operations ▸ Customer Invoices ▸ Tax Invoice", "caption": "A full tax invoice — the tenant is VAT registered, so both TRNs are shown.", "maxHeight": 1150 },
     { "key": "customer-receipt-create", "url": "/CustomerReceipts/Create?invoiceId=26", "address": "Operations ▸ Customer Receipts ▸ New Receipt", "caption": "Recording a receipt against an invoice. It is saved as a draft.", "maxHeight": 760 },
     { "key": "pdc-receipts", "url": "/PdcReceipts", "address": "Operations ▸ PDC Receipts", "caption": "The post-dated cheque register: received, cleared and still in hand.", "maxHeight": 760,

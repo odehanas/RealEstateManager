@@ -21,6 +21,7 @@
         { "key": "opening-balances", "title": "Opening Balances", "path": "System Setup ▸ Opening Balances", "summary": "Bringing balances across from a previous system and keeping them balanced.", "screens": ["OpeningBalances"] },
         { "key": "owner-withdrawal-categories", "title": "Owner Withdrawal Categories", "path": "System Setup ▸ Owner Withdrawal Categories", "summary": "The list used to tag what owner drawings were spent on.", "screens": ["OwnerWithdrawalCategories"] },
         { "key": "vat-settings", "title": "VAT Settings", "path": "System Setup ▸ VAT Settings", "summary": "Your TRN, tax invoice details and the input-tax recovery rate.", "screens": ["VatSettings"] },
+        { "key": "e-invoicing", "title": "E-Invoicing Settings", "path": "System Setup ▸ E-Invoicing Settings", "summary": "The UAE e-invoicing mandate, your provider, start date and the identity printed on every e-invoice.", "screens": ["EInvoicing.Settings"] },
         { "key": "revenue-recognition", "title": "Revenue Recognition", "path": "System Setup ▸ Revenue Recognition", "summary": "Releasing billed rent into revenue month by month.", "screens": ["RevenueRecognition"] },
         { "key": "prepayments", "title": "Recurring Prepayments", "path": "System Setup ▸ Recurring Prepayments", "summary": "Spreading an up-front payment over the months it covers.", "screens": ["Prepayments"] },
         { "key": "closing", "title": "Period & Year Closing", "path": "System Setup ▸ Period Closing", "summary": "Month-end checklist, closing a period and closing the fiscal year.", "screens": ["Closing"] },
@@ -44,6 +45,9 @@
       "title": "Operations",
       "topics": [
         { "key": "customer-invoices", "title": "Customer Invoices", "path": "Operations ▸ Customer Invoices", "summary": "Posting rent invoices and printing tax invoices.", "screens": ["CustomerInvoices"] },
+        { "key": "credit-notes", "title": "Credit Notes", "path": "Operations ▸ Credit Notes", "summary": "Reducing or cancelling an invoice - the only lawful correction once it is e-invoiced.", "screens": ["CustomerCreditNotes"] },
+        { "key": "e-invoice-monitor", "title": "E-Invoice Monitor", "path": "Operations ▸ E-Invoice Monitor", "summary": "Generating e-invoices, sending them through your provider within 14 days, and recording the answer.", "screens": ["EInvoicing"] },
+        { "key": "received-e-invoices", "title": "Received E-Invoices", "path": "Operations ▸ Received E-Invoices", "summary": "Uploading suppliers' e-invoices and booking them as vendor bills.", "screens": ["EInvoicing.Received", "EInvoicing.Upload", "EInvoicing.ReceivedFile", "EInvoicing.SetReceivedStatus"] },
         { "key": "customer-receipts", "title": "Customer Receipts", "path": "Operations ▸ Customer Receipts", "summary": "Recording money received against an invoice.", "screens": ["CustomerReceipts"] },
         { "key": "pdc-receipts", "title": "PDC Receipts", "path": "Operations ▸ PDC Receipts", "summary": "Post-dated cheques: receiving, correcting and clearing them.", "screens": ["PdcReceipts"] },
         { "key": "security-deposits", "title": "Security Deposits", "path": "Operations ▸ Security Deposits", "summary": "Holding and releasing tenant deposits.", "screens": ["SecurityDeposits"] },

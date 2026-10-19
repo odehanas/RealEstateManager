@@ -48,6 +48,10 @@ namespace RealEstateManager.Models
         public decimal OpeningBalance { get; set; }
         public decimal TotalInvoiced { get; set; }
         public decimal TotalPaid { get; set; }
+
+        /// <summary>Reductions by credit note - shown apart from money paid.</summary>
+        public decimal TotalCredited { get; set; }
+
         public decimal OutstandingBalance { get; set; }
 
         public decimal OverdueAmount { get; set; }
@@ -99,8 +103,14 @@ namespace RealEstateManager.Models
         public decimal Subtotal { get; set; }
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
+        /// <summary>Everything that settled the invoice, credit notes included.</summary>
         public decimal AmountPaid { get; set; }
+
+        public decimal CreditedAmount { get; set; }
         public string Status { get; set; } = string.Empty;
+
+        /// <summary>Money actually received.</summary>
+        public decimal CashPaid => AmountPaid - CreditedAmount;
 
         public decimal Outstanding => TotalAmount - AmountPaid;
         public bool IsOverdue => Outstanding > 0m && DueDate < DateTime.Today;

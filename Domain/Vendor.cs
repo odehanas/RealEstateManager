@@ -21,6 +21,18 @@
         // supplier cannot be created twice under two vendor codes.
         public string? TradeLicenseNumber { get; set; }
 
+        /// <summary>
+        /// The supplier's Tax Identification Number - how a received e-invoice is matched
+        /// to this vendor when the supplier is not VAT registered. Blank means "take it
+        /// from the TRN".
+        /// </summary>
+        public string? TaxIdentificationNumber { get; set; }
+
+        public string? EffectiveTin =>
+            !string.IsNullOrWhiteSpace(TaxIdentificationNumber)
+                ? TaxIdentificationNumber.Trim()
+                : Company.TinFromTrn(TrnNumber);
+
         // Whether the supplier holds a LIVE VAT registration. Separate from having a
         // TRN on file, because a registration can be cancelled while the number stays
         // on old paperwork - and billing tax against a deregistered supplier is a

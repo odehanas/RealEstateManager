@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<RealEstateManager.Domain.CustomerInvoice>
+@using RealEstateManager.Domain
 
 @{
     ViewData["Title"] = "Customer Invoices";
@@ -6,8 +7,20 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Customer Invoices</h2>
-    <a asp-controller="CustomerReceipts" asp-action="Create" class="btn btn-dark">Receive Payment</a>
+    <div class="d-flex gap-2">
+        <a asp-controller="EInvoicing" asp-action="Index" class="btn btn-outline-primary">E-Invoice Monitor</a>
+        <a asp-controller="CustomerReceipts" asp-action="Create" class="btn btn-dark">Receive Payment</a>
+    </div>
 </div>
+
+@if (TempData["InvoiceSuccess"] is string success)
+{
+    <div class="alert alert-success py-2">@success</div>
+}
+@if (TempData["InvoiceError"] is string error)
+{
+    <div class="alert alert-danger py-2">@error</div>
+}
 
 <table class="table table-bordered table-striped">
     <thead>
@@ -23,6 +36,7 @@
             <th class="text-end">Balance</th>
             <th>Status</th>
             <th>GL</th>
+            <th>E-Invoice</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -33,14 +47,26 @@
             var invoicePosted = invoice.JournalEntry?.IsPosted == true;
 
             <tr>
-                <td>@invoice.InvoiceNumber</td>
+                <td>
+                    @invoice.InvoiceNumber
+                    @if (!string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
+                    {
+                        <div class="small text-muted">@invoice.TaxInvoiceNumber</div>
+                    }
+                </td>
                 <td>@invoice.Lease?.Unit?.Property?.Name</td>
                 <td>@invoice.Lease?.Unit?.UnitNumber</td>
                 <td>@invoice.Lease?.Tenant?.FullName</td>
                 <td>@invoice.InvoiceDate.ToString("dd/MM/yyyy")</td>
                 <td>@invoice.DueDate.ToString("dd/MM/yyyy")</td>
                 <td class="text-end">@invoice.TotalAmount.ToString("N2")</td>
-                <td class="text-end">@invoice.AmountPaid.ToString("N2")</td>
+                <td class="text-end">
+                    @invoice.CashReceived.ToString("N2")
+                    @if (invoice.CreditedAmount > 0m)
+                    {
+                        <div class="small text-muted">+ @invoice.CreditedAmount.ToString("N2") credited</div>
+                    }
+                </td>
                 <td class="text-end">@balance.ToString("N2")</td>
                 <td>@invoice.Status</td>
                 @* Posted means the journal is POSTED, not merely that one exists. A journal
@@ -57,7 +83,12 @@
                     }
                 </td>
                 <td>
-                    <div class="d-flex gap-2">
+                    <span class="badge @EInvoiceStatuses.BadgeClass(invoice.EInvoiceStatus)">
+                        @EInvoiceStatuses.Describe(invoice.EInvoiceStatus)
+                    </span>
+                </td>
+                <td>
+                    <div class="d-flex gap-2 flex-wrap">
                         @if (!invoicePosted)
                         {
                             <form asp-action="Post" method="post">
@@ -69,14 +100,19 @@
 
                         <a asp-action="TaxInvoice" asp-route-id="@invoice.Id" target="_blank"
                            class="btn btn-sm btn-outline-dark"
-                           title="@(invoice.VatAmount > 0 ? "Print the tax invoice" : "Print the invoice — no output tax on this supply")">
-                            @(invoice.VatAmount > 0 ? "Tax Invoice" : "Invoice")
+                           title="@(invoice.TaxInvoiceNumber != null ? "Print the tax invoice" : "Print the invoice — no output tax on this supply")">
+                            @(invoice.TaxInvoiceNumber != null ? "Tax Invoice" : "Invoice")
                         </a>
 
                         @if (balance > 0 && invoicePosted)
                         {
                             <a asp-controller="CustomerReceipts" asp-action="Create" asp-route-invoiceId="@invoice.Id" class="btn btn-sm btn-outline-success">
                                 Receive
+                            </a>
+                            <a asp-controller="CustomerCreditNotes" asp-action="Create" asp-route-invoiceId="@invoice.Id"
+                               class="btn btn-sm btn-outline-danger"
+                               title="Reduce or cancel this invoice. Once it has been e-invoiced, a credit note is the only way.">
+                                Credit Note
                             </a>
                         }
                     </div>

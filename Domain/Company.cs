@@ -35,6 +35,78 @@ namespace RealEstateManager.Domain
 
         public bool IsVatRegistered => !string.IsNullOrWhiteSpace(TrnNumber);
 
+        // ---------------------------------------------------------------------
+        // E-invoicing identity. Every e-invoice must identify the seller on the
+        // Peppol network (its TIN), by its commercial registration, and by a
+        // structured address that names the emirate.
+        // ---------------------------------------------------------------------
+
+        /// <summary>
+        /// Tax Identification Number: the first 10 digits of the TRN for a VAT
+        /// registered business, or the TIN the FTA issues to one that is not.
+        /// Blank means "take it from the TRN".
+        /// </summary>
+        public string? TaxIdentificationNumber { get; set; }
+
+        public string? TradeLicenseNumber { get; set; }
+
+        /// <summary>TL, EID, PAS or CD - see <see cref="LegalRegistrationTypes"/>.</summary>
+        public string LegalRegistrationType { get; set; } = LegalRegistrationTypes.TradeLicence;
+
+        /// <summary>Authority that issued the trade licence, e.g. "Department of Economy and Tourism".</summary>
+        public string? LicensingAuthority { get; set; }
+
+        /// <summary>Emirate code (AUH, DXB, SHJ, AJM, UAQ, RAK, FUJ).</summary>
+        public string? Emirate { get; set; }
+
+        /// <summary>ISO 3166 country code of the registered address.</summary>
+        public string CountryCode { get; set; } = "AE";
+
+        /// <summary>Printed as the account to pay into when the payment means is a transfer.</summary>
+        public string? BankIban { get; set; }
+        public string? BankAccountName { get; set; }
+
+        // ---------------------------------------------------------------------
+        // E-invoicing switch and provider.
+        // ---------------------------------------------------------------------
+
+        /// <summary>
+        /// Off until the company has appointed a provider. While off, every invoice is
+        /// marked Not Required and nothing changes for the user.
+        /// </summary>
+        public bool EInvoicingEnabled { get; set; }
+
+        /// <summary>Large, Standard or Government - decides the statutory dates.</summary>
+        public string? EInvoicingRevenueBand { get; set; }
+
+        /// <summary>
+        /// Supplies on or after this date are e-invoiced. Defaults to the statutory date
+        /// for the revenue band; may be earlier for voluntary adoption.
+        /// </summary>
+        public DateTime? EInvoicingStartDate { get; set; }
+
+        /// <summary>The Accredited Service Provider appointed by the company.</summary>
+        public string? EInvoicingProviderName { get; set; }
+        public DateTime? EInvoicingProviderAppointedOn { get; set; }
+
+        /// <summary>Payment means code printed on every e-invoice (UNCL 4461).</summary>
+        public string EInvoicePaymentMeansCode { get; set; } = EInvoicePaymentMeans.CreditTransfer;
+
+        /// <summary>The TIN to use: the one entered, else the first 10 digits of the TRN.</summary>
+        public string? EffectiveTin =>
+            !string.IsNullOrWhiteSpace(TaxIdentificationNumber)
+                ? TaxIdentificationNumber.Trim()
+                : TinFromTrn(TrnNumber);
+
+        /// <summary>A TRN is the TIN followed by five more digits.</summary>
+        public static string? TinFromTrn(string? trn)
+        {
+            var digits = trn?.Trim();
+            return !string.IsNullOrEmpty(digits) && digits.Length == 15 && digits.All(char.IsDigit)
+                ? digits[..10]
+                : null;
+        }
+
         public CompanyAccountSetting? AccountSetting { get; set; }
         public CompanySubscription? Subscription { get; set; }
 

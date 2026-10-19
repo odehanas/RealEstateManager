@@ -51,6 +51,7 @@ document in a new tab.</p>
     <tbody>
         <tr><td><strong>Full tax invoice</strong></td><td>VAT is charged and the tenant has a TRN on file. Shows both TRNs.</td></tr>
         <tr><td><strong>Simplified tax invoice</strong></td><td>VAT is charged and the tenant has no TRN.</td></tr>
+        <tr><td><strong>Tax invoice at 0%</strong></td><td>A zero-rated supply. It is taxable at 0%, so it is numbered and issued as a tax invoice.</td></tr>
         <tr><td><strong>Invoice</strong></td><td>No VAT is charged — an exempt residential letting, for example.</td></tr>
     </tbody>
 </table>
@@ -60,6 +61,12 @@ invoice already issued. Your own TRN, legal name and address come from
 <a href="#vat-settings">VAT Settings</a>.</p>
 
 <figure data-shot="tax-invoice"></figure>
+
+<h3>E-invoicing</h3>
+<p>The <strong>E-Invoice</strong> column shows where each invoice stands on the UAE e-invoicing network. Invoices to
+business and government tenants are queued for the <a href="#e-invoice-monitor">E-Invoice Monitor</a> when posted;
+invoices to individuals show <em>Not required</em>. Once an invoice has been sent to your provider its e-invoice ID
+also appears on the printed tax invoice.</p>
 
 <h3>Receiving payment</h3>
 <p><strong>Receive</strong> on an invoice row opens a customer receipt already pointing at that invoice — see
@@ -73,9 +80,11 @@ invoice already issued. Your own TRN, legal name and address come from
         <tr><td><strong>Posted</strong></td><td>Journal posted; receivable outstanding in full.</td></tr>
         <tr><td><strong>PartiallyPaid</strong></td><td>Some payment posted; a balance remains.</td></tr>
         <tr><td><strong>Paid</strong></td><td>Fully settled.</td></tr>
+        <tr><td><strong>Credited</strong></td><td>Fully reduced by credit notes.</td></tr>
         <tr><td><strong>Cancelled</strong></td><td>Voided. Excluded from PDC and receipt selection.</td></tr>
     </tbody>
 </table>
-<p>To correct a posted invoice, reset its journal to draft from Journal Inquiry — see
-<a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>. This is refused while receipts or cleared cheques are
-posted against it.</p>
+<p>To reduce or cancel a posted invoice, select <strong>Credit Note</strong> on its row &mdash; see
+<a href="#credit-notes">Credit Notes</a>. An invoice not yet sent to your e-invoicing provider can instead be reset to
+draft from Journal Inquiry &mdash; see <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>. This is refused
+while receipts, cleared cheques or credit notes are posted against it, and always once the invoice has been sent.</p>

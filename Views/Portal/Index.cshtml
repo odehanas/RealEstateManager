@@ -122,6 +122,10 @@ else if (Model.IsSettled)
             <div class="col-6 col-md-3">
                 <div class="text-muted">Total paid</div>
                 <div class="fw-semibold">@Model.TotalPaid.ToString("N2")</div>
+                @if (Model.TotalCredited > 0m)
+                {
+                    <div class="text-muted mt-1">Credit notes: @Model.TotalCredited.ToString("N2")</div>
+                }
             </div>
             <div class="col-6 col-md-3">
                 <div class="text-muted">Balance</div>

@@ -5,7 +5,9 @@ using RealEstateManager.Data;
 using RealEstateManager.Domain;
 using RealEstateManager.Services;
 
-const string Cs = @"Server=(localdb)\ClaudeREM;Database=RemDemo;Trusted_Connection=True;TrustServerCertificate=True";
+// REM_DEMO_DB names a different throwaway database, e.g. for comparing schemas.
+var dbName = Environment.GetEnvironmentVariable("REM_DEMO_DB") ?? "RemDemo";
+var Cs = $@"Server=(localdb)\ClaudeREM;Database={dbName};Trusted_Connection=True;TrustServerCertificate=True";
 
 var options = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(Cs).Options;
 using var db = new ApplicationDbContext(options, new NoCompany(), new DatabaseConnectionOptions { ConnectionString = Cs });
@@ -26,7 +28,17 @@ var company = new Company
     Country = "United Arab Emirates",
     Phone = "+971 7 222 4400",
     Email = "accounts@gulfhorizon.example",
-    ProvisionalVatRecoveryRate = 70m
+    ProvisionalVatRecoveryRate = 70m,
+    // E-invoicing identity (fictional). Switched off: the demo shows the set-up state.
+    TradeLicenseNumber = "RAK-10458",
+    LegalRegistrationType = LegalRegistrationTypes.TradeLicence,
+    LicensingAuthority = "Department of Economic Development - Ras Al Khaimah",
+    Emirate = "RAK",
+    CountryCode = "AE",
+    BankIban = "AE070331234567890123456",
+    BankAccountName = "Gulf Horizon Properties LLC",
+    EInvoicePaymentMeansCode = EInvoicePaymentMeans.CreditTransfer,
+    EInvoicingRevenueBand = EInvoicingRevenueBands.Standard
 };
 db.Companies.Add(company);
 await db.SaveChangesAsync();
@@ -89,7 +101,15 @@ db.Units.AddRange(units);
 Tenant T(int n, string name, string email, string phone, string nat, string? eid = null, string? passport = null, string? licence = null, string? trn = null) => new()
 {
     CompanyId = company.Id, Code = $"TNT-{n:00000}", FullName = name, Email = email, Phone = phone, Nationality = nat,
-    IdNumber = eid, PassportNumber = passport, TradeLicenseNumber = licence, TrnNumber = trn, IsActive = true
+    IdNumber = eid, PassportNumber = passport, TradeLicenseNumber = licence, TrnNumber = trn, IsActive = true,
+    // A licence holder is a business: its invoices are in scope for e-invoicing.
+    PartyType = licence != null ? PartyTypes.Business : PartyTypes.Individual,
+    LicensingAuthority = licence == null ? null
+        : licence.StartsWith("RAKEZ") ? "Ras Al Khaimah Economic Zone (RAKEZ)" : "Department of Economic Development - Ras Al Khaimah",
+    Address = licence != null ? $"Office {100 + n * 7}, Al Muntasir Road, Al Nakheel" : null,
+    City = "Ras Al Khaimah",
+    Emirate = "RAK",
+    CountryCode = "AE"
 };
 var tenants = new[]
 {

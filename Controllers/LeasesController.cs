@@ -168,6 +168,10 @@ namespace RealEstateManager.Controllers
 
             while (invoiceDate <= lease.EndDate)
             {
+                // The rent period this invoice bills - printed on the e-invoice.
+                var periodEnd = invoiceDate.AddMonths(billingMonths).AddDays(-1);
+                if (periodEnd > lease.EndDate) periodEnd = lease.EndDate;
+
                 _db.CustomerInvoices.Add(new CustomerInvoice
                 {
                     CompanyId = companyId,
@@ -176,6 +180,8 @@ namespace RealEstateManager.Controllers
                     InvoiceDate = invoiceDate,
                     DueDate = invoiceDate,
                     DateOfSupply = invoiceDate,
+                    PeriodStart = invoiceDate,
+                    PeriodEnd = periodEnd,
                     Subtotal = baseAmountPerInvoice,
                     VatAmount = vatAmountPerInvoice,
                     TotalAmount = baseAmountPerInvoice + vatAmountPerInvoice,

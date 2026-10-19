@@ -12,11 +12,22 @@
         <tr><td>Expired</td><td>Ran to its end date.</td></tr>
         <tr><td>Renewed</td><td>Replaced by a successor contract.</td></tr>
 
-        <tr><td rowspan="5"><strong>Customer invoice</strong></td><td>Draft</td><td>Generated, not posted. No ledger impact.</td></tr>
+        <tr><td rowspan="6"><strong>Customer invoice</strong></td><td>Draft</td><td>Generated, not posted. No ledger impact.</td></tr>
         <tr><td>Posted</td><td>Journal written; fully outstanding.</td></tr>
         <tr><td>PartiallyPaid</td><td>Part settled.</td></tr>
         <tr><td>Paid</td><td>Fully settled.</td></tr>
+        <tr><td>Credited</td><td>Fully reduced by credit notes.</td></tr>
         <tr><td>Cancelled</td><td>Voided.</td></tr>
+
+        <tr><td rowspan="2"><strong>Credit note</strong></td><td>Draft</td><td>Saved, not posted. The invoice is not reduced yet.</td></tr>
+        <tr><td>Posted</td><td>Invoice balance and output VAT reduced.</td></tr>
+
+        <tr><td rowspan="6"><strong>E-invoice</strong> <span class="small muted">(invoice or credit note)</span></td><td>Not required</td><td>Individual tenant, e-invoicing off, or before the start date.</td></tr>
+        <tr><td>To generate</td><td>In scope; no file yet.</td></tr>
+        <tr><td>Ready to send</td><td>File produced and checked.</td></tr>
+        <tr><td>Sent to provider</td><td>Handed to the provider. Locked &mdash; correct only by credit note.</td></tr>
+        <tr><td>Accepted</td><td>Validated, delivered and reported. Final.</td></tr>
+        <tr><td>Rejected</td><td>Refused by the provider. Fix and generate again.</td></tr>
 
         <tr><td rowspan="3"><strong>PDC receipt</strong></td><td>Draft</td><td>Transient state during creation.</td></tr>
         <tr><td>Received</td><td>In custody; memorandum posted.</td></tr>

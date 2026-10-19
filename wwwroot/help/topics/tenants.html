@@ -5,10 +5,13 @@ up into the <code>11200</code> Accounts Receivable control account.</p>
 <ol class="steps">
     <li>Select <strong>Add Tenant</strong>. The tenant code, such as <code>TNT-00001</code>, is issued when you save.</li>
     <li>Enter the <strong>Full Name</strong> exactly as it should appear on contracts, invoices and statements.</li>
-    <li>Enter <strong>Email</strong>, <strong>Phone</strong>, <strong>Nationality</strong> and <strong>Address</strong>.</li>
+    <li>Enter <strong>Email</strong>, <strong>Phone</strong> and <strong>Nationality</strong>, and the address: <strong>Street
+        address</strong>, <strong>City</strong>, <strong>Emirate</strong> and <strong>Country</strong>.</li>
     <li>Enter the identifiers you hold: <strong>Trade Licence Number</strong> for a company,
         <strong>Emirates ID / ID Number</strong> and <strong>Passport Number</strong> for an individual.</li>
     <li>Enter the <strong>TRN</strong> if the tenant is VAT registered.</li>
+    <li>Under <strong>E-invoicing</strong>, choose the <strong>Customer type</strong>: Individual, Business or Government.
+        For a business, complete the TIN (only if it has no TRN), what identifies it, and who issued its trade licence.</li>
     <li>Enter the <strong>Opening Balance</strong> only when migrating from another system. Save.</li>
 </ol>
 
@@ -17,6 +20,14 @@ up into the <code>11200</code> Accounts Receivable control account.</p>
     <tbody>
         <tr><td><strong>Trade licence, Emirates ID, passport, TRN</strong></td><td>Each must be unique in the company. If another tenant already holds one, the save is refused and that tenant is named — open the existing record rather than creating a second one.</td></tr>
         <tr><td><strong>TRN</strong></td><td>A tenant with a TRN receives a <strong>full tax invoice</strong> showing it; without one, a <strong>simplified tax invoice</strong>.</td></tr>
+        <tr><td><strong>Customer type</strong></td><td>Decides whether the tenant's invoices are <a href="#e-invoicing">e-invoices</a>. A
+            company or establishment is a <strong>Business</strong> even if it is not VAT registered; only private
+            persons are <strong>Individuals</strong>.</td></tr>
+        <tr><td><strong>TIN</strong></td><td>The 10-digit Tax Identification Number &mdash; the tenant's address on the e-invoicing
+            network. Leave blank when a TRN is entered: the TIN is the TRN's first 10 digits.</td></tr>
+        <tr><td><strong>Identified by / issued by</strong></td><td>The registration printed on the e-invoice: normally the trade
+            licence and the authority that issued it. A passport also needs its issuing country as a two-letter code.</td></tr>
+        <tr><td><strong>Emirate</strong></td><td>Required on every e-invoice address. Choose from the seven emirates.</td></tr>
         <tr><td><strong>Opening Balance</strong></td><td><strong>Positive</strong> — the tenant owes you at go-live.<br/><strong>Negative</strong> — an advance you are holding for them.<br/>Feeds the AR control account.</td></tr>
         <tr><td><strong>Is Active</strong></td><td>Untick when the tenant leaves. History and statements are kept.</td></tr>
     </tbody>

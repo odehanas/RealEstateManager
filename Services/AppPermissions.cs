@@ -141,6 +141,8 @@ namespace RealEstateManager.Services
                 ["PettyCash"] = new[] { AppPermissions.AccountingManage },
                 ["VatSettings"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerInvoices"] = new[] { AppPermissions.AccountingManage },
+                ["CustomerCreditNotes"] = new[] { AppPermissions.AccountingManage },
+                ["EInvoicing"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerReceipts"] = new[] { AppPermissions.AccountingManage },
                 ["PdcReceipts"] = new[] { AppPermissions.AccountingManage },
                 ["VendorBills"] = new[] { AppPermissions.AccountingManage },

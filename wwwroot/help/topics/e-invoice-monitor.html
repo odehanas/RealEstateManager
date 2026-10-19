@@ -1,0 +1,52 @@
+<p>The work queue for e-invoicing. Every posted invoice and credit note to a business or government tenant appears
+here until your provider has accepted it, ordered by its <strong>14-day deadline</strong>: the file must reach your
+provider within 14 days of the supply.</p>
+
+<figure data-shot="einvoice-monitor"></figure>
+
+<h3>The daily routine</h3>
+<ol class="steps">
+    <li>Post the month's invoices as usual in <a href="#customer-invoices">Customer Invoices</a>. Those in scope arrive
+        here as <strong>To generate</strong>.</li>
+    <li>Select <strong>Generate all</strong>. Each file is built and checked. Anything that cannot be generated is listed
+        with the reason &mdash; usually a missing TIN, licence or address on the tenant &mdash; and a link to fix it.</li>
+    <li>Select <strong>Download ready files (ZIP)</strong> and upload them in your provider's portal.</li>
+    <li>Back here, tick the documents you uploaded, enter the provider's batch reference if it gave one, and select
+        <strong>Mark ticked as sent</strong>.</li>
+    <li>When the provider reports back, record <strong>Accepted</strong> (with its reference) or
+        <strong>Rejected</strong> (with its reason) under <em>Sent &mdash; awaiting the provider's answer</em>.</li>
+</ol>
+
+<table class="t-compact">
+    <thead><tr><th style="width:24%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Not required</strong></td><td>Individual tenant, e-invoicing off, or supplied before the start date.</td></tr>
+        <tr><td><strong>To generate</strong></td><td>In scope; no file produced yet.</td></tr>
+        <tr><td><strong>Ready to send</strong></td><td>File produced and checked. Download it and upload it to the provider.</td></tr>
+        <tr><td><strong>Sent to provider</strong></td><td>Handed over. Now part of the FTA's record &mdash; <strong>locked</strong>.</td></tr>
+        <tr><td><strong>Accepted</strong></td><td>The provider validated, delivered and reported it. Final.</td></tr>
+        <tr><td><strong>Rejected</strong></td><td>The provider refused it. Fix the cause and generate again; a fresh identifier is issued.</td></tr>
+    </tbody>
+</table>
+
+<div class="box warn">
+    <div class="box-title">Sent means locked</div>
+    <p>Once a document is marked as sent it can no longer be reset to draft or changed. The law allows only one
+    correction: a <a href="#credit-notes">credit note</a>. Mark documents as sent only after the upload has actually
+    happened.</p>
+</div>
+
+<h3>The warnings at the top</h3>
+<ul>
+    <li><strong>Past the 14-day deadline / Due within 3 days</strong> &mdash; send these first. Late issue carries a
+        penalty of AED 100 per invoice, up to AED 5,000 a month.</li>
+    <li><strong>Draft invoices with a passed supply date</strong> &mdash; the clock runs from the supply, not from
+        posting, so post them promptly.</li>
+    <li><strong>Setup is incomplete</strong> &mdash; open <a href="#e-invoicing">E-Invoicing Settings</a> for the list.</li>
+</ul>
+
+<p><strong>Re-assess</strong> re-applies the scope rules to posted documents that have not been generated yet &mdash;
+use it after changing a tenant's customer type.</p>
+
+<p>Each file is kept exactly as produced. <strong>XML</strong> downloads it again at any time, for your provider or an
+auditor; the e-invoice ID is also printed on the tax invoice.</p>

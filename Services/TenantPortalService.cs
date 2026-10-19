@@ -50,7 +50,11 @@ namespace RealEstateManager.Services
                 .SumAsync(x => (decimal?)x.Amount) ?? 0m;
 
             var invoiced = invoices.Sum(x => x.TotalAmount);
-            var paid = invoices.Sum(x => x.AmountPaid);
+
+            // AmountPaid counts credit notes as well as money; the tenant sees them apart.
+            var credited = invoices.Sum(x => x.CreditedAmount);
+            var settled = invoices.Sum(x => x.AmountPaid);
+            var paid = settled - credited;
 
             var overdue = invoices
                 .Where(x => x.DueDate < asOfDate && x.Outstanding > 0m)
@@ -68,7 +72,8 @@ namespace RealEstateManager.Services
                 OpeningBalance = tenant.OpeningBalance,
                 TotalInvoiced = invoiced,
                 TotalPaid = paid,
-                OutstandingBalance = tenant.OpeningBalance + invoiced - paid,
+                TotalCredited = credited,
+                OutstandingBalance = tenant.OpeningBalance + invoiced - settled,
 
                 OverdueAmount = overdue.Sum(x => x.Outstanding),
                 OverdueCount = overdue.Count,
@@ -138,6 +143,7 @@ namespace RealEstateManager.Services
                     VatAmount = x.VatAmount,
                     TotalAmount = x.TotalAmount,
                     AmountPaid = x.AmountPaid,
+                    CreditedAmount = x.CreditedAmount,
                     Status = x.Status
                 })
                 .ToListAsync();
@@ -226,7 +232,24 @@ namespace RealEstateManager.Services
                 .Select(x => new { Date = x.ClearedDate!.Value, x.ChequeNumber, x.Amount })
                 .ToListAsync();
 
+            var creditNotes = await _db.CustomerCreditNotes
+                .AsNoTracking()
+                .Where(x => x.CustomerInvoice!.Lease!.TenantId == tenantId
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted
+                            && x.CreditNoteDate <= toDate)
+                .Select(x => new { x.CreditNoteDate, x.CreditNoteNumber, x.TotalAmount, Invoice = x.CustomerInvoice!.InvoiceNumber, x.Reason })
+                .ToListAsync();
+
             var entries = new List<PortalStatementLineViewModel>();
+
+            entries.AddRange(creditNotes.Select(x => new PortalStatementLineViewModel
+            {
+                Date = x.CreditNoteDate,
+                Reference = x.CreditNoteNumber,
+                Description = $"Credit note against {x.Invoice} - {x.Reason}",
+                Payment = x.TotalAmount
+            }));
 
             entries.AddRange(invoices.Select(x => new PortalStatementLineViewModel
             {

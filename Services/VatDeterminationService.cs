@@ -99,12 +99,13 @@ namespace RealEstateManager.Services
         // =====================================================================
 
         /// <summary>
-        /// Which document the tenant should receive. A supply with no output tax is
-        /// not a tax invoice at all; a registered recipient gets the full layout.
+        /// Which document the tenant should receive. An exempt supply is not a tax
+        /// invoice at all. A zero-rated supply IS a taxable supply - at 0% - and needs a
+        /// tax invoice like a standard-rated one. A registered recipient gets the full layout.
         /// </summary>
         public static string ResolveInvoiceType(string category, string? recipientTrn)
         {
-            if (!VatCategories.IsTaxable(category))
+            if (!VatCategories.IsTaxable(category) && category != VatCategories.ZeroRated)
                 return TaxInvoiceTypes.NotApplicable;
 
             return string.IsNullOrWhiteSpace(recipientTrn)

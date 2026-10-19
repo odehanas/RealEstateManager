@@ -137,6 +137,14 @@
                 <td colspan="3">@Model.SourceInvoiceNumber</td>
             </tr>
         }
+        @if (Model.EInvoiceUuid != null)
+        {
+            <tr>
+                <td class="k">E-invoice ID</td>
+                <td colspan="3" class="small">@Model.EInvoiceUuid
+                    <span class="muted">(@EInvoiceStatuses.Describe(Model.EInvoiceStatus))</span></td>
+            </tr>
+        }
     </table>
 
     <table class="lines">
@@ -176,10 +184,20 @@
         </tr>
         @if (Model.AmountPaid > 0m)
         {
-            <tr>
-                <td>Received to date</td>
-                <td class="num">@Model.Currency @Model.AmountPaid.ToString("N2")</td>
-            </tr>
+            @if (Model.CreditedAmount > 0m)
+            {
+                <tr>
+                    <td>Credit notes issued</td>
+                    <td class="num">@Model.Currency @Model.CreditedAmount.ToString("N2")</td>
+                </tr>
+            }
+            @if (Model.AmountPaid - Model.CreditedAmount > 0m)
+            {
+                <tr>
+                    <td>Received to date</td>
+                    <td class="num">@Model.Currency @((Model.AmountPaid - Model.CreditedAmount).ToString("N2"))</td>
+                </tr>
+            }
             <tr>
                 <td><strong>Balance outstanding</strong></td>
                 <td class="num"><strong>@Model.Currency @((Model.TotalAmount - Model.AmountPaid).ToString("N2"))</strong></td>

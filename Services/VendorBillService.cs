@@ -197,7 +197,73 @@ namespace RealEstateManager.Services
             RecalculateHeader(bill);
 
             await _db.SaveChangesAsync();
+
+            // A bill booked from a supplier e-invoice is linked to it, so the same document
+            // cannot be booked a second time.
+            if (model.ReceivedEInvoiceId.HasValue)
+            {
+                var received = await _db.ReceivedEInvoices
+                    .FirstOrDefaultAsync(x => x.Id == model.ReceivedEInvoiceId.Value && x.CompanyId == companyId);
+
+                if (received != null && received.VendorBillId == null)
+                {
+                    received.VendorBillId = bill.Id;
+                    received.VendorId ??= bill.VendorId;
+                    received.Status = "Booked";
+                    await _db.SaveChangesAsync();
+                }
+            }
+
             return bill;
+        }
+
+        /// <summary>
+        /// A new draft pre-filled from a supplier's e-invoice: their number, dates and
+        /// lines. The accounts are left for the user to choose - the supplier cannot know
+        /// how we classify their charge.
+        /// </summary>
+        public async Task<VendorBillEditViewModel?> BuildFromReceivedAsync(int receivedId)
+        {
+            var received = await _db.ReceivedEInvoices.AsNoTracking().FirstOrDefaultAsync(x => x.Id == receivedId);
+            if (received == null || received.VendorBillId != null || received.IsCreditNote)
+                return null;
+
+            var parsed = EInvoiceReader.Parse(received.Xml);
+            var vendor = received.VendorId.HasValue
+                ? await _db.Vendors.AsNoTracking().FirstOrDefaultAsync(x => x.Id == received.VendorId.Value)
+                : null;
+
+            var model = BuildNew();
+            model.ReceivedEInvoiceId = received.Id;
+            model.ReceivedNet = received.NetAmount;
+            model.ReceivedVat = received.VatAmount;
+            model.ReceivedTotal = received.TotalAmount;
+            model.ReceivedSupplierName = received.SupplierName;
+
+            model.VendorId = vendor?.Id ?? 0;
+            model.VendorCanChargeVat = vendor?.CanChargeVat ?? false;
+            model.VendorTrn = vendor?.TrnNumber;
+            model.VendorReference = received.DocumentNumber;
+            model.BillDate = received.IssueDate.Date;
+            model.AccountingDate = received.IssueDate.Date;
+            model.DueDate = (received.DueDate ?? received.IssueDate).Date;
+            model.Notes = $"Booked from supplier e-invoice {received.DocumentNumber} (UUID {received.Uuid}).";
+            model.ExpenseCategory = "Supplier e-invoice";
+
+            model.Lines = parsed.Lines.Count == 0
+                ? new List<VendorBillLineViewModel> { new() { Quantity = 1m } }
+                : parsed.Lines.Select(x => new VendorBillLineViewModel
+                    {
+                        Description = x.Description.Length > 250 ? x.Description[..250] : x.Description,
+                        // One line at the supplier's line amount reproduces their figure
+                        // exactly, whatever their quantity and unit price were.
+                        Quantity = 1m,
+                        UnitPrice = x.NetAmount,
+                        IsTaxable = x.IsStandardRated
+                    })
+                    .ToList();
+
+            return model;
         }
 
         /// <summary>

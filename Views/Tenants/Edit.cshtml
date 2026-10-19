@@ -72,10 +72,7 @@
             </div>
         </div>
 
-        <div class="col-md-12">
-            <label asp-for="Address" class="form-label"></label>
-            <input asp-for="Address" class="form-control" />
-        </div>
+        <partial name="_AddressAndEInvoicing" model="Model" />
 
         <div class="col-md-4">
             <label asp-for="OpeningBalance" class="form-label">Opening Balance</label>

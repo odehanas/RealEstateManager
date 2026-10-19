@@ -1,0 +1,141 @@
+@model RealEstateManager.Models.CreditNoteDocumentViewModel
+@using RealEstateManager.Domain
+@{
+    Layout = null;
+    var taxable = VatCategories.IsTaxable(Model.VatCategory);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>@Model.Title @Model.CreditNoteNumber</title>
+<style>
+    @@page { size: A4 portrait; margin: 14mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; color: #1f2933; background: #f2f4f7; }
+    .sheet { max-width: 190mm; margin: 0 auto; background: #fff; padding: 18mm 16mm; box-shadow: 0 0 18px rgba(15,39,64,.12); }
+    h1 { font-size: 19pt; color: #0f2740; margin: 0 0 2px; }
+    .doc-type { font-size: 9pt; text-transform: uppercase; letter-spacing: 1.2pt; color: #c0392b; font-weight: 700; }
+    .muted { color: #5b6774; } .small { font-size: 9pt; }
+    table { width: 100%; border-collapse: collapse; }
+    .head { display: flex; justify-content: space-between; gap: 20px; border-bottom: 3px solid #0f2740; padding-bottom: 12px; margin-bottom: 16px; }
+    .parties { display: flex; gap: 18px; margin-bottom: 16px; }
+    .party { flex: 1; border: 1px solid #d8dee6; border-radius: 6px; padding: 10px 12px; }
+    .party h3 { margin: 0 0 6px; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .8pt; color: #5b6774; }
+    .party .nm { font-weight: 700; color: #0f2740; }
+    .meta { border: 1px solid #d8dee6; border-radius: 6px; margin-bottom: 16px; }
+    .meta td { padding: 6px 10px; border-bottom: 1px solid #eceff3; font-size: 10pt; }
+    .meta td.k { color: #5b6774; width: 26%; }
+    .lines th { background: #0f2740; color: #fff; text-align: left; padding: 8px 10px; font-size: 9.5pt; }
+    .lines td { padding: 8px 10px; border: 1px solid #d8dee6; }
+    .num { text-align: right; white-space: nowrap; }
+    .totals { margin-top: 14px; margin-left: auto; width: 62%; }
+    .totals td { padding: 6px 10px; border-bottom: 1px solid #eceff3; }
+    .totals tr.grand td { background: #c0392b; color: #fff; font-weight: 700; font-size: 12pt; border: 0; }
+    .foot { margin-top: 24px; padding-top: 10px; border-top: 1px solid #d8dee6; font-size: 8.5pt; color: #5b6774; }
+    .toolbar { max-width: 190mm; margin: 0 auto 12px; display: flex; justify-content: flex-end; gap: 8px; }
+    .toolbar button, .toolbar a { font: inherit; font-size: 10pt; padding: 7px 16px; border-radius: 4px; border: 1px solid #0f2740; background: #0f2740; color: #fff; cursor: pointer; text-decoration: none; }
+    .toolbar a { background: #fff; color: #0f2740; }
+    .warn { max-width: 190mm; margin: 0 auto 12px; padding: 10px 14px; border-radius: 6px; background: #fff8e6; border: 1px solid #e0a800; font-size: 10pt; }
+    @@media print { body { background: #fff; padding: 0; } .sheet { box-shadow: none; max-width: none; padding: 0; } .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+    <a href="@Url.Action("Index", "CustomerCreditNotes")">Back</a>
+    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+</div>
+
+@if (!Model.IsPosted)
+{
+    <div class="warn no-print"><strong>Draft.</strong> This credit note is not posted, so it has not reduced the invoice yet.</div>
+}
+
+<div class="sheet">
+    <div class="head">
+        <div>
+            <div class="doc-type">@Model.Title</div>
+            <h1>@Model.SupplierName</h1>
+            <div class="small muted">@Model.SupplierAddress</div>
+        </div>
+        <div style="text-align:right">
+            <div class="small muted">Credit Note No.</div>
+            <div style="font-size:14pt;font-weight:700;color:#0f2740">@Model.CreditNoteNumber</div>
+            @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn))
+            {
+                <div class="small" style="font-weight:700">TRN: @Model.SupplierTrn</div>
+            }
+        </div>
+    </div>
+
+    <div class="parties">
+        <div class="party">
+            <h3>Issued To</h3>
+            <div class="nm">@Model.TenantName</div>
+            <div class="small muted">@Model.TenantAddress</div>
+            @if (!string.IsNullOrWhiteSpace(Model.TenantTrn))
+            {
+                <div class="small" style="font-weight:700;margin-top:5px">TRN: @Model.TenantTrn</div>
+            }
+        </div>
+        <div class="party">
+            <h3>Property</h3>
+            <div class="nm">@Model.PropertyUnit</div>
+            <div class="small muted">Contract @Model.ContractNumber</div>
+        </div>
+    </div>
+
+    <table class="meta">
+        <tr>
+            <td class="k">Date of issue</td>
+            <td>@Model.CreditNoteDate.ToString("dd MMMM yyyy")</td>
+            <td class="k">Original invoice</td>
+            <td>@Model.OriginalInvoiceNumber of @Model.OriginalInvoiceDate.ToString("dd MMM yyyy")</td>
+        </tr>
+        <tr>
+            <td class="k">Reason</td>
+            <td colspan="3">@CreditNoteReasons.Describe(Model.ReasonCode) &mdash; @Model.Reason</td>
+        </tr>
+        @if (Model.EInvoiceUuid != null)
+        {
+            <tr>
+                <td class="k">E-invoice ID</td>
+                <td colspan="3" class="small">@Model.EInvoiceUuid (@EInvoiceStatuses.Describe(Model.EInvoiceStatus))</td>
+            </tr>
+        }
+    </table>
+
+    <table class="lines">
+        <thead>
+            <tr>
+                <th style="width:52%">Description</th>
+                <th class="num">Net Amount</th>
+                <th class="num">VAT Rate</th>
+                <th class="num">VAT Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Credit against rent invoiced</strong><div class="small muted">@Model.Reason</div></td>
+                <td class="num">@Model.Subtotal.ToString("N2")</td>
+                <td class="num">@(taxable ? Model.VatRate.ToString("N0") + "%" : VatCategories.Describe(Model.VatCategory))</td>
+                <td class="num">@Model.VatAmount.ToString("N2")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="totals">
+        <tr><td>Net credited</td><td class="num">AED @Model.Subtotal.ToString("N2")</td></tr>
+        <tr><td>VAT credited</td><td class="num">AED @Model.VatAmount.ToString("N2")</td></tr>
+        <tr class="grand"><td>Total credited</td><td class="num">AED @Model.TotalAmount.ToString("N2")</td></tr>
+    </table>
+
+    <div class="foot">
+        This credit note reduces invoice @Model.OriginalInvoiceNumber by AED @Model.TotalAmount.ToString("N2").
+        All amounts are stated in UAE Dirhams (AED).
+    </div>
+</div>
+
+</body>
+</html>

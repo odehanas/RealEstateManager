@@ -75,7 +75,50 @@ namespace RealEstateManager.Services
                 }
             }
 
-            report.OutputLines = report.OutputLines.OrderBy(x => x.VatCategory).ToList();
+            // Credit notes reduce the supplies and the output tax of the period in which they
+            // are issued (Article 61), not the period of the invoice they correct.
+            var creditNotes = await _db.CustomerCreditNotes
+                .AsNoTracking()
+                .Where(x => x.CompanyId == companyId
+                            && x.JournalEntry != null && x.JournalEntry.IsPosted
+                            && x.CreditNoteDate >= startDate
+                            && x.CreditNoteDate <= endDate)
+                .Select(x => new { x.VatCategory, x.Subtotal, x.VatAmount })
+                .ToListAsync();
+
+            foreach (var group in creditNotes.GroupBy(x => x.VatCategory))
+            {
+                var net = group.Sum(x => x.Subtotal);
+                var vat = group.Sum(x => x.VatAmount);
+
+                report.OutputLines.Add(new VatReturnOutputLineDto
+                {
+                    VatCategory = group.Key,
+                    IsCreditNote = true,
+                    SupplyCount = group.Count(),
+                    NetAmount = -net,
+                    VatAmount = -vat
+                });
+
+                switch (group.Key)
+                {
+                    case VatCategories.Standard:
+                        report.StandardRatedNet -= net;
+                        report.StandardRatedVat -= vat;
+                        break;
+                    case VatCategories.ZeroRated:
+                        report.ZeroRatedNet -= net;
+                        break;
+                    case VatCategories.Exempt:
+                        report.ExemptNet -= net;
+                        break;
+                }
+            }
+
+            report.OutputLines = report.OutputLines
+                .OrderBy(x => x.VatCategory)
+                .ThenBy(x => x.IsCreditNote)
+                .ToList();
 
             // ----- INPUT TAX --------------------------------------------------
             // Input tax is summed from the BILL LINES, not the header. One supplier
@@ -174,6 +217,10 @@ namespace RealEstateManager.Services
     public class VatReturnOutputLineDto
     {
         public string VatCategory { get; set; } = string.Empty;
+
+        /// <summary>A row of credit notes, shown as a deduction from the supplies above it.</summary>
+        public bool IsCreditNote { get; set; }
+
         public int SupplyCount { get; set; }
         public decimal NetAmount { get; set; }
         public decimal VatAmount { get; set; }

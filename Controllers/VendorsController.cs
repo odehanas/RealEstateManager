@@ -135,6 +135,9 @@ namespace RealEstateManager.Controllers
             vendor.Email = model.Email;
             vendor.TrnNumber = model.TrnNumber;
             vendor.TradeLicenseNumber = model.TradeLicenseNumber;
+            vendor.TaxIdentificationNumber = string.IsNullOrWhiteSpace(model.TaxIdentificationNumber)
+                ? null
+                : model.TaxIdentificationNumber.Trim();
             vendor.IsVatRegistered = model.IsVatRegistered;
             vendor.OpeningBalance = model.OpeningBalance;
             vendor.IsActive = model.IsActive;

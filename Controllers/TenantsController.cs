@@ -134,6 +134,7 @@ namespace RealEstateManager.Controllers
             // The code is generated, never typed. Anything posted from the form is ignored.
             ModelState.Remove(nameof(model.Code));
 
+            NormaliseEInvoicingFields(model);
             await _uniquenessService.ValidateTenantAsync(ModelState, companyId, model);
 
             if (!ModelState.IsValid)
@@ -185,6 +186,7 @@ namespace RealEstateManager.Controllers
             // tenant on statements and contracts already in circulation.
             ModelState.Remove(nameof(model.Code));
 
+            NormaliseEInvoicingFields(model);
             await _uniquenessService.ValidateTenantAsync(ModelState, companyId, model, id);
 
             if (!ModelState.IsValid)
@@ -203,12 +205,55 @@ namespace RealEstateManager.Controllers
             tenant.TradeLicenseNumber = model.TradeLicenseNumber;
             tenant.TrnNumber = model.TrnNumber;
             tenant.Address = model.Address;
+            tenant.City = model.City;
+            tenant.Emirate = model.Emirate;
+            tenant.CountryCode = model.CountryCode;
+            tenant.PartyType = model.PartyType;
+            tenant.TaxIdentificationNumber = model.TaxIdentificationNumber;
+            tenant.LegalRegistrationType = model.LegalRegistrationType;
+            tenant.LicensingAuthority = model.LicensingAuthority;
+            tenant.PassportIssuingCountry = model.PassportIssuingCountry;
             tenant.OpeningBalance = model.OpeningBalance;
             tenant.IsActive = model.IsActive;
 
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// Tidies and checks the e-invoicing details. Only the format is enforced here -
+        /// completeness for a business tenant is reported on the E-Invoicing Settings page,
+        /// so a tenant can still be set up before every number is to hand.
+        /// </summary>
+        private void NormaliseEInvoicingFields(Tenant model)
+        {
+            static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+            model.TrnNumber = Clean(model.TrnNumber)?.Replace(" ", string.Empty);
+            model.TaxIdentificationNumber = Clean(model.TaxIdentificationNumber)?.Replace(" ", string.Empty);
+            model.LegalRegistrationType = Clean(model.LegalRegistrationType);
+            model.LicensingAuthority = Clean(model.LicensingAuthority);
+            model.PassportIssuingCountry = Clean(model.PassportIssuingCountry)?.ToUpperInvariant();
+            model.City = Clean(model.City);
+            model.Emirate = Clean(model.Emirate);
+            model.CountryCode = Clean(model.CountryCode)?.ToUpperInvariant() ?? "AE";
+
+            if (!PartyTypes.All.Contains(model.PartyType))
+                ModelState.AddModelError(nameof(model.PartyType), "Choose whether the tenant is an individual, a business or a government entity.");
+
+            if (model.Emirate != null && !Emirates.IsValid(model.Emirate))
+                ModelState.AddModelError(nameof(model.Emirate), "Choose one of the seven emirates.");
+
+            if (model.CountryCode.Length != 2 || !model.CountryCode.All(char.IsLetter))
+                ModelState.AddModelError(nameof(model.CountryCode), "Enter the country as a two-letter code, e.g. AE.");
+
+            if (model.TaxIdentificationNumber != null
+                && (model.TaxIdentificationNumber.Length != 10 || !model.TaxIdentificationNumber.All(char.IsDigit)))
+                ModelState.AddModelError(nameof(model.TaxIdentificationNumber), "A TIN is 10 digits.");
+
+            if (model.LegalRegistrationType != null && !LegalRegistrationTypes.All.Contains(model.LegalRegistrationType))
+                ModelState.AddModelError(nameof(model.LegalRegistrationType), "Choose how the tenant is identified.");
         }
     }
 }

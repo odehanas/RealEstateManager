@@ -144,6 +144,8 @@ builder.Services.AddScoped<MasterDataUniquenessService>();
 builder.Services.AddScoped<VendorBillService>();
 builder.Services.AddScoped<ContractQrService>();
 builder.Services.AddScoped<AccountingPostingService>();
+builder.Services.AddScoped<EInvoiceService>();
+builder.Services.AddScoped<CreditNoteService>();
 builder.Services.AddScoped<OpeningBalanceService>();
 builder.Services.AddScoped<FinancialReportService>();
 builder.Services.AddScoped<ManagementReportService>();

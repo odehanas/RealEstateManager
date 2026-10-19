@@ -81,3 +81,35 @@ topic.
 
 Requirements: SQL Server LocalDB (installed with Visual Studio), Chrome or Edge, and
 `pip install websocket-client`.
+
+## Checking e-invoice files against the official UAE rules
+
+`Tools/EInvoicing` holds what an Accredited Service Provider runs on every e-invoice before
+accepting it:
+
+| Folder | What it is |
+|---|---|
+| `schematron/` | The official PINT AE validation rules (PINT AE Billing 1.0.4, from docs.peppol.eu) |
+| `ubl-2.1/` | The OASIS UBL 2.1 XML schema |
+| `SchemaCheck/` | A small program that checks files against that schema |
+| `samples/` | Three official sample documents, for a sanity check |
+
+Download e-invoice files from the E-Invoice Monitor (on the local demo copy) and run:
+
+```
+python Tools/EInvoicing/validate_einvoice.py path/to/files-or-folder
+```
+
+Every file must report PASS twice: once for the PINT AE rules, once for the UBL 2.1 schema.
+When the Ministry of Finance publishes a new version of PINT AE, replace the two files in
+`schematron/` with the new ones and run the check again.
+
+Requirements: `pip install saxonche`, and the .NET 8 SDK.
+
+`REM_DEMO_DB` makes the demo builder create a differently named database, which is useful
+for comparing the schema a SQL script produces with the one the code expects:
+
+```
+set REM_DEMO_DB=RemCompare
+dotnet run --project Tools/DemoData
+```

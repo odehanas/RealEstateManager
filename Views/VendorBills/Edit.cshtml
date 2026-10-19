@@ -48,6 +48,29 @@
 <form asp-action="@(isNew ? "Create" : "Edit")" method="post" id="billForm">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ReceivedEInvoiceId" />
+    <input type="hidden" asp-for="ReceivedNet" />
+    <input type="hidden" asp-for="ReceivedVat" />
+    <input type="hidden" asp-for="ReceivedTotal" />
+    <input type="hidden" asp-for="ReceivedSupplierName" />
+
+    @if (Model.ReceivedEInvoiceId.HasValue)
+    {
+        <div class="alert alert-info">
+            <strong>Booking a supplier e-invoice</strong> from @Model.ReceivedSupplierName &mdash;
+            their number, dates and lines are filled in. Choose the account for each line, check the totals
+            against theirs, then save.
+            <div class="small mt-1">
+                Supplier's figures: net <strong>@Model.ReceivedNet?.ToString("N2")</strong>,
+                VAT <strong>@Model.ReceivedVat?.ToString("N2")</strong>,
+                total <strong>@Model.ReceivedTotal?.ToString("N2")</strong>.
+                @if (Model.VendorId == 0)
+                {
+                    <span class="text-danger">No vendor matched their TRN &mdash; select the supplier below.</span>
+                }
+            </div>
+        </div>
+    }
 
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 

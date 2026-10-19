@@ -50,6 +50,17 @@ namespace RealEstateManager.Models
         public string? VendorTrn { get; set; }
 
         public string DocumentType => VendorCanChargeVat ? "Tax Invoice" : "Commercial Invoice";
+
+        // ---- Booking a supplier e-invoice ----------------------------------------
+
+        /// <summary>The received e-invoice this bill is being booked from, if any.</summary>
+        public int? ReceivedEInvoiceId { get; set; }
+
+        /// <summary>The supplier's own totals, shown beside ours so a difference is visible.</summary>
+        public decimal? ReceivedNet { get; set; }
+        public decimal? ReceivedVat { get; set; }
+        public decimal? ReceivedTotal { get; set; }
+        public string? ReceivedSupplierName { get; set; }
     }
 
     public class VendorBillLineViewModel

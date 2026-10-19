@@ -86,6 +86,48 @@
     "markers": []
   },
   {
+    "key": "einvoicing-settings",
+    "file": "einvoicing-settings.webp",
+    "width": 1366,
+    "height": 1250,
+    "frame": "browser",
+    "address": "System Setup ▸ E-Invoicing Settings",
+    "caption": "E-Invoicing Settings: the readiness check, your revenue band and provider, and the identity printed on every e-invoice.",
+    "version": 1792340928,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Readiness check — what is still missing",
+        "x": 8.13,
+        "y": 14.51
+      },
+      {
+        "number": 2,
+        "label": "Revenue band — sets your deadlines",
+        "x": 9.3,
+        "y": 35.23
+      },
+      {
+        "number": 3,
+        "label": "Switch on once the provider is appointed",
+        "x": 62.88,
+        "y": 34.11
+      },
+      {
+        "number": 4,
+        "label": "Your Accredited Service Provider",
+        "x": 9.3,
+        "y": 45.79
+      },
+      {
+        "number": 5,
+        "label": "Emirate — required on every e-invoice",
+        "x": 29.39,
+        "y": 83.63
+      }
+    ]
+  },
+  {
     "key": "closing",
     "file": "closing.webp",
     "width": 1366,
@@ -290,26 +332,146 @@
     "height": 900,
     "frame": "browser",
     "address": "Operations ▸ Customer Invoices",
-    "caption": "Customer invoices. Draft invoices carry a Post button; posted ones can be printed and received against.",
-    "version": 1792055441,
+    "caption": "Customer invoices. Draft invoices carry a Post button; posted ones can be printed, received against or credited, and show where they stand for e-invoicing.",
+    "version": 1792340929,
     "markers": [
       {
         "number": 1,
         "label": "Post — puts the invoice into the accounts",
-        "x": 79.25,
-        "y": 34.71
+        "x": 88.12,
+        "y": 32.54
       },
       {
         "number": 2,
         "label": "Print the tax invoice",
-        "x": 83.07,
-        "y": 34.71
+        "x": 88.12,
+        "y": 36.88
       },
       {
         "number": 3,
         "label": "Receive a payment",
-        "x": 84.37,
+        "x": 88.12,
         "y": 98.0
+      },
+      {
+        "number": 4,
+        "label": "Credit note — reduce or cancel the invoice",
+        "x": 88.12,
+        "y": 98.0
+      },
+      {
+        "number": 5,
+        "label": "E-invoice status",
+        "x": 79.01,
+        "y": 98.0
+      }
+    ]
+  },
+  {
+    "key": "credit-note-edit",
+    "file": "credit-note-edit.webp",
+    "width": 1366,
+    "height": 900,
+    "frame": "browser",
+    "address": "Operations ▸ Customer Invoices ▸ Credit Note",
+    "caption": "A credit note against one invoice: the statutory reason, the amount, and the VAT reversed automatically.",
+    "version": 1792341142,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Reason, from the statutory list",
+        "x": 26.82,
+        "y": 36.38
+      },
+      {
+        "number": 2,
+        "label": "Or credit everything outstanding",
+        "x": 9.3,
+        "y": 56.38
+      },
+      {
+        "number": 3,
+        "label": "Net amount — VAT is added for you",
+        "x": 9.3,
+        "y": 65.27
+      },
+      {
+        "number": 4,
+        "label": "Save & Post",
+        "x": 17.26,
+        "y": 78.27
+      }
+    ]
+  },
+  {
+    "key": "einvoice-monitor",
+    "file": "einvoice-monitor.webp",
+    "width": 1366,
+    "height": 1250,
+    "frame": "browser",
+    "address": "Operations ▸ E-Invoice Monitor",
+    "caption": "The E-Invoice Monitor: every document to send, ordered by its 14-day deadline.",
+    "version": 1792340930,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Deadlines at a glance",
+        "x": 8.05,
+        "y": 21.07
+      },
+      {
+        "number": 2,
+        "label": "Generate all",
+        "x": 81.77,
+        "y": 29.84
+      },
+      {
+        "number": 3,
+        "label": "Download the files for your provider",
+        "x": 9.3,
+        "y": 58.0
+      },
+      {
+        "number": 4,
+        "label": "Record them as sent — this locks them",
+        "x": 78.46,
+        "y": 58.0
+      },
+      {
+        "number": 5,
+        "label": "Record the provider's answer",
+        "x": 79.48,
+        "y": 70.2
+      }
+    ]
+  },
+  {
+    "key": "received-einvoices",
+    "file": "received-einvoices.webp",
+    "width": 1366,
+    "height": 650,
+    "frame": "browser",
+    "address": "Operations ▸ Received E-Invoices",
+    "caption": "Suppliers' e-invoices: matched to the vendor by TRN, then booked as a bill in one click.",
+    "version": 1792340931,
+    "markers": [
+      {
+        "number": 1,
+        "label": "Upload the files from your provider",
+        "x": 9.3,
+        "y": 46.06
+      },
+      {
+        "number": 2,
+        "label": "Already booked as a vendor bill",
+        "x": 61.97,
+        "y": 82.37
+      },
+      {
+        "number": 3,
+        "label": "No vendor with this TRN yet",
+        "x": 48.45,
+        "y": 70.52
       }
     ]
   },
@@ -317,11 +479,11 @@
     "key": "tax-invoice",
     "file": "tax-invoice.webp",
     "width": 1366,
-    "height": 965,
+    "height": 995,
     "frame": "browser",
     "address": "Operations ▸ Customer Invoices ▸ Tax Invoice",
     "caption": "A full tax invoice — the tenant is VAT registered, so both TRNs are shown.",
-    "version": 1792055442,
+    "version": 1792340932,
     "markers": []
   },
   {

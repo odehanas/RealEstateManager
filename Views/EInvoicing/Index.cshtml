@@ -1,0 +1,320 @@
+@model RealEstateManager.Models.EInvoiceMonitorViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "E-Invoice Monitor";
+}
+
+<style>
+    .einv-kpi { border-radius: 10px; padding: 14px 16px; background: #fff; border: 1px solid #e3e8ef; height: 100%; }
+    .einv-kpi .v { font-size: 1.7rem; font-weight: 700; line-height: 1.1; color: #0f2740; }
+    .einv-kpi .k { font-size: .8rem; color: #5b6774; text-transform: uppercase; letter-spacing: .04em; }
+    .einv-kpi.danger { border-left: 5px solid #dc3545; }
+    .einv-kpi.warn { border-left: 5px solid #e0a800; }
+    .einv-kpi.info { border-left: 5px solid #0d6efd; }
+    .einv-kpi.ok { border-left: 5px solid #198754; }
+    .days-left { font-weight: 600; white-space: nowrap; }
+</style>
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h2 class="mb-1">E-Invoice Monitor</h2>
+        <p class="text-muted mb-0">
+            Every invoice and credit note to a business or government tenant must reach your
+            Accredited Service Provider within <strong>14 days</strong> of the supply.
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Settings" class="btn btn-outline-secondary">Settings</a>
+        <a asp-action="Received" class="btn btn-outline-secondary">Received from suppliers</a>
+    </div>
+</div>
+
+<partial name="_Messages" />
+
+@if (!Model.Enabled)
+{
+    <div class="alert alert-info">
+        <strong>E-invoicing is switched off for this company.</strong>
+        Nothing is queued until you appoint an Accredited Service Provider and switch it on in
+        <a asp-action="Settings">E-Invoicing Settings</a>.
+        @if (Model.AppointmentDeadline != null)
+        {
+            <br /><text>Your provider must be appointed by <strong>@Model.AppointmentDeadline.Value.ToString("dd MMMM yyyy")</strong>
+            and e-invoicing starts on <strong>@Model.StartDate?.ToString("dd MMMM yyyy")</strong>.</text>
+        }
+    </div>
+}
+else
+{
+    <div class="small text-muted mb-3">
+        Provider: <strong>@Model.ProviderName</strong>
+        &middot; e-invoicing supplies from <strong>@Model.StartDate?.ToString("dd MMM yyyy")</strong>
+        &middot; @EInvoicingRevenueBands.Describe(Model.RevenueBand)
+    </div>
+}
+
+@if (Model.CompanySetupProblems > 0 || Model.TenantsNeedingAttention > 0)
+{
+    <div class="alert alert-warning">
+        <strong>Setup is incomplete:</strong>
+        @if (Model.CompanySetupProblems > 0)
+        {
+            <text>@Model.CompanySetupProblems item(s) missing from the company's details. </text>
+        }
+        @if (Model.TenantsNeedingAttention > 0)
+        {
+            <text>@Model.TenantsNeedingAttention business tenant(s) are missing a TIN, address or licence. </text>
+        }
+        Files cannot be generated until these are filled in &mdash; see <a asp-action="Settings">E-Invoicing Settings</a>.
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="einv-kpi @(Model.OverdueCount > 0 ? "danger" : "ok")">
+            <div class="v">@Model.OverdueCount</div>
+            <div class="k">Past the 14-day deadline</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="einv-kpi @(Model.DueSoonCount > 0 ? "warn" : "ok")">
+            <div class="v">@Model.DueSoonCount</div>
+            <div class="k">Due within 3 days</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="einv-kpi info">
+            <div class="v">@Model.ReadyCount</div>
+            <div class="k">Generated, ready to send</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="einv-kpi @(Model.AwaitingResponse.Count > 0 ? "info" : "ok")">
+            <div class="v">@Model.AwaitingResponse.Count</div>
+            <div class="k">Sent, awaiting provider</div>
+        </div>
+    </div>
+</div>
+
+@if (Model.UnpostedInScope > 0)
+{
+    <div class="alert alert-warning">
+        <strong>@Model.UnpostedInScope draft invoice(s)</strong> to business tenants have a supply date that has already passed.
+        The 14 days run from the supply, not from posting &mdash;
+        <a asp-controller="CustomerInvoices" asp-action="Index">post them</a> so they can be e-invoiced in time.
+    </div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div><strong>To send</strong> <span class="text-muted small ms-2">Ordered by deadline</span></div>
+        <div class="d-flex gap-2">
+            <form asp-action="Reassess" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-outline-secondary"
+                        title="Re-apply the scope rules after changing settings or a tenant's customer type">Re-assess</button>
+            </form>
+            <form asp-action="GenerateAll" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-primary">Generate all</button>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.Outstanding.Count == 0)
+    {
+        <div class="card-body text-muted">Nothing waiting. Every in-scope document has been sent.</div>
+    }
+    else
+    {
+        <form method="post" id="sendForm">
+            @Html.AntiForgeryToken()
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:32px"><input type="checkbox" id="selectAll" title="Select all ready" /></th>
+                            <th>Document</th>
+                            <th>Tenant</th>
+                            <th>Supply date</th>
+                            <th>Deadline</th>
+                            <th class="text-end">Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.Outstanding)
+                        {
+                            var rowClass = row.IsOverdue ? "table-danger" : row.DaysLeft <= 3 ? "table-warning" : "";
+                            <tr class="@rowClass">
+                                <td>
+                                    @if (row.Status == EInvoiceStatuses.Generated)
+                                    {
+                                        <input type="checkbox" name="selected" value="@row.Key" class="row-check" />
+                                    }
+                                </td>
+                                <td>
+                                    @row.Number
+                                    <div class="small text-muted">@(row.IsCreditNote ? "Credit note" : "Invoice")</div>
+                                </td>
+                                <td>@row.TenantName</td>
+                                <td>@row.SupplyDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @row.Deadline.ToString("dd/MM/yyyy")
+                                    <div class="small days-left @(row.IsOverdue ? "text-danger" : row.DaysLeft <= 3 ? "text-warning" : "text-muted")">
+                                        @(row.IsOverdue ? $"{-row.DaysLeft} day(s) late" : row.DaysLeft == 0 ? "today" : $"{row.DaysLeft} day(s) left")
+                                    </div>
+                                </td>
+                                <td class="text-end">@row.Total.ToString("N2")</td>
+                                <td>
+                                    <span class="badge @EInvoiceStatuses.BadgeClass(row.Status)">@EInvoiceStatuses.Describe(row.Status)</span>
+                                    @if (!string.IsNullOrWhiteSpace(row.RejectionReason))
+                                    {
+                                        <div class="small text-danger mt-1">@row.RejectionReason</div>
+                                    }
+                                </td>
+                                <td class="text-nowrap">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                            formaction="@Url.Action("Generate", new { kind = row.Kind, id = row.Id })">
+                                        @(row.Status == EInvoiceStatuses.Pending ? "Generate" : "Regenerate")
+                                    </button>
+                                    @if (row.Status != EInvoiceStatuses.Pending)
+                                    {
+                                        <a class="btn btn-sm btn-outline-dark" asp-action="Download" asp-route-kind="@row.Kind" asp-route-id="@row.Id">XML</a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-body border-top bg-light">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <div class="small text-muted mb-1">
+                            <strong>1.</strong> Download the ready files (all, or the ones ticked) and upload them in your provider's portal.
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-dark" formaction="@Url.Action("DownloadBatch")">
+                            Download ready files (ZIP)
+                        </button>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="small text-muted mb-1">
+                            <strong>2.</strong> Once uploaded, tick them and record that they were sent. This locks them &mdash;
+                            corrections then need a credit note.
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="providerReference" class="form-control" placeholder="Provider's batch / upload reference (optional)" />
+                            <button type="submit" class="btn btn-success" formaction="@Url.Action("MarkSubmitted")"
+                                    onclick="return confirm('Record the ticked documents as sent to your provider? They cannot be reset to draft afterwards.');">
+                                Mark ticked as sent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light"><strong>Sent &mdash; awaiting the provider's answer</strong></div>
+    @if (Model.AwaitingResponse.Count == 0)
+    {
+        <div class="card-body text-muted">Nothing awaiting an answer.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Document</th>
+                        <th>Tenant</th>
+                        <th>Sent</th>
+                        <th class="text-end">Total</th>
+                        <th style="width:45%">Provider's answer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.AwaitingResponse)
+                    {
+                        <tr>
+                            <td>
+                                @row.Number
+                                <div class="small text-muted">@(row.IsCreditNote ? "Credit note" : "Invoice")</div>
+                            </td>
+                            <td>@row.TenantName</td>
+                            <td>
+                                @row.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                @if (!string.IsNullOrWhiteSpace(row.ProviderReference))
+                                {
+                                    <div class="small text-muted">Ref @row.ProviderReference</div>
+                                }
+                            </td>
+                            <td class="text-end">@row.Total.ToString("N2")</td>
+                            <td>
+                                <form asp-action="RecordResponse" method="post" class="d-flex gap-1 flex-wrap">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="kind" value="@row.Kind" />
+                                    <input type="hidden" name="id" value="@row.Id" />
+                                    <input type="text" name="providerReference" class="form-control form-control-sm" style="max-width:150px"
+                                           placeholder="Provider ref" value="@row.ProviderReference" />
+                                    <input type="text" name="reason" class="form-control form-control-sm" style="max-width:200px"
+                                           placeholder="Rejection reason" />
+                                    <button type="submit" name="accepted" value="true" class="btn btn-sm btn-success">Accepted</button>
+                                    <button type="submit" name="accepted" value="false" class="btn btn-sm btn-outline-danger">Rejected</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light"><strong>Recently accepted</strong></div>
+    @if (Model.RecentlyAccepted.Count == 0)
+    {
+        <div class="card-body text-muted">None yet.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr><th>Document</th><th>Tenant</th><th>Accepted</th><th>Provider ref</th><th class="text-end">Total</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.RecentlyAccepted)
+                    {
+                        <tr>
+                            <td>@row.Number <span class="small text-muted">@(row.IsCreditNote ? "credit note" : "")</span></td>
+                            <td>@row.TenantName</td>
+                            <td>@row.ResponseAt?.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td>@row.ProviderReference</td>
+                            <td class="text-end">@row.Total.ToString("N2")</td>
+                            <td><a asp-action="Download" asp-route-kind="@row.Kind" asp-route-id="@row.Id" class="small">XML</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var all = document.getElementById('selectAll');
+            if (!all) return;
+            all.addEventListener('change', function () {
+                document.querySelectorAll('.row-check').forEach(function (box) { box.checked = all.checked; });
+            });
+        })();
+    </script>
+}

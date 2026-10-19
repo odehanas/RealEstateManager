@@ -1,0 +1,29 @@
+<p>Your suppliers' e-invoices arrive through your provider as XML files. Upload them here and book each one as a
+vendor bill without retyping it: the supplier, their invoice number, dates and lines are filled in for you.</p>
+
+<figure data-shot="received-einvoices"></figure>
+
+<h3>Receiving</h3>
+<ol class="steps">
+    <li>Download the files from your provider's portal.</li>
+    <li>Open <span class="path">Operations ▸ Received E-Invoices</span>, choose the files (several at once is fine) and
+        select <strong>Upload</strong>.</li>
+    <li>Each file is read and matched to a vendor by <strong>TRN</strong>, or by <strong>TIN</strong> for a supplier
+        that is not VAT registered. The same document is never accepted twice.</li>
+</ol>
+<p>If no vendor matches, the file is still kept and marked <em>No vendor with this TRN</em>. Ask whoever maintains
+master data to set the supplier up, with their TRN or TIN, then book it.</p>
+
+<h3>Booking as a bill</h3>
+<ol class="steps">
+    <li>Select <strong>Book as bill</strong>. The vendor bill form opens with the supplier's figures shown alongside.</li>
+    <li>Choose the <strong>account</strong> for each line &mdash; the supplier cannot know how you classify their charge
+        &mdash; and the property it relates to.</li>
+    <li>Check that the totals agree with the supplier's, then save. The bill is a draft as usual; post it from
+        <a href="#vendor-bills">Vendor Bills</a>.</li>
+</ol>
+<p>The received file is linked to the bill and kept as the evidence for your input tax claim.</p>
+
+<p><strong>Ignore</strong> sets aside a file you will not book &mdash; a duplicate sent by mistake, for example. It can
+be restored. Supplier <strong>credit notes</strong> are listed but not booked automatically: record them by reducing or
+reversing the bill they relate to.</p>

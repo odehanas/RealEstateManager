@@ -1,0 +1,95 @@
+@model List<RealEstateManager.Models.CreditNoteListItemViewModel>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Credit Notes";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h2 class="mb-1">Credit Notes</h2>
+        <p class="text-muted mb-0">
+            Reductions of customer invoices. Raise one from <a asp-controller="CustomerInvoices" asp-action="Index">Customer Invoices</a>
+            with the <strong>Credit Note</strong> button. Once an invoice has been e-invoiced, a credit note is the only way to correct it.
+        </p>
+    </div>
+</div>
+
+@if (TempData["CreditNoteSuccess"] is string success)
+{
+    <div class="alert alert-success py-2">@success</div>
+}
+@if (TempData["CreditNoteError"] is string error)
+{
+    <div class="alert alert-danger py-2">@error</div>
+}
+
+<table class="table table-bordered table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Credit Note</th>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Tenant</th>
+            <th>Reason</th>
+            <th class="text-end">Net</th>
+            <th class="text-end">VAT</th>
+            <th class="text-end">Total</th>
+            <th>GL</th>
+            <th>E-Invoice</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr><td colspan="11" class="text-muted">No credit notes yet.</td></tr>
+        }
+        @foreach (var note in Model)
+        {
+            <tr>
+                <td>@note.CreditNoteNumber</td>
+                <td>@note.CreditNoteDate.ToString("dd/MM/yyyy")</td>
+                <td>@note.InvoiceNumber</td>
+                <td>@note.TenantName</td>
+                <td>@CreditNoteReasons.Describe(note.ReasonCode)</td>
+                <td class="text-end">@note.Subtotal.ToString("N2")</td>
+                <td class="text-end">@note.VatAmount.ToString("N2")</td>
+                <td class="text-end">@note.TotalAmount.ToString("N2")</td>
+                <td>
+                    @if (note.IsPosted)
+                    {
+                        <span class="badge bg-success">Posted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Draft</span>
+                    }
+                </td>
+                <td><span class="badge @EInvoiceStatuses.BadgeClass(note.EInvoiceStatus)">@EInvoiceStatuses.Describe(note.EInvoiceStatus)</span></td>
+                <td>
+                    <div class="d-flex gap-2 flex-wrap">
+                        @if (!note.IsPosted)
+                        {
+                            <a asp-action="Edit" asp-route-id="@note.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <form asp-action="Post" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@note.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Post</button>
+                            </form>
+                        }
+                        else if (!EInvoiceStatuses.IsLocked(note.EInvoiceStatus))
+                        {
+                            <form asp-action="ResetToDraft" method="post"
+                                  onsubmit="return confirm('Reset this credit note to draft? The invoice balance and VAT go back up until it is posted again.');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@note.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-warning">Reset to Draft</button>
+                            </form>
+                        }
+                        <a asp-action="Document" asp-route-id="@note.Id" target="_blank" class="btn btn-sm btn-outline-dark">Print</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

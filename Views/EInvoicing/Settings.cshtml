@@ -1,0 +1,275 @@
+@model RealEstateManager.Models.EInvoicingSettingsViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "E-Invoicing Settings";
+    var appointBy = EInvoicingRevenueBands.AppointmentDeadline(Model.EInvoicingRevenueBand);
+    var mandatoryFrom = EInvoicingRevenueBands.MandatoryFrom(Model.EInvoicingRevenueBand);
+    var ready = Model.CompanyProblems.Count == 0 && Model.TenantIssues.Count == 0;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    <div>
+        <h2 class="mb-1">E-Invoicing Settings</h2>
+        <p class="text-muted mb-0">
+            <strong>@Model.CompanyName</strong> &mdash; the identity printed on every e-invoice, the provider it is sent
+            through, and the date it starts.
+        </p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">E-Invoice Monitor</a>
+</div>
+
+<partial name="_Messages" />
+
+<div class="card shadow-sm mb-4 @(ready ? "border-success" : "border-warning")">
+    <div class="card-header @(ready ? "bg-success-subtle" : "bg-warning-subtle")">
+        <strong>Readiness check</strong>
+        <span class="small ms-2">@(ready ? "Everything the UAE format requires is in place." : "Fill these in before e-invoices can be generated.")</span>
+    </div>
+    <div class="card-body small">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="fw-semibold mb-1">Company</div>
+                @if (Model.CompanyProblems.Count == 0)
+                {
+                    <div class="text-success">&#10003; Complete</div>
+                }
+                else
+                {
+                    <ul class="mb-0 ps-3">
+                        @foreach (var problem in Model.CompanyProblems)
+                        {
+                            <li>@problem</li>
+                        }
+                    </ul>
+                }
+            </div>
+            <div class="col-md-6">
+                <div class="fw-semibold mb-1">Tenants</div>
+                <div class="mb-1">
+                    @Model.BusinessTenants business &middot; @Model.GovernmentTenants government &middot;
+                    @Model.IndividualTenants individual (individuals are outside e-invoicing)
+                </div>
+                @if (Model.TenantIssues.Count == 0)
+                {
+                    <div class="text-success">&#10003; Every business and government tenant is complete</div>
+                }
+                else
+                {
+                    <ul class="mb-0 ps-3">
+                        @foreach (var issue in Model.TenantIssues.Take(25))
+                        {
+                            <li>
+                                <a asp-controller="Tenants" asp-action="Edit" asp-route-id="@issue.TenantId">@issue.TenantCode</a> &mdash;
+                                @string.Join(" ", issue.Problems)
+                            </li>
+                        }
+                    </ul>
+                    @if (Model.TenantIssues.Count > 25)
+                    {
+                        <div class="text-muted mt-1">… and @(Model.TenantIssues.Count - 25) more.</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Settings" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>1. Switch and provider</strong></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="EInvoicingRevenueBand" class="form-label"></label>
+                    <select asp-for="EInvoicingRevenueBand" class="form-select" id="band">
+                        <option value="">&mdash; choose &mdash;</option>
+                        @foreach (var band in EInvoicingRevenueBands.All)
+                        {
+                            <option value="@band"
+                                    data-appoint="@EInvoicingRevenueBands.AppointmentDeadline(band)?.ToString("dd MMM yyyy")"
+                                    data-start="@EInvoicingRevenueBands.MandatoryFrom(band)?.ToString("dd MMM yyyy")">
+                                @EInvoicingRevenueBands.Describe(band)
+                            </option>
+                        }
+                    </select>
+                    <div class="form-text" id="bandDates">
+                        @if (appointBy != null)
+                        {
+                            <text>Appoint a provider by <strong>@appointBy.Value.ToString("dd MMM yyyy")</strong>; mandatory from <strong>@mandatoryFrom?.ToString("dd MMM yyyy")</strong>.</text>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="EInvoicingStartDate" class="form-label"></label>
+                    <input asp-for="EInvoicingStartDate" type="date" class="form-control" />
+                    <div class="form-text">Leave blank to start on the mandatory date. Set an earlier date to join voluntarily.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-check form-switch mt-4">
+                        <input asp-for="EInvoicingEnabled" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="EInvoicingEnabled" class="form-check-label fw-semibold"></label>
+                    </div>
+                    <div class="form-text">
+                        Switch on once your provider is appointed. Invoices to business and government tenants
+                        are then queued in the E-Invoice Monitor.
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="EInvoicingProviderName" class="form-label"></label>
+                    <input asp-for="EInvoicingProviderName" class="form-control" placeholder="The company accredited by the Ministry of Finance that sends your e-invoices" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="EInvoicingProviderAppointedOn" class="form-label"></label>
+                    <input asp-for="EInvoicingProviderAppointedOn" type="date" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>2. Company identity</strong> <span class="text-muted small ms-2">How the network and your customers identify you</span></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="LegalName" class="form-label"></label>
+                    <input asp-for="LegalName" class="form-control" placeholder="As on the trade licence" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TrnNumber" class="form-label"></label>
+                    <input asp-for="TrnNumber" class="form-control" maxlength="15" placeholder="15 digits" />
+                    <div class="form-text">Blank if not VAT registered.</div>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TaxIdentificationNumber" class="form-label"></label>
+                    <input asp-for="TaxIdentificationNumber" class="form-control" maxlength="10"
+                           placeholder="@(Model.DerivedTin ?? "10 digits")" />
+                    <div class="form-text">
+                        @if (Model.DerivedTin != null)
+                        {
+                            <text>Taken from the TRN: <strong>@Model.DerivedTin</strong>. Leave blank.</text>
+                        }
+                        else
+                        {
+                            <text>Issued by the FTA. Your address on the network.</text>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="LegalRegistrationType" class="form-label"></label>
+                    <select asp-for="LegalRegistrationType" class="form-select">
+                        @foreach (var type in new[] { LegalRegistrationTypes.TradeLicence, LegalRegistrationTypes.EmiratesId, LegalRegistrationTypes.CabinetDecision })
+                        {
+                            <option value="@type">@LegalRegistrationTypes.Describe(type)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TradeLicenseNumber" class="form-label"></label>
+                    <input asp-for="TradeLicenseNumber" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="LicensingAuthority" class="form-label"></label>
+                    <input asp-for="LicensingAuthority" class="form-control" placeholder="e.g. Department of Economic Development - Ras Al Khaimah" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AddressLine1" class="form-label"></label>
+                    <input asp-for="AddressLine1" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AddressLine2" class="form-label"></label>
+                    <input asp-for="AddressLine2" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="City" class="form-label"></label>
+                    <input asp-for="City" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Emirate" class="form-label"></label>
+                    <select asp-for="Emirate" class="form-select">
+                        <option value="">&mdash;</option>
+                        @foreach (var emirate in Emirates.All)
+                        {
+                            <option value="@emirate.Key">@emirate.Value</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>3. Payment</strong> <span class="text-muted small ms-2">Every e-invoice must say how it is to be paid</span></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="EInvoicePaymentMeansCode" class="form-label"></label>
+                    <select asp-for="EInvoicePaymentMeansCode" class="form-select">
+                        @foreach (var means in EInvoicePaymentMeans.All)
+                        {
+                            <option value="@means.Key">@means.Value</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="BankIban" class="form-label"></label>
+                    <input asp-for="BankIban" class="form-control" placeholder="AE.. (23 characters)" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="BankAccountName" class="form-label"></label>
+                    <input asp-for="BankAccountName" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Save E-Invoicing Settings</button>
+</form>
+
+<div class="alert alert-light border small mt-4">
+    <strong>How sending works.</strong> This system produces each e-invoice in the official UAE format (PINT AE).
+    Your Accredited Service Provider validates it, delivers it to your customer's provider and reports it to the FTA.
+    Download the files from the E-Invoice Monitor and upload them in your provider's portal, then record what the
+    provider answered. A direct connection to a specific provider can be added on request.
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var band = document.getElementById('band'), out = document.getElementById('bandDates');
+            if (!band || !out) return;
+            band.addEventListener('change', function () {
+                var o = band.options[band.selectedIndex];
+                out.innerHTML = o && o.dataset.appoint
+                    ? 'Appoint a provider by <strong>' + o.dataset.appoint + '</strong>; mandatory from <strong>' + o.dataset.start + '</strong>.'
+                    : '';
+            });
+        })();
+    </script>
+}

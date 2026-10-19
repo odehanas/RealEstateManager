@@ -64,6 +64,15 @@
             </div>
         </div>
 
+        <div class="col-md-4">
+            <label asp-for="TaxIdentificationNumber" class="form-label">TIN (Tax Identification Number)</label>
+            <input asp-for="TaxIdentificationNumber" class="form-control" maxlength="10" placeholder="10 digits" />
+            <div class="form-text">
+                Matches this supplier's e-invoices to this record. Leave blank when they have a TRN &mdash;
+                the TIN is its first 10 digits.
+            </div>
+        </div>
+
         <div class="col-md-6">
             <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" class="form-control" />

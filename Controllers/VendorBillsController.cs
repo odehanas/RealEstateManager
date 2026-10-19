@@ -80,10 +80,25 @@ namespace RealEstateManager.Controllers
         // =====================================================================
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? receivedId)
         {
+            var model = _vendorBillService.BuildNew();
+
+            if (receivedId.HasValue)
+            {
+                var fromEInvoice = await _vendorBillService.BuildFromReceivedAsync(receivedId.Value);
+                if (fromEInvoice == null)
+                {
+                    TempData["EInvoiceError"] =
+                        "That e-invoice is already booked, is a credit note, or was not found.";
+                    return RedirectToAction("Received", "EInvoicing");
+                }
+
+                model = fromEInvoice;
+            }
+
             await LoadListsAsync();
-            return View("Edit", _vendorBillService.BuildNew());
+            return View("Edit", model);
         }
 
         [HttpPost]
