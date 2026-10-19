@@ -43,13 +43,16 @@ namespace RealEstateManager.Services
             if (leaseId.HasValue && selectedLease == null)
                 throw new InvalidOperationException("Selected lease was not found for the tenant.");
 
+            // Only documents whose journal is posted are in the accounts. A journal reset
+            // to draft keeps its link to the document, so the link alone is not enough.
             var invoices = await _db.CustomerInvoices
                 .AsNoTracking()
                 .Include(x => x.Lease)
                     .ThenInclude(x => x!.Unit)
                         .ThenInclude(x => x!.Property)
                 .Where(x =>
-                    x.JournalEntryId.HasValue &&
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
                     x.Status != "Cancelled" &&
                     x.Lease != null &&
                     x.Lease.TenantId == tenantId &&
@@ -63,7 +66,8 @@ namespace RealEstateManager.Services
                         .ThenInclude(x => x!.Unit)
                             .ThenInclude(x => x!.Property)
                 .Where(x =>
-                    x.JournalEntryId.HasValue &&
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
                     x.CustomerInvoice != null &&
                     x.CustomerInvoice.Lease != null &&
                     x.CustomerInvoice.Lease.TenantId == tenantId &&
@@ -76,6 +80,8 @@ namespace RealEstateManager.Services
                     .ThenInclude(x => x!.Unit)
                         .ThenInclude(x => x!.Property)
                 .Include(x => x.CustomerInvoice)
+                .Include(x => x.ClearanceJournalEntry)
+                .Include(x => x.MemorandumJournalEntry)
                 .Where(x =>
                     x.Lease != null &&
                     x.Lease.TenantId == tenantId &&
@@ -113,7 +119,8 @@ namespace RealEstateManager.Services
             var openingClearedPdc = pdcReceipts
                 .Where(x =>
                     x.Status == "Cleared" &&
-                    x.ClearanceJournalEntryId.HasValue &&
+                    x.ClearanceJournalEntry != null &&
+                    x.ClearanceJournalEntry.IsPosted &&
                     x.ClearedDate.HasValue &&
                     x.ClearedDate.Value.Date < fromDate.Date)
                 .Sum(x => x.Amount);
@@ -147,7 +154,8 @@ namespace RealEstateManager.Services
             rows.AddRange(pdcReceipts
                 .Where(x =>
                     x.Status == "Cleared" &&
-                    x.ClearanceJournalEntryId.HasValue &&
+                    x.ClearanceJournalEntry != null &&
+                    x.ClearanceJournalEntry.IsPosted &&
                     x.ClearedDate.HasValue &&
                     x.ClearedDate.Value.Date >= fromDate.Date &&
                     x.ClearedDate.Value.Date <= toDate.Date)
@@ -192,7 +200,8 @@ namespace RealEstateManager.Services
 
             var notedPdcItems = pdcReceipts
                 .Where(x =>
-                    x.MemorandumJournalEntryId.HasValue &&
+                    x.MemorandumJournalEntry != null &&
+                    x.MemorandumJournalEntry.IsPosted &&
                     x.ReceivedDate.Date <= toDate.Date &&
                     x.Status != "Cancelled" &&
                     x.Status != "Replaced" &&
