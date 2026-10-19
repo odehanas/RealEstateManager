@@ -14,11 +14,16 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly PettyCashService _pettyCashService;
+        private readonly JournalWorkflowService _journalWorkflowService;
 
-        public PettyCashController(ApplicationDbContext db, PettyCashService pettyCashService)
+        public PettyCashController(
+            ApplicationDbContext db,
+            PettyCashService pettyCashService,
+            JournalWorkflowService journalWorkflowService)
         {
             _db = db;
             _pettyCashService = pettyCashService;
+            _journalWorkflowService = journalWorkflowService;
         }
 
         [HttpGet]
@@ -79,10 +84,13 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await _pettyCashService.PostExpenseAsync(model);
-                TempData["PettyCashMessage"] =
-                    $"Voucher saved as a draft: {model.Description} for {model.Amount:N2}. " +
-                    "Post it from Journal Inquiry to reduce the float.";
+                var journalId = await _pettyCashService.PostExpenseAsync(model);
+
+                // "Post Voucher" posts, through the same checks as Journal Inquiry.
+                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journalId);
+                TempData["PettyCashMessage"] = notPosted == null
+                    ? $"Voucher posted: {model.Description} for {model.Amount:N2}."
+                    : $"Voucher saved as a draft but not posted: {notPosted}";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
             catch (Exception ex)
@@ -124,10 +132,13 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await _pettyCashService.PostReplenishmentAsync(model);
-                TempData["PettyCashMessage"] =
-                    $"Replenishment saved as a draft: {model.Amount:N2}. " +
-                    "Post it from Journal Inquiry to top up the float.";
+                var journalId = await _pettyCashService.PostReplenishmentAsync(model);
+
+                // "Post Replenishment" posts, through the same checks as Journal Inquiry.
+                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journalId);
+                TempData["PettyCashMessage"] = notPosted == null
+                    ? $"Replenishment posted: {model.Amount:N2} added to the float."
+                    : $"Replenishment saved as a draft but not posted: {notPosted}";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
             catch (Exception ex)

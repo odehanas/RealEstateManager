@@ -24,9 +24,10 @@ namespace RealEstateManager.Services
     {
         private const string CatalogPath = "help/catalog.json";
         private const string ShotsPath = "help/images/shots.json";
+        private const string VideosPath = "help/videos/videos.json";
 
         private readonly IWebHostEnvironment _environment;
-        private readonly ConcurrentDictionary<string, (DateTimeOffset TopicStamp, DateTimeOffset ShotsStamp, string Html)> _contentCache =
+        private readonly ConcurrentDictionary<string, (DateTimeOffset TopicStamp, DateTimeOffset ShotsStamp, DateTimeOffset VideosStamp, string Html)> _contentCache =
             new(StringComparer.OrdinalIgnoreCase);
 
         private readonly object _catalogLock = new();
@@ -36,6 +37,10 @@ namespace RealEstateManager.Services
         private readonly object _shotsLock = new();
         private Dictionary<string, HelpShot> _shots = new(StringComparer.OrdinalIgnoreCase);
         private DateTimeOffset _shotsStamp = DateTimeOffset.MinValue;
+
+        private readonly object _videosLock = new();
+        private Dictionary<string, HelpVideo> _videos = new(StringComparer.OrdinalIgnoreCase);
+        private DateTimeOffset _videosStamp = DateTimeOffset.MinValue;
 
         public HelpCatalogService(IWebHostEnvironment environment)
         {
@@ -252,10 +257,13 @@ namespace RealEstateManager.Services
             // topic must refresh even if its file time is older than the screenshot list's.
             var shots = Shots;
             var shotsStamp = _shotsStamp;
+            var videos = Videos;
+            var videosStamp = _videosStamp;
 
             if (_contentCache.TryGetValue(key, out var cached)
                 && cached.TopicStamp == file.LastModified
-                && cached.ShotsStamp == shotsStamp)
+                && cached.ShotsStamp == shotsStamp
+                && cached.VideosStamp == videosStamp)
             {
                 return cached.Html;
             }
@@ -265,8 +273,9 @@ namespace RealEstateManager.Services
                 html = reader.ReadToEnd();
 
             html = ShotPattern.Replace(html, match => RenderShot(match.Groups[1].Value, shots));
+            html = VideoPattern.Replace(html, match => RenderVideo(match.Groups[1].Value, videos));
 
-            _contentCache[key] = (file.LastModified, shotsStamp, html);
+            _contentCache[key] = (file.LastModified, shotsStamp, videosStamp, html);
             return html;
         }
 
@@ -361,6 +370,91 @@ namespace RealEstateManager.Services
                 $"<img src=\"{src}\" width=\"{shot.Width}\" height=\"{shot.Height}\" loading=\"lazy\" " +
                 $"alt=\"{enc(shot.Caption)}\" data-shot-zoom=\"{src}\" />{markers}</div></div>" +
                 $"<figcaption>{enc(shot.Caption)}</figcaption>{legend}</figure>";
+        }
+
+        // =====================================================================
+        //  VIDEOS
+        // =====================================================================
+
+        /// <summary>
+        /// A topic places a training video with one tag: &lt;figure data-video="lease"&gt;&lt;/figure&gt;.
+        /// The title, file, cover picture and length come from videos/videos.json, which
+        /// the recording tool (Tools/VideoCapture) writes - so re-recording the videos after
+        /// a screen changes refreshes every topic without touching its text.
+        /// </summary>
+        private static readonly Regex VideoPattern =
+            new("<figure\\s+data-video=\"([a-z0-9-]+)\"\\s*>\\s*</figure>", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>Every recorded video, in the order they are meant to be watched.</summary>
+        public IReadOnlyList<HelpVideo> AllVideos => Videos.Values.OrderBy(x => x.Number).ToList();
+
+        private Dictionary<string, HelpVideo> Videos
+        {
+            get
+            {
+                var file = _environment.WebRootFileProvider.GetFileInfo(VideosPath);
+                var stamp = file.Exists ? file.LastModified : DateTimeOffset.MinValue;
+
+                if (stamp == _videosStamp)
+                    return _videos;
+
+                lock (_videosLock)
+                {
+                    if (stamp == _videosStamp)
+                        return _videos;
+
+                    var loaded = new Dictionary<string, HelpVideo>(StringComparer.OrdinalIgnoreCase);
+
+                    if (file.Exists)
+                    {
+                        using var stream = file.CreateReadStream();
+                        var list = JsonSerializer.Deserialize<List<HelpVideo>>(stream, new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        }) ?? new List<HelpVideo>();
+
+                        // A video that is listed but not on the server - not uploaded yet -
+                        // is left out, so a topic never shows a player that cannot play.
+                        foreach (var video in list.Where(x => !string.IsNullOrWhiteSpace(x.Key)))
+                        {
+                            if (_environment.WebRootFileProvider.GetFileInfo($"help/videos/{video.File}").Exists)
+                                loaded[video.Key] = video;
+                        }
+                    }
+
+                    _videos = loaded;
+                    _videosStamp = stamp;
+                    return _videos;
+                }
+            }
+        }
+
+        /// <summary>
+        /// A player showing the video's cover picture. Nothing is downloaded until someone
+        /// presses play. On paper - the printed manual and the PDF - a video cannot play,
+        /// so a short note stands in for it there (see help.css).
+        /// </summary>
+        private static string RenderVideo(string key, Dictionary<string, HelpVideo> videos)
+        {
+            if (!videos.TryGetValue(key, out var video))
+                return string.Empty;
+
+            var enc = (Func<string?, string>)(value => WebUtility.HtmlEncode(value ?? string.Empty));
+            var src = $"/help/videos/{enc(video.File)}?v={video.Version}";
+            var poster = string.IsNullOrWhiteSpace(video.Poster)
+                ? string.Empty
+                : $" poster=\"/help/videos/{enc(video.Poster)}?v={video.Version}\"";
+            var length = $"{video.Seconds / 60}:{video.Seconds % 60:00}";
+
+            return
+                $"<figure class=\"help-video\">" +
+                $"<video controls preload=\"none\" playsinline{poster} src=\"{src}\" " +
+                $"aria-label=\"Video: {enc(video.Title)}\"></video>" +
+                $"<figcaption><span class=\"help-video-badge\">Video</span>{enc(video.Title)} " +
+                $"<span class=\"help-video-length\">{length}</span></figcaption>" +
+                $"<p class=\"help-video-print\">Video: <strong>{enc(video.Title)}</strong> ({length}) - " +
+                $"watch it in the Help on screen.</p>" +
+                $"</figure>";
         }
 
         // =====================================================================
@@ -503,6 +597,20 @@ namespace RealEstateManager.Services
         public long Version { get; set; }
 
         public List<HelpShotMarker> Markers { get; set; } = new();
+    }
+
+    /// <summary>One training video, as listed in wwwroot/help/videos/videos.json.</summary>
+    public class HelpVideo
+    {
+        public string Key { get; set; } = string.Empty;
+        public string Number { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string File { get; set; } = string.Empty;
+        public string? Poster { get; set; }
+        public int Seconds { get; set; }
+
+        /// <summary>When it was recorded; added to the address so browsers fetch a new recording.</summary>
+        public long Version { get; set; }
     }
 
     public class HelpShotMarker

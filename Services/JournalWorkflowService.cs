@@ -113,6 +113,18 @@ namespace RealEstateManager.Services
         }
 
         /// <summary>
+        /// Posts an entry a screen has just created, for the screens whose button says it
+        /// posts - receipts, supplier payments, deposits, cheques and petty cash. The same
+        /// checks apply as when posting from Journal Inquiry. Returns null when the entry
+        /// went into the accounts, or the reason it stayed a draft, for the screen to show.
+        /// </summary>
+        public async Task<string?> PostNewEntryAsync(int journalEntryId)
+        {
+            var result = await PostAsync(journalEntryId);
+            return result.Success ? null : result.Message;
+        }
+
+        /// <summary>
         /// Posts every draft in a date range. Batch operations - a month of revenue
         /// recognition, a depreciation run - produce many drafts at once, and posting
         /// them one at a time is not realistic.

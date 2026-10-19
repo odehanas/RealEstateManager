@@ -492,3 +492,63 @@
 
 .help-content .shot-pair .shot { margin: 0; flex: 0 1 300px; }
 .help-panel .help-content .shot-pair .shot { flex-basis: 240px; }
+
+/* ===========================================================================
+   TRAINING VIDEOS
+   A topic places one with <figure data-video="key"></figure>; the help service
+   expands it into a player with a cover picture. On paper a video cannot play,
+   so the printed manual and the PDF show a short note in its place.
+   =========================================================================== */
+
+.help-content .help-video {
+    margin: 1.4em 0 1.8em;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.help-content .help-video video {
+    display: block;
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 16 / 9;
+    background: #0f2740;
+    border-radius: 10px;
+    box-shadow:
+        0 0 0 1px rgba(15, 39, 64, .10),
+        0 8px 24px rgba(15, 39, 64, .18);
+}
+
+.help-content .help-video figcaption {
+    margin-top: .55em;
+    font-size: .92em;
+    color: #4a5b6c;
+}
+
+.help-content .help-video-badge {
+    display: inline-block;
+    margin-right: .5em;
+    padding: 0 .6em;
+    border-radius: 999px;
+    background: #f0b429;
+    color: #0f2740;
+    font-size: .78em;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+}
+
+.help-content .help-video-length { color: #7b8794; }
+
+.help-content .help-video-print { display: none; }
+
+@media print {
+    .help-content .help-video video,
+    .help-content .help-video figcaption { display: none; }
+
+    .help-content .help-video-print {
+        display: block;
+        padding: .6em .8em;
+        border: 1px dashed #9aa5b1;
+        border-radius: 6px;
+    }
+}

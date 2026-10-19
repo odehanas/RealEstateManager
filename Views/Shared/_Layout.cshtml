@@ -406,6 +406,13 @@
                 <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
             </div>
         }
+        @if (TempData["PostingWarning"] is string postingWarning)
+        {
+            @* A screen that posts on save could not post: the entry is kept as a draft. *@
+            <div class="alert alert-warning">
+                @postingWarning Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> once the reason is resolved.
+            </div>
+        }
         @RenderBody()
     </div>
 

@@ -11,11 +11,16 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly PdcService _pdcService;
+        private readonly JournalWorkflowService _journalWorkflowService;
 
-        public PdcReceiptsController(ApplicationDbContext db, PdcService pdcService)
+        public PdcReceiptsController(
+            ApplicationDbContext db,
+            PdcService pdcService,
+            JournalWorkflowService journalWorkflowService)
         {
             _db = db;
             _pdcService = pdcService;
+            _journalWorkflowService = journalWorkflowService;
         }
 
         [HttpGet]
@@ -203,9 +208,16 @@ namespace RealEstateManager.Controllers
                 _db.PdcReceipts.Add(pdc);
                 await _db.SaveChangesAsync();
 
-                await _pdcService.ReceivePdcAsync(pdc.Id);
+                var journal = await _pdcService.ReceivePdcAsync(pdc.Id);
 
                 await transaction.CommitAsync();
+
+                // The cheque is recorded as received at once, through the same checks as
+                // Journal Inquiry; if one refuses, the memorandum entry stays a draft.
+                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journal.Id);
+                if (notPosted != null)
+                    TempData["PostingWarning"] = $"Cheque {pdc.ChequeNumber} was saved as a draft but not posted: {notPosted}";
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -384,7 +396,13 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await _pdcService.ClearPdcAsync(pdc.Id, model.ClearedDate.Date);
+                var journal = await _pdcService.ClearPdcAsync(pdc.Id, model.ClearedDate.Date);
+
+                // "Clear and Post" posts, through the same checks as Journal Inquiry.
+                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journal.Id);
+                if (notPosted != null)
+                    TempData["PostingWarning"] = $"Cheque {pdc.ChequeNumber} was cleared as a draft but not posted: {notPosted}";
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

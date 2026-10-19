@@ -11,11 +11,16 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly AccountingPostingService _postingService;
+        private readonly JournalWorkflowService _journalWorkflowService;
 
-        public CustomerReceiptsController(ApplicationDbContext db, AccountingPostingService postingService)
+        public CustomerReceiptsController(
+            ApplicationDbContext db,
+            AccountingPostingService postingService,
+            JournalWorkflowService journalWorkflowService)
         {
             _db = db;
             _postingService = postingService;
+            _journalWorkflowService = journalWorkflowService;
         }
 
         [HttpGet]
@@ -143,9 +148,16 @@ namespace RealEstateManager.Controllers
                 _db.CustomerReceipts.Add(receipt);
                 await _db.SaveChangesAsync();
 
-                await _postingService.PostCustomerReceiptAsync(receipt.Id);
+                var journal = await _postingService.PostCustomerReceiptAsync(receipt.Id);
 
                 await transaction.CommitAsync();
+
+                // "Save and Post" posts: the receipt goes into the accounts now, through the
+                // same checks as Journal Inquiry. If one of them refuses, it stays a draft.
+                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journal.Id);
+                if (notPosted != null)
+                    TempData["PostingWarning"] = $"Receipt {receipt.ReceiptNumber} was saved as a draft but not posted: {notPosted}";
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

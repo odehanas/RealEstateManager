@@ -2,6 +2,9 @@
 courier fees. Each float is its own asset account with its own running balance, so you always know how much cash
 should be in the box.</p>
 
+<figure data-video="petty-cash"></figure>
+
+
 <h3>Setting up a float</h3>
 <ol class="steps">
     <li>In <span class="path">System Setup ▸ Chart of Accounts</span>, create an <strong>Asset</strong> account for the float —
@@ -41,13 +44,13 @@ choose the <strong>Funding Account</strong> (normally your bank or main cash acc
     </tbody>
 </table>
 
-<div class="box warn">
-    <div class="box-title">Vouchers and replenishments are saved as drafts</div>
-    <p>They do not reduce the float balance until posted. Post them from
-    <span class="path">Operations ▸ Journal Inquiry</span> — see <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
-    <p>This works the other way too: a voucher is refused with <em>"This voucher would take the float below zero"</em>
-    if the cash it uses came from a replenishment that is still a draft. <strong>Post the replenishment first</strong>,
-    then enter the vouchers it pays for.</p>
+<div class="box">
+    <div class="box-title">Vouchers and replenishments post straight away</div>
+    <p>The float balance changes as soon as you save. If the posting is refused, the entry is kept as a draft and the
+    message says why; post it from <span class="path">Operations ▸ Journal Inquiry</span> once resolved - see
+    <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+    <p>A voucher is refused with <em>"This voucher would take the float below zero"</em> when the float does not hold
+    enough cash. <strong>Replenish the float first</strong>, then enter the vouchers it pays for.</p>
 </div>
 
 <figure data-shot="petty-cash"></figure>

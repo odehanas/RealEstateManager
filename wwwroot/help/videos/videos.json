@@ -1,0 +1,92 @@
+[
+  {
+    "key": "sign-in",
+    "number": "01",
+    "title": "Signing in and finding your way",
+    "file": "sign-in.webm",
+    "poster": "sign-in.jpg",
+    "seconds": 90,
+    "version": 1792414410
+  },
+  {
+    "key": "master-data",
+    "number": "02",
+    "title": "Adding a property, a unit and a tenant",
+    "file": "master-data.webm",
+    "poster": "master-data.jpg",
+    "seconds": 153,
+    "version": 1792414563
+  },
+  {
+    "key": "lease",
+    "number": "03",
+    "title": "Creating a lease",
+    "file": "lease.webm",
+    "poster": "lease.jpg",
+    "seconds": 77,
+    "version": 1792414639
+  },
+  {
+    "key": "invoice-and-receipt",
+    "number": "04",
+    "title": "Posting an invoice and receiving the rent",
+    "file": "invoice-and-receipt.webm",
+    "poster": "invoice-and-receipt.jpg",
+    "seconds": 99,
+    "version": 1792414738
+  },
+  {
+    "key": "cheques",
+    "number": "05",
+    "title": "Post-dated cheques",
+    "file": "cheques.webm",
+    "poster": "cheques.jpg",
+    "seconds": 113,
+    "version": 1792414851
+  },
+  {
+    "key": "supplier-bill",
+    "number": "06",
+    "title": "Entering a supplier bill and paying it",
+    "file": "supplier-bill.webm",
+    "poster": "supplier-bill.jpg",
+    "seconds": 114,
+    "version": 1792414965
+  },
+  {
+    "key": "petty-cash",
+    "number": "07",
+    "title": "Petty cash",
+    "file": "petty-cash.webm",
+    "poster": "petty-cash.jpg",
+    "seconds": 85,
+    "version": 1792415051
+  },
+  {
+    "key": "month-end",
+    "number": "08",
+    "title": "Month-end",
+    "file": "month-end.webm",
+    "poster": "month-end.jpg",
+    "seconds": 82,
+    "version": 1792415132
+  },
+  {
+    "key": "reports",
+    "number": "09",
+    "title": "The reports",
+    "file": "reports.webm",
+    "poster": "reports.jpg",
+    "seconds": 106,
+    "version": 1792415239
+  },
+  {
+    "key": "tenant-portal",
+    "number": "10",
+    "title": "The tenant portal",
+    "file": "tenant-portal.webm",
+    "poster": "tenant-portal.jpg",
+    "seconds": 161,
+    "version": 1792415401
+  }
+]

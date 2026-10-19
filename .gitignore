@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Training videos are recorded locally and shared separately, not kept in git
+Tools/VideoCapture/output/
+# The training video files are large and re-recorded at will: kept out of git. They are
+# published with the site like any file in wwwroot (re-create them with Tools/VideoCapture).
+wwwroot/help/videos/*.webm

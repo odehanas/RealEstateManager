@@ -82,6 +82,48 @@ topic.
 Requirements: SQL Server LocalDB (installed with Visual Studio), Chrome or Edge, and
 `pip install websocket-client`.
 
+## Recording the training videos
+
+`Tools/VideoCapture/record_videos.py` records ten short walkthroughs of the main tasks:
+signing in, master data, leases, invoices and receipts, post-dated cheques, supplier
+bills, petty cash, month-end, the reports and the tenant portal. A real browser does the
+clicking and typing, with a caption bar explaining each step and a pointer showing where
+to click. **Like the screenshots, always record from the local demo copy, never the live
+site.** The tool refuses any address other than localhost.
+
+1. Build a fresh demo database and start the application against it (steps 1 and 2 of
+   *Re-capturing screenshots* above). The videos add records, so each recording needs a
+   fresh database.
+2. Record:
+   ```
+   python Tools/VideoCapture/record_videos.py
+   python Tools/VideoCapture/record_videos.py --only 05,09     # just some
+   python Tools/VideoCapture/record_videos.py --show           # watch it work
+   python Tools/VideoCapture/record_videos.py --pace 1.3       # slower
+   ```
+   The first run opens a practice company, "Al Waha Properties", and loads a year of
+   sample data into it. Every video works inside that company.
+
+Each video is recorded into `Tools/VideoCapture/output/` and then **published into the
+help**: `wwwroot/help/videos/<key>.webm`, a cover picture `<key>.jpg`, and `videos.json`
+listing them. A help topic shows a video with one tag, just like a screenshot:
+
+```html
+<figure data-video="lease"></figure>
+```
+
+Every video sits in the topic for its screen, and the **Training Videos** topic lists all
+ten. In the printed manual and the PDF a short note stands in for each video. Like the
+rest of the help, the videos go live with your normal publish; replacing a `.webm` file
+on the server is enough to update one. The `.webm` files are kept out of git because of
+their size - re-create them with this tool. `--publish-only` copies already-recorded
+videos into the help again without recording.
+
+To add a voice-over or make an `.mp4` copy, open a video in Microsoft Clipchamp and export it.
+
+Requirements: Google Chrome or Microsoft Edge, `pip install playwright`, and
+`python -m playwright install ffmpeg`.
+
 ## Checking e-invoice files against the official UAE rules
 
 `Tools/EInvoicing` holds what an Accredited Service Provider runs on every e-invoice before

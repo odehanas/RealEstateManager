@@ -7,6 +7,7 @@
       "topics": [
         { "key": "introduction", "title": "About This System", "path": "", "summary": "What the system covers and how owned and managed properties differ.", "screens": [] },
         { "key": "getting-started", "title": "Signing In & Finding Your Way", "path": "Home", "summary": "Signing in, the menus, switching company, changing your password, the dashboard.", "screens": ["Home", "Profile"] },
+        { "key": "training-videos", "title": "Training Videos", "path": "Help", "summary": "Ten short videos showing the main tasks step by step, recorded in the practice company.", "screens": [] },
         { "key": "workflow", "title": "The System Workflow", "path": "Operations ▸ Workflow Guide", "summary": "The order work is done in, from property to payment received.", "screens": ["Workflow"] },
         { "key": "draft-post-reset", "title": "Draft, Post & Reset to Draft", "path": "Operations ▸ Journal Inquiry", "summary": "Why most transactions are saved as drafts, how to post them, and how to correct a posted one.", "screens": [] },
         { "key": "master-data-rules", "title": "Master Data: Codes, Uniqueness & Who Can Edit", "path": "Master Data", "summary": "Automatic codes, duplicate protection and the View/Manage split.", "screens": [] }

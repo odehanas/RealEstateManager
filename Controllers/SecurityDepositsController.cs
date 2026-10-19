@@ -11,11 +11,16 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly AccountingPostingService _postingService;
+        private readonly JournalWorkflowService _journalWorkflowService;
 
-        public SecurityDepositsController(ApplicationDbContext db, AccountingPostingService postingService)
+        public SecurityDepositsController(
+            ApplicationDbContext db,
+            AccountingPostingService postingService,
+            JournalWorkflowService journalWorkflowService)
         {
             _db = db;
             _postingService = postingService;
+            _journalWorkflowService = journalWorkflowService;
         }
 
         [HttpGet]
@@ -108,7 +113,12 @@ namespace RealEstateManager.Controllers
             _db.SecurityDeposits.Add(deposit);
             await _db.SaveChangesAsync();
 
-            await _postingService.PostSecurityDepositAsync(deposit.Id);
+            var journal = await _postingService.PostSecurityDepositAsync(deposit.Id);
+
+            // "Save and Post" posts, through the same checks as Journal Inquiry.
+            var notPosted = await _journalWorkflowService.PostNewEntryAsync(journal.Id);
+            if (notPosted != null)
+                TempData["PostingWarning"] = $"Deposit {deposit.ReferenceNumber} was saved as a draft but not posted: {notPosted}";
 
             return RedirectToAction(nameof(Index));
         }
