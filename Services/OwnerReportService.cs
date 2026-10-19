@@ -107,7 +107,8 @@ namespace RealEstateManager.Services
             var invoiceTotals = await _db.CustomerInvoices
                 .AsNoTracking()
                 .Where(x => leaseIds.Contains(x.LeaseId)
-                            && x.JournalEntryId != null
+                            && x.JournalEntry != null
+                            && x.JournalEntry.IsPosted
                             && x.Status != "Cancelled"
                             && x.InvoiceDate <= asOfDate)
                 .GroupBy(x => x.LeaseId)

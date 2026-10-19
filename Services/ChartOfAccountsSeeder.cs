@@ -305,6 +305,24 @@ namespace RealEstateManager.Services
             await db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Opens the twelve monthly periods of one fiscal year if the company does not
+        /// have them yet. Setup only creates the current and next year; this is for work
+        /// that needs an earlier one, such as sample data that starts last January.
+        /// </summary>
+        public static async Task EnsureFiscalYearPeriodsAsync(ApplicationDbContext db, Company company, int fiscalYear)
+        {
+            var exists = await db.AccountingPeriods
+                .IgnoreQueryFilters()
+                .AnyAsync(x => x.CompanyId == company.Id && x.FiscalYear == fiscalYear);
+
+            if (exists)
+                return;
+
+            db.AccountingPeriods.AddRange(BuildMonthlyPeriods(company.Id, fiscalYear, company.FiscalYearStartMonth));
+            await db.SaveChangesAsync();
+        }
+
         private static async Task EnsureCompanyAccountSettingsAsync(ApplicationDbContext db, Company company)
         {
             var accountsByCode = await db.Accounts

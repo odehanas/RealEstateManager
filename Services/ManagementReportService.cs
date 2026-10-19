@@ -315,7 +315,8 @@ namespace RealEstateManager.Services
                 .AsNoTracking()
                 .Where(x =>
                     x.CompanyId == companyId &&
-                    x.Status != "Draft" &&
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
                     x.Status != "Cancelled" &&
                     x.InvoiceDate <= asOfDate)
                 .Select(x => new

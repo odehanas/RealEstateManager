@@ -84,9 +84,15 @@ namespace RealEstateManager.Controllers
                 model.CurrentPeriodName = $"{currentPeriod.FiscalYear} / {currentPeriod.Name}";
             }
 
+            // Posted invoices only. A lease raises all its future invoices as drafts,
+            // and a draft is not a receivable until it is posted to the accounts.
             var outstandingInvoices = await _db.CustomerInvoices
                 .AsNoTracking()
-                .Where(x => x.Status != "Cancelled" && x.TotalAmount > x.AmountPaid)
+                .Where(x =>
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
+                    x.Status != "Cancelled" &&
+                    x.TotalAmount > x.AmountPaid)
                 .Select(x => new
                 {
                     OutstandingAmount = x.TotalAmount - x.AmountPaid,
@@ -103,12 +109,21 @@ namespace RealEstateManager.Controllers
 
             model.ThisMonthInvoices = await _db.CustomerInvoices
                 .AsNoTracking()
-                .Where(x => x.Status != "Cancelled" && x.InvoiceDate.Date >= monthStart && x.InvoiceDate.Date <= today)
+                .Where(x =>
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
+                    x.Status != "Cancelled" &&
+                    x.InvoiceDate.Date >= monthStart &&
+                    x.InvoiceDate.Date <= today)
                 .SumAsync(x => (decimal?)x.TotalAmount) ?? 0m;
 
             model.ThisMonthReceipts = await _db.CustomerReceipts
                 .AsNoTracking()
-                .Where(x => x.ReceiptDate.Date >= monthStart && x.ReceiptDate.Date <= today)
+                .Where(x =>
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
+                    x.ReceiptDate.Date >= monthStart &&
+                    x.ReceiptDate.Date <= today)
                 .SumAsync(x => (decimal?)x.Amount) ?? 0m;
 
             if (model.ActiveUnitsCount > 0)
@@ -150,6 +165,8 @@ namespace RealEstateManager.Controllers
                 .Include(x => x.Lease)
                     .ThenInclude(x => x!.Unit)
                         .ThenInclude(x => x!.Property)
+                // Issued invoices only; otherwise next year's draft instalments head the list.
+                .Where(x => x.JournalEntry != null && x.JournalEntry.IsPosted)
                 .OrderByDescending(x => x.InvoiceDate)
                 .ThenByDescending(x => x.Id)
                 .Take(5)
@@ -228,6 +245,8 @@ namespace RealEstateManager.Controllers
                 .Include(x => x.Lease)
                     .ThenInclude(x => x!.Unit)
                 .Where(x =>
+                    x.JournalEntry != null &&
+                    x.JournalEntry.IsPosted &&
                     x.Status != "Cancelled" &&
                     x.Lease != null &&
                     x.Lease.Unit != null)

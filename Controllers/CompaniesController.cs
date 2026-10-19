@@ -12,13 +12,38 @@ namespace RealEstateManager.Controllers
     {
         private readonly AdminManagementService _adminManagementService;
         private readonly SubscriptionService _subscriptionService;
+        private readonly SampleDataService _sampleDataService;
 
         public CompaniesController(
             AdminManagementService adminManagementService,
-            SubscriptionService subscriptionService)
+            SubscriptionService subscriptionService,
+            SampleDataService sampleDataService)
         {
             _adminManagementService = adminManagementService;
             _subscriptionService = subscriptionService;
+            _sampleDataService = sampleDataService;
+        }
+
+        /// <summary>
+        /// Fills an empty company with a year of fictional business, for training. The
+        /// service refuses a company that already holds any records.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoadSampleData(int id)
+        {
+            try
+            {
+                var result = await _sampleDataService.FillCompanyAsync(id, User.GetAppUserId());
+                TempData["SuccessMessage"] = result.Summary +
+                    (result.Warnings.Count > 0 ? " Skipped: " + string.Join(" | ", result.Warnings.Take(5)) : string.Empty);
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]

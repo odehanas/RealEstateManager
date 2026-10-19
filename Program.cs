@@ -23,6 +23,7 @@ builder.Services.Configure<PlatformOwnerOptions>(builder.Configuration.GetSectio
 builder.Services.AddSingleton<PlatformOwnerService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CompanyContextOverride>();
 builder.Services.AddScoped<ICurrentCompanyAccessor, CurrentCompanyAccessor>();
 builder.Services.AddScoped<PasswordHashingService>();
 builder.Services.AddScoped<AppAuthService>();
@@ -164,6 +165,9 @@ builder.Services.AddScoped<PettyCashService>();
 builder.Services.AddScoped<PdcService>();
 builder.Services.AddScoped<TenantStatementService>();
 builder.Services.AddScoped<FixedAssetService>();
+builder.Services.AddScoped<SampleDataService>();
+builder.Services.AddSingleton<SampleDataQueue>();
+builder.Services.AddHostedService<SampleDataWorker>();
 
 var app = builder.Build();
 

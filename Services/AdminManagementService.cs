@@ -532,6 +532,52 @@ namespace RealEstateManager.Services
             await ChartOfAccountsSeeder.EnsureCompanySetupAsync(_db, company);
         }
 
+        /// <summary>
+        /// Opens a separate practice company for a newly registered user, next to their
+        /// real one: "<name> - Training". It is created empty; the sample data goes in
+        /// afterwards. The user's real company stays their default, so they always land
+        /// there and switch to the training copy when they want to practise.
+        /// </summary>
+        public async Task<int> CreateTrainingCompanyAsync(int userId, string realCompanyName)
+        {
+            var realCompany = await _db.Companies
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Name == realCompanyName.Trim());
+
+            var baseName = realCompanyName.Trim() + SampleDataService.TrainingSuffix;
+            var name = baseName;
+            for (var n = 2; await _db.Companies.IgnoreQueryFilters().AnyAsync(x => x.Name == name); n++)
+                name = $"{baseName} {n}";
+
+            var company = new Company
+            {
+                Name = name,
+                BaseCurrency = realCompany?.BaseCurrency ?? "AED",
+                FiscalYearStartMonth = realCompany?.FiscalYearStartMonth ?? 1,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.Companies.Add(company);
+            await _db.SaveChangesAsync();
+
+            // Practice data is no use if it locks after the 15-day trial, so the training
+            // copy runs for a year. It holds only fictional records.
+            await _subscriptionService.EnsureTrialSubscriptionAsync(company.Id, trialDays: 365);
+            await EnsureCompanySetupAsync(company.Id);
+
+            _db.AppUserCompanies.Add(new AppUserCompany
+            {
+                AppUserId = userId,
+                CompanyId = company.Id,
+                IsDefault = false
+            });
+            await _db.SaveChangesAsync();
+
+            await GrantSystemAdminsAccessAsync(company.Id);
+            return company.Id;
+        }
+
         private async Task GrantSystemAdminsAccessAsync(int companyId)
         {
             var systemAdminIds = await _db.AppUsers

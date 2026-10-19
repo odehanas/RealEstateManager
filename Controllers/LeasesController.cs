@@ -144,85 +144,12 @@ namespace RealEstateManager.Controllers
 
             unit.Status = "Occupied";
 
-            GenerateInvoices(companyId, lease);
-            GenerateRevenueRecognitionSchedules(companyId, lease, unit.Property!.OwnershipType);
+            LeaseScheduleBuilder.GenerateInvoices(_db, companyId, lease);
+            LeaseScheduleBuilder.GenerateRevenueRecognitionSchedules(_db, companyId, lease, unit.Property!);
 
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private void GenerateInvoices(int companyId, Lease lease)
-        {
-            var billingMonths = lease.BillingFrequencyMonths;
-            var invoicesPerYear = 12 / billingMonths;
-
-            var baseAmountPerInvoice = lease.AnnualRent / invoicesPerYear;
-
-            // Tax is computed from the lease's VAT category through the one service
-            // that owns that decision, so the rate and the rounding are identical
-            // everywhere tax is calculated.
-            var vatAmountPerInvoice = VatDeterminationService.CalculateTax(baseAmountPerInvoice, lease.VatCategory);
-
-            var invoiceDate = lease.StartDate;
-
-            while (invoiceDate <= lease.EndDate)
-            {
-                // The rent period this invoice bills - printed on the e-invoice.
-                var periodEnd = invoiceDate.AddMonths(billingMonths).AddDays(-1);
-                if (periodEnd > lease.EndDate) periodEnd = lease.EndDate;
-
-                _db.CustomerInvoices.Add(new CustomerInvoice
-                {
-                    CompanyId = companyId,
-                    LeaseId = lease.Id,
-                    InvoiceNumber = $"INV-{lease.ContractNumber}-{invoiceDate:yyyyMM}",
-                    InvoiceDate = invoiceDate,
-                    DueDate = invoiceDate,
-                    DateOfSupply = invoiceDate,
-                    PeriodStart = invoiceDate,
-                    PeriodEnd = periodEnd,
-                    Subtotal = baseAmountPerInvoice,
-                    VatAmount = vatAmountPerInvoice,
-                    TotalAmount = baseAmountPerInvoice + vatAmountPerInvoice,
-                    AmountPaid = 0m,
-                    // Snapshot the treatment so a later change to the property or the
-                    // lease can never rewrite an invoice that has already been issued.
-                    VatCategory = lease.VatCategory,
-                    VatRate = lease.VatRate,
-                    Status = "Draft"
-                });
-
-                invoiceDate = invoiceDate.AddMonths(billingMonths);
-            }
-        }
-
-        private void GenerateRevenueRecognitionSchedules(int companyId, Lease lease, string ownershipType)
-        {
-            var monthlyRent = Math.Round(lease.AnnualRent / 12m, 2);
-            var startMonth = new DateTime(lease.StartDate.Year, lease.StartDate.Month, 1);
-            var endMonth = new DateTime(lease.EndDate.Year, lease.EndDate.Month, 1);
-
-            var currentMonth = startMonth;
-
-            while (currentMonth <= endMonth)
-            {
-                var recognitionDate = new DateTime(
-                    currentMonth.Year,
-                    currentMonth.Month,
-                    DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month));
-
-                _db.RevenueRecognitionSchedules.Add(new RevenueRecognitionSchedule
-                {
-                    CompanyId = companyId,
-                    LeaseId = lease.Id,
-                    RecognitionDate = recognitionDate,
-                    Amount = monthlyRent,
-                    Status = "Planned"
-                });
-
-                currentMonth = currentMonth.AddMonths(1);
-            }
         }
 
         private async Task LoadCreateListsAsync()
