@@ -194,7 +194,92 @@ namespace RealEstateManager.Services
             return code;
         }
 
-        public async Task ActivateCodeAsync(int companyId, string code)
+        /// <summary>
+        /// Stops a company working before its paid time runs out - for a bounced payment,
+        /// say. Its users are blocked exactly as if it had expired; nothing is deleted.
+        ///
+        /// Every code the company has not used yet is cancelled at the same moment, so a
+        /// code sent before the suspension cannot quietly undo it. A code issued after it
+        /// - once the customer has paid - does lift it, so settling up stays one step.
+        /// Returns how many unused codes were cancelled.
+        /// </summary>
+        public async Task<int> SuspendAsync(int companyId, string? reason, string actingUser)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+                throw new InvalidOperationException("Give the reason for suspending - it is kept on the company's record.");
+
+            await EnsureTrialSubscriptionAsync(companyId);
+            var subscription = await _db.CompanySubscriptions
+                .IgnoreQueryFilters()
+                .FirstAsync(x => x.CompanyId == companyId);
+
+            if (subscription.IsSuspended)
+                throw new InvalidOperationException("This company is already suspended.");
+
+            var unusedCodes = await _db.SubscriptionActivationCodes
+                .IgnoreQueryFilters()
+                .Where(x => x.CompanyId == companyId && !x.IsCancelled && !x.ActivatedAt.HasValue)
+                .ToListAsync();
+
+            foreach (var unused in unusedCodes)
+                unused.IsCancelled = true;
+
+            subscription.IsSuspended = true;
+            subscription.Notes = Limit($"Suspended {DateTime.Today:dd/MM/yyyy} by {actingUser}: {reason.Trim()}", 500);
+            subscription.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+            return unusedCodes.Count;
+        }
+
+        /// <summary>Lifts a suspension without a new code. The company's dates are unchanged.</summary>
+        public async Task ReactivateAsync(int companyId, string actingUser)
+        {
+            var subscription = await _db.CompanySubscriptions
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.CompanyId == companyId);
+
+            if (subscription == null || !subscription.IsSuspended)
+                throw new InvalidOperationException("This company is not suspended.");
+
+            subscription.IsSuspended = false;
+            subscription.Notes = Limit(
+                $"Reactivated {DateTime.Today:dd/MM/yyyy} by {actingUser}. Before that: {subscription.Notes}", 500);
+            subscription.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Withdraws a code that has not been used - one sent to the wrong customer, or
+        /// for the wrong number of days. A used code cannot be cancelled: its days have
+        /// already been added.
+        /// </summary>
+        public async Task CancelCodeAsync(int companyId, string code)
+        {
+            var normalizedCode = NormalizeCode(code);
+            var activationCode = await _db.SubscriptionActivationCodes
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.CompanyId == companyId && x.Code == normalizedCode);
+
+            if (activationCode == null)
+                throw new InvalidOperationException("That activation code was not found for this company.");
+
+            if (activationCode.ActivatedAt.HasValue)
+                throw new InvalidOperationException("That code has already been used, so it can no longer be cancelled.");
+
+            if (activationCode.IsCancelled)
+                throw new InvalidOperationException("That code is already cancelled.");
+
+            activationCode.IsCancelled = true;
+            await _db.SaveChangesAsync();
+        }
+
+        /// <param name="appliedBy">
+        /// Who entered the code, recorded on it so the owner can see in the activation
+        /// history which user of the company applied each one.
+        /// </param>
+        public async Task ActivateCodeAsync(int companyId, string code, string? appliedBy = null)
         {
             var normalizedCode = NormalizeCode(code);
             if (string.IsNullOrWhiteSpace(normalizedCode))
@@ -232,6 +317,13 @@ namespace RealEstateManager.Services
 
             activationCode.ActivatedAt = DateTime.UtcNow;
 
+            if (!string.IsNullOrWhiteSpace(appliedBy))
+            {
+                var applied = $"Applied by {appliedBy.Trim()}";
+                activationCode.Notes = Limit(
+                    string.IsNullOrWhiteSpace(activationCode.Notes) ? applied : $"{activationCode.Notes} | {applied}", 300);
+            }
+
             await _db.SaveChangesAsync();
         }
 
@@ -251,14 +343,26 @@ namespace RealEstateManager.Services
             return first >= second.Value ? first : second.Value;
         }
 
+        /// <summary>
+        /// Letters and digits that cannot be mistaken for one another when read aloud or
+        /// copied by hand: no 0/O, 1/I/L.
+        /// </summary>
+        private const string CodeAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+        /// <summary>
+        /// REM-XXXX-XXXX-XXXX from a cryptographically secure generator. A code is worth
+        /// paid time, so it must not be guessable: twelve characters from a 31-letter
+        /// alphabet give about 7.9 x 10^17 possibilities.
+        /// </summary>
         private static string GenerateCode()
         {
-            var random = Random.Shared;
-            var part1 = random.Next(1000, 9999).ToString();
-            var part2 = Guid.NewGuid().ToString("N")[..4].ToUpperInvariant();
-            var part3 = Guid.NewGuid().ToString("N")[..4].ToUpperInvariant();
-            return $"REM-{part1}-{part2}-{part3}";
+            var characters = System.Security.Cryptography.RandomNumberGenerator.GetItems<char>(CodeAlphabet, 12);
+            var text = new string(characters);
+            return $"REM-{text[..4]}-{text[4..8]}-{text[8..]}";
         }
+
+        private static string Limit(string text, int maxLength) =>
+            text.Length <= maxLength ? text : text[..(maxLength - 1)] + "…";
 
         private static string NormalizeCode(string? code)
         {

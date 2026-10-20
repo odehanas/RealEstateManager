@@ -1,5 +1,5 @@
 <h3>Companies</h3>
-<p><span class="path">System Setup ▸ Companies</span> — system administrators only.</p>
+<p><span class="path">System Setup ▸ Companies &amp; Subscriptions</span> — the platform owner only.</p>
 <p>Each company is a completely separate set of books with its own chart of accounts, master data and
 ledger. Creating a company automatically seeds its chart of accounts, its account mapping and its monthly
 accounting periods.</p>
@@ -11,6 +11,16 @@ accounting periods.</p>
         <tr><td><strong>Fiscal Year Start Month</strong></td><td>1 for a January–December year. Drives accounting periods and the Balance Sheet's current-year profit calculation.</td></tr>
     </tbody>
 </table>
+
+<p>The same screen manages the company's subscription:</p>
+<ul>
+    <li><strong>Generate Code</strong> issues an activation code for a number of days. It works once, for this company only.
+    Send it to the customer; the history shows when it was used and by whom.</li>
+    <li><strong>Cancel</strong> withdraws a code that has not been used yet - one sent by mistake or for the wrong period.</li>
+    <li><strong>Suspend Company</strong> blocks the company's users at once, with a reason that is kept on record
+    but not shown to the customer. Its unused codes are cancelled with it, so an earlier code cannot undo the
+    suspension. <strong>Reactivate</strong> lifts it; so does a new code issued afterwards, once the customer has paid.</li>
+</ul>
 
 <h3>Users</h3>
 <p><span class="path">System Setup ▸ Users &amp; Permissions</span> — system administrators only.</p>

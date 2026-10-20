@@ -18,6 +18,11 @@
         ? await SubscriptionService.GetStatusAsync(currentCompanyId.Value)
         : null;
     var subscriptionBlocked = subscriptionStatus != null && subscriptionStatus.IsExpired && !isSystemAdmin;
+    // The last two weeks of a paid period, or the last five days of the 15-day trial (two
+    // weeks' warning there would nag from its second day). Not shown to System Admins, who
+    // work across customers' companies and follow expiry from Companies & Subscriptions.
+    var subscriptionEndingSoon = subscriptionStatus != null && !subscriptionStatus.IsExpired && !isSystemAdmin
+                                 && subscriptionStatus.DaysRemaining <= (subscriptionStatus.IsInTrial ? 5 : 14);
     // Master data is centralised: reading it is broadly available, creating and
     // amending it is not. The menu follows the read right; the Create/Edit controls
     // inside each page follow the manage right.
@@ -402,7 +407,27 @@
         @if (subscriptionBlocked && subscriptionStatus != null)
         {
             <div class="alert alert-danger">
-                Subscription for <strong>@subscriptionStatus.CompanyName</strong> has expired. Enter an activation code to continue processing.
+                @if (subscriptionStatus.IsSuspended)
+                {
+                    <text>Access for <strong>@subscriptionStatus.CompanyName</strong> has been suspended. Please contact your service provider.</text>
+                }
+                else
+                {
+                    <text>Subscription for <strong>@subscriptionStatus.CompanyName</strong> has expired. Enter an activation code to continue processing.</text>
+                }
+                <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
+            </div>
+        }
+        else if (subscriptionEndingSoon && subscriptionStatus != null)
+        {
+            @* Warned in time: a customer should never first learn of the end date by being locked out. *@
+            <div class="alert alert-warning">
+                @(subscriptionStatus.IsInTrial ? "The free trial" : "The subscription") for
+                <strong>@subscriptionStatus.CompanyName</strong>
+                @(subscriptionStatus.DaysRemaining == 0
+                    ? "ends today"
+                    : $"ends in {subscriptionStatus.DaysRemaining} day{(subscriptionStatus.DaysRemaining == 1 ? "" : "s")}, on {subscriptionStatus.AccessEndDate:dd/MM/yyyy}").
+                Renew in time to keep working without interruption.
                 <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
             </div>
         }

@@ -24,6 +24,62 @@ namespace RealEstateManager.Controllers
             _sampleDataService = sampleDataService;
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Suspend(int id, string? reason)
+        {
+            try
+            {
+                var cancelled = await _subscriptionService.SuspendAsync(id, reason, ActingUser());
+                TempData["SuccessMessage"] = "The company is suspended: its users are blocked until it is reactivated " +
+                    "or a new activation code is applied." +
+                    (cancelled > 0 ? $" {cancelled} unused code(s) were cancelled with it." : string.Empty);
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Edit), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reactivate(int id)
+        {
+            try
+            {
+                await _subscriptionService.ReactivateAsync(id, ActingUser());
+                TempData["SuccessMessage"] = "The company is reactivated. Its users can work again until the access date shown.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Edit), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelCode(int id, string code)
+        {
+            try
+            {
+                await _subscriptionService.CancelCodeAsync(id, code);
+                TempData["SuccessMessage"] = $"Activation code {code} is cancelled and can no longer be used.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Edit), new { id });
+        }
+
+        private string ActingUser() =>
+            User.FindFirst(AppClaimTypes.Username)?.Value ?? User.Identity?.Name ?? "owner";
+
         /// <summary>
         /// Fills an empty company with a year of fictional business, for training. The
         /// service refuses a company that already holds any records.

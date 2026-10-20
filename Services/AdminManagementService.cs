@@ -90,6 +90,8 @@ namespace RealEstateManager.Services
             model.SubscriptionEndDate = status.SubscriptionEndDate;
             model.AccessEndDate = status.AccessEndDate;
             model.DaysRemaining = status.DaysRemaining;
+            model.IsSuspended = status.IsSuspended;
+            model.SubscriptionNotes = status.Notes;
             model.ActivationCodes = (await _subscriptionService.GetActivationCodesAsync(id, 50)).ToList();
             return model;
         }

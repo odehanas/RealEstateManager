@@ -31,7 +31,9 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await _subscriptionService.ActivateCodeAsync(companyId, activationCode);
+                var appliedBy = $"{User.FindFirst(AppClaimTypes.DisplayName)?.Value} " +
+                                $"({User.FindFirst(AppClaimTypes.Username)?.Value}) on {DateTime.Today:dd/MM/yyyy}";
+                await _subscriptionService.ActivateCodeAsync(companyId, activationCode, appliedBy);
                 TempData["SuccessMessage"] = "Activation code applied successfully. Subscription access has been restored.";
 
                 if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))

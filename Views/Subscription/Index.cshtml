@@ -9,7 +9,14 @@
     <div class="col-lg-8">
         <h2 class="mb-3">Subscription Control</h2>
 
-        @if (expiredMessage || Model.IsExpired)
+        @if (Model.IsSuspended)
+        {
+            <div class="alert alert-danger">
+                Access for this company has been suspended by your service provider. Your records are safe and unchanged.
+                Please contact them; access returns as soon as they reactivate the company or you enter a new activation code below.
+            </div>
+        }
+        else if (expiredMessage || Model.IsExpired)
         {
             <div class="alert alert-danger">
                 Your company subscription has expired. Enter a valid activation code to continue using the processing screens.

@@ -54,6 +54,10 @@ namespace RealEstateManager.Models
         public DateTime? SubscriptionEndDate { get; set; }
         public DateTime? AccessEndDate { get; set; }
         public int DaysRemaining { get; set; }
+        public bool IsSuspended { get; set; }
+
+        /// <summary>The latest suspension or reactivation, with who did it and why. Owner-only.</summary>
+        public string? SubscriptionNotes { get; set; }
 
         [Range(1, 3650)]
         [Display(Name = "Code Duration (Days)")]
