@@ -1,0 +1,158 @@
+@model RealEstateManager.Models.VendorStatementViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Vendor Statement";
+    var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+}
+
+<style>
+    @@media print {
+        .statement-no-print { display: none !important; }
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="mb-0">Vendor Statement</h2>
+    @if (Model.VendorId.HasValue)
+    {
+        <button type="button" class="btn btn-outline-secondary btn-sm statement-no-print" onclick="window.print()">Print</button>
+    }
+</div>
+
+<div class="alert alert-info statement-no-print">
+    What we owe a supplier and how it arose: every posted bill and payment on Accounts Payable for that vendor.
+    Draft bills are not in the accounts and are not shown. The closing balance agrees with the vendor's share of
+    Accounts Payable in the Trial Balance.
+</div>
+
+<form method="get" class="row g-3 mb-4 statement-no-print">
+    <div class="col-md-6">
+        <label class="form-label">Vendor</label>
+        <select name="vendorId" class="form-select">
+            <option value="">Select Vendor</option>
+            @foreach (var vendor in vendors)
+            {
+                <option value="@vendor.Id" selected="@(Model.VendorId == vendor.Id)">@vendor.Code - @vendor.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">From Date</label>
+        <input type="date" name="fromDate" value="@Model.FromDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">To Date</label>
+        <input type="date" name="toDate" value="@Model.ToDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark w-100">View Statement</button>
+    </div>
+</form>
+
+<div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+@if (!Model.VendorId.HasValue)
+{
+    <div class="alert alert-secondary">Select a vendor to view the statement.</div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <strong>@Model.VendorCode - @Model.VendorName</strong>
+            @if (!string.IsNullOrWhiteSpace(Model.VendorTrn))
+            {
+                <span class="text-muted small ms-2">TRN @Model.VendorTrn</span>
+            }
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-md-12"><strong>Statement Period:</strong> @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</div>
+            <div class="col-6 col-md-3"><div class="text-muted small">Opening balance</div><div class="fs-5">@Model.OpeningBalance.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">Billed in the period</div><div class="fs-5">@Model.TotalBilled.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">Paid in the period</div><div class="fs-5">@Model.TotalPaid.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">Closing balance - we owe</div><div class="fs-5 fw-bold">@Model.ClosingBalance.ToString("N2")</div></div>
+        </div>
+    </div>
+
+    <h4>Statement Movements</h4>
+    <table class="table table-bordered table-striped table-sm mb-4">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Reference</th>
+                <th>Description</th>
+                <th class="text-end">Paid (Debit)</th>
+                <th class="text-end">Billed (Credit)</th>
+                <th class="text-end">Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-light">
+                <td>@Model.FromDate.ToString("dd/MM/yyyy")</td>
+                <td colspan="5"><em>Opening balance</em></td>
+                <td class="text-end">@Model.OpeningBalance.ToString("N2")</td>
+            </tr>
+            @if (Model.Rows.Count == 0)
+            {
+                <tr><td colspan="7" class="text-center text-muted">No movements in the selected period.</td></tr>
+            }
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td>
+                    <td>@row.TransactionType</td>
+                    <td>@row.ReferenceNumber</td>
+                    <td>@row.Description</td>
+                    <td class="text-end">@(row.Debit == 0 ? "" : row.Debit.ToString("N2"))</td>
+                    <td class="text-end">@(row.Credit == 0 ? "" : row.Credit.ToString("N2"))</td>
+                    <td class="text-end">@row.RunningBalance.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold">
+                <td colspan="4">Closing balance</td>
+                <td class="text-end">@Model.TotalPaid.ToString("N2")</td>
+                <td class="text-end">@Model.TotalBilled.ToString("N2")</td>
+                <td class="text-end">@Model.ClosingBalance.ToString("N2")</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <h4>Open Bills at @Model.ToDate.ToString("dd/MM/yyyy")</h4>
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th>Bill</th>
+                <th>Supplier's No.</th>
+                <th>Bill Date</th>
+                <th>Due Date</th>
+                <th class="text-end">Total</th>
+                <th class="text-end">Paid</th>
+                <th class="text-end">Balance</th>
+                <th class="text-end">Days Overdue</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.OpenBills.Count == 0)
+            {
+                <tr><td colspan="8" class="text-center text-muted">No unpaid bills.</td></tr>
+            }
+            @foreach (var bill in Model.OpenBills)
+            {
+                <tr class="@(bill.DaysOverdue > 0 ? "table-warning" : "")">
+                    <td>@bill.BillNumber</td>
+                    <td>@(bill.VendorReference ?? "-")</td>
+                    <td>@bill.BillDate.ToString("dd/MM/yyyy")</td>
+                    <td>@bill.DueDate.ToString("dd/MM/yyyy")</td>
+                    <td class="text-end">@bill.TotalAmount.ToString("N2")</td>
+                    <td class="text-end">@bill.AmountPaid.ToString("N2")</td>
+                    <td class="text-end">@bill.Balance.ToString("N2")</td>
+                    <td class="text-end">@(bill.DaysOverdue == 0 ? "-" : bill.DaysOverdue.ToString())</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

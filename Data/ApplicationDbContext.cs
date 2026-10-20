@@ -64,6 +64,9 @@ namespace RealEstateManager.Data
         public DbSet<CustomerCreditNote> CustomerCreditNotes => Set<CustomerCreditNote>();
         public DbSet<ReceivedEInvoice> ReceivedEInvoices => Set<ReceivedEInvoice>();
         public DbSet<ApprovalRequest> ApprovalRequests => Set<ApprovalRequest>();
+        public DbSet<OwnerSettlement> OwnerSettlements => Set<OwnerSettlement>();
+        public DbSet<OwnerCommissionInvoice> OwnerCommissionInvoices => Set<OwnerCommissionInvoice>();
+        public DbSet<OwnerCommissionInvoiceLine> OwnerCommissionInvoiceLines => Set<OwnerCommissionInvoiceLine>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -245,6 +248,7 @@ namespace RealEstateManager.Data
             modelBuilder.Entity<Company>().Property(x => x.ProvisionalVatRecoveryRate).HasPrecision(9, 4);
 
             modelBuilder.Entity<Property>().Property(x => x.VatCategory).HasMaxLength(20);
+            modelBuilder.Entity<Property>().Property(x => x.OwnerTrn).HasMaxLength(20);
             modelBuilder.Entity<Unit>().Property(x => x.VatCategory).HasMaxLength(20);
             modelBuilder.Entity<Tenant>().Property(x => x.TrnNumber).HasMaxLength(30);
             modelBuilder.Entity<Vendor>().Property(x => x.TrnNumber).HasMaxLength(30);
@@ -1832,6 +1836,87 @@ namespace RealEstateManager.Data
                 entity.HasIndex(x => new { x.DocumentType, x.DocumentId });
 
                 entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<OwnerSettlement>(entity =>
+            {
+                entity.Property(x => x.SettlementNumber).HasMaxLength(30);
+                entity.Property(x => x.OwnerName).HasMaxLength(200);
+                entity.Property(x => x.PaymentMethod).HasMaxLength(50);
+                entity.Property(x => x.ReferenceNumber).HasMaxLength(100);
+                entity.Property(x => x.Notes).HasMaxLength(1000);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+
+                entity.Property(x => x.GrossRent).HasPrecision(18, 2);
+                entity.Property(x => x.Commission).HasPrecision(18, 2);
+                entity.Property(x => x.CommissionVat).HasPrecision(18, 2);
+                entity.Property(x => x.OwnerShare).HasPrecision(18, 2);
+                entity.Property(x => x.CollectedOwnerShare).HasPrecision(18, 2);
+                entity.Property(x => x.PreviouslySettled).HasPrecision(18, 2);
+                entity.Property(x => x.AmountPaid).HasPrecision(18, 2);
+
+                entity.HasOne(x => x.Company)
+                    .WithMany()
+                    .HasForeignKey(x => x.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.PaidFromAccount)
+                    .WithMany()
+                    .HasForeignKey(x => x.PaidFromAccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.JournalEntry)
+                    .WithMany()
+                    .HasForeignKey(x => x.JournalEntryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new { x.CompanyId, x.SettlementNumber }).IsUnique();
+                entity.HasIndex(x => new { x.CompanyId, x.OwnerName });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<OwnerCommissionInvoice>(entity =>
+            {
+                entity.Property(x => x.InvoiceNumber).HasMaxLength(30);
+                entity.Property(x => x.TaxInvoiceNumber).HasMaxLength(30);
+                entity.Property(x => x.OwnerName).HasMaxLength(200);
+                entity.Property(x => x.RecipientTrn).HasMaxLength(20);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+
+                entity.Property(x => x.Commission).HasPrecision(18, 2);
+                entity.Property(x => x.VatRate).HasPrecision(9, 4);
+                entity.Property(x => x.VatAmount).HasPrecision(18, 2);
+                entity.Property(x => x.TotalAmount).HasPrecision(18, 2);
+
+                entity.HasOne(x => x.Company)
+                    .WithMany()
+                    .HasForeignKey(x => x.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.JournalEntry)
+                    .WithMany()
+                    .HasForeignKey(x => x.JournalEntryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(x => x.Lines)
+                    .WithOne(x => x.OwnerCommissionInvoice)
+                    .HasForeignKey(x => x.OwnerCommissionInvoiceId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(x => new { x.CompanyId, x.InvoiceNumber }).IsUnique();
+                entity.HasIndex(x => new { x.CompanyId, x.OwnerName });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<OwnerCommissionInvoiceLine>(entity =>
+            {
+                entity.Property(x => x.Description).HasMaxLength(300);
+                entity.Property(x => x.Commission).HasPrecision(18, 2);
+
+                // A month's commission on a contract is invoiced once, never twice.
+                entity.HasIndex(x => x.RevenueRecognitionScheduleId).IsUnique();
             });
         }
     }

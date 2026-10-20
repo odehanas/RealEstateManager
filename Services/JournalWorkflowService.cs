@@ -676,7 +676,11 @@ namespace RealEstateManager.Services
                 "PrepaymentRecognition",
                 "FixedAssetAcquisition",
                 "FixedAssetCapitalization",
-                "FixedAssetDepreciation"
+                "FixedAssetDepreciation",
+
+                // A tax invoice handed to a landlord keeps its number and its VAT; taking
+                // the VAT back out by a reset would leave the issued invoice unreported.
+                "OwnerCommissionInvoice"
             };
 
         private static string DescribeSourceType(string sourceType) => sourceType switch
@@ -687,6 +691,8 @@ namespace RealEstateManager.Services
             "FixedAssetAcquisition" => "fixed asset acquisition",
             "FixedAssetCapitalization" => "fixed asset capitalisation",
             "FixedAssetDepreciation" => "depreciation",
+            "OwnerSettlement" => "owner settlement",
+            "OwnerCommissionInvoice" => "commission tax invoice",
             _ => sourceType
         };
 

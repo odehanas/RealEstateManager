@@ -143,6 +143,7 @@ namespace RealEstateManager.Controllers
             property.PropertyType = model.PropertyType;
             property.OwnershipType = model.OwnershipType;
             property.OwnerName = model.OwnerName;
+            property.OwnerTrn = string.IsNullOrWhiteSpace(model.OwnerTrn) ? null : model.OwnerTrn.Trim();
             property.AssetValue = model.AssetValue;
             property.CommissionPercentage = model.CommissionPercentage;
             property.IsActive = model.IsActive;

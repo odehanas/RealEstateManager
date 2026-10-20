@@ -161,6 +161,8 @@ namespace RealEstateManager.Services
         private readonly ManualJournalService _manualJournals;
         private readonly FixedAssetService _fixedAssets;
         private readonly CreditNoteService _creditNotes;
+        private readonly OwnerSettlementService _ownerSettlements;
+        private readonly OwnerCommissionInvoiceService _commissionInvoices;
 
         private readonly SampleDataResult _result = new();
 
@@ -191,7 +193,9 @@ namespace RealEstateManager.Services
             PettyCashService pettyCash,
             ManualJournalService manualJournals,
             FixedAssetService fixedAssets,
-            CreditNoteService creditNotes)
+            CreditNoteService creditNotes,
+            OwnerSettlementService ownerSettlements,
+            OwnerCommissionInvoiceService commissionInvoices)
         {
             _db = db;
             _posting = posting;
@@ -203,6 +207,8 @@ namespace RealEstateManager.Services
             _manualJournals = manualJournals;
             _fixedAssets = fixedAssets;
             _creditNotes = creditNotes;
+            _ownerSettlements = ownerSettlements;
+            _commissionInvoices = commissionInvoices;
         }
 
         public async Task<SampleDataResult> BuildAsync(int companyId, int? userId)
@@ -344,6 +350,10 @@ namespace RealEstateManager.Services
                 "Corniche Al Qawasim, Ras Al Khaimah", 0m, "Al Mansoori Holdings", 8m);
             var palm = await AddProperty("palm", "Palm View Villas", "Residential", "Managed", VatCategories.Exempt,
                 "Mina Al Arab, Ras Al Khaimah", 0m, "Sheikha Investments LLC", 6m);
+
+            // A VAT-registered landlord, so the commission tax invoice shows a recipient TRN.
+            corniche.OwnerTrn = "100456789100003";
+            await _db.SaveChangesAsync();
 
             async Task AddUnit(Property property, string floor, string usage, decimal area, decimal rent, string status = "Vacant")
             {
@@ -543,6 +553,7 @@ namespace RealEstateManager.Services
             // Remittances and VAT read posted balances, so they come after the month is in.
             if (monthEnd <= _today)
             {
+                await IssueCommissionInvoicesAsync(monthEnd);
                 await RemitToLandlordsAsync(monthStart, monthEnd);
                 await PostAllAsync(monthStart, monthEnd);
             }
@@ -917,34 +928,53 @@ namespace RealEstateManager.Services
             }
         }
 
+        private async Task IssueCommissionInvoicesAsync(DateTime monthEnd)
+        {
+            // Month end: each landlord gets a tax invoice for the month's commission plus VAT.
+            await TryAsync("issue commission invoices", async () =>
+            {
+                var run = await _commissionInvoices.IssueAsync(monthEnd, "Sample data");
+                _result.Warnings.AddRange(run.Warnings);
+            });
+        }
+
         private async Task RemitToLandlordsAsync(DateTime monthStart, DateTime monthEnd)
         {
-            // What was collected for each managed building this month, less our fee, is
-            // paid on to its owner.
-            foreach (var property in _properties.Values.Where(x => x.OwnershipType == "Managed"))
+            // Each landlord is paid what was collected for them, less our commission, through
+            // the same Owner Settlement screen a user would use. One owner is paid in round
+            // thousands, so the sample shows a partial settlement carrying a balance forward.
+            var owners = _properties.Values
+                .Where(x => x.OwnershipType == "Managed" && !string.IsNullOrWhiteSpace(x.OwnerName))
+                .Select(x => x.OwnerName!.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            for (var i = 0; i < owners.Count; i++)
             {
-                var leaseIds = _leases.Where(x => x.PropertyId == property.Id).Select(x => x.LeaseId).ToList();
+                var owner = owners[i];
+                await TryAsync($"settle with {owner}", async () =>
+                {
+                    var statement = await _ownerSettlements.BuildStatementAsync(owner, monthEnd);
+                    var amount = Math.Min(statement.AvailableFromCollections, statement.MaximumPayable);
+                    if (i % 2 == 1)
+                        amount = Math.Floor(amount / 1_000m) * 1_000m;
+                    if (amount <= 0m) return;
 
-                var collected = await _db.CustomerReceipts.AsNoTracking()
-                    .Where(x => x.ReceiptDate >= monthStart && x.ReceiptDate <= monthEnd &&
-                                x.JournalEntry != null && x.JournalEntry.IsPosted &&
-                                leaseIds.Contains(x.CustomerInvoice!.LeaseId))
-                    .Select(x => new { x.Amount, x.CustomerInvoice!.Subtotal, x.CustomerInvoice.TotalAmount })
-                    .ToListAsync();
+                    var (_, warning) = await _ownerSettlements.PayAsync(new OwnerSettlementPaymentInput
+                    {
+                        OwnerName = owner,
+                        AsOfDate = monthEnd,
+                        SettlementDate = monthEnd,
+                        Amount = amount,
+                        PaymentMethod = "Bank Transfer",
+                        PaidFromAccountId = _acc["11100"],
+                        ReferenceNumber = $"TT-{monthEnd:yyMM}-{i + 1:D2}",
+                        Notes = $"Rent collected to {monthEnd:dd MMM yyyy}, less management commission"
+                    }, _userId, "Sample data");
 
-                collected.AddRange(await _db.PdcReceipts.AsNoTracking()
-                    .Where(x => x.Status == "Cleared" && x.ClearedDate >= monthStart && x.ClearedDate <= monthEnd &&
-                                leaseIds.Contains(x.LeaseId) && x.CustomerInvoice != null)
-                    .Select(x => new { x.Amount, x.CustomerInvoice!.Subtotal, x.CustomerInvoice.TotalAmount })
-                    .ToListAsync());
-
-                var net = collected.Sum(x => x.TotalAmount == 0m ? 0m : x.Amount * x.Subtotal / x.TotalAmount);
-                var remit = Math.Round(net * (1m - property.CommissionPercentage / 100m), 2);
-                if (remit <= 0m) continue;
-
-                await JournalAsync(monthEnd, $"Remittance to {property.OwnerName} - {monthStart:MMMM yyyy}",
-                    ("21500", remit, 0m, $"Rent collected for {property.Name}, less management fee", null),
-                    ("11100", 0m, remit, "Bank transfer to landlord", null));
+                    if (warning != null)
+                        throw new InvalidOperationException(warning);
+                });
             }
         }
 

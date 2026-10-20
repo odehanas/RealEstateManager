@@ -131,9 +131,23 @@ namespace RealEstateManager.Services
                 .Select(x => x.TaxInvoiceNumber)
                 .FirstOrDefaultAsync();
 
+            // One series for the company: commission invoices to landlords are tax invoices
+            // too, and draw from the same sequence as tenant invoices.
+            var lastCommission = await _db.OwnerCommissionInvoices
+                .IgnoreQueryFilters()
+                .Where(x => x.CompanyId == companyId
+                            && x.TaxInvoiceNumber != null
+                            && x.TaxInvoiceNumber.StartsWith(prefix))
+                .OrderByDescending(x => x.TaxInvoiceNumber)
+                .Select(x => x.TaxInvoiceNumber)
+                .FirstOrDefaultAsync();
+
             var next = 1;
-            if (!string.IsNullOrEmpty(last) && int.TryParse(last[prefix.Length..], out var parsed))
-                next = parsed + 1;
+            foreach (var number in new[] { last, lastCommission })
+            {
+                if (!string.IsNullOrEmpty(number) && int.TryParse(number[prefix.Length..], out var parsed))
+                    next = Math.Max(next, parsed + 1);
+            }
 
             return $"{prefix}{next:D6}";
         }

@@ -68,6 +68,12 @@
         </div>
 
         <div class="col-md-4">
+            <label asp-for="OwnerTrn" class="form-label">Owner TRN</label>
+            <input asp-for="OwnerTrn" class="form-control" maxlength="20" />
+            <div class="form-text">Managed properties only, if the owner is VAT registered. Printed on our commission tax invoice.</div>
+        </div>
+
+        <div class="col-md-4">
             <label asp-for="AssetValue" class="form-label"></label>
             <input asp-for="AssetValue" class="form-control" />
         </div>

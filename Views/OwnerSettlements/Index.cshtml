@@ -1,0 +1,243 @@
+@model RealEstateManager.Models.OwnerSettlementIndexViewModel
+
+@{
+    ViewData["Title"] = "Owner Settlements";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="mb-0">Owner Settlements</h2>
+</div>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-info">
+    For managed properties we collect rent on the landlord's behalf. Each owner is owed the
+    <strong>rent billed, less our commission and the 5% VAT on it</strong>, less what we have already paid them.
+    Open an owner to see the statement per contract and to pay the balance in full or in part.
+    <em>Available from collections</em> is the part we have actually received from tenants.
+</div>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Balances as at</label>
+        <input type="date" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark w-100">Refresh</button>
+    </div>
+</form>
+
+<h4>Owners</h4>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm mb-4">
+        <thead>
+            <tr>
+                <th>Owner</th>
+                <th class="text-end">Properties</th>
+                <th class="text-end">Contracts</th>
+                <th class="text-end">Rent Billed</th>
+                <th class="text-end">Commission</th>
+                <th class="text-end">VAT on Commission</th>
+                <th class="text-end">Owner's Share</th>
+                <th class="text-end">Paid to Owner</th>
+                <th class="text-end">Balance Payable</th>
+                <th class="text-end">Available from Collections</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Owners.Count == 0)
+            {
+                <tr>
+                    <td colspan="11" class="text-center text-muted">
+                        No managed property has an owner recorded. Set the ownership type to Managed and fill in
+                        the owner's name in Master Data &rsaquo; Properties.
+                    </td>
+                </tr>
+            }
+            @foreach (var owner in Model.Owners)
+            {
+                <tr>
+                    <td>@owner.OwnerName</td>
+                    <td class="text-end">@owner.PropertyCount</td>
+                    <td class="text-end">@owner.ContractCount</td>
+                    <td class="text-end">@owner.RentBilled.ToString("N2")</td>
+                    <td class="text-end">@owner.Commission.ToString("N2")</td>
+                    <td class="text-end">@owner.CommissionVat.ToString("N2")</td>
+                    <td class="text-end">@owner.OwnerShare.ToString("N2")</td>
+                    <td class="text-end">@owner.PreviouslySettled.ToString("N2")</td>
+                    <td class="text-end fw-bold">@owner.BalancePayable.ToString("N2")</td>
+                    <td class="text-end">@owner.AvailableFromCollections.ToString("N2")</td>
+                    <td class="text-nowrap">
+                        <a class="btn btn-sm btn-primary" asp-action="Statement"
+                           asp-route-owner="@owner.OwnerName" asp-route-asOfDate="@Model.AsOfDate.ToString("yyyy-MM-dd")">Statement &amp; Pay</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        @if (Model.Owners.Count > 0)
+        {
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="3">Total</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.RentBilled).ToString("N2")</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.Commission).ToString("N2")</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.CommissionVat).ToString("N2")</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.OwnerShare).ToString("N2")</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.PreviouslySettled).ToString("N2")</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.BalancePayable).ToString("N2")</td>
+                    <td class="text-end">@Model.Owners.Sum(x => x.AvailableFromCollections).ToString("N2")</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        }
+    </table>
+</div>
+
+<h4>Commission Tax Invoices</h4>
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <p class="small text-muted mb-2">
+            At each month end, issue one tax invoice to every landlord for the commission earned that month, plus 5% VAT.
+            The VAT is taken from the owner's money (Due to Landlords) and goes to VAT Payable, so it is in that month's
+            VAT return. Run it after the month's revenue recognition is posted. Commission already invoiced is never invoiced again.
+        </p>
+        <form method="get" class="row g-2 align-items-end mb-2">
+            <div class="col-md-3">
+                <label class="form-label">Month ending</label>
+                <input type="date" name="invoiceMonthEnd" value="@Model.InvoiceMonthEnd.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-dark w-100">Check</button>
+            </div>
+        </form>
+        @if (Model.PendingCommission.Count == 0)
+        {
+            <p class="mb-0 text-muted">No commission waiting to be invoiced up to @Model.InvoiceMonthEnd.ToString("dd/MM/yyyy").</p>
+        }
+        else
+        {
+            <table class="table table-sm mb-2" style="max-width: 640px;">
+                <thead><tr><th>Owner</th><th class="text-end">Months</th><th class="text-end">Commission to invoice</th></tr></thead>
+                <tbody>
+                    @foreach (var pending in Model.PendingCommission)
+                    {
+                        <tr>
+                            <td>@(string.IsNullOrWhiteSpace(pending.OwnerName) ? "(owner not recorded)" : pending.OwnerName)</td>
+                            <td class="text-end">@pending.Months</td>
+                            <td class="text-end">@pending.Commission.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <form asp-action="IssueCommissionInvoices" method="post">
+                <input type="hidden" name="monthEnd" value="@Model.InvoiceMonthEnd.ToString("yyyy-MM-dd")" />
+                <button type="submit" class="btn btn-primary"
+                        onclick="return confirm('Issue and post the commission tax invoices dated @Model.InvoiceMonthEnd.ToString("dd/MM/yyyy")?');">
+                    Issue Commission Invoices at @Model.InvoiceMonthEnd.ToString("dd/MM/yyyy")
+                </button>
+            </form>
+        }
+    </div>
+</div>
+<div class="table-responsive mb-4">
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Tax Invoice No.</th>
+                <th>Date</th>
+                <th>Owner</th>
+                <th class="text-end">Commission</th>
+                <th class="text-end">VAT</th>
+                <th class="text-end">Total</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.CommissionInvoices.Count == 0)
+            {
+                <tr><td colspan="9" class="text-center text-muted">No commission invoices yet.</td></tr>
+            }
+            @foreach (var ci in Model.CommissionInvoices)
+            {
+                <tr>
+                    <td>@ci.InvoiceNumber</td>
+                    <td>@(ci.TaxInvoiceNumber ?? "-")</td>
+                    <td>@ci.InvoiceDate.ToString("dd/MM/yyyy")</td>
+                    <td>@ci.OwnerName</td>
+                    <td class="text-end">@ci.Commission.ToString("N2")</td>
+                    <td class="text-end">@ci.VatAmount.ToString("N2")</td>
+                    <td class="text-end">@ci.TotalAmount.ToString("N2")</td>
+                    <td>
+                        @if (ci.IsPosted)
+                        {
+                            <span class="badge bg-success">Posted</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Draft</span>
+                        }
+                    </td>
+                    <td><a class="btn btn-sm btn-outline-secondary" asp-action="CommissionInvoice" asp-route-id="@ci.Id">Invoice</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<h4>Settlements Made</h4>
+<div class="table-responsive">
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Date</th>
+                <th>Owner</th>
+                <th>Method</th>
+                <th>Paid From</th>
+                <th>Reference</th>
+                <th class="text-end">Amount</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.RecentSettlements.Count == 0)
+            {
+                <tr><td colspan="9" class="text-center text-muted">No settlements yet.</td></tr>
+            }
+            @foreach (var s in Model.RecentSettlements)
+            {
+                <tr>
+                    <td>@s.SettlementNumber</td>
+                    <td>@s.SettlementDate.ToString("dd/MM/yyyy")</td>
+                    <td>@s.OwnerName</td>
+                    <td>@s.PaymentMethod</td>
+                    <td>@s.PaidFromAccount?.Code - @s.PaidFromAccount?.Name</td>
+                    <td>@(s.ReferenceNumber ?? "-")</td>
+                    <td class="text-end">@s.AmountPaid.ToString("N2")</td>
+                    <td>
+                        @if (s.IsPosted)
+                        {
+                            <span class="badge bg-success">Posted</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Draft</span>
+                        }
+                    </td>
+                    <td><a class="btn btn-sm btn-outline-secondary" asp-action="Print" asp-route-id="@s.Id">Advice</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

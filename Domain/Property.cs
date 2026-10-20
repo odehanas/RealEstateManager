@@ -23,6 +23,12 @@
         public string VatCategory { get; set; } = VatCategories.Standard;
 
         public string? OwnerName { get; set; }
+
+        /// <summary>
+        /// The landlord's VAT registration number, for a managed property. Our commission
+        /// tax invoice to a registered owner must show it.
+        /// </summary>
+        public string? OwnerTrn { get; set; }
         public decimal AssetValue { get; set; } = 0m;
         public decimal CommissionPercentage { get; set; } = 0m;
 

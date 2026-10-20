@@ -1,0 +1,104 @@
+@model RealEstateManager.Domain.OwnerSettlement
+@using RealEstateManager.Models
+
+@{
+    ViewData["Title"] = "Settlement Advice " + Model.SettlementNumber;
+    var statement = ViewBag.Statement as OwnerSettlementStatementViewModel;
+}
+
+<style>
+    @@media print {
+        .statement-no-print, nav, footer { display: none !important; }
+    }
+</style>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success statement-no-print">@success</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 statement-no-print">
+    <a asp-action="Statement" asp-route-owner="@Model.OwnerName" class="btn btn-outline-secondary btn-sm">Back to statement</a>
+    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Print</button>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-4">
+            <div>
+                <h3 class="mb-0">@Model.Company?.Name</h3>
+                <div class="text-muted">Owner Settlement Advice</div>
+            </div>
+            <div class="text-end">
+                <div><strong>@Model.SettlementNumber</strong></div>
+                <div>Date: @Model.SettlementDate.ToString("dd/MM/yyyy")</div>
+                @if (!Model.IsPosted)
+                {
+                    <span class="badge bg-warning text-dark">Draft - not posted</span>
+                }
+            </div>
+        </div>
+
+        <p class="mb-1"><strong>To:</strong> @Model.OwnerName</p>
+        <p class="text-muted">Rent collected on your behalf for your managed properties, up to @Model.AsOfDate.ToString("dd/MM/yyyy").</p>
+
+        @if (statement != null && statement.Contracts.Count > 0)
+        {
+            <table class="table table-bordered table-sm mb-4">
+                <thead>
+                    <tr>
+                        <th>Property / Unit</th>
+                        <th>Contract</th>
+                        <th>Tenant</th>
+                        <th class="text-end">Rent Billed</th>
+                        <th class="text-end">Commission</th>
+                        <th class="text-end">VAT</th>
+                        <th class="text-end">Your Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in statement.Contracts)
+                    {
+                        <tr>
+                            <td>@c.PropertyName / @c.UnitNumber</td>
+                            <td>@c.ContractNumber</td>
+                            <td>@c.TenantName</td>
+                            <td class="text-end">@c.RentBilled.ToString("N2")</td>
+                            <td class="text-end">@c.Commission.ToString("N2") <span class="text-muted small">(@c.CommissionPercentage.ToString("0.##")%)</span></td>
+                            <td class="text-end">@c.CommissionVat.ToString("N2")</td>
+                            <td class="text-end">@c.OwnerShare.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <table class="table table-sm ms-auto" style="max-width: 460px;">
+            <tbody>
+                <tr><td>Rent billed (before VAT)</td><td class="text-end">@Model.GrossRent.ToString("N2")</td></tr>
+                <tr><td>Less: management commission</td><td class="text-end">(@Model.Commission.ToString("N2"))</td></tr>
+                @if (Model.CommissionVat > 0)
+                {
+                    <tr><td>Less: VAT on commission</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
+                }
+                <tr class="fw-bold"><td>Your share</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
+                <tr><td>Less: paid to you before</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
+                <tr><td>Balance due before this payment</td><td class="text-end">@((Model.OwnerShare - Model.PreviouslySettled).ToString("N2"))</td></tr>
+                <tr class="fw-bold table-primary"><td>Paid now</td><td class="text-end">@Model.AmountPaid.ToString("N2")</td></tr>
+                <tr class="fw-bold"><td>Balance still due to you</td><td class="text-end">@Model.BalanceAfter.ToString("N2")</td></tr>
+            </tbody>
+        </table>
+
+        <p class="mb-1"><strong>Paid by:</strong> @Model.PaymentMethod
+            @if (!string.IsNullOrWhiteSpace(Model.ReferenceNumber))
+            {
+                <span>&middot; Ref. @Model.ReferenceNumber</span>
+            }
+        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.Notes))
+        {
+            <p class="mb-1"><strong>Notes:</strong> @Model.Notes</p>
+        }
+        <p class="text-muted small mt-4 mb-0">Prepared by @(Model.CreatedByName ?? "-") on @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy").</p>
+    </div>
+</div>

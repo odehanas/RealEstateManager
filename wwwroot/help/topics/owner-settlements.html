@@ -1,0 +1,99 @@
+<p><span class="path">Operations ▸ Owner Settlements</span></p>
+<p>For a <strong>managed</strong> property we collect the rent on the landlord's behalf. The landlord is owed
+that rent less our commission and the VAT on it. An <strong>owner settlement</strong> is the payment of that money to the landlord,
+in full or in part, with a settlement advice to hand over.</p>
+
+<h3>How the amount owed is worked out</h3>
+<table class="je">
+    <tbody>
+        <tr><td>Rent billed to the tenants up to the statement date (before VAT, after credit notes)</td><td class="num">A</td></tr>
+        <tr><td>Less: our commission at the property's <em>Commission %</em></td><td class="num">(B)</td></tr>
+        <tr><td>Less: 5% VAT on that commission (when your company is VAT registered)</td><td class="num">(V)</td></tr>
+        <tr><td><strong>Owner's share</strong></td><td class="num"><strong>A − B − V</strong></td></tr>
+        <tr><td>Less: settlements already paid to the owner</td><td class="num">(C)</td></tr>
+        <tr><td><strong>Balance payable to the owner</strong></td><td class="num"><strong>A − B − V − C</strong></td></tr>
+    </tbody>
+</table>
+<p>Only posted invoices, credit notes, receipts and cleared cheques count. VAT charged to the tenants is never
+part of the owner's money — it is paid to the FTA. The statement also shows the <strong>total rent of each agreement</strong>
+for its full term, for reference.</p>
+<p>Next to the balance you see <strong>Available from collections</strong>: the owner's share of rent the tenants
+have actually <em>paid</em>, less what was already settled. That is the cash you hold for the owner. You may pay
+more, up to the full balance, but the difference is an advance of rent the tenant still owes you.</p>
+
+<h3>VAT on our commission: the monthly commission tax invoice</h3>
+<p>Our commission is a service we supply to the landlord — property management. It is <strong>standard rated at 5%</strong>
+even when the rent itself is exempt residential rent: the exemption covers the lease between landlord and tenant, not
+our fee. So every month each landlord receives a tax invoice from us for the commission plus VAT, and that amount is
+taken from the rent we collected for them.</p>
+<ol class="steps">
+    <li>Post the month's revenue recognition first (<span class="path">System Setup ▸ Revenue Recognition</span>). That is
+        what moves the month's commission into Management Fee Revenue.</li>
+    <li>Open <span class="path">Operations ▸ Owner Settlements</span>. Under <strong>Commission Tax Invoices</strong> the
+        month just ended is offered, with the commission waiting to be invoiced per owner. Choose another
+        <strong>Month ending</strong> and select <strong>Check</strong> if needed.</li>
+    <li>Select <strong>Issue Commission Invoices</strong>. One invoice per landlord is created, dated the month end, with a
+        number from your tax invoice series (TX-year-…, the same series as tenant invoices), and posted straight away.</li>
+    <li>Select <strong>Invoice</strong> on any of them to print the tax invoice for the owner. Record the owner's TRN on the
+        property (<span class="path">Master Data ▸ Properties</span>, <em>Owner TRN</em>) if they are VAT registered, so it
+        appears on the invoice.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num dr">VAT</td><td class="num">—</td></tr>
+        <tr><td><code>21400</code> VAT Payable</td><td class="num">—</td><td class="num cr">VAT</td></tr>
+    </tbody>
+</table>
+<p>The commission itself is already in revenue through revenue recognition, so the invoice only adds the VAT. It appears
+in the <span class="path">Reporting ▸ VAT Return</span> for that month as <em>Standard rated - management commission to
+landlords</em>. Commission that was invoiced once is never invoiced again; commission recognised late (for example a
+month posted after its invoice run) is picked up by the next run. A company with no TRN issues the invoice without VAT.</p>
+<div class="box">
+    <div class="box-title">An issued commission tax invoice cannot be reset to draft</div>
+    <p>It has a number from your tax invoice series and has been handed to the owner, so its VAT must stay in the return.
+    Correct a mistake with an adjustment in the following month rather than by undoing the invoice.</p>
+</div>
+
+<h3>Paying an owner</h3>
+<ol class="steps">
+    <li>Open <span class="path">Operations ▸ Owner Settlements</span>. Every landlord named on a managed property is
+        listed with the rent billed, commission, owner's share, what was paid and the balance.</li>
+    <li>Select <strong>Statement &amp; Pay</strong> for the owner. Change <strong>Statement as at</strong> if you are
+        settling up to an earlier date, for example a month end.</li>
+    <li>Check the contracts: property and unit, tenant, agreement rent, rent billed, commission % and amount, the VAT on
+        the commission, and the owner's share. The commission tax invoices issued to the owner are listed underneath.</li>
+    <li>Under <strong>Pay the Owner</strong>, the amount starts at what has been collected. Keep it to pay in full, or
+        enter a smaller amount for a part payment.</li>
+    <li>Enter the <strong>Payment date</strong>, <strong>Payment method</strong> (bank transfer, cheque or cash),
+        the account it is <strong>Paid from</strong>, and the cheque or transfer reference.</li>
+    <li>Select <strong>Save and Post Payment</strong>. The payment is posted straight away and the settlement advice
+        opens, ready to print for the owner.</li>
+</ol>
+
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num dr">Amount paid</td><td class="num">—</td></tr>
+        <tr><td><code>11100</code> Cash and Cash Equivalents (or the account chosen)</td><td class="num">—</td><td class="num cr">Amount paid</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">An owner can never be paid twice</div>
+    <p>The most you can pay is the balance, less any settlement still waiting to be posted. A larger amount is refused
+    with <em>"The most that can be paid to … is …"</em>. Settlement numbers run OS-year-0001, OS-year-0002 and so on.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Why Due to Landlords in the Trial Balance can be higher than the balances here</div>
+    <p>When an invoice is posted the whole rent goes to <em>Due to Landlords</em>, and our commission is taken out of it
+    month by month by revenue recognition, with its VAT by the monthly commission invoice. The settlement statement deducts
+    the commission and VAT on everything billed at once. So when rent is billed in advance, <em>Due to Landlords</em> also
+    holds the commission and VAT for the months still to come, and is higher than the total balance payable by that amount.</p>
+</div>
+
+<h3>Correcting a settlement</h3>
+<p>Find the settlement's journal in <span class="path">Operations ▸ Journal Inquiry</span> (source <em>OwnerSettlement</em>)
+and reset it to draft. A draft settlement no longer counts as paid, but still holds back the amount until it is posted
+again, so nothing is paid twice by mistake.</p>

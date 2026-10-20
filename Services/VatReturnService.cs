@@ -75,6 +75,35 @@ namespace RealEstateManager.Services
                 }
             }
 
+            // Our management commission to the landlords of managed properties: a standard
+            // rated service of our own, whatever the VAT treatment of the rent it is earned on.
+            var commissionInvoices = await _db.OwnerCommissionInvoices
+                .AsNoTracking()
+                .Where(x => x.CompanyId == companyId
+                            && x.JournalEntry != null && x.JournalEntry.IsPosted
+                            && x.InvoiceDate >= startDate
+                            && x.InvoiceDate <= endDate)
+                .Select(x => new { x.Commission, x.VatAmount })
+                .ToListAsync();
+
+            if (commissionInvoices.Count > 0)
+            {
+                var net = commissionInvoices.Sum(x => x.Commission);
+                var vat = commissionInvoices.Sum(x => x.VatAmount);
+
+                report.OutputLines.Add(new VatReturnOutputLineDto
+                {
+                    VatCategory = VatCategories.Standard,
+                    Label = "Standard rated - management commission to landlords",
+                    SupplyCount = commissionInvoices.Count,
+                    NetAmount = net,
+                    VatAmount = vat
+                });
+
+                report.StandardRatedNet += net;
+                report.StandardRatedVat += vat;
+            }
+
             // Credit notes reduce the supplies and the output tax of the period in which they
             // are issued (Article 61), not the period of the invoice they correct.
             var creditNotes = await _db.CustomerCreditNotes
@@ -117,6 +146,7 @@ namespace RealEstateManager.Services
 
             report.OutputLines = report.OutputLines
                 .OrderBy(x => x.VatCategory)
+                .ThenBy(x => x.Label != null)
                 .ThenBy(x => x.IsCreditNote)
                 .ToList();
 
@@ -220,6 +250,9 @@ namespace RealEstateManager.Services
 
         /// <summary>A row of credit notes, shown as a deduction from the supplies above it.</summary>
         public bool IsCreditNote { get; set; }
+
+        /// <summary>Overrides the category name, for a row that is not tenant rent.</summary>
+        public string? Label { get; set; }
 
         public int SupplyCount { get; set; }
         public decimal NetAmount { get; set; }

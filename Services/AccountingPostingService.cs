@@ -606,6 +606,146 @@ namespace RealEstateManager.Services
             return journalEntry;
         }
 
+        /// <summary>
+        /// Builds the journal for the VAT on a commission tax invoice to a landlord. The
+        /// commission itself is already in revenue through revenue recognition; this adds
+        /// the output tax on it, paid out of the owner's money:
+        ///
+        ///   Dr  Due to Landlords        one line per property
+        ///       Cr  VAT Payable
+        /// </summary>
+        public async Task<JournalEntry> PostOwnerCommissionVatAsync(int ownerCommissionInvoiceId)
+        {
+            var invoice = await _db.OwnerCommissionInvoices
+                .Include(x => x.Lines)
+                .FirstOrDefaultAsync(x => x.Id == ownerCommissionInvoiceId)
+                ?? throw new InvalidOperationException("Commission invoice was not found.");
+
+            if (invoice.JournalEntryId.HasValue)
+            {
+                return await _db.JournalEntries
+                    .Include(x => x.Lines)
+                    .FirstAsync(x => x.Id == invoice.JournalEntryId.Value);
+            }
+
+            var settings = await GetCompanyAccountSettingAsync(invoice.CompanyId);
+            var dueToLandlords = await GetMappedAccountAsync(
+                invoice.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords");
+            var vatPayable = await GetMappedAccountAsync(
+                invoice.CompanyId, settings.VatPayableAccountId, "VAT Payable");
+
+            // The VAT is worked out on the invoice total and shared across the properties,
+            // the last one taking the rounding, so the lines always add up to the invoice.
+            var byProperty = invoice.Lines
+                .GroupBy(x => x.PropertyId)
+                .Select(g => new { PropertyId = g.Key, Commission = g.Sum(x => x.Commission) })
+                .ToList();
+
+            var lines = new List<JournalEntryLine>();
+            var allocated = 0m;
+            for (var i = 0; i < byProperty.Count; i++)
+            {
+                var share = i == byProperty.Count - 1 || invoice.Commission == 0m
+                    ? invoice.VatAmount - allocated
+                    : VatDeterminationService.Round(invoice.VatAmount * byProperty[i].Commission / invoice.Commission);
+                allocated += share;
+
+                lines.Add(new JournalEntryLine
+                {
+                    AccountId = dueToLandlords.Id,
+                    Debit = share,
+                    Credit = 0m,
+                    Description = $"VAT on commission {invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber} - {invoice.OwnerName}",
+                    PropertyId = byProperty[i].PropertyId
+                });
+            }
+
+            lines.Add(new JournalEntryLine
+            {
+                AccountId = vatPayable.Id,
+                Debit = 0m,
+                Credit = invoice.VatAmount,
+                Description = $"Output VAT on management commission {invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber}"
+            });
+
+            var journalEntry = await CreateJournalEntryAsync(
+                invoice.CompanyId,
+                invoice.InvoiceDate,
+                $"Commission tax invoice {invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber} - {invoice.OwnerName}",
+                "OwnerCommissionInvoice",
+                invoice.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber,
+                referenceNumber: invoice.InvoiceNumber);
+
+            invoice.JournalEntryId = journalEntry.Id;
+            await _db.SaveChangesAsync();
+            return journalEntry;
+        }
+
+        /// <summary>
+        /// Builds the journal for a payment to the landlord of a managed property:
+        ///
+        ///   Dr  Due to Landlords        the liability to the owner falls
+        ///       Cr  Bank / Cash         the money leaves
+        /// </summary>
+        public async Task<JournalEntry> PostOwnerSettlementAsync(int ownerSettlementId, int? propertyId)
+        {
+            var settlement = await _db.OwnerSettlements
+                .FirstOrDefaultAsync(x => x.Id == ownerSettlementId)
+                ?? throw new InvalidOperationException("Owner settlement was not found.");
+
+            if (settlement.JournalEntryId.HasValue)
+            {
+                return await _db.JournalEntries
+                    .Include(x => x.Lines)
+                    .FirstAsync(x => x.Id == settlement.JournalEntryId.Value);
+            }
+
+            var settings = await GetCompanyAccountSettingAsync(settlement.CompanyId);
+            var dueToLandlords = await GetMappedAccountAsync(
+                settlement.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords");
+            var paidFrom = await GetMappedAccountAsync(
+                settlement.CompanyId, settlement.PaidFromAccountId, "Paid from account");
+
+            var lines = new List<JournalEntryLine>
+            {
+                new()
+                {
+                    AccountId = dueToLandlords.Id,
+                    Debit = settlement.AmountPaid,
+                    Credit = 0m,
+                    Description = $"Settlement {settlement.SettlementNumber} to {settlement.OwnerName}",
+                    PropertyId = propertyId
+                },
+                new()
+                {
+                    AccountId = paidFrom.Id,
+                    Debit = 0m,
+                    Credit = settlement.AmountPaid,
+                    Description = $"Paid to {settlement.OwnerName} - {settlement.PaymentMethod}",
+                    PropertyId = propertyId
+                }
+            };
+
+            var journalEntry = await CreateJournalEntryAsync(
+                settlement.CompanyId,
+                settlement.SettlementDate,
+                $"Owner settlement {settlement.SettlementNumber} - {settlement.OwnerName}",
+                "OwnerSettlement",
+                settlement.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: settlement.SettlementNumber,
+                referenceNumber: settlement.ReferenceNumber,
+                remarks: settlement.Notes);
+
+            settlement.JournalEntryId = journalEntry.Id;
+            await _db.SaveChangesAsync();
+            return journalEntry;
+        }
+
         public async Task<JournalEntry> PostSecurityDepositAsync(int securityDepositId)
         {
             var deposit = await _db.SecurityDeposits
