@@ -16,6 +16,12 @@ namespace RealEstateManager.Models
         /// </summary>
         public string? VatCategory { get; set; }
 
+        [System.ComponentModel.DataAnnotations.Display(Name = "Floor number (for the building view)")]
+        public int? FloorNumber { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Display(Name = "Position on the floor")]
+        public int? FloorPosition { get; set; }
+
         [System.ComponentModel.DataAnnotations.Display(Name = "Unit title deed number")]
         public string? TitleDeedNumber { get; set; }
 

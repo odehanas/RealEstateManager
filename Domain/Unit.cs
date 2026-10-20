@@ -9,6 +9,15 @@ namespace RealEstateManager.Domain
 
         public string UnitNumber { get; set; } = string.Empty;
         public string? Floor { get; set; }
+
+        /// <summary>
+        /// The floor as a number, for the building view: 0 is the ground floor, negative is a
+        /// basement. Empty means it is read from <see cref="Floor"/> ("G" = 0, "3" = 3, "B1" = -1).
+        /// </summary>
+        public int? FloorNumber { get; set; }
+
+        /// <summary>Where the unit sits along its floor in the building view, from the left (1, 2, 3...).</summary>
+        public int? FloorPosition { get; set; }
         public string? UsageType { get; set; }
 
         public decimal AreaSqFt { get; set; } = 0m;

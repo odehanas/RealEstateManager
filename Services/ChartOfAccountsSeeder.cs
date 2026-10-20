@@ -34,7 +34,8 @@ namespace RealEstateManager.Services
             ("Properties", "FairValue"),
             ("UnitSales", null),
             ("CapitalAssetVatRecords", null),
-            ("Units", "FirstSupplyDate")
+            ("Units", "FirstSupplyDate"),
+            ("Units", "FloorNumber")
         };
 
         public static async Task SeedAsync(IServiceProvider serviceProvider)

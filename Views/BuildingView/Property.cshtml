@@ -1,0 +1,226 @@
+@model RealEstateManager.Services.BuildingViewDto
+
+@{
+    ViewData["Title"] = "Building View - " + Model.Name;
+    var json = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        floors = Model.Floors.Select(f => new
+        {
+            f.Number,
+            f.Label,
+            units = f.Units.Select(u => new
+            {
+                u.UnitId, u.UnitNumber, u.ShortLabel, u.AreaSqFt, u.Usage, u.StandardAnnualRent, u.Health, u.Reasons,
+                u.LeaseId, u.SaleId, u.ContractNumber, u.TenantId, u.TenantName, u.AnnualRent,
+                ContractEnd = u.ContractEnd?.ToString("dd/MM/yyyy"), u.DaysToExpiry,
+                u.Invoiced, u.Collected, u.Outstanding, u.OverdueAmount, u.OldestOverdueDays,
+                u.BouncedCheques, u.BouncedAmount, u.Postponements, u.Score, u.Grade, u.VacantDays, u.CollectedPercent,
+                Floor = f.Label
+            })
+        }),
+        selected = ViewBag.SelectedUnitId as int?
+    }, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+}
+
+<style>
+    .bv-legend button { border: 1px solid #dee2e6; background: #fff; border-radius: 6px; padding: 3px 10px; font-size: 13px; margin: 0 6px 6px 0; }
+    .bv-legend button.off { opacity: .35; }
+    .bv-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    #building .unit { cursor: pointer; transition: opacity .15s; }
+    #building .unit:hover rect { stroke-width: 2.5; }
+    #building .unit.dim { opacity: .18; }
+    #building .unit.sel rect { stroke-width: 3.5; }
+    .kv { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f3f5; font-size: 14px; }
+    .kv span:first-child { color: #6c757d; }
+    #panel { position: sticky; top: 12px; }
+    @@media print { .no-print, nav, footer { display: none !important; } #panel { position: static; } }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="mb-0">@Model.Name</h2>
+        <div class="text-muted">@Model.Code &middot; @Model.PropertyType &middot; @Model.OwnershipType @(string.IsNullOrWhiteSpace(Model.Address) ? "" : "· " + Model.Address)</div>
+    </div>
+    <div class="no-print d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">All buildings</a>
+        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-outline-secondary btn-sm">Property record</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Units</div><div class="fs-5">@Model.Units.Count</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Let</div><div class="fs-5">@Model.OccupancyPercent.ToString("0")%</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Healthy</div><div class="fs-5 text-success">@Model.Count("good")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Watch</div><div class="fs-5" style="color:#997404">@Model.Count("watch")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">At risk</div><div class="fs-5 text-danger">@Model.Count("risk")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Overdue</div><div class="fs-5">@Model.Overdue.ToString("N0")</div></div></div></div>
+</div>
+
+@if (Model.Units.Count == 0)
+{
+    <div class="alert alert-secondary">This property has no units yet. Add them in Master Data &rsaquo; Units, with their floor and area.</div>
+}
+else
+{
+    <div class="bv-legend no-print" id="legend"></div>
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <svg id="building" width="100%" role="img" aria-label="@Model.Name drawn floor by floor; each unit coloured by the health of its rent"></svg>
+            <p class="small text-muted mt-2">
+                Units are drawn in proportion to their area. Select a unit for its details, or a colour above to show only those units.
+                Floors come from each unit's floor (G = ground); set the floor number and position on the unit to arrange them exactly.
+            </p>
+        </div>
+        <div class="col-lg-5">
+            <div id="panel" class="card shadow-sm"><div class="card-body"><p class="text-muted mb-0">Select a unit to see its details.</p></div></div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+<script>
+(function () {
+    const data = @Html.Raw(json);
+    const svg = document.getElementById('building');
+    if (!svg) return;
+
+    const style = {
+        good:        { fill: '#d1e7dd', stroke: '#198754', text: '#0f5132', label: 'Healthy' },
+        watch:       { fill: '#fff3cd', stroke: '#e0a800', text: '#664d03', label: 'Watch' },
+        risk:        { fill: '#f8d7da', stroke: '#dc3545', text: '#842029', label: 'At risk' },
+        vacant:      { fill: '#f1f3f5', stroke: '#adb5bd', text: '#495057', label: 'Vacant' },
+        maintenance: { fill: 'url(#hatch)', stroke: '#adb5bd', text: '#495057', label: 'Maintenance' },
+        reserved:    { fill: '#cfe2ff', stroke: '#0d6efd', text: '#084298', label: 'Reserved' },
+        sold:        { fill: '#9ec5fe', stroke: '#0a58ca', text: '#052c65', label: 'Sold' }
+    };
+    const urls = {
+        statement: '@Url.Action("Index", "TenantStatements")',
+        lease: '@Url.Action("Edit", "Leases")',
+        sale: '@Url.Action("Details", "UnitSales")',
+        unit: '@Url.Action("Edit", "Units")'
+    };
+    const fmt = n => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+    const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    // ---- Geometry: a front face of floors, a side face and a roof drawn at an angle. ----
+    const floors = data.floors, nFloors = floors.length;
+    const maxUnits = Math.max(1, ...floors.map(f => f.units.length));
+    const W = Math.min(640, Math.max(320, maxUnits * 92));
+    const H = nFloors <= 10 ? 52 : Math.max(22, Math.floor(560 / nFloors));
+    const x0 = 46, depthX = 70, depthY = -40, y0 = 30 - depthY;
+    const bh = H * nFloors, vbW = x0 + W + depthX + 10, vbH = y0 + bh + 28;
+    svg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const el = (t, a, parent) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); (parent || svg).appendChild(e); return e; };
+
+    const defs = el('defs', {});
+    const pat = el('pattern', { id: 'hatch', width: 8, height: 8, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
+    el('rect', { width: 8, height: 8, fill: '#f1f3f5' }, pat);
+    el('line', { x1: 0, y1: 0, x2: 0, y2: 8, stroke: '#ced4da', 'stroke-width': 3 }, pat);
+
+    el('polygon', { points: `${x0},${y0} ${x0 + W},${y0} ${x0 + W + depthX},${y0 + depthY} ${x0 + depthX},${y0 + depthY}`, fill: '#e9ecef', stroke: '#adb5bd' });
+    el('polygon', { points: `${x0 + W},${y0} ${x0 + W + depthX},${y0 + depthY} ${x0 + W + depthX},${y0 + depthY + bh} ${x0 + W},${y0 + bh}`, fill: '#dee2e6', stroke: '#adb5bd' });
+    el('rect', { x: x0, y: y0, width: W, height: bh, fill: '#f8f9fa', stroke: '#adb5bd' });
+    el('line', { x1: 8, y1: y0 + bh, x2: vbW - 4, y2: y0 + bh, stroke: '#868e96', 'stroke-width': 2 });
+
+    const groups = [];
+    floors.forEach((f, i) => {
+        const y = y0 + i * H;
+        el('line', { x1: x0 + W, y1: y + H, x2: x0 + W + depthX, y2: y + H + depthY, stroke: '#ced4da' });
+        const label = el('text', { x: x0 - 10, y: y + H / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#6c757d' });
+        label.textContent = f.label;
+
+        if (f.units.length === 0) {
+            const t = el('text', { x: x0 + W / 2, y: y + H / 2 + 4, 'text-anchor': 'middle', 'font-size': 11, fill: '#adb5bd' });
+            if (H >= 22) t.textContent = 'no units recorded';
+            return;
+        }
+
+        // Widths in proportion to area, each unit at least a sliver wide.
+        const areas = f.units.map(u => Math.max(u.areaSqFt || 0, 1));
+        const total = areas.reduce((a, b) => a + b, 0);
+        let x = x0;
+        f.units.forEach((u, j) => {
+            const w = j === f.units.length - 1 ? x0 + W - x : W * areas[j] / total;
+            const s = style[u.health] || style.vacant;
+            const g = el('g', { class: 'unit', tabindex: 0, 'data-health': u.health, 'aria-label': `Unit ${u.unitNumber}, ${s.label}` });
+            el('rect', { x: x + 3, y: y + 3, width: Math.max(4, w - 6), height: H - 6, rx: 3, fill: s.fill, stroke: s.stroke, 'stroke-width': 1.2 }, g);
+            if (w > 34 && H >= 22) {
+                const t = el('text', { x: x + w / 2, y: y + H / 2 + 4, 'text-anchor': 'middle', 'font-size': H >= 40 ? 12 : 10, fill: s.text, 'pointer-events': 'none' }, g);
+                t.textContent = u.shortLabel;
+            }
+            g.addEventListener('click', () => select(u, g));
+            g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(u, g); } });
+            groups.push({ g, u });
+            x += w;
+        });
+    });
+    el('rect', { x: x0 + W / 2 - 18, y: y0 + bh - 3, width: 36, height: 6, fill: '#868e96' });
+
+    // ---- Legend: click a colour to show only those units. ----
+    const legend = document.getElementById('legend');
+    const present = Object.keys(style).filter(k => groups.some(x => x.u.health === k));
+    const active = new Set(present);
+    present.forEach(k => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        const n = groups.filter(x => x.u.health === k).length;
+        b.innerHTML = `<i style="background:${k === 'maintenance' ? '#dee2e6' : style[k].fill};border:1px solid ${style[k].stroke}"></i>${style[k].label} (${n})`;
+        b.addEventListener('click', () => {
+            if (active.size === present.length) { active.clear(); active.add(k); }
+            else if (active.has(k)) { active.delete(k); if (active.size === 0) present.forEach(p => active.add(p)); }
+            else active.add(k);
+            legend.querySelectorAll('button').forEach((btn, i) => btn.classList.toggle('off', !active.has(present[i])));
+            groups.forEach(x => x.g.classList.toggle('dim', !active.has(x.u.health)));
+        });
+        legend.appendChild(b);
+    });
+
+    // ---- The unit panel. ----
+    let current = null;
+    function row(label, value, cls) { return `<div class="kv"><span>${label}</span><span class="${cls || ''}">${value}</span></div>`; }
+    function select(u, g) {
+        if (current) current.classList.remove('sel');
+        current = g; g.classList.add('sel');
+        const s = style[u.health] || style.vacant;
+        let html = `<div class="d-flex justify-content-between align-items-start mb-2">
+            <div><h5 class="mb-0">Unit ${esc(u.unitNumber)}</h5><div class="small text-muted">Floor ${esc(u.floor)} &middot; ${esc(u.usage || '')} &middot; ${fmt(u.areaSqFt)} sq ft</div></div>
+            <span class="badge" style="background:${u.health === 'maintenance' ? '#dee2e6' : s.fill};color:${s.text};border:1px solid ${s.stroke}">${s.label}</span></div>`;
+
+        if (u.leaseId) {
+            html += `<p class="mb-2"><a href="${urls.statement}?tenantId=${u.tenantId}">${esc(u.tenantName)}</a>
+                <span class="small text-muted">&middot; <a href="${urls.lease}/${u.leaseId}">${esc(u.contractNumber)}</a></span></p>`;
+            html += row('Tenant health score', u.score == null ? 'not scored yet' : `${Math.round(u.score)} / 100 (grade ${esc(u.grade)})`);
+            html += row('Annual rent', fmt(u.annualRent));
+            html += row('Billed to date', fmt(u.invoiced));
+            html += row('Collected', fmt(u.collected));
+            html += row('Outstanding', fmt(u.outstanding), u.outstanding > 0 ? 'text-danger' : '');
+            html += row('Overdue', u.overdueAmount > 0 ? `${fmt(u.overdueAmount)} (oldest ${u.oldestOverdueDays} days)` : 'none', u.oldestOverdueDays > 30 ? 'text-danger' : '');
+            html += row('Bounced cheques (12 months)', u.bouncedCheques ? `${u.bouncedCheques} (${fmt(u.bouncedAmount)})` : 'none', u.bouncedCheques ? 'text-danger' : '');
+            html += row('Postponement requests (12 months)', u.postponements || 'none');
+            html += row('Contract ends', `${esc(u.contractEnd)} (${u.daysToExpiry} days)`, u.daysToExpiry <= 90 ? 'text-warning fw-bold' : '');
+            html += `<div class="small text-muted mt-3 mb-1">Billed rent collected: ${u.collectedPercent}%</div>
+                <div class="progress" style="height:8px"><div class="progress-bar bg-success" style="width:${u.collectedPercent}%"></div></div>`;
+        } else if (u.saleId) {
+            html += `<p class="mb-2">Buyer: ${esc(u.tenantName)} &middot; <a href="${urls.sale}/${u.saleId}">${esc(u.contractNumber)}</a></p>`;
+        } else {
+            html += row('Standard annual rent', fmt(u.standardAnnualRent));
+            if (u.vacantDays != null) {
+                html += row('Vacant for', `${u.vacantDays} days`);
+                html += row('Rent lost so far', fmt(u.standardAnnualRent * u.vacantDays / 365), 'text-danger');
+            }
+        }
+
+        html += `<div class="small fw-bold mt-3 mb-1">Why this colour</div><ul class="small mb-2 ps-3">${u.reasons.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+            <a class="small no-print" href="${urls.unit}/${u.unitId}">Edit the unit (floor, position, area)</a>`;
+        document.getElementById('panel').innerHTML = `<div class="card-body">${html}</div>`;
+    }
+
+    const pick = (data.selected && groups.find(x => x.u.unitId === data.selected))
+        || groups.find(x => x.u.health === 'risk') || groups.find(x => x.u.health === 'watch') || groups[0];
+    if (pick) select(pick.u, pick.g);
+})();
+</script>
+}

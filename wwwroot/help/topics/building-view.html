@@ -1,0 +1,38 @@
+<p><span class="path">Reporting ▸ Building View</span>, or <strong>Building view</strong> on a property's page.</p>
+<p>Each building drawn floor by floor, every unit coloured by the health of its rent, so an owner sees at a glance where the
+building earns well and where it needs attention. Select a unit for its details.</p>
+
+<h3>All buildings</h3>
+<p>The first page shows every property as a card: how much of it is let, a bar of its units by colour, the counts of healthy,
+watch and at-risk units, and the rent overdue. <strong>Open building</strong> draws it.</p>
+
+<h3>The colours</h3>
+<table class="fields t-compact">
+    <thead><tr><th>Colour</th><th>When</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Green - healthy</strong></td><td>Let, and none of the warning signs below</td></tr>
+        <tr><td><strong>Yellow - watch</strong></td><td>Tenant health score below 75, or rent overdue more than 30 days, or a request to postpone a payment in the last 12 months</td></tr>
+        <tr><td><strong>Red - at risk</strong></td><td>Tenant health score below 55, or rent overdue more than 90 days, or a cheque on the contract bounced in the last 12 months</td></tr>
+        <tr><td><strong>Grey</strong></td><td>Vacant (no current contract); striped grey is under maintenance</td></tr>
+        <tr><td><strong>Blue</strong></td><td>Reserved for a buyer (light) or sold and handed over (darker) - see <a href="#unit-sales">Unit Sales</a></td></tr>
+    </tbody>
+</table>
+<p>The score is the tenant's score from <a href="#management-reports">Tenant Health &amp; Ranking</a>, so the drawing and the report
+always agree. Select a colour above the drawing to show only those units; select it again to show all.</p>
+
+<h3>A unit's details</h3>
+<p>Selecting a unit shows its tenant (linked to their statement) and contract, the health score and grade, the annual rent,
+what was billed, collected, outstanding and overdue (with the age of the oldest overdue item), bounced cheques and postponement
+requests in the last 12 months, the days to the contract's end (highlighted inside 90 days), a bar of billed rent collected, and
+<strong>Why this colour</strong> - each reason that set it. For a vacant unit it shows how long it has been empty and the rent lost.</p>
+
+<h3>How the building is drawn</h3>
+<ul>
+    <li>Floors run from the lowest to the highest unit, and up to the property's <em>Number of floors</em> when recorded, so a tower
+        with only some units entered still has its full height. Floors with no units say so.</li>
+    <li>Each unit is placed on its floor by the unit's <strong>Floor number</strong>; when that is empty, it is read from the
+        <em>Floor</em> text (G = ground, 3 = third, B1 = first basement).</li>
+    <li>Along the floor, units go left to right by <strong>Position on the floor</strong>, then by unit number, and each is as wide as
+        its share of the floor's area.</li>
+</ul>
+<p>Set both on the unit in <span class="path">Master Data ▸ Units ▸ Edit</span> to arrange a building exactly as it stands.</p>

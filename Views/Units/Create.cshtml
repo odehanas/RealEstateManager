@@ -59,6 +59,18 @@
         </div>
 
         <div class="col-md-4">
+            <label asp-for="FloorNumber" class="form-label"></label>
+            <input asp-for="FloorNumber" class="form-control" min="-10" max="200" placeholder="0 = ground" />
+            <div class="form-text">Optional. Read from Floor when empty (G = 0, B1 = -1).</div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="FloorPosition" class="form-label"></label>
+            <input asp-for="FloorPosition" class="form-control" min="1" max="200" placeholder="1 = far left" />
+            <div class="form-text">Optional. Left to right in the building view; by unit number when empty.</div>
+        </div>
+
+        <div class="col-md-4">
             <label asp-for="TitleDeedNumber" class="form-label"></label>
             <input asp-for="TitleDeedNumber" class="form-control" maxlength="50" />
             <div class="form-text">Only when the unit has its own deed (strata title).</div>

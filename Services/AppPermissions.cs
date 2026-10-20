@@ -179,7 +179,8 @@ namespace RealEstateManager.Services
                 ["DevelopmentProjects"] = new[] { AppPermissions.AccountingManage },
                 ["InvestmentProperty"] = new[] { AppPermissions.ReportsView },
                 ["UnitSales"] = new[] { AppPermissions.AccountingManage },
-                ["CapitalAssetVat"] = new[] { AppPermissions.AccountingManage }
+                ["CapitalAssetVat"] = new[] { AppPermissions.AccountingManage },
+                ["BuildingView"] = new[] { AppPermissions.ReportsView }
             };
 
         private static readonly Dictionary<string, string[]> ActionPermissionMap =

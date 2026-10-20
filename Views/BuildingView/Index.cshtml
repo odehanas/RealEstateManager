@@ -1,0 +1,64 @@
+@model List<RealEstateManager.Services.BuildingSummaryDto>
+
+@{
+    ViewData["Title"] = "Building View";
+}
+
+<style>
+    .bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: #f1f3f5; }
+    .bar span { display: block; height: 100%; }
+    .h-good { background: #75b798; } .h-watch { background: #ffda6a; } .h-risk { background: #ea868f; }
+    .h-vacant { background: #ced4da; } .h-sold { background: #6ea8fe; }
+    .key i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 12px; vertical-align: -1px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="mb-0">Building View</h2>
+</div>
+
+<p class="text-muted">
+    Every building, with its units coloured by the health of their rent. Open a building to see it floor by floor and select
+    any unit for its details.
+    <span class="key small"><i class="h-good"></i>Healthy<i class="h-watch"></i>Watch<i class="h-risk"></i>At risk<i class="h-vacant"></i>Vacant<i class="h-sold"></i>Sold or reserved</span>
+</p>
+
+<div class="row g-3">
+    @if (Model.Count == 0)
+    {
+        <div class="col-12"><div class="alert alert-secondary">No properties yet.</div></div>
+    }
+    @foreach (var b in Model)
+    {
+        var total = Math.Max(1, b.Units);
+        <div class="col-md-6 col-xl-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="mb-0">@b.Name</h5>
+                            <div class="small text-muted">@b.Code &middot; @b.OwnershipType &middot; @b.Units unit(s) on @b.Floors floor(s)</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-5">@b.OccupancyPercent.ToString("0")%</div>
+                            <div class="small text-muted">let</div>
+                        </div>
+                    </div>
+                    <div class="bar my-3" title="@b.Good healthy, @b.Watch watch, @b.Risk at risk, @b.Vacant vacant, @b.SoldOrReserved sold or reserved">
+                        <span class="h-good" style="width:@(b.Good * 100m / total)%"></span>
+                        <span class="h-watch" style="width:@(b.Watch * 100m / total)%"></span>
+                        <span class="h-risk" style="width:@(b.Risk * 100m / total)%"></span>
+                        <span class="h-vacant" style="width:@(b.Vacant * 100m / total)%"></span>
+                        <span class="h-sold" style="width:@(b.SoldOrReserved * 100m / total)%"></span>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span><strong class="text-success">@b.Good</strong> healthy &middot; <strong class="text-warning">@b.Watch</strong> watch &middot; <strong class="text-danger">@b.Risk</strong> at risk</span>
+                        <span class="text-muted">overdue @b.Overdue.ToString("N0")</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0">
+                    <a asp-action="Property" asp-route-id="@b.PropertyId" class="btn btn-sm btn-dark">Open building</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

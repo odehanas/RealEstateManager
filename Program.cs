@@ -178,6 +178,7 @@ builder.Services.AddScoped<InvestmentPropertySetupService>();
 builder.Services.AddScoped<RealEstateVatService>();
 builder.Services.AddScoped<UnitSaleService>();
 builder.Services.AddScoped<CapitalAssetVatService>();
+builder.Services.AddScoped<BuildingViewService>();
 builder.Services.AddScoped<FixedAssetService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();

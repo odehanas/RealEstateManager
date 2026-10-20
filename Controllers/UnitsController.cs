@@ -114,6 +114,8 @@ namespace RealEstateManager.Controllers
                 // Blank means inherit the property's VAT treatment.
                 VatCategory = string.IsNullOrWhiteSpace(model.VatCategory) ? null : model.VatCategory,
                 TitleDeedNumber = Clean(model.TitleDeedNumber),
+                FloorNumber = model.FloorNumber,
+                FloorPosition = model.FloorPosition,
                 ParkingBays = model.ParkingBays,
                 UtilityAccountNumber = Clean(model.UtilityAccountNumber),
                 IsActive = true
@@ -150,6 +152,8 @@ namespace RealEstateManager.Controllers
                 Status = unit.Status,
                 VatCategory = unit.VatCategory,
                 TitleDeedNumber = unit.TitleDeedNumber,
+                FloorNumber = unit.FloorNumber,
+                FloorPosition = unit.FloorPosition,
                 ParkingBays = unit.ParkingBays,
                 UtilityAccountNumber = unit.UtilityAccountNumber
             };
@@ -197,6 +201,8 @@ namespace RealEstateManager.Controllers
             unit.Status = model.Status;
             unit.VatCategory = string.IsNullOrWhiteSpace(model.VatCategory) ? null : model.VatCategory;
             unit.TitleDeedNumber = Clean(model.TitleDeedNumber);
+            unit.FloorNumber = model.FloorNumber;
+            unit.FloorPosition = model.FloorPosition;
             unit.ParkingBays = model.ParkingBays;
             unit.UtilityAccountNumber = Clean(model.UtilityAccountNumber);
 

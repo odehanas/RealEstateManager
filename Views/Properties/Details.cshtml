@@ -26,6 +26,7 @@
     </div>
     <div class="no-print d-flex gap-2">
         <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+        <a asp-controller="BuildingView" asp-action="Property" asp-route-id="@Model.Id" class="btn btn-outline-dark btn-sm">Building view</a>
         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
         @if (canEdit)
         {
