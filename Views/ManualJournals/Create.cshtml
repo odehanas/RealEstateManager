@@ -1,4 +1,4 @@
-﻿@model RealEstateManager.Models.ManualJournalEntryViewModel
+@model RealEstateManager.Models.ManualJournalEntryViewModel
 @using RealEstateManager.Domain
 
 @{
@@ -11,6 +11,7 @@
     var leases = ViewBag.Leases as List<Lease> ?? new();
     var ownerCategories = ViewBag.OwnerWithdrawalCategories as List<OwnerWithdrawalCategory> ?? new();
     var ownerAccountIds = ViewBag.OwnerAccountIds as List<int> ?? new();
+    var projects = ViewBag.DevelopmentProjects as List<RealEstateManager.Models.DevelopmentCostOption> ?? new();
 }
 
 <style>
@@ -68,6 +69,10 @@
                     <th style="min-width: 180px;">Line Memo</th>
                     <th style="min-width: 140px;">Unit Cost Center</th>
                     <th style="min-width: 190px;">Owner Withdrawal Category</th>
+                    @if (projects.Count > 0)
+                    {
+                        <th style="min-width: 220px;">Development Cost</th>
+                    }
                     <th class="text-end" style="min-width: 120px;">Debit</th>
                     <th class="text-end" style="min-width: 120px;">Credit</th>
                     <th class="advanced-ref d-none" style="min-width: 160px;">Tenant (AR)</th>
@@ -112,6 +117,28 @@
                                 }
                             </select>
                         </td>
+
+                        @if (projects.Count > 0)
+                        {
+                            <td>
+                                <select name="Lines[@i].DevelopmentCost" class="form-select line-project">
+                                    <option value="">Not applicable</option>
+                                    @foreach (var project in projects)
+                                    {
+                                        <optgroup label="@project.ProjectLabel">
+                                            @foreach (var costCategory in DevelopmentCostCategories.All)
+                                            {
+                                                var tag = project.ProjectId + "|" + costCategory;
+                                                <option value="@tag" data-account="@project.WipAccountId"
+                                                        selected="@(tag == Model.Lines[i].DevelopmentCost ? "selected" : null)">
+                                                    @DevelopmentCostCategories.Describe(costCategory)
+                                                </option>
+                                            }
+                                        </optgroup>
+                                    }
+                                </select>
+                            </td>
+                        }
 
                         <td>
                             <input asp-for="Lines[@i].Debit" class="form-control text-end" />
@@ -212,6 +239,18 @@
             document.querySelectorAll("tbody tr").forEach(function (row) {
                 var accountSelect = row.querySelector("select[name$='.AccountId']");
                 if (!accountSelect) return;
+
+                // A development cost is posted to its project's account: choosing one sets it.
+                var projectSelect = row.querySelector("select.line-project");
+                if (projectSelect) {
+                    projectSelect.addEventListener("change", function () {
+                        var option = projectSelect.options[projectSelect.selectedIndex];
+                        if (projectSelect.value && option && option.dataset.account) {
+                            accountSelect.value = option.dataset.account;
+                            syncRow(row);
+                        }
+                    });
+                }
 
                 accountSelect.addEventListener("change", function () { syncRow(row); });
                 syncRow(row);

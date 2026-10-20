@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
 using RealEstateManager.Domain;
@@ -113,6 +113,9 @@ namespace RealEstateManager.Controllers
                 Status = model.Status,
                 // Blank means inherit the property's VAT treatment.
                 VatCategory = string.IsNullOrWhiteSpace(model.VatCategory) ? null : model.VatCategory,
+                TitleDeedNumber = Clean(model.TitleDeedNumber),
+                ParkingBays = model.ParkingBays,
+                UtilityAccountNumber = Clean(model.UtilityAccountNumber),
                 IsActive = true
             };
 
@@ -145,7 +148,10 @@ namespace RealEstateManager.Controllers
                 AreaSqFt = unit.AreaSqFt,
                 StandardAnnualRent = unit.StandardAnnualRent,
                 Status = unit.Status,
-                VatCategory = unit.VatCategory
+                VatCategory = unit.VatCategory,
+                TitleDeedNumber = unit.TitleDeedNumber,
+                ParkingBays = unit.ParkingBays,
+                UtilityAccountNumber = unit.UtilityAccountNumber
             };
 
             return View(model);
@@ -190,10 +196,15 @@ namespace RealEstateManager.Controllers
             unit.StandardAnnualRent = model.StandardAnnualRent;
             unit.Status = model.Status;
             unit.VatCategory = string.IsNullOrWhiteSpace(model.VatCategory) ? null : model.VatCategory;
+            unit.TitleDeedNumber = Clean(model.TitleDeedNumber);
+            unit.ParkingBays = model.ParkingBays;
+            unit.UtilityAccountNumber = Clean(model.UtilityAccountNumber);
 
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
+
+        private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 }

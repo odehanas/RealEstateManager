@@ -10,6 +10,7 @@
                      ?? new List<RealEstateManager.Domain.Property>();
     var accounts = ViewBag.Accounts as List<SelectListItem> ?? new List<SelectListItem>();
     var attributions = ViewBag.Attributions as List<SelectListItem> ?? new List<SelectListItem>();
+    var projects = ViewBag.DevelopmentProjects as List<RealEstateManager.Models.DevelopmentCostOption> ?? new();
 }
 
 <style>
@@ -175,7 +176,7 @@
                     <tr>
                         <th style="width:26%">Description</th>
                         <th style="width:20%">Account</th>
-                        <th style="width:14%">Property</th>
+                        <th style="width:14%">Property@(projects.Count > 0 ? " / Project" : "")</th>
                         <th style="width:8%" class="num">Qty</th>
                         <th style="width:11%" class="num">Unit Price</th>
                         <th style="width:6%">VAT</th>
@@ -216,6 +217,26 @@
                                         </option>
                                     }
                                 </select>
+                                @if (projects.Count > 0)
+                                {
+                                    @* A development cost: picking a project and category charges the line to the project's account. *@
+                                    <select name="Lines[@i].DevelopmentCost" class="form-select form-select-sm mt-1 line-project" title="Development cost">
+                                        <option value="">-- not a development cost --</option>
+                                        @foreach (var project in projects)
+                                        {
+                                            <optgroup label="@project.ProjectLabel">
+                                                @foreach (var category in RealEstateManager.Domain.DevelopmentCostCategories.All)
+                                                {
+                                                    var tag = project.ProjectId + "|" + category;
+                                                    <option value="@tag" data-account="@project.WipAccountId" data-property="@project.PropertyId"
+                                                            selected="@(tag == line.DevelopmentCost ? "selected" : null)">
+                                                        @RealEstateManager.Domain.DevelopmentCostCategories.Describe(category)
+                                                    </option>
+                                                }
+                                            </optgroup>
+                                        }
+                                    </select>
+                                }
                             </td>
                             <td>
                                 <input type="number" step="0.01" name="Lines[@i].Quantity" value="@line.Quantity"
@@ -406,6 +427,9 @@
                 const propertySelect = clone.querySelector('select[name*="PropertyId"]');
                 if (propertySelect && defaultProperty) { propertySelect.value = defaultProperty.value; }
 
+                const projectSelect = clone.querySelector('.line-project');
+                if (projectSelect) { projectSelect.value = ''; }
+
                 body.appendChild(clone);
                 bindRow(clone);
                 renumber();
@@ -443,6 +467,19 @@
                         field.addEventListener('input', recalculate);
                         field.addEventListener('change', recalculate);
                     });
+
+                // Choosing a development cost moves the line onto the project's account and property.
+                const projectSelect = row.querySelector('.line-project');
+                if (projectSelect) {
+                    projectSelect.addEventListener('change', function () {
+                        const option = projectSelect.options[projectSelect.selectedIndex];
+                        if (!projectSelect.value || !option) { return; }
+                        const accountSelect = row.querySelector('select[name*="AccountId"]');
+                        const propertySelect = row.querySelector('select[name*="PropertyId"]');
+                        if (accountSelect && option.dataset.account) { accountSelect.value = option.dataset.account; }
+                        if (propertySelect && option.dataset.property) { propertySelect.value = option.dataset.property; }
+                    });
+                }
 
                 const removeButton = row.querySelector('.remove-line');
                 if (removeButton) {

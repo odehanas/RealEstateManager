@@ -163,6 +163,13 @@ namespace RealEstateManager.Services
         private readonly CreditNoteService _creditNotes;
         private readonly OwnerSettlementService _ownerSettlements;
         private readonly OwnerCommissionInvoiceService _commissionInvoices;
+        private readonly DevelopmentProjectService _developmentProjects;
+        private readonly DevelopmentTransferService _developmentTransfers;
+        private readonly InvestmentPropertySetupService _investmentPropertySetup;
+        private readonly UnitSaleService _unitSales;
+        private readonly List<int> _saleIds = new();
+        private int _projectId;
+        private int _annexProjectId;
 
         private readonly SampleDataResult _result = new();
 
@@ -195,7 +202,11 @@ namespace RealEstateManager.Services
             FixedAssetService fixedAssets,
             CreditNoteService creditNotes,
             OwnerSettlementService ownerSettlements,
-            OwnerCommissionInvoiceService commissionInvoices)
+            OwnerCommissionInvoiceService commissionInvoices,
+            DevelopmentProjectService developmentProjects,
+            DevelopmentTransferService developmentTransfers,
+            InvestmentPropertySetupService investmentPropertySetup,
+            UnitSaleService unitSales)
         {
             _db = db;
             _posting = posting;
@@ -209,6 +220,10 @@ namespace RealEstateManager.Services
             _creditNotes = creditNotes;
             _ownerSettlements = ownerSettlements;
             _commissionInvoices = commissionInvoices;
+            _developmentProjects = developmentProjects;
+            _developmentTransfers = developmentTransfers;
+            _investmentPropertySetup = investmentPropertySetup;
+            _unitSales = unitSales;
         }
 
         public async Task<SampleDataResult> BuildAsync(int companyId, int? userId)
@@ -243,6 +258,8 @@ namespace RealEstateManager.Services
             await SetOpeningBalancesAsync();
             await CreateMasterDataAsync();
             await CreateLeasesAsync();
+            await CreateDevelopmentProjectAsync();
+            await SetUpBuildingDepreciationAsync();
 
             for (var month = _start; month <= _today; month = month.AddMonths(1))
             {
@@ -353,6 +370,90 @@ namespace RealEstateManager.Services
 
             // A VAT-registered landlord, so the commission tax invoice shows a recipient TRN.
             corniche.OwnerTrn = "100456789100003";
+
+            // Registration details, as they appear on the title deeds and permits.
+            void Register(Property property, string area, string plot, string deed, DateTime deedDate, string landUse,
+                decimal plotArea, decimal builtUp, int floors, int parking, DateTime? completed, string insurer, DateTime insuranceExpiry)
+            {
+                property.Emirate = "Ras Al Khaimah";
+                property.AreaName = area;
+                property.PlotNumber = plot;
+                property.MunicipalityNumber = "M-" + plot.Replace("/", "");
+                property.TitleDeedNumber = deed;
+                property.TitleDeedDate = deedDate;
+                property.TitleDeedAuthority = "Ras Al Khaimah Land Department";
+                property.TenureType = "Freehold";
+                property.LandUse = landUse;
+                property.PlotAreaSqFt = plotArea;
+                property.OwnershipPercentage = 100m;
+                property.BuiltUpAreaSqFt = builtUp;
+                property.NumberOfFloors = floors;
+                property.ParkingBays = parking;
+                property.CompletionDate = completed;
+                property.CompletionCertificateNumber = completed.HasValue ? "CC-" + completed.Value.Year + "-" + plot.Replace("/", "") : null;
+                property.Insurer = insurer;
+                property.InsurancePolicyNumber = "POL-" + plot.Replace("/", "");
+                property.InsuranceExpiryDate = insuranceExpiry;
+            }
+
+            Register(marina, "Al Marjan Island", "214/7", "TD-2019-004417", new DateTime(2019, 3, 12), "Residential",
+                42_000m, 118_000m, 12, 96, new DateTime(2019, 2, 20), "Al Ameen Insurance PJSC", _today.AddDays(45));
+            Register(naeem, "Al Nakheel", "88/3", "TD-2017-001932", new DateTime(2017, 9, 4), "Commercial",
+                36_500m, 152_000m, 15, 140, new DateTime(2017, 7, 30), "Al Ameen Insurance PJSC", _today.AddMonths(7));
+            Register(corniche, "Corniche Al Qawasim", "12/41", "TD-2015-000876", new DateTime(2015, 5, 18), "Commercial",
+                18_000m, 32_000m, 2, 40, new DateTime(2015, 4, 2), "Owner's insurer", _today.AddMonths(4));
+            Register(palm, "Mina Al Arab", "301/2", "TD-2021-006120", new DateTime(2021, 11, 7), "Residential",
+                24_000m, 9_800m, 2, 8, new DateTime(2021, 10, 15), "Owner's insurer", _today.AddMonths(10));
+            marina.FairValue = 19_800_000m;
+            marina.FairValueDate = new DateTime(_start.Year - 1, 12, 31);
+            marina.ValuerName = "Gulf Property Valuers LLC";
+            naeem.FairValue = 26_400_000m;
+            naeem.FairValueDate = new DateTime(_start.Year - 1, 12, 31);
+            naeem.ValuerName = "Gulf Property Valuers LLC";
+            naeem.IsMortgaged = true;
+            naeem.MortgageDetails = "Emirates Islamic - facility ref. EI-RAK-55102";
+
+            await _db.SaveChangesAsync();
+
+            // A plot being developed into flats for sale: the development project's building.
+            var marjanBay = await AddProperty("marjanbay", "Marjan Bay Residences", "Residential", "Owned", VatCategories.Exempt,
+                "Al Marjan Island, Ras Al Khaimah", 0m);
+            marjanBay.Emirate = "Ras Al Khaimah";
+            marjanBay.AreaName = "Al Marjan Island";
+            marjanBay.PlotNumber = "219/1";
+            marjanBay.TitleDeedNumber = "TD-" + _start.Year + "-007301";
+            marjanBay.TitleDeedDate = _start.AddDays(14);
+            marjanBay.TitleDeedAuthority = "Ras Al Khaimah Land Department";
+            marjanBay.TenureType = "Freehold";
+            marjanBay.LandUse = "Residential";
+            marjanBay.PlotAreaSqFt = 28_000m;
+            marjanBay.BuildingPermitNumber = "BP-" + _start.Year + "-0219";
+            marjanBay.BuildingPermitDate = _start.AddMonths(1).AddDays(9);
+            marjanBay.NumberOfFloors = 14;
+            marjanBay.DeveloperName = _company.Name;
+            marjanBay.MainContractor = "Al Hamra Contracting LLC";
+            marjanBay.ConsultantName = "Gulf Design Consultants";
+            await _db.SaveChangesAsync();
+
+            // A four-shop retail block built on spare land beside the business centre, to rent out.
+            var annex = await AddProperty("annex", "Al Naeem Retail Annex", "Commercial", "Owned", VatCategories.Standard,
+                "Al Nakheel, Ras Al Khaimah", 0m);
+            annex.Emirate = "Ras Al Khaimah";
+            annex.AreaName = "Al Nakheel";
+            annex.PlotNumber = "88/4";
+            annex.TitleDeedNumber = "TD-2018-002210";
+            annex.TitleDeedDate = new DateTime(2018, 4, 9);
+            annex.TitleDeedAuthority = "Ras Al Khaimah Land Department";
+            annex.TenureType = "Freehold";
+            annex.LandUse = "Commercial";
+            annex.PlotAreaSqFt = 6_500m;
+            annex.BuildingPermitNumber = "BP-" + _start.Year + "-0088";
+            annex.BuildingPermitDate = _start.AddDays(5);
+            annex.NumberOfFloors = 1;
+            annex.MainContractor = "Al Hamra Contracting LLC";
+            annex.FairValue = 2_250_000m;
+            annex.FairValueDate = _start.AddMonths(4).AddDays(-1);
+            annex.ValuerName = "Gulf Property Valuers LLC";
             await _db.SaveChangesAsync();
 
             async Task AddUnit(Property property, string floor, string usage, decimal area, decimal rent, string status = "Vacant")
@@ -384,6 +485,14 @@ namespace RealEstateManager.Services
             await AddUnit(corniche, "G", "Clinic", 1100, 96_000);
             await AddUnit(palm, "-", "Villa 4BR", 3800, 140_000);
             await AddUnit(palm, "-", "Villa 4BR", 3800, 145_000);
+            await AddUnit(marjanBay, "3", "Apartment 1BR", 820, 0);
+            await AddUnit(marjanBay, "5", "Apartment 2BR", 1_240, 0);
+            await AddUnit(marjanBay, "8", "Apartment 2BR", 1_260, 0);
+            await AddUnit(marjanBay, "12", "Apartment 3BR", 1_680, 0);
+            await AddUnit(annex, "G", "Retail", 950, 70_000);
+            await AddUnit(annex, "G", "Retail", 950, 70_000);
+            await AddUnit(annex, "G", "Retail", 1200, 85_000);
+            await AddUnit(annex, "G", "Retail", 1400, 95_000);
 
             async Task AddTenant(string key, string name, string email, string phone, string nationality,
                 string? eid = null, string? passport = null, string? licence = null, string? trn = null)
@@ -447,6 +556,8 @@ namespace RealEstateManager.Services
 
             await AddVendor("facility", "Emirates Facility Services LLC", "Cleaning & Security", "Anil Kumar", true, "100000000600003");
             await AddVendor("cooltech", "CoolTech Air Conditioning", "HVAC Maintenance", "Yousef Darwish", true, "100000000700003");
+            await AddVendor("contractor", "Al Hamra Contracting LLC", "Main Contractor", "Imran Siddiqui", true, "100000001000003");
+            await AddVendor("consultant", "Gulf Design Consultants", "Architecture & Supervision", "Layla Haddad", true, "100000001100003");
             await AddVendor("handyman", "Rashid Handyman Services", "General Repairs", "Rashid Khan", false, null);
             await AddVendor("utilities", "Northern Utilities Company", "Water & Electricity", "Customer Service", true, "100000000800003");
             await AddVendor("insurance", "Al Ameen Insurance PJSC", "Property Insurance", "Mona Saeed", true, "100000000900003");
@@ -540,6 +651,8 @@ namespace RealEstateManager.Services
             if (monthEnd <= _today)
             {
                 await SupplierBillsAsync(index, monthStart, monthEnd);
+                await DevelopmentCostsAsync(index, monthStart, monthEnd);
+                await UnitSalesAsync(index, monthStart, monthEnd);
                 await MonthEndJournalsAsync(index, monthStart, monthEnd);
 
                 await _posting.ProcessRevenueRecognitionUpToAsync(monthEnd);
@@ -781,6 +894,266 @@ namespace RealEstateManager.Services
                     ("Door lock and hinge repairs", "52100", marina, 1, 650m, false, InputTaxAttributions.Exempt),
                     ("Paint touch-up - corridors", "52100", marina, 1, 1_200m, false, InputTaxAttributions.Exempt));
             }
+        }
+
+        // =====================================================================
+        //  DEVELOPMENT PROJECT
+        // =====================================================================
+
+        private async Task CreateDevelopmentProjectAsync()
+        {
+            await TryAsync("create development project", async () =>
+            {
+                var budget = new Dictionary<string, decimal>
+                {
+                    [DevelopmentCostCategories.Land] = 6_120_000m,
+                    [DevelopmentCostCategories.Design] = 900_000m,
+                    [DevelopmentCostCategories.Permits] = 250_000m,
+                    [DevelopmentCostCategories.Construction] = 18_000_000m,
+                    [DevelopmentCostCategories.Infrastructure] = 1_200_000m,
+                    [DevelopmentCostCategories.Supervision] = 600_000m,
+                    [DevelopmentCostCategories.Other] = 300_000m
+                };
+
+                _annexProjectId = await _developmentProjects.SaveAsync(new DevelopmentProjectFormViewModel
+                {
+                    Name = "Al Naeem Retail Annex",
+                    PropertyId = _properties["annex"].Id,
+                    IntendedUse = DevelopmentIntendedUses.Rental,
+                    WipAccountId = _acc["15500"],
+                    StartDate = _start.AddDays(5),
+                    ExpectedCompletionDate = _start.AddMonths(3).AddDays(14),
+                    MainContractorVendorId = _vendors["contractor"].Id,
+                    Notes = "Four ground-floor shops built to rent out.",
+                    Budget = DevelopmentCostCategories.All
+                        .Select(c => new DevelopmentBudgetInput
+                        {
+                            Category = c,
+                            Amount = c switch
+                            {
+                                DevelopmentCostCategories.Land => 450_000m,
+                                DevelopmentCostCategories.Design => 40_000m,
+                                DevelopmentCostCategories.Permits => 15_000m,
+                                DevelopmentCostCategories.Construction => 760_000m,
+                                _ => 0m
+                            }
+                        })
+                        .ToList()
+                });
+
+                _projectId = await _developmentProjects.SaveAsync(new DevelopmentProjectFormViewModel
+                {
+                    Name = "Marjan Bay Residences",
+                    PropertyId = _properties["marjanbay"].Id,
+                    IntendedUse = DevelopmentIntendedUses.Sale,
+                    WipAccountId = _acc["13100"],
+                    StartDate = _start.AddDays(14),
+                    ExpectedCompletionDate = _start.AddMonths(30).AddDays(-1),
+                    MainContractorVendorId = _vendors["contractor"].Id,
+                    Notes = "14-storey residential tower, 112 apartments, built for sale.",
+                    Budget = DevelopmentCostCategories.All
+                        .Select(c => new DevelopmentBudgetInput { Category = c, Amount = budget.GetValueOrDefault(c) })
+                        .ToList()
+                });
+            });
+        }
+
+        private async Task DevelopmentCostsAsync(int index, DateTime monthStart, DateTime monthEnd)
+        {
+            await AnnexAsync(index, monthStart, monthEnd);
+
+            if (_projectId == 0)
+                return;
+
+            async Task Direct(DateTime date, string category, string text, decimal amount, string creditCode, string reference)
+            {
+                await TryAsync($"development cost {reference}", async () =>
+                {
+                    var warning = await _developmentProjects.RecordCostAsync(_projectId, date, category, text, amount, _acc[creditCode], reference);
+                    if (warning != null)
+                        throw new InvalidOperationException(warning);
+                });
+            }
+
+            if (index == 0)
+            {
+                // The plot was contributed by the shareholders, and its transfer fee paid from the bank.
+                await Direct(monthStart.AddDays(14), DevelopmentCostCategories.Land,
+                    "Plot 219/1 Al Marjan Island - contributed in kind by the shareholders", 6_000_000m, "31100", "TD-PLOT-219");
+                await Direct(monthStart.AddDays(20), DevelopmentCostCategories.Land,
+                    "Land transfer registration fee", 120_000m, "11100", "LD-RCPT-4471");
+            }
+
+            if (index == 1)
+                await Direct(monthStart.AddDays(9), DevelopmentCostCategories.Permits, "Building permit fee", 85_000m, "11100", "BP-FEE-0219");
+
+            if (index == 5)
+                await Direct(monthStart.AddDays(12), DevelopmentCostCategories.Infrastructure,
+                    "Electricity and water connection charges", 95_000m, "11100", "UTIL-CONN-219");
+
+            if (index <= 3)
+            {
+                await ProjectBillAsync("consultant", $"GDC-{monthStart:yyMM}", monthEnd.AddDays(-2), "Design and consultancy",
+                    ("Architectural and structural design - stage " + (index + 1), DevelopmentCostCategories.Design, 75_000m));
+            }
+
+            if (index >= 2)
+            {
+                await ProjectBillAsync("contractor", $"AHC-IPC-{index - 1:00}", monthEnd.AddDays(-3), "Construction progress",
+                    ($"Interim payment certificate {index - 1} - substructure and frame", DevelopmentCostCategories.Construction, 140_000m + index * 10_000m));
+            }
+
+            if (index >= 3)
+            {
+                await ProjectBillAsync("consultant", $"GDC-SUP-{monthStart:yyMM}", monthEnd.AddDays(-1), "Site supervision",
+                    ($"Site supervision - {monthStart:MMMM yyyy}", DevelopmentCostCategories.Supervision, 18_000m));
+            }
+        }
+
+        /// <summary>
+        /// The annex: built in three months, completed, and its cost transferred to investment
+        /// property in month four - land kept apart, the building depreciated from then on.
+        /// </summary>
+        private async Task AnnexAsync(int index, DateTime monthStart, DateTime monthEnd)
+        {
+            if (_annexProjectId == 0 || index > 3)
+                return;
+
+            async Task Direct(DateTime date, string category, string text, decimal amount, string creditCode, string reference)
+            {
+                await TryAsync($"annex cost {reference}", async () =>
+                {
+                    var warning = await _developmentProjects.RecordCostAsync(_annexProjectId, date, category, text, amount, _acc[creditCode], reference);
+                    if (warning != null)
+                        throw new InvalidOperationException(warning);
+                });
+            }
+
+            if (index == 0)
+            {
+                await Direct(monthStart.AddDays(5), DevelopmentCostCategories.Land,
+                    "Plot 88/4 Al Nakheel - moved from the business centre's land", 450_000m, "31100", "TD-2018-002210");
+                await Direct(monthStart.AddDays(6), DevelopmentCostCategories.Permits, "Building permit fee", 15_000m, "11100", "BP-FEE-0088");
+                await ProjectBillAsync("consultant", $"GDC-ANX-{monthStart:yyMM}", monthEnd.AddDays(-4), "Annex design", _annexProjectId, "annex",
+                    ("Annex design and tender drawings", DevelopmentCostCategories.Design, 40_000m));
+            }
+
+            if (index <= 2)
+            {
+                await ProjectBillAsync("contractor", $"AHC-ANX-{index + 1:00}", monthEnd.AddDays(-6), "Annex construction", _annexProjectId, "annex",
+                    ($"Annex construction - certificate {index + 1}", DevelopmentCostCategories.Construction, 250_000m));
+            }
+
+            if (index == 3)
+            {
+                await TryAsync("complete and transfer the annex", async () =>
+                {
+                    await _developmentProjects.CompleteAsync(_annexProjectId, monthStart.AddDays(4), "CC-" + monthStart.Year + "-0088");
+
+                    var units = await _developmentTransfers.GetUnitsAsync(_annexProjectId);
+                    await _developmentTransfers.TransferAsync(_annexProjectId, monthStart.AddDays(9), 30,
+                        units.ToDictionary(x => x.Id, _ => DevelopmentIntendedUses.Rental), "Sample data");
+                });
+            }
+        }
+
+        /// <summary>
+        /// The business centre came in as an opening balance; it is brought under the cost model
+        /// (land not depreciated, building over its remaining life). Marina Heights is left for
+        /// the user to set up as an exercise.
+        /// </summary>
+        private async Task SetUpBuildingDepreciationAsync()
+        {
+            await TryAsync("depreciate the business centre", async () =>
+            {
+                await _investmentPropertySetup.SetUpAsync(_properties["naeem"].Id, _start, 9_000_000m, 15_000_000m, 45, true);
+            });
+        }
+
+        /// <summary>
+        /// Off-plan sales in the tower: each first sale of a new flat is zero rated. The buyers pay
+        /// 20% on signing, then by the plan; payments are advances until handover.
+        /// </summary>
+        private async Task UnitSalesAsync(int index, DateTime monthStart, DateTime monthEnd)
+        {
+            async Task Sell(int unitOffset, string buyerKey, decimal price)
+            {
+                await TryAsync($"sell tower unit {unitOffset + 1}", async () =>
+                {
+                    var units = await _db.Units.AsNoTracking()
+                        .Where(x => x.PropertyId == _properties["marjanbay"].Id)
+                        .OrderBy(x => x.Id).Select(x => x.Id).ToListAsync();
+                    var date = monthStart.AddDays(9);
+                    var total = price; // zero rated: no VAT
+                    var down = Math.Round(total * 0.2m, 2);
+                    var mid = Math.Round(total * 0.3m, 2);
+                    var sale = await _unitSales.CreateAsync(units[unitOffset], _tenantIds[buyerKey], date, price,
+                        new List<(string, DateTime, decimal)>
+                        {
+                            ("Down payment on signing", date, down),
+                            ("Second instalment", date.AddMonths(3), mid),
+                            ("Third instalment", date.AddMonths(12), mid),
+                            ("On handover", date.AddMonths(24), total - down - mid - mid)
+                        },
+                        "Off-plan sale", "Sample data");
+                    _saleIds.Add(sale.Id);
+                });
+            }
+
+            if (index == 2) await Sell(0, "khalid", 780_000m);
+            if (index == 5) await Sell(2, "ahmed", 1_150_000m);
+
+            // Each instalment that falls due in the month is paid on its due date.
+            foreach (var saleId in _saleIds)
+            {
+                await TryAsync($"payments on sale {saleId}", async () =>
+                {
+                    var sale = await _unitSales.GetAsync(saleId);
+                    if (sale == null) return;
+                    foreach (var step in sale.Instalments.Where(x => x.DueDate >= monthStart && x.DueDate <= monthEnd && x.DueDate <= _today).OrderBy(x => x.Sequence))
+                        await _unitSales.RecordReceiptAsync(saleId, step.DueDate, step.Amount, "Bank Transfer", _acc["11100"], $"TT-{step.DueDate:yyMMdd}-{saleId}");
+                });
+            }
+        }
+
+        private Task ProjectBillAsync(string vendorKey, string reference, DateTime date, string category,
+            params (string Text, string CostCategory, decimal Amount)[] lines) =>
+            ProjectBillAsync(vendorKey, reference, date, category, _projectId, "marjanbay", lines);
+
+        private async Task ProjectBillAsync(string vendorKey, string reference, DateTime date, string category,
+            int projectId, string propertyKey, params (string Text, string CostCategory, decimal Amount)[] lines)
+        {
+            await TryAsync($"bill {reference}", async () =>
+            {
+                var modelState = new ModelStateDictionary();
+                var bill = await _bills.SaveAsync(modelState, _companyId, new VendorBillEditViewModel
+                {
+                    VendorId = _vendors[vendorKey].Id,
+                    VendorReference = reference,
+                    BillDate = date,
+                    AccountingDate = date,
+                    DueDate = date.AddDays(30),
+                    PropertyId = _properties[propertyKey].Id,
+                    ExpenseCategory = category,
+                    Lines = lines.Select(x => new VendorBillLineViewModel
+                    {
+                        Description = x.Text,
+                        AccountId = _acc["13100"],
+                        Quantity = 1m,
+                        UnitPrice = x.Amount,
+                        IsTaxable = true,
+                        // The first sale of each new flat will be zero rated, so the VAT is recoverable.
+                        InputTaxAttribution = InputTaxAttributions.Taxable,
+                        DevelopmentCost = $"{projectId}|{x.CostCategory}"
+                    }).ToList()
+                });
+
+                if (bill == null)
+                    throw new InvalidOperationException(Describe(modelState));
+
+                var journal = await _posting.PostVendorBillAsync(bill.Id);
+                await PostJournalAsync(journal.Id);
+            });
         }
 
         private async Task BillAsync(string vendorKey, string reference, DateTime date, string category, int? propertyId,

@@ -79,5 +79,10 @@ namespace RealEstateManager.Domain
 
         /// <summary>What actually lands on the expense account: net plus irrecoverable tax.</summary>
         public decimal ChargedToExpense => LineSubtotal + NonRecoverableVatAmount;
+
+        /// <summary>A development cost: the project it is capitalised into, and what for.</summary>
+        public int? DevelopmentProjectId { get; set; }
+        public DevelopmentProject? DevelopmentProject { get; set; }
+        public string? DevelopmentCostCategory { get; set; }
     }
 }

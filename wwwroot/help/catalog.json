@@ -27,14 +27,14 @@
         { "key": "prepayments", "title": "Recurring Prepayments", "path": "System Setup ▸ Recurring Prepayments", "summary": "Spreading an up-front payment over the months it covers.", "screens": ["Prepayments"] },
         { "key": "closing", "title": "Period & Year Closing", "path": "System Setup ▸ Period Closing", "summary": "Month-end checklist, closing a period and closing the fiscal year.", "screens": ["Closing"] },
         { "key": "companies-users", "title": "Companies, Users & Permissions", "path": "System Setup ▸ Users & Permissions", "summary": "Companies, user accounts and what each permission allows.", "screens": ["Companies", "Users"] },
-        { "key": "subscription-support", "title": "Subscription, Audit Log & Feedback", "path": "System Setup ▸ Subscription & Help", "summary": "Trial and activation, the audit trail, help and feedback.", "screens": ["Subscription", "AuditLogs", "Feedback"] }
+        { "key": "subscription-support", "title": "Subscription, Audit Log & Feedback", "path": "System Setup ▸ Subscription & Help", "summary": "Trial and activation, the audit trail, database updates, help and feedback.", "screens": ["Subscription", "AuditLogs", "Feedback", "DatabaseUpdates"] }
       ]
     },
     {
       "key": "master-data",
       "title": "Master Data",
       "topics": [
-        { "key": "properties", "title": "Properties", "path": "Master Data ▸ Properties", "summary": "Registering a building, its ownership type and its VAT treatment.", "screens": ["Properties"] },
+        { "key": "properties", "title": "Properties", "path": "Master Data ▸ Properties", "summary": "Registering a building: ownership, VAT, title deed, permits, completion and documents.", "screens": ["Properties"] },
         { "key": "units", "title": "Units", "path": "Master Data ▸ Units", "summary": "The rentable spaces inside a property.", "screens": ["Units"] },
         { "key": "tenants", "title": "Tenants", "path": "Master Data ▸ Tenants", "summary": "The tenant register, identifiers and opening balances.", "screens": ["Tenants"] },
         { "key": "vendors", "title": "Vendors", "path": "Master Data ▸ Vendors", "summary": "Suppliers, their TRN and whether they may charge VAT.", "screens": ["Vendors"] },
@@ -54,6 +54,8 @@
         { "key": "security-deposits", "title": "Security Deposits", "path": "Operations ▸ Security Deposits", "summary": "Holding and releasing tenant deposits.", "screens": ["SecurityDeposits"] },
         { "key": "vendor-bills", "title": "Vendor Bills", "path": "Operations ▸ Vendor Bills", "summary": "Multi-line supplier bills, VAT by supplier registration, draft and post.", "screens": ["VendorBills"] },
         { "key": "vendor-payments", "title": "Vendor Payments", "path": "Operations ▸ Vendor Payments", "summary": "Paying a posted bill.", "screens": ["VendorPayments"] },
+        { "key": "development-projects", "title": "Development Projects", "path": "Operations ▸ Development Projects", "summary": "Buildings under construction: budgets, costs, completion, and the transfer to held for sale, investment property or fixed assets.", "screens": ["DevelopmentProjects"] },
+        { "key": "unit-sales", "title": "Unit Sales", "path": "Operations ▸ Unit Sales", "summary": "Sale contracts, payment plans, buyer payments, and handover - revenue and cost of sales at handover.", "screens": ["UnitSales"] },
         { "key": "owner-settlements", "title": "Owner Settlements", "path": "Operations ▸ Owner Settlements", "summary": "Monthly commission tax invoices with 5% VAT, and paying landlords the rent collected, less commission, in full or in part.", "screens": ["OwnerSettlements"] },
         { "key": "petty-cash", "title": "Petty Cash", "path": "Operations ▸ Petty Cash", "summary": "Cash floats, petty cash vouchers and replenishment.", "screens": ["PettyCash"] },
         { "key": "fixed-assets", "title": "Fixed Assets & Depreciation", "path": "Operations ▸ Fixed Assets", "summary": "Acquisition costs, capitalisation and monthly depreciation.", "screens": ["FixedAssets"] },
@@ -71,6 +73,8 @@
         { "key": "balance-sheet", "title": "Balance Sheet", "path": "Reporting ▸ Balance Sheet", "summary": "Assets, liabilities and equity at a date.", "screens": ["Reports.BalanceSheet"] },
         { "key": "cash-flow", "title": "Statement of Cash Flows", "path": "Reporting ▸ Statement of Cash Flows", "summary": "Cash in and out by operating, investing and financing activity (IAS 7).", "screens": ["Reports.CashFlow"] },
         { "key": "general-ledger", "title": "General Ledger, Tenant & Vendor Statements", "path": "Reporting ▸ General Ledger", "summary": "Movement on one account, one tenant's running account, and one supplier's account.", "screens": ["Journal.GeneralLedger", "TenantStatements", "VendorStatements"] },
+        { "key": "investment-property", "title": "Investment Property Note", "path": "Reporting ▸ Investment Property Note", "summary": "Cost model: carrying amount movement, depreciation and fair values by property (IAS 40).", "screens": ["InvestmentProperty"] },
+        { "key": "real-estate-vat", "title": "Real Estate VAT", "path": "Operations ▸ Capital Assets Scheme (VAT)", "summary": "Zero-rated first supplies of new residential units, exempt later ones, and the ten-year Capital Assets Scheme.", "screens": ["CapitalAssetVat"] },
         { "key": "vat-return", "title": "VAT Return", "path": "Reporting ▸ VAT Return", "summary": "Output and input tax for a tax period, and the annual wash-up.", "screens": ["Reports.VatReturn"] },
         { "key": "management-reports", "title": "Tenant & Property Reports", "path": "Reporting ▸ Management — Tenants & Properties", "summary": "P&L by property, property utilization, tenant health and ranking.", "screens": ["Reports.ProfitAndLossByProperty", "Reports.PropertyUtilization", "Reports.TenantHealth"] },
         { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule and owner withdrawals.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals"] }

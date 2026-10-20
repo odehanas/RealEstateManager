@@ -92,7 +92,8 @@ namespace RealEstateManager.Services
                         Quantity = x.Quantity,
                         UnitPrice = x.UnitPrice,
                         IsTaxable = x.IsTaxable,
-                        InputTaxAttribution = x.InputTaxAttribution
+                        InputTaxAttribution = x.InputTaxAttribution,
+                        DevelopmentCost = DevelopmentProjectService.CostTag(x.DevelopmentProjectId, x.DevelopmentCostCategory)
                     })
                     .ToList()
             };
@@ -129,6 +130,27 @@ namespace RealEstateManager.Services
             }
 
             ValidateHeader(modelState, model);
+
+            // A development cost goes to its project's work-in-progress account, so the
+            // project's cost always agrees with the ledger.
+            var projectTags = new Dictionary<VendorBillLineViewModel, (int ProjectId, string Category)>();
+            for (var i = 0; i < lines.Count; i++)
+            {
+                var (project, category, tagError) = await DevelopmentProjectService.ParseCostTagAsync(_db, lines[i].DevelopmentCost);
+                if (tagError != null)
+                {
+                    modelState.AddModelError(string.Empty, $"Line {i + 1}: {tagError}.");
+                    continue;
+                }
+
+                if (project == null)
+                    continue;
+
+                lines[i].AccountId = project.WipAccountId;
+                lines[i].PropertyId ??= project.PropertyId;
+                projectTags[lines[i]] = (project.Id, category!);
+            }
+
             await ValidateLinesAsync(modelState, companyId, lines);
 
             if (!modelState.IsValid)
@@ -191,7 +213,14 @@ namespace RealEstateManager.Services
             var lineNumber = 1;
             foreach (var source in lines)
             {
-                bill.Lines.Add(BuildLine(source, lineNumber++, canChargeVat, company.ProvisionalVatRecoveryRate));
+                var line = BuildLine(source, lineNumber++, canChargeVat, company.ProvisionalVatRecoveryRate);
+                if (projectTags.TryGetValue(source, out var tag))
+                {
+                    line.DevelopmentProjectId = tag.ProjectId;
+                    line.DevelopmentCostCategory = tag.Category;
+                }
+
+                bill.Lines.Add(line);
             }
 
             RecalculateHeader(bill);

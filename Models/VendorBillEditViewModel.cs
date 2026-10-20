@@ -80,6 +80,12 @@ namespace RealEstateManager.Models
         public string InputTaxAttribution { get; set; } = InputTaxAttributions.Taxable;
 
         /// <summary>
+        /// "projectId|category" when the line is a development cost. The line is then
+        /// charged to the project's work-in-progress account, whatever account was chosen.
+        /// </summary>
+        public string? DevelopmentCost { get; set; }
+
+        /// <summary>
         /// Set by the browser when the user removes a row. The row stays in the form so
         /// the posted indexes do not shift; the server drops it on save.
         /// </summary>

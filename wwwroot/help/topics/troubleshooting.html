@@ -91,3 +91,15 @@ opening balances.</p>
     <li>Check for a security deposit wrongly entered as a customer receipt.</li>
     <li>Confirm the tenant's opening balance was entered on the tenant record, not on the AR account.</li>
 </ol>
+
+<h3>After an update, a screen shows a database error</h3>
+<p>A message such as <em>"Invalid column name"</em> or <em>"Invalid object name"</em> right after a new version
+means a database change was not applied. Database changes now apply themselves when the site starts.</p>
+<ol class="steps">
+    <li>The platform owner opens <span class="path">System Setup ▸ Database Updates</span>.</li>
+    <li>If the last start shows <strong>Stopped on an error</strong>, send that page to your developer. Do not run
+        the script by hand in the hosting console: the application would not know, and would try it again.</li>
+    <li>If it shows <strong>Up to date</strong>, the problem is elsewhere - report it through
+        <span class="path">System Setup ▸ Send Feedback</span>.</li>
+</ol>
+<p>See <a href="#subscription-support">Subscription, Audit Log &amp; Feedback</a>.</p>

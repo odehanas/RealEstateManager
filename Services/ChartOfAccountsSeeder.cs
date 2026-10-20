@@ -25,7 +25,16 @@ namespace RealEstateManager.Services
             ("Properties", "VatCategory"),
             ("Tenants", "TrnNumber"),
             ("CustomerInvoices", "TaxInvoiceNumber"),
-            ("VendorBills", "InputTaxAttribution")
+            ("VendorBills", "InputTaxAttribution"),
+            ("Properties", "TitleDeedNumber"),
+            ("PropertyDocuments", null),
+            ("DevelopmentProjects", null),
+            ("JournalEntryLines", "DevelopmentProjectId"),
+            ("DevelopmentTransfers", null),
+            ("Properties", "FairValue"),
+            ("UnitSales", null),
+            ("CapitalAssetVatRecords", null),
+            ("Units", "FirstSupplyDate")
         };
 
         public static async Task SeedAsync(IServiceProvider serviceProvider)
@@ -238,16 +247,23 @@ namespace RealEstateManager.Services
                 new() { CompanyId = company.Id, Code = "11100", Name = "Cash and Cash Equivalents", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsControlAccount = true, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11100 },
                 new() { CompanyId = company.Id, Code = "11200", Name = "Accounts Receivable", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsControlAccount = true, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11200 },
                 new() { CompanyId = company.Id, Code = "11150", Name = "Petty Cash", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, IsPettyCashAccount = true, SortOrder = 11150 },
+                new() { CompanyId = company.Id, Code = "11250", Name = "Receivable from Unit Buyers", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11250 },
                 new() { CompanyId = company.Id, Code = "11300", Name = "VAT Recoverable", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11300 },
                 new() { CompanyId = company.Id, Code = "11400", Name = "PDC On Hand", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11400 },
                 new() { CompanyId = company.Id, Code = "11500", Name = "Prepaid Expenses", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11500 },
                 new() { CompanyId = company.Id, Code = "15100", Name = "Investment Property", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15100 },
                 new() { CompanyId = company.Id, Code = "15200", Name = "Fixed Assets", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15200 },
                 new() { CompanyId = company.Id, Code = "15300", Name = "Accumulated Depreciation", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15300 },
+                new() { CompanyId = company.Id, Code = "13100", Name = "Properties Under Development - For Sale", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 13100 },
+                new() { CompanyId = company.Id, Code = "13200", Name = "Completed Properties Held for Sale", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 13200 },
+                new() { CompanyId = company.Id, Code = "15150", Name = "Accumulated Depreciation - Investment Property", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15150 },
+                new() { CompanyId = company.Id, Code = "15500", Name = "Investment Property Under Construction", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15500 },
+                new() { CompanyId = company.Id, Code = "15600", Name = "Capital Work in Progress", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15600 },
                 new() { CompanyId = company.Id, Code = "15400", Name = "Fixed Asset Clearing", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 15400 },
 
                 new() { CompanyId = company.Id, Code = "21100", Name = "Accounts Payable", AccountType = "Liability", ReportingGroup = "Liabilities", ParentAccountId = accountsByCode["20000"].Id, IsControlAccount = true, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 21100 },
                 new() { CompanyId = company.Id, Code = "21200", Name = "Advances from Customers", AccountType = "Liability", ReportingGroup = "Liabilities", ParentAccountId = accountsByCode["20000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 21200 },
+                new() { CompanyId = company.Id, Code = "21250", Name = "Advances from Unit Buyers", AccountType = "Liability", ReportingGroup = "Liabilities", ParentAccountId = accountsByCode["20000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 21250 },
                 new() { CompanyId = company.Id, Code = "21300", Name = "Tenant Security Deposits", AccountType = "Liability", ReportingGroup = "Liabilities", ParentAccountId = accountsByCode["20000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 21300 },
                 new() { CompanyId = company.Id, Code = "21400", Name = "VAT Payable", AccountType = "Liability", ReportingGroup = "Liabilities", ParentAccountId = accountsByCode["20000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 21400 },
                 new() { CompanyId = company.Id, Code = "21500", Name = "Due to Landlords", AccountType = "Liability", ReportingGroup = "Liabilities", ParentAccountId = accountsByCode["20000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 21500 },
@@ -263,13 +279,16 @@ namespace RealEstateManager.Services
                 new() { CompanyId = company.Id, Code = "39999", Name = "Opening Balance Control Account", AccountType = "Equity", ReportingGroup = "Equity", ParentAccountId = accountsByCode["30000"].Id, IsGroup = false, IsPostable = false, IsActive = true, SortOrder = 39999 },
 
                 new() { CompanyId = company.Id, Code = "41100", Name = "Rental Revenue - Owned", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 41100 },
+                new() { CompanyId = company.Id, Code = "41200", Name = "Revenue from Sale of Properties", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 41200 },
                 new() { CompanyId = company.Id, Code = "42100", Name = "Management Fee Revenue", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 42100 },
                 new() { CompanyId = company.Id, Code = "43100", Name = "Other Income", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 43100 },
 
                 new() { CompanyId = company.Id, Code = "51100", Name = "Property Operating Expenses", AccountType = "Expense", ReportingGroup = "DirectExpense", ParentAccountId = accountsByCode["50000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 51100 },
+                new() { CompanyId = company.Id, Code = "51200", Name = "Cost of Properties Sold", AccountType = "Expense", ReportingGroup = "DirectExpense", ParentAccountId = accountsByCode["50000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 51200 },
                 new() { CompanyId = company.Id, Code = "52100", Name = "Property Maintenance", AccountType = "Expense", ReportingGroup = "DirectExpense", ParentAccountId = accountsByCode["50000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 52100 },
 
                 new() { CompanyId = company.Id, Code = "61100", Name = "Administrative Expenses", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 61100 },
+                new() { CompanyId = company.Id, Code = "61200", Name = "Irrecoverable VAT - Capital Assets Scheme", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 61200 },
                 new() { CompanyId = company.Id, Code = "62100", Name = "Depreciation Expense", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 62100 },
                 new() { CompanyId = company.Id, Code = "63100", Name = "Finance Costs", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 63100 }
             };

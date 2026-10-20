@@ -1,0 +1,196 @@
+@model RealEstateManager.Domain.UnitSale
+@using RealEstateManager.Domain
+@using RealEstateManager.Services
+
+@{
+    ViewData["Title"] = "Sale " + Model.ContractNumber;
+    var accounts = ViewBag.Accounts as List<SelectListItem> ?? new();
+    var unitCost = ViewBag.UnitCost as decimal? ?? 0m;
+    var posted = Model.Receipts.Where(x => x.JournalEntry?.IsPosted == true).OrderBy(x => x.ReceiptDate).ThenBy(x => x.Id).ToList();
+    var received = posted.Sum(x => x.Amount);
+    var outstanding = Model.TotalPrice - received;
+
+    // Payments are applied to the instalments in date order, to show what is paid and what is overdue.
+    var remaining = received;
+    var today = DateTime.Today;
+}
+
+<style>
+    @@media print { .no-print, nav, footer { display: none !important; } }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="mb-0">Sale Contract @Model.ContractNumber</h2>
+        <div class="text-muted">@Model.Unit?.Property?.Name / unit @Model.Unit?.UnitNumber &middot; <strong>@UnitSaleStatuses.Describe(Model.Status)</strong></div>
+    </div>
+    <div class="no-print d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print statement</button>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success no-print">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger no-print">@error</div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Contract</strong></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-5 fw-normal text-muted">Buyer</dt><dd class="col-7">@Model.Buyer?.FullName @(string.IsNullOrWhiteSpace(Model.Buyer?.TrnNumber) ? "" : "(TRN " + Model.Buyer!.TrnNumber + ")")</dd>
+                    <dt class="col-5 fw-normal text-muted">Contract date</dt><dd class="col-7">@Model.ContractDate.ToString("dd/MM/yyyy")</dd>
+                    <dt class="col-5 fw-normal text-muted">Unit</dt><dd class="col-7">@Model.Unit?.UnitNumber - @Model.Unit?.UsageType, @Model.Unit?.AreaSqFt.ToString("N0") sq ft</dd>
+                    <dt class="col-5 fw-normal text-muted">Sale price</dt><dd class="col-7">@Model.SalePrice.ToString("N2")</dd>
+                    <dt class="col-5 fw-normal text-muted">VAT</dt><dd class="col-7">@VatCategories.Describe(Model.VatCategory): @Model.VatAmount.ToString("N2")<div class="small text-muted">@Model.VatReason</div></dd>
+                    <dt class="col-5 fw-normal text-muted">Price incl. VAT</dt><dd class="col-7 fw-bold">@Model.TotalPrice.ToString("N2")</dd>
+                    @if (Model.HandoverDate.HasValue)
+                    {
+                        <dt class="col-5 fw-normal text-muted">Handed over</dt><dd class="col-7">@Model.HandoverDate.Value.ToString("dd/MM/yyyy") @(Model.BuyerTitleDeedNumber != null ? "· buyer's deed " + Model.BuyerTitleDeedNumber : "")</dd>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+                    {
+                        <dt class="col-5 fw-normal text-muted">Notes</dt><dd class="col-7">@Model.Notes</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Account</strong></div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr><td>Price including VAT</td><td class="text-end">@Model.TotalPrice.ToString("N2")</td></tr>
+                    <tr><td>Paid</td><td class="text-end">(@received.ToString("N2"))</td></tr>
+                    <tr class="fw-bold table-primary"><td>Outstanding</td><td class="text-end">@outstanding.ToString("N2")</td></tr>
+                    @if (Model.Status == UnitSaleStatuses.HandedOver)
+                    {
+                        <tr><td class="text-muted">Revenue recognised at handover</td><td class="text-end text-muted">@Model.SalePrice.ToString("N2")</td></tr>
+                        <tr><td class="text-muted">Cost of sales</td><td class="text-end text-muted">@Model.CostOfSales.ToString("N2")</td></tr>
+                        <tr><td class="text-muted">Gross profit</td><td class="text-end text-muted">@((Model.SalePrice - Model.CostOfSales).ToString("N2"))</td></tr>
+                    }
+                    else
+                    {
+                        <tr><td class="text-muted">Unit's cost held for sale (13200)</td><td class="text-end text-muted">@(unitCost == 0 ? "not yet transferred" : unitCost.ToString("N2"))</td></tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>Payment Plan</h4>
+<table class="table table-bordered table-sm">
+    <thead><tr><th>#</th><th>Description</th><th>Due</th><th class="text-end">Amount</th><th class="text-end">Paid</th><th>Status</th></tr></thead>
+    <tbody>
+        @foreach (var step in Model.Instalments.OrderBy(x => x.Sequence))
+        {
+            var paid = Math.Min(step.Amount, Math.Max(0m, remaining));
+            remaining -= paid;
+            var status = paid >= step.Amount ? "Paid" : step.DueDate < today ? "Overdue" : paid > 0 ? "Part paid" : "Due " + step.DueDate.ToString("dd/MM/yyyy");
+            <tr class="@(status == "Overdue" ? "table-danger" : status == "Paid" ? "table-success" : "")">
+                <td>@step.Sequence</td>
+                <td>@step.Description</td>
+                <td>@step.DueDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-end">@step.Amount.ToString("N2")</td>
+                <td class="text-end">@paid.ToString("N2")</td>
+                <td>@status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Payments Received</h4>
+<table class="table table-bordered table-sm">
+    <thead><tr><th>Receipt</th><th>Tax Invoice</th><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Amount</th><th class="text-end">Price part</th><th class="text-end">VAT</th><th>Applied to</th></tr></thead>
+    <tbody>
+        @if (posted.Count == 0)
+        {
+            <tr><td colspan="9" class="text-center text-muted">Nothing received yet.</td></tr>
+        }
+        @foreach (var r in posted)
+        {
+            <tr>
+                <td>@r.ReceiptNumber</td>
+                <td>@(r.TaxInvoiceNumber ?? "-")</td>
+                <td>@r.ReceiptDate.ToString("dd/MM/yyyy")</td>
+                <td>@r.PaymentMethod</td>
+                <td>@(r.Reference ?? "-")</td>
+                <td class="text-end">@r.Amount.ToString("N2")</td>
+                <td class="text-end">@(r.IsBeforeHandover ? r.NetAmount.ToString("N2") : "-")</td>
+                <td class="text-end">@(r.IsBeforeHandover ? r.VatAmount.ToString("N2") : "-")</td>
+                <td>@(r.IsBeforeHandover ? "Advance (21250)" : "Buyer balance (11250)")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Status != UnitSaleStatuses.Cancelled && outstanding > 0)
+{
+    <div class="card shadow-sm mb-3 no-print">
+        <div class="card-header bg-light"><strong>Record a Payment</strong></div>
+        <div class="card-body">
+            <form asp-action="RecordReceipt" asp-route-id="@Model.Id" method="post" class="row g-3">
+                <div class="col-md-2"><label class="form-label">Date</label><input type="date" name="receiptDate" value="@today.ToString("yyyy-MM-dd")" class="form-control" required /></div>
+                <div class="col-md-2"><label class="form-label">Amount (incl. VAT)</label><input type="number" step="0.01" min="0.01" max="@outstanding.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" name="amount" class="form-control" required /></div>
+                <div class="col-md-2">
+                    <label class="form-label">Method</label>
+                    <select name="paymentMethod" class="form-select">
+                        @foreach (var m in UnitSaleService.PaymentMethods)
+                        {
+                            <option>@m</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3"><label class="form-label">Received into</label><select name="accountId" asp-items="accounts" class="form-select"></select></div>
+                <div class="col-md-3"><label class="form-label">Reference</label><input type="text" name="reference" class="form-control" maxlength="100" /></div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-dark">Record and Post</button>
+                    <span class="small text-muted ms-2">
+                        @(Model.Status == UnitSaleStatuses.Active
+                            ? (Model.VatRate > 0 ? "Before handover: held as an advance, with VAT due on it now - a tax invoice number is issued." : "Before handover: held as an advance from the buyer.")
+                            : "After handover: settles the buyer's balance.")
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@if (Model.Status == UnitSaleStatuses.Active)
+{
+    <div class="row g-3 mb-4 no-print">
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100 border-primary"><div class="card-body">
+                <h6>Handover</h6>
+                <p class="small text-muted">
+                    Recognises the sale: @Model.SalePrice.ToString("N2") to revenue, advances received applied, any unpaid balance (with its VAT)
+                    becomes a receivable from the buyer, and the unit's cost (@(unitCost == 0 ? "not yet transferred - complete the project and transfer the unit as for sale first" : unitCost.ToString("N2")))
+                    goes to cost of sales. Posted at once; it cannot be reset.
+                </p>
+                <form asp-action="Handover" asp-route-id="@Model.Id" method="post" class="row g-2" onsubmit="return confirm('Hand the unit over and post the sale?');">
+                    <div class="col-md-4"><input type="date" name="handoverDate" value="@today.ToString("yyyy-MM-dd")" class="form-control form-control-sm" required /></div>
+                    <div class="col-md-5"><input type="text" name="buyerTitleDeed" class="form-control form-control-sm" maxlength="50" placeholder="Buyer's title deed number (optional)" /></div>
+                    <div class="col-md-3"><button type="submit" class="btn btn-primary btn-sm w-100" @(unitCost == 0 ? "disabled" : "")>Hand over</button></div>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <h6>Cancel</h6>
+                <p class="small text-muted">Only while nothing has been paid. A refund or forfeiture is recorded with a journal first.</p>
+                <form asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Cancel this contract?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cancel contract</button>
+                </form>
+            </div></div>
+        </div>
+    </div>
+}

@@ -1,4 +1,4 @@
-﻿namespace RealEstateManager.Domain
+namespace RealEstateManager.Domain
 {
     public class JournalEntryLine
     {
@@ -43,6 +43,13 @@
         // Owner expenditure dimension. Only meaningful on lines posted to an account
         // flagged as an owner's current account (Account.IsOwnerAccount).
         public int? OwnerWithdrawalCategoryId { get; set; }
+
+        /// <summary>The building under construction this cost belongs to.</summary>
+        public int? DevelopmentProjectId { get; set; }
+        public DevelopmentProject? DevelopmentProject { get; set; }
+
+        /// <summary>What the development cost was for: land, construction, design...</summary>
+        public string? DevelopmentCostCategory { get; set; }
         public OwnerWithdrawalCategory? OwnerWithdrawalCategory { get; set; }
     }
 }

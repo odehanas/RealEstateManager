@@ -91,9 +91,11 @@
         </div>
     </div>
 
+    <partial name="_RegistrationFields" model="Model" />
+
     <div class="mt-4">
         <button type="submit" class="btn btn-dark">Save</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Back</a>
     </div>
 </form>
 

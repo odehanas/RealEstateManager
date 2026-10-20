@@ -1,0 +1,152 @@
+@model RealEstateManager.Models.DatabaseUpdatesViewModel
+
+@{
+    ViewData["Title"] = "Database Updates";
+    var status = Model.Status;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Database Updates</h2>
+    <span class="text-muted">Read-only. Times are UTC.</span>
+</div>
+
+<p class="text-muted">
+    Each new version of the application carries its database changes as numbered scripts and applies any it has not
+    applied before, every time the site starts. This page shows what happened at the last start and every script
+    recorded so far.
+</p>
+
+<div class="card shadow-sm mb-4 @(status.HasFailed ? "border-danger" : "border-success")">
+    <div class="card-body">
+        <h5 class="card-title mb-2">
+            Last start:
+            @if (status.Outcome == "Failed")
+            {
+                <span class="badge bg-danger">Stopped on an error</span>
+            }
+            else if (status.Outcome == "Skipped")
+            {
+                <span class="badge bg-warning text-dark">Skipped</span>
+            }
+            else if (status.Outcome == "Updated")
+            {
+                <span class="badge bg-success">Updated</span>
+            }
+            else if (status.Outcome == "Up to date")
+            {
+                <span class="badge bg-success">Up to date</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">@status.Outcome</span>
+            }
+        </h5>
+        <div class="small text-muted mb-2">
+            Checked @(status.StartedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "-")
+        </div>
+
+        @if (status.BaselineNote != null)
+        {
+            <div class="alert alert-info mb-2">@status.BaselineNote</div>
+        }
+
+        @if (status.AppliedThisRun.Count > 0)
+        {
+            <div class="mb-2">Applied at this start: <strong>@string.Join(", ", status.AppliedThisRun)</strong></div>
+        }
+
+        @if (status.HasFailed)
+        {
+            <div class="alert alert-danger mb-0">
+                @if (status.FailedScript != null)
+                {
+                    <div><strong>Script:</strong> @status.FailedScript@(status.FailedStatement.HasValue ? $", statement {status.FailedStatement}" : "")</div>
+                }
+                <div><strong>What happened:</strong> @status.FailureMessage</div>
+                <div class="mt-2">
+                    The site is running, but scripts from this one onwards were not applied, so screens that rely on them
+                    may show errors. Send this page to your developer. Once the script is corrected and a new version is
+                    deployed, the next start tries again.
+                </div>
+                @if (!string.IsNullOrWhiteSpace(status.FailedSql))
+                {
+                    <details class="mt-2">
+                        <summary>The statement</summary>
+                        <pre class="small mb-0 mt-2" style="white-space: pre-wrap;">@status.FailedSql</pre>
+                    </details>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.HistoryError != null)
+{
+    <div class="alert alert-warning">The list of applied scripts could not be read: @Model.HistoryError</div>
+}
+
+@if (Model.NotApplied.Count > 0)
+{
+    <div class="card shadow-sm mb-4 border-warning">
+        <div class="card-body">
+            <h5 class="card-title">Included in this version but not applied (@Model.NotApplied.Count)</h5>
+            <ul class="mb-0">
+                @foreach (var name in Model.NotApplied)
+                {
+                    <li>@name</li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">
+            Applied scripts
+            @if (Model.History != null)
+            {
+                <span class="badge bg-secondary">@Model.History.Count of @Model.IncludedCount</span>
+            }
+        </h5>
+        @if (Model.History == null)
+        {
+            <div class="text-muted">No scripts have been recorded on this database yet.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Script</th>
+                            <th>Recorded</th>
+                            <th>How</th>
+                            <th class="text-end">Statements</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.History)
+                        {
+                            <tr>
+                                <td>@row.ScriptName</td>
+                                <td>@row.AppliedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                <td>
+                                    @if (row.Method == "Baseline")
+                                    {
+                                        <span title="Already applied by hand before automatic updates existed">Already in place</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Applied automatically</span>
+                                    }
+                                </td>
+                                <td class="text-end">@(row.Statements?.ToString() ?? "-")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

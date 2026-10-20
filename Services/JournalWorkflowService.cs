@@ -680,7 +680,15 @@ namespace RealEstateManager.Services
 
                 // A tax invoice handed to a landlord keeps its number and its VAT; taking
                 // the VAT back out by a reset would leave the issued invoice unreported.
-                "OwnerCommissionInvoice"
+                "OwnerCommissionInvoice",
+
+                // Creates fixed asset records and per-unit costs; reversed by a journal, not a reset.
+                "DevelopmentTransfer",
+
+                // Unit sales change the contract's and the unit's state; corrections are journals.
+                "UnitSaleReceipt",
+                "UnitSaleHandover",
+                "CapitalAssetVatAdjustment"
             };
 
         private static string DescribeSourceType(string sourceType) => sourceType switch
@@ -693,6 +701,12 @@ namespace RealEstateManager.Services
             "FixedAssetDepreciation" => "depreciation",
             "OwnerSettlement" => "owner settlement",
             "OwnerCommissionInvoice" => "commission tax invoice",
+            "DevelopmentCost" => "development cost",
+            "DevelopmentTransfer" => "completion transfer",
+            "InvestmentPropertySetup" => "investment property allocation",
+            "UnitSaleReceipt" => "unit sale payment",
+            "UnitSaleHandover" => "unit handover",
+            "CapitalAssetVatAdjustment" => "capital asset VAT adjustment",
             _ => sourceType
         };
 

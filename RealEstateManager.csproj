@@ -21,6 +21,14 @@
   </ItemGroup>
 
   <!--
+    The numbered database scripts travel inside the application, which applies any not yet
+    applied when it starts (Services/SchemaScriptRunner.cs).
+  -->
+  <ItemGroup>
+    <EmbeddedResource Include="SQL\*.sql" LogicalName="SchemaScripts.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!--
     Tools/ holds developer utilities - the screenshot capture, the PDF export and the demo
     company builder (a separate small program). None of it is part of the application:
     it must not be compiled into it and must not be published to the server.

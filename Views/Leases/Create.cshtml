@@ -1,4 +1,4 @@
-﻿@model RealEstateManager.Models.LeaseCreateViewModel
+@model RealEstateManager.Models.LeaseCreateViewModel
 @using RealEstateManager.Domain
 @{
     ViewData["Title"] = "Create Lease";
@@ -82,8 +82,10 @@
                 <option value="ZeroRated">Override &mdash; Zero rated (0%)</option>
             </select>
             <div class="form-text">
-                VAT is derived from the unit, falling back to the property. Override only for a genuine
-                exception, and say why &mdash; commercial leases are standard rated, residential leases are exempt.
+                VAT is derived from the unit, falling back to the property. Commercial leases are standard rated;
+                residential leases are exempt, except the <strong>first</strong> lease of a unit in a new building
+                (within three years of its completion date), which is zero rated automatically. Override only for a
+                genuine exception, and say why.
             </div>
         </div>
 

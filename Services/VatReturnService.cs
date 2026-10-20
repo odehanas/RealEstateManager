@@ -104,6 +104,52 @@ namespace RealEstateManager.Services
                 report.StandardRatedVat += vat;
             }
 
+            // Unit sales. A payment received before handover is a supply when received (the tax
+            // point); whatever is still unpaid at handover is a supply at handover.
+            var saleReceipts = await _db.UnitSaleReceipts
+                .AsNoTracking()
+                .Where(x => x.CompanyId == companyId && x.IsBeforeHandover
+                            && x.JournalEntry != null && x.JournalEntry.IsPosted
+                            && x.ReceiptDate >= startDate && x.ReceiptDate <= endDate)
+                .Select(x => new { x.UnitSale!.VatCategory, Net = x.NetAmount, Vat = x.VatAmount })
+                .ToListAsync();
+            var handovers = await _db.UnitSales
+                .AsNoTracking()
+                .Where(x => x.CompanyId == companyId && x.HandoverJournalEntry != null && x.HandoverJournalEntry.IsPosted
+                            && x.HandoverDate >= startDate && x.HandoverDate <= endDate
+                            && (x.HandoverNetAmount != 0m || x.HandoverVatAmount != 0m))
+                .Select(x => new { x.VatCategory, Net = x.HandoverNetAmount, Vat = x.HandoverVatAmount })
+                .ToListAsync();
+
+            foreach (var group in saleReceipts.Concat(handovers).GroupBy(x => x.VatCategory))
+            {
+                var net = group.Sum(x => x.Net);
+                var vat = group.Sum(x => x.Vat);
+
+                report.OutputLines.Add(new VatReturnOutputLineDto
+                {
+                    VatCategory = group.Key,
+                    Label = VatCategories.Describe(group.Key) + " - sale of units",
+                    SupplyCount = group.Count(),
+                    NetAmount = net,
+                    VatAmount = vat
+                });
+
+                switch (group.Key)
+                {
+                    case VatCategories.Standard:
+                        report.StandardRatedNet += net;
+                        report.StandardRatedVat += vat;
+                        break;
+                    case VatCategories.ZeroRated:
+                        report.ZeroRatedNet += net;
+                        break;
+                    case VatCategories.Exempt:
+                        report.ExemptNet += net;
+                        break;
+                }
+            }
+
             // Credit notes reduce the supplies and the output tax of the period in which they
             // are issued (Article 61), not the period of the invoice they correct.
             var creditNotes = await _db.CustomerCreditNotes
@@ -194,6 +240,28 @@ namespace RealEstateManager.Services
             report.InputVatTotal = billLines.Sum(x => x.VatAmount);
             report.InputVatRecoverable = billLines.Sum(x => x.RecoverableVatAmount);
             report.InputVatNonRecoverable = billLines.Sum(x => x.NonRecoverableVatAmount);
+
+            // Capital Assets Scheme: the yearly correction of input tax recovered on a building,
+            // in the return for the period in which it is made.
+            var casAdjustments = await _db.CapitalAssetVatAdjustments
+                .AsNoTracking()
+                .Where(x => x.CapitalAssetVatRecord != null && x.CapitalAssetVatRecord.CompanyId == companyId
+                            && x.JournalEntry != null && x.JournalEntry.IsPosted
+                            && x.AdjustmentDate >= startDate && x.AdjustmentDate <= endDate)
+                .Select(x => x.Adjustment)
+                .ToListAsync();
+            if (casAdjustments.Count > 0)
+            {
+                var adjustment = casAdjustments.Sum();
+                report.InputLines.Add(new VatReturnInputLineDto
+                {
+                    Attribution = "CapitalAssetsScheme",
+                    BillCount = casAdjustments.Count,
+                    RecoverableVat = adjustment
+                });
+                report.InputVatRecoverable += adjustment;
+                report.CapitalAssetAdjustment = adjustment;
+            }
 
             report.ResidualInputVat = billLines
                 .Where(x => x.InputTaxAttribution == InputTaxAttributions.Residual)
@@ -288,6 +356,10 @@ namespace RealEstateManager.Services
         public decimal InputVatRecoverable { get; set; }
         public decimal InputVatNonRecoverable { get; set; }
         public decimal ResidualInputVat { get; set; }
+
+        /// <summary>Capital Assets Scheme adjustments in the period: positive recovers more, negative repays.</summary>
+        public decimal CapitalAssetAdjustment { get; set; }
+
         public List<VatReturnInputLineDto> InputLines { get; set; } = new();
 
         public decimal ProvisionalRecoveryRate { get; set; }

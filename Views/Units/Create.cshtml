@@ -1,4 +1,4 @@
-﻿@model RealEstateManager.Models.UnitCreateViewModel
+@model RealEstateManager.Models.UnitCreateViewModel
 @using RealEstateManager.Domain
 @{
     ViewData["Title"] = "Create Unit";
@@ -56,6 +56,22 @@
         <div class="col-md-4">
             <label asp-for="StandardAnnualRent" class="form-label"></label>
             <input asp-for="StandardAnnualRent" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="TitleDeedNumber" class="form-label"></label>
+            <input asp-for="TitleDeedNumber" class="form-control" maxlength="50" />
+            <div class="form-text">Only when the unit has its own deed (strata title).</div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ParkingBays" class="form-label"></label>
+            <input asp-for="ParkingBays" class="form-control" min="0" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="UtilityAccountNumber" class="form-label"></label>
+            <input asp-for="UtilityAccountNumber" class="form-control" maxlength="50" />
         </div>
 
         <div class="col-md-4">

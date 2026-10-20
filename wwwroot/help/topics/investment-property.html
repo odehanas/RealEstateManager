@@ -1,0 +1,50 @@
+<p><span class="path">Reporting ▸ Investment Property Note</span></p>
+<p>Buildings held to earn rent are <strong>investment property</strong>. The company uses the <strong>cost model</strong>
+(IAS 40): investment property is carried at cost less accumulated depreciation. Land is never depreciated; buildings are
+depreciated straight-line over their useful lives. The fair value is <em>not</em> booked — it is disclosed in the note,
+as the standard requires.</p>
+
+<h3>Running the note</h3>
+<ol class="steps">
+    <li>Enter the period — normally the financial year — and select <strong>Refresh</strong>.</li>
+    <li>The first table is the <strong>movement in the carrying amount</strong>: cost at the start, additions, buildings
+        transferred from properties under construction, disposals, cost at the end; then accumulated depreciation at the
+        start, the charge for the period and at the end; and the carrying amount at both dates.</li>
+    <li>The second table shows each property's cost, accumulated depreciation, carrying amount and <strong>fair value</strong>,
+        with the valuation date and valuer.</li>
+    <li>Select <strong>Print</strong> to take it into the financial statements. A suggested wording for the accounting
+        policy and fair value disclosure is printed underneath.</li>
+</ol>
+<p>The figures are read from <code>15100</code> Investment Property and <code>15150</code> Accumulated Depreciation -
+Investment Property, so they agree with the balance sheet. Opening balances brought forward from a previous system, and
+entries posted without a property, are shown on a separate line as <em>not allocated to a property</em>.</p>
+
+<h3>Recording the fair value</h3>
+<p>Open the property in <span class="path">Master Data ▸ Properties ▸ Edit</span> and fill in the <strong>Valuation</strong>
+section: the fair value from the latest independent valuation, its date and the valuer. Update it at each year end. If any
+investment property has no fair value, the note warns you.</p>
+
+<h3>Where the depreciation comes from</h3>
+<p>When a rental building is completed and transferred (see <a href="#development-projects">Development Projects</a>), its
+building part is entered in the <a href="#fixed-assets">fixed asset register</a> with the useful life you gave, and the
+monthly depreciation run posts the charge:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>62100</code> Depreciation Expense</td><td class="num dr">Monthly charge</td><td class="num">—</td></tr>
+        <tr><td><code>15150</code> Accumulated Depreciation - Investment Property</td><td class="num">—</td><td class="num cr">Monthly charge</td></tr>
+    </tbody>
+</table>
+
+<h3>Depreciating a building brought in as an opening balance</h3>
+<p>An investment property brought in as an opening balance on <code>15100</code> is not depreciated until it is set up. At the
+foot of the note, under <strong>Depreciate an Existing Building</strong> (needs <em>Manage Accounting</em>):</p>
+<ol class="steps">
+    <li>Choose the property and the month depreciation starts.</li>
+    <li>Split its carrying amount into <strong>land</strong> (never depreciated) and <strong>building</strong>. If the building was
+        depreciated in a previous system, enter its carrying amount — cost less the depreciation so far.</li>
+    <li>Enter the building's <strong>remaining useful life</strong> in years.</li>
+    <li>Leave <em>allocate</em> ticked to move land and building out of the unallocated opening balance and onto the property,
+        so the note shows them against the building. Select <strong>Set Up Depreciation</strong>.</li>
+</ol>
+<p>The building is entered in the fixed asset register and the monthly depreciation run charges it from then on.</p>

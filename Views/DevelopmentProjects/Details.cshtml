@@ -1,0 +1,387 @@
+@model RealEstateManager.Models.DevelopmentProjectDetailsViewModel
+@using RealEstateManager.Domain
+
+@{
+    var p = Model.Project;
+    ViewData["Title"] = p.Code + " - " + p.Name;
+    var creditAccounts = ViewBag.CreditAccounts as List<SelectListItem> ?? new();
+    var isResidential = p.Property != null && (p.Property.PropertyType is "Residential" or "MixedUse" || p.Property.LandUse is "Residential" or "Mixed use");
+}
+
+<style>
+    @@media print { .no-print, nav, footer { display: none !important; } }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="mb-0">@p.Name</h2>
+        <div class="text-muted">
+            @p.Code &middot; @DevelopmentIntendedUses.Describe(p.IntendedUse) &middot;
+            <strong>@DevelopmentProjectStatuses.Describe(p.Status)</strong>
+        </div>
+    </div>
+    <div class="no-print d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        @if (p.Status != DevelopmentProjectStatuses.Cancelled)
+        {
+            <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-primary btn-sm">Edit</a>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success no-print">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger no-print">@error</div>
+}
+@if (Model.DraftCount > 0)
+{
+    <div class="alert alert-warning no-print">
+        @Model.DraftCount draft journal(s) tagged to this project, @Model.DraftCosts.ToString("N2") in total, are not posted yet and
+        are not in the cost below. Post them from <strong>Operations &rsaquo; Journal Inquiry</strong>.
+    </div>
+}
+@if (p.Status == DevelopmentProjectStatuses.Completed)
+{
+    <div class="alert alert-info">
+        Completed on <strong>@p.CompletionDate?.ToString("dd/MM/yyyy")</strong>@(p.CompletionCertificateNumber != null ? $" (certificate {p.CompletionCertificateNumber})" : "").
+        @if (Model.InWorkInProgress != 0)
+        {
+            <text>@Model.InWorkInProgress.ToString("N2") is still in @p.WipAccount?.Code @p.WipAccount?.Name - transfer it below.</text>
+        }
+        else
+        {
+            <text>The whole cost has been transferred out of work in progress.</text>
+        }
+        @if (isResidential && p.CompletionDate.HasValue)
+        {
+            <br /><text>VAT: the first sale or lease of each residential unit is zero rated if made by
+            <strong>@p.CompletionDate.Value.AddYears(3).AddDays(-1).ToString("dd/MM/yyyy")</strong>.</text>
+        }
+    </div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Budget</div><div class="fs-5">@Model.Budget.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Cost to date</div><div class="fs-5 fw-bold">@Model.CostToDate.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Remaining budget</div><div class="fs-5 @(Model.Remaining < 0 ? "text-danger" : "")">@Model.Remaining.ToString("N2")</div></div></div></div>
+    @if (Model.Transferred != 0)
+    {
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Transferred on completion</div><div class="fs-5">@Model.Transferred.ToString("N2")</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Still in work in progress</div><div class="fs-5">@Model.InWorkInProgress.ToString("N2")</div></div></div></div>
+    }
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Spent</div><div class="fs-5 @(Model.PercentOfBudget > 100 ? "text-danger" : "")">@(Model.Budget == 0 ? "-" : Model.PercentOfBudget.ToString("0.0") + "%")</div></div></div></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Project</strong></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-5 fw-normal text-muted">Property</dt>
+                    <dd class="col-7">
+                        @if (p.Property != null)
+                        {
+                            <a asp-controller="Properties" asp-action="Details" asp-route-id="@p.Property.Id">@p.Property.Code - @p.Property.Name</a>
+                        }
+                        else
+                        {
+                            <text>-</text>
+                        }
+                    </dd>
+                    <dt class="col-5 fw-normal text-muted">Title deed</dt><dd class="col-7">@(p.Property?.TitleDeedNumber ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">Building permit</dt><dd class="col-7">@(p.Property?.BuildingPermitNumber ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">Cost collected in</dt><dd class="col-7">@p.WipAccount?.Code @p.WipAccount?.Name</dd>
+                    <dt class="col-5 fw-normal text-muted">Main contractor</dt><dd class="col-7">@(p.MainContractorVendor?.Name ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">Started</dt><dd class="col-7">@(p.StartDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">Expected completion</dt><dd class="col-7">@(p.ExpectedCompletionDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">Notes</dt><dd class="col-7">@(p.Notes ?? "-")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Budget against Actual</strong></div>
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Category</th><th class="text-end">Budget</th><th class="text-end">Actual</th><th class="text-end">Remaining</th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model.Categories.Where(x => x.Budget != 0 || x.Actual != 0))
+                    {
+                        <tr>
+                            <td>@c.Label</td>
+                            <td class="text-end">@c.Budget.ToString("N2")</td>
+                            <td class="text-end">@c.Actual.ToString("N2")</td>
+                            <td class="text-end @(c.Variance < 0 ? "text-danger" : "")">@c.Variance.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td>Total</td>
+                        <td class="text-end">@Model.Budget.ToString("N2")</td>
+                        <td class="text-end">@Model.CostToDate.ToString("N2")</td>
+                        <td class="text-end @(Model.Remaining < 0 ? "text-danger" : "")">@Model.Remaining.ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Cost Ledger</h4>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr><th>Date</th><th>Entry</th><th>Source</th><th>Document</th><th>Supplier</th><th>Category</th><th>Description</th><th class="text-end">Amount</th></tr>
+        </thead>
+        <tbody>
+            @if (Model.Ledger.Count == 0)
+            {
+                <tr><td colspan="8" class="text-center text-muted">No posted costs yet.</td></tr>
+            }
+            @foreach (var line in Model.Ledger)
+            {
+                <tr>
+                    <td>@line.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@line.EntryNumber</td>
+                    <td>@(line.Source switch { "VendorBill" => "Supplier bill", "ManualJournal" => "Journal", "DevelopmentCost" => "Direct cost", _ => line.Source })</td>
+                    <td>@(line.DocumentNumber ?? "-")</td>
+                    <td>@(line.VendorName ?? "-")</td>
+                    <td>@DevelopmentCostCategories.Describe(line.Category)</td>
+                    <td>@line.Description</td>
+                    <td class="text-end">@line.Amount.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold"><td colspan="7">Cost to date</td><td class="text-end">@Model.CostToDate.ToString("N2")</td></tr>
+        </tfoot>
+    </table>
+</div>
+
+@if (Model.Transfers.Count > 0)
+{
+    <h4 class="mt-4">Completion Transfers</h4>
+    @foreach (var t in Model.Transfers)
+    {
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-light">
+                <strong>@t.TransferDate.ToString("dd/MM/yyyy")</strong> &middot; journal @t.JournalEntry?.EntryNumber &middot;
+                land @t.LandCost.ToString("N2") + building @t.BuildingCost.ToString("N2") = <strong>@((t.LandCost + t.BuildingCost).ToString("N2"))</strong>
+                @if (t.BuildingUsefulLifeYears > 0)
+                {
+                    <span class="text-muted">&middot; building depreciated over @t.BuildingUsefulLifeYears years</span>
+                }
+            </div>
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Unit</th><th>Goes to</th><th class="text-end">Area (sq ft)</th><th class="text-end">Land</th><th class="text-end">Building</th><th class="text-end">Total cost</th></tr></thead>
+                <tbody>
+                    @foreach (var l in t.Lines.OrderBy(x => x.Unit?.UnitNumber))
+                    {
+                        <tr>
+                            <td>@l.Unit?.UnitNumber</td>
+                            <td>@(l.IntendedUse == DevelopmentIntendedUses.Sale ? "13200 Held for sale" : l.IntendedUse == DevelopmentIntendedUses.Rental ? "15100 Investment property" : "15200 Fixed assets")</td>
+                            <td class="text-end">@l.AreaSqFt.ToString("N2")</td>
+                            <td class="text-end">@l.LandCost.ToString("N2")</td>
+                            <td class="text-end">@l.BuildingCost.ToString("N2")</td>
+                            <td class="text-end">@((l.LandCost + l.BuildingCost).ToString("N2"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (t.RentalFixedAsset != null || t.OwnUseFixedAsset != null)
+            {
+                <div class="card-body py-2 small">
+                    Building in the fixed asset register:
+                    @foreach (var asset in new[] { t.RentalFixedAsset, t.OwnUseFixedAsset }.Where(x => x != null))
+                    {
+                        <a asp-controller="FixedAssets" asp-action="Depreciation" asp-route-id="@asset!.Id" class="me-3">@asset.AssetCode - @asset.Cost.ToString("N2")</a>
+                    }
+                </div>
+            }
+        </div>
+    }
+}
+
+@if (p.Status == DevelopmentProjectStatuses.Completed && Model.InWorkInProgress > 0)
+{
+    var transferUnits = Model.Units.Where(x => x.AreaSqFt > 0).ToList();
+    var totalArea = transferUnits.Sum(x => x.AreaSqFt);
+    <div class="card shadow-sm mb-3 no-print border-primary">
+        <div class="card-header bg-light"><strong>Transfer on Completion</strong></div>
+        <div class="card-body">
+            <p class="small text-muted">
+                Moves the @Model.InWorkInProgress.ToString("N2") still in work in progress to where each unit now belongs, shared by
+                area. Units for <strong>sale</strong> go to 13200 Completed Properties Held for Sale at cost. Units for <strong>rental</strong>
+                go to 15100 Investment Property and units for <strong>own use</strong> to 15200 Fixed Assets; for both, the land part is
+                never depreciated and the building part is entered in the fixed asset register and depreciated monthly over the useful
+                life below (cost model). This is posted at once and cannot be reset.
+            </p>
+            @if (transferUnits.Count == 0)
+            {
+                <div class="alert alert-warning mb-0">
+                    The cost is shared between the units by area. Add the building's units, with their areas, to
+                    @(p.Property == null ? "the project's property (choose one in Edit first)" : p.Property.Code + " in Master Data ▸ Units"), then come back.
+                </div>
+            }
+            else
+            {
+                <form asp-action="Transfer" asp-route-id="@p.Id" method="post"
+                      onsubmit="return confirm('Transfer the cost and post it now? This cannot be reset.');">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Transfer date</label>
+                            <input type="date" name="transferDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Building useful life (years)</label>
+                            <input type="number" name="usefulLifeYears" value="30" min="1" max="100" class="form-control" />
+                            <div class="form-text">Rental and own-use units only.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Set every unit to</label>
+                            <select class="form-select" id="allUses">
+                                <option value="">--</option>
+                                @foreach (var use in DevelopmentIntendedUses.All)
+                                {
+                                    <option value="@use">@DevelopmentIntendedUses.Describe(use)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <table class="table table-sm table-bordered">
+                        <thead><tr><th>Unit</th><th>Usage</th><th class="text-end">Area (sq ft)</th><th class="text-end">Share</th><th class="text-end">Cost (approx.)</th><th style="width: 260px;">Goes to</th></tr></thead>
+                        <tbody>
+                            @foreach (var u in transferUnits)
+                            {
+                                <tr>
+                                    <td>@u.UnitNumber</td>
+                                    <td>@u.UsageType</td>
+                                    <td class="text-end">@u.AreaSqFt.ToString("N2")</td>
+                                    <td class="text-end">@((u.AreaSqFt / totalArea * 100m).ToString("0.00"))%</td>
+                                    <td class="text-end">@((Model.InWorkInProgress * u.AreaSqFt / totalArea).ToString("N2"))</td>
+                                    <td>
+                                        <select name="uses[@u.Id]" class="form-select form-select-sm unit-use">
+                                            @foreach (var use in DevelopmentIntendedUses.All)
+                                            {
+                                                <option value="@use" selected="@(use == p.IntendedUse ? "selected" : null)">@DevelopmentIntendedUses.Describe(use)</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-primary">Transfer and Post</button>
+                </form>
+            }
+        </div>
+    </div>
+}
+
+@if (p.TakesCosts)
+{
+    <div class="card shadow-sm mb-3 no-print">
+        <div class="card-header bg-light"><strong>Record a Cost without a Supplier Bill</strong></div>
+        <div class="card-body">
+            <p class="small text-muted">
+                Supplier invoices are entered as <a asp-controller="VendorBills" asp-action="Create">vendor bills</a> with the project
+                chosen on each line. Use this for everything else: land paid from the bank, authority fees, or borrowing costs moved
+                out of Finance Costs (interest on a loan taken to build the project, while it is being built). It is posted straight away.
+            </p>
+            <form asp-action="RecordCost" asp-route-id="@p.Id" method="post" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">Date</label>
+                    <input type="date" name="costDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select" required>
+                        @foreach (var c in DevelopmentCostCategories.All)
+                        {
+                            <option value="@c">@DevelopmentCostCategories.Describe(c)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="form-control" maxlength="250" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Amount</label>
+                    <input type="number" step="0.01" min="0.01" name="amount" class="form-control" required />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Paid from / moved from</label>
+                    <select name="creditAccountId" asp-items="creditAccounts" class="form-select" required></select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Reference</label>
+                    <input type="text" name="reference" class="form-control" maxlength="50" placeholder="Receipt, cheque or transfer number" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100">Record and Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@if (p.IsOpen)
+{
+    <div class="row g-3 mb-4 no-print">
+        @if (p.Status == DevelopmentProjectStatuses.Planning)
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100"><div class="card-body">
+                    <h6>Start Construction</h6>
+                    <p class="small text-muted">Moves the project from planning to under construction. Recording the first cost does this too.</p>
+                    <form asp-action="StartConstruction" asp-route-id="@p.Id" method="post">
+                        <button type="submit" class="btn btn-outline-dark btn-sm">Start construction</button>
+                    </form>
+                </div></div>
+            </div>
+        }
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <h6>Completion</h6>
+                <p class="small text-muted">Enter the completion certificate. Its date is copied to the property, where it starts the VAT
+                zero-rating window for new residential units.</p>
+                <form asp-action="Complete" asp-route-id="@p.Id" method="post" class="row g-2"
+                      onsubmit="return confirm('Mark the project complete?');">
+                    <div class="col-6"><input type="date" name="completionDate" class="form-control form-control-sm" required /></div>
+                    <div class="col-6"><input type="text" name="certificateNumber" class="form-control form-control-sm" placeholder="Certificate number" maxlength="50" /></div>
+                    <div class="col-12"><button type="submit" class="btn btn-success btn-sm">Mark complete</button></div>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <h6>Cancel</h6>
+                <p class="small text-muted">Only while nothing has been spent on the project.</p>
+                <form asp-action="Cancel" asp-route-id="@p.Id" method="post" onsubmit="return confirm('Cancel this project?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cancel project</button>
+                </form>
+            </div></div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var all = document.getElementById('allUses');
+            if (!all) return;
+            all.addEventListener('change', function () {
+                if (!all.value) return;
+                document.querySelectorAll('.unit-use').forEach(function (s) { s.value = all.value; });
+            });
+        })();
+    </script>
+}

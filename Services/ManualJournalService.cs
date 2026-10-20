@@ -91,6 +91,27 @@ namespace RealEstateManager.Services
                     throw new InvalidOperationException("One or more selected owner withdrawal categories were not found.");
             }
 
+            // Development costs: the project must take costs, and the line must sit on the
+            // project's own account, or the project's cost would disagree with the ledger.
+            var projectTags = new Dictionary<ManualJournalLineViewModel, (DevelopmentProject Project, string Category)>();
+            for (var i = 0; i < validLines.Count; i++)
+            {
+                var (project, category, tagError) = await DevelopmentProjectService.ParseCostTagAsync(_db, validLines[i].DevelopmentCost);
+                if (tagError != null)
+                    throw new InvalidOperationException($"Line {i + 1}: {tagError}.");
+                if (project == null)
+                    continue;
+
+                if (validLines[i].AccountId != project.WipAccountId)
+                {
+                    var wipCode = await _db.Accounts.Where(x => x.Id == project.WipAccountId).Select(x => x.Code + " " + x.Name).FirstOrDefaultAsync();
+                    throw new InvalidOperationException(
+                        $"Line {i + 1}: a cost for {project.Code} must be posted to the project's account {wipCode}.");
+                }
+
+                projectTags[validLines[i]] = (project, category!);
+            }
+
             var totalDebit = validLines.Sum(x => x.Debit);
             var totalCredit = validLines.Sum(x => x.Credit);
 
@@ -117,9 +138,9 @@ namespace RealEstateManager.Services
 
             foreach (var line in validLines)
             {
-                int? propertyId = null;
+                int? propertyId = projectTags.TryGetValue(line, out var projectTag) ? projectTag.Project.PropertyId : null;
 
-                if (line.UnitId.HasValue)
+                if (line.UnitId.HasValue && propertyId == null)
                 {
                     propertyId = await _db.Units
                         .Where(x => x.Id == line.UnitId.Value)
@@ -138,7 +159,9 @@ namespace RealEstateManager.Services
                     TenantId = line.TenantId,
                     VendorId = line.VendorId,
                     LeaseId = line.LeaseId,
-                    OwnerWithdrawalCategoryId = line.OwnerWithdrawalCategoryId
+                    OwnerWithdrawalCategoryId = line.OwnerWithdrawalCategoryId,
+                    DevelopmentProjectId = projectTags.TryGetValue(line, out var tag) ? tag.Project.Id : null,
+                    DevelopmentCostCategory = projectTags.TryGetValue(line, out var tag2) ? tag2.Category : null
                 });
             }
 

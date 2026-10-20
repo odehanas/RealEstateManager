@@ -1,4 +1,4 @@
-﻿@model RealEstateManager.Domain.Property
+@model RealEstateManager.Domain.Property
 
 @{
     ViewData["Title"] = "Create Property";
@@ -86,6 +86,8 @@
             <input asp-for="CommissionPercentage" class="form-control" />
         </div>
     </div>
+
+    <partial name="_RegistrationFields" model="Model" />
 
     <div class="mt-4">
         <button type="submit" class="btn btn-dark">Save</button>

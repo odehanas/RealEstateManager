@@ -171,12 +171,21 @@ builder.Services.AddScoped<TenantStatementService>();
 builder.Services.AddScoped<VendorStatementService>();
 builder.Services.AddScoped<OwnerSettlementService>();
 builder.Services.AddScoped<OwnerCommissionInvoiceService>();
+builder.Services.AddScoped<DevelopmentProjectService>();
+builder.Services.AddScoped<DevelopmentTransferService>();
+builder.Services.AddScoped<InvestmentPropertyNoteService>();
+builder.Services.AddScoped<InvestmentPropertySetupService>();
+builder.Services.AddScoped<RealEstateVatService>();
+builder.Services.AddScoped<UnitSaleService>();
+builder.Services.AddScoped<CapitalAssetVatService>();
 builder.Services.AddScoped<FixedAssetService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<LeaseWorkflowService>();
 // Each kind of document that can be approved registers its handler here.
 builder.Services.AddScoped<IApprovalHandler>(sp => sp.GetRequiredService<LeaseWorkflowService>());
+builder.Services.AddSingleton<SchemaUpdateStatus>();
+builder.Services.AddSingleton<SchemaScriptRunner>();
 builder.Services.AddSingleton<SampleDataQueue>();
 builder.Services.AddHostedService<SampleDataWorker>();
 
@@ -185,6 +194,8 @@ var app = builder.Build();
 // Seeding must never prevent the host from starting. An unhandled exception here
 // happens before the request pipeline exists and surfaces as HTTP 500.30, which
 // leaves no UI from which to diagnose or fix the problem. Log and continue.
+// Database scripts first: the seeders and every screen expect their tables to exist.
+await RunSeederAsync("SchemaScriptRunner", () => app.Services.GetRequiredService<SchemaScriptRunner>().RunAsync());
 await RunSeederAsync("ChartOfAccountsSeeder", () => ChartOfAccountsSeeder.SeedAsync(app.Services));
 await RunSeederAsync("AppSecuritySeeder", () => AppSecuritySeeder.SeedAsync(app.Services));
 

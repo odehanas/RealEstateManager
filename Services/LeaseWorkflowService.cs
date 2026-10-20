@@ -191,6 +191,10 @@ namespace RealEstateManager.Services
             lease.Status = LeaseStatuses.Active;
             unit.Status = "Occupied";
 
+            // The unit's first supply, if it has had none - its later leases are then exempt
+            // when it is residential.
+            RealEstateVatService.RecordFirstSupply(unit, lease.StartDate, "Lease", lease.ContractNumber);
+
             LeaseScheduleBuilder.GenerateInvoices(_db, lease.CompanyId, lease);
             LeaseScheduleBuilder.GenerateRevenueRecognitionSchedules(_db, lease.CompanyId, lease, unit.Property!);
         }

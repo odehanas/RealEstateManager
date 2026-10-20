@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RealEstateManager.Domain.Property>
+@model IEnumerable<RealEstateManager.Domain.Property>
 @inject PermissionService PermissionService
 
 @{
@@ -31,6 +31,8 @@
             <th>Type</th>
             <th>Ownership</th>
             <th>Owner</th>
+            <th>Emirate</th>
+            <th>Title Deed</th>
             <th class="text-end">Asset Value</th>
             <th class="text-end">Commission %</th>
             <th>Status</th>
@@ -46,10 +48,13 @@
                 <td>@item.PropertyType</td>
                 <td>@item.OwnershipType</td>
                 <td>@item.OwnerName</td>
+                <td>@item.Emirate</td>
+                <td>@item.TitleDeedNumber</td>
                 <td class="text-end">@item.AssetValue.ToString("N2")</td>
                 <td class="text-end">@item.CommissionPercentage.ToString("N2")</td>
                 <td>@(item.IsActive ? "Active" : "Inactive")</td>
-                <td>
+                <td class="text-nowrap">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark">View</a>
                     @if (canEdit)
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>

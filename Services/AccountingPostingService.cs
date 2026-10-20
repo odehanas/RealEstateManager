@@ -450,7 +450,9 @@ namespace RealEstateManager.Services
                     PropertyId = billLine.PropertyId ?? bill.PropertyId,
                     UnitId = billLine.UnitId,
                     VendorId = bill.VendorId,
-                    VendorBillId = bill.Id
+                    VendorBillId = bill.Id,
+                    DevelopmentProjectId = billLine.DevelopmentProjectId,
+                    DevelopmentCostCategory = billLine.DevelopmentCostCategory
                 });
             }
 
@@ -604,6 +606,103 @@ namespace RealEstateManager.Services
 
             await _db.SaveChangesAsync();
             return journalEntry;
+        }
+
+        /// <summary>
+        /// A cost capitalised into a development project without a supplier bill - the land
+        /// paid from the bank, an authority fee, borrowing costs moved out of finance costs:
+        ///
+        ///   Dr  the project's work-in-progress account    tagged with project and category
+        ///       Cr  the account chosen (bank, accrual, finance costs...)
+        /// </summary>
+        public async Task<JournalEntry> PostDevelopmentCostAsync(
+            DevelopmentProject project,
+            DateTime costDate,
+            string costCategory,
+            string description,
+            decimal amount,
+            int creditAccountId,
+            string? reference)
+        {
+            var wipAccount = await GetMappedAccountAsync(project.CompanyId, project.WipAccountId, "Project work in progress");
+            var creditAccount = await GetMappedAccountAsync(project.CompanyId, creditAccountId, "Account credited");
+
+            var lines = new List<JournalEntryLine>
+            {
+                new()
+                {
+                    AccountId = wipAccount.Id,
+                    Debit = amount,
+                    Credit = 0m,
+                    Description = description,
+                    PropertyId = project.PropertyId,
+                    DevelopmentProjectId = project.Id,
+                    DevelopmentCostCategory = costCategory
+                },
+                new()
+                {
+                    AccountId = creditAccount.Id,
+                    Debit = 0m,
+                    Credit = amount,
+                    Description = $"{project.Code} {project.Name} - {description}",
+                    PropertyId = project.PropertyId
+                }
+            };
+
+            return await CreateJournalEntryAsync(
+                project.CompanyId,
+                costDate,
+                $"Development cost {project.Code} - {description}",
+                "DevelopmentCost",
+                project.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: reference,
+                referenceNumber: project.Code);
+        }
+
+        /// <summary>Records a journal whose lines another service has built (unit sales, capital asset VAT).</summary>
+        public Task<JournalEntry> CreatePreparedJournalAsync(
+            int companyId, DateTime date, string description, string sourceType, int sourceId,
+            List<JournalEntryLine> lines, string? documentNumber, string? referenceNumber = null)
+        {
+            return CreateJournalEntryAsync(companyId, date, description, sourceType, sourceId, lines,
+                journalType: "Auto", documentNumber: documentNumber, referenceNumber: referenceNumber);
+        }
+
+        /// <summary>Allocates opening investment property to one building (built by InvestmentPropertySetupService).</summary>
+        public Task<JournalEntry> CreateInvestmentPropertySetupJournalAsync(
+            int companyId, DateTime date, Property property, List<JournalEntryLine> lines)
+        {
+            return CreateJournalEntryAsync(
+                companyId,
+                date,
+                $"Investment property allocated to {property.Code} - {property.Name}",
+                InvestmentPropertySetupService.SourceType,
+                property.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: property.Code);
+        }
+
+        /// <summary>
+        /// The journal that moves a completed project's cost out of work in progress. The
+        /// lines are built by <see cref="DevelopmentTransferService"/>, which knows the
+        /// allocation to units; this only records them.
+        /// </summary>
+        public Task<JournalEntry> CreateDevelopmentTransferJournalAsync(
+            DevelopmentTransfer transfer, DevelopmentProject project, List<JournalEntryLine> lines)
+        {
+            return CreateJournalEntryAsync(
+                transfer.CompanyId,
+                transfer.TransferDate,
+                $"Completion transfer {project.Code} - {project.Name}",
+                "DevelopmentTransfer",
+                transfer.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: project.Code,
+                referenceNumber: project.CompletionCertificateNumber);
         }
 
         /// <summary>

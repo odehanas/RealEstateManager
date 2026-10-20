@@ -1,0 +1,94 @@
+@model List<RealEstateManager.Domain.CapitalAssetVatRecord>
+@using RealEstateManager.Services
+
+@{
+    ViewData["Title"] = "Capital Assets Scheme";
+    var candidates = ViewBag.Candidates as List<CapitalAssetCandidate> ?? new();
+    var properties = ViewBag.Properties as List<SelectListItem> ?? new();
+}
+
+<h2>Capital Assets Scheme (VAT)</h2>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-info">
+    A building costing <strong>AED 5 million or more</strong> before VAT is a capital asset for VAT. The input tax recovered on it is
+    reviewed every year for <strong>ten years</strong>: if the building is used more for exempt supplies than when the tax was recovered -
+    typically a residential building whose zero-rated first leases are followed by exempt ones - part of the tax is paid back; if it is used
+    more for taxable supplies, more can be recovered. Each year's adjustment goes in the VAT return after the year ends.
+</div>
+
+<h4>Registered Assets</h4>
+<table class="table table-bordered table-sm">
+    <thead><tr><th>Asset</th><th>Property</th><th class="text-end">Value</th><th class="text-end">Input VAT</th><th class="text-end">Recovered</th><th class="text-end">Taxable use at recovery</th><th>Period</th><th class="text-end">Years adjusted</th><th></th></tr></thead>
+    <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr><td colspan="9" class="text-center text-muted">No capital assets registered.</td></tr>
+        }
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Name</td>
+                <td>@r.Property?.Code</td>
+                <td class="text-end">@r.AssetValue.ToString("N2")</td>
+                <td class="text-end">@r.InputVat.ToString("N2")</td>
+                <td class="text-end">@r.RecoveredVat.ToString("N2")</td>
+                <td class="text-end">@r.OriginalRecoveryPercent.ToString("0.##")%</td>
+                <td>@r.StartDate.ToString("dd/MM/yyyy") - @r.EndDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-end">@r.Adjustments.Count / 10</td>
+                <td><a asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-outline-dark">Open</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (candidates.Count > 0)
+{
+    <h4 class="mt-4">Completed Buildings to Register</h4>
+    <table class="table table-bordered table-sm">
+        <thead><tr><th>Project</th><th class="text-end">Cost</th><th class="text-end">Input VAT</th><th class="text-end">Recovered</th><th>From</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var c in candidates)
+            {
+                <tr>
+                    <td>@c.Name</td>
+                    <td class="text-end">@c.Value.ToString("N2")</td>
+                    <td class="text-end">@c.InputVat.ToString("N2")</td>
+                    <td class="text-end">@c.RecoveredVat.ToString("N2")</td>
+                    <td>@c.StartDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <form asp-action="RegisterProject" method="post">
+                            <input type="hidden" name="projectId" value="@c.ProjectId" />
+                            <button type="submit" class="btn btn-sm btn-primary">Register</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p class="small text-muted">Rental and own-use buildings from Development Projects, completed, costing AED 5 million or more. The input VAT comes from the project's posted supplier bills.</p>
+}
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-light"><strong>Register a Building Bought or Built Outside the System</strong></div>
+    <div class="card-body">
+        <form asp-action="RegisterManual" method="post" class="row g-3">
+            <div class="col-md-4"><label class="form-label">Name</label><input type="text" name="name" class="form-control" maxlength="150" required /></div>
+            <div class="col-md-4"><label class="form-label">Property</label><select name="propertyId" asp-items="properties" class="form-select" required></select></div>
+            <div class="col-md-4"><label class="form-label">First used on (year 1 starts)</label><input type="date" name="startDate" class="form-control" required /></div>
+            <div class="col-md-4"><label class="form-label">Value before VAT</label><input type="number" step="0.01" min="5000000" name="value" class="form-control" required /></div>
+            <div class="col-md-4"><label class="form-label">Input VAT charged</label><input type="number" step="0.01" min="0.01" name="inputVat" class="form-control" required /></div>
+            <div class="col-md-4"><label class="form-label">Input VAT recovered</label><input type="number" step="0.01" min="0" name="recoveredVat" class="form-control" required /></div>
+            <div class="col-md-8"><label class="form-label">Notes</label><input type="text" name="notes" class="form-control" maxlength="1000" /></div>
+            <div class="col-md-4 d-flex align-items-end"><button type="submit" class="btn btn-dark w-100">Register</button></div>
+        </form>
+    </div>
+</div>

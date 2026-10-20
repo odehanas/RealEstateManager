@@ -1,4 +1,4 @@
-﻿namespace RealEstateManager.Models
+namespace RealEstateManager.Models
 {
     public class UnitCreateViewModel
     {
@@ -15,5 +15,14 @@
         /// treatment, which is what you want for everything except a mixed-use building.
         /// </summary>
         public string? VatCategory { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Display(Name = "Unit title deed number")]
+        public string? TitleDeedNumber { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Display(Name = "Parking bays")]
+        public int? ParkingBays { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Display(Name = "Electricity / water account")]
+        public string? UtilityAccountNumber { get; set; }
     }
 }

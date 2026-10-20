@@ -31,3 +31,21 @@ complete manual as one printable document, with a PDF to download.</p>
 expected and what happened, plus any document number involved — that is usually enough to resolve an issue
 without further correspondence. Administrators review submissions under
 <span class="path">System Setup ▸ Feedback Review</span>.</p>
+
+<h3>Database Updates</h3>
+<p><span class="path">System Setup ▸ Database Updates</span> — the platform owner only.</p>
+<p>Each new version of the application brings its own database changes as numbered scripts, and applies any it
+has not applied before when the site starts. Nobody needs to run SQL in the hosting console any more: deploying
+the new version is enough. Every script is applied at most once, all or nothing, and the record of what has been
+applied is kept in the database itself.</p>
+<ul>
+    <li><strong>Safety.</strong> A script runs as a single unit: if any of its statements fails, none of it is kept.
+    The application never removes tables, columns or data on its own - a script that would do so is refused
+    unless it is explicitly marked as reviewed.</li>
+    <li><strong>If an update fails</strong>, the site still opens. The page shows the script and statement that
+    failed and the database's own error message, and no later scripts are applied. Send the page to your
+    developer; the next deployment tries again.</li>
+    <li><strong>First start after this feature arrived.</strong> Scripts 01 to 21 had already been run by hand.
+    The application recognised them from the tables they created and recorded them as <em>Already in place</em>
+    without running them again.</li>
+</ul>

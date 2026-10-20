@@ -142,8 +142,17 @@ namespace RealEstateManager.Services
                 .Select(x => x.TaxInvoiceNumber)
                 .FirstOrDefaultAsync();
 
+            var lastUnitSale = await _db.UnitSaleReceipts
+                .IgnoreQueryFilters()
+                .Where(x => x.CompanyId == companyId
+                            && x.TaxInvoiceNumber != null
+                            && x.TaxInvoiceNumber.StartsWith(prefix))
+                .OrderByDescending(x => x.TaxInvoiceNumber)
+                .Select(x => x.TaxInvoiceNumber)
+                .FirstOrDefaultAsync();
+
             var next = 1;
-            foreach (var number in new[] { last, lastCommission })
+            foreach (var number in new[] { last, lastCommission, lastUnitSale })
             {
                 if (!string.IsNullOrEmpty(number) && int.TryParse(number[prefix.Length..], out var parsed))
                     next = Math.Max(next, parsed + 1);

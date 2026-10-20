@@ -1,0 +1,69 @@
+<p><span class="path">Operations ▸ Unit Sales</span></p>
+<p>Selling units — completed or off plan — with a sale and purchase agreement, a payment plan, the buyer's payments and
+the <strong>handover</strong>. Revenue is recognised <strong>at handover</strong>: until then, everything the buyer pays is
+held as an advance.</p>
+
+<h3>Signing a contract</h3>
+<ol class="steps">
+    <li>Add the buyer to the customer register first (<span class="path">Master Data ▸ Tenants</span>), with their Emirates
+        ID or passport and, for a company, its TRN.</li>
+    <li>Select <strong>New Sale Contract</strong>. Choose the unit, the buyer, the contract date and the <strong>sale price before
+        VAT</strong>. The VAT treatment appears at once, with the reason.</li>
+    <li>Enter the <strong>payment plan</strong> — up to six instalments with due dates, amounts including VAT — or leave it empty
+        for one payment of the full price. <em>Split 20 / 30 / 30 / 20</em> fills a typical off-plan plan. The plan must add up to
+        the price including VAT.</li>
+    <li>Select <strong>Sign Contract</strong>. It is numbered SPA-year-0001; the unit becomes <em>Reserved</em>.</li>
+</ol>
+
+<h3>The VAT treatment</h3>
+<table class="fields t-compact">
+    <thead><tr><th>Unit</th><th>Treatment</th></tr></thead>
+    <tbody>
+        <tr><td>Commercial (standard rated unit or property)</td><td>Standard rated, 5%</td></tr>
+        <tr><td>Residential, the unit's <strong>first</strong> supply, within three years of completion — or before completion (off plan)</td><td>Zero rated</td></tr>
+        <tr><td>Residential, any later supply (resale, or sold after it was first let)</td><td>Exempt</td></tr>
+    </tbody>
+</table>
+<p>A building is treated as new when its property has a completion date or a development project. The decision and its
+reason are kept on the contract, and the sale is recorded as the unit's first supply. See
+<a href="#real-estate-vat">Real Estate VAT</a>.</p>
+
+<h3>Recording the buyer's payments</h3>
+<p>On the contract page, under <strong>Record a Payment</strong>, enter the date, amount (including VAT), method and the bank
+account. It is posted at once. The payment plan shows each instalment as paid, part paid, due or overdue.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td colspan="3"><em>Before handover</em></td></tr>
+        <tr><td><code>11100</code> Bank</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>21250</code> Advances from Unit Buyers</td><td class="num">—</td><td class="num cr">Price part</td></tr>
+        <tr><td><code>21400</code> VAT Payable — standard-rated sales only</td><td class="num">—</td><td class="num cr">VAT part</td></tr>
+        <tr><td colspan="3"><em>After handover</em></td></tr>
+        <tr><td><code>11100</code> Bank</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11250</code> Receivable from Unit Buyers</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p>On a standard-rated sale, VAT is due when each payment is received, so each payment before handover gets a number from
+the tax invoice series (TX-year-…).</p>
+
+<h3>Handover</h3>
+<p>The unit must have its cost in <code>13200</code> Completed Properties Held for Sale — that is, its development project is
+complete and the unit was transferred <em>for sale</em>. Enter the handover date and, if known, the buyer's new title deed
+number, and select <strong>Hand over</strong>:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21250</code> Advances from Unit Buyers</td><td class="num dr">Advances received</td><td class="num">—</td></tr>
+        <tr><td><code>11250</code> Receivable from Unit Buyers</td><td class="num dr">Unpaid balance with its VAT</td><td class="num">—</td></tr>
+        <tr><td><code>41200</code> Revenue from Sale of Properties</td><td class="num">—</td><td class="num cr">Sale price</td></tr>
+        <tr><td><code>21400</code> VAT Payable</td><td class="num">—</td><td class="num cr">VAT on the unpaid balance</td></tr>
+        <tr><td><code>51200</code> Cost of Properties Sold</td><td class="num dr">Unit's cost</td><td class="num">—</td></tr>
+        <tr><td><code>13200</code> Completed Properties Held for Sale</td><td class="num">—</td><td class="num cr">Unit's cost</td></tr>
+    </tbody>
+</table>
+<p>The unit becomes <em>Sold</em>; the contract page shows revenue, cost of sales and gross profit. Payments and the handover
+cannot be reset to draft — a correction is a journal.</p>
+
+<h3>Cancelling</h3>
+<p>A contract can be cancelled only while nothing has been paid; the unit becomes available again. If the buyer has paid,
+agree the refund or forfeiture and record it with a journal first.</p>

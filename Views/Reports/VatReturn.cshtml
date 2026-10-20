@@ -163,7 +163,7 @@
                 @foreach (var line in Model.InputLines)
                 {
                     <tr>
-                        <td class="lbl">@InputTaxAttributions.Describe(line.Attribution)</td>
+                        <td class="lbl">@(line.Attribution == "CapitalAssetsScheme" ? "Capital Assets Scheme adjustment" : InputTaxAttributions.Describe(line.Attribution))</td>
                         <td class="text-end">@line.BillCount</td>
                         <td class="text-end">@line.NetAmount.ToString("N2")</td>
                         <td class="text-end">@line.VatAmount.ToString("N2")</td>

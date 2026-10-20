@@ -1,0 +1,108 @@
+@model RealEstateManager.Domain.CapitalAssetVatRecord
+@using RealEstateManager.Services
+
+@{
+    ViewData["Title"] = Model.Name + " - Capital Assets Scheme";
+    var nextYear = ViewBag.NextYear as int? ?? 0;
+    var proposed = ViewBag.ProposedPercent as decimal?;
+    var explanation = ViewBag.Explanation as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="mb-0">@Model.Name</h2>
+        <div class="text-muted">Capital Assets Scheme &middot; @Model.Property?.Code - @Model.Property?.Name</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Value before VAT</div><div class="fs-5">@Model.AssetValue.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Input VAT charged</div><div class="fs-5">@Model.InputVat.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Recovered at the time</div><div class="fs-5">@Model.RecoveredVat.ToString("N2") (@Model.OriginalRecoveryPercent.ToString("0.##")%)</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">One year's share</div><div class="fs-5">@((Model.InputVat / 10m).ToString("N2"))</div></div></div></div>
+</div>
+
+<p class="small text-muted">Each year: adjustment = input VAT &times; (taxable use that year &minus; @Model.OriginalRecoveryPercent.ToString("0.##")%) &divide; 10.
+A positive figure is more tax to recover; a negative one is tax to pay back.</p>
+
+<table class="table table-bordered table-sm">
+    <thead><tr><th>Year</th><th>Period</th><th class="text-end">Taxable use</th><th class="text-end">Adjustment</th><th>Accounted on</th><th>Journal</th><th>Notes</th></tr></thead>
+    <tbody>
+        @for (var year = 1; year <= 10; year++)
+        {
+            var (start, end) = CapitalAssetVatService.YearPeriod(Model, year);
+            var a = Model.Adjustments.FirstOrDefault(x => x.YearNumber == year);
+            <tr class="@(a != null ? "" : end > DateTime.Today ? "text-muted" : "table-warning")">
+                <td>@year</td>
+                <td>@start.ToString("dd/MM/yyyy") - @end.ToString("dd/MM/yyyy")</td>
+                @if (a != null)
+                {
+                    <td class="text-end">@a.TaxableUsePercent.ToString("0.##")%</td>
+                    <td class="text-end @(a.Adjustment < 0 ? "text-danger" : "")">@a.Adjustment.ToString("N2")</td>
+                    <td>@a.AdjustmentDate.ToString("dd/MM/yyyy")</td>
+                    <td>@(a.JournalEntry?.EntryNumber ?? "-")</td>
+                    <td>@a.Notes</td>
+                }
+                else
+                {
+                    <td colspan="5">@(end > DateTime.Today ? "Not over yet" : "Due - review this year")</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (nextYear > 0 && CapitalAssetVatService.YearPeriod(Model, nextYear).End <= DateTime.Today)
+{
+    var (s, e) = CapitalAssetVatService.YearPeriod(Model, nextYear);
+    <div class="card shadow-sm border-primary">
+        <div class="card-header bg-light"><strong>Review Year @nextYear (@s.ToString("dd/MM/yyyy") - @e.ToString("dd/MM/yyyy"))</strong></div>
+        <div class="card-body">
+            <p class="small text-muted">@explanation</p>
+            <form asp-action="Adjust" asp-route-id="@Model.Id" method="post" class="row g-3"
+                  onsubmit="return confirm('Post the Capital Assets Scheme adjustment for this year?');">
+                <input type="hidden" name="year" value="@nextYear" />
+                <div class="col-md-3">
+                    <label class="form-label">Taxable use %</label>
+                    <input type="number" step="0.01" min="0" max="100" name="taxableUsePercent" id="taxableUse"
+                           value="@((proposed ?? Model.OriginalRecoveryPercent).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Adjustment</label>
+                    <div class="form-control bg-light" id="adjPreview">-</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Account on</label>
+                    <input type="date" name="adjustmentDate" value="@(e.AddDays(1) > DateTime.Today ? DateTime.Today.ToString("yyyy-MM-dd") : e.AddDays(1).ToString("yyyy-MM-dd"))" class="form-control" required />
+                </div>
+                <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-primary w-100">Post Adjustment</button></div>
+                <div class="col-12"><input type="text" name="notes" class="form-control" maxlength="500" placeholder="Notes (optional) - e.g. how the taxable use was worked out" /></div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var input = document.getElementById('taxableUse');
+            if (!input) return;
+            var vat = @Model.InputVat.ToString(System.Globalization.CultureInfo.InvariantCulture), original = @Model.OriginalRecoveryPercent.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            function show() {
+                var a = Math.round(vat * ((parseFloat(input.value) || 0) - original) / 100 / 10 * 100) / 100;
+                document.getElementById('adjPreview').textContent = a.toFixed(2) + (a < 0 ? ' (repay)' : a > 0 ? ' (recover more)' : '');
+            }
+            input.addEventListener('input', show); show();
+        })();
+    </script>
+}

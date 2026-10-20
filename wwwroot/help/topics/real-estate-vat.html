@@ -1,0 +1,55 @@
+<p>How the system applies UAE VAT to the sale and lease of real estate, and the ten-year review of input tax on buildings.
+Confirm the treatment of unusual cases with your tax adviser.</p>
+
+<h3>Supplies: sales and leases</h3>
+<table class="fields t-compact">
+    <thead><tr><th>Supply</th><th>Treatment</th></tr></thead>
+    <tbody>
+        <tr><td>Commercial property — sale or lease</td><td>Standard rated, 5%</td></tr>
+        <tr><td>Residential — the <strong>first supply</strong> of a new unit (its first sale or first lease), within three years of the building's completion, or before completion</td><td>Zero rated — the related input tax is recoverable</td></tr>
+        <tr><td>Residential — any later supply</td><td>Exempt — no output tax, and related input tax is not recoverable</td></tr>
+    </tbody>
+</table>
+<p>The system decides this for every new <a href="#leases">lease</a> and <a href="#unit-sales">sale</a>:</p>
+<ul>
+    <li>A building is <em>new</em> when its property has a <strong>completion date</strong> (from the completion certificate) or a
+        <a href="#development-projects">development project</a>. Without either, a residential building is treated as existing
+        and its supplies are exempt.</li>
+    <li>Each unit records its <strong>first supply</strong> — the date, whether it was a sale or a lease, and the contract — when the
+        first contract takes effect. Every later lease or sale of the unit is exempt.</li>
+    <li>The three years run from the completion date. The property page shows the last day of the window.</li>
+    <li>A unit or property deliberately set to zero rated keeps that; a lease's treatment can still be overridden with a reason.</li>
+</ul>
+
+<h3>The Capital Assets Scheme</h3>
+<p><span class="path">Operations ▸ Capital Assets Scheme (VAT)</span></p>
+<p>A building costing <strong>AED 5 million or more</strong> before VAT is a capital asset. The input tax recovered on it is
+reviewed every year for <strong>ten years</strong> against how it was actually used. The usual case: a residential building
+built to rent out recovers its construction VAT because the first leases are zero rated, but later leases are exempt — so
+part of that VAT is paid back over the following years.</p>
+<ol class="steps">
+    <li><strong>Register the building.</strong> Completed rental or own-use development projects of AED 5 million or more are
+        listed; <strong>Register</strong> takes the input VAT charged and recovered from the project's posted supplier bills.
+        A building bought or built outside the system is registered by hand. Year 1 starts on the first-use date.</li>
+    <li><strong>Review each year once it is over.</strong> Open the asset: the next year due is offered, with a proposed
+        <strong>taxable use</strong> worked out from the building's leases — each unit's area for the days it was let,
+        standard or zero-rated leases counting as taxable and exempt leases as exempt. Change it if you know better.</li>
+    <li><strong>Post the adjustment.</strong> Adjustment = input VAT &times; (taxable use this year &minus; taxable use at
+        recovery) &divide; 10. It is dated after the year ends and goes in that period's VAT return.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td colspan="3"><em>Tax to pay back (use became more exempt)</em></td></tr>
+        <tr><td><code>61200</code> Irrecoverable VAT - Capital Assets Scheme</td><td class="num dr">Adjustment</td><td class="num">—</td></tr>
+        <tr><td><code>11300</code> VAT Recoverable</td><td class="num">—</td><td class="num cr">Adjustment</td></tr>
+        <tr><td colspan="3"><em>More tax recoverable (use became more taxable)</em></td></tr>
+        <tr><td><code>11300</code> VAT Recoverable</td><td class="num dr">Adjustment</td><td class="num">—</td></tr>
+        <tr><td><code>61200</code> Irrecoverable VAT - Capital Assets Scheme</td><td class="num">—</td><td class="num cr">Adjustment</td></tr>
+    </tbody>
+</table>
+
+<h3>In the VAT return</h3>
+<p>The <a href="#vat-return">VAT return</a> shows unit sales by treatment (<em>… - sale of units</em>): payments received
+before handover in the period they are received, and the balance at handover in the handover period. Capital Assets
+Scheme adjustments appear under input tax as <em>Capital Assets Scheme adjustment</em>.</p>

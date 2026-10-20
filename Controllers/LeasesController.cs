@@ -14,19 +14,22 @@ namespace RealEstateManager.Controllers
         private readonly ContractQrService _contractQrService;
         private readonly LeaseWorkflowService _workflow;
         private readonly ApprovalService _approvals;
+        private readonly RealEstateVatService _realEstateVat;
 
         public LeasesController(
             ApplicationDbContext db,
             CodeGenerationService codeGenerationService,
             ContractQrService contractQrService,
             LeaseWorkflowService workflow,
-            ApprovalService approvals)
+            ApprovalService approvals,
+            RealEstateVatService realEstateVat)
         {
             _db = db;
             _codeGenerationService = codeGenerationService;
             _contractQrService = contractQrService;
             _workflow = workflow;
             _approvals = approvals;
+            _realEstateVat = realEstateVat;
         }
 
         [HttpGet]
@@ -189,10 +192,11 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            // VAT treatment comes from the unit, falling back to the property. It is
-            // never typed in freehand: an override must be a deliberate choice with a
-            // reason, so a residential lease cannot silently acquire 5% output tax.
-            var derivedCategory = VatDeterminationService.ResolveCategory(unit!.Property!, unit);
+            // VAT treatment comes from the unit, falling back to the property, and for a new
+            // residential building from whether this is the unit's first supply (zero rated
+            // within three years of completion, exempt afterwards). It is never typed in
+            // freehand: an override must be a deliberate choice with a reason.
+            var derivedCategory = (await _realEstateVat.DetermineAsync(unit!.Id, model.StartDate)).Category;
             var effectiveCategory = string.IsNullOrWhiteSpace(model.VatCategoryOverride)
                 ? derivedCategory
                 : model.VatCategoryOverride!;
@@ -439,7 +443,7 @@ namespace RealEstateManager.Controllers
             lease.AnnualRent = model.AnnualRent;
             lease.BillingFrequencyMonths = model.BillingFrequencyMonths;
 
-            var derivedCategory = VatDeterminationService.ResolveCategory(unit!.Property!, unit);
+            var derivedCategory = (await _realEstateVat.DetermineAsync(unit!.Id, model.StartDate, excludeLeaseId: lease.Id)).Category;
             var effectiveCategory = string.IsNullOrWhiteSpace(model.VatCategoryOverride)
                 ? derivedCategory
                 : model.VatCategoryOverride!;

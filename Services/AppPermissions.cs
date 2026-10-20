@@ -143,7 +143,8 @@ namespace RealEstateManager.Services
                 "Print",
                 "Export",
                 "Search",
-                "PreviewCode"
+                "PreviewCode",
+                "Document"
             };
 
         private static readonly Dictionary<string, string[]> ControllerPermissionMap =
@@ -174,13 +175,18 @@ namespace RealEstateManager.Services
                 ["Reports"] = new[] { AppPermissions.ReportsView },
                 ["TenantStatements"] = new[] { AppPermissions.ReportsView },
                 ["VendorStatements"] = new[] { AppPermissions.ReportsView, AppPermissions.AccountingManage },
-                ["OwnerSettlements"] = new[] { AppPermissions.AccountingManage }
+                ["OwnerSettlements"] = new[] { AppPermissions.AccountingManage },
+                ["DevelopmentProjects"] = new[] { AppPermissions.AccountingManage },
+                ["InvestmentProperty"] = new[] { AppPermissions.ReportsView },
+                ["UnitSales"] = new[] { AppPermissions.AccountingManage },
+                ["CapitalAssetVat"] = new[] { AppPermissions.AccountingManage }
             };
 
         private static readonly Dictionary<string, string[]> ActionPermissionMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView }
+                ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView },
+                ["InvestmentProperty.SetUpBuilding"] = new[] { AppPermissions.AccountingManage }
             };
 
         /// <summary>

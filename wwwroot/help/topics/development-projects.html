@@ -1,0 +1,103 @@
+<p><span class="path">Operations ▸ Development Projects</span></p>
+<p>A <strong>development project</strong> is a building under construction. Until it is complete, everything it costs —
+land, design, permits, contractors, supervision, borrowing costs — is collected in one asset account and stays on the
+balance sheet. Nothing is charged to profit and loss while the building is being built.</p>
+
+<h3>Where the cost is collected depends on what the building is for</h3>
+<table class="fields t-compact">
+    <thead><tr><th>Intended use</th><th>Account</th><th>Standard</th><th>On completion it becomes</th></tr></thead>
+    <tbody>
+        <tr><td><strong>For sale</strong></td><td><code>13100</code> Properties Under Development - For Sale</td><td>IAS 2 Inventories</td><td>Completed units held for sale; cost of sales when each unit is sold</td></tr>
+        <tr><td><strong>For rental</strong></td><td><code>15500</code> Investment Property Under Construction</td><td>IAS 40 Investment Property</td><td>Investment property (cost or fair value model)</td></tr>
+        <tr><td><strong>Own use</strong></td><td><code>15600</code> Capital Work in Progress</td><td>IAS 16 Property, Plant and Equipment</td><td>A fixed asset, depreciated</td></tr>
+    </tbody>
+</table>
+<p>Choose the main use. A building that will be partly sold and partly rented is split between the two on completion.</p>
+
+<h3>Setting up a project</h3>
+<ol class="steps">
+    <li>Record the plot as an <strong>Owned</strong> property in <span class="path">Master Data ▸ Properties</span>, with its
+        title deed and building permit.</li>
+    <li>Select <strong>New Project</strong>. Enter the name, choose the property, the intended use (the account follows
+        it), the main contractor and the dates.</li>
+    <li>Enter the <strong>budget</strong> for each cost category and save. The project is numbered DEV-0001, DEV-0002 and so on.</li>
+</ol>
+
+<h3>Recording costs</h3>
+<p>Every cost line carries the project and a <strong>cost category</strong>. The project's cost to date is read from the
+posted ledger lines that carry it, so it always agrees with the balance sheet.</p>
+<ul>
+    <li><strong>Supplier invoices</strong> (contractor certificates, consultants): enter a
+        <a href="#vendor-bills">vendor bill</a> and, on each line, choose the project and category in the box under
+        <em>Property</em>. The line's account switches to the project's account by itself. Irrecoverable VAT, if any, becomes
+        part of the project cost.</li>
+    <li><strong>Everything else</strong> — land paid from the bank, a plot contributed by the shareholders, authority fees —
+        use <strong>Record a Cost without a Supplier Bill</strong> on the project page. Choose the account it is paid from
+        or moved from. It is posted straight away.</li>
+    <li><strong>Adjustments</strong>: a <a href="#manual-journals">manual journal</a> line can carry a project too, but only on
+        the project's own account.</li>
+</ul>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>13100</code> / <code>15500</code> / <code>15600</code> the project's account</td><td class="num dr">Cost</td><td class="num">—</td></tr>
+        <tr><td>Accounts Payable, bank, share capital, or the account chosen</td><td class="num">—</td><td class="num cr">Cost</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">What belongs in project cost - and what does not</div>
+    <p>Only costs <em>directly</em> needed to bring the building to completion: land and its transfer fees, design, permits,
+    construction, infrastructure and utility connections, supervision, and borrowing costs on money borrowed to build it while
+    it is being built (IAS 23). Marketing, sales commissions, show-flat running costs, general overheads and abnormal waste are
+    expenses of the period, not project cost.</p>
+</div>
+
+<h3>Following the project</h3>
+<p>The project page shows the budget, cost to date, remaining budget and percentage spent; budget against actual for each
+category; and the <strong>cost ledger</strong> — every posted cost with its date, source, supplier and category. Draft
+bills or journals tagged to the project are flagged until they are posted. On the project list, an amount posted to a
+development account <em>without</em> a project is shown as <em>Not in any project</em> so it can be corrected.</p>
+
+<h3>Completion</h3>
+<p>When the completion certificate is issued, enter its date and number under <strong>Completion</strong>. The date is
+copied to the property record, where it starts the VAT window below. Late invoices and retention releases can still be
+tagged to a completed project.</p>
+
+<h3>Transfer on completion</h3>
+<p>Once the project is complete, its cost leaves work in progress for where each unit now belongs. First add the building's
+units, with their areas, to the project's property (<span class="path">Master Data ▸ Units</span>). Then, on the project page:</p>
+<ol class="steps">
+    <li>Under <strong>Transfer on Completion</strong>, check the units, their areas and their share of the cost.</li>
+    <li>Choose what each unit is for — <strong>for sale</strong>, <strong>for rental</strong> or <strong>own use</strong>. A mixed
+        building simply has units of different kinds. <em>Set every unit to</em> changes them all at once.</li>
+    <li>Enter the transfer date and, for rental and own-use units, the building's <strong>useful life</strong> in years.</li>
+    <li>Select <strong>Transfer and Post</strong>. It is posted at once and cannot be reset to draft.</li>
+</ol>
+<p>The cost is shared by area. The <em>Land and acquisition costs</em> category is kept apart from everything else (the
+building), so land is never depreciated:</p>
+<table class="fields t-compact">
+    <thead><tr><th>Unit for</th><th>Debited to</th><th>Afterwards</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Sale</strong></td><td><code>13200</code> Completed Properties Held for Sale, one line per unit at its cost</td><td>Inventory at cost until the unit is sold</td></tr>
+        <tr><td><strong>Rental</strong></td><td><code>15100</code> Investment Property, land and building on separate lines</td><td>Cost model: the building part is entered in the fixed asset register and depreciated monthly to <code>15150</code>; land is not depreciated. See <a href="#investment-property">Investment Property Note</a></td></tr>
+        <tr><td><strong>Own use</strong></td><td><code>15200</code> Fixed Assets, land and building on separate lines</td><td>The building part is depreciated monthly to <code>15300</code>; land is not</td></tr>
+    </tbody>
+</table>
+<p>The project's work-in-progress account is credited with the whole amount. The project page then shows the transfer,
+each unit's land, building and total cost, and links to the building's record in the fixed asset register. Depreciation
+starts in the month of the transfer. If a late invoice arrives after the transfer, a second transfer moves the remainder
+the same way.</p>
+
+<div class="box">
+    <div class="box-title">VAT on a new residential building</div>
+    <p>The first sale or first lease of each new residential unit, made within <strong>three years of completion</strong>, is
+    zero rated; later supplies of residential units are exempt. That is why input VAT on a residential project is normally
+    entered as <em>Taxable</em> (recoverable) on the supplier bills. If the building is kept and rented out, the later
+    exempt leases reduce that recovery over the following years under the Capital Assets Scheme — confirm the treatment
+    of each project with your tax adviser.</p>
+</div>
+
+<h3>Cancelling a project</h3>
+<p>A project can be cancelled only while nothing is recorded against it. An abandoned project's costs must first be written
+off with a journal.</p>

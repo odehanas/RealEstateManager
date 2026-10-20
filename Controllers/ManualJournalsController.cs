@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
 using RealEstateManager.Models;
@@ -97,6 +97,8 @@ namespace RealEstateManager.Controllers
 
             // Ids of accounts flagged as owner current accounts, so the General Journal
             // can enable the category selector only on those lines.
+            ViewBag.DevelopmentProjects = await DevelopmentProjectService.DevelopmentCostOptions(_db);
+
             ViewBag.OwnerAccountIds = await _db.Accounts
                 .Where(x => x.IsOwnerAccount)
                 .Select(x => x.Id)

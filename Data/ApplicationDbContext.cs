@@ -67,6 +67,16 @@ namespace RealEstateManager.Data
         public DbSet<OwnerSettlement> OwnerSettlements => Set<OwnerSettlement>();
         public DbSet<OwnerCommissionInvoice> OwnerCommissionInvoices => Set<OwnerCommissionInvoice>();
         public DbSet<OwnerCommissionInvoiceLine> OwnerCommissionInvoiceLines => Set<OwnerCommissionInvoiceLine>();
+        public DbSet<PropertyDocument> PropertyDocuments => Set<PropertyDocument>();
+        public DbSet<DevelopmentProject> DevelopmentProjects => Set<DevelopmentProject>();
+        public DbSet<DevelopmentBudgetLine> DevelopmentBudgetLines => Set<DevelopmentBudgetLine>();
+        public DbSet<DevelopmentTransfer> DevelopmentTransfers => Set<DevelopmentTransfer>();
+        public DbSet<DevelopmentTransferLine> DevelopmentTransferLines => Set<DevelopmentTransferLine>();
+        public DbSet<UnitSale> UnitSales => Set<UnitSale>();
+        public DbSet<UnitSaleInstalment> UnitSaleInstalments => Set<UnitSaleInstalment>();
+        public DbSet<UnitSaleReceipt> UnitSaleReceipts => Set<UnitSaleReceipt>();
+        public DbSet<CapitalAssetVatRecord> CapitalAssetVatRecords => Set<CapitalAssetVatRecord>();
+        public DbSet<CapitalAssetVatAdjustment> CapitalAssetVatAdjustments => Set<CapitalAssetVatAdjustment>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -249,6 +259,219 @@ namespace RealEstateManager.Data
 
             modelBuilder.Entity<Property>().Property(x => x.VatCategory).HasMaxLength(20);
             modelBuilder.Entity<Property>().Property(x => x.OwnerTrn).HasMaxLength(20);
+
+            // Registration details on the property record.
+            modelBuilder.Entity<Property>(entity =>
+            {
+                entity.Property(x => x.Emirate).HasMaxLength(30);
+                entity.Property(x => x.AreaName).HasMaxLength(100);
+                entity.Property(x => x.PlotNumber).HasMaxLength(50);
+                entity.Property(x => x.MunicipalityNumber).HasMaxLength(50);
+                entity.Property(x => x.LocationReference).HasMaxLength(50);
+                entity.Property(x => x.Latitude).HasPrecision(9, 6);
+                entity.Property(x => x.Longitude).HasPrecision(9, 6);
+                entity.Property(x => x.TitleDeedNumber).HasMaxLength(50);
+                entity.Property(x => x.TitleDeedAuthority).HasMaxLength(100);
+                entity.Property(x => x.TenureType).HasMaxLength(30);
+                entity.Property(x => x.LandUse).HasMaxLength(30);
+                entity.Property(x => x.PlotAreaSqFt).HasPrecision(18, 2);
+                entity.Property(x => x.OwnershipPercentage).HasPrecision(9, 4);
+                entity.Property(x => x.MortgageDetails).HasMaxLength(300);
+                entity.Property(x => x.BuildingPermitNumber).HasMaxLength(50);
+                entity.Property(x => x.CompletionCertificateNumber).HasMaxLength(50);
+                entity.Property(x => x.BuiltUpAreaSqFt).HasPrecision(18, 2);
+                entity.Property(x => x.DeveloperName).HasMaxLength(150);
+                entity.Property(x => x.MainContractor).HasMaxLength(150);
+                entity.Property(x => x.ConsultantName).HasMaxLength(150);
+                entity.Property(x => x.UtilityAccountNumber).HasMaxLength(100);
+                entity.Property(x => x.Insurer).HasMaxLength(150);
+                entity.Property(x => x.InsurancePolicyNumber).HasMaxLength(50);
+                entity.Property(x => x.RegistrationNotes).HasMaxLength(1000);
+                entity.Property(x => x.FairValue).HasPrecision(18, 2);
+                entity.Property(x => x.ValuerName).HasMaxLength(150);
+            });
+
+            modelBuilder.Entity<DevelopmentProject>(entity =>
+            {
+                entity.Property(x => x.Code).HasMaxLength(20);
+                entity.Property(x => x.Name).HasMaxLength(150);
+                entity.Property(x => x.IntendedUse).HasMaxLength(20);
+                entity.Property(x => x.Status).HasMaxLength(20);
+                entity.Property(x => x.CompletionCertificateNumber).HasMaxLength(50);
+                entity.Property(x => x.Notes).HasMaxLength(1000);
+
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.WipAccount).WithMany().HasForeignKey(x => x.WipAccountId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.MainContractorVendor).WithMany().HasForeignKey(x => x.MainContractorVendorId).OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(x => x.BudgetLines)
+                    .WithOne(x => x.DevelopmentProject)
+                    .HasForeignKey(x => x.DevelopmentProjectId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(x => new { x.CompanyId, x.Code }).IsUnique();
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<DevelopmentBudgetLine>(entity =>
+            {
+                entity.Property(x => x.CostCategory).HasMaxLength(30);
+                entity.Property(x => x.Amount).HasPrecision(18, 2);
+                entity.HasIndex(x => new { x.DevelopmentProjectId, x.CostCategory }).IsUnique();
+            });
+
+            modelBuilder.Entity<DevelopmentTransfer>(entity =>
+            {
+                entity.Ignore(x => x.TotalCost);
+                entity.Property(x => x.LandCost).HasPrecision(18, 2);
+                entity.Property(x => x.BuildingCost).HasPrecision(18, 2);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.DevelopmentProject).WithMany().HasForeignKey(x => x.DevelopmentProjectId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.RentalFixedAsset).WithMany().HasForeignKey(x => x.RentalFixedAssetId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.OwnUseFixedAsset).WithMany().HasForeignKey(x => x.OwnUseFixedAssetId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.JournalEntry).WithMany().HasForeignKey(x => x.JournalEntryId).OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(x => x.Lines)
+                    .WithOne(x => x.DevelopmentTransfer)
+                    .HasForeignKey(x => x.DevelopmentTransferId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<DevelopmentTransferLine>(entity =>
+            {
+                entity.Ignore(x => x.TotalCost);
+                entity.Property(x => x.IntendedUse).HasMaxLength(20);
+                entity.Property(x => x.AreaSqFt).HasPrecision(18, 2);
+                entity.Property(x => x.LandCost).HasPrecision(18, 2);
+                entity.Property(x => x.BuildingCost).HasPrecision(18, 2);
+                entity.HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<JournalEntryLine>(entity =>
+            {
+                entity.Property(x => x.DevelopmentCostCategory).HasMaxLength(30);
+                entity.HasOne(x => x.DevelopmentProject).WithMany().HasForeignKey(x => x.DevelopmentProjectId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => x.DevelopmentProjectId);
+            });
+
+            modelBuilder.Entity<VendorBillLine>(entity =>
+            {
+                entity.Property(x => x.DevelopmentCostCategory).HasMaxLength(30);
+                entity.HasOne(x => x.DevelopmentProject).WithMany().HasForeignKey(x => x.DevelopmentProjectId).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Unit>().Property(x => x.FirstSupplyType).HasMaxLength(10);
+            modelBuilder.Entity<Unit>().Property(x => x.FirstSupplyReference).HasMaxLength(100);
+
+            modelBuilder.Entity<UnitSale>(entity =>
+            {
+                entity.Property(x => x.ContractNumber).HasMaxLength(30);
+                entity.Property(x => x.VatCategory).HasMaxLength(20);
+                entity.Property(x => x.VatReason).HasMaxLength(300);
+                entity.Property(x => x.Status).HasMaxLength(20);
+                entity.Property(x => x.BuyerTitleDeedNumber).HasMaxLength(50);
+                entity.Property(x => x.Notes).HasMaxLength(1000);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.Property(x => x.SalePrice).HasPrecision(18, 2);
+                entity.Property(x => x.VatRate).HasPrecision(9, 4);
+                entity.Property(x => x.VatAmount).HasPrecision(18, 2);
+                entity.Property(x => x.TotalPrice).HasPrecision(18, 2);
+                entity.Property(x => x.CostOfSales).HasPrecision(18, 2);
+                entity.Property(x => x.HandoverNetAmount).HasPrecision(18, 2);
+                entity.Property(x => x.HandoverVatAmount).HasPrecision(18, 2);
+
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Buyer).WithMany().HasForeignKey(x => x.BuyerId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.HandoverJournalEntry).WithMany().HasForeignKey(x => x.HandoverJournalEntryId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(x => x.Instalments).WithOne(x => x.UnitSale).HasForeignKey(x => x.UnitSaleId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(x => x.Receipts).WithOne(x => x.UnitSale).HasForeignKey(x => x.UnitSaleId).OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new { x.CompanyId, x.ContractNumber }).IsUnique();
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<UnitSaleInstalment>(entity =>
+            {
+                entity.Property(x => x.Description).HasMaxLength(150);
+                entity.Property(x => x.Amount).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<UnitSaleReceipt>(entity =>
+            {
+                entity.Property(x => x.ReceiptNumber).HasMaxLength(30);
+                entity.Property(x => x.TaxInvoiceNumber).HasMaxLength(30);
+                entity.Property(x => x.PaymentMethod).HasMaxLength(50);
+                entity.Property(x => x.Reference).HasMaxLength(100);
+                entity.Property(x => x.Amount).HasPrecision(18, 2);
+                entity.Property(x => x.NetAmount).HasPrecision(18, 2);
+                entity.Property(x => x.VatAmount).HasPrecision(18, 2);
+                entity.HasOne(x => x.JournalEntry).WithMany().HasForeignKey(x => x.JournalEntryId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.CompanyId, x.ReceiptNumber }).IsUnique();
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<CapitalAssetVatRecord>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(150);
+                entity.Property(x => x.Notes).HasMaxLength(1000);
+                entity.Property(x => x.AssetValue).HasPrecision(18, 2);
+                entity.Property(x => x.InputVat).HasPrecision(18, 2);
+                entity.Property(x => x.RecoveredVat).HasPrecision(18, 2);
+                entity.Property(x => x.OriginalRecoveryPercent).HasPrecision(9, 4);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.DevelopmentProject).WithMany().HasForeignKey(x => x.DevelopmentProjectId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(x => x.Adjustments).WithOne(x => x.CapitalAssetVatRecord).HasForeignKey(x => x.CapitalAssetVatRecordId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<CapitalAssetVatAdjustment>(entity =>
+            {
+                entity.Property(x => x.Notes).HasMaxLength(500);
+                entity.Property(x => x.TaxableUsePercent).HasPrecision(9, 4);
+                entity.Property(x => x.Adjustment).HasPrecision(18, 2);
+                entity.HasOne(x => x.JournalEntry).WithMany().HasForeignKey(x => x.JournalEntryId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.CapitalAssetVatRecordId, x.YearNumber }).IsUnique();
+            });
+
+            modelBuilder.Entity<Unit>().Property(x => x.TitleDeedNumber).HasMaxLength(50);
+            modelBuilder.Entity<Unit>().Property(x => x.UtilityAccountNumber).HasMaxLength(50);
+
+            modelBuilder.Entity<PropertyDocument>(entity =>
+            {
+                entity.Property(x => x.DocumentType).HasMaxLength(50);
+                entity.Property(x => x.DocumentNumber).HasMaxLength(100);
+                entity.Property(x => x.Description).HasMaxLength(300);
+                entity.Property(x => x.FileName).HasMaxLength(260);
+                entity.Property(x => x.ContentType).HasMaxLength(100);
+                entity.Property(x => x.UploadedByName).HasMaxLength(200);
+
+                entity.HasOne(x => x.Company)
+                    .WithMany()
+                    .HasForeignKey(x => x.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Property)
+                    .WithMany(x => x.Documents)
+                    .HasForeignKey(x => x.PropertyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Unit)
+                    .WithMany()
+                    .HasForeignKey(x => x.UnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new { x.CompanyId, x.PropertyId });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
             modelBuilder.Entity<Unit>().Property(x => x.VatCategory).HasMaxLength(20);
             modelBuilder.Entity<Tenant>().Property(x => x.TrnNumber).HasMaxLength(30);
             modelBuilder.Entity<Vendor>().Property(x => x.TrnNumber).HasMaxLength(30);

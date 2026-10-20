@@ -276,6 +276,8 @@ namespace RealEstateManager.Controllers
                 })
                 .ToListAsync();
 
+            ViewBag.DevelopmentProjects = await DevelopmentProjectService.DevelopmentCostOptions(_db);
+
             ViewBag.Attributions = InputTaxAttributions.All
                 .Select(x => new SelectListItem
                 {

@@ -1,4 +1,4 @@
-﻿namespace RealEstateManager.Domain
+namespace RealEstateManager.Domain
 {
     public class Unit
     {
@@ -21,6 +21,27 @@
         public string Status { get; set; } = "Vacant";
 
         public bool IsActive { get; set; } = true;
+
+        /// <summary>The unit's own title deed, for a unit registered separately (strata title).</summary>
+        public string? TitleDeedNumber { get; set; }
+
+        public int? ParkingBays { get; set; }
+
+        /// <summary>The unit's electricity / water account, when metered separately.</summary>
+        public string? UtilityAccountNumber { get; set; }
+
+        /// <summary>
+        /// The unit's first supply - its first sale or first lease. For a new residential unit
+        /// that supply alone can be zero rated (within three years of completion); every later
+        /// supply of it is exempt. Recorded when the first contract takes effect.
+        /// </summary>
+        public DateTime? FirstSupplyDate { get; set; }
+
+        /// <summary>Sale or Lease.</summary>
+        public string? FirstSupplyType { get; set; }
+
+        /// <summary>The contract number of the first supply.</summary>
+        public string? FirstSupplyReference { get; set; }
 
         public ICollection<Lease> Leases { get; set; } = new List<Lease>();
     }

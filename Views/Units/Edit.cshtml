@@ -44,6 +44,12 @@
                 <option>Commercial</option>
                 <option>Warehouse</option>
                 <option>Office</option>
+                @* Keep a usage recorded outside this list, or saving the form would wipe it. *@
+                @if (!string.IsNullOrWhiteSpace(Model.UsageType) &&
+                     !new[] { "Residential", "Commercial", "Warehouse", "Office" }.Contains(Model.UsageType))
+                {
+                    <option value="@Model.UsageType" selected>@Model.UsageType</option>
+                }
             </select>
         </div>
 
@@ -55,6 +61,22 @@
         <div class="col-md-4">
             <label asp-for="StandardAnnualRent" class="form-label"></label>
             <input asp-for="StandardAnnualRent" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="TitleDeedNumber" class="form-label"></label>
+            <input asp-for="TitleDeedNumber" class="form-control" maxlength="50" />
+            <div class="form-text">Only when the unit has its own deed (strata title).</div>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="ParkingBays" class="form-label"></label>
+            <input asp-for="ParkingBays" class="form-control" min="0" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="UtilityAccountNumber" class="form-label"></label>
+            <input asp-for="UtilityAccountNumber" class="form-control" maxlength="50" />
         </div>
 
         <div class="col-md-4">

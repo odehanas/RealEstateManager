@@ -1,0 +1,292 @@
+@model RealEstateManager.Domain.Property
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = Model.Code + " - " + Model.Name;
+    var documents = ViewBag.Documents as List<PropertyDocument> ?? new();
+    var canEdit = ViewBag.CanEdit is true;
+    var today = DateTime.Today;
+    var isResidential = Model.PropertyType is "Residential" or "MixedUse" || Model.LandUse is "Residential" or "Mixed use";
+
+    string Show(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    string Date(DateTime? value) => value?.ToString("dd/MM/yyyy") ?? "-";
+    string Num(decimal? value) => value.HasValue ? value.Value.ToString("N2") : "-";
+}
+
+<style>
+    .reg dt { font-weight: normal; color: #6c757d; }
+    .reg dd { margin-bottom: .5rem; }
+    @@media print { .no-print, nav, footer { display: none !important; } }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="mb-0">@Model.Name</h2>
+        <div class="text-muted">@Model.Code &middot; @Model.PropertyType &middot; @Model.OwnershipType @(Model.IsActive ? "" : "· Inactive")</div>
+    </div>
+    <div class="no-print d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        @if (canEdit)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Edit</a>
+        }
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success no-print">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger no-print">@error</div>
+}
+
+@{
+    var expired = documents.Where(x => x.IsExpired(today)).ToList();
+    var expiring = documents.Where(x => x.IsExpiringSoon(today)).ToList();
+    var insuranceExpired = Model.InsuranceExpiryDate.HasValue && Model.InsuranceExpiryDate.Value.Date < today;
+    var insuranceExpiring = !insuranceExpired && Model.InsuranceExpiryDate.HasValue && Model.InsuranceExpiryDate.Value.Date <= today.AddDays(60);
+}
+@if (expired.Count > 0 || insuranceExpired)
+{
+    <div class="alert alert-danger">
+        <strong>Expired:</strong>
+        @string.Join(", ", expired.Select(x => $"{x.DocumentType} ({x.ExpiryDate:dd/MM/yyyy})"))
+        @(insuranceExpired ? (expired.Count > 0 ? ", " : "") + $"insurance policy ({Model.InsuranceExpiryDate:dd/MM/yyyy})" : "")
+    </div>
+}
+@if (expiring.Count > 0 || insuranceExpiring)
+{
+    <div class="alert alert-warning">
+        <strong>Expiring within 60 days:</strong>
+        @string.Join(", ", expiring.Select(x => $"{x.DocumentType} ({x.ExpiryDate:dd/MM/yyyy})")
+            .Concat(insuranceExpiring ? new[] { $"insurance policy ({Model.InsuranceExpiryDate:dd/MM/yyyy})" } : Array.Empty<string>()))
+    </div>
+}
+
+@if (isResidential && Model.OwnershipType == "Owned")
+{
+    <div class="alert alert-info">
+        @if (Model.CompletionDate.HasValue)
+        {
+            <text>
+                <strong>VAT:</strong> completed on @Model.CompletionDate.Value.ToString("dd/MM/yyyy"). The first sale or lease of each
+                residential unit is zero rated if made by <strong>@Model.ZeroRatingWindowEnds!.Value.ToString("dd/MM/yyyy")</strong>
+                @(Model.ZeroRatingWindowEnds < today ? "(this window has closed)" : $"({(Model.ZeroRatingWindowEnds!.Value - today).Days} days left)").
+                Later supplies of residential units are exempt.
+            </text>
+        }
+        else
+        {
+            <text><strong>VAT:</strong> record the completion date from the completion certificate. The first sale or lease of a new
+            residential unit within three years of it is zero rated.</text>
+        }
+    </div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Location</strong></div>
+            <div class="card-body">
+                <dl class="row reg mb-0">
+                    <dt class="col-5">Address</dt><dd class="col-7">@Show(Model.Address)</dd>
+                    <dt class="col-5">Emirate</dt><dd class="col-7">@Show(Model.Emirate)</dd>
+                    <dt class="col-5">Area / community</dt><dd class="col-7">@Show(Model.AreaName)</dd>
+                    <dt class="col-5">Plot number</dt><dd class="col-7">@Show(Model.PlotNumber)</dd>
+                    <dt class="col-5">Land / municipality no.</dt><dd class="col-7">@Show(Model.MunicipalityNumber)</dd>
+                    <dt class="col-5">Location reference</dt><dd class="col-7">@Show(Model.LocationReference)</dd>
+                    <dt class="col-5">GPS</dt>
+                    <dd class="col-7">
+                        @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                        {
+                            var lat = Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            var lng = Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                            <a href="https://www.google.com/maps?q=@lat,@lng" target="_blank" rel="noopener">@lat, @lng</a>
+                        }
+                        else
+                        {
+                            <text>-</text>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Title Deed &amp; Land</strong></div>
+            <div class="card-body">
+                <dl class="row reg mb-0">
+                    <dt class="col-5">Title deed number</dt><dd class="col-7">@Show(Model.TitleDeedNumber)</dd>
+                    <dt class="col-5">Title deed date</dt><dd class="col-7">@Date(Model.TitleDeedDate)</dd>
+                    <dt class="col-5">Issued by</dt><dd class="col-7">@Show(Model.TitleDeedAuthority)</dd>
+                    <dt class="col-5">Tenure</dt><dd class="col-7">@Show(Model.TenureType)</dd>
+                    <dt class="col-5">Land use</dt><dd class="col-7">@Show(Model.LandUse)</dd>
+                    <dt class="col-5">Plot area (sq ft)</dt><dd class="col-7">@Num(Model.PlotAreaSqFt)</dd>
+                    <dt class="col-5">Ownership share</dt><dd class="col-7">@(Model.OwnershipPercentage.HasValue ? Model.OwnershipPercentage.Value.ToString("0.##") + "%" : "-")</dd>
+                    <dt class="col-5">Mortgage</dt><dd class="col-7">@(Model.IsMortgaged ? "Yes - " + Show(Model.MortgageDetails) : "No")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Building &amp; Completion</strong></div>
+            <div class="card-body">
+                <dl class="row reg mb-0">
+                    <dt class="col-5">Building permit</dt><dd class="col-7">@Show(Model.BuildingPermitNumber) @(Model.BuildingPermitDate.HasValue ? "of " + Date(Model.BuildingPermitDate) : "")</dd>
+                    <dt class="col-5">Completion certificate</dt><dd class="col-7">@Show(Model.CompletionCertificateNumber)</dd>
+                    <dt class="col-5">Completion date</dt><dd class="col-7">@Date(Model.CompletionDate)</dd>
+                    <dt class="col-5">Built-up area (sq ft)</dt><dd class="col-7">@Num(Model.BuiltUpAreaSqFt)</dd>
+                    <dt class="col-5">Floors / parking bays</dt><dd class="col-7">@(Model.NumberOfFloors?.ToString() ?? "-") / @(Model.ParkingBays?.ToString() ?? "-")</dd>
+                    <dt class="col-5">Developer</dt><dd class="col-7">@Show(Model.DeveloperName)</dd>
+                    <dt class="col-5">Main contractor</dt><dd class="col-7">@Show(Model.MainContractor)</dd>
+                    <dt class="col-5">Consultant</dt><dd class="col-7">@Show(Model.ConsultantName)</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><strong>Ownership, Utilities &amp; Insurance</strong></div>
+            <div class="card-body">
+                <dl class="row reg mb-0">
+                    <dt class="col-5">Ownership</dt><dd class="col-7">@Model.OwnershipType @(Model.OwnershipType == "Managed" ? "for " + Show(Model.OwnerName) : "")</dd>
+                    <dt class="col-5">VAT treatment</dt><dd class="col-7">@VatCategories.Describe(Model.VatCategory)</dd>
+                    <dt class="col-5">Asset value</dt><dd class="col-7">@Model.AssetValue.ToString("N2")</dd>
+                    <dt class="col-5">Fair value</dt><dd class="col-7">@(Model.FairValue.HasValue ? Model.FairValue.Value.ToString("N2") + (Model.FairValueDate.HasValue ? " at " + Date(Model.FairValueDate) : "") + (string.IsNullOrWhiteSpace(Model.ValuerName) ? "" : " (" + Model.ValuerName + ")") : "-")</dd>
+                    <dt class="col-5">Electricity / water</dt><dd class="col-7">@Show(Model.UtilityAccountNumber)</dd>
+                    <dt class="col-5">Insurer</dt><dd class="col-7">@Show(Model.Insurer)</dd>
+                    <dt class="col-5">Policy number</dt><dd class="col-7">@Show(Model.InsurancePolicyNumber)</dd>
+                    <dt class="col-5">Insurance expiry</dt><dd class="col-7">@Date(Model.InsuranceExpiryDate)</dd>
+                    <dt class="col-5">Notes</dt><dd class="col-7">@Show(Model.RegistrationNotes)</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Units</h4>
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Unit</th><th>Floor</th><th>Usage</th><th class="text-end">Area (sq ft)</th>
+            <th>Unit Title Deed</th><th class="text-end">Parking</th><th>Electricity / Water</th><th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Units.Count == 0)
+        {
+            <tr><td colspan="8" class="text-center text-muted">No units yet.</td></tr>
+        }
+        @foreach (var unit in Model.Units.OrderBy(x => x.UnitNumber))
+        {
+            <tr>
+                <td>@unit.UnitNumber</td>
+                <td>@unit.Floor</td>
+                <td>@unit.UsageType</td>
+                <td class="text-end">@unit.AreaSqFt.ToString("N2")</td>
+                <td>@Show(unit.TitleDeedNumber)</td>
+                <td class="text-end">@(unit.ParkingBays?.ToString() ?? "-")</td>
+                <td>@Show(unit.UtilityAccountNumber)</td>
+                <td>@unit.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4 class="mt-4">Documents</h4>
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Type</th><th>Number</th><th>Unit</th><th>Description</th><th>Issued</th><th>Expires</th><th>File</th><th class="no-print"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (documents.Count == 0)
+        {
+            <tr><td colspan="8" class="text-center text-muted">No documents uploaded.</td></tr>
+        }
+        @foreach (var doc in documents)
+        {
+            <tr class="@(doc.IsExpired(today) ? "table-danger" : doc.IsExpiringSoon(today) ? "table-warning" : "")">
+                <td>@doc.DocumentType</td>
+                <td>@Show(doc.DocumentNumber)</td>
+                <td>@(doc.Unit?.UnitNumber ?? "-")</td>
+                <td>@Show(doc.Description)</td>
+                <td>@Date(doc.IssueDate)</td>
+                <td>@Date(doc.ExpiryDate)</td>
+                <td>
+                    <a asp-action="Document" asp-route-id="@doc.Id" target="_blank">@doc.FileName</a>
+                    <span class="text-muted small">(@(doc.SizeBytes / 1024) KB)</span>
+                </td>
+                <td class="no-print">
+                    @if (canEdit)
+                    {
+                        <form asp-action="DeleteDocument" asp-route-id="@doc.Id" method="post"
+                              onsubmit="return confirm('Delete this document? The file cannot be recovered.');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (canEdit)
+{
+    <div class="card shadow-sm mb-4 no-print">
+        <div class="card-header bg-light"><strong>Upload a Document</strong></div>
+        <div class="card-body">
+            <form asp-action="UploadDocument" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Document type</label>
+                    <select name="documentType" class="form-select" required>
+                        <option value="">--</option>
+                        @foreach (var type in PropertyDocument.DocumentTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Document number</label>
+                    <input type="text" name="documentNumber" class="form-control" maxlength="100" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">For unit (optional)</label>
+                    <select name="unitId" class="form-select">
+                        <option value="">Whole property</option>
+                        @foreach (var unit in Model.Units.OrderBy(x => x.UnitNumber))
+                        {
+                            <option value="@unit.Id">@unit.UnitNumber</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Issue date</label>
+                    <input type="date" name="issueDate" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Expiry date</label>
+                    <input type="date" name="expiryDate" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="form-control" maxlength="300" />
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">File (PDF, JPG or PNG, up to 5 MB)</label>
+                    <input type="file" name="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-dark w-100">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
