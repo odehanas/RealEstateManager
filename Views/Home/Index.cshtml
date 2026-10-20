@@ -1,8 +1,32 @@
 @model RealEstateManager.Models.HomeDashboardViewModel
+@inject RealEstateManager.Services.ICurrentCompanyAccessor CurrentCompanyAccessor
+@inject RealEstateManager.Services.SubscriptionService SubscriptionService
 
 @{
     ViewData["Title"] = "Home";
     var dateValue = Model.Today.ToString("yyyy-MM-dd");
+
+    // The subscription is always in view on the dashboard, not only when it is about to end.
+    // The layout's own warning banner stands aside on this page so it is not said twice.
+    ViewData["SubscriptionShownOnPage"] = true;
+    var subscription = CurrentCompanyAccessor.CompanyId.HasValue
+        ? await SubscriptionService.GetStatusAsync(CurrentCompanyAccessor.CompanyId.Value)
+        : null;
+    var endingSoon = subscription != null && !subscription.IsExpired
+                     && subscription.DaysRemaining <= (subscription.IsInTrial ? 5 : 14);
+    var daysText = subscription == null ? string.Empty
+        : subscription.DaysRemaining == 0 ? "ends today"
+        : $"{subscription.DaysRemaining} day{(subscription.DaysRemaining == 1 ? "" : "s")} left";
+    var (noteClass, noteIcon, noteLabel) = subscription switch
+    {
+        null => ("", "", ""),
+        { IsSuspended: true } => ("alert-danger", "&#9888;", "Suspended"),
+        { IsExpired: true } => ("alert-danger", "&#9888;", "Expired"),
+        { IsInTrial: true } when endingSoon => ("alert-warning", "&#9201;", "Free trial ending soon"),
+        _ when endingSoon => ("alert-warning", "&#9201;", "Ending soon"),
+        { IsInTrial: true } => ("alert-info", "&#9432;", "Free trial"),
+        _ => ("alert-success", "&#10003;", "Active")
+    };
 }
 
 <style>
@@ -20,6 +44,34 @@
         }
     }
 </style>
+
+@if (subscription != null)
+{
+    <div class="alert @noteClass d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 py-2 dashboard-no-print"
+         role="status">
+        <div>
+            <span class="me-1" aria-hidden="true">@Html.Raw(noteIcon)</span>
+            <strong>Subscription: @noteLabel</strong>
+            @if (subscription.IsSuspended)
+            {
+                <span> - access to @subscription.CompanyName has been suspended. Please contact your service provider.</span>
+            }
+            else if (subscription.IsExpired)
+            {
+                <span> - ended on @subscription.AccessEndDate?.ToString("dd/MM/yyyy"). Enter an activation code to continue working.</span>
+            }
+            else
+            {
+                <span> - <strong>@daysText</strong>, until @subscription.AccessEndDate?.ToString("dd/MM/yyyy").</span>
+                @if (endingSoon)
+                {
+                    <span> Renew in time to keep working without interruption.</span>
+                }
+            }
+        </div>
+        <a asp-controller="Subscription" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">Manage subscription</a>
+    </div>
+}
 
 @if (TempData["SuccessMessage"] is string successMessage)
 {

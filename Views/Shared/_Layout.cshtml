@@ -404,7 +404,11 @@
     </header>
 
     <div class="container py-4">
-        @if (subscriptionBlocked && subscriptionStatus != null)
+        @if (ViewData["SubscriptionShownOnPage"] is true)
+        {
+            @* The page shows the subscription itself (the dashboard's status note). *@
+        }
+        else if (subscriptionBlocked && subscriptionStatus != null)
         {
             <div class="alert alert-danger">
                 @if (subscriptionStatus.IsSuspended)
