@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Add User";
     var canGrantSystemAdmin = PlatformOwnerService.IsOwner(User);
+    var scope = ViewBag.Scope as RealEstateManager.Models.UserAdminScope;
+    var companyAdminOnly = scope?.IsCompanyAdminOnly == true;
 }
 
 <h2>Add User</h2>
@@ -62,15 +64,25 @@
 
     <div class="col-12">
         <label class="form-label">Company Access</label>
+        <div class="form-text mb-2">
+            A company's <strong>administrator</strong> manages its users and their permissions. Tick it only together with
+            access to that company.
+        </div>
         <div class="row">
             @for (var i = 0; i < Model.Companies.Count; i++)
             {
                 <div class="col-md-4">
-                    <div class="form-check">
-                        <input asp-for="Companies[i].IsSelected" class="form-check-input" />
-                        <input asp-for="Companies[i].CompanyId" type="hidden" />
-                        <input asp-for="Companies[i].CompanyName" type="hidden" />
-                        <label class="form-check-label" asp-for="Companies[i].IsSelected">@Model.Companies[i].CompanyName</label>
+                    <div class="border rounded px-3 py-2 mb-2">
+                        <div class="form-check">
+                            <input asp-for="Companies[i].IsSelected" class="form-check-input" />
+                            <input asp-for="Companies[i].CompanyId" type="hidden" />
+                            <input asp-for="Companies[i].CompanyName" type="hidden" />
+                            <label class="form-check-label" asp-for="Companies[i].IsSelected">@Model.Companies[i].CompanyName</label>
+                        </div>
+                        <div class="form-check small ms-3">
+                            <input asp-for="Companies[i].IsCompanyAdmin" class="form-check-input" />
+                            <label class="form-check-label" asp-for="Companies[i].IsCompanyAdmin">Administrator of this company</label>
+                        </div>
                     </div>
                 </div>
             }
@@ -79,9 +91,12 @@
 
     <div class="col-12">
         <label class="form-label">Permission Assignment</label>
-        <div class="alert alert-info py-2">
-            System Admin ignores the permission matrix and always has full access.
-        </div>
+        @if (!companyAdminOnly)
+        {
+            <div class="alert alert-info py-2">
+                System Admin ignores the permission matrix and always has full access.
+            </div>
+        }
         @for (var groupIndex = 0; groupIndex < Model.PermissionGroups.Count; groupIndex++)
         {
             <div class="border rounded p-3 mb-3">

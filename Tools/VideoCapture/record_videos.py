@@ -411,7 +411,8 @@ async def v03_lease(d: Director):
     await d.fill("#BillingFrequencyMonths", "3", "The tenant pays every quarter, so four invoices a year.", "Step 3")
     await d.point("#vatCategoryOverride", "VAT is taken from the unit automatically - leave this as it is.")
     await d.fill("#SecurityDepositAmount", "3600", "The security deposit agreed in the contract.", "Step 3")
-    await d.submit("/Leases/Create", "Click Save.", "Step 4")
+    await d.click("button[name=nextStep][value=activate]",
+                  "Click Save and Activate. (With approval switched on, it would go to a second person first.)", "Step 4")
     await d.point(d.page.locator("tr", has_text=STATE["tenant"]).first,
                   "The lease is active and gets its own contract number.")
     await d.menu("operationsDropdown", "/CustomerInvoices", "Look at Customer Invoices.", "Step 5")

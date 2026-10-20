@@ -1,6 +1,8 @@
 @model RealEstateManager.Models.HomeDashboardViewModel
 @inject RealEstateManager.Services.ICurrentCompanyAccessor CurrentCompanyAccessor
 @inject RealEstateManager.Services.SubscriptionService SubscriptionService
+@inject RealEstateManager.Services.ApprovalService ApprovalService
+@inject RealEstateManager.Services.PermissionService PermissionService
 
 @{
     ViewData["Title"] = "Home";
@@ -14,6 +16,11 @@
         : null;
     var endingSoon = subscription != null && !subscription.IsExpired
                      && subscription.DaysRemaining <= (subscription.IsInTrial ? 5 : 14);
+    // Contracts waiting for this person to approve (never their own).
+    var approvalsWaiting = CurrentCompanyAccessor.UserId.HasValue
+                           && await PermissionService.HasPermissionAsync(User, RealEstateManager.Services.AppPermissions.LeasesApprove)
+        ? await ApprovalService.CountAwaitingAsync(CurrentCompanyAccessor.UserId.Value)
+        : 0;
     var daysText = subscription == null ? string.Empty
         : subscription.DaysRemaining == 0 ? "ends today"
         : $"{subscription.DaysRemaining} day{(subscription.DaysRemaining == 1 ? "" : "s")} left";
@@ -70,6 +77,18 @@
             }
         </div>
         <a asp-controller="Subscription" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">Manage subscription</a>
+    </div>
+}
+
+@if (approvalsWaiting > 0)
+{
+    <div class="alert alert-warning d-flex justify-content-between align-items-center gap-2 py-2 dashboard-no-print" role="status">
+        <div>
+            <span class="me-1" aria-hidden="true">&#9998;</span>
+            <strong>@approvalsWaiting contract@(approvalsWaiting == 1 ? " is" : "s are") waiting for your approval.</strong>
+            They take effect only once approved.
+        </div>
+        <a asp-controller="Approvals" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">Review</a>
     </div>
 }
 

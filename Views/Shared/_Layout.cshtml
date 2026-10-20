@@ -6,6 +6,7 @@
 @inject SubscriptionService SubscriptionService
 @inject HelpCatalogService HelpCatalog
 @inject PlatformOwnerService PlatformOwnerService
+@inject ApprovalService ApprovalService
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
@@ -14,6 +15,10 @@
     var displayName = User.FindFirst(AppClaimTypes.DisplayName)?.Value ?? User.Identity?.Name ?? "User";
     var isSystemAdmin = User.IsInRole("SystemAdmin");
     var isPlatformOwner = PlatformOwnerService.IsOwner(User);
+    // A customer's own administrator: manages the users of the company they are in.
+    var isCompanyAdmin = !isSystemAdmin && isAuthenticated && currentCompanyId.HasValue
+                         && CurrentCompanyAccessor.UserId.HasValue
+                         && await AppAuthService.IsCompanyAdminAsync(CurrentCompanyAccessor.UserId.Value, currentCompanyId.Value);
     var subscriptionStatus = isAuthenticated && currentCompanyId.HasValue
         ? await SubscriptionService.GetStatusAsync(currentCompanyId.Value)
         : null;
@@ -32,6 +37,12 @@
         AppPermissions.MasterDataManage);
     var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
     var canHandleServiceRequests = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
+    // Approvers see the queue in the menu with how many contracts wait for them (not their own).
+    var canApproveContracts = isAuthenticated && currentCompanyId.HasValue
+                              && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesApprove);
+    var approvalsWaiting = canApproveContracts && CurrentCompanyAccessor.UserId.HasValue
+        ? await ApprovalService.CountAwaitingAsync(CurrentCompanyAccessor.UserId.Value)
+        : 0;
     var canManageAccounting = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
     var canViewReports = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ReportsView);
     var canViewVendors = isAuthenticated && await PermissionService.HasAnyPermissionAsync(
@@ -39,7 +50,7 @@
         AppPermissions.MasterDataView,
         AppPermissions.MasterDataManage,
         AppPermissions.AccountingManage);
-    var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors;
+    var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors || canApproveContracts;
     var showAccountsMenu = canManageAccounting;
     // Operations opens for either job: keeping the books, or answering tenants.
     var showOperationsMenu = canManageAccounting || canHandleServiceRequests;
@@ -156,6 +167,14 @@
                                         <a class="dropdown-item" asp-controller="Feedback" asp-action="Manage">Feedback Review</a>
                                     </li>
                                 }
+                                else if (isCompanyAdmin)
+                                {
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">Company Administration</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">Users &amp; Permissions</a>
+                                    </li>
+                                }
                                 @if (currentCompanyId.HasValue)
                                 {
                                     <li><hr class="dropdown-divider" /></li>
@@ -199,6 +218,18 @@
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-controller="Leases" asp-action="Index">Leases</a>
+                                        </li>
+                                    }
+                                    @if (canApproveContracts)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item d-flex justify-content-between align-items-center gap-3" asp-controller="Approvals" asp-action="Index">
+                                                Approvals
+                                                @if (approvalsWaiting > 0)
+                                                {
+                                                    <span class="badge rounded-pill bg-warning text-dark">@approvalsWaiting</span>
+                                                }
+                                            </a>
                                         </li>
                                     }
                                     @if (canViewVendors)

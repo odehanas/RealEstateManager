@@ -6,6 +6,13 @@ namespace RealEstateManager.Domain
         public string Name { get; set; } = string.Empty;
         public string BaseCurrency { get; set; } = "AED";
         public int FiscalYearStartMonth { get; set; } = 1;
+
+        /// <summary>
+        /// When on, a new contract must be approved by a second person - one holding the
+        /// Approve Contracts permission who neither created nor submitted it - before it
+        /// takes effect. When off, its creator activates it.
+        /// </summary>
+        public bool RequireContractApproval { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // ---------------------------------------------------------------------

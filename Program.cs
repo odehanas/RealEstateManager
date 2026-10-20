@@ -45,6 +45,7 @@ builder.Services.AddSingleton<HelpCatalogService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, PlatformOwnerAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, UserManagerAuthorizationHandler>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -121,6 +122,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(PlatformOwnerRequirement.PolicyName, policy => policy
         .RequireAuthenticatedUser()
         .AddRequirements(new PlatformOwnerRequirement()));
+    options.AddPolicy(UserManagerRequirement.PolicyName, policy => policy
+        .RequireAuthenticatedUser()
+        .AddRequirements(new UserManagerRequirement()));
 });
 
 builder.Services.AddControllersWithViews(options =>
@@ -166,6 +170,10 @@ builder.Services.AddScoped<PdcService>();
 builder.Services.AddScoped<TenantStatementService>();
 builder.Services.AddScoped<FixedAssetService>();
 builder.Services.AddScoped<SampleDataService>();
+builder.Services.AddScoped<ApprovalService>();
+builder.Services.AddScoped<LeaseWorkflowService>();
+// Each kind of document that can be approved registers its handler here.
+builder.Services.AddScoped<IApprovalHandler>(sp => sp.GetRequiredService<LeaseWorkflowService>());
 builder.Services.AddSingleton<SampleDataQueue>();
 builder.Services.AddHostedService<SampleDataWorker>();
 

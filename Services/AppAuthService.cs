@@ -66,6 +66,10 @@ namespace RealEstateManager.Services
                 .FirstOrDefaultAsync();
         }
 
+        /// <summary>Whether the user administers this company (manages its users).</summary>
+        public Task<bool> IsCompanyAdminAsync(int userId, int companyId) =>
+            UserManagerAuthorizationHandler.IsCompanyAdminAsync(_db, userId, companyId);
+
         public async Task<bool> UserHasAccessToCompanyAsync(int userId, int companyId)
         {
             return await _db.AppUserCompanies

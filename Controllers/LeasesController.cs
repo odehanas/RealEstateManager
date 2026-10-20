@@ -12,15 +12,21 @@ namespace RealEstateManager.Controllers
         private readonly ApplicationDbContext _db;
         private readonly CodeGenerationService _codeGenerationService;
         private readonly ContractQrService _contractQrService;
+        private readonly LeaseWorkflowService _workflow;
+        private readonly ApprovalService _approvals;
 
         public LeasesController(
             ApplicationDbContext db,
             CodeGenerationService codeGenerationService,
-            ContractQrService contractQrService)
+            ContractQrService contractQrService,
+            LeaseWorkflowService workflow,
+            ApprovalService approvals)
         {
             _db = db;
             _codeGenerationService = codeGenerationService;
             _contractQrService = contractQrService;
+            _workflow = workflow;
+            _approvals = approvals;
         }
 
         [HttpGet]
@@ -33,6 +39,11 @@ namespace RealEstateManager.Controllers
                 .OrderByDescending(x => x.StartDate)
                 .ToListAsync();
 
+            // The latest approval step of each contract: waiting, approved, or returned with a reason.
+            ViewBag.Approvals = await _approvals.GetLatestAsync(ApprovalDocumentTypes.Lease, leases.Select(x => x.Id));
+            ViewBag.ApprovalRequired = await _workflow.ApprovalRequiredAsync();
+            ViewBag.UserId = User.GetAppUserId();
+
             return View(leases);
         }
 
@@ -40,14 +51,87 @@ namespace RealEstateManager.Controllers
         public async Task<IActionResult> Create()
         {
             await LoadCreateListsAsync();
+            ViewBag.ApprovalRequired = await _workflow.ApprovalRequiredAsync();
             return View(new LeaseCreateViewModel());
+        }
+
+        /// <summary>Puts a draft into effect - when the company does not require approval.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activate(int id)
+        {
+            var (success, message) = await _workflow.ActivateAsync(id);
+            TempData[success ? "LeaseSuccess" : "LeaseError"] = message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>Sends a draft to a second person for approval.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Submit(int id)
+        {
+            var (success, message) = await _workflow.SubmitAsync(id, User.GetAppUserId() ?? 0, CurrentUserName());
+            TempData[success ? "LeaseSuccess" : "LeaseError"] = message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>Takes a submitted contract back to draft before anyone decides.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Withdraw(int id)
+        {
+            var pending = await _approvals.GetPendingAsync(ApprovalDocumentTypes.Lease, id);
+            if (pending == null)
+            {
+                TempData["LeaseError"] = "This contract is not waiting for approval.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var (success, message) = await _approvals.WithdrawAsync(pending.Id, User.GetAppUserId() ?? 0, CurrentUserName());
+            TempData[success ? "LeaseSuccess" : "LeaseError"] = message;
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LeaseCreateViewModel model)
+        public async Task<IActionResult> DeleteDraft(int id)
+        {
+            var (success, message) = await _workflow.DeleteDraftAsync(id);
+            TempData[success ? "LeaseSuccess" : "LeaseError"] = message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        private string CurrentUserName() =>
+            User.FindFirst(AppClaimTypes.DisplayName)?.Value ?? User.FindFirst(AppClaimTypes.Username)?.Value ?? "User";
+
+        /// <summary>After saving a draft: keep it, activate it, or submit it, as the button pressed said.</summary>
+        private async Task<IActionResult> AfterSaveAsync(Lease lease, string? nextStep)
+        {
+            if (nextStep == "activate")
+            {
+                var (ok, message) = await _workflow.ActivateAsync(lease.Id);
+                TempData[ok ? "LeaseSuccess" : "LeaseError"] = ok ? message : $"Saved as a draft, but not activated: {message}";
+            }
+            else if (nextStep == "submit")
+            {
+                var (ok, message) = await _workflow.SubmitAsync(lease.Id, User.GetAppUserId() ?? 0, CurrentUserName());
+                TempData[ok ? "LeaseSuccess" : "LeaseError"] = ok ? message : $"Saved as a draft, but not submitted: {message}";
+            }
+            else
+            {
+                TempData["LeaseSuccess"] = $"Contract {lease.ContractNumber} is saved as a draft. It has no effect until it is " +
+                    (await _workflow.ApprovalRequiredAsync() ? "submitted and approved." : "activated.");
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(LeaseCreateViewModel model, string? nextStep)
         {
             await LoadCreateListsAsync();
+            ViewBag.ApprovalRequired = await _workflow.ApprovalRequiredAsync();
 
             var companyId = User.GetRequiredCurrentCompanyId();
             var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
@@ -84,15 +168,11 @@ namespace RealEstateManager.Controllers
             // The contract code is generated from the unit code, never typed.
             ModelState.Remove(nameof(model.ContractNumber));
 
-            var overlappingLeaseExists = await _db.Leases.AnyAsync(x =>
-                x.UnitId == model.UnitId &&
-                x.Status == "Active" &&
-                model.StartDate <= x.EndDate &&
-                model.EndDate >= x.StartDate);
-
-            if (overlappingLeaseExists)
+            // A contract that is active or awaiting approval holds the unit for its dates.
+            var clash = await _workflow.CheckUnitFreeAsync(0, model.UnitId, model.StartDate, model.EndDate);
+            if (clash != null)
             {
-                ModelState.AddModelError(nameof(model.UnitId), "This unit already has an overlapping active lease.");
+                ModelState.AddModelError(nameof(model.UnitId), clash);
             }
 
             // Overriding the derived VAT treatment is allowed, but never silently:
@@ -129,9 +209,12 @@ namespace RealEstateManager.Controllers
                 AnnualRent = model.AnnualRent,
                 BillingFrequencyMonths = model.BillingFrequencyMonths,
                 SecurityDepositAmount = model.SecurityDepositAmount,
-                Status = "Active",
+                // Every contract starts as a draft: no invoices, no effect on the unit.
+                // It takes effect when activated, or when approved if the company requires it.
+                Status = LeaseStatuses.Draft,
                 Notes = model.Notes,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CreatedByAppUserId = User.GetAppUserId()
             };
 
             VatDeterminationService.ApplyToLease(
@@ -142,14 +225,7 @@ namespace RealEstateManager.Controllers
             _db.Leases.Add(lease);
             await _db.SaveChangesAsync();
 
-            unit.Status = "Occupied";
-
-            LeaseScheduleBuilder.GenerateInvoices(_db, companyId, lease);
-            LeaseScheduleBuilder.GenerateRevenueRecognitionSchedules(_db, companyId, lease, unit.Property!);
-
-            await _db.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            return await AfterSaveAsync(lease, nextStep);
         }
 
         private async Task LoadCreateListsAsync()
@@ -215,7 +291,7 @@ namespace RealEstateManager.Controllers
 
             // The payment schedule already exists as the generated invoices, so the
             // contract states exactly what the tenant will be billed.
-            ViewBag.Instalments = await _db.CustomerInvoices
+            var instalments = await _db.CustomerInvoices
                 .AsNoTracking()
                 .Where(x => x.LeaseId == lease.Id && x.Status != "Cancelled")
                 .OrderBy(x => x.InvoiceDate)
@@ -228,6 +304,23 @@ namespace RealEstateManager.Controllers
                     TotalAmount = x.TotalAmount
                 })
                 .ToListAsync();
+
+            // A draft or a contract awaiting approval has no invoices yet: show the ones it will create.
+            if (instalments.Count == 0 && LeaseStatuses.IsBeforeActivation(lease.Status))
+            {
+                instalments = LeaseScheduleBuilder.PlanInvoices(companyId, lease)
+                    .Select(x => new ContractInstalmentViewModel
+                    {
+                        InvoiceNumber = x.InvoiceNumber,
+                        DueDate = x.DueDate,
+                        Subtotal = x.Subtotal,
+                        VatAmount = x.VatAmount,
+                        TotalAmount = x.TotalAmount
+                    })
+                    .ToList();
+            }
+
+            ViewBag.Instalments = instalments;
 
             ViewBag.Company = company;
             ViewBag.QrDataUri = _contractQrService.GetQrDataUri(lease.ContractNumber);
@@ -245,7 +338,7 @@ namespace RealEstateManager.Controllers
             }
 
             await LoadCreateListsAsync();
-            ViewBag.Id = id;
+            await LoadEditContextAsync(lease);
 
             var model = new LeaseCreateViewModel
             {
@@ -271,15 +364,38 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, LeaseCreateViewModel model)
+        public async Task<IActionResult> Edit(int id, LeaseCreateViewModel model, string? nextStep)
         {
             await LoadCreateListsAsync();
-            ViewBag.Id = id;
 
             var lease = await _db.Leases.FirstOrDefaultAsync(x => x.Id == id);
             if (lease == null)
             {
                 return BadRequest("Record not found.");
+            }
+
+            await LoadEditContextAsync(lease);
+
+            if (lease.Status == LeaseStatuses.PendingApproval)
+            {
+                TempData["LeaseError"] = $"Contract {lease.ContractNumber} is awaiting approval. Withdraw it first to change it.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Once in effect the terms are locked: its invoices were made from them and must
+            // keep matching the signed contract. Only the notes can still be updated.
+            if (!LeaseStatuses.IsBeforeActivation(lease.Status))
+            {
+                lease.Notes = model.Notes;
+                await _db.SaveChangesAsync();
+                TempData["LeaseSuccess"] = $"Notes for contract {lease.ContractNumber} are saved. Its terms are locked because it is {lease.Status.ToLowerInvariant()}.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var clash = await _workflow.CheckUnitFreeAsync(lease.Id, model.UnitId, model.StartDate, model.EndDate);
+            if (clash != null)
+            {
+                ModelState.AddModelError(nameof(model.UnitId), clash);
             }
 
             var unit = await _db.Units
@@ -338,7 +454,18 @@ namespace RealEstateManager.Controllers
 
             await _db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return await AfterSaveAsync(lease, nextStep);
+        }
+
+        /// <summary>What the edit screen needs to know: whether the terms can change, and the approval history.</summary>
+        private async Task LoadEditContextAsync(Lease lease)
+        {
+            ViewBag.Id = lease.Id;
+            ViewBag.Status = lease.Status;
+            ViewBag.ContractNumber = lease.ContractNumber;
+            ViewBag.TermsLocked = !LeaseStatuses.IsBeforeActivation(lease.Status) || lease.Status == LeaseStatuses.PendingApproval;
+            ViewBag.ApprovalRequired = await _workflow.ApprovalRequiredAsync();
+            ViewBag.ApprovalHistory = await _approvals.GetHistoryAsync(ApprovalDocumentTypes.Lease, lease.Id);
         }
     }
 }

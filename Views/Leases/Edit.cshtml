@@ -5,15 +5,40 @@
     var units = ViewBag.Units as List<Unit> ?? new();
     var tenants = ViewBag.Tenants as List<Tenant> ?? new();
     var id = ViewBag.Id;
+    var status = ViewBag.Status as string ?? LeaseStatuses.Draft;
+    var termsLocked = ViewBag.TermsLocked is true;
+    var approvalRequired = ViewBag.ApprovalRequired is true;
+    var history = ViewBag.ApprovalHistory as List<ApprovalRequest> ?? new();
+    var lastReturn = history.FirstOrDefault(x => x.Status == ApprovalStatuses.Rejected);
 }
 
-<h2>Edit Lease</h2>
+<h2>@(termsLocked ? "Contract" : "Edit Lease") <small class="text-muted fs-6">@LeaseStatuses.Describe(status)</small></h2>
+
+@if (status == LeaseStatuses.Draft && lastReturn != null && history.FirstOrDefault() == lastReturn)
+{
+    <div class="alert alert-danger">
+        <strong>Returned by @lastReturn.DecidedByName</strong> on @lastReturn.DecidedAt?.ToLocalTime().ToString("dd/MM/yyyy"):
+        “@lastReturn.DecisionComment” Correct it and submit it again.
+    </div>
+}
+else if (status == LeaseStatuses.PendingApproval)
+{
+    <div class="alert alert-warning">This contract is awaiting approval, so it cannot be changed. Withdraw it from the Leases list to correct it.</div>
+}
+else if (termsLocked)
+{
+    <div class="alert alert-info">
+        This contract is @status.ToLowerInvariant(): its invoices were created from these terms, so they are locked.
+        Only the notes can be updated.
+    </div>
+}
 
 <form asp-action="Edit" asp-route-id="@id" method="post">
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
+    <fieldset @(termsLocked ? "disabled" : "")>
     <div class="row g-3">
         <div class="col-md-4">
             <label asp-for="ContractNumber" class="form-label">Contract Code</label>
@@ -94,17 +119,57 @@
             <input asp-for="SecurityDepositAmount" class="form-control" />
         </div>
 
+    </div>
+    </fieldset>
+
+    <div class="row g-3 mt-1">
         <div class="col-md-12">
             <label asp-for="Notes" class="form-label"></label>
-            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+            <textarea asp-for="Notes" class="form-control" rows="3" disabled="@(status == LeaseStatuses.PendingApproval)"></textarea>
         </div>
     </div>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save</button>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        @if (status == LeaseStatuses.Draft)
+        {
+            <button type="submit" name="nextStep" value="draft" class="btn btn-outline-dark">Save Draft</button>
+            @if (approvalRequired)
+            {
+                <button type="submit" name="nextStep" value="submit" class="btn btn-warning">Save and Submit for Approval</button>
+            }
+            else
+            {
+                <button type="submit" name="nextStep" value="activate" class="btn btn-success"
+                        onclick="return confirm('Activate this contract? Its invoices will be created and its terms locked.');">Save and Activate</button>
+            }
+        }
+        else if (status != LeaseStatuses.PendingApproval)
+        {
+            <button type="submit" class="btn btn-dark">Save Notes</button>
+        }
         <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
     </div>
 </form>
+
+@if (history.Count > 0)
+{
+    <h5 class="mt-5">Approval history</h5>
+    <table class="table table-sm table-bordered">
+        <thead><tr><th>Submitted</th><th>By</th><th>Outcome</th><th>Decided by</th><th>Remark</th></tr></thead>
+        <tbody>
+            @foreach (var step in history)
+            {
+                <tr>
+                    <td>@step.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@step.RequestedByName</td>
+                    <td>@(step.Status == ApprovalStatuses.Rejected ? "Returned" : step.Status == ApprovalStatuses.Pending ? "Waiting" : step.Status)</td>
+                    <td>@(step.DecidedByName ?? "-")</td>
+                    <td>@(step.DecisionComment ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

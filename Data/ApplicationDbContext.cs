@@ -63,6 +63,7 @@ namespace RealEstateManager.Data
         public DbSet<TenantServiceRequestComment> TenantServiceRequestComments => Set<TenantServiceRequestComment>();
         public DbSet<CustomerCreditNote> CustomerCreditNotes => Set<CustomerCreditNote>();
         public DbSet<ReceivedEInvoice> ReceivedEInvoices => Set<ReceivedEInvoice>();
+        public DbSet<ApprovalRequest> ApprovalRequests => Set<ApprovalRequest>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -1810,6 +1811,28 @@ namespace RealEstateManager.Data
 
             modelBuilder.Entity<ReceivedEInvoice>()
                 .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            // Approvals (SQL/14_AddContractApproval.sql creates the same table on live).
+            modelBuilder.Entity<ApprovalRequest>(entity =>
+            {
+                entity.Property(x => x.DocumentType).HasMaxLength(50);
+                entity.Property(x => x.DocumentNumber).HasMaxLength(100);
+                entity.Property(x => x.Summary).HasMaxLength(300);
+                entity.Property(x => x.Status).HasMaxLength(20);
+                entity.Property(x => x.RequestedByName).HasMaxLength(200);
+                entity.Property(x => x.DecidedByName).HasMaxLength(200);
+                entity.Property(x => x.DecisionComment).HasMaxLength(1000);
+
+                entity.HasOne(x => x.Company)
+                    .WithMany()
+                    .HasForeignKey(x => x.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new { x.CompanyId, x.Status });
+                entity.HasIndex(x => new { x.DocumentType, x.DocumentId });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
         }
     }
 }

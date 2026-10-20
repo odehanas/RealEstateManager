@@ -35,11 +35,38 @@
 
         public decimal SecurityDepositAmount { get; set; } = 0m;
 
-        // Draft, Active, Terminated, Expired, Renewed
-        public string Status { get; set; } = "Draft";
+        /// <summary>See <see cref="LeaseStatuses"/>.</summary>
+        public string Status { get; set; } = LeaseStatuses.Draft;
 
         public string? Notes { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>Who created the contract - who may therefore not approve it.</summary>
+        public int? CreatedByAppUserId { get; set; }
+    }
+
+    /// <summary>
+    /// A contract starts as a Draft, which can be corrected freely and has no financial
+    /// effect. Activating it - straight away, or through approval when the company
+    /// requires it - creates its invoices and income schedule and locks its terms.
+    /// </summary>
+    public static class LeaseStatuses
+    {
+        public const string Draft = "Draft";
+        public const string PendingApproval = "PendingApproval";
+        public const string Active = "Active";
+        public const string Terminated = "Terminated";
+        public const string Expired = "Expired";
+        public const string Renewed = "Renewed";
+
+        /// <summary>Not yet in force: no invoices, not shown to the tenant, terms still editable.</summary>
+        public static bool IsBeforeActivation(string status) => status is Draft or PendingApproval;
+
+        public static string Describe(string status) => status switch
+        {
+            PendingApproval => "Awaiting approval",
+            _ => status
+        };
     }
 }

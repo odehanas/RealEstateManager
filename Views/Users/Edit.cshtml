@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Edit User";
     var canGrantSystemAdmin = PlatformOwnerService.IsOwner(User);
+    var scope = ViewBag.Scope as RealEstateManager.Models.UserAdminScope;
+    var companyAdminOnly = scope?.IsCompanyAdminOnly == true;
 }
 
 <h2>Edit User</h2>
@@ -54,35 +56,53 @@
         <label asp-for="IsActive" class="form-check-label"></label>
     </div>
 
-    <div class="col-md-3 form-check ms-3">
-        @if (canGrantSystemAdmin)
-        {
-            <input asp-for="IsSystemAdmin" class="form-check-input" />
-        }
-        else
-        {
-            @* Shown but not changeable; the current value is posted back unchanged. *@
-            <input type="checkbox" class="form-check-input" id="IsSystemAdmin" disabled checked="@Model.IsSystemAdmin" />
-            <input type="hidden" name="IsSystemAdmin" value="@(Model.IsSystemAdmin ? "true" : "false")" />
-        }
-        <label asp-for="IsSystemAdmin" class="form-check-label"></label>
-        @if (!canGrantSystemAdmin)
-        {
-            <div class="form-text">Only the platform owner can change this.</div>
-        }
-    </div>
+    @if (companyAdminOnly)
+    {
+        @* A company administrator only ever edits ordinary users; the flag is not theirs to see. *@
+        <input type="hidden" name="IsSystemAdmin" value="false" />
+    }
+    else
+    {
+        <div class="col-md-3 form-check ms-3">
+            @if (canGrantSystemAdmin)
+            {
+                <input asp-for="IsSystemAdmin" class="form-check-input" />
+            }
+            else
+            {
+                @* Shown but not changeable; the current value is posted back unchanged. *@
+                <input type="checkbox" class="form-check-input" id="IsSystemAdmin" disabled checked="@Model.IsSystemAdmin" />
+                <input type="hidden" name="IsSystemAdmin" value="@(Model.IsSystemAdmin ? "true" : "false")" />
+            }
+            <label asp-for="IsSystemAdmin" class="form-check-label"></label>
+            @if (!canGrantSystemAdmin)
+            {
+                <div class="form-text">Only the platform owner can change this.</div>
+            }
+        </div>
+    }
 
     <div class="col-12">
         <label class="form-label">Company Access</label>
+        <div class="form-text mb-2">
+            A company's <strong>administrator</strong> manages its users and their permissions. Tick it only together with
+            access to that company.
+        </div>
         <div class="row">
             @for (var i = 0; i < Model.Companies.Count; i++)
             {
                 <div class="col-md-4">
-                    <div class="form-check">
-                        <input asp-for="Companies[i].IsSelected" class="form-check-input" />
-                        <input asp-for="Companies[i].CompanyId" type="hidden" />
-                        <input asp-for="Companies[i].CompanyName" type="hidden" />
-                        <label class="form-check-label" asp-for="Companies[i].IsSelected">@Model.Companies[i].CompanyName</label>
+                    <div class="border rounded px-3 py-2 mb-2">
+                        <div class="form-check">
+                            <input asp-for="Companies[i].IsSelected" class="form-check-input" />
+                            <input asp-for="Companies[i].CompanyId" type="hidden" />
+                            <input asp-for="Companies[i].CompanyName" type="hidden" />
+                            <label class="form-check-label" asp-for="Companies[i].IsSelected">@Model.Companies[i].CompanyName</label>
+                        </div>
+                        <div class="form-check small ms-3">
+                            <input asp-for="Companies[i].IsCompanyAdmin" class="form-check-input" />
+                            <label class="form-check-label" asp-for="Companies[i].IsCompanyAdmin">Administrator of this company</label>
+                        </div>
                     </div>
                 </div>
             }
@@ -91,9 +111,12 @@
 
     <div class="col-12">
         <label class="form-label">Permission Assignment</label>
-        <div class="alert alert-info py-2">
-            System Admin ignores the permission matrix and always has full access.
-        </div>
+        @if (!companyAdminOnly)
+        {
+            <div class="alert alert-info py-2">
+                System Admin ignores the permission matrix and always has full access.
+            </div>
+        }
         @for (var groupIndex = 0; groupIndex < Model.PermissionGroups.Count; groupIndex++)
         {
             <div class="border rounded p-3 mb-3">

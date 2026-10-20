@@ -56,7 +56,8 @@ namespace RealEstateManager.Services
         {
             model.Leases = await _db.Leases
                 .AsNoTracking()
-                .Where(x => x.TenantId == tenantId)
+                .Where(x => x.TenantId == tenantId &&
+                            x.Status != LeaseStatuses.Draft && x.Status != LeaseStatuses.PendingApproval)
                 .OrderByDescending(x => x.StartDate)
                 .Select(x => new ServiceRequestLeaseOption
                 {

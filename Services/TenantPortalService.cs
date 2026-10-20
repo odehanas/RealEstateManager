@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
+using RealEstateManager.Domain;
 using RealEstateManager.Models;
 
 namespace RealEstateManager.Services
@@ -94,7 +95,9 @@ namespace RealEstateManager.Services
         {
             return await _db.Leases
                 .AsNoTracking()
-                .Where(x => x.TenantId == tenantId)
+                // A draft or a contract awaiting approval is not yet agreed: the tenant does not see it.
+                .Where(x => x.TenantId == tenantId &&
+                            x.Status != LeaseStatuses.Draft && x.Status != LeaseStatuses.PendingApproval)
                 .OrderByDescending(x => x.StartDate)
                 .Select(x => new PortalContractViewModel
                 {

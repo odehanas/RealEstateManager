@@ -156,11 +156,13 @@ namespace RealEstateManager.Services
             _db.AppUsers.Add(user);
             await _db.SaveChangesAsync();
 
+            // Whoever registers the company is its first administrator: they set up its users.
             _db.AppUserCompanies.Add(new AppUserCompany
             {
                 AppUserId = user.Id,
                 CompanyId = company.Id,
-                IsDefault = true
+                IsDefault = true,
+                IsCompanyAdmin = true
             });
 
             _db.AppUserPermissions.AddRange(
@@ -207,7 +209,41 @@ namespace RealEstateManager.Services
             await EnsureCompanySetupAsync(company.Id);
         }
 
-        public async Task<List<AppUserListItemViewModel>> GetUsersAsync()
+        /// <summary>
+        /// Whose users this person may manage: everyone for a System Admin, otherwise the
+        /// users of the companies they administer (see <see cref="UserAdminScope"/>).
+        /// </summary>
+        public async Task<UserAdminScope> GetUserAdminScopeAsync(System.Security.Claims.ClaimsPrincipal principal)
+        {
+            var userId = principal.GetAppUserId() ?? 0;
+
+            if (principal.IsInRole("SystemAdmin"))
+            {
+                return new UserAdminScope
+                {
+                    UserId = userId,
+                    IsSystemAdmin = true,
+                    IsPlatformOwner = _platformOwnerService.IsOwner(principal),
+                    CompanyIds = null
+                };
+            }
+
+            var administered = await _db.AppUserCompanies
+                .IgnoreQueryFilters()
+                .Where(x => x.AppUserId == userId && x.IsCompanyAdmin)
+                .Select(x => x.CompanyId)
+                .ToListAsync();
+
+            return new UserAdminScope { UserId = userId, CompanyIds = administered.ToHashSet() };
+        }
+
+        private static bool CanManage(UserAdminScope scope, AppUser user) =>
+            !scope.IsCompanyAdminOnly ||
+            (!user.IsSystemAdmin &&
+             user.CompanyAccesses.Count > 0 &&
+             scope.CoversAll(user.CompanyAccesses.Select(x => x.CompanyId)));
+
+        public async Task<List<AppUserListItemViewModel>> GetUsersAsync(UserAdminScope scope)
         {
             var users = await _db.AppUsers
                 .IgnoreQueryFilters()
@@ -217,6 +253,8 @@ namespace RealEstateManager.Services
                 .Include(x => x.Permissions)
                 .OrderBy(x => x.Username)
                 .ToListAsync();
+
+            users = users.Where(x => CanManage(scope, x)).ToList();
 
             return users.Select(x => new AppUserListItemViewModel
             {
@@ -231,7 +269,8 @@ namespace RealEstateManager.Services
                     x.CompanyAccesses
                         .OrderByDescending(link => link.IsDefault)
                         .ThenBy(link => link.Company!.Name)
-                        .Select(link => $"{link.Company!.Name}{(link.IsDefault ? " (Default)" : string.Empty)}")),
+                        .Select(link => $"{link.Company!.Name}{(link.IsCompanyAdmin ? " (Administrator)" : string.Empty)}" +
+                                        $"{(link.IsDefault ? " (Default)" : string.Empty)}")),
                 PermissionsDisplay = x.IsSystemAdmin
                     ? "Full Access"
                     : string.Join(", ",
@@ -241,9 +280,10 @@ namespace RealEstateManager.Services
             }).ToList();
         }
 
-        public async Task<AppUserFormViewModel> BuildUserFormAsync(int? id = null)
+        public async Task<AppUserFormViewModel> BuildUserFormAsync(UserAdminScope scope, int? id = null)
         {
-            var companies = await _db.Companies
+            // A company administrator chooses only among the companies they administer.
+            var companies = (await _db.Companies
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .OrderBy(x => x.Name)
@@ -252,7 +292,9 @@ namespace RealEstateManager.Services
                     CompanyId = x.Id,
                     CompanyName = x.Name
                 })
-                .ToListAsync();
+                .ToListAsync())
+                .Where(x => scope.CompanyIds == null || scope.CompanyIds.Contains(x.CompanyId))
+                .ToList();
 
             if (!id.HasValue)
             {
@@ -270,12 +312,14 @@ namespace RealEstateManager.Services
                 .Include(x => x.Permissions)
                 .FirstOrDefaultAsync(x => x.Id == id.Value);
 
-            if (user == null)
+            if (user == null || !CanManage(scope, user))
                 throw new InvalidOperationException("User was not found.");
 
             foreach (var company in companies)
             {
-                company.IsSelected = user.CompanyAccesses.Any(x => x.CompanyId == company.CompanyId);
+                var link = user.CompanyAccesses.FirstOrDefault(x => x.CompanyId == company.CompanyId);
+                company.IsSelected = link != null;
+                company.IsCompanyAdmin = link?.IsCompanyAdmin == true;
             }
 
             return new AppUserFormViewModel
@@ -295,7 +339,7 @@ namespace RealEstateManager.Services
         /// Whether the person saving the form is the platform owner. Only the owner may
         /// make someone a System Admin or create an owner account.
         /// </param>
-        public async Task<int> CreateUserAsync(AppUserFormViewModel model, bool actingUserIsOwner)
+        public async Task<int> CreateUserAsync(AppUserFormViewModel model, bool actingUserIsOwner, UserAdminScope scope)
         {
             var normalizedUsername = model.Username.Trim().ToUpperInvariant();
 
@@ -315,7 +359,7 @@ namespace RealEstateManager.Services
                 throw new InvalidOperationException("Password is required for a new user.");
 
             var selectedCompanyIds = GetSelectedCompanyIds(model);
-            ValidateSelectedCompanies(model, selectedCompanyIds);
+            ValidateSelectedCompanies(model, selectedCompanyIds, scope);
 
             var user = new AppUser
             {
@@ -330,7 +374,7 @@ namespace RealEstateManager.Services
             _db.AppUsers.Add(user);
             await _db.SaveChangesAsync();
 
-            await SaveUserCompanyAccessesAsync(user, selectedCompanyIds, model.DefaultCompanyId!.Value);
+            await SaveUserCompanyAccessesAsync(user, model, selectedCompanyIds, model.DefaultCompanyId!.Value);
             await SaveUserPermissionsAsync(user, model);
 
             return user.Id;
@@ -342,7 +386,7 @@ namespace RealEstateManager.Services
         /// account at all - otherwise they could reset its password, or rename it and take
         /// its name, and become the owner.
         /// </param>
-        public async Task UpdateUserAsync(AppUserFormViewModel model, bool actingUserIsOwner)
+        public async Task UpdateUserAsync(AppUserFormViewModel model, bool actingUserIsOwner, UserAdminScope scope)
         {
             if (!model.Id.HasValue)
                 throw new InvalidOperationException("User id is required.");
@@ -352,8 +396,23 @@ namespace RealEstateManager.Services
                 .Include(x => x.CompanyAccesses)
                 .FirstOrDefaultAsync(x => x.Id == model.Id.Value);
 
-            if (user == null)
+            if (user == null || !CanManage(scope, user))
                 throw new InvalidOperationException("User was not found.");
+
+            // A company administrator cannot lock themselves out: they stay active and keep
+            // administering every company they administer now.
+            if (scope.IsCompanyAdminOnly && user.Id == scope.UserId)
+            {
+                if (!model.IsActive)
+                    throw new InvalidOperationException("You cannot deactivate your own account.");
+
+                foreach (var administered in user.CompanyAccesses.Where(x => x.IsCompanyAdmin))
+                {
+                    if (!model.Companies.Any(c => c.CompanyId == administered.CompanyId && c.IsSelected && c.IsCompanyAdmin))
+                        throw new InvalidOperationException(
+                            "You cannot remove your own administrator rights. Ask another administrator of the company to do it.");
+                }
+            }
 
             var normalizedUsername = model.Username.Trim().ToUpperInvariant();
 
@@ -392,7 +451,7 @@ namespace RealEstateManager.Services
             }
 
             var selectedCompanyIds = GetSelectedCompanyIds(model);
-            ValidateSelectedCompanies(model, selectedCompanyIds);
+            ValidateSelectedCompanies(model, selectedCompanyIds, scope);
 
             user.Username = normalizedUsername;
             user.DisplayName = model.DisplayName.Trim();
@@ -404,7 +463,7 @@ namespace RealEstateManager.Services
                 user.PasswordHash = _passwordHashingService.HashPassword(model.Password);
             }
 
-            await SaveUserCompanyAccessesAsync(user, selectedCompanyIds, model.DefaultCompanyId!.Value);
+            await SaveUserCompanyAccessesAsync(user, model, selectedCompanyIds, model.DefaultCompanyId!.Value);
             await SaveUserPermissionsAsync(user, model);
         }
 
@@ -417,16 +476,20 @@ namespace RealEstateManager.Services
                 .ToList();
         }
 
-        private static void ValidateSelectedCompanies(AppUserFormViewModel model, List<int> selectedCompanyIds)
+        private static void ValidateSelectedCompanies(AppUserFormViewModel model, List<int> selectedCompanyIds, UserAdminScope scope)
         {
             if (selectedCompanyIds.Count == 0)
                 throw new InvalidOperationException("Select at least one company for the user.");
+
+            if (!scope.CoversAll(selectedCompanyIds))
+                throw new InvalidOperationException("You can only give access to companies you administer.");
 
             if (!model.DefaultCompanyId.HasValue || !selectedCompanyIds.Contains(model.DefaultCompanyId.Value))
                 throw new InvalidOperationException("Default company must be one of the selected companies.");
         }
 
-        private async Task SaveUserCompanyAccessesAsync(AppUser user, List<int> selectedCompanyIds, int defaultCompanyId)
+        private async Task SaveUserCompanyAccessesAsync(
+            AppUser user, AppUserFormViewModel model, List<int> selectedCompanyIds, int defaultCompanyId)
         {
             var existingLinks = await _db.AppUserCompanies
                 .IgnoreQueryFilters()
@@ -454,6 +517,7 @@ namespace RealEstateManager.Services
                 }
 
                 link.IsDefault = companyId == defaultCompanyId;
+                link.IsCompanyAdmin = model.Companies.Any(x => x.CompanyId == companyId && x.IsCompanyAdmin);
             }
 
             await _db.SaveChangesAsync();
@@ -572,7 +636,9 @@ namespace RealEstateManager.Services
             {
                 AppUserId = userId,
                 CompanyId = company.Id,
-                IsDefault = false
+                IsDefault = false,
+                // They administer their practice company too, so they can add colleagues to practise.
+                IsCompanyAdmin = true
             });
             await _db.SaveChangesAsync();
 

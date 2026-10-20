@@ -11,11 +11,18 @@ namespace RealEstateManager.Services
     /// </summary>
     public static class LeaseScheduleBuilder
     {
-        public static void GenerateInvoices(ApplicationDbContext db, int companyId, Lease lease)
+        /// <summary>
+        /// The rent invoices the lease will produce, without saving anything - so a
+        /// contract awaiting approval can show exactly what will be billed.
+        /// </summary>
+        public static List<CustomerInvoice> PlanInvoices(int companyId, Lease lease)
         {
+            var invoices = new List<CustomerInvoice>();
             var billingMonths = lease.BillingFrequencyMonths;
-            var invoicesPerYear = 12 / billingMonths;
+            if (billingMonths <= 0 || 12 % billingMonths != 0)
+                return invoices;
 
+            var invoicesPerYear = 12 / billingMonths;
             var baseAmountPerInvoice = lease.AnnualRent / invoicesPerYear;
 
             // Tax is computed from the lease's VAT category through the one service
@@ -31,7 +38,7 @@ namespace RealEstateManager.Services
                 var periodEnd = invoiceDate.AddMonths(billingMonths).AddDays(-1);
                 if (periodEnd > lease.EndDate) periodEnd = lease.EndDate;
 
-                db.CustomerInvoices.Add(new CustomerInvoice
+                invoices.Add(new CustomerInvoice
                 {
                     CompanyId = companyId,
                     LeaseId = lease.Id,
@@ -54,6 +61,13 @@ namespace RealEstateManager.Services
 
                 invoiceDate = invoiceDate.AddMonths(billingMonths);
             }
+
+            return invoices;
+        }
+
+        public static void GenerateInvoices(ApplicationDbContext db, int companyId, Lease lease)
+        {
+            db.CustomerInvoices.AddRange(PlanInvoices(companyId, lease));
         }
 
         /// <summary>

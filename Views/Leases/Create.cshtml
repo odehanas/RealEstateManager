@@ -105,9 +105,27 @@
         </div>
     </div>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save</button>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        @if (ViewBag.ApprovalRequired is true)
+        {
+            <button type="submit" name="nextStep" value="submit" class="btn btn-warning">Save and Submit for Approval</button>
+        }
+        else
+        {
+            <button type="submit" name="nextStep" value="activate" class="btn btn-dark">Save and Activate</button>
+        }
+        <button type="submit" name="nextStep" value="draft" class="btn btn-outline-dark">Save as Draft</button>
         <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+    <div class="form-text mt-2">
+        @if (ViewBag.ApprovalRequired is true)
+        {
+            <text>This company requires approval: the contract takes effect - its invoices created, its terms locked - once a second person approves it.</text>
+        }
+        else
+        {
+            <text>Activating creates the contract's rent invoices and locks its terms. Save it as a draft to finish it later.</text>
+        }
     </div>
 </form>
 

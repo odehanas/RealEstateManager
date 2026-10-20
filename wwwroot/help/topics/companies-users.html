@@ -23,14 +23,34 @@ accounting periods.</p>
 </ul>
 
 <h3>Users</h3>
-<p><span class="path">System Setup ▸ Users &amp; Permissions</span> — system administrators only.</p>
+<p><span class="path">System Setup ▸ Users &amp; Permissions</span> — system administrators, and each company's own administrators.</p>
 <ol class="steps">
     <li>Select <strong>New User</strong>.</li>
     <li>Enter the <strong>Username</strong>, <strong>Display Name</strong> and an initial <strong>Password</strong>.</li>
-    <li>Grant access to one or more <strong>Companies</strong>.</li>
+    <li>Grant access to one or more <strong>Companies</strong>. Tick <strong>Administrator of this company</strong> for someone
+        who should manage that company's users.</li>
     <li>Tick the <strong>Permissions</strong> the user needs.</li>
     <li><strong>Save</strong> and give the user their credentials. They should change the password at first login.</li>
 </ol>
+
+<h3>Who manages users</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:24%">Level</th><th>What they can do</th></tr></thead>
+    <tbody>
+        <tr><td><strong>System Administrator</strong></td><td>Every company and every user. Set by the service provider.</td></tr>
+        <tr><td><strong>Company Administrator</strong></td><td>The users of the companies they administer: add them, reset passwords, choose their
+            permissions - including who approves contracts - and appoint other administrators of the same company. Whoever
+            registers a company becomes its first administrator.</td></tr>
+        <tr><td><strong>User</strong></td><td>What their ticked permissions allow.</td></tr>
+    </tbody>
+</table>
+<div class="box">
+    <div class="box-title">What a company administrator cannot touch</div>
+    <p>System administrators, and anyone who also works for a company they do not administer: changing that person's
+    password would open the other company to them. Those users are managed by the service provider. An administrator
+    also cannot deactivate themselves or remove their own administrator rights - another administrator of the company
+    has to.</p>
+</div>
 
 <figure data-shot="users"></figure>
 
@@ -41,6 +61,7 @@ accounting periods.</p>
         <tr><td><strong>View Master Data</strong></td><td>Master Data</td><td>Look up properties, units, tenants and vendors. Read only.</td></tr>
         <tr><td><strong>Create &amp; Edit Master Data</strong></td><td>Master Data</td><td>Add and amend properties, units, tenants and vendors; issue tenant portal logins. Implies View.</td></tr>
         <tr><td><strong>Manage Leases</strong></td><td>Operations</td><td>Lease contracts, the draft contract and QR label.</td></tr>
+        <tr><td><strong>Approve Contracts</strong></td><td>Operations</td><td>Approve or return contracts submitted by others, and switch contract approval on or off. Never their own contracts.</td></tr>
         <tr><td><strong>Handle Tenant Requests</strong></td><td>Operations</td><td>The Tenant Requests queue: replying, changing status, applying agreed postponements.</td></tr>
         <tr><td><strong>Manage Accounting</strong></td><td>Accounting</td><td>Invoices, receipts, PDCs, bills, payments, deposits, petty cash, fixed assets, prepayments, revenue recognition, journals, accounting setup and closing. Also lets the user look vendors up.</td></tr>
         <tr><td><strong>View Reports</strong></td><td>Reporting</td><td>All financial and management reports.</td></tr>
@@ -53,6 +74,7 @@ accounting periods.</p>
     <tbody>
         <tr><td><strong>Master data owner</strong></td><td>Create &amp; Edit Master Data · Manage Leases</td></tr>
         <tr><td><strong>Leasing officer</strong></td><td>View Master Data · Manage Leases · Handle Tenant Requests</td></tr>
+        <tr><td><strong>Leasing manager (approver)</strong></td><td>View Master Data · Approve Contracts · View Reports</td></tr>
         <tr><td><strong>Property / facilities manager</strong></td><td>View Master Data · Handle Tenant Requests</td></tr>
         <tr><td><strong>Accountant</strong></td><td>View Master Data · Manage Accounting · View Reports</td></tr>
         <tr><td><strong>Owner / auditor</strong></td><td>View Reports only</td></tr>

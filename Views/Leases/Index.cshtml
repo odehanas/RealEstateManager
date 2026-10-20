@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<RealEstateManager.Domain.Lease>
+@using RealEstateManager.Domain
 
 @{
     ViewData["Title"] = "Leases";
+    var approvals = ViewBag.Approvals as Dictionary<int, ApprovalRequest> ?? new();
+    var approvalRequired = ViewBag.ApprovalRequired is true;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -9,7 +12,22 @@
     <a asp-controller="Leases" asp-action="Create" class="btn btn-dark">Create Lease</a>
 </div>
 
-<table class="table table-bordered table-striped">
+@if (TempData["LeaseSuccess"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["LeaseError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<p class="small text-muted">
+    A new contract is a <strong>Draft</strong> until it is
+    @(approvalRequired ? "submitted and approved by a second person" : "activated")
+    - only then are its invoices created and its terms locked.
+</p>
+
+<table class="table table-bordered table-striped align-middle">
     <thead>
         <tr>
             <th>Contract</th>
@@ -27,6 +45,8 @@
     <tbody>
         @foreach (var lease in Model)
         {
+            approvals.TryGetValue(lease.Id, out var latest);
+            var returned = lease.Status == LeaseStatuses.Draft && latest?.Status == ApprovalStatuses.Rejected;
             <tr>
                 <td>@lease.ContractNumber</td>
                 <td>@lease.Unit?.Property?.Name</td>
@@ -36,10 +56,73 @@
                 <td>@lease.EndDate.ToString("dd/MM/yyyy")</td>
                 <td class="text-end">@lease.AnnualRent.ToString("N2")</td>
                 <td>@lease.BillingFrequencyMonths month(s)</td>
-                <td>@lease.Status</td>
                 <td>
-                    <div class="d-flex gap-2">
-                        <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-primary">Edit</a>
+                    @switch (lease.Status)
+                    {
+                        case LeaseStatuses.Draft:
+                            <span class="badge @(returned ? "bg-danger" : "bg-secondary")">@(returned ? "Returned" : "Draft")</span>
+                            break;
+                        case LeaseStatuses.PendingApproval:
+                            <span class="badge bg-warning text-dark">Awaiting approval</span>
+                            break;
+                        case LeaseStatuses.Active:
+                            <span class="badge bg-success">Active</span>
+                            break;
+                        default:
+                            <span class="badge bg-light text-dark border">@lease.Status</span>
+                            break;
+                    }
+                    @if (returned)
+                    {
+                        <div class="small text-danger mt-1">@latest!.DecidedByName: “@latest.DecisionComment”</div>
+                    }
+                    else if (lease.Status == LeaseStatuses.PendingApproval && latest != null)
+                    {
+                        <div class="small text-muted mt-1">Submitted by @latest.RequestedByName</div>
+                    }
+                    else if (lease.Status == LeaseStatuses.Active && latest?.Status == ApprovalStatuses.Approved)
+                    {
+                        <div class="small text-muted mt-1">Approved by @latest.DecidedByName</div>
+                    }
+                </td>
+                <td>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (lease.Status == LeaseStatuses.Draft)
+                        {
+                            <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-primary">Edit</a>
+                            @if (approvalRequired)
+                            {
+                                <form asp-action="Submit" asp-route-id="@lease.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-warning">Submit for approval</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Activate" asp-route-id="@lease.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Activate contract @lease.ContractNumber? Its invoices will be created and its terms locked.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                                </form>
+                            }
+                            <form asp-action="DeleteDraft" asp-route-id="@lease.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete draft contract @lease.ContractNumber?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        }
+                        else if (lease.Status == LeaseStatuses.PendingApproval)
+                        {
+                            <form asp-action="Withdraw" asp-route-id="@lease.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Take contract @lease.ContractNumber back to draft?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Withdraw</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-outline-primary">Notes</a>
+                        }
                         <a asp-action="ContractLabel" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-dark">QR Label</a>
                         <a asp-action="ContractDraft" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-secondary">Draft Contract</a>
                     </div>

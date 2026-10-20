@@ -5,7 +5,11 @@ using RealEstateManager.Services;
 
 namespace RealEstateManager.Controllers
 {
-    [Authorize(Roles = "SystemAdmin")]
+    /// <summary>
+    /// Users &amp; Permissions. A System Admin manages every user; a company administrator
+    /// manages the users of the companies they administer - see UserAdminScope.
+    /// </summary>
+    [Authorize(Policy = UserManagerRequirement.PolicyName)]
     public class UsersController : Controller
     {
         private readonly AdminManagementService _adminManagementService;
@@ -19,17 +23,23 @@ namespace RealEstateManager.Controllers
             _platformOwnerService = platformOwnerService;
         }
 
+        private Task<UserAdminScope> ScopeAsync() => _adminManagementService.GetUserAdminScopeAsync(User);
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var model = await _adminManagementService.GetUsersAsync();
+            var scope = await ScopeAsync();
+            ViewBag.Scope = scope;
+            var model = await _adminManagementService.GetUsersAsync(scope);
             return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var model = await _adminManagementService.BuildUserFormAsync();
+            var scope = await ScopeAsync();
+            ViewBag.Scope = scope;
+            var model = await _adminManagementService.BuildUserFormAsync(scope);
             return View(model);
         }
 
@@ -37,23 +47,26 @@ namespace RealEstateManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AppUserFormViewModel model)
         {
+            var scope = await ScopeAsync();
+            ViewBag.Scope = scope;
+
             if (!ModelState.IsValid)
             {
-                var refreshed = await _adminManagementService.BuildUserFormAsync();
+                var refreshed = await _adminManagementService.BuildUserFormAsync(scope);
                 MergeSelection(model, refreshed);
                 return View(refreshed);
             }
 
             try
             {
-                await _adminManagementService.CreateUserAsync(model, _platformOwnerService.IsOwner(User));
+                await _adminManagementService.CreateUserAsync(model, _platformOwnerService.IsOwner(User), scope);
                 TempData["SuccessMessage"] = "User created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             catch (InvalidOperationException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                var refreshed = await _adminManagementService.BuildUserFormAsync();
+                var refreshed = await _adminManagementService.BuildUserFormAsync(scope);
                 MergeSelection(model, refreshed);
                 return View(refreshed);
             }
@@ -62,9 +75,12 @@ namespace RealEstateManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            var scope = await ScopeAsync();
+            ViewBag.Scope = scope;
+
             try
             {
-                var model = await _adminManagementService.BuildUserFormAsync(id);
+                var model = await _adminManagementService.BuildUserFormAsync(scope, id);
                 return View(model);
             }
             catch (InvalidOperationException)
@@ -77,25 +93,35 @@ namespace RealEstateManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(AppUserFormViewModel model)
         {
+            var scope = await ScopeAsync();
+            ViewBag.Scope = scope;
+
             if (!ModelState.IsValid)
             {
-                var refreshedModel = await _adminManagementService.BuildUserFormAsync(model.Id);
+                var refreshedModel = await _adminManagementService.BuildUserFormAsync(scope, model.Id);
                 MergeSelection(model, refreshedModel);
                 return View(refreshedModel);
             }
 
             try
             {
-                await _adminManagementService.UpdateUserAsync(model, _platformOwnerService.IsOwner(User));
+                await _adminManagementService.UpdateUserAsync(model, _platformOwnerService.IsOwner(User), scope);
                 TempData["SuccessMessage"] = "User updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
             catch (InvalidOperationException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                var refreshedModel = await _adminManagementService.BuildUserFormAsync(model.Id);
-                MergeSelection(model, refreshedModel);
-                return View(refreshedModel);
+                try
+                {
+                    var refreshedModel = await _adminManagementService.BuildUserFormAsync(scope, model.Id);
+                    MergeSelection(model, refreshedModel);
+                    return View(refreshedModel);
+                }
+                catch (InvalidOperationException)
+                {
+                    return NotFound();
+                }
             }
         }
 
@@ -109,7 +135,9 @@ namespace RealEstateManager.Controllers
 
             foreach (var company in target.Companies)
             {
-                company.IsSelected = source.Companies.Any(x => x.CompanyId == company.CompanyId && x.IsSelected);
+                var posted = source.Companies.FirstOrDefault(x => x.CompanyId == company.CompanyId);
+                company.IsSelected = posted?.IsSelected == true;
+                company.IsCompanyAdmin = posted?.IsCompanyAdmin == true;
             }
 
             foreach (var group in target.PermissionGroups)

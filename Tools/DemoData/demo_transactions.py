@@ -69,7 +69,9 @@ LEASES = [  # unit, tenant, start, end, rent, frequency, deposit
 for unit, tenant, start, end, rent, freq, dep in LEASES:
     post("/Leases/Create", {"UnitId": unit, "TenantId": tenant, "StartDate": start, "EndDate": end,
                             "AnnualRent": rent, "BillingFrequencyMonths": freq, "SecurityDepositAmount": dep,
-                            "VatCategoryOverride": "", "VatOverrideReason": "", "Notes": ""})
+                            "VatCategoryOverride": "", "VatOverrideReason": "", "Notes": "",
+                            # A contract is saved as a draft unless told to take effect at once.
+                            "nextStep": "activate"})
 print("leases:", sql("SELECT COUNT(*) FROM Leases")[0][0], "| invoices:", sql("SELECT COUNT(*) FROM CustomerInvoices")[0][0])
 
 # ---- post every invoice dated on or before today ------------------------------

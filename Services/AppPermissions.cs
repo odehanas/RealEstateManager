@@ -18,6 +18,13 @@ namespace RealEstateManager.Services
         public const string MasterDataManage = "MasterData.Manage";
 
         public const string LeasesManage = "Leases.Manage";
+
+        /// <summary>
+        /// Approve or reject contracts submitted by others, when the company requires
+        /// contract approval. Kept apart from Leases.Manage so the person who writes a
+        /// contract and the person who signs it off can be different people.
+        /// </summary>
+        public const string LeasesApprove = "Leases.Approve";
         public const string AccountingManage = "Accounting.Manage";
         public const string ReportsView = "Reports.View";
 
@@ -64,6 +71,15 @@ namespace RealEstateManager.Services
                 Group = "Operations",
                 Name = "Manage Leases",
                 Description = "Lease contracts and related operations."
+            },
+            new()
+            {
+                Key = AppPermissions.LeasesApprove,
+                Group = "Operations",
+                Name = "Approve Contracts",
+                Description =
+                    "Approve or return contracts that others have submitted, and switch contract approval " +
+                    "on or off for the company. Nobody can approve a contract they created or submitted."
             },
             new()
             {
@@ -134,6 +150,7 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 ["Leases"] = new[] { AppPermissions.LeasesManage },
+                ["Approvals"] = new[] { AppPermissions.LeasesApprove },
                 ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["AccountMappings"] = new[] { AppPermissions.AccountingManage },

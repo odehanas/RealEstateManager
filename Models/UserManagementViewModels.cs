@@ -49,6 +49,31 @@ namespace RealEstateManager.Models
         public int CompanyId { get; set; }
         public string CompanyName { get; set; } = string.Empty;
         public bool IsSelected { get; set; }
+
+        /// <summary>Administers this company - manages its users. Only meaningful when selected.</summary>
+        public bool IsCompanyAdmin { get; set; }
+    }
+
+    /// <summary>
+    /// Whose users the person at the screen may manage. A System Admin manages everyone
+    /// (CompanyIds is null). A company administrator manages only users whose every company
+    /// is one they administer - never a System Admin, and never someone who also works for
+    /// a company they do not administer, because resetting that person's password would
+    /// open the other company to them.
+    /// </summary>
+    public sealed class UserAdminScope
+    {
+        public int UserId { get; init; }
+        public bool IsSystemAdmin { get; init; }
+        public bool IsPlatformOwner { get; init; }
+
+        /// <summary>The companies this person administers; null means all of them.</summary>
+        public HashSet<int>? CompanyIds { get; init; }
+
+        public bool IsCompanyAdminOnly => CompanyIds != null;
+
+        public bool CoversAll(IEnumerable<int> companyIds) =>
+            CompanyIds == null || companyIds.All(CompanyIds.Contains);
     }
 
     public class SelectablePermissionGroupViewModel

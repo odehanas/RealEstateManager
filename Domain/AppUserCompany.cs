@@ -11,5 +11,11 @@ namespace RealEstateManager.Domain
         public Company? Company { get; set; }
 
         public bool IsDefault { get; set; } = false;
+
+        /// <summary>
+        /// The user administers this company: manages its users and their permissions.
+        /// Held per company, so a customer's administrator has no say over any other company.
+        /// </summary>
+        public bool IsCompanyAdmin { get; set; }
     }
 }

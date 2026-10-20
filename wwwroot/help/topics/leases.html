@@ -1,5 +1,7 @@
-<p>The lease is the pivot of the whole system. Saving one lease creates, in a single action, the contract, its
-contract code, the entire schedule of rent invoices for its term, and the month-by-month revenue-recognition plan.</p>
+<p>The lease is the pivot of the whole system. A new contract is first saved as a <strong>draft</strong>, which can be
+corrected freely. The moment it takes effect - when it is activated, or approved if your company requires approval -
+it creates the entire schedule of rent invoices for its term and the month-by-month revenue-recognition plan, and its
+terms are locked.</p>
 
 <figure data-video="lease"></figure>
 
@@ -15,8 +17,33 @@ contract code, the entire schedule of rent invoices for its term, and the month-
     <li>Choose the <strong>Billing Frequency (Months)</strong> — it must divide 12 exactly: 1, 2, 3, 4, 6 or 12.</li>
     <li>Check the <strong>VAT treatment</strong> shown for the unit. Override it only with a reason (see below).</li>
     <li>Enter the <strong>Security Deposit Amount</strong> agreed in the contract and any <strong>Notes</strong>.</li>
-    <li><strong>Save</strong>.</li>
+    <li>Choose how to save:
+        <ul>
+            <li><strong>Save and Activate</strong> - the contract takes effect at once (companies without approval).</li>
+            <li><strong>Save and Submit for Approval</strong> - it goes to a second person (companies with approval).</li>
+            <li><strong>Save as Draft</strong> - to finish it later. A draft has no effect on anything.</li>
+        </ul>
+    </li>
 </ol>
+
+<h3>Approval in two levels</h3>
+<p>A company can require every new contract to be checked by a second person before it takes effect. Someone with the
+<strong>Approve Contracts</strong> permission switches this on or off in <span class="path">Master Data ▸ Approvals</span>.</p>
+<ol class="steps">
+    <li>The creator saves the contract and <strong>submits it for approval</strong>. Its unit is held: no other contract
+        can be submitted for the same unit and dates.</li>
+    <li>Approvers see it in <span class="path">Master Data ▸ Approvals</span>, with a count in the menu and a note on the
+        dashboard. <strong>Review</strong> shows the terms and every invoice it will create.</li>
+    <li><strong>Approve</strong>: the contract becomes Active, its invoices and revenue plan are created and the unit
+        becomes Occupied. <strong>Return to creator</strong> (a reason is required): it goes back to Draft, with the
+        reason shown on the Leases list, to be corrected and submitted again.</li>
+</ol>
+<div class="box">
+    <div class="box-title">The four-eyes rule</div>
+    <p>Nobody can approve a contract they created or submitted, even with the Approve Contracts permission. Until it is
+    decided, the person who submitted it can <strong>Withdraw</strong> it back to draft. Every submission, approval and
+    return is kept, with who did it, when and why - see the history at the bottom of the contract.</p>
+</div>
 
 <h3>The contract code</h3>
 <p>You do not type a contract number. The system issues one from the unit code, a tenancy number and the year,
@@ -42,7 +69,7 @@ See <a href="#master-data-rules">Master Data: Codes, Uniqueness &amp; Who Can Ed
 <p>If a specific contract genuinely needs different treatment, choose a <strong>VAT category override</strong> and
 enter the <strong>reason</strong>. The reason is kept on the contract so the decision can be explained later.</p>
 
-<h3>What is generated automatically</h3>
+<h3>What is generated when the contract takes effect</h3>
 <p><strong>Invoice schedule.</strong> The annual rent is divided by the number of invoices per year
 (12 ÷ billing frequency). One draft invoice is created for each billing date from the start date until the end
 date. VAT is calculated per invoice from the contract's VAT category.</p>
@@ -79,23 +106,24 @@ for one-twelfth of the annual rent. This spreads the rent evenly over time howev
     <tbody>
         <tr><td>End date after start date</td><td>"End date must be later than start date."</td></tr>
         <tr><td>Billing frequency divides 12</td><td>"Billing frequency must be 1, 2, 3, 4, 6, or 12."</td></tr>
-        <tr><td>No overlapping active lease on the same unit</td><td>"This unit already has an overlapping active lease."</td></tr>
+        <tr><td>No other active or waiting contract on the same unit for overlapping dates</td><td>"The unit is already taken for these dates by contract …"</td></tr>
     </tbody>
 </table>
 
 <div class="box warn">
-    <div class="box-title">Editing a lease does not regenerate its schedules</div>
-    <p>Changing the rent, dates or billing frequency of an existing lease updates the contract only. Invoices and
-    revenue-recognition entries already generated are left as they are. If commercial terms change materially,
-    end the lease and raise a new contract, then cancel any unposted invoices from the old one.</p>
+    <div class="box-title">An active contract's terms are locked</div>
+    <p>Its invoices were created from its rent, dates and billing frequency, so those can no longer be changed - only its
+    notes. Check a contract while it is a draft. If commercial terms change later, end the lease and raise a new
+    contract, then cancel any unposted invoices from the old one.</p>
 </div>
 
 <h3>Lease statuses</h3>
 <table class="t-compact">
     <thead><tr><th style="width:20%">Status</th><th>Meaning</th></tr></thead>
     <tbody>
-        <tr><td><strong>Draft</strong></td><td>Being prepared. Not yet operative.</td></tr>
-        <tr><td><strong>Active</strong></td><td>In force. Only active leases appear on the PDC screen.</td></tr>
+        <tr><td><strong>Draft</strong></td><td>Being prepared. No invoices, not visible to the tenant, freely editable. Shown as <em>Returned</em> when an approver sent it back.</td></tr>
+        <tr><td><strong>Awaiting approval</strong></td><td>Submitted to a second person. Read-only; its unit is held for it.</td></tr>
+        <tr><td><strong>Active</strong></td><td>In force: invoices created, terms locked. Only active leases appear on the PDC screen.</td></tr>
         <tr><td><strong>Terminated</strong></td><td>Ended early.</td></tr>
         <tr><td><strong>Expired</strong></td><td>Ran to its natural end date.</td></tr>
         <tr><td><strong>Renewed</strong></td><td>Superseded by a successor contract.</td></tr>

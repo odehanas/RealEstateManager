@@ -1,0 +1,131 @@
+@model List<RealEstateManager.Domain.ApprovalRequest>
+@using RealEstateManager.Domain
+@using RealEstateManager.Services
+
+@{
+    ViewData["Title"] = "Approvals";
+    var showAll = ViewBag.ShowAll is true;
+    var userId = ViewBag.UserId as int?;
+    var approvalRequired = ViewBag.ApprovalRequired is true;
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Approvals</h2>
+        <p class="text-muted mb-0">Contracts waiting for a second person to approve them before they take effect.</p>
+    </div>
+    <div class="btn-group">
+        <a asp-action="Index" class="btn btn-sm @(showAll ? "btn-outline-dark" : "btn-dark")">Waiting</a>
+        <a asp-action="Index" asp-route-all="true" class="btn btn-sm @(showAll ? "btn-dark" : "btn-outline-dark")">All decisions</a>
+    </div>
+</div>
+
+@if (TempData["ApprovalSuccess"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@if (TempData["ApprovalError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <strong>Contract approval is @(approvalRequired ? "ON" : "OFF") for this company.</strong>
+            <div class="small text-muted">
+                @if (approvalRequired)
+                {
+                    <text>Every new contract is submitted, and approved by someone with the Approve Contracts permission who did not create or submit it.</text>
+                }
+                else
+                {
+                    <text>A contract takes effect when its creator activates it. Switch approval on when two people should be involved.</text>
+                }
+            </div>
+        </div>
+        <form asp-action="Settings" method="post"
+              onsubmit="return confirm('@(approvalRequired ? "Switch contract approval OFF?" : "Switch contract approval ON? New contracts will need a second person to approve them.")');">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="requireContractApproval" value="@(approvalRequired ? "false" : "true")" />
+            <button type="submit" class="btn btn-sm @(approvalRequired ? "btn-outline-secondary" : "btn-primary")">
+                @(approvalRequired ? "Switch approval off" : "Switch approval on")
+            </button>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Document</th>
+            <th>What</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Decision</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr><td colspan="6" class="text-center text-muted py-4">@(showAll ? "No approvals yet." : "Nothing is waiting for approval.")</td></tr>
+        }
+        @foreach (var request in Model)
+        {
+            var mine = userId.HasValue && ApprovalService.FourEyesBlock(request, userId.Value) != null;
+            <tr>
+                <td>
+                    <div class="small text-muted">@(request.DocumentType == ApprovalDocumentTypes.Lease ? "Contract" : request.DocumentType)</div>
+                    <strong>@request.DocumentNumber</strong>
+                </td>
+                <td>@request.Summary</td>
+                <td class="text-nowrap">
+                    @request.RequestedByName
+                    <div class="small text-muted">@request.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                </td>
+                <td>
+                    @switch (request.Status)
+                    {
+                        case ApprovalStatuses.Pending:
+                            <span class="badge bg-warning text-dark">Waiting</span>
+                            break;
+                        case ApprovalStatuses.Approved:
+                            <span class="badge bg-success">Approved</span>
+                            break;
+                        case ApprovalStatuses.Rejected:
+                            <span class="badge bg-danger">Returned</span>
+                            break;
+                        default:
+                            <span class="badge bg-secondary">@request.Status</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    @if (request.DecidedAt.HasValue)
+                    {
+                        <span>@request.DecidedByName, @request.DecidedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                        @if (!string.IsNullOrWhiteSpace(request.DecisionComment))
+                        {
+                            <div class="small text-muted">“@request.DecisionComment”</div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Review" asp-route-id="@request.Id"
+                       class="btn btn-sm @(request.Status == ApprovalStatuses.Pending && !mine ? "btn-primary" : "btn-outline-secondary")">
+                        @(request.Status == ApprovalStatuses.Pending && !mine ? "Review" : "View")
+                    </a>
+                    @if (request.Status == ApprovalStatuses.Pending && mine)
+                    {
+                        <div class="small text-muted mt-1">Yours - someone else approves it</div>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
