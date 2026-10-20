@@ -29,7 +29,8 @@ namespace RealEstateManager.Controllers
             var requests = await _approvals.GetQueueAsync(pendingOnly: !all);
             ViewBag.ShowAll = all;
             ViewBag.UserId = User.GetAppUserId();
-            ViewBag.ApprovalRequired = (await _db.Companies.AsNoTracking().FirstOrDefaultAsync())?.RequireContractApproval == true;
+            var companyId = User.GetRequiredCurrentCompanyId();
+            ViewBag.ApprovalRequired = (await _db.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Id == companyId))?.RequireContractApproval == true;
             return View(requests);
         }
 
@@ -89,7 +90,9 @@ namespace RealEstateManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Settings(bool requireContractApproval)
         {
-            var company = await _db.Companies.FirstOrDefaultAsync();
+            // Companies carry no company filter: without the id this would switch whichever company is first.
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
             if (company == null)
                 return NotFound();
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Threading.Channels;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
@@ -14,7 +15,10 @@ namespace RealEstateManager.Services
     /// quarterly, half-yearly and annual billing, receipts, cheques, deposits, supplier
     /// bills and payments, petty cash, owner drawings, landlord remittances, VAT
     /// settlements, prepayments, fixed assets with depreciation, a credit note, tenant
-    /// requests, and closed periods - every report has something to show.
+    /// requests, and closed periods - every report has something to show. Also property
+    /// documents, development projects with a completion transfer, off-plan and completed
+    /// unit sales with a handover, a contract awaiting approval, a building under the
+    /// Capital Assets Scheme, and e-invoices sent and received.
     ///
     /// Everything is created through the same services the screens use, so each journal
     /// is genuine: the sample data obeys the same rules as data a user would enter.
@@ -167,9 +171,13 @@ namespace RealEstateManager.Services
         private readonly DevelopmentTransferService _developmentTransfers;
         private readonly InvestmentPropertySetupService _investmentPropertySetup;
         private readonly UnitSaleService _unitSales;
+        private readonly CapitalAssetVatService _capitalAssets;
+        private readonly LeaseWorkflowService _leaseWorkflow;
+        private readonly EInvoiceService _eInvoices;
         private readonly List<int> _saleIds = new();
         private int _projectId;
         private int _annexProjectId;
+        private int _annexSaleId;
 
         private readonly SampleDataResult _result = new();
 
@@ -206,8 +214,14 @@ namespace RealEstateManager.Services
             DevelopmentProjectService developmentProjects,
             DevelopmentTransferService developmentTransfers,
             InvestmentPropertySetupService investmentPropertySetup,
-            UnitSaleService unitSales)
+            UnitSaleService unitSales,
+            CapitalAssetVatService capitalAssets,
+            LeaseWorkflowService leaseWorkflow,
+            EInvoiceService eInvoices)
         {
+            _capitalAssets = capitalAssets;
+            _leaseWorkflow = leaseWorkflow;
+            _eInvoices = eInvoices;
             _db = db;
             _posting = posting;
             _workflow = workflow;
@@ -257,6 +271,7 @@ namespace RealEstateManager.Services
             await FillCompanyProfileAsync();
             await SetOpeningBalancesAsync();
             await CreateMasterDataAsync();
+            await AddPropertyDocumentsAsync();
             await CreateLeasesAsync();
             await CreateDevelopmentProjectAsync();
             await SetUpBuildingDepreciationAsync();
@@ -273,6 +288,10 @@ namespace RealEstateManager.Services
             await ClosePastPeriodsAsync();
             await CreateServiceRequestsAsync();
             await LeaveWorkInDraftAsync();
+            await RegisterCapitalAssetAsync();
+            await SubmitContractForApprovalAsync();
+            await StartEInvoicingAsync();
+            await ReceiveSupplierEInvoicesAsync();
 
             _result.PostedJournals = await _db.JournalEntries.CountAsync(x => x.IsPosted);
             _result.Elapsed = clock.Elapsed;
@@ -532,6 +551,11 @@ namespace RealEstateManager.Services
             await AddTenant("brightsmile", "Bright Smile Dental Clinic", "admin@brightsmile.example", "+971 7 200 1008", "UAE", licence: "RAK-10008", trn: "100000000400003");
             await AddTenant("gulfpearl", "Gulf Pearl Pharmacy LLC", "office@gulfpearl.example", "+971 7 200 1009", "UAE", licence: "RAK-10009", trn: "100000000500003");
             await AddTenant("ahmed", "Ahmed Rashid", "ahmed@mail.example", "+971 50 000 1010", "Jordan", passport: "P0001010");
+            // The retail annex's tenants, the shop's buyer, and a tenant whose contract awaits approval.
+            await AddTenant("coastal", "Coastal Optics LLC", "accounts@coastaloptics.example", "+971 7 200 1011", "UAE", licence: "RAK-10011", trn: "100000001200003");
+            await AddTenant("saffron", "Saffron Bakery LLC", "orders@saffronbakery.example", "+971 7 200 1012", "UAE", licence: "RAK-10012", trn: "100000001300003");
+            await AddTenant("horizon", "Horizon Investments LLC", "invest@horizon.example", "+971 7 200 1013", "UAE", licence: "RAK-10013", trn: "100000001400003");
+            await AddTenant("reem", "Al Reem Mobile Accessories LLC", "shop@alreem.example", "+971 7 200 1014", "UAE", licence: "RAK-10014", trn: "100000001500003");
 
             async Task AddVendor(string key, string name, string service, string contact, bool vatRegistered, string? trn)
             {
@@ -588,43 +612,64 @@ namespace RealEstateManager.Services
             foreach (var (unit, tenantKey, offset, frequency, deposit, behaviour) in plan)
             {
                 var startDate = _start.AddMonths(offset);
-                if (startDate > _today)
-                    continue;
-
-                var tenantId = _tenantIds[tenantKey];
-                var category = VatDeterminationService.ResolveCategory(unit.Property!, unit);
-
-                var lease = new Lease
-                {
-                    CompanyId = _companyId,
-                    UnitId = unit.Id,
-                    TenantId = tenantId,
-                    ContractNumber = await _codes.GenerateContractCodeAsync(unit.Id, tenantId, startDate),
-                    StartDate = startDate,
-                    EndDate = startDate.AddYears(1).AddDays(-1),
-                    AnnualRent = unit.StandardAnnualRent,
-                    BillingFrequencyMonths = frequency,
-                    SecurityDepositAmount = deposit,
-                    Status = "Active",
-                    Notes = "Sample lease",
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                VatDeterminationService.ApplyToLease(lease, category, null);
-
-                _db.Leases.Add(lease);
-                await _db.SaveChangesAsync();
-
-                unit.Status = "Occupied";
-                LeaseScheduleBuilder.GenerateInvoices(_db, _companyId, lease);
-                LeaseScheduleBuilder.GenerateRevenueRecognitionSchedules(_db, _companyId, lease, unit.Property!);
-                await _db.SaveChangesAsync();
-
-                _leases.Add(new SampleLease(lease.Id, tenantId, unit.Property!.Id, unit.Property.OwnershipType,
-                    unit.Property.CommissionPercentage, startDate, behaviour, deposit));
+                if (startDate <= _today)
+                    await CreateLeaseAsync(unit, tenantKey, startDate, frequency, deposit, behaviour);
             }
 
             _result.Leases = _leases.Count;
+        }
+
+        private async Task CreateLeaseAsync(Unit unit, string tenantKey, DateTime startDate, int frequency, decimal deposit, string behaviour)
+        {
+            var tenantId = _tenantIds[tenantKey];
+            var category = VatDeterminationService.ResolveCategory(unit.Property!, unit);
+
+            var lease = new Lease
+            {
+                CompanyId = _companyId,
+                UnitId = unit.Id,
+                TenantId = tenantId,
+                ContractNumber = await _codes.GenerateContractCodeAsync(unit.Id, tenantId, startDate),
+                StartDate = startDate,
+                EndDate = startDate.AddYears(1).AddDays(-1),
+                AnnualRent = unit.StandardAnnualRent,
+                BillingFrequencyMonths = frequency,
+                SecurityDepositAmount = deposit,
+                Status = "Active",
+                Notes = "Sample lease",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            VatDeterminationService.ApplyToLease(lease, category, null);
+
+            _db.Leases.Add(lease);
+            await _db.SaveChangesAsync();
+
+            unit.Status = "Occupied";
+            LeaseScheduleBuilder.GenerateInvoices(_db, _companyId, lease);
+            LeaseScheduleBuilder.GenerateRevenueRecognitionSchedules(_db, _companyId, lease, unit.Property!);
+            await _db.SaveChangesAsync();
+
+            _leases.Add(new SampleLease(lease.Id, tenantId, unit.Property!.Id, unit.Property.OwnershipType,
+                unit.Property.CommissionPercentage, startDate, behaviour, deposit));
+        }
+
+        /// <summary>
+        /// The month after the annex is transferred, two of its shops are let. Called before
+        /// the month's deposits and invoices, so their first invoices go through that month.
+        /// </summary>
+        private async Task LeaseAnnexShopsAsync(DateTime monthStart)
+        {
+            await TryAsync("let the annex shops", async () =>
+            {
+                var shops = await _db.Units.Include(x => x.Property)
+                    .Where(x => x.PropertyId == _properties["annex"].Id)
+                    .OrderBy(x => x.Id).ToListAsync();
+
+                await CreateLeaseAsync(shops[0], "coastal", monthStart, 3, 17_500m, "OnTime");
+                await CreateLeaseAsync(shops[1], "saffron", monthStart, 1, 5_850m, "OnTime");
+                _result.Leases = _leases.Count;
+            });
         }
 
         // =====================================================================
@@ -636,6 +681,9 @@ namespace RealEstateManager.Services
             var monthEnd = monthStart.AddMonths(1).AddDays(-1);
             var lastDay = monthEnd < _today ? monthEnd : _today;
             var index = (monthStart.Year - _start.Year) * 12 + monthStart.Month - _start.Month;
+
+            if (index == 4)
+                await LeaseAnnexShopsAsync(monthStart);
 
             await DepositsAndChequesAsync(monthStart, lastDay);
             await PostInvoicesAsync(monthStart, lastDay);
@@ -1050,9 +1098,13 @@ namespace RealEstateManager.Services
                 {
                     await _developmentProjects.CompleteAsync(_annexProjectId, monthStart.AddDays(4), "CC-" + monthStart.Year + "-0088");
 
+                    // Three shops are kept to rent out; the largest is sold to an investor, so its
+                    // share of the cost goes to completed properties held for sale.
                     var units = await _developmentTransfers.GetUnitsAsync(_annexProjectId);
+                    var forSale = units.OrderBy(x => x.Id).Last().Id;
                     await _developmentTransfers.TransferAsync(_annexProjectId, monthStart.AddDays(9), 30,
-                        units.ToDictionary(x => x.Id, _ => DevelopmentIntendedUses.Rental), "Sample data");
+                        units.ToDictionary(x => x.Id, x => x.Id == forSale ? DevelopmentIntendedUses.Sale : DevelopmentIntendedUses.Rental),
+                        "Sample data");
                 });
             }
         }
@@ -1103,6 +1155,30 @@ namespace RealEstateManager.Services
             if (index == 2) await Sell(0, "khalid", 780_000m);
             if (index == 5) await Sell(2, "ahmed", 1_150_000m);
 
+            // A completed shop in the annex: commercial, so standard rated at 5%. Half is paid on
+            // signing - VAT is due on that advance - and the rest next month, when it is handed over.
+            if (index == 4)
+            {
+                await TryAsync("sell the annex shop", async () =>
+                {
+                    var shop = await _db.Units.AsNoTracking()
+                        .Where(x => x.PropertyId == _properties["annex"].Id)
+                        .OrderBy(x => x.Id).Select(x => x.Id).LastAsync();
+                    var date = monthStart.AddDays(11);
+                    const decimal price = 1_150_000m;
+                    var total = price * 1.05m;
+                    var sale = await _unitSales.CreateAsync(shop, _tenantIds["horizon"], date, price,
+                        new List<(string, DateTime, decimal)>
+                        {
+                            ("Deposit on signing", date, total / 2m),
+                            ("Balance on handover", date.AddMonths(1), total / 2m)
+                        },
+                        "Completed shop sold to an investor", "Sample data");
+                    _saleIds.Add(sale.Id);
+                    _annexSaleId = sale.Id;
+                });
+            }
+
             // Each instalment that falls due in the month is paid on its due date.
             foreach (var saleId in _saleIds)
             {
@@ -1112,6 +1188,17 @@ namespace RealEstateManager.Services
                     if (sale == null) return;
                     foreach (var step in sale.Instalments.Where(x => x.DueDate >= monthStart && x.DueDate <= monthEnd && x.DueDate <= _today).OrderBy(x => x.Sequence))
                         await _unitSales.RecordReceiptAsync(saleId, step.DueDate, step.Amount, "Bank Transfer", _acc["11100"], $"TT-{step.DueDate:yyMMdd}-{saleId}");
+                });
+            }
+
+            if (index == 5 && _annexSaleId != 0)
+            {
+                await TryAsync("hand over the annex shop", async () =>
+                {
+                    var sale = await _unitSales.GetAsync(_annexSaleId);
+                    var lastPayment = sale?.Receipts.Max(x => (DateTime?)x.ReceiptDate);
+                    if (lastPayment != null)
+                        await _unitSales.HandoverAsync(_annexSaleId, lastPayment.Value, "TD-" + lastPayment.Value.Year + "-008841");
                 });
             }
         }
@@ -1627,6 +1714,328 @@ namespace RealEstateManager.Services
                 if (bill == null)
                     throw new InvalidOperationException(Describe(modelState));
             });
+        }
+
+        /// <summary>
+        /// The business centre under the Capital Assets Scheme. It was bought while two floors
+        /// were planned as staff flats, so only 70% of its input tax was recovered; it has since
+        /// been let entirely to businesses, so year 1's adjustment gives back more input tax.
+        /// </summary>
+        private async Task RegisterCapitalAssetAsync()
+        {
+            var firstOfMonth = new DateTime(_today.Year, _today.Month, 1);
+
+            await TryAsync("register the business centre under the Capital Assets Scheme", async () =>
+            {
+                var record = await _capitalAssets.RegisterManualAsync("Al Naeem Business Centre", _properties["naeem"].Id,
+                    24_000_000m, 1_200_000m, 840_000m, firstOfMonth.AddMonths(-13),
+                    "Bought while two floors were planned as staff flats (exempt), so 70% of the input tax was recovered. " +
+                    "Now let entirely to businesses.");
+
+                var (proposed, explanation) = await _capitalAssets.ProposeTaxableUseAsync(record.Id, 1);
+                await _capitalAssets.PostAdjustmentAsync(record.Id, 1, proposed ?? 100m, firstOfMonth.AddMonths(-1),
+                    proposed.HasValue ? explanation : "Let entirely to VAT-registered businesses.");
+            });
+        }
+
+        /// <summary>
+        /// A shop contract sent for approval by the leasing officer, waiting on the Approvals
+        /// screen for the user to approve or return. Approval stays switched off for the
+        /// company afterwards: a trainee working alone could not approve their own contracts.
+        /// </summary>
+        private async Task SubmitContractForApprovalAsync()
+        {
+            await TryAsync("contract awaiting approval", async () =>
+            {
+                var shop = await _db.Units.Include(x => x.Property)
+                    .Where(x => x.PropertyId == _properties["annex"].Id && x.Status == "Vacant")
+                    .OrderBy(x => x.Id).FirstOrDefaultAsync();
+                if (shop == null) return;
+
+                var startDate = new DateTime(_today.Year, _today.Month, 1).AddMonths(1);
+                var tenantId = _tenantIds["reem"];
+                var lease = new Lease
+                {
+                    CompanyId = _companyId,
+                    UnitId = shop.Id,
+                    TenantId = tenantId,
+                    ContractNumber = await _codes.GenerateContractCodeAsync(shop.Id, tenantId, startDate),
+                    StartDate = startDate,
+                    EndDate = startDate.AddYears(1).AddDays(-1),
+                    AnnualRent = shop.StandardAnnualRent,
+                    BillingFrequencyMonths = 3,
+                    SecurityDepositAmount = 4_750m,
+                    Status = LeaseStatuses.Draft,
+                    Notes = "Sample lease - awaiting approval",
+                    CreatedAt = DateTime.UtcNow
+                };
+                VatDeterminationService.ApplyToLease(lease, VatDeterminationService.ResolveCategory(shop.Property!, shop), null);
+                _db.Leases.Add(lease);
+                await _db.SaveChangesAsync();
+
+                var company = await _db.Companies.FirstAsync(x => x.Id == _companyId);
+                var wasRequired = company.RequireContractApproval;
+                company.RequireContractApproval = true;
+                await _db.SaveChangesAsync();
+                try
+                {
+                    // Submitted by someone other than the user, so the four-eyes rule lets them decide it.
+                    var (success, message) = await _leaseWorkflow.SubmitAsync(lease.Id, 0, "Leasing Officer (sample)");
+                    if (!success)
+                        throw new InvalidOperationException(message);
+                }
+                finally
+                {
+                    company.RequireContractApproval = wasRequired;
+                    await _db.SaveChangesAsync();
+                }
+            });
+        }
+
+        /// <summary>
+        /// E-invoicing started voluntarily three months ago. Business tenants' invoices from then
+        /// on are produced; older ones were sent and accepted, one was rejected and waits to be
+        /// corrected, and last month's and this month's are ready to send.
+        /// </summary>
+        private async Task StartEInvoicingAsync()
+        {
+            var firstOfMonth = new DateTime(_today.Year, _today.Month, 1);
+
+            await TryAsync("start e-invoicing", async () =>
+            {
+                var company = await _db.Companies.FirstAsync(x => x.Id == _companyId);
+                if (company.EInvoicingEnabled)
+                    return;
+
+                company.EInvoicingEnabled = true;
+                company.EInvoicingStartDate = firstOfMonth.AddMonths(-3);
+                company.EInvoicingRevenueBand ??= EInvoicingRevenueBands.Standard;
+                company.EInvoicingProviderName ??= "Training Access Point (fictional)";
+                company.EInvoicingProviderAppointedOn ??= firstOfMonth.AddMonths(-4);
+                if (string.IsNullOrWhiteSpace(company.EInvoicePaymentMeansCode))
+                    company.EInvoicePaymentMeansCode = EInvoicePaymentMeans.CreditTransfer;
+                await _db.SaveChangesAsync();
+
+                await _eInvoices.ReassessAsync(_companyId);
+                var batch = await _eInvoices.GenerateAllPendingAsync(_companyId);
+                _result.Warnings.AddRange(batch.Failures.Select(x => $"e-invoice: {x.Message} {string.Join(" ", x.Problems)}"));
+
+                var sent = await _db.CustomerInvoices.AsNoTracking()
+                    .Where(x => x.EInvoiceStatus == EInvoiceStatuses.Generated && x.InvoiceDate < firstOfMonth.AddMonths(-1))
+                    .OrderBy(x => x.InvoiceDate).ThenBy(x => x.Id)
+                    .Select(x => x.Id).ToListAsync();
+                if (sent.Count == 0)
+                    return;
+
+                var refs = sent.Select(id => new EInvoiceDocumentRef(EInvoiceService.KindInvoice, id)).ToList();
+                await _eInvoices.MarkSubmittedAsync(_companyId, refs, $"TAP-{firstOfMonth.AddMonths(-1):yyyyMM}-BATCH01");
+
+                for (var i = 0; i < refs.Count; i++)
+                {
+                    var rejected = i == refs.Count - 1;
+                    await _eInvoices.RecordResponseAsync(_companyId, refs[i], !rejected, $"TAP-ACK-{refs[i].Id:000000}",
+                        rejected ? "Buyer TRN not found in the FTA register - check the tenant's TRN and send again." : null);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Two suppliers' e-invoices delivered by the provider: one from a known vendor, ready to
+        /// book, and one from a supplier not set up yet.
+        /// </summary>
+        private async Task ReceiveSupplierEInvoicesAsync()
+        {
+            await TryAsync("received e-invoices", async () =>
+            {
+                var issued = _today.AddDays(-2);
+                var utilities = _vendors["utilities"];
+
+                var documents = new[]
+                {
+                    SupplierEInvoiceXml($"NUC-E-{issued:yyMMdd}", issued, utilities.Name, utilities.TrnNumber!,
+                        ("Water and electricity - Al Naeem Business Centre common areas", 3_420m),
+                        ("Water and electricity - Marina Heights common areas", 2_610m)),
+                    SupplierEInvoiceXml($"BW-{issued:yyyy}-0412", issued.AddDays(-1), "Blue Wave Pest Control LLC", "100000001600003",
+                        ("Quarterly pest control - Marina Heights", 1_850m))
+                };
+
+                foreach (var xml in documents)
+                {
+                    var parsed = EInvoiceReader.Parse(xml);
+                    var vendor = _vendors.Values.FirstOrDefault(x => x.TrnNumber == parsed.SupplierTrn);
+                    _db.ReceivedEInvoices.Add(new ReceivedEInvoice
+                    {
+                        CompanyId = _companyId,
+                        Uuid = parsed.Uuid,
+                        DocumentTypeCode = parsed.DocumentTypeCode,
+                        DocumentNumber = parsed.DocumentNumber,
+                        IssueDate = parsed.IssueDate,
+                        DueDate = parsed.DueDate,
+                        SupplierName = parsed.SupplierName,
+                        SupplierTrn = parsed.SupplierTrn,
+                        SupplierTin = parsed.SupplierTin,
+                        VendorId = vendor?.Id,
+                        Currency = parsed.Currency,
+                        NetAmount = parsed.NetAmount,
+                        VatAmount = parsed.VatAmount,
+                        TotalAmount = parsed.TotalAmount,
+                        Xml = xml,
+                        FileName = EInvoiceService.FileNameFor(parsed.DocumentNumber),
+                        Status = "Received",
+                        ReceivedAt = DateTime.UtcNow,
+                        ReceivedByAppUserId = _userId
+                    });
+                }
+                await _db.SaveChangesAsync();
+            });
+        }
+
+        /// <summary>A supplier's PINT AE invoice addressed to this company, standard rated.</summary>
+        private string SupplierEInvoiceXml(string number, DateTime issued, string supplierName, string supplierTrn,
+            params (string Text, decimal Net)[] lines)
+        {
+            XNamespace inv = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
+            XNamespace cac = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
+            XNamespace cbc = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+            static string A(decimal x) => x.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+
+            var net = lines.Sum(x => x.Net);
+            var vat = Math.Round(net * 0.05m, 2);
+
+            XElement Party(string name, string trn) => new(cac + "Party",
+                new XElement(cbc + "EndpointID", new XAttribute("schemeID", "0235"), trn[..10]),
+                new XElement(cac + "PartyName", new XElement(cbc + "Name", name)),
+                new XElement(cac + "PartyTaxScheme",
+                    new XElement(cbc + "CompanyID", trn),
+                    new XElement(cac + "TaxScheme", new XElement(cbc + "ID", "VAT"))),
+                new XElement(cac + "PartyLegalEntity", new XElement(cbc + "RegistrationName", name)));
+
+            XElement Category(string element) => new(cac + element,
+                new XElement(cbc + "ID", "S"),
+                new XElement(cbc + "Percent", "5"),
+                new XElement(cac + "TaxScheme", new XElement(cbc + "ID", "VAT")));
+
+            var document = new XElement(inv + "Invoice",
+                new XAttribute(XNamespace.Xmlns + "cac", cac),
+                new XAttribute(XNamespace.Xmlns + "cbc", cbc),
+                new XElement(cbc + "CustomizationID", "urn:peppol:pint:billing-1@ae-1"),
+                new XElement(cbc + "ProfileID", "urn:peppol:bis:billing"),
+                new XElement(cbc + "ID", number),
+                new XElement(cbc + "UUID", Guid.NewGuid().ToString()),
+                new XElement(cbc + "IssueDate", issued.ToString("yyyy-MM-dd")),
+                new XElement(cbc + "DueDate", issued.AddDays(30).ToString("yyyy-MM-dd")),
+                new XElement(cbc + "InvoiceTypeCode", "380"),
+                new XElement(cbc + "DocumentCurrencyCode", "AED"),
+                new XElement(cac + "AccountingSupplierParty", Party(supplierName, supplierTrn)),
+                new XElement(cac + "AccountingCustomerParty", Party(_company.LegalName ?? _company.Name, _company.TrnNumber ?? "100000000000003")),
+                new XElement(cac + "TaxTotal",
+                    new XElement(cbc + "TaxAmount", new XAttribute("currencyID", "AED"), A(vat)),
+                    new XElement(cac + "TaxSubtotal",
+                        new XElement(cbc + "TaxableAmount", new XAttribute("currencyID", "AED"), A(net)),
+                        new XElement(cbc + "TaxAmount", new XAttribute("currencyID", "AED"), A(vat)),
+                        Category("TaxCategory"))),
+                new XElement(cac + "LegalMonetaryTotal",
+                    new XElement(cbc + "LineExtensionAmount", new XAttribute("currencyID", "AED"), A(net)),
+                    new XElement(cbc + "TaxExclusiveAmount", new XAttribute("currencyID", "AED"), A(net)),
+                    new XElement(cbc + "TaxInclusiveAmount", new XAttribute("currencyID", "AED"), A(net + vat)),
+                    new XElement(cbc + "PayableAmount", new XAttribute("currencyID", "AED"), A(net + vat))),
+                lines.Select((line, i) => new XElement(cac + "InvoiceLine",
+                    new XElement(cbc + "ID", i + 1),
+                    new XElement(cbc + "InvoicedQuantity", new XAttribute("unitCode", "C62"), "1"),
+                    new XElement(cbc + "LineExtensionAmount", new XAttribute("currencyID", "AED"), A(line.Net)),
+                    new XElement(cac + "Item",
+                        new XElement(cbc + "Name", line.Text),
+                        Category("ClassifiedTaxCategory")),
+                    new XElement(cac + "Price",
+                        new XElement(cbc + "PriceAmount", new XAttribute("currencyID", "AED"), A(line.Net))))));
+
+            return new XDocument(new XDeclaration("1.0", "UTF-8", null), document).ToString();
+        }
+
+        /// <summary>
+        /// Scans of the registration papers, so the property screens show the document list and
+        /// the expiry warnings. Each is a one-page PDF marked as a training sample.
+        /// </summary>
+        private async Task AddPropertyDocumentsAsync()
+        {
+            await TryAsync("property documents", async () =>
+            {
+                void Add(string propertyKey, string type, string? number, DateTime? issued, DateTime? expires, string description)
+                {
+                    var property = _properties[propertyKey];
+                    var content = SamplePdf(type.ToUpperInvariant(), property.Name, number != null ? $"Number: {number}" : "",
+                        issued.HasValue ? $"Issued: {issued:dd/MM/yyyy}" : "",
+                        expires.HasValue ? $"Expires: {expires:dd/MM/yyyy}" : "",
+                        "TRAINING SAMPLE - NOT A REAL DOCUMENT");
+
+                    _db.PropertyDocuments.Add(new PropertyDocument
+                    {
+                        CompanyId = _companyId,
+                        PropertyId = property.Id,
+                        DocumentType = type,
+                        DocumentNumber = number,
+                        Description = description,
+                        IssueDate = issued,
+                        ExpiryDate = expires,
+                        FileName = $"{type.Replace(" ", "-").Replace("/", "-")}-{property.Code}.pdf",
+                        ContentType = "application/pdf",
+                        SizeBytes = content.Length,
+                        Content = content,
+                        UploadedAt = DateTime.UtcNow,
+                        UploadedByName = "Sample data"
+                    });
+                }
+
+                var marina = _properties["marina"];
+                var naeem = _properties["naeem"];
+                Add("marina", "Title deed", marina.TitleDeedNumber, marina.TitleDeedDate, null, "Freehold title deed");
+                Add("marina", "Insurance policy", marina.InsurancePolicyNumber, _today.AddMonths(-10).AddDays(45), marina.InsuranceExpiryDate,
+                    "Property all-risks policy - renewal due soon");
+                Add("naeem", "Title deed", naeem.TitleDeedNumber, naeem.TitleDeedDate, null, "Freehold title deed");
+                Add("naeem", "Mortgage document", "EI-RAK-55102", new DateTime(2018, 2, 11), null, "Mortgage registration - Emirates Islamic");
+                Add("marjanbay", "Building permit", _properties["marjanbay"].BuildingPermitNumber, _properties["marjanbay"].BuildingPermitDate,
+                    _properties["marjanbay"].BuildingPermitDate?.AddYears(3), "Permit for the 14-storey tower");
+                Add("annex", "Building permit", _properties["annex"].BuildingPermitNumber, _properties["annex"].BuildingPermitDate,
+                    _properties["annex"].BuildingPermitDate?.AddYears(1), "Permit for the four-shop retail annex");
+                await _db.SaveChangesAsync();
+            });
+        }
+
+        /// <summary>A minimal one-page PDF showing the given lines of text.</summary>
+        private static byte[] SamplePdf(params string[] lines)
+        {
+            static string Escape(string s) => s.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
+
+            var text = new System.Text.StringBuilder("BT /F1 16 Tf 72 760 Td 22 TL\n");
+            foreach (var line in lines.Where(x => x.Length > 0))
+                text.Append('(').Append(Escape(line)).Append(") Tj T*\n");
+            text.Append("ET");
+            var stream = text.ToString();
+
+            var objects = new[]
+            {
+                "<< /Type /Catalog /Pages 2 0 R >>",
+                "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+                "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+                "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+                $"<< /Length {System.Text.Encoding.ASCII.GetByteCount(stream)} >>\nstream\n{stream}\nendstream"
+            };
+
+            var pdf = new System.Text.StringBuilder("%PDF-1.4\n");
+            var offsets = new List<int>();
+            for (var i = 0; i < objects.Length; i++)
+            {
+                offsets.Add(System.Text.Encoding.ASCII.GetByteCount(pdf.ToString()));
+                pdf.Append($"{i + 1} 0 obj\n{objects[i]}\nendobj\n");
+            }
+
+            var xref = System.Text.Encoding.ASCII.GetByteCount(pdf.ToString());
+            pdf.Append($"xref\n0 {objects.Length + 1}\n0000000000 65535 f \n");
+            foreach (var offset in offsets)
+                pdf.Append($"{offset:0000000000} 00000 n \n");
+            pdf.Append($"trailer\n<< /Size {objects.Length + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
+
+            return System.Text.Encoding.ASCII.GetBytes(pdf.ToString());
         }
 
         // =====================================================================

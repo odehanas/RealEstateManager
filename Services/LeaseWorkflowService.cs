@@ -22,11 +22,13 @@ namespace RealEstateManager.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly ApprovalService _approvals;
+        private readonly ICurrentCompanyAccessor _currentCompany;
 
-        public LeaseWorkflowService(ApplicationDbContext db, ApprovalService approvals)
+        public LeaseWorkflowService(ApplicationDbContext db, ApprovalService approvals, ICurrentCompanyAccessor currentCompany)
         {
             _db = db;
             _approvals = approvals;
+            _currentCompany = currentCompany;
         }
 
         public string DocumentType => ApprovalDocumentTypes.Lease;
@@ -35,7 +37,9 @@ namespace RealEstateManager.Services
 
         public async Task<bool> ApprovalRequiredAsync()
         {
-            var company = await _db.Companies.AsNoTracking().FirstOrDefaultAsync();
+            // Companies carry no company filter: without the id this reads whichever company is first.
+            var companyId = _currentCompany.CompanyId;
+            var company = await _db.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Id == companyId);
             return company?.RequireContractApproval == true;
         }
 
