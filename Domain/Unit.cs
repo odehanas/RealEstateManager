@@ -1,5 +1,10 @@
 namespace RealEstateManager.Domain
 {
+    public static class UnitSides
+    {
+        public static readonly string[] All = { "Front", "Back", "Left", "Right" };
+    }
+
     public class Unit
     {
         public int Id { get; set; }
@@ -18,6 +23,12 @@ namespace RealEstateManager.Domain
 
         /// <summary>Where the unit sits along its floor in the building view, from the left (1, 2, 3...).</summary>
         public int? FloorPosition { get; set; }
+
+        /// <summary>
+        /// The side of the building the unit faces, for the 3D view: Front, Back, Left or Right.
+        /// Empty means the 3D view spreads the floor's units between front and back.
+        /// </summary>
+        public string? FloorSide { get; set; }
         public string? UsageType { get; set; }
 
         public decimal AreaSqFt { get; set; } = 0m;

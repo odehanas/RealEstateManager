@@ -180,7 +180,10 @@ namespace RealEstateManager.Services
                 ["InvestmentProperty"] = new[] { AppPermissions.ReportsView },
                 ["UnitSales"] = new[] { AppPermissions.AccountingManage },
                 ["CapitalAssetVat"] = new[] { AppPermissions.AccountingManage },
-                ["BuildingView"] = new[] { AppPermissions.ReportsView }
+                ["BuildingView"] = new[] { AppPermissions.ReportsView },
+
+                // Uploading photos and marking units on them changes the property record.
+                ["BuildingPhotos"] = new[] { AppPermissions.MasterDataManage }
             };
 
         private static readonly Dictionary<string, string[]> ActionPermissionMap =

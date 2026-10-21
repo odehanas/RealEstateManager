@@ -7,10 +7,12 @@ namespace RealEstateManager.Controllers
     public class BuildingViewController : Controller
     {
         private readonly BuildingViewService _buildings;
+        private readonly BuildingPhotoService _photos;
 
-        public BuildingViewController(BuildingViewService buildings)
+        public BuildingViewController(BuildingViewService buildings, BuildingPhotoService photos)
         {
             _buildings = buildings;
+            _photos = photos;
         }
 
         /// <summary>All buildings side by side.</summary>
@@ -29,7 +31,20 @@ namespace RealEstateManager.Controllers
                 return NotFound();
 
             ViewBag.SelectedUnitId = unit;
+            ViewBag.Photos = await _photos.GetPhotosAsync(id);
             return View(building);
+        }
+
+        /// <summary>A building photo, for the photo mode.</summary>
+        [HttpGet]
+        public async Task<IActionResult> PhotoImage(int id)
+        {
+            var image = await _photos.GetImageAsync(id);
+            if (image == null)
+                return NotFound();
+
+            Response.Headers.CacheControl = "private, max-age=3600";
+            return File(image.Value.Content, image.Value.ContentType);
         }
     }
 }

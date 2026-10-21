@@ -116,6 +116,7 @@ namespace RealEstateManager.Controllers
                 TitleDeedNumber = Clean(model.TitleDeedNumber),
                 FloorNumber = model.FloorNumber,
                 FloorPosition = model.FloorPosition,
+                FloorSide = CleanSide(model.FloorSide),
                 ParkingBays = model.ParkingBays,
                 UtilityAccountNumber = Clean(model.UtilityAccountNumber),
                 IsActive = true
@@ -154,6 +155,7 @@ namespace RealEstateManager.Controllers
                 TitleDeedNumber = unit.TitleDeedNumber,
                 FloorNumber = unit.FloorNumber,
                 FloorPosition = unit.FloorPosition,
+                FloorSide = unit.FloorSide,
                 ParkingBays = unit.ParkingBays,
                 UtilityAccountNumber = unit.UtilityAccountNumber
             };
@@ -203,6 +205,7 @@ namespace RealEstateManager.Controllers
             unit.TitleDeedNumber = Clean(model.TitleDeedNumber);
             unit.FloorNumber = model.FloorNumber;
             unit.FloorPosition = model.FloorPosition;
+            unit.FloorSide = CleanSide(model.FloorSide);
             unit.ParkingBays = model.ParkingBays;
             unit.UtilityAccountNumber = Clean(model.UtilityAccountNumber);
 
@@ -212,5 +215,8 @@ namespace RealEstateManager.Controllers
         }
 
         private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+        private static string? CleanSide(string? value) =>
+            UnitSides.All.FirstOrDefault(x => string.Equals(x, value?.Trim(), StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -22,6 +22,9 @@ namespace RealEstateManager.Models
         [System.ComponentModel.DataAnnotations.Display(Name = "Position on the floor")]
         public int? FloorPosition { get; set; }
 
+        [System.ComponentModel.DataAnnotations.Display(Name = "Side of the building")]
+        public string? FloorSide { get; set; }
+
         [System.ComponentModel.DataAnnotations.Display(Name = "Unit title deed number")]
         public string? TitleDeedNumber { get; set; }
 

@@ -10,7 +10,7 @@
             f.Label,
             units = f.Units.Select(u => new
             {
-                u.UnitId, u.UnitNumber, u.ShortLabel, u.AreaSqFt, u.Usage, u.StandardAnnualRent, u.Health, u.Reasons,
+                u.UnitId, u.UnitNumber, u.ShortLabel, u.Side, u.AreaSqFt, u.Usage, u.StandardAnnualRent, u.Health, u.Reasons,
                 u.LeaseId, u.SaleId, u.ContractNumber, u.TenantId, u.TenantName, u.AnnualRent,
                 ContractEnd = u.ContractEnd?.ToString("dd/MM/yyyy"), u.DaysToExpiry,
                 u.Invoiced, u.Collected, u.Outstanding, u.OverdueAmount, u.OldestOverdueDays,
@@ -18,7 +18,13 @@
                 Floor = f.Label
             })
         }),
-        selected = ViewBag.SelectedUnitId as int?
+        selected = ViewBag.SelectedUnitId as int?,
+        photos = (ViewBag.Photos as List<RealEstateManager.Domain.PropertyPhoto> ?? new()).Select(ph => new
+        {
+            ph.Id,
+            ph.Title,
+            areas = ph.Areas.Select(a => new { a.UnitId, points = RealEstateManager.Services.BuildingPhotoService.Read(a.PointsJson) })
+        })
     }, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
 }
 
@@ -33,6 +39,17 @@
     .kv { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f3f5; font-size: 14px; }
     .kv span:first-child { color: #6c757d; }
     #panel { position: sticky; top: 12px; }
+    #view3d { position: relative; height: 560px; border-radius: 10px; background: #eef1f4; overflow: hidden; }
+    #view3d canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+    #tip3d { position: absolute; pointer-events: none; background: rgba(33,37,41,.88); color: #fff; font-size: 12px; padding: 3px 8px; border-radius: 4px; display: none; white-space: nowrap; }
+    .bv-mode .btn { min-width: 64px; }
+    #photoStage { position: relative; display: inline-block; max-width: 100%; }
+    #photoStage img { display: block; max-width: 100%; max-height: 640px; border-radius: 8px; }
+    #photoOverlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+    #photoOverlay polygon { cursor: pointer; stroke-width: 2; vector-effect: non-scaling-stroke; transition: opacity .15s; }
+    #photoOverlay polygon:hover { stroke-width: 3; }
+    #photoOverlay polygon.sel { stroke-width: 4; }
+    #photoOverlay polygon.dim { opacity: .12; }
     @@media print { .no-print, nav, footer { display: none !important; } #panel { position: static; } }
 </style>
 
@@ -63,13 +80,46 @@
 }
 else
 {
-    <div class="bv-legend no-print" id="legend"></div>
+    <div class="d-flex justify-content-between align-items-start flex-wrap no-print">
+        <div class="bv-legend" id="legend"></div>
+        <div class="btn-group btn-group-sm bv-mode mb-2" role="group" aria-label="Drawing style">
+            <button type="button" class="btn btn-outline-dark active" id="mode2d">2.5D</button>
+            <button type="button" class="btn btn-outline-dark" id="mode3d">3D</button>
+            <button type="button" class="btn btn-outline-dark" id="modePhoto">Photo</button>
+        </div>
+    </div>
     <div class="row g-3">
         <div class="col-lg-7">
-            <svg id="building" width="100%" role="img" aria-label="@Model.Name drawn floor by floor; each unit coloured by the health of its rent"></svg>
-            <p class="small text-muted mt-2">
+            <div id="view2d">
+                <svg id="building" width="100%" role="img" aria-label="@Model.Name drawn floor by floor; each unit coloured by the health of its rent"></svg>
+            </div>
+            <div id="view3d" class="d-none" aria-label="@Model.Name as a 3D model; drag to rotate, scroll to zoom, select a unit for its details">
+                <canvas id="canvas3d"></canvas>
+                <div id="tip3d"></div>
+            </div>
+            <div id="viewPhoto" class="d-none">
+                <div class="d-flex flex-wrap gap-2 mb-2" id="photoTabs"></div>
+                <div id="photoEmpty" class="alert alert-secondary d-none">
+                    No photos of this building yet. <a asp-controller="BuildingPhotos" asp-action="Index" asp-route-id="@Model.PropertyId">Upload a photo and mark the units on it</a>
+                    to see the rent health on the real building.
+                </div>
+                <div id="photoStage" class="d-none">
+                    <img id="photoImg" alt="Photo of @Model.Name" />
+                    <svg id="photoOverlay"></svg>
+                </div>
+                <div class="small text-muted mt-2" id="photoUnmarked"></div>
+            </div>
+            <p class="small text-muted mt-2" id="hint2d">
                 Units are drawn in proportion to their area. Select a unit for its details, or a colour above to show only those units.
                 Floors come from each unit's floor (G = ground); set the floor number and position on the unit to arrange them exactly.
+            </p>
+            <p class="small text-muted mt-2 d-none" id="hintPhoto">
+                Each unit marked on the photo is tinted with its colour; select it for its details.
+                <a asp-controller="BuildingPhotos" asp-action="Index" asp-route-id="@Model.PropertyId">Manage photos and mark units</a>
+            </p>
+            <p class="small text-muted mt-2 d-none" id="hint3d">
+                Drag to turn the building, scroll or pinch to zoom, right-drag to move it. Units sit on the side recorded on the unit
+                (front, back, left, right); without one, a floor's units are shared between front and back.
             </p>
         </div>
         <div class="col-lg-5">
@@ -79,6 +129,8 @@ else
 }
 
 @section Scripts {
+<script src="~/lib/three/three.min.js"></script>
+<script src="~/lib/three/OrbitControls.js"></script>
 <script>
 (function () {
     const data = @Html.Raw(json);
@@ -151,8 +203,8 @@ else
                 const t = el('text', { x: x + w / 2, y: y + H / 2 + 4, 'text-anchor': 'middle', 'font-size': H >= 40 ? 12 : 10, fill: s.text, 'pointer-events': 'none' }, g);
                 t.textContent = u.shortLabel;
             }
-            g.addEventListener('click', () => select(u, g));
-            g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(u, g); } });
+            g.addEventListener('click', () => select(u));
+            g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(u); } });
             groups.push({ g, u });
             x += w;
         });
@@ -174,16 +226,18 @@ else
             else active.add(k);
             legend.querySelectorAll('button').forEach((btn, i) => btn.classList.toggle('off', !active.has(present[i])));
             groups.forEach(x => x.g.classList.toggle('dim', !active.has(x.u.health)));
+            three.dim(active);
+            photo.dim(active);
         });
         legend.appendChild(b);
     });
 
     // ---- The unit panel. ----
-    let current = null;
     function row(label, value, cls) { return `<div class="kv"><span>${label}</span><span class="${cls || ''}">${value}</span></div>`; }
-    function select(u, g) {
-        if (current) current.classList.remove('sel');
-        current = g; g.classList.add('sel');
+    function select(u) {
+        groups.forEach(x => x.g.classList.toggle('sel', x.u.unitId === u.unitId));
+        three.highlight(u.unitId);
+        photo.highlight(u.unitId);
         const s = style[u.health] || style.vacant;
         let html = `<div class="d-flex justify-content-between align-items-start mb-2">
             <div><h5 class="mb-0">Unit ${esc(u.unitNumber)}</h5><div class="small text-muted">Floor ${esc(u.floor)} &middot; ${esc(u.usage || '')} &middot; ${fmt(u.areaSqFt)} sq ft</div></div>
@@ -218,9 +272,247 @@ else
         document.getElementById('panel').innerHTML = `<div class="card-body">${html}</div>`;
     }
 
+    // =====================================================================
+    //  3D - the same units as boxes on floor slabs, drawn with three.js.
+    // =====================================================================
+    const three = (function () {
+        const hex = { good: 0x75b798, watch: 0xffc107, risk: 0xe35d6a, vacant: 0xced4da, maintenance: 0xadb5bd, reserved: 0x9ec5fe, sold: 0x3d8bfd };
+        const box = document.getElementById('view3d'), canvas = document.getElementById('canvas3d'), tip = document.getElementById('tip3d');
+        let renderer, scene, camera, controls, meshes = [], built = false, selectedId = null, activeSet = null;
+
+        function label(text) {
+            const c = document.createElement('canvas'); c.width = 64; c.height = 64;
+            const g = c.getContext('2d'); g.fillStyle = '#6c757d'; g.font = 'bold 34px sans-serif';
+            g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 32, 34);
+            const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
+            s.scale.set(0.8, 0.8, 1); return s;
+        }
+
+        // Lays a floor's units out: front and back share the depth, left and right take the ends.
+        function layout(units, hasEnds, BW, BD) {
+            const sides = { Front: [], Back: [], Left: [], Right: [] };
+            const unsided = units.filter(u => !sides[u.side]);
+            units.filter(u => sides[u.side]).forEach(u => sides[u.side].push(u));
+            if (unsided.length) {
+                if (!sides.Front.length && !sides.Back.length && unsided.length > 1) {
+                    const half = Math.ceil(unsided.length / 2);
+                    sides.Front.push(...unsided.slice(0, half)); sides.Back.push(...unsided.slice(half));
+                } else sides.Front.push(...unsided);
+            }
+            const end = hasEnds ? 1.8 : 0, x0 = -BW / 2 + end, x1 = BW / 2 - end;
+            const both = sides.Front.length && sides.Back.length;
+            const out = [];
+            const along = (list, from, to, place) => {
+                const total = list.reduce((a, u) => a + Math.max(u.areaSqFt || 0, 1), 0); let p = from;
+                list.forEach(u => { const w = (to - from) * Math.max(u.areaSqFt || 0, 1) / total; place(u, p, w); p += w; });
+            };
+            const d = both ? BD / 2 : BD;
+            along(sides.Front, x0, x1, (u, p, w) => out.push({ u, x: p + w / 2, z: both ? BD / 4 : 0, w, d }));
+            along(sides.Back, x0, x1, (u, p, w) => out.push({ u, x: p + w / 2, z: both ? -BD / 4 : 0, w, d }));
+            along(sides.Left, BD / 2, -BD / 2, (u, p, w) => out.push({ u, x: -BW / 2 + end / 2, z: p + w / 2, w: end || 1.8, d: Math.abs(w) }));
+            along(sides.Right, BD / 2, -BD / 2, (u, p, w) => out.push({ u, x: BW / 2 - end / 2, z: p + w / 2, w: end || 1.8, d: Math.abs(w) }));
+            return out;
+        }
+
+        function build() {
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(38, 1, 0.1, 1000);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const sun = new THREE.DirectionalLight(0xffffff, 0.55); sun.position.set(12, 30, 18); scene.add(sun);
+
+            const all = floors.flatMap(f => f.units);
+            const hasEnds = all.some(u => u.side === 'Left' || u.side === 'Right');
+            const widest = Math.max(1, ...floors.map(f => f.units.filter(u => u.side !== 'Left' && u.side !== 'Right').length));
+            const BW = Math.max(8, Math.min(22, widest * 2.4)), BD = 6, FH = 1.2;
+            const order = floors.slice().reverse();     // ground first
+            const height = order.length * FH;
+
+            const ground = new THREE.Mesh(new THREE.CircleGeometry(Math.max(BW, BD) * 1.1, 48), new THREE.MeshLambertMaterial({ color: 0xdee2e6 }));
+            ground.rotation.x = -Math.PI / 2; ground.position.y = -0.01; scene.add(ground);
+            const edge = new THREE.LineBasicMaterial({ color: 0x495057, transparent: true, opacity: 0.45 });
+
+            order.forEach((f, i) => {
+                const y = i * FH;
+                const slab = new THREE.Mesh(new THREE.BoxGeometry(BW + 0.3, 0.1, BD + 0.3), new THREE.MeshLambertMaterial({ color: 0xf8f9fa }));
+                slab.position.set(0, y, 0); scene.add(slab);
+                const l = label(f.label); l.position.set(-BW / 2 - 1.1, y + FH / 2, BD / 2); scene.add(l);
+
+                if (!f.units.length) {
+                    const ghost = new THREE.Mesh(new THREE.BoxGeometry(BW, FH - 0.15, BD),
+                        new THREE.MeshLambertMaterial({ color: 0xe9ecef, transparent: true, opacity: 0.35 }));
+                    ghost.position.set(0, y + FH / 2, 0); scene.add(ghost);
+                    return;
+                }
+                layout(f.units, hasEnds, BW, BD).forEach(c => {
+                    const geo = new THREE.BoxGeometry(Math.max(0.2, c.w - 0.08), FH - 0.18, Math.max(0.2, c.d - 0.08));
+                    const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ color: hex[c.u.health] || hex.vacant, transparent: true, opacity: 0.94, emissive: 0x000000 }));
+                    m.position.set(c.x, y + FH / 2 + 0.03, c.z); m.userData = c.u; scene.add(m); meshes.push(m);
+                    const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edge); e.position.copy(m.position); scene.add(e);
+                    m.userData.edge = e;
+                });
+            });
+            const roof = new THREE.Mesh(new THREE.BoxGeometry(BW + 0.3, 0.25, BD + 0.3), new THREE.MeshLambertMaterial({ color: 0x868e96 }));
+            roof.position.set(0, height + 0.08, 0); scene.add(roof);
+
+            const dist = Math.max(18, Math.max(height, BW) * 1.6);
+            camera.position.set(dist * 0.75, height * 0.6 + dist * 0.35, dist * 0.9);
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.target.set(0, height / 2, 0); controls.enableDamping = true;
+            controls.autoRotate = true; controls.autoRotateSpeed = 0.6;
+            controls.minDistance = 6; controls.maxDistance = dist * 3; controls.maxPolarAngle = Math.PI * 0.495;
+
+            const ray = new THREE.Raycaster(), mouse = new THREE.Vector2();
+            const hitAt = e => {
+                const r = canvas.getBoundingClientRect();
+                mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1; mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+                ray.setFromCamera(mouse, camera);
+                return ray.intersectObjects(meshes.filter(m => m.visible && m.material.opacity > 0.5))[0];
+            };
+            let down = null;
+            canvas.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; controls.autoRotate = false; });
+            canvas.addEventListener('pointerup', e => {
+                if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+                const hit = hitAt(e); if (hit) select(hit.object.userData);
+            });
+            canvas.addEventListener('pointermove', e => {
+                const hit = hitAt(e), r = box.getBoundingClientRect();
+                canvas.style.cursor = hit ? 'pointer' : 'grab';
+                if (hit) {
+                    const s = style[hit.object.userData.health] || style.vacant;
+                    tip.textContent = `${hit.object.userData.unitNumber} - ${s.label}`;
+                    tip.style.left = (e.clientX - r.left + 12) + 'px'; tip.style.top = (e.clientY - r.top + 12) + 'px'; tip.style.display = 'block';
+                } else tip.style.display = 'none';
+            });
+            canvas.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+
+            (function loop() { requestAnimationFrame(loop); if (!box.classList.contains('d-none')) { controls.update(); renderer.render(scene, camera); } })();
+            built = true;
+            apply();
+        }
+
+        function resize() {
+            if (!built) return;
+            const w = box.clientWidth, h = box.clientHeight;
+            renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', resize);
+
+        function apply() {
+            meshes.forEach(m => {
+                const on = !activeSet || activeSet.has(m.userData.health);
+                m.material.opacity = on ? 0.94 : 0.1;
+                m.userData.edge.material = m.userData.edge.material;
+                m.userData.edge.visible = on;
+                const sel = m.userData.unitId === selectedId;
+                m.material.emissive.setHex(sel ? 0x444444 : 0x000000);
+                m.scale.setScalar(sel ? 1.07 : 1);
+            });
+        }
+
+        return {
+            show() { if (!built) { if (!window.THREE) return false; build(); } resize(); return true; },
+            highlight(id) { selectedId = id; if (built) apply(); },
+            dim(set) { activeSet = new Set(set); if (built) apply(); }
+        };
+    })();
+
+    // =====================================================================
+    //  PHOTO - the units marked on real photos of the building, tinted.
+    // =====================================================================
+    const photo = (function () {
+        const tint = {
+            good: ['rgba(25,135,84,.38)', '#198754'], watch: ['rgba(255,193,7,.45)', '#e0a800'], risk: ['rgba(220,53,69,.45)', '#dc3545'],
+            vacant: ['rgba(173,181,189,.40)', '#6c757d'], maintenance: ['rgba(108,117,125,.40)', '#495057'],
+            reserved: ['rgba(13,110,253,.30)', '#0d6efd'], sold: ['rgba(10,88,202,.50)', '#0a58ca']
+        };
+        const photos = data.photos || [], unitsById = {};
+        floors.forEach(f => f.units.forEach(u => unitsById[u.unitId] = u));
+        const img = document.getElementById('photoImg'), svg = document.getElementById('photoOverlay');
+        let current = null, selectedId = null, activeSet = null, W = 1000, H = 1000;
+
+        function tabs() {
+            const box = document.getElementById('photoTabs'); box.innerHTML = '';
+            if (photos.length < 2) return;
+            photos.forEach(ph => {
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'btn btn-sm ' + (current && current.id === ph.id ? 'btn-dark' : 'btn-outline-dark');
+                b.textContent = ph.title; b.addEventListener('click', () => open(ph)); box.appendChild(b);
+            });
+        }
+
+        function draw() {
+            svg.innerHTML = '';
+            if (!current) return;
+            svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            current.areas.forEach(a => {
+                const u = unitsById[a.unitId]; if (!u) return;
+                const c = tint[u.health] || tint.vacant;
+                const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                poly.setAttribute('points', a.points.map(p => `${p[0] * W},${p[1] * H}`).join(' '));
+                poly.setAttribute('fill', c[0]); poly.setAttribute('stroke', c[1]);
+                poly.dataset.unit = u.unitId; poly.dataset.health = u.health;
+                const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                title.textContent = `${u.unitNumber} - ${(style[u.health] || style.vacant).label}`; poly.appendChild(title);
+                poly.addEventListener('click', () => select(u));
+                svg.appendChild(poly);
+            });
+            apply();
+            const marked = new Set(current.areas.map(a => a.unitId));
+            const missing = Object.values(unitsById).filter(u => !marked.has(u.unitId));
+            document.getElementById('photoUnmarked').textContent = missing.length
+                ? `Not marked on this photo (${missing.length}): ${missing.slice(0, 12).map(u => u.shortLabel).join(', ')}${missing.length > 12 ? '…' : ''}`
+                : 'Every unit is marked on this photo.';
+        }
+
+        function apply() {
+            svg.querySelectorAll('polygon').forEach(p => {
+                p.classList.toggle('sel', +p.dataset.unit === selectedId);
+                p.classList.toggle('dim', !!activeSet && !activeSet.has(p.dataset.health));
+            });
+        }
+
+        function open(ph) {
+            current = ph; tabs();
+            img.onload = () => { H = Math.round(1000 * img.naturalHeight / img.naturalWidth); draw(); };
+            img.src = '@Url.Action("PhotoImage")/' + ph.id;
+        }
+
+        return {
+            show() {
+                const has = photos.length > 0;
+                document.getElementById('photoEmpty').classList.toggle('d-none', has);
+                document.getElementById('photoStage').classList.toggle('d-none', !has);
+                if (has && !current) open(photos[0]);
+            },
+            highlight(id) { selectedId = id; apply(); },
+            dim(set) { activeSet = new Set(set); apply(); }
+        };
+    })();
+
+    // ---- 2.5D / 3D / Photo toggle, remembered on this computer. ----
+    const buttons = { '2d': document.getElementById('mode2d'), '3d': document.getElementById('mode3d'), photo: document.getElementById('modePhoto') };
+    const views = { '2d': ['view2d', 'hint2d'], '3d': ['view3d', 'hint3d'], photo: ['viewPhoto', 'hintPhoto'] };
+    function mode(m) {
+        if (!views[m]) m = '2d';
+        Object.keys(views).forEach(k => {
+            views[k].forEach(id => document.getElementById(id).classList.toggle('d-none', k !== m));
+            buttons[k].classList.toggle('active', k === m);
+        });
+        if (m === '3d' && !three.show()) { mode('2d'); return; }
+        if (m === 'photo') photo.show();
+        try { localStorage.setItem('buildingViewMode', m); } catch (e) { }
+    }
+    Object.keys(buttons).forEach(k => buttons[k].addEventListener('click', () => mode(k)));
+
     const pick = (data.selected && groups.find(x => x.u.unitId === data.selected))
         || groups.find(x => x.u.health === 'risk') || groups.find(x => x.u.health === 'watch') || groups[0];
-    if (pick) select(pick.u, pick.g);
+    if (pick) select(pick.u);
+
+    let saved = null;
+    try { saved = localStorage.getItem('buildingViewMode'); } catch (e) { }
+    if (saved === '3d' || saved === 'photo') mode(saved);
 })();
 </script>
 }

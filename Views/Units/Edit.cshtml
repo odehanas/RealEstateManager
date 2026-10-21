@@ -76,6 +76,18 @@
         </div>
 
         <div class="col-md-4">
+            <label asp-for="FloorSide" class="form-label"></label>
+            <select asp-for="FloorSide" class="form-select">
+                <option value="">Not set</option>
+                <option>Front</option>
+                <option>Back</option>
+                <option>Left</option>
+                <option>Right</option>
+            </select>
+            <div class="form-text">Optional. Where the unit sits in the 3D building view.</div>
+        </div>
+
+        <div class="col-md-4">
             <label asp-for="TitleDeedNumber" class="form-label"></label>
             <input asp-for="TitleDeedNumber" class="form-control" maxlength="50" />
             <div class="form-text">Only when the unit has its own deed (strata title).</div>

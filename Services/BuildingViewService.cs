@@ -142,6 +142,7 @@ namespace RealEstateManager.Services
                     ShortLabel = ShortLabel(unit.UnitNumber),
                     Floor = ResolveFloor(unit),
                     Position = unit.FloorPosition,
+                    Side = unit.FloorSide,
                     AreaSqFt = unit.AreaSqFt,
                     Usage = unit.UsageType,
                     StandardAnnualRent = unit.StandardAnnualRent
@@ -319,6 +320,9 @@ namespace RealEstateManager.Services
         public string ShortLabel { get; set; } = string.Empty;
         public int Floor { get; set; }
         public int? Position { get; set; }
+
+        /// <summary>Front, Back, Left or Right, for the 3D view; empty when not recorded.</summary>
+        public string? Side { get; set; }
         public decimal AreaSqFt { get; set; }
         public string? Usage { get; set; }
         public decimal StandardAnnualRent { get; set; }

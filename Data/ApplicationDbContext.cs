@@ -68,6 +68,8 @@ namespace RealEstateManager.Data
         public DbSet<OwnerCommissionInvoice> OwnerCommissionInvoices => Set<OwnerCommissionInvoice>();
         public DbSet<OwnerCommissionInvoiceLine> OwnerCommissionInvoiceLines => Set<OwnerCommissionInvoiceLine>();
         public DbSet<PropertyDocument> PropertyDocuments => Set<PropertyDocument>();
+        public DbSet<PropertyPhoto> PropertyPhotos => Set<PropertyPhoto>();
+        public DbSet<UnitPhotoArea> UnitPhotoAreas => Set<UnitPhotoArea>();
         public DbSet<DevelopmentProject> DevelopmentProjects => Set<DevelopmentProject>();
         public DbSet<DevelopmentBudgetLine> DevelopmentBudgetLines => Set<DevelopmentBudgetLine>();
         public DbSet<DevelopmentTransfer> DevelopmentTransfers => Set<DevelopmentTransfer>();
@@ -367,6 +369,7 @@ namespace RealEstateManager.Data
             });
 
             modelBuilder.Entity<Unit>().Property(x => x.FirstSupplyType).HasMaxLength(10);
+            modelBuilder.Entity<Unit>().Property(x => x.FloorSide).HasMaxLength(10);
             modelBuilder.Entity<Unit>().Property(x => x.FirstSupplyReference).HasMaxLength(100);
 
             modelBuilder.Entity<UnitSale>(entity =>
@@ -439,6 +442,30 @@ namespace RealEstateManager.Data
                 entity.Property(x => x.Adjustment).HasPrecision(18, 2);
                 entity.HasOne(x => x.JournalEntry).WithMany().HasForeignKey(x => x.JournalEntryId).OnDelete(DeleteBehavior.Restrict);
                 entity.HasIndex(x => new { x.CapitalAssetVatRecordId, x.YearNumber }).IsUnique();
+            });
+
+            modelBuilder.Entity<PropertyPhoto>(entity =>
+            {
+                entity.Property(x => x.Title).HasMaxLength(100);
+                entity.Property(x => x.FileName).HasMaxLength(260);
+                entity.Property(x => x.ContentType).HasMaxLength(100);
+                entity.Property(x => x.UploadedByName).HasMaxLength(200);
+
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(x => x.Areas).WithOne(x => x.PropertyPhoto).HasForeignKey(x => x.PropertyPhotoId).OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(x => new { x.CompanyId, x.PropertyId });
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<UnitPhotoArea>(entity =>
+            {
+                entity.Property(x => x.PointsJson).HasMaxLength(4000);
+                entity.HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId).OnDelete(DeleteBehavior.Restrict);
+
+                // One outline per unit per photo.
+                entity.HasIndex(x => new { x.PropertyPhotoId, x.UnitId }).IsUnique();
             });
 
             modelBuilder.Entity<Unit>().Property(x => x.TitleDeedNumber).HasMaxLength(50);
