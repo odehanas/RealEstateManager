@@ -11,10 +11,13 @@ namespace RealEstateManager.Controllers
         private readonly ApplicationDbContext _db;
         private readonly OpeningBalanceService _openingBalanceService;
 
-        public HomeController(ApplicationDbContext db, OpeningBalanceService openingBalanceService)
+        private readonly ManagementReportService _reports;
+
+        public HomeController(ApplicationDbContext db, OpeningBalanceService openingBalanceService, ManagementReportService reports)
         {
             _db = db;
             _openingBalanceService = openingBalanceService;
+            _reports = reports;
         }
 
         [HttpGet]
@@ -156,6 +159,17 @@ namespace RealEstateManager.Controllers
                 model.OverdueReceivablesRate = Math.Round(
                     model.OverdueReceivables * 100m / model.OutstandingReceivables,
                     2);
+            }
+
+            // The Tenant Health report's score, averaged over tenants with a current contract.
+            var companyIdForHealth = User.GetCurrentCompanyId();
+            if (companyIdForHealth.HasValue)
+            {
+                var health = await _reports.GetTenantHealthAsync(companyIdForHealth.Value, today);
+                var current = health.Rows.Where(x => x.IsScored && x.CurrentContractNumber != null).ToList();
+                model.ScoredTenantsCount = current.Count;
+                model.TenantsAtRiskCount = current.Count(x => x.HealthScore < DashboardTargets.HealthWatch);
+                model.AverageTenantHealth = current.Count == 0 ? null : Math.Round(current.Average(x => x.HealthScore), 1);
             }
 
             model.RecentInvoices = await _db.CustomerInvoices

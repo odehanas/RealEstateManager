@@ -74,7 +74,21 @@
         <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Transferred on completion</div><div class="fs-5">@Model.Transferred.ToString("N2")</div></div></div></div>
         <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Still in work in progress</div><div class="fs-5">@Model.InWorkInProgress.ToString("N2")</div></div></div></div>
     }
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Spent</div><div class="fs-5 @(Model.PercentOfBudget > 100 ? "text-danger" : "")">@(Model.Budget == 0 ? "-" : Model.PercentOfBudget.ToString("0.0") + "%")</div></div></div></div>
+    <div class="col-12 col-md-3"><div class="card shadow-sm"><div class="card-body py-1">
+        <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+        {
+            Title = "Budget Spent",
+            Value = Model.PercentOfBudget,
+            Max = 120m,
+            HasValue = Model.Budget > 0m,
+            Bands = new()
+            {
+                new(0m, 90m, RealEstateManager.Models.GaugeModel.Green, "Within budget"),
+                new(90m, 100m, RealEstateManager.Models.GaugeModel.Amber, "Near budget"),
+                new(100m, 120m, RealEstateManager.Models.GaugeModel.Red, "Over budget")
+            }
+        })" />
+    </div></div></div>
 </div>
 
 <div class="row g-3">

@@ -74,6 +74,52 @@
     <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Overdue</div><div class="fs-5">@Model.Overdue.ToString("N0")</div></div></div></div>
 </div>
 
+@{
+    var letUnits = Model.Units.Where(x => x.LeaseId.HasValue).ToList();
+    var billed = letUnits.Sum(x => x.Invoiced);
+    var healthyShare = letUnits.Count == 0 ? 0m : Math.Round(letUnits.Count(x => x.Health == "good") * 100m / letUnits.Count, 1);
+}
+@if (Model.Units.Count > 0)
+{
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body py-2">
+                <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+                {
+                    Title = "Occupancy",
+                    Value = Model.OccupancyPercent,
+                    Bands = RealEstateManager.Models.GaugeModel.HigherIsBetter(0, RealEstateManager.Models.DashboardTargets.OccupancyWatch, RealEstateManager.Models.DashboardTargets.OccupancyGood, 100),
+                    Notes = { $"{Model.Let} of {Model.Units.Count} units let" }
+                })" />
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body py-2">
+                <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+                {
+                    Title = "Healthy Tenancies",
+                    Value = healthyShare,
+                    HasValue = letUnits.Count > 0,
+                    Bands = RealEstateManager.Models.GaugeModel.HigherIsBetter(0, 60, 80, 100),
+                    Notes = { $"{Model.Count("good")} of {letUnits.Count} let units green" }
+                })" />
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body py-2">
+                <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+                {
+                    Title = "Billed Rent Collected",
+                    Value = billed == 0m ? 0m : Math.Round(letUnits.Sum(x => x.Collected) * 100m / billed, 1),
+                    HasValue = billed > 0m,
+                    Bands = RealEstateManager.Models.GaugeModel.HigherIsBetter(0, 80, 95, 100),
+                    Notes = { $"{letUnits.Sum(x => x.Collected):N0} of {billed:N0} on current contracts" }
+                })" />
+            </div></div>
+        </div>
+    </div>
+}
+
 @if (Model.Units.Count == 0)
 {
     <div class="alert alert-secondary">This property has no units yet. Add them in Master Data &rsaquo; Units, with their floor and area.</div>

@@ -1,3 +1,4 @@
+@using RealEstateManager.Models
 @model RealEstateManager.Models.HomeDashboardViewModel
 @inject RealEstateManager.Services.ICurrentCompanyAccessor CurrentCompanyAccessor
 @inject RealEstateManager.Services.SubscriptionService SubscriptionService
@@ -159,67 +160,61 @@
     </div>
 </div>
 
+@{
+    var occupancyGauge = new GaugeModel
+    {
+        Title = "Occupancy",
+        Value = Model.OccupancyRate,
+        HasValue = Model.ActiveUnitsCount > 0,
+        Bands = GaugeModel.HigherIsBetter(0, DashboardTargets.OccupancyWatch, DashboardTargets.OccupancyGood, 100),
+        Notes = { $"{Model.OccupiedUnitsCount} of {Model.ActiveUnitsCount} units let",
+                  $"Vacant {Model.VacantUnitsCount} · maintenance {Model.UnderMaintenanceUnitsCount} · reserved {Model.ReservedUnitsCount}" },
+        Link = Url.Action("Index", "BuildingView"), LinkText = "Building view"
+    };
+    var collectionGauge = new GaugeModel
+    {
+        Title = "Collection This Month",
+        Value = Model.MonthlyCollectionRate,
+        Max = DashboardTargets.CollectionMax,
+        HasValue = Model.ThisMonthInvoices > 0m,
+        Bands = GaugeModel.HigherIsBetter(0, DashboardTargets.CollectionWatch, DashboardTargets.CollectionGood, DashboardTargets.CollectionMax),
+        Notes = { $"Received {Model.ThisMonthReceipts:N0} of {Model.ThisMonthInvoices:N0} billed" },
+        Link = Url.Action("Index", "CustomerReceipts"), LinkText = "Customer receipts"
+    };
+    var overdueGauge = new GaugeModel
+    {
+        Title = "Overdue Pressure",
+        Value = Model.OverdueReceivablesRate,
+        HasValue = Model.OutstandingReceivables > 0m,
+        Bands = GaugeModel.LowerIsBetter(0, DashboardTargets.OverdueWatch, DashboardTargets.OverdueHigh, 100),
+        Notes = { $"{Model.OverdueReceivables:N0} overdue of {Model.OutstandingReceivables:N0} owed",
+                  $"{Model.OverdueInvoicesCount} overdue invoice(s)" },
+        Link = Url.Action("TenantHealth", "Reports"), LinkText = "Who is overdue"
+    };
+    var healthGauge = new GaugeModel
+    {
+        Title = "Tenant Health",
+        Value = Model.AverageTenantHealth ?? 0m,
+        Unit = "",
+        HasValue = Model.AverageTenantHealth.HasValue,
+        Bands = GaugeModel.HigherIsBetter(0, DashboardTargets.HealthWatch, DashboardTargets.HealthGood, 100),
+        Notes = { $"Average score of {Model.ScoredTenantsCount} current tenant(s), out of 100",
+                  $"{Model.TenantsAtRiskCount} below {DashboardTargets.HealthWatch:0}" },
+        Link = Url.Action("TenantHealth", "Reports"), LinkText = "Tenant health & ranking"
+    };
+}
+
 <div class="row g-3 mb-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
-            <div class="card-header bg-light">
-                <strong>Collection Trend</strong>
-            </div>
-            <div class="card-body">
-                <div class="fs-3 fw-bold">@Model.MonthlyCollectionRate.ToString("N2")%</div>
-                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.MonthlyCollectionRate" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-success" style="width:@Math.Min(Model.MonthlyCollectionRate, 100m).ToString("0.##")%"></div>
+    @foreach (var gauge in new[] { occupancyGauge, collectionGauge, overdueGauge, healthGauge })
+    {
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm border-0 h-100 dashboard-print-card">
+                <div class="card-body">
+                    <partial name="_Gauge" model="gauge" />
                 </div>
-                <div class="mt-3 text-muted small">Invoices this month: @Model.ThisMonthInvoices.ToString("N2")</div>
-                <div class="text-muted small">Receipts this month: @Model.ThisMonthReceipts.ToString("N2")</div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
-            <div class="card-header bg-light">
-                <strong>Overdue Pressure</strong>
-            </div>
-            <div class="card-body">
-                <div class="fs-3 fw-bold">@Model.OverdueReceivablesRate.ToString("N2")%</div>
-                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.OverdueReceivablesRate" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-danger" style="width:@Math.Min(Model.OverdueReceivablesRate, 100m).ToString("0.##")%"></div>
-                </div>
-                <div class="mt-3 text-muted small">Overdue invoices: @Model.OverdueInvoicesCount</div>
-                <div class="text-muted small">Overdue amount: @Model.OverdueReceivables.ToString("N2")</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
-            <div class="card-header bg-light">
-                <strong>Vacancy KPI</strong>
-            </div>
-            <div class="card-body">
-                <div class="fs-3 fw-bold">@Model.VacancyRate.ToString("N2")%</div>
-                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.VacancyRate" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-secondary" style="width:@Math.Min(Model.VacancyRate, 100m).ToString("0.##")%"></div>
-                </div>
-                <div class="mt-3 text-muted small">Vacant units: @Model.VacantUnitsCount</div>
-                <div class="text-muted small">Maintenance: @Model.UnderMaintenanceUnitsCount | Reserved: @Model.ReservedUnitsCount</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card shadow-sm border-0 h-100 dashboard-print-card">
-            <div class="card-header bg-light">
-                <strong>Managed Portfolio</strong>
-            </div>
-            <div class="card-body">
-                <div class="fs-3 fw-bold">@Model.ManagedPortfolioRate.ToString("N2")%</div>
-                <div class="progress mt-3" role="progressbar" aria-valuenow="@Model.ManagedPortfolioRate" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-info" style="width:@Math.Min(Model.ManagedPortfolioRate, 100m).ToString("0.##")%"></div>
-                </div>
-                <div class="mt-3 text-muted small">Managed properties: @Model.ManagedPropertiesCount</div>
-                <div class="text-muted small">Owned properties: @Model.OwnedPropertiesCount</div>
-            </div>
-        </div>
-    </div>
+    }
 </div>
 
 <div class="row g-3 mb-4">

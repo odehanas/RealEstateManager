@@ -48,3 +48,16 @@ body {
 .coa-tree > li::before {
     display: none;
 }
+/* ---- Speedometer gauges (Views/Shared/_Gauge.cshtml) ---------------------------- */
+.gauge { padding: .25rem .5rem; }
+.gauge-title { font-weight: 600; font-size: .95rem; margin-bottom: .25rem; }
+.gauge-svg { width: 100%; max-width: 230px; display: block; margin: 0 auto; }
+.gauge-tick { font-size: 10px; fill: #6c757d; }
+.gauge-value { font-size: 1.6rem; font-weight: 700; line-height: 1.1; margin-top: -.15rem; }
+.gauge-band { font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: #6c757d; }
+.gauge-note { font-size: .82rem; color: #6c757d; }
+.gauge-link { font-size: .82rem; }
+.gauge-needle { animation: gauge-sweep .9s ease-out; }
+@keyframes gauge-sweep { from { transform: rotate(-90deg); } }
+@media (prefers-reduced-motion: reduce) { .gauge-needle { animation: none; } }
+@media print { .gauge-needle { animation: none; } .gauge-link { display: none; } }

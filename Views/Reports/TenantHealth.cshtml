@@ -58,11 +58,16 @@
 
 <div class="row g-3 mb-4">
     <div class="col-md-6 col-xl-3">
-        <div class="card shadow-sm h-100 border-0 bg-primary text-white">
-            <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Collection Ratio</div>
-                <div class="h3 fw-bold mb-1">@Model.PortfolioCollectionRatio.ToString("N1")%</div>
-                <div class="small">@Model.TotalCollected.ToString("N0") collected of @Model.TotalInvoiced.ToString("N0")</div>
+        <div class="card shadow-sm h-100">
+            <div class="card-body py-2">
+                <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+                {
+                    Title = "Collection Ratio",
+                    Value = Model.PortfolioCollectionRatio,
+                    HasValue = Model.TotalInvoiced > 0m,
+                    Bands = RealEstateManager.Models.GaugeModel.HigherIsBetter(0, 80, 95, 100),
+                    Notes = { $"{Model.TotalCollected:N0} collected of {Model.TotalInvoiced:N0}" }
+                })" />
             </div>
         </div>
     </div>
@@ -76,11 +81,17 @@
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="card shadow-sm h-100 border-0 bg-success text-white">
-            <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Average Health Score</div>
-                <div class="h3 fw-bold mb-1">@Model.AverageHealthScore.ToString("N1")</div>
-                <div class="small">@Model.ScoredTenants of @Model.Rows.Count tenants scored</div>
+        <div class="card shadow-sm h-100">
+            <div class="card-body py-2">
+                <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+                {
+                    Title = "Average Health Score",
+                    Value = Model.AverageHealthScore,
+                    Unit = "",
+                    HasValue = Model.ScoredTenants > 0,
+                    Bands = RealEstateManager.Models.GaugeModel.HigherIsBetter(0, RealEstateManager.Models.DashboardTargets.HealthWatch, RealEstateManager.Models.DashboardTargets.HealthGood, 100),
+                    Notes = { $"{Model.ScoredTenants} of {Model.Rows.Count} tenants scored" }
+                })" />
             </div>
         </div>
     </div>

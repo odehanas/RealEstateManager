@@ -1,5 +1,16 @@
 namespace RealEstateManager.Models
 {
+    /// <summary>
+    /// Where the dashboard gauges turn from red to amber to green. One place to change a target.
+    /// </summary>
+    public static class DashboardTargets
+    {
+        public const decimal OccupancyWatch = 75m, OccupancyGood = 90m;
+        public const decimal CollectionWatch = 70m, CollectionGood = 90m, CollectionMax = 120m;
+        public const decimal OverdueWatch = 15m, OverdueHigh = 35m;
+        public const decimal HealthWatch = 55m, HealthGood = 75m;
+    }
+
     public class HomeDashboardViewModel
     {
         public DateTime Today { get; set; } = DateTime.Today;
@@ -31,6 +42,11 @@ namespace RealEstateManager.Models
         public int UnclearedPdcCount { get; set; }
         public decimal UnclearedPdcAmount { get; set; }
         public bool PdcDataAvailable { get; set; } = true;
+
+        /// <summary>Average Tenant Health score of tenants with a current contract; null when none is scored yet.</summary>
+        public decimal? AverageTenantHealth { get; set; }
+        public int ScoredTenantsCount { get; set; }
+        public int TenantsAtRiskCount { get; set; }
 
         public decimal OccupancyRate { get; set; }
         public decimal VacancyRate { get; set; }

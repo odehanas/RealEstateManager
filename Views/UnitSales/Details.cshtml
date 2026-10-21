@@ -67,6 +67,12 @@
         <div class="card shadow-sm h-100">
             <div class="card-header bg-light"><strong>Account</strong></div>
             <div class="card-body">
+                <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
+                {
+                    Title = "Price Paid",
+                    Value = Model.TotalPrice == 0m ? 0m : Math.Round(received * 100m / Model.TotalPrice, 1),
+                    Bands = new() { new(0m, 100m, RealEstateManager.Models.GaugeModel.Blue, received >= Model.TotalPrice ? "Paid in full" : "Paid so far") }
+                })" />
                 <table class="table table-sm mb-0">
                     <tr><td>Price including VAT</td><td class="text-end">@Model.TotalPrice.ToString("N2")</td></tr>
                     <tr><td>Paid</td><td class="text-end">(@received.ToString("N2"))</td></tr>

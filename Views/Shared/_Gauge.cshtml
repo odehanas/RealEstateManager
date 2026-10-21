@@ -1,0 +1,73 @@
+@model RealEstateManager.Models.GaugeModel
+@using System.Globalization
+
+@{
+    // A half-circle dial: centre (100, 100), radius 80. 0 sits on the left, the maximum on the right.
+    const double cx = 100, cy = 100, r = 80;
+    var span = (double)(Model.Max - Model.Min);
+    double Fraction(decimal v) => span <= 0 ? 0 : Math.Clamp((double)(v - Model.Min) / span, 0, 1);
+    (double X, double Y) Point(double fraction, double radius)
+    {
+        var angle = Math.PI * (1 - fraction);
+        return (cx + radius * Math.Cos(angle), cy - radius * Math.Sin(angle));
+    }
+    string N(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
+    string Arc(double f0, double f1)
+    {
+        var a = Point(f0, r); var b = Point(f1, r);
+        return $"M {N(a.X)} {N(a.Y)} A {N(r)} {N(r)} 0 0 1 {N(b.X)} {N(b.Y)}";
+    }
+
+    var needle = Fraction(Model.Value) * 180 - 90;      // degrees from straight up
+    var band = Model.HasValue ? Model.CurrentBand : null;
+    var label = $"{Model.Title}: {(Model.HasValue ? Model.DisplayValue : "no data")}{(band != null ? ", " + band.Name : "")}";
+    string Tick(decimal v) => v.ToString(Model.Format, CultureInfo.InvariantCulture);
+}
+
+<div class="gauge text-center">
+    <div class="gauge-title">@Model.Title</div>
+    <svg viewBox="0 0 200 122" role="img" aria-label="@label" class="gauge-svg">
+        <title>@label</title>
+        <path d="@Arc(0, 1)" stroke="#e9ecef" stroke-width="18" fill="none" />
+        @foreach (var b in Model.Bands)
+        {
+            var f0 = Fraction(b.From); var f1 = Fraction(b.To);
+            if (f1 > f0)
+            {
+                <path d="@Arc(f0, f1)" stroke="@b.Color" stroke-width="18" fill="none" opacity="@(Model.HasValue ? "0.85" : "0.25")" />
+            }
+        }
+        @* Ticks at the band edges, so the target lines can be read off the dial. *@
+        @foreach (var edge in Model.Bands.Select(b => b.From).Skip(1).Distinct())
+        {
+            var inner = Point(Fraction(edge), r - 12); var outer = Point(Fraction(edge), r + 11);
+            <line x1="@N(inner.X)" y1="@N(inner.Y)" x2="@N(outer.X)" y2="@N(outer.Y)" stroke="#495057" stroke-width="1.5" />
+        }
+        <text x="@N(cx - r)" y="117" text-anchor="middle" class="gauge-tick">@Tick(Model.Min)</text>
+        <text x="@N(cx + r)" y="117" text-anchor="middle" class="gauge-tick">@Tick(Model.Max)</text>
+        @if (Model.HasValue)
+        {
+            <g class="gauge-needle" style="transform-origin: 100px 100px; transform: rotate(@N(needle)deg);">
+                <polygon points="97,100 103,100 100,30" fill="#212529" />
+            </g>
+        }
+        <circle cx="100" cy="100" r="7" fill="#212529" />
+    </svg>
+    <div class="gauge-value" style="@(band != null ? $"color:{(band.Color == GaugeModel.Amber ? "#997404" : band.Color)}" : "")">@Model.DisplayValue</div>
+    @if (band != null)
+    {
+        <div class="gauge-band">@band.Name</div>
+    }
+    else if (!Model.HasValue)
+    {
+        <div class="gauge-band">no data yet</div>
+    }
+    @foreach (var note in Model.Notes)
+    {
+        <div class="gauge-note">@note</div>
+    }
+    @if (Model.Link != null)
+    {
+        <a href="@Model.Link" class="gauge-link">@(Model.LinkText ?? "Details")</a>
+    }
+</div>
