@@ -33,24 +33,32 @@ so on — under <span class="path">System Setup ▸ Chart of Accounts</span>, se
 to <em>Yes</em> on each. The same category list serves all of them, and each gets its own column in the
 report. Only a postable Equity account can be flagged this way; the setting is ignored on any other type.</p>
 
-<h3>Posting owner expenditure</h3>
-<p><span class="path">Operations ▸ Manual Journals ▸ New Manual Journal</span></p>
-
-<p>The General Journal has an <strong>Owner Withdrawal Category</strong> column. It activates only on a
-line posted to an account flagged as an owner account; on every other line it stays locked and empty, and
-the row is highlighted when the dimension becomes available.</p>
-
+<h3>Recording a withdrawal</h3>
+<p><span class="path">Operations ▸ Owner Withdrawals</span></p>
+<p>The owner's withdrawals have their own screen. The debit side is fixed - it is always the owner's current account, and it
+cannot be changed there (if several owner accounts exist, one per partner, only those are offered). You choose what the money
+was spent on and where it was paid from.</p>
 <ol class="steps">
-    <li>Enter the <strong>Entry Date</strong> and a clear <strong>Description</strong>.</li>
-    <li>On the first line choose the <strong>owner's current account</strong> and enter the amount as a
-        <strong>Debit</strong>.</li>
-    <li>Choose the <strong>Owner Withdrawal Category</strong> — the column is now enabled on that line.</li>
-    <li>On the second line credit whatever the money came out of, normally
-        <code>11100</code> Cash and Cash Equivalents.</li>
-    <li>Select <strong>Save as Draft</strong>, then post it from Journal Inquiry.</li>
+    <li>Enter the <strong>Date</strong> and the <strong>Amount</strong>.</li>
+    <li>Choose what it was <strong>Spent on</strong> - the withdrawal category.</li>
+    <li>Choose where it was <strong>Paid from</strong>: normally <code>11100</code> Cash and Cash Equivalents, or petty cash, or a
+        card or payable account if it was charged there.</li>
+    <li>Add a description and the cheque or transfer reference, and select <strong>Save and Post</strong>. It is posted at once.</li>
 </ol>
+<p>Below the form, every movement on the owner accounts in the chosen period is listed - including any made by manual journal -
+with its category, the account on the other side, and the totals withdrawn and put in. <strong>Charts and report</strong> opens the
+<a href="#owner-reports">Owner Withdrawals report</a> for the same period, with a bar chart of the withdrawals by category and a
+line chart of the withdrawals month by month with their running total.</p>
+<p>To correct a withdrawal, reset its journal to draft in Journal Inquiry - it then drops out of the figures - and record it again.</p>
 
-<h4>Owner pays school fees of 25,000 from the company bank account</h4>
+<h3>From a manual journal</h3>
+<p><span class="path">Operations ▸ Manual Journals ▸ New Manual Journal</span></p>
+<p>A manual journal can still carry a withdrawal category, for the occasional entry the withdrawal screen does not cover. The
+<strong>Owner Withdrawal Category</strong> column is hidden to keep the journal simple; select <strong>+ Owner withdrawal
+category</strong> at the top right of the journal lines to show it (<strong>-</strong> hides it again). It activates only on a line
+posted to an account flagged as an owner account; on every other line it stays locked.</p>
+
+<h4>Example: the owner pays school fees of 25,000 from the company bank account</h4>
 <table class="je">
     <thead><tr><th>Account</th><th>Category</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
     <tbody>

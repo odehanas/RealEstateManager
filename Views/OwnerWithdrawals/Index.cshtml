@@ -1,0 +1,162 @@
+@model List<RealEstateManager.Services.OwnerWithdrawalRegisterRow>
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Owner Withdrawals";
+    var owners = ViewBag.OwnerAccounts as List<Account> ?? new();
+    var paidFrom = ViewBag.PaidFromAccounts as List<Account> ?? new();
+    var categories = ViewBag.Categories as List<OwnerWithdrawalCategory> ?? new();
+    var from = (DateTime)ViewBag.FromDate;
+    var to = (DateTime)ViewBag.ToDate;
+    var defaultPaidFrom = paidFrom.FirstOrDefault(x => x.Code == "11100")?.Id;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="mb-0">Owner Withdrawals</h2>
+    <a asp-controller="Reports" asp-action="OwnerWithdrawals" asp-route-startDate="@from.ToString("yyyy-MM-dd")" asp-route-endDate="@to.ToString("yyyy-MM-dd")"
+       class="btn btn-outline-dark btn-sm">Charts and report</a>
+</div>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-info">
+    Money the owner takes out of the business for their own use. It is not a business expense, so it never reaches profit and
+    loss: it is charged straight to the <strong>owner's current account</strong> (equity), with a category saying what it was for,
+    and paid from the account you choose. The categories give the owner a report of where their withdrawals went.
+</div>
+
+@if (owners.Count == 0)
+{
+    <div class="alert alert-warning">
+        No account is flagged as the owner's account. In <a asp-controller="ChartOfAccounts" asp-action="Index">System Setup &rsaquo; Chart of Accounts</a>,
+        edit the owner's current account (34100) and tick <em>Owner account</em>.
+    </div>
+}
+else if (categories.Count == 0)
+{
+    <div class="alert alert-warning">
+        No withdrawal categories yet. Add them in <a asp-controller="OwnerWithdrawalCategories" asp-action="Index">System Setup &rsaquo; Owner Withdrawal Categories</a>.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>Record a Withdrawal</strong></div>
+        <div class="card-body">
+            <form asp-action="Record" method="post" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">Date</label>
+                    <input type="date" name="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Charged to (debit)</label>
+                    @if (owners.Count == 1)
+                    {
+                        <input type="hidden" name="ownerAccountId" value="@owners[0].Id" />
+                        <div class="form-control bg-light" title="Fixed: a withdrawal always goes to the owner's account">
+                            @owners[0].Code - @owners[0].Name <span class="text-muted small">(fixed)</span>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Several partners each have their own current account; only owner accounts are offered. *@
+                        <select name="ownerAccountId" class="form-select">
+                            @foreach (var o in owners)
+                            {
+                                <option value="@o.Id">@o.Code - @o.Name</option>
+                            }
+                        </select>
+                    }
+                    <div class="form-text">Always the owner's account - it cannot be changed here.</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Spent on</label>
+                    <select name="categoryId" class="form-select" required>
+                        <option value="">-- category --</option>
+                        @foreach (var c in categories)
+                        {
+                            <option value="@c.Id">@c.Code - @c.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Amount</label>
+                    <input type="number" step="0.01" min="0.01" name="amount" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Paid from (credit)</label>
+                    <select name="paidFromAccountId" class="form-select" required>
+                        @foreach (var a in paidFrom)
+                        {
+                            <option value="@a.Id" selected="@(a.Id == defaultPaidFrom ? "selected" : null)">@a.Code - @a.Name</option>
+                        }
+                    </select>
+                    <div class="form-text">Bank, cash, petty cash, or a card or payable account it was charged to.</div>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Description</label>
+                    <input type="text" name="description" class="form-control" maxlength="250" placeholder="School fees - second term" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Reference</label>
+                    <input type="text" name="reference" class="form-control" maxlength="50" placeholder="Cheque or transfer number" />
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-dark">Save and Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-md-3"><label class="form-label">From</label><input type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div class="col-md-3"><label class="form-label">To</label><input type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control" /></div>
+    <div class="col-md-2"><button type="submit" class="btn btn-outline-dark w-100">Show</button></div>
+    <div class="col-md-4 text-md-end">
+        <span class="text-muted small">Withdrawn</span> <strong>@Model.Sum(x => x.Withdrawn).ToString("N2")</strong>
+        @if (Model.Sum(x => x.PutIn) > 0)
+        {
+            <span class="text-muted small ms-3">Put in</span> <strong>@Model.Sum(x => x.PutIn).ToString("N2")</strong>
+        }
+    </div>
+</form>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-sm">
+        <thead>
+            <tr>
+                <th>Date</th><th>Entry</th><th>Category</th><th>Description</th><th>Owner account</th><th>Paid from / to</th>
+                <th class="text-end">Withdrawn</th><th class="text-end">Put in</th><th>Recorded in</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="9" class="text-center text-muted">Nothing in this period.</td></tr>
+            }
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@r.EntryNumber @(r.Reference != null ? "· " + r.Reference : "")</td>
+                    <td>@(r.Category ?? "-")</td>
+                    <td>@r.Description</td>
+                    <td class="small">@r.OwnerAccount</td>
+                    <td class="small">@r.OtherAccount</td>
+                    <td class="text-end">@(r.Withdrawn == 0 ? "" : r.Withdrawn.ToString("N2"))</td>
+                    <td class="text-end">@(r.PutIn == 0 ? "" : r.PutIn.ToString("N2"))</td>
+                    <td class="small">@(r.RecordedHere ? "This screen" : "Journal")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<p class="small text-muted">To correct a withdrawal, reset its journal to draft in Operations &rsaquo; Journal Inquiry (it then drops out of the figures) and record it again.</p>

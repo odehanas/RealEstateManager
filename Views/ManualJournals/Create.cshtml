@@ -12,6 +12,11 @@
     var ownerCategories = ViewBag.OwnerWithdrawalCategories as List<OwnerWithdrawalCategory> ?? new();
     var ownerAccountIds = ViewBag.OwnerAccountIds as List<int> ?? new();
     var projects = ViewBag.DevelopmentProjects as List<RealEstateManager.Models.DevelopmentCostOption> ?? new();
+
+    // The owner withdrawal category is rarely needed here - withdrawals have their own screen -
+    // so the column stays hidden unless a line already uses it.
+    var showOwnerCategory = Model.Lines.Any(x => x.OwnerWithdrawalCategoryId.HasValue);
+    var ownerColumnClass = showOwnerCategory ? "owner-cat-col" : "owner-cat-col d-none";
 }
 
 <style>
@@ -56,9 +61,15 @@
 
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h4 class="mb-0">Journal Lines</h4>
-        <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleAdvancedRefs">
-            Show / Hide Advanced References
-        </button>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleOwnerCategory"
+                    title="Show or hide the owner withdrawal category column" aria-expanded="@(showOwnerCategory ? "true" : "false")">
+                <span id="ownerCategorySign">@(showOwnerCategory ? "−" : "+")</span> Owner withdrawal category
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleAdvancedRefs">
+                Show / Hide Advanced References
+            </button>
+        </div>
     </div>
 
     <div class="table-responsive">
@@ -68,7 +79,7 @@
                     <th style="min-width: 240px;">Account</th>
                     <th style="min-width: 180px;">Line Memo</th>
                     <th style="min-width: 140px;">Unit Cost Center</th>
-                    <th style="min-width: 190px;">Owner Withdrawal Category</th>
+                    <th style="min-width: 190px;" class="@ownerColumnClass">Owner Withdrawal Category</th>
                     @if (projects.Count > 0)
                     {
                         <th style="min-width: 220px;">Development Cost</th>
@@ -108,7 +119,7 @@
                             </select>
                         </td>
 
-                        <td class="owner-cat-cell">
+                        <td class="owner-cat-cell @ownerColumnClass">
                             <select asp-for="Lines[@i].OwnerWithdrawalCategoryId" class="form-select owner-category">
                                 <option value="">Not applicable</option>
                                 @foreach (var category in ownerCategories)
@@ -183,13 +194,14 @@
         </table>
     </div>
 
-    <div class="alert alert-light border small">
+    <div class="alert alert-light border small @ownerColumnClass">
         <strong>Owner Withdrawal Category.</strong>
         This column becomes available only on a line posted to an account flagged as an
         <em>owner's current account</em> (equity). It is the analysis dimension for the owner's own
         expenditure and is deliberately separate from both the chart of accounts &mdash; which belongs to the
         company &mdash; and unit cost centres, which allocate rental revenue and property costs to space.
-        Leave it blank for capital introduced or for a transfer of the owner's balance.
+        Leave it blank for capital introduced or for a transfer of the owner's balance. Money the owner takes out is
+        quicker to record in <a asp-controller="OwnerWithdrawals" asp-action="Index">Operations &rsaquo; Owner Withdrawals</a>.
     </div>
 
     <div class="mt-4">
@@ -208,6 +220,14 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        document.getElementById("toggleOwnerCategory").addEventListener("click", function () {
+            var cells = document.querySelectorAll(".owner-cat-col");
+            var show = cells.length > 0 && cells[0].classList.contains("d-none");
+            cells.forEach(function (el) { el.classList.toggle("d-none", !show); });
+            document.getElementById("ownerCategorySign").textContent = show ? "−" : "+";
+            this.setAttribute("aria-expanded", show ? "true" : "false");
+        });
+
         document.getElementById("toggleAdvancedRefs").addEventListener("click", function () {
             document.querySelectorAll(".advanced-ref").forEach(function (el) {
                 el.classList.toggle("d-none");

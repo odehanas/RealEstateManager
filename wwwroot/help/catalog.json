@@ -93,7 +93,7 @@
       "key": "reference",
       "title": "Reference",
       "topics": [
-        { "key": "owner-withdrawals", "title": "Owner Withdrawals Explained", "path": "", "summary": "Why owner spending is equity, not expense, and how it is recorded.", "screens": [] },
+        { "key": "owner-withdrawals", "title": "Owner Withdrawals Explained", "path": "", "summary": "Why owner spending is equity, not expense, how to record it, and the charts by category and over time.", "screens": ["OwnerWithdrawals"] },
         { "key": "accounts-reference", "title": "Chart of Accounts Reference", "path": "", "summary": "The standard accounts created for every company.", "screens": [] },
         { "key": "entries-reference", "title": "Accounting Entries Reference", "path": "", "summary": "Every journal the system writes for you.", "screens": [] },
         { "key": "status-reference", "title": "Status Values Reference", "path": "", "summary": "What each status means on every kind of record.", "screens": [] },

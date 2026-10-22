@@ -181,6 +181,7 @@ namespace RealEstateManager.Services
                 ["UnitSales"] = new[] { AppPermissions.AccountingManage },
                 ["CapitalAssetVat"] = new[] { AppPermissions.AccountingManage },
                 ["BuildingView"] = new[] { AppPermissions.ReportsView },
+                ["OwnerWithdrawals"] = new[] { AppPermissions.AccountingManage },
 
                 // Uploading photos and marking units on them changes the property record.
                 ["BuildingPhotos"] = new[] { AppPermissions.MasterDataManage }

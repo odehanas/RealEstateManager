@@ -180,6 +180,7 @@ builder.Services.AddScoped<UnitSaleService>();
 builder.Services.AddScoped<CapitalAssetVatService>();
 builder.Services.AddScoped<BuildingViewService>();
 builder.Services.AddScoped<BuildingPhotoService>();
+builder.Services.AddScoped<OwnerWithdrawalService>();
 builder.Services.AddScoped<FixedAssetService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();

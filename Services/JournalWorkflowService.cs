@@ -705,6 +705,7 @@ namespace RealEstateManager.Services
             "DevelopmentTransfer" => "completion transfer",
             "InvestmentPropertySetup" => "investment property allocation",
             "UnitSaleReceipt" => "unit sale payment",
+            "OwnerWithdrawal" => "owner withdrawal",
             "UnitSaleHandover" => "unit handover",
             "CapitalAssetVatAdjustment" => "capital asset VAT adjustment",
             _ => sourceType

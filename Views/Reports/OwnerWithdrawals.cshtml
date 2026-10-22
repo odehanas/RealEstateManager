@@ -26,6 +26,7 @@
         </p>
     </div>
     <div class="d-flex gap-2 no-print">
+        <a asp-controller="OwnerWithdrawals" asp-action="Index" class="btn btn-outline-dark btn-sm">Record a Withdrawal</a>
         <a asp-controller="OwnerWithdrawalCategories" asp-action="Index" class="btn btn-outline-secondary btn-sm">Manage Categories</a>
         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
     </div>
@@ -156,6 +157,76 @@
 }
 else
 {
+    var catRows = Model.Categories.Where(x => x.Total != 0m).OrderByDescending(x => x.Total).ToList();
+    var months = new List<DateTime>();
+    for (var m = new DateTime(Model.StartDate.Year, Model.StartDate.Month, 1); m <= Model.EndDate; m = m.AddMonths(1)) months.Add(m);
+    var monthly = months.Select(m => Model.Details.Where(d => d.EntryDate.Year == m.Year && d.EntryDate.Month == m.Month).Sum(d => d.Debit)).ToList();
+    var running = 0m;
+    var cumulative = monthly.Select(v => running += v).ToList();
+    var chartData = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        categories = catRows.Select(x => x.CategoryName),
+        categoryTotals = catRows.Select(x => x.Total),
+        categoryColours = catRows.Select(x => x.CategoryId.HasValue ? "#0d6efd" : "#adb5bd"),
+        months = months.Select(m => m.ToString("MMM yy")),
+        monthly,
+        cumulative
+    });
+
+    <div class="row g-3 mb-4 ow-charts">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light"><strong>Withdrawals by Category</strong></div>
+                <div class="card-body"><div style="position:relative;height:@(Math.Max(220, catRows.Count * 34 + 60))px"><canvas id="chartByCategory" aria-label="Bar chart of withdrawals by category"></canvas></div></div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light"><strong>Withdrawals over Time</strong></div>
+                <div class="card-body"><div style="position:relative;height:300px"><canvas id="chartOverTime" aria-label="Line chart of withdrawals by month and the running total"></canvas></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/chartjs/chart.umd.js"></script>
+    <script>
+    (function () {
+        if (!window.Chart) return;
+        const d = @Html.Raw(chartData);
+        const money = v => Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+
+        new Chart(document.getElementById('chartByCategory'), {
+            type: 'bar',
+            data: { labels: d.categories, datasets: [{ label: 'Withdrawn', data: d.categoryTotals, backgroundColor: d.categoryColours, borderRadius: 4 }] },
+            options: {
+                indexAxis: 'y', maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + money(c.parsed.x) } } },
+                scales: { x: { beginAtZero: true, ticks: { callback: money } }, y: { grid: { display: false } } }
+            }
+        });
+
+        new Chart(document.getElementById('chartOverTime'), {
+            type: 'line',
+            data: {
+                labels: d.months,
+                datasets: [
+                    { label: 'Each month', data: d.monthly, borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,.12)', fill: true, tension: 0, pointRadius: 3 },
+                    { label: 'Running total', data: d.cumulative, borderColor: '#fd7e14', borderDash: [6, 4], tension: 0, pointRadius: 2, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: { tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + money(c.parsed.y) } } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: money }, title: { display: true, text: 'Each month' } },
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: money }, title: { display: true, text: 'Running total' } }
+                }
+            }
+        });
+    })();
+    </script>
+
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light"><strong>Breakdown by Category</strong></div>
         <div class="scroll-x">
