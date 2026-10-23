@@ -29,6 +29,9 @@ namespace RealEstateManager.Models
         public int OpenPeriodsCount { get; set; }
         public string CurrentPeriodName { get; set; } = "Not Available";
 
+        /// <summary>Periods that have started and are not closed yet; null when the user does not keep the books.</summary>
+        public UnclosedPeriodsSummary? UnclosedPeriods { get; set; }
+
         public int OutstandingInvoicesCount { get; set; }
         public decimal OutstandingReceivables { get; set; }
         public int OverdueInvoicesCount { get; set; }

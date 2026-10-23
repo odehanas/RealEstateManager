@@ -1,0 +1,60 @@
+@model RealEstateManager.Models.ReopenRequestsViewModel
+@*
+    Pending reopen requests with the approver's Approve / Turn down forms. Used by the
+    cockpit and by the Reopen Requests page; ViewData["ReturnTo"] says where to go back.
+*@
+@{
+    var returnTo = ViewData["ReturnTo"] as string;
+}
+
+<div class="table-responsive">
+    <table class="table mb-0 align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Period</th>
+                <th>Asked by</th>
+                <th>Reason</th>
+                <th style="width:360px">Decision</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Pending)
+            {
+                var own = r.RequestedByAppUserId == Model.CurrentUserId;
+                <tr>
+                    <td class="text-nowrap">
+                        <a asp-action="Index" asp-route-fiscalYear="@r.AccountingPeriod?.FiscalYear" asp-route-period="@r.AccountingPeriod?.PeriodNumber">
+                            @r.AccountingPeriod?.Name
+                        </a>
+                        <div class="small text-muted">FY @r.AccountingPeriod?.FiscalYear</div>
+                    </td>
+                    <td class="small">@r.RequestedByName<br />@r.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@r.Reason</td>
+                    <td>
+                        @if (own && !Model.OnlyApprover)
+                        {
+                            <span class="small text-muted">Your own request - another approver decides it.</span>
+                        }
+                        else
+                        {
+                            <form method="post" class="d-flex flex-column gap-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="requestId" value="@r.Id" />
+                                <input type="hidden" name="returnTo" value="@returnTo" />
+                                <input type="text" name="comment" class="form-control form-control-sm" maxlength="1000"
+                                       placeholder="Comment (required to turn down)" />
+                                <div class="d-flex gap-1">
+                                    <button type="submit" class="btn btn-sm btn-success" asp-action="ApproveReopen"
+                                            onclick="return confirm('Reopen @r.AccountingPeriod?.Name? Postings into it will be allowed until it is closed again.');">
+                                        Approve &amp; reopen
+                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" asp-action="RejectReopen">Turn down</button>
+                                </div>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

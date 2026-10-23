@@ -110,6 +110,9 @@ namespace RealEstateManager.Services
                     x.JournalEntry != null &&
                     x.JournalEntry.CompanyId == companyId &&
                     x.JournalEntry.IsPosted &&
+                    // The year-end closing entry empties the result accounts into retained
+                    // earnings; counting it would show every closed year as nil.
+                    x.JournalEntry.JournalType != PeriodClosingService.ClosingJournalType &&
                     x.JournalEntry.EntryDate >= startDate &&
                     x.JournalEntry.EntryDate <= endDate)
                 .Where(x => x.Account != null && (x.Account.AccountType == "Revenue" || x.Account.AccountType == "Expense"))
@@ -175,10 +178,24 @@ namespace RealEstateManager.Services
         {
             var openingSnapshot = await _openingBalanceService.BuildSnapshotAsync();
 
+            var company = await _db.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Id == companyId);
+            if (company == null)
+                throw new InvalidOperationException("Company record was not found.");
+
+            var startMonth = company.FiscalYearStartMonth;
+            var yearStart = asOfDate.Month >= startMonth
+                ? new DateTime(asOfDate.Year, startMonth, 1)
+                : new DateTime(asOfDate.Year - 1, startMonth, 1);
+
             var movements = await _db.JournalEntryLines
                 .Include(x => x.Account)
                 .Include(x => x.JournalEntry)
                 .Where(x => x.JournalEntry != null && x.JournalEntry.CompanyId == companyId && x.JournalEntry.IsPosted && x.JournalEntry.EntryDate <= asOfDate)
+                // This year's own closing entry is left out: its result is shown as the
+                // current year's profit below, which the P&L computes without it. Earlier
+                // years' closing entries stay - they are what put those results into
+                // retained earnings.
+                .Where(x => x.JournalEntry!.JournalType != PeriodClosingService.ClosingJournalType || x.JournalEntry.EntryDate < yearStart)
                 .Where(x => x.Account != null && (
                     x.Account.AccountType == "Asset" ||
                     x.Account.AccountType == "Liability" ||
@@ -266,14 +283,6 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.AccountCode)
                 .ToList();
 
-            var company = await _db.Companies.AsNoTracking().FirstOrDefaultAsync(x => x.Id == companyId);
-            if (company == null)
-                throw new InvalidOperationException("Company record was not found.");
-
-            var startMonth = company.FiscalYearStartMonth;
-            var yearStart = asOfDate.Month >= startMonth
-                ? new DateTime(asOfDate.Year, startMonth, 1)
-                : new DateTime(asOfDate.Year - 1, startMonth, 1);
             var currentYearPnL = await GetProfitAndLossAsync(companyId, yearStart, asOfDate);
 
             var shareCapital = equityRows

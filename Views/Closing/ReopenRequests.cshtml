@@ -1,0 +1,67 @@
+@model RealEstateManager.Models.ReopenRequestsViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Period Reopen Requests";
+    var canApprove = ViewBag.CanApprove == true;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Period Reopen Requests</h2>
+        <div class="text-muted">A closed period opens again only when an approver agrees with the reason given.</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Closing Cockpit</a>
+</div>
+
+@if (TempData["ClosingSuccess"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (TempData["ClosingError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light"><h5 class="mb-0">Waiting for a decision (@Model.Pending.Count)</h5></div>
+    <div class="card-body p-0">
+        @if (Model.Pending.Count == 0)
+        {
+            <div class="p-3 text-muted">No request is waiting.</div>
+        }
+        else if (!canApprove)
+        {
+            <div class="p-3 text-muted">You can see the requests, but deciding them needs the Approve Period Reopening permission.</div>
+        }
+        else
+        {
+            @await Html.PartialAsync("_ReopenRequestRows", Model)
+        }
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light"><h5 class="mb-0">Decided lately</h5></div>
+    <div class="card-body p-0">
+        <table class="table table-sm table-striped mb-0">
+            <thead>
+                <tr><th>Period</th><th>Asked by</th><th>Reason</th><th>Status</th><th>Decided by</th><th>Comment</th><th>Closed again</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Recent)
+                {
+                    <tr>
+                        <td class="text-nowrap">@r.AccountingPeriod?.Name</td>
+                        <td class="small">@r.RequestedByName<br />@r.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td class="small">@r.Reason</td>
+                        <td>@r.Status</td>
+                        <td class="small">@r.DecidedByName<br />@r.DecidedAt?.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td class="small">@r.DecisionComment</td>
+                        <td class="small">@(r.ReclosedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? (r.Status == PeriodReopenStatuses.Approved ? "Still open" : ""))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

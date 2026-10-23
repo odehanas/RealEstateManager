@@ -7,6 +7,7 @@
 @inject HelpCatalogService HelpCatalog
 @inject PlatformOwnerService PlatformOwnerService
 @inject ApprovalService ApprovalService
+@inject PeriodClosingService PeriodClosingService
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
@@ -44,6 +45,12 @@
         ? await ApprovalService.CountAwaitingAsync(CurrentCompanyAccessor.UserId.Value)
         : 0;
     var canManageAccounting = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
+    // Approvers of period reopening see their queue with how many requests wait.
+    var canApproveReopen = isAuthenticated && currentCompanyId.HasValue
+                           && await PermissionService.HasPermissionAsync(User, AppPermissions.PeriodReopenApprove);
+    var reopenRequestsWaiting = canApproveReopen
+        ? await PeriodClosingService.CountPendingReopenRequestsAsync()
+        : 0;
     var canViewReports = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ReportsView);
     var canViewVendors = isAuthenticated && await PermissionService.HasAnyPermissionAsync(
         User,
@@ -144,7 +151,19 @@
                                         <a class="dropdown-item" asp-controller="Prepayments" asp-action="Index">Recurring Prepayments</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Closing" asp-action="Index">Period Closing</a>
+                                        <a class="dropdown-item" asp-controller="Closing" asp-action="Index">Closing Cockpit</a>
+                                    </li>
+                                }
+                                @if (canApproveReopen)
+                                {
+                                    <li>
+                                        <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="Closing" asp-action="ReopenRequests">
+                                            Period Reopen Requests
+                                            @if (reopenRequestsWaiting > 0)
+                                            {
+                                                <span class="badge bg-danger ms-2">@reopenRequestsWaiting</span>
+                                            }
+                                        </a>
                                     </li>
                                 }
                                 @if (isSystemAdmin)

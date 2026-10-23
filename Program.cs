@@ -182,6 +182,7 @@ builder.Services.AddScoped<BuildingViewService>();
 builder.Services.AddScoped<BuildingPhotoService>();
 builder.Services.AddScoped<OwnerWithdrawalService>();
 builder.Services.AddScoped<FixedAssetService>();
+builder.Services.AddScoped<PeriodClosingService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<LeaseWorkflowService>();

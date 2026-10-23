@@ -174,6 +174,7 @@ namespace RealEstateManager.Services
         private readonly CapitalAssetVatService _capitalAssets;
         private readonly LeaseWorkflowService _leaseWorkflow;
         private readonly EInvoiceService _eInvoices;
+        private readonly PeriodClosingService _closing;
         private readonly List<int> _saleIds = new();
         private int _projectId;
         private int _annexProjectId;
@@ -217,8 +218,10 @@ namespace RealEstateManager.Services
             UnitSaleService unitSales,
             CapitalAssetVatService capitalAssets,
             LeaseWorkflowService leaseWorkflow,
-            EInvoiceService eInvoices)
+            EInvoiceService eInvoices,
+            PeriodClosingService closing)
         {
+            _closing = closing;
             _capitalAssets = capitalAssets;
             _leaseWorkflow = leaseWorkflow;
             _eInvoices = eInvoices;
@@ -1564,13 +1567,13 @@ namespace RealEstateManager.Services
             var periods = await _db.AccountingPeriods
                 .Where(x => !x.IsClosed && x.StartDate >= _start && x.EndDate < closeBefore)
                 .OrderBy(x => x.StartDate)
-                .Select(x => new { x.FiscalYear, x.PeriodNumber })
+                .Select(x => new { x.Id, x.FiscalYear, x.PeriodNumber })
                 .ToListAsync();
 
             foreach (var period in periods)
             {
                 await TryAsync($"close period {period.PeriodNumber}/{period.FiscalYear}",
-                    () => _posting.CloseAccountingPeriodAsync(_companyId, period.FiscalYear, period.PeriodNumber));
+                    () => _closing.CloseWithoutChecklistAsync(_companyId, period.Id, "Sample data"));
             }
 
             // A whole earlier fiscal year in the data is closed into retained earnings.
@@ -1580,9 +1583,9 @@ namespace RealEstateManager.Services
                 var fiscalYear = year;
                 await TryAsync($"close fiscal year {fiscalYear}", async () =>
                 {
-                    var journal = await _posting.CloseFiscalYearAsync(_companyId, fiscalYear);
-                    if (!journal.IsPosted)
-                        await PostJournalAsync(journal.Id);
+                    var (success, message) = await _closing.CloseFiscalYearAsync(_companyId, fiscalYear, "Sample data");
+                    if (!success)
+                        throw new InvalidOperationException(message);
                 });
             }
         }

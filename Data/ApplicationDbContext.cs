@@ -4,7 +4,7 @@ using RealEstateManager.Services;
 
 namespace RealEstateManager.Data
 {
-    public class ApplicationDbContext : DbContext
+    public partial class ApplicationDbContext : DbContext
     {
         private readonly ICurrentCompanyAccessor _currentCompanyAccessor;
         private readonly DatabaseConnectionOptions _databaseConnectionOptions;
@@ -35,6 +35,9 @@ namespace RealEstateManager.Data
         public DbSet<JournalEntryLine> JournalEntryLines => Set<JournalEntryLine>();
         public DbSet<AccountingPeriod> AccountingPeriods => Set<AccountingPeriod>();
         public DbSet<FiscalYearClosing> FiscalYearClosings => Set<FiscalYearClosing>();
+        public DbSet<FiscalYearCarryForward> FiscalYearCarryForwards => Set<FiscalYearCarryForward>();
+        public DbSet<PeriodReopenRequest> PeriodReopenRequests => Set<PeriodReopenRequest>();
+        public DbSet<AccountingPeriodEvent> AccountingPeriodEvents => Set<AccountingPeriodEvent>();
 
         public DbSet<Property> Properties => Set<Property>();
         public DbSet<Unit> Units => Set<Unit>();
@@ -2168,6 +2171,8 @@ namespace RealEstateManager.Data
                 // A month's commission on a contract is invoiced once, never twice.
                 entity.HasIndex(x => x.RevenueRecognitionScheduleId).IsUnique();
             });
+
+            ConfigurePeriodClosing(modelBuilder);
         }
     }
 }
