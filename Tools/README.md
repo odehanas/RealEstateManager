@@ -19,7 +19,7 @@ a screenshot needs no rebuild and no restart** — the file only has to reach th
 normal push/publish or by uploading just that file. Only changes to `.cs` or `.cshtml` files need
 a full deployment.
 
-After changing help text or pictures, refresh the downloadable PDF:
+After changing help text, pictures or the training workbook, refresh the downloadable PDFs:
 
 ```
 python Tools/export_manual_pdf.py

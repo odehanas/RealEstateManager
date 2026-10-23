@@ -1,0 +1,950 @@
+@{
+    // A standalone document like the User Manual: no navigation, its own print
+    // layout, readable on a phone, and the PDF is produced straight from it.
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RealEstateManager — Training Workbook</title>
+    <link rel="stylesheet" href="~/help/training.css" asp-append-version="true" />
+</head>
+<body>
+
+<div class="toolbar">
+    <div><strong>RealEstateManager</strong> &nbsp;— Training Workbook</div>
+    <div class="actions">
+        <a class="ghost" href="/Help/Manual">User Manual</a>
+        <a class="ghost" href="/manual/RealEstateManager-Training-Workbook.pdf" target="_blank">Download PDF</a>
+        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+</div>
+
+<div class="sheet">
+
+<section class="cover">
+    <div>
+        <div class="brandmark">
+            <svg viewBox="0 0 24 24" width="34" height="34" style="stroke:#8ec2ff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round">
+                <path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/>
+            </svg>
+            RealEstateManager
+        </div>
+    </div>
+    <div>
+        <div class="rule"></div>
+        <h1>Training Workbook</h1>
+        <div class="sub">Practice transactions for new users —<br/>step by step, with the result to expect</div>
+        <div class="chips">
+            <span class="chip">Leases</span>
+            <span class="chip">Invoices &amp; Receipts</span>
+            <span class="chip">PDC Cheques</span>
+            <span class="chip">Supplier Bills</span>
+            <span class="chip">Petty Cash &amp; Journals</span>
+            <span class="chip">Fixed Assets</span>
+            <span class="chip">Landlord Settlements</span>
+            <span class="chip">Month-End Closing</span>
+        </div>
+    </div>
+    <div class="meta">
+        For: new leasing staff, accountants and supervisors, working in a practice company<br/>
+        Assumes: the company, chart of accounts and master data are already set up — see the User Manual<br/>
+        Edition: @DateTime.Today.ToString("MMMM yyyy")
+    </div>
+</section>
+
+@* =========================================================== CONTENTS *@
+<section>
+    <h2>Contents</h2>
+    <div class="toc">
+        <div class="grp">
+            <div class="grp-title">Before you start</div>
+            <a href="#how"><span class="num">0.1</span>How to use this workbook</a>
+            <a href="#cast"><span class="num">0.2</span>The practice company</a>
+            <a href="#draft"><span class="num">0.3</span>Draft, Post and Journal Inquiry</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">1 · Leasing</div>
+            <a href="#t1"><span class="num">T1</span>Commercial lease, activated at once</a>
+            <a href="#t2"><span class="num">T2</span>Residential lease through approval</a>
+            <a href="#t3"><span class="num">T3</span>Managed property lease</a>
+            <a href="#t4"><span class="num">T4</span>Print the contract and its QR label</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">2 · Tenant receivables</div>
+            <a href="#t5"><span class="num">T5</span>Post and print a rent invoice</a>
+            <a href="#t6"><span class="num">T6</span>Credit note for a rent discount</a>
+            <a href="#t7"><span class="num">T7</span>Receipt by bank transfer</a>
+            <a href="#t8"><span class="num">T8</span>Part payments</a>
+            <a href="#t9"><span class="num">T9</span>Receive post-dated cheques</a>
+            <a href="#t10"><span class="num">T10</span>Clear a cheque and correct one</a>
+            <a href="#t11"><span class="num">T11</span>Security deposit</a>
+            <a href="#t12"><span class="num">T12</span>Tenant request: more time to pay</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">3 · Supplier payables</div>
+            <a href="#t13"><span class="num">T13</span>Bill from a VAT-registered supplier</a>
+            <a href="#t14"><span class="num">T14</span>Bill from an unregistered supplier</a>
+            <a href="#t15"><span class="num">T15</span>Correct a posted bill</a>
+            <a href="#t16"><span class="num">T16</span>A late bill for a closed month</a>
+            <a href="#t17"><span class="num">T17</span>Pay suppliers</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">4 · Cash and general ledger</div>
+            <a href="#t18"><span class="num">T18</span>Petty cash float</a>
+            <a href="#t19"><span class="num">T19</span>Annual insurance as a prepayment</a>
+            <a href="#t20"><span class="num">T20</span>Manual journals</a>
+            <a href="#t21"><span class="num">T21</span>Owner withdrawal</a>
+            <a href="#t22"><span class="num">T22</span>Fixed asset: buy, capitalise, depreciate</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">5 · Landlords</div>
+            <a href="#t23"><span class="num">T23</span>Commission tax invoices</a>
+            <a href="#t24"><span class="num">T24</span>Pay the landlord</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">6 · Month-end and year-end</div>
+            <a href="#t25"><span class="num">T25</span>Close the month in the Closing Cockpit</a>
+            <a href="#t26"><span class="num">T26</span>Reopen a closed month on request</a>
+            <a href="#t27"><span class="num">T27</span>VAT return and VAT payment</a>
+            <a href="#t28"><span class="num">T28</span>Check the reports</a>
+            <a href="#t29"><span class="num">T29</span>Year-end close</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">7 · Advanced (optional)</div>
+            <a href="#t30"><span class="num">T30</span>Development project costs</a>
+            <a href="#t31"><span class="num">T31</span>Sell a unit</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">Appendices</div>
+            <a href="#a1"><span class="num">A</span>Messages you may see</a>
+            <a href="#a2"><span class="num">B</span>Trainee progress record</a>
+        </div>
+    </div>
+</section>
+
+@* =========================================================== 0 *@
+<section class="section" id="how">
+    <span class="section-tag">Before you start</span>
+    <h2>0.1 How to use this workbook</h2>
+    <p>
+        Each scenario is a real piece of work you will do in your job, written as a short exercise. Do them
+        <strong>in order</strong>: later scenarios use the leases, invoices and bills created by earlier ones,
+        and the figures to expect assume you did.
+    </p>
+    <ul>
+        <li><strong>Work in the practice company</strong>, never the live one. Check the company name at the top
+            right of every screen before you start.</li>
+        <li><strong>Menus are written as paths</strong>: <span class="path">Operations ▸ Customer Receipts</span> means
+            open the <em>Operations</em> menu and choose <em>Customer Receipts</em>. Buttons are shown like
+            <span class="btn">Save and Post</span>.</li>
+        <li><strong>Dates.</strong> "<em>Day 1</em>" means the first day of the current month, "<em>Day 10</em>" the
+            tenth, and "<em>month end</em>" its last day. Use the current year.</li>
+        <li><strong>Each scenario ends with the result to expect</strong>, usually the journal entry. Open
+            <span class="path">Operations ▸ Journal Inquiry</span> and compare. If your figures differ, find out why
+            before moving on — that is where the learning is.</li>
+        <li><strong>Two people</strong> are needed for the approval scenarios (T2 and T26): the trainee, and a trainer
+            holding the approval permission. Nobody can approve their own work.</li>
+        <li>The trainer signs each scenario off at the bottom of its box, and the record in Appendix B.</li>
+    </ul>
+    <div class="watch">
+        <strong>On a phone</strong>
+        The workbook can be read on a phone, but enter the transactions on a computer: the forms have many fields.
+        Wide tables scroll sideways inside their box.
+    </div>
+
+    <h2 id="cast" style="margin-top:1.4em">0.2 The practice company</h2>
+    <p>Your trainer will have created these records. Ask for them if any is missing; setting them up is covered in the User Manual.</p>
+
+    <h4>Properties and units</h4>
+    <div class="tbl"><table>
+        <tr><th>Property</th><th>Ownership</th><th>Unit</th><th>VAT</th><th>Notes</th></tr>
+        <tr><td>Marina Heights</td><td>Owned</td><td>Office 301</td><td>Standard 5%</td><td>Commercial offices</td></tr>
+        <tr><td>Palm Residences</td><td>Owned</td><td>Apartment 704</td><td>Exempt</td><td>Residential, not a new building</td></tr>
+        <tr><td>Garden Villas</td><td>Managed</td><td>Villa 12</td><td>Exempt</td><td>Landlord: Khalid Rahman · Commission 5%</td></tr>
+    </table></div>
+
+    <h4>Tenants</h4>
+    <div class="tbl"><table>
+        <tr><th>Tenant</th><th>Type</th><th>Notes</th></tr>
+        <tr><td>Al Noor Trading LLC</td><td>Company</td><td>Has a TRN on file</td></tr>
+        <tr><td>Sara Ahmed</td><td>Individual</td><td>Emirates ID on file</td></tr>
+        <tr><td>Omar Haddad</td><td>Individual</td><td>Emirates ID on file</td></tr>
+    </table></div>
+
+    <h4>Vendors</h4>
+    <div class="tbl"><table>
+        <tr><th>Vendor</th><th>VAT registered</th><th>Used in</th></tr>
+        <tr><td>Coastal Facility Services LLC</td><td>Yes, with TRN</td><td>T13, T17</td></tr>
+        <tr><td>Quick Fix Plumbing</td><td>No</td><td>T14, T15, T17</td></tr>
+        <tr><td>Gulf Shield Insurance</td><td>Yes, with TRN</td><td>T19</td></tr>
+        <tr><td>PowerGen Equipment Trading</td><td>Yes, with TRN</td><td>T22</td></tr>
+    </table></div>
+
+    <h4>Accounts you will meet</h4>
+    <div class="tbl"><table>
+        <tr><th>Code</th><th>Account</th><th>Code</th><th>Account</th></tr>
+        <tr><td>11100</td><td>Cash and Cash Equivalents (bank)</td><td>21300</td><td>Tenant Security Deposits</td></tr>
+        <tr><td>11150</td><td>Petty Cash (float)</td><td>21400</td><td>VAT Payable</td></tr>
+        <tr><td>11200</td><td>Accounts Receivable</td><td>21500</td><td>Due to Landlords</td></tr>
+        <tr><td>11300</td><td>VAT Recoverable</td><td>21600</td><td>PDC Contra</td></tr>
+        <tr><td>11400</td><td>PDC On Hand</td><td>34100</td><td>Owner's Current Account</td></tr>
+        <tr><td>11500</td><td>Prepaid Expenses</td><td>41100</td><td>Rental Revenue – Owned</td></tr>
+        <tr><td>15200 / 15300</td><td>Fixed Assets / Accumulated Depreciation</td><td>42100</td><td>Management Fee Revenue</td></tr>
+        <tr><td>15400</td><td>Fixed Asset Clearing</td><td>51100</td><td>Property Operating Expenses</td></tr>
+        <tr><td>21100</td><td>Accounts Payable</td><td>52100</td><td>Property Maintenance</td></tr>
+        <tr><td>21200</td><td>Advances from Customers (unearned rent)</td><td>61100 / 62100 / 63100</td><td>Administrative / Depreciation / Finance Costs</td></tr>
+    </table></div>
+
+    <h2 id="draft" style="margin-top:1.4em">0.3 Draft, Post and Journal Inquiry</h2>
+    <p>
+        Every transaction produces a journal entry. A <strong>draft</strong> journal is not in any report; a
+        <strong>posted</strong> one is. Some screens post at once, others leave a draft you post yourself.
+    </p>
+    <div class="tbl"><table>
+        <tr><th>Screens</th><th>What saving does</th></tr>
+        <tr><td>Customer Invoices, Vendor Bills, Credit Notes</td><td>The <span class="btn">Post</span> button builds and posts the journal in one click.</td></tr>
+        <tr><td>Receipts, PDCs, Security Deposits, Vendor Payments, Petty Cash, Owner Withdrawals</td><td><span class="btn">Save and Post</span> posts at once. If it is refused, a yellow message says why and the entry stays a draft.</td></tr>
+        <tr><td>Manual Journals, Revenue Recognition, Prepayments</td><td>Saving creates a draft. Post it from <span class="path">Operations ▸ Journal Inquiry</span>.</td></tr>
+        <tr><td>Fixed Assets</td><td>Posted immediately.</td></tr>
+    </table></div>
+    <div class="data">
+        <strong>To post drafts</strong>
+        <span class="path">Operations ▸ Journal Inquiry</span> → set <em>Posted Only</em> to <em>No</em> → <span class="btn">Go</span> →
+        <span class="btn">Post</span> on one entry, or <span class="btn">Post All Drafts</span> for everything in the filter.
+    </div>
+</section>
+
+@* =========================================================== 1 LEASING *@
+<section class="section">
+    <span class="section-tag">Module 1</span>
+    <h2>Leasing</h2>
+    <p class="intro">The lease drives everything else: when it takes effect it creates every rent invoice for its term and the month-by-month revenue plan.</p>
+
+    <div class="scenario" id="t1">
+        <div class="scenario-head"><span class="id">T1</span><h3>Commercial lease, activated at once</h3></div>
+        <div class="facts"><span><b>Role:</b> Leasing officer</span><span><b>Menu:</b> Master Data ▸ Leases</span><span><b>Time:</b> 10 min</span></div>
+        <p>Al Noor Trading LLC signs a one-year lease of Office 301, paying quarterly.</p>
+        <div class="data"><strong>Practice data</strong>
+            Unit: Marina Heights – Office 301 · Tenant: Al Noor Trading LLC · Start: Day 1 · End: one year later, less one day ·
+            Annual rent: 120,000 · Billing: Quarterly · Security deposit: 10,000
+        </div>
+        <ol class="steps">
+            <li>Open <span class="path">Master Data ▸ Leases</span> and select <span class="btn">Create Lease</span>.</li>
+            <li>Choose the <em>Unit</em> and the <em>Tenant</em>.</li>
+            <li>Enter the <em>Start Date</em>, <em>End Date</em> and <em>Annual Rent</em>.</li>
+            <li>Set the <em>Billing Frequency</em> to <em>Quarterly</em>.</li>
+            <li>Check the VAT treatment shown: it should be <em>Standard 5%</em> from the unit. Do not override it.</li>
+            <li>Enter the <em>Security Deposit Amount</em> 10,000.</li>
+            <li>Select <span class="btn">Save and Activate</span>. (If your company requires approval, use <span class="btn">Save and Submit for Approval</span> and ask the trainer to approve, as in T2.)</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <ul>
+                <li>The lease is <em>Active</em> with a generated contract code such as <code>…-U301-C001-2026</code>. The unit is <em>Occupied</em>.</li>
+                <li><span class="path">Operations ▸ Customer Invoices</span> shows <strong>4 draft invoices</strong> of 30,000 + 1,500 VAT = <strong>31,500</strong>, dated Day 1 and every three months after.</li>
+                <li><span class="path">System Setup ▸ Revenue Recognition</span> shows <strong>12 planned entries of 10,000</strong>, one at each month end.</li>
+                <li>No journal yet: a lease is not a transaction.</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t2">
+        <div class="scenario-head"><span class="id">T2</span><h3>Residential lease through approval</h3></div>
+        <div class="facts"><span><b>Role:</b> Leasing officer + approver</span><span><b>Menu:</b> Master Data ▸ Leases, Master Data ▸ Approvals</span><span><b>Time:</b> 15 min</span></div>
+        <p>Sara Ahmed rents Apartment 704. Contract approval is switched on, so a second person must approve. The approver first sends it back once.</p>
+        <div class="data"><strong>Practice data</strong>
+            Unit: Palm Residences – Apartment 704 · Tenant: Sara Ahmed · Start: Day 1 · One year · Annual rent: 72,000 · Billing: Quarterly ·
+            Deposit: 5,000 (typed wrongly first as 50,000)
+        </div>
+        <ol class="steps">
+            <li><strong>Trainee:</strong> create the lease as in T1, but enter the deposit as 50,000, and select <span class="btn">Save and Submit for Approval</span>.</li>
+            <li><strong>Approver:</strong> open <span class="path">Master Data ▸ Approvals</span>, open the request and read the terms and the invoices it will create.</li>
+            <li><strong>Approver:</strong> select <em>Return to creator</em> with the reason "Deposit should be 5,000".</li>
+            <li><strong>Trainee:</strong> the lease is back in <em>Draft</em>, marked <em>Returned</em> with the reason. Edit it, correct the deposit to 5,000, and select <span class="btn">Submit for approval</span>.</li>
+            <li><strong>Approver:</strong> approve it.</li>
+            <li><strong>Trainee:</strong> try to approve your own lease next time — the system refuses (four-eyes rule).</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <ul>
+                <li>The lease is <em>Active</em>. The history at the bottom shows the submission, the return with its reason, and the approval.</li>
+                <li>4 draft invoices of <strong>18,000</strong> with <strong>no VAT</strong> (exempt residential), and 12 planned recognition entries of <strong>6,000</strong>.</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Approver: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t3">
+        <div class="scenario-head"><span class="id">T3</span><h3>Managed property lease</h3></div>
+        <div class="facts"><span><b>Role:</b> Leasing officer</span><span><b>Menu:</b> Master Data ▸ Leases</span><span><b>Time:</b> 10 min</span></div>
+        <p>We manage Villa 12 for its landlord. The rent belongs to the landlord; only our 5% commission is our income.</p>
+        <div class="data"><strong>Practice data</strong>
+            Unit: Garden Villas – Villa 12 · Tenant: Omar Haddad · Start: Day 1 · One year · Annual rent: 90,000 · Billing: Semi-Annual · Deposit: none
+        </div>
+        <ol class="steps">
+            <li>Create and activate the lease as in T1.</li>
+            <li>Open <span class="path">System Setup ▸ Revenue Recognition</span> and find the lease's entries.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <ul>
+                <li>2 draft invoices of <strong>45,000</strong> (no VAT), dated Day 1 and six months later.</li>
+                <li>12 planned recognition entries of <strong>375</strong> each: 90,000 ÷ 12 × 5%. Only the commission becomes our revenue.</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t4">
+        <div class="scenario-head"><span class="id">T4</span><h3>Print the contract and its QR label</h3></div>
+        <div class="facts"><span><b>Role:</b> Leasing officer</span><span><b>Menu:</b> Master Data ▸ Leases</span><span><b>Time:</b> 5 min</span></div>
+        <ol class="steps">
+            <li>On Al Noor's lease row, select <span class="btn">Draft Contract</span>. It opens in a new tab; print it or save it as PDF.</li>
+            <li>Select <span class="btn">QR Label</span> and print the label for the contract file.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            A full tenancy agreement filled in from the lease (parties, premises, rent, payment schedule, deposit), and a label showing the contract code and a QR code.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 2 RECEIVABLES *@
+<section class="section">
+    <span class="section-tag">Module 2</span>
+    <h2>Tenant receivables</h2>
+    <p class="intro">Invoices are created by the lease; your job is to post them when due, correct them with credit notes, and record what the tenants pay.</p>
+
+    <div class="scenario" id="t5">
+        <div class="scenario-head"><span class="id">T5</span><h3>Post and print a rent invoice</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Customer Invoices</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>Open <span class="path">Operations ▸ Customer Invoices</span>.</li>
+            <li>Find the <strong>Day 1</strong> invoice of each of the three leases (Al Noor 31,500 · Sara 18,000 · Omar 45,000).</li>
+            <li>Select <span class="btn">Post</span> on each. The status becomes <em>Posted</em>.</li>
+            <li>On Al Noor's invoice select <span class="btn">Tax Invoice</span>; on Sara's, <span class="btn">Invoice</span>. Compare the two documents.</li>
+            <li>Leave the later invoices as drafts: they are posted when they fall due.</li>
+        </ol>
+        <div class="expect"><strong>Expected result — Al Noor (owned, standard rated)</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+                <tr><td>11200 Accounts Receivable</td><td class="num">31,500.00</td><td class="num"></td></tr>
+                <tr><td>21200 Advances from Customers</td><td class="num"></td><td class="num">30,000.00</td></tr>
+                <tr><td>21400 VAT Payable</td><td class="num"></td><td class="num">1,500.00</td></tr>
+            </table></div>
+            Sara's invoice has no VAT line. Omar's credits <strong>21500 Due to Landlords</strong> 45,000 instead of 21200, because the rent is the landlord's.
+            Al Noor's is a <em>full tax invoice</em> showing both TRNs; Sara's is a plain <em>invoice</em> because exempt rent carries no VAT.
+        </div>
+        <div class="watch"><strong>Why no revenue?</strong>
+            Billing is not earning. The invoice creates a receivable and unearned rent. Revenue arrives month by month through revenue recognition (T25).
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t6">
+        <div class="scenario-head"><span class="id">T6</span><h3>Credit note for a rent discount</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Customer Invoices</span><span><b>Time:</b> 10 min</span></div>
+        <p>Office 301 was handed over three days late; management agrees a discount of 1,000 plus VAT on the first invoice.</p>
+        <ol class="steps">
+            <li>On Al Noor's Day 1 invoice, select <span class="btn">Credit Note</span>.</li>
+            <li><em>Credit note date</em>: Day 5. <em>Reason</em>: choose the discount reason from the list. <em>Explanation</em>: "Discount for late handover of Office 301".</li>
+            <li><em>Net amount</em>: 1,000. VAT of 50 is calculated for you.</li>
+            <li>Leave <em>Reverse into account</em> as it is, and select <span class="btn">Save &amp; Post</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+                <tr><td>21200 Advances from Customers</td><td class="num">1,000.00</td><td class="num"></td></tr>
+                <tr><td>21400 VAT Payable</td><td class="num">50.00</td><td class="num"></td></tr>
+                <tr><td>11200 Accounts Receivable</td><td class="num"></td><td class="num">1,050.00</td></tr>
+            </table></div>
+            The invoice now shows 1,050 credited and a balance of <strong>30,450</strong>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t7">
+        <div class="scenario-head"><span class="id">T7</span><h3>Receipt by bank transfer</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Customer Invoices / Customer Receipts</span><span><b>Time:</b> 5 min</span></div>
+        <p>Al Noor transfers the balance of its first invoice.</p>
+        <ol class="steps">
+            <li>On Al Noor's Day 1 invoice, select <span class="btn">Receive Payment</span>. The receipt form opens on that invoice and shows the outstanding 30,450.</li>
+            <li><em>Receipt Number</em>: RCPT-T7 · <em>Receipt Date</em>: Day 6 · <em>Amount</em>: 30,450 · <em>Payment Method</em>: Bank Transfer.</li>
+            <li>Select <span class="btn">Save and Post</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+                <tr><td>11100 Cash and Cash Equivalents</td><td class="num">30,450.00</td><td class="num"></td></tr>
+                <tr><td>11200 Accounts Receivable</td><td class="num"></td><td class="num">30,450.00</td></tr>
+            </table></div>
+            The invoice is <em>Paid</em>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t8">
+        <div class="scenario-head"><span class="id">T8</span><h3>Part payments</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Customer Receipts</span><span><b>Time:</b> 10 min</span></div>
+        <p>Omar Haddad pays his first semi-annual invoice of 45,000 in two transfers.</p>
+        <ol class="steps">
+            <li>Select <span class="btn">New Receipt</span>, choose Omar's Day 1 invoice, receipt number RCPT-T8A, date Day 3, amount <strong>20,000</strong>, Bank Transfer, <span class="btn">Save and Post</span>.</li>
+            <li>Check the invoice: status <em>PartiallyPaid</em>, balance 25,000.</li>
+            <li>Record a second receipt RCPT-T8B on Day 12 for <strong>25,000</strong>.</li>
+            <li>Try a third receipt of 1 against the same invoice — it is no longer offered, because nothing is outstanding.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Two journals, each Dr 11100 / Cr 11200. The invoice is <em>Paid</em>.
+        </div>
+        <div class="watch"><strong>One receipt, one invoice</strong>
+            If a tenant pays several invoices with one transfer, enter one receipt per invoice with the same date and reference.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t9">
+        <div class="scenario-head"><span class="id">T9</span><h3>Receive post-dated cheques</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant / cashier</span><span><b>Menu:</b> Operations ▸ PDC Receipts</span><span><b>Time:</b> 15 min</span></div>
+        <p>Sara Ahmed hands over four cheques, one for each quarterly invoice.</p>
+        <div class="data"><strong>Practice data</strong>
+            <div class="tbl"><table>
+                <tr><th>Cheque no.</th><th>Bank</th><th>Cheque date</th><th>Against invoice</th><th class="num">Amount</th></tr>
+                <tr><td>100201</td><td>Emirates Practice Bank</td><td>Day 1</td><td>1st quarter</td><td class="num">18,000</td></tr>
+                <tr><td>100202</td><td>Emirates Practice Bank</td><td>Day 1 + 3 months</td><td>2nd quarter</td><td class="num">18,000</td></tr>
+                <tr><td>100203</td><td>Emirates Practice Bank</td><td>Day 1 + 6 months</td><td>3rd quarter</td><td class="num">18,000</td></tr>
+                <tr><td>100204</td><td>Emirates Practice Bank</td><td>Day 1 + 9 months</td><td>4th quarter</td><td class="num">18,000</td></tr>
+            </table></div>
+            Received date for all four: Day 1.
+        </div>
+        <ol class="steps">
+            <li>Open <span class="path">Operations ▸ PDC Receipts</span> and select <span class="btn">Receive PDC</span>.</li>
+            <li>Choose Sara's lease and <em>Settlement Mode</em> <strong>Receivable</strong>, then the 1st-quarter invoice.</li>
+            <li>Enter the cheque number, bank, <em>Received Date</em> Day 1, <em>Cheque Date</em> and amount. Select <span class="btn">Save and Receive</span>.</li>
+            <li>Repeat for the other three cheques, each against its own invoice.</li>
+        </ol>
+        <div class="expect"><strong>Expected result — each cheque</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+                <tr><td>11400 PDC On Hand</td><td class="num">18,000.00</td><td class="num"></td></tr>
+                <tr><td>21600 PDC Contra</td><td class="num"></td><td class="num">18,000.00</td></tr>
+            </table></div>
+            A memorandum pair dated on the <em>received</em> date: it shows the cheques you hold without touching cash or receivables. Status <em>Received</em>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t10">
+        <div class="scenario-head"><span class="id">T10</span><h3>Clear a cheque and correct one</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ PDC Receipts</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>The bank honours cheque 100201. Select <span class="btn">Clear</span> on it, enter <em>Cleared Date</em> Day 4 and save.</li>
+            <li>You notice cheque 100204 was keyed with the wrong cheque date. Select <span class="btn">Edit</span> on it, correct the cheque date by one day, and save.</li>
+            <li>Try to clear cheque 100202 today. Read the warning: the cheque date is months away and a bank will not normally honour it early. <strong>Cancel.</strong></li>
+        </ol>
+        <div class="expect"><strong>Expected result — clearing 100201</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+                <tr><td>21600 PDC Contra</td><td class="num">18,000.00</td><td class="num"></td></tr>
+                <tr><td>11400 PDC On Hand</td><td class="num"></td><td class="num">18,000.00</td></tr>
+                <tr><td>11100 Cash and Cash Equivalents</td><td class="num">18,000.00</td><td class="num"></td></tr>
+                <tr><td>11200 Accounts Receivable</td><td class="num"></td><td class="num">18,000.00</td></tr>
+            </table></div>
+            The cheque is <em>Cleared</em> and Sara's first invoice is <em>Paid</em>. The other three cheques stay <em>Received</em>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t11">
+        <div class="scenario-head"><span class="id">T11</span><h3>Security deposit</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Security Deposits</span><span><b>Time:</b> 5 min</span></div>
+        <ol class="steps">
+            <li>Select <span class="btn">Receive Deposit</span> and choose Al Noor's lease.</li>
+            <li><em>Reference Number</em>: DEP-T11 · <em>Receipt Date</em>: Day 2 · <em>Payment Method</em>: Bank Transfer · <em>Amount</em>: 10,000.</li>
+            <li>Select <span class="btn">Save and Post</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Dr 11100 Cash 10,000 · Cr <strong>21300 Tenant Security Deposits</strong> 10,000. A deposit is a liability, never income.
+        </div>
+        <div class="watch"><strong>Never as a customer receipt</strong>
+            A deposit entered as a receipt would reduce the tenant's rent balance and end up as revenue.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t12">
+        <div class="scenario-head"><span class="id">T12</span><h3>Tenant request: more time to pay</h3></div>
+        <div class="facts"><span><b>Role:</b> Tenant services</span><span><b>Menu:</b> Operations ▸ Tenant Requests</span><span><b>Time:</b> 10 min</span></div>
+        <p>Using the tenant portal (your trainer gives you Sara's practice sign-in), Sara asks to pay her 2nd-quarter invoice 15 days late.</p>
+        <ol class="steps">
+            <li><strong>As the tenant</strong>, in the portal, raise a <em>payment postponement</em> request on the 2nd-quarter invoice with the new date.</li>
+            <li><strong>As staff</strong>, open <span class="path">Operations ▸ Tenant Requests</span> and select <span class="btn">Open</span> on it.</li>
+            <li>Set the status to <em>Acknowledged</em>, add an <em>Internal note</em> "Good payment history", and <span class="btn">Save update</span>.</li>
+            <li>Set <em>Resolved</em> with the response "Agreed, you may pay by &lt;new date&gt;".</li>
+            <li>Select <span class="btn">Apply new due date to INV-…</span> and confirm.</li>
+            <li>Set the request to <em>Closed</em>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Only the invoice's due date changes. No journal, no amount, no VAT moves. The tenant sees the reply in the portal but never the internal note.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 3 PAYABLES *@
+<section class="section">
+    <span class="section-tag">Module 3</span>
+    <h2>Supplier payables</h2>
+    <p class="intro">A bill records what you owe a supplier. VAT depends on whether the supplier is registered, and how much you can reclaim depends on what each line was for.</p>
+
+    <div class="scenario" id="t13">
+        <div class="scenario-head"><span class="id">T13</span><h3>Bill from a VAT-registered supplier</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Vendor Bills</span><span><b>Time:</b> 15 min</span></div>
+        <p>Coastal Facility Services invoices this month's cleaning for two buildings on one document.</p>
+        <div class="data"><strong>Practice data</strong>
+            Supplier's bill no. CFS-5510 · Category: Building cleaning · Bill date and accounting date: Day 8 · Due: 30 days later
+            <div class="tbl"><table>
+                <tr><th>Line</th><th>Account</th><th>Property</th><th class="num">Qty × price</th><th>Taxable</th><th>Attribution</th></tr>
+                <tr><td>Lobby and office cleaning</td><td>51100</td><td>Marina Heights</td><td class="num">1 × 4,000</td><td>Yes</td><td>Taxable</td></tr>
+                <tr><td>Stairwell cleaning</td><td>51100</td><td>Palm Residences</td><td class="num">1 × 2,000</td><td>Yes</td><td>Exempt</td></tr>
+            </table></div>
+        </div>
+        <ol class="steps">
+            <li>Select <span class="btn">New Bill</span> and choose the supplier. A blue banner says <em>Tax Invoice — 5% VAT applies</em>.</li>
+            <li>Enter the supplier's bill number, category and dates.</li>
+            <li>Enter the two lines as above; use <span class="btn">+ Add line</span> for the second. Watch the totals update.</li>
+            <li>Select <span class="btn">Save Draft</span>, review, then <span class="btn">Post</span>.</li>
+            <li>Select <span class="btn">Print</span> to see the bill document with the signature strip.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+                <tr><td>51100 · Marina Heights</td><td class="num">4,000.00</td><td class="num"></td></tr>
+                <tr><td>51100 · Palm Residences (2,000 + irrecoverable VAT 100)</td><td class="num">2,100.00</td><td class="num"></td></tr>
+                <tr><td>11300 VAT Recoverable</td><td class="num">200.00</td><td class="num"></td></tr>
+                <tr><td>21100 Accounts Payable</td><td class="num"></td><td class="num">6,300.00</td></tr>
+            </table></div>
+            VAT on the residential line cannot be reclaimed, so it is added to that line's cost. Your own bill number (BILL-…) is issued on saving.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t14">
+        <div class="scenario-head"><span class="id">T14</span><h3>Bill from an unregistered supplier</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Vendor Bills</span><span><b>Time:</b> 5 min</span></div>
+        <div class="data"><strong>Practice data</strong>
+            Quick Fix Plumbing · Bill QF-118 · Day 9 · One line: "Leak repair, Apartment 704", account 52100, Palm Residences, 1 × <strong>850</strong>
+        </div>
+        <ol class="steps">
+            <li>Select <span class="btn">New Bill</span> and choose Quick Fix Plumbing. An amber banner says <em>Commercial Invoice — no VAT</em> and the VAT controls switch off.</li>
+            <li>Enter the details and line, <span class="btn">Save Draft</span>, then <span class="btn">Post</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Dr 52100 Property Maintenance (Palm Residences) 850 · Cr 21100 Accounts Payable 850. No VAT line at all.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t15">
+        <div class="scenario-head"><span class="id">T15</span><h3>Correct a posted bill</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Vendor Bills</span><span><b>Time:</b> 5 min</span></div>
+        <p>Checking the paperwork, you see the plumber's bill was 950, not 850.</p>
+        <ol class="steps">
+            <li>On bill QF-118 select <span class="btn">Reset</span>. The journal leaves the accounts and the bill becomes editable.</li>
+            <li>Edit the line price to 950 and save.</li>
+            <li>Select <span class="btn">Post</span> again.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            One journal of 950 in the accounts. Journal Inquiry shows it posted once; the 850 version no longer counts anywhere.
+        </div>
+        <div class="watch"><strong>When reset is refused</strong>
+            A bill cannot be reset once a payment is posted against it, or if its period is closed. Reset the payment first, or post a correcting journal in an open month.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t16">
+        <div class="scenario-head"><span class="id">T16</span><h3>A late bill for a closed month</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Vendor Bills</span><span><b>Time:</b> 5 min</span></div>
+        <p>Coastal sends last month's window cleaning (bill CFS-5490, 1,000 + VAT, Marina Heights, taxable) after last month was closed.</p>
+        <ol class="steps">
+            <li>Create the bill with <em>Bill Date</em> = the date on the supplier's document (last month).</li>
+            <li>Try to save with <em>Accounting Date</em> also last month and <span class="btn">Post</span>: it is refused because the period is closed.</li>
+            <li>Set the <em>Accounting Date</em> to Day 10 of this month, and post.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The journal lands in this month (Dr 51100 1,000 · Dr 11300 50 · Cr 21100 1,050). The supplier's date is still printed on the bill.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t17">
+        <div class="scenario-head"><span class="id">T17</span><h3>Pay suppliers</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Vendor Payments</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>Select <span class="btn">New Vendor Payment</span>, choose bill CFS-5510 (outstanding 6,300). Payment number PAY-T17A, Day 15, amount <strong>3,000</strong>, Bank Transfer, <span class="btn">Save and Post</span>.</li>
+            <li>Pay the remaining <strong>3,300</strong> with PAY-T17B on Day 25.</li>
+            <li>Pay QF-118 in full (950) with PAY-T17C on Day 15.</li>
+            <li>Try to pay a <em>draft</em> bill: it is not offered — post the bill first.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Each payment: Dr 21100 Accounts Payable · Cr 11100 Cash. CFS-5510 goes <em>PartiallyPaid</em> then <em>Paid</em>; QF-118 is <em>Paid</em>.
+            <span class="path">Reporting ▸ Vendor Statement</span> for Coastal shows 6,300 billed and 6,300 paid for CFS-5510.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 4 CASH & GL *@
+<section class="section">
+    <span class="section-tag">Module 4</span>
+    <h2>Cash and general ledger</h2>
+
+    <div class="scenario" id="t18">
+        <div class="scenario-head"><span class="id">T18</span><h3>Petty cash float</h3></div>
+        <div class="facts"><span><b>Role:</b> Site administrator / accountant</span><span><b>Menu:</b> Operations ▸ Petty Cash</span><span><b>Time:</b> 15 min</span></div>
+        <ol class="steps">
+            <li>Choose the float 11150 Petty Cash at the top of the screen. Note its current balance.</li>
+            <li>Select <span class="btn">New Expense Voucher</span>: Day 11, paid to "City Hardware", "Cleaning supplies", expense 51100, property Marina Heights, amount <strong>120</strong>, reference receipt no. 7781. <span class="btn">Post Voucher</span>.</li>
+            <li>Try a voucher larger than the float balance. It is refused: "This voucher would take the float below zero". Cancel it.</li>
+            <li>Select <span class="btn">Replenish Float</span>: Day 12, funding account 11100, amount <strong>2,000</strong>, reference TRF-T18. <span class="btn">Post Replenishment</span>.</li>
+            <li>Add a second voucher: Day 13, "Speedy Couriers", courier fees, expense 61100, amount <strong>45</strong>.</li>
+            <li>Select <span class="btn">Refresh</span>, then <span class="btn">Print</span> the petty cash report and compare its closing balance with a pretend cash count.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Closing balance = starting balance − 120 + 2,000 − 45. Vouchers: Dr expense · Cr 11150. Replenishment: Dr 11150 · Cr 11100 — a transfer, not an expense.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t19">
+        <div class="scenario-head"><span class="id">T19</span><h3>Annual insurance as a prepayment</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> System Setup ▸ Recurring Prepayments</span><span><b>Time:</b> 10 min</span></div>
+        <p>The building insurance for the next 12 months costs 12,000, billed by Gulf Shield Insurance on credit.</p>
+        <ol class="steps">
+            <li>Select <span class="btn">New Prepayment Setup</span>.</li>
+            <li><em>Description</em>: "Building insurance – 12 months" · <em>Payment Date</em>: Day 1 · <em>Total Amount</em>: 12,000.</li>
+            <li><em>First Recognition Date</em>: this month end · <em>Recognition Months</em>: 12.</li>
+            <li><em>Prepaid Account</em>: 11500 · <em>Expense Account</em>: 51100 · <em>Offset Account</em>: 21100 Accounts Payable, with the vendor Gulf Shield Insurance.</li>
+            <li><span class="btn">Save Prepayment Setup</span>, then post the draft set-up journal from Journal Inquiry.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Set-up: Dr 11500 Prepaid Expenses 12,000 · Cr 21100 Accounts Payable 12,000, with a bill raised for the vendor.
+            The schedule shows 12 monthly amounts of <strong>1,000</strong>, released at month end (T25).
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t20">
+        <div class="scenario-head"><span class="id">T20</span><h3>Manual journals</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Manual Journals</span><span><b>Time:</b> 15 min</span></div>
+        <p>Three entries no other screen makes. For each: <span class="btn">New Manual Journal</span>, enter the <em>Entry Date</em> and a description someone else will understand, add the lines, <span class="btn">Save as Draft</span>, then post from Journal Inquiry.</p>
+        <div class="tbl"><table>
+            <tr><th>#</th><th>Date</th><th>Description</th><th>Debit</th><th>Credit</th><th class="num">Amount</th></tr>
+            <tr><td>a</td><td>Day 20</td><td>Bank charges for the month, statement ref BS-T20</td><td>63100 Finance Costs</td><td>11100 Cash</td><td class="num">75</td></tr>
+            <tr><td>b</td><td>Month end</td><td>Accrual: common-area electricity, Marina Heights, bill not yet received</td><td>51100 (unit: Office 301)</td><td>21100 Accounts Payable</td><td class="num">1,800</td></tr>
+            <tr><td>c</td><td>Day 21</td><td>Try an unbalanced entry: Dr 63100 100, Cr 11100 90</td><td>—</td><td>—</td><td class="num">—</td></tr>
+        </table></div>
+        <div class="expect"><strong>Expected result</strong>
+            Journals (a) and (b) are posted. Entry (c) is refused with "Journal entry is not balanced" — debits must equal credits.
+        </div>
+        <div class="watch"><strong>Write the description for an auditor</strong>
+            "Accrual: common-area electricity, Marina Heights, bill not yet received" explains itself in six months; "accrual" does not.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t21">
+        <div class="scenario-head"><span class="id">T21</span><h3>Owner withdrawal</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Owner Withdrawals</span><span><b>Time:</b> 5 min</span></div>
+        <p>The owner pays private school fees of 5,000 from the company bank account.</p>
+        <ol class="steps">
+            <li>Enter <em>Date</em> Day 14 and <em>Amount</em> 5,000.</li>
+            <li><em>Spent on</em>: the Education category · <em>Paid from</em>: 11100.</li>
+            <li>Description "School fees – term 1", reference TRF-T21, <span class="btn">Save and Post</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Dr 34100 Owner's Current Account (category Education) 5,000 · Cr 11100 5,000. No expense account is touched, so company profit does not change.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t22">
+        <div class="scenario-head"><span class="id">T22</span><h3>Fixed asset: buy, capitalise, depreciate</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Fixed Assets</span><span><b>Time:</b> 20 min</span></div>
+        <p>A standby generator is bought for Marina Heights: 60,000 from PowerGen on credit, plus 3,000 installation paid from the bank.</p>
+        <ol class="steps">
+            <li>Select <span class="btn">Add Fixed Asset</span>: code FA-GEN-01, name "Standby generator – Marina Heights", asset account 15200, accumulated depreciation 15300, useful life <strong>120</strong> months, depreciation start Day 1, property Marina Heights. Save.</li>
+            <li>Select <span class="btn">Acquisition</span> on the asset. <span class="btn">Add Cost</span>: supplier invoice, 60,000, capitalisable, offset Accounts Payable with vendor PowerGen.</li>
+            <li><span class="btn">Add Cost</span> again: installation, 3,000, capitalisable, offset 11100 Cash.</li>
+            <li>Select <span class="btn">Capitalize Asset</span>.</li>
+            <li>Open <span class="btn">Depreciation</span> on the asset and look at the schedule. (It is posted at month end in T25.)</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            <ul>
+                <li>Costs: Dr 15400 Fixed Asset Clearing 60,000 / Cr 21100 (a vendor bill is raised), and Dr 15400 3,000 / Cr 11100.</li>
+                <li>Capitalisation: Dr 15200 Fixed Assets <strong>63,000</strong> · Cr 15400 63,000.</li>
+                <li>Schedule: 120 instalments of <strong>525</strong> (63,000 ÷ 120).</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 5 LANDLORDS *@
+<section class="section">
+    <span class="section-tag">Module 5</span>
+    <h2>Landlords of managed properties</h2>
+    <p class="intro">For Villa 12 we collect rent for the landlord, keep our 5% commission plus its VAT, and pay him the rest.</p>
+
+    <div class="scenario" id="t23">
+        <div class="scenario-head"><span class="id">T23</span><h3>Commission tax invoices</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Owner Settlements</span><span><b>Time:</b> 10 min</span></div>
+        <p>Do this after the month's revenue recognition has been posted (T25 step 2), which moves the 375 commission into revenue.</p>
+        <ol class="steps">
+            <li>Under <em>Commission Tax Invoices</em>, choose <em>Month ending</em> = this month end and select <span class="btn">Check</span>.</li>
+            <li>Select <span class="btn">Issue Commission Invoices</span>.</li>
+            <li>Select <span class="btn">Invoice</span> next to Khalid Rahman's and print the tax invoice.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            One posted tax invoice (TX-… series) for commission 375 plus VAT <strong>18.75</strong>: Dr 21500 Due to Landlords 18.75 · Cr 21400 VAT Payable 18.75.
+            It cannot be reset to draft.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t24">
+        <div class="scenario-head"><span class="id">T24</span><h3>Pay the landlord</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Owner Settlements</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>Select <span class="btn">Statement &amp; Pay</span> for Khalid Rahman, with <em>Statement as at</em> this month end.</li>
+            <li>Check the statement: rent billed <strong>45,000</strong> · commission 5% <strong>2,250</strong> · VAT on commission <strong>112.50</strong> · owner's share <strong>42,637.50</strong>. Because Omar paid in full (T8), <em>Available from collections</em> is also 42,637.50.</li>
+            <li>Under <em>Pay the Owner</em> enter 40,000 (a part payment), Day 26, Bank Transfer, paid from 11100, reference TRF-T24.</li>
+            <li>Select <span class="btn">Save and Post Payment</span> and print the settlement advice that opens.</li>
+            <li>Try to pay another 5,000: it is refused, because the most that can still be paid is 2,637.50.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Dr 21500 Due to Landlords 40,000 · Cr 11100 40,000. Settlement number OS-year-0001. The balance payable to the landlord is 2,637.50.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 6 CLOSING *@
+<section class="section">
+    <span class="section-tag">Module 6</span>
+    <h2>Month-end and year-end</h2>
+    <p class="intro">The Closing Cockpit checks that every recurring process reached the general ledger before a month is locked. Once closed, nothing can be posted, reset or changed in that month.</p>
+
+    <div class="scenario" id="t25">
+        <div class="scenario-head"><span class="id">T25</span><h3>Close the month in the Closing Cockpit</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant / finance supervisor</span><span><b>Menu:</b> System Setup ▸ Closing Cockpit</span><span><b>Time:</b> 20 min</span></div>
+        <p>In training, close the month you have been working in. Your trainer may first move the practice dates so that the month has ended.</p>
+        <ol class="steps">
+            <li>Open the cockpit. Select the month's tile. Read every line of its checklist and its light:
+                <ul>
+                    <li><strong>Green</strong> — processed and the ledger agrees.</li>
+                    <li><strong>Amber</strong> — review; does not stop the close once you tick that you reviewed it.</li>
+                    <li><strong>Red</strong> — not processed; blocks the close.</li>
+                    <li><strong>Grey</strong> — nothing to do this month.</li>
+                </ul>
+            </li>
+            <li><em>Revenue recognition</em> is red: select <span class="btn">Run recognition</span>. It turns green with <strong>16,375</strong> recognised (10,000 + 6,000 + 375).</li>
+            <li><em>Depreciation</em> is red (the generator): select <span class="btn">Run depreciation</span>. Green at <strong>525</strong>.</li>
+            <li><em>Prepayment amortisation</em> is red (insurance): select <span class="btn">Run amortisation</span>. Green at <strong>1,000</strong>.</li>
+            <li><em>No draft journals</em>: if red, read which drafts are listed. Post genuine ones with <span class="btn">Post all drafts</span>; delete or correct any that should not exist.</li>
+            <li>Read the amber lines (for example cheques due but not cleared). Decide whether each is acceptable.</li>
+            <li>Now do T23 (commission invoices), then return here.</li>
+            <li>When nothing is red, tick <em>I have reviewed the amber warnings</em> and select <span class="btn">Close</span>.</li>
+            <li>Try to post anything dated in that month — a receipt, a journal, a reset. Every attempt is refused.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The tile shows a padlock. The period history records who closed it, when, and the warnings acknowledged. The dashboard's
+            <em>Unclosed Periods</em> section no longer lists the month.
+        </div>
+        <div class="tbl"><table class="je">
+            <tr><th>Month-end entry</th><th>Debit</th><th>Credit</th><th class="num">Amount</th></tr>
+            <tr><td>Revenue – Al Noor</td><td>21200 Advances from Customers</td><td>41100 Rental Revenue – Owned</td><td class="num">10,000.00</td></tr>
+            <tr><td>Revenue – Sara</td><td>21200 Advances from Customers</td><td>41100 Rental Revenue – Owned</td><td class="num">6,000.00</td></tr>
+            <tr><td>Commission – Villa 12</td><td>21500 Due to Landlords</td><td>42100 Management Fee Revenue</td><td class="num">375.00</td></tr>
+            <tr><td>Depreciation – generator</td><td>62100 Depreciation Expense</td><td>15300 Accumulated Depreciation</td><td class="num">525.00</td></tr>
+            <tr><td>Insurance – month 1</td><td>51100 Property Operating Expenses</td><td>11500 Prepaid Expenses</td><td class="num">1,000.00</td></tr>
+        </table></div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t26">
+        <div class="scenario-head"><span class="id">T26</span><h3>Reopen a closed month on request</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant + approver</span><span><b>Menu:</b> System Setup ▸ Closing Cockpit / Period Reopen Requests</span><span><b>Time:</b> 15 min</span></div>
+        <p>After closing, a supplier's bill for the month turns up that must be in it.</p>
+        <ol class="steps">
+            <li><strong>Trainee:</strong> select the closed month's tile. Under <em>Ask for this period to be reopened</em>, write a real reason (at least 15 characters), e.g. "Coastal bill CFS-5530 for this month's pest control arrived after closing", and select <span class="btn">Request reopening</span>.</li>
+            <li><strong>Approver:</strong> open <span class="path">System Setup ▸ Period Reopen Requests</span> (the red badge shows how many wait). Read the reason.</li>
+            <li><strong>Approver:</strong> first try <span class="btn">Turn down</span> without a comment — a comment is required. Then add the comment "Approved – post the bill and close again today" and select <span class="btn">Approve &amp; reopen</span>.</li>
+            <li><strong>Trainee:</strong> the month shows <em>Reopened</em>. Enter and post the bill (500 + VAT, Marina Heights, taxable).</li>
+            <li><strong>Trainee:</strong> close the month again through the checklist, as in T25.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The request shows <em>Reclosed</em>. The period history lists: Closed → Reopen requested → Reopened (with reason and approver) → Closed again.
+            The requester could not approve their own request.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Approver: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t27">
+        <div class="scenario-head"><span class="id">T27</span><h3>VAT return and VAT payment</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Reporting ▸ VAT Return, Operations ▸ Manual Journals</span><span><b>Time:</b> 15 min</span></div>
+        <ol class="steps">
+            <li>Open <span class="path">Reporting ▸ VAT Return</span> for the current quarter and select <span class="btn">Refresh</span>.</li>
+            <li>Find each of your documents: Al Noor's invoice (standard), the credit note (<em>Less credit notes</em>), Sara's and Omar's invoices (exempt), the commission invoice (<em>management commission to landlords</em>), and the bills by attribution.</li>
+            <li>Note <em>Output Tax Due</em>, <em>Input Tax Recoverable</em> and <em>Net VAT payable</em>.</li>
+            <li>Record the payment to the FTA with a manual journal: Dr 21400 VAT Payable (output tax) · Cr 11300 VAT Recoverable (input tax) · Cr 11100 Cash (the net amount). Post it.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            With only this workbook's documents, output tax is 1,500 − 50 + 18.75 = <strong>1,468.75</strong>; recoverable input tax is the 5% on the taxable bill lines.
+            After the payment journal, 21400 and 11300 are back to zero for the quarter.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t28">
+        <div class="scenario-head"><span class="id">T28</span><h3>Check the reports</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant / supervisor</span><span><b>Menu:</b> Reporting</span><span><b>Time:</b> 20 min</span></div>
+        <p>Open each report for the month you closed and answer the question beside it.</p>
+        <div class="tbl"><table>
+            <tr><th>Report</th><th>Question to answer</th></tr>
+            <tr><td>Trial Balance</td><td>Do total debits equal total credits?</td></tr>
+            <tr><td>Profit &amp; Loss</td><td>Is rental revenue 16,000 and management fee revenue 375? Where are depreciation and insurance?</td></tr>
+            <tr><td>Balance Sheet</td><td>What does 21200 Advances from Customers hold, and why? What is in 21300?</td></tr>
+            <tr><td>Tenant Statement — Al Noor</td><td>Invoice 31,500, credit 1,050, receipt 30,450: is the balance nil?</td></tr>
+            <tr><td>Vendor Statement — Coastal</td><td>Which bills are still unpaid?</td></tr>
+            <tr><td>P&amp;L by Property</td><td>Which building carries the generator depreciation and the cleaning?</td></tr>
+            <tr><td>General Ledger — 11100</td><td>Can you find every receipt and payment from this workbook?</td></tr>
+            <tr><td>Owner Withdrawals</td><td>Is the 5,000 under Education?</td></tr>
+        </table></div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t29">
+        <div class="scenario-head"><span class="id">T29</span><h3>Year-end close</h3></div>
+        <div class="facts"><span><b>Role:</b> Finance supervisor (trainer demonstrates)</span><span><b>Menu:</b> System Setup ▸ Closing Cockpit</span><span><b>Time:</b> 15 min</span></div>
+        <p>Done once a year, after all twelve months are closed. The trainer demonstrates it on a practice year.</p>
+        <ol class="steps">
+            <li>Choose the fiscal year in the cockpit. Under <em>Year-end close</em>, read any red lines: every period closed, the previous year closed, the retained earnings account mapped.</li>
+            <li>Review the preview: revenue to clear, expenses to clear, and the net profit or loss going to retained earnings.</li>
+            <li>Select <span class="btn">Close fiscal year</span> and confirm.</li>
+            <li>Open <em>Opening balances carried into</em> the next year and check that debits equal credits.</li>
+            <li>Run the Profit &amp; Loss for the closed year: it still shows the year's result. Run the Balance Sheet one day into the new year: the result now sits in 32100 Retained Earnings.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            One posted closing entry on the last day of the year: every revenue account debited, every expense account credited, and the difference to 32100 Retained Earnings.
+            Balance sheet accounts carry into the new year unchanged. If any month of that year is later reopened, the year close is undone and must be run again.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Seen</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 7 ADVANCED *@
+<section class="section">
+    <span class="section-tag">Module 7 · optional</span>
+    <h2>Development and unit sales</h2>
+    <p class="intro">Only for companies that build or sell units. Your trainer will set up a practice project "Creek View" on an owned plot.</p>
+
+    <div class="scenario" id="t30">
+        <div class="scenario-head"><span class="id">T30</span><h3>Development project costs</h3></div>
+        <div class="facts"><span><b>Role:</b> Project accountant</span><span><b>Menu:</b> Operations ▸ Development Projects, Vendor Bills</span><span><b>Time:</b> 20 min</span></div>
+        <ol class="steps">
+            <li>Open the project and compare its budget by cost category with the cost to date.</li>
+            <li>Enter a contractor's certificate as a vendor bill (e.g. 250,000 + VAT). On the line, choose the project and the construction category under <em>Property</em>: the account switches to the project's account by itself. Post it.</li>
+            <li>On the project page, use <em>Record a Cost without a Supplier Bill</em> for a municipality fee of 15,000 paid from 11100, category permits. <span class="btn">Record and Post</span>.</li>
+            <li>Check the budget against actual for each category, and the cost ledger.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Both costs are debited to the project's work-in-progress account (13100 for sale, 15500 for rental, 15600 own use). Nothing reaches the Profit &amp; Loss while the building is being built.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t31">
+        <div class="scenario-head"><span class="id">T31</span><h3>Sell a unit</h3></div>
+        <div class="facts"><span><b>Role:</b> Sales administrator + accountant</span><span><b>Menu:</b> Operations ▸ Unit Sales</span><span><b>Time:</b> 20 min</span></div>
+        <ol class="steps">
+            <li>Select <span class="btn">New Sale Contract</span>: a completed unit, the buyer, today's date, sale price 900,000 before VAT. Read the VAT treatment and its reason.</li>
+            <li>Select <span class="btn">Split 20 / 30 / 30 / 20</span> to fill the payment plan, check it adds up to the price including VAT, and <span class="btn">Sign Contract</span>.</li>
+            <li>Under <em>Record a Payment</em>, record the first instalment received by bank transfer. <span class="btn">Record and Post</span>.</li>
+            <li>When the buyer has paid (or the trainer says so), enter the handover date and select <span class="btn">Hand over</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Before handover, payments sit in 21250 Advances from Unit Buyers. At handover, revenue is recognised in 41200 and the unit's cost moves to 51200 Cost of Properties Sold; the unit becomes <em>Sold</em> and the contract shows the gross profit.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== APPENDICES *@
+<section class="section" id="a1">
+    <span class="section-tag">Appendix A</span>
+    <h2>Messages you may see, and what to do</h2>
+    <div class="tbl"><table>
+        <tr><th>Message or situation</th><th>Meaning</th><th>What to do</th></tr>
+        <tr><td>"… is closed. … cannot be created, posted, changed or removed in a closed period."</td><td>The date falls in a closed month.</td><td>Date it in an open month, or ask for the month to be reopened (T26).</td></tr>
+        <tr><td>"Invoice … has not been posted yet"</td><td>You are receiving money or clearing a cheque against a draft invoice.</td><td>Post the invoice first (T5).</td></tr>
+        <tr><td>"Bill … has not been posted yet"</td><td>You are paying a draft bill.</td><td>Post the bill first.</td></tr>
+        <tr><td>"Journal entry is not balanced"</td><td>Debits and credits differ, or a line has both.</td><td>Check each line's figures.</td></tr>
+        <tr><td>"This voucher would take the float below zero"</td><td>Not enough cash in the petty cash float.</td><td>Replenish the float first.</td></tr>
+        <tr><td>"The unit is already taken for these dates by contract …"</td><td>Another active or waiting lease covers the dates.</td><td>Check the dates, or end the other lease.</td></tr>
+        <tr><td>"The most that can be paid to … is …"</td><td>The landlord payment exceeds the balance.</td><td>Pay no more than the balance shown.</td></tr>
+        <tr><td>I saved it but it is not in the Trial Balance</td><td>It is a draft.</td><td>Post it from Journal Inquiry (0.3).</td></tr>
+        <tr><td>Reset to Draft is refused</td><td>Something depends on it (a receipt, a payment, a cleared cheque) or the month is closed.</td><td>Reset the later item first, or post a correcting journal.</td></tr>
+        <tr><td>A red light in the Closing Cockpit</td><td>A process for the month has not reached the ledger.</td><td>Use the line's Run button or open the screen named beside it.</td></tr>
+    </table></div>
+</section>
+
+<section class="section" id="a2">
+    <span class="section-tag">Appendix B</span>
+    <h2>Trainee progress record</h2>
+    <p>Trainee: ______________________________ &nbsp; Role: ____________________ &nbsp; Start date: ____________</p>
+    <div class="tbl"><table>
+        <tr><th>#</th><th>Scenario</th><th>Done</th><th>Trainer initials</th><th>Date</th></tr>
+        <tr><td>T1</td><td>Commercial lease, activated at once</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T2</td><td>Residential lease through approval</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T3</td><td>Managed property lease</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T4</td><td>Print the contract and its QR label</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T5</td><td>Post and print a rent invoice</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T6</td><td>Credit note for a rent discount</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T7</td><td>Receipt by bank transfer</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T8</td><td>Part payments</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T9</td><td>Receive post-dated cheques</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T10</td><td>Clear a cheque and correct one</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T11</td><td>Security deposit</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T12</td><td>Tenant request: more time to pay</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T13</td><td>Bill from a VAT-registered supplier</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T14</td><td>Bill from an unregistered supplier</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T15</td><td>Correct a posted bill</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T16</td><td>A late bill for a closed month</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T17</td><td>Pay suppliers</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T18</td><td>Petty cash float</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T19</td><td>Annual insurance as a prepayment</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T20</td><td>Manual journals</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T21</td><td>Owner withdrawal</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T22</td><td>Fixed asset: buy, capitalise, depreciate</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T23</td><td>Commission tax invoices</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T24</td><td>Pay the landlord</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T25</td><td>Close the month in the Closing Cockpit</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T26</td><td>Reopen a closed month on request</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T27</td><td>VAT return and VAT payment</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T28</td><td>Check the reports</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T29</td><td>Year-end close (demonstration)</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T30</td><td>Development project costs (optional)</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T31</td><td>Sell a unit (optional)</td><td><i class="box"></i></td><td></td><td></td></tr>
+    </table></div>
+    <p style="margin-top:18px">Trainee signature: ______________________ &nbsp;&nbsp; Trainer signature: ______________________ &nbsp;&nbsp; Date: ____________</p>
+    <div class="end-note">
+        The steps follow the screens as they are in this edition. Each screen's <strong>Help</strong> button explains
+        its fields in full, and the User Manual covers setting up the company and its master data.
+    </div>
+</section>
+
+</div>
+</body>
+</html>

@@ -95,5 +95,14 @@ namespace RealEstateManager.Controllers
 
             return View(model);
         }
+
+        /// <summary>
+        /// The Training Workbook: practice transactions for new users, step by step with
+        /// the result to expect. Public for the same reason as the manual, so its PDF can
+        /// be produced straight from this page.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Training() => View();
     }
 }
