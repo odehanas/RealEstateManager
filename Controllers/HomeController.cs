@@ -12,12 +12,21 @@ namespace RealEstateManager.Controllers
         private readonly OpeningBalanceService _openingBalanceService;
 
         private readonly ManagementReportService _reports;
+        private readonly PeriodClosingService _closing;
+        private readonly PermissionService _permissions;
 
-        public HomeController(ApplicationDbContext db, OpeningBalanceService openingBalanceService, ManagementReportService reports)
+        public HomeController(
+            ApplicationDbContext db,
+            OpeningBalanceService openingBalanceService,
+            ManagementReportService reports,
+            PeriodClosingService closing,
+            PermissionService permissions)
         {
             _db = db;
             _openingBalanceService = openingBalanceService;
             _reports = reports;
+            _closing = closing;
+            _permissions = permissions;
         }
 
         [HttpGet]
@@ -85,6 +94,14 @@ namespace RealEstateManager.Controllers
             if (currentPeriod != null)
             {
                 model.CurrentPeriodName = $"{currentPeriod.FiscalYear} / {currentPeriod.Name}";
+            }
+
+            // The months still waiting to be closed, for those who close them or approve reopening.
+            var dashboardCompanyId = User.GetCurrentCompanyId();
+            if (dashboardCompanyId.HasValue &&
+                await _permissions.HasAnyPermissionAsync(User, AppPermissions.AccountingManage, AppPermissions.PeriodReopenApprove))
+            {
+                model.UnclosedPeriods = await _closing.GetUnclosedPeriodsAsync(dashboardCompanyId.Value, today);
             }
 
             // Posted invoices only. A lease raises all its future invoices as drafts,

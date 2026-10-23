@@ -47,6 +47,7 @@ namespace RealEstateManager.Services
                     x.JournalEntry != null &&
                     x.JournalEntry.CompanyId == companyId &&
                     x.JournalEntry.IsPosted &&
+                    x.JournalEntry.JournalType != PeriodClosingService.ClosingJournalType &&
                     x.JournalEntry.EntryDate >= startDate &&
                     x.JournalEntry.EntryDate <= endDate)
                 .Where(x => x.Account != null && (x.Account.AccountType == "Revenue" || x.Account.AccountType == "Expense"))

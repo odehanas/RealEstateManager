@@ -26,6 +26,14 @@ namespace RealEstateManager.Services
         /// </summary>
         public const string LeasesApprove = "Leases.Approve";
         public const string AccountingManage = "Accounting.Manage";
+
+        /// <summary>
+        /// Open a closed accounting period again, on a request that says why. Kept apart
+        /// from Accounting.Manage so the people who post and close are not the ones who
+        /// unlock a month that has already been reported. Granted to company
+        /// administrators.
+        /// </summary>
+        public const string PeriodReopenApprove = "Closing.ApproveReopen";
         public const string ReportsView = "Reports.View";
 
         /// <summary>
@@ -96,6 +104,15 @@ namespace RealEstateManager.Services
                 Group = "Accounting",
                 Name = "Manage Accounting",
                 Description = "Invoices, receipts, payables, journals, closing, fixed assets, and prepayments."
+            },
+            new()
+            {
+                Key = AppPermissions.PeriodReopenApprove,
+                Group = "Accounting",
+                Name = "Approve Period Reopening",
+                Description =
+                    "Open a closed accounting period again when someone has asked for it with a reason, or turn " +
+                    "the request down. Nobody can approve their own request unless they are the company's only approver."
             },
             new()
             {
@@ -191,6 +208,12 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView },
+
+                // The approver's desk for reopening closed periods. An approver need not
+                // be an accountant, so these do not require Accounting.Manage.
+                ["Closing.ReopenRequests"] = new[] { AppPermissions.PeriodReopenApprove, AppPermissions.AccountingManage },
+                ["Closing.ApproveReopen"] = new[] { AppPermissions.PeriodReopenApprove },
+                ["Closing.RejectReopen"] = new[] { AppPermissions.PeriodReopenApprove },
                 ["InvestmentProperty.SetUpBuilding"] = new[] { AppPermissions.AccountingManage }
             };
 

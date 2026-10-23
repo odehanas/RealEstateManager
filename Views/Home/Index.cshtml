@@ -160,6 +160,86 @@
     </div>
 </div>
 
+@if (Model.UnclosedPeriods is { } unclosed)
+{
+    var needsAttention = unclosed.OverdueCount > 0 || unclosed.UnclosedFiscalYears.Count > 0 || unclosed.PendingReopenRequests > 0;
+    <div class="card shadow-sm border-0 mb-4 dashboard-print-card @(needsAttention ? "border-start border-4 border-danger" : "")">
+        <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <h5 class="mb-0">Unclosed Periods</h5>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                @if (unclosed.OverdueCount > 0)
+                {
+                    <span class="badge bg-danger">@unclosed.OverdueCount overdue for closing</span>
+                }
+                @if (unclosed.PendingReopenRequests > 0)
+                {
+                    <a asp-controller="Closing" asp-action="ReopenRequests" class="badge bg-warning text-dark text-decoration-none">
+                        @unclosed.PendingReopenRequests reopen request(s) waiting
+                    </a>
+                }
+                <a asp-controller="Closing" asp-action="Index" class="btn btn-sm btn-dark dashboard-no-print">Open Closing Cockpit</a>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            @if (unclosed.UnclosedFiscalYears.Count > 0)
+            {
+                <div class="alert alert-danger rounded-0 mb-0 py-2">
+                    Fiscal year @string.Join(", ", unclosed.UnclosedFiscalYears) has ended but is not closed:
+                    its profit or loss is not yet in retained earnings.
+                </div>
+            }
+            @if (unclosed.Periods.Count == 0)
+            {
+                <div class="p-3 text-muted">Every period up to today is closed.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Period</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                                <th class="text-end">Draft journals</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in unclosed.Periods)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@p.Name <span class="text-muted fw-normal small">FY @p.FiscalYear</span></td>
+                                    <td class="small">@p.StartDate.ToString("dd/MM/yyyy") - @p.EndDate.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (p.DaysOverdue > 0)
+                                        {
+                                            <span class="badge bg-danger">Overdue @p.DaysOverdue day(s)</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">Current period</span>
+                                        }
+                                        @if (p.IsReopened)
+                                        {
+                                            <span class="badge bg-primary">Reopened - to close again</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">@(p.DraftJournals > 0 ? p.DraftJournals.ToString() : "-")</td>
+                                    <td class="text-end dashboard-no-print">
+                                        <a asp-controller="Closing" asp-action="Index" asp-route-fiscalYear="@p.FiscalYear" asp-route-period="@p.PeriodNumber"
+                                           class="btn btn-sm btn-outline-dark">Checklist</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+}
+
 @{
     var occupancyGauge = new GaugeModel
     {

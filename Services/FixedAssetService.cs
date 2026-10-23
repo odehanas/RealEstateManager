@@ -505,12 +505,17 @@ namespace RealEstateManager.Services
             };
         }
 
-        public async Task<FixedAssetDepreciationRunResult> PostDepreciationUpToAsync(DateTime postingDate)
+        /// <param name="fromDate">
+        /// Only lines on or after this date. The Closing Cockpit passes the period start so
+        /// its run never reaches into an earlier month, which may be closed.
+        /// </param>
+        public async Task<FixedAssetDepreciationRunResult> PostDepreciationUpToAsync(DateTime postingDate, DateTime? fromDate = null)
         {
             var cutoffDate = new DateTime(
                 postingDate.Year,
                 postingDate.Month,
                 DateTime.DaysInMonth(postingDate.Year, postingDate.Month));
+            var startDate = fromDate?.Date ?? DateTime.MinValue;
 
             var schedules = await _db.FixedAssetDepreciations
                 .Include(x => x.FixedAsset)
@@ -521,6 +526,7 @@ namespace RealEstateManager.Services
                     .ThenInclude(x => x!.AccumulatedDepreciationAccount)
                 .Where(x =>
                     x.Status == "Planned" &&
+                    x.DepreciationDate.Date >= startDate &&
                     x.DepreciationDate.Date <= cutoffDate.Date)
                 .OrderBy(x => x.DepreciationDate)
                 .ThenBy(x => x.FixedAssetId)
