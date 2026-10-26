@@ -304,6 +304,7 @@ namespace RealEstateManager.Data
                 entity.Property(x => x.Status).HasMaxLength(20);
                 entity.Property(x => x.CompletionCertificateNumber).HasMaxLength(50);
                 entity.Property(x => x.Notes).HasMaxLength(1000);
+                entity.Property(x => x.InputTaxAttribution).HasMaxLength(20);
 
                 entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
@@ -524,6 +525,9 @@ namespace RealEstateManager.Data
             modelBuilder.Entity<VendorBill>().Property(x => x.NonRecoverableVatAmount).HasPrecision(18, 2);
             modelBuilder.Entity<VendorBill>().Property(x => x.AppliedRecoveryRate).HasPrecision(9, 4);
             modelBuilder.Entity<VendorBill>().Property(x => x.SupplierTrn).HasMaxLength(30);
+            modelBuilder.Entity<VendorBill>()
+                .HasOne(x => x.DevelopmentProject).WithMany().HasForeignKey(x => x.DevelopmentProjectId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<VendorBill>().HasIndex(x => x.DevelopmentProjectId);
 
             modelBuilder.Entity<CustomerInvoice>()
                 .HasIndex(x => new { x.CompanyId, x.TaxInvoiceNumber })
@@ -2177,6 +2181,7 @@ namespace RealEstateManager.Data
             ConfigureControls(modelBuilder);
             ConfigureAssistant(modelBuilder);
             ConfigureReporting(modelBuilder);
+            ConfigurePayables(modelBuilder);
         }
     }
 }

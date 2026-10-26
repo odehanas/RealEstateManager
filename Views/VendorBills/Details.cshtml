@@ -6,7 +6,9 @@
     var currency = company?.BaseCurrency ?? "AED";
     var periodClosed = Model.JournalEntry?.AccountingPeriod?.IsClosed ?? false;
     var isPosted = Model.JournalEntry?.IsPosted ?? false;
-    var hasPayments = Model.Payments.Any(x => x.JournalEntryId != null);
+    var clearings = ViewBag.Clearings as List<RealEstateManager.Domain.VendorClearingLine> ?? new();
+    var hasPayments = Model.Payments.Any(x => x.JournalEntryId != null && x.VendorBillId == Model.Id && !x.IsAdvance)
+                      || clearings.Any(x => x.VendorClearing?.Status == RealEstateManager.Domain.VendorClearingStatuses.Posted);
     var accountingDate = Model.AccountingDate == default ? Model.BillDate : Model.AccountingDate;
 
     string Money(decimal value) => value.ToString("N2");
@@ -187,6 +189,13 @@
                 <span class="label">Category</span>
                 <span class="value">@(string.IsNullOrWhiteSpace(Model.ExpenseCategory) ? "—" : Model.ExpenseCategory)</span>
             </div>
+            @if (Model.DevelopmentProject != null)
+            {
+                <div class="doc-field">
+                    <span class="label">Development project</span>
+                    <span class="value">@Model.DevelopmentProject.Code @Model.DevelopmentProject.Name</span>
+                </div>
+            }
             <div class="doc-field">
                 <span class="label">Journal entry</span>
                 <span class="value">@(Model.JournalEntry?.EntryNumber ?? "Not journalised")</span>
@@ -232,6 +241,11 @@
                     <dl class="mb-0">
                         <dt>Category</dt>
                         <dd>@(string.IsNullOrWhiteSpace(Model.ExpenseCategory) ? "—" : Model.ExpenseCategory)</dd>
+                        @if (Model.DevelopmentProject != null)
+                        {
+                            <dt>Development project</dt>
+                            <dd><a asp-controller="DevelopmentProjects" asp-action="Details" asp-route-id="@Model.DevelopmentProjectId">@Model.DevelopmentProject.Code @Model.DevelopmentProject.Name</a></dd>
+                        }
                         <dt>Journal Entry</dt>
                         <dd>
                             @if (Model.JournalEntryId.HasValue)
@@ -396,6 +410,35 @@
             </div>
         </div>
     </div>
+
+    @if (clearings.Count > 0)
+    {
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-white d-print-none d-flex justify-content-between">
+                <strong>Settled by</strong>
+                <span>@(Model.ClearingNumber != null ? $"Cleared by {Model.ClearingNumber} on {Model.ClearedDate:dd/MM/yyyy}" : $"Open {Money(Model.TotalAmount - Model.AmountPaid)}")</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 doc-lines">
+                    <thead><tr><th>Clearing document</th><th>Date</th><th>By</th><th class="num">Amount</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var line in clearings)
+                        {
+                            var c = line.VendorClearing!;
+                            var source = c.ClearingType == RealEstateManager.Domain.VendorClearingTypes.Advance ? c.AdvancePayment : c.VendorPayment;
+                            <tr>
+                                <td>@c.ClearingNumber</td>
+                                <td>@c.ClearingDate.ToString("dd/MM/yyyy")</td>
+                                <td>@(c.ClearingType == RealEstateManager.Domain.VendorClearingTypes.Advance ? "Advance " : "Payment ")<a asp-controller="VendorPayments" asp-action="Details" asp-route-id="@source?.Id">@source?.PaymentNumber</a></td>
+                                <td class="num">@Money(line.Amount)</td>
+                                <td>@c.Status</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 
     @if (Model.Payments.Any())
     {

@@ -47,7 +47,10 @@ namespace RealEstateManager.Services.Reporting
             ["OwnerSettlement"] = "Owner settlements", ["UnitSale"] = "Unit sales", ["DevelopmentProject"] = "Development projects",
             ["Employee"] = "Employees", ["LeaveRequest"] = "Leave", ["EmployeeAdvance"] = "Salary advances",
             ["PayrollRun"] = "Payroll runs", ["PayrollRunLine"] = "Payslips (payroll lines)", ["AttendanceRecord"] = "Attendance",
-            ["PaymentApproval"] = "Payment approvals"
+            ["PaymentApproval"] = "Payment approvals",
+            ["VendorBillLine"] = "Vendor bill lines (project costs, VAT)",
+            ["DevelopmentTransfer"] = "Development completions (transfers out of WIP)",
+            ["VendorClearingLine"] = "Vendor clearing documents (bills settled by payments and advances)"
         };
 
         public sealed record SourceInfo(string Key, string Label);
@@ -330,10 +333,10 @@ namespace RealEstateManager.Services.Reporting
             var measureLabel = measure switch
             {
                 "count" => "Count",
-                "sum" => "Total " + valueField!.Label.ToLowerInvariant(),
-                "avg" => "Average " + valueField!.Label.ToLowerInvariant(),
-                "min" => "Lowest " + valueField!.Label.ToLowerInvariant(),
-                _ => "Highest " + valueField!.Label.ToLowerInvariant()
+                "sum" => "Total " + LowerFirst(valueField!.Label),
+                "avg" => "Average " + LowerFirst(valueField!.Label),
+                "min" => "Lowest " + LowerFirst(valueField!.Label),
+                _ => "Highest " + LowerFirst(valueField!.Label)
             };
 
             if (groupField == null)
@@ -371,6 +374,10 @@ namespace RealEstateManager.Services.Reporting
                 Total = measure is "count" or "sum" ? groups.Sum(x => x.Value ?? 0m) : null
             };
         }
+
+        /// <summary>"Annual rent" becomes "annual rent", but "VAT amount" stays as it is.</summary>
+        private static string LowerFirst(string label) =>
+            label.Length > 1 && char.IsUpper(label[1]) ? label : char.ToLowerInvariant(label[0]) + label[1..];
 
         private static (string Sort, string Label) GroupKey(object? key, string? dateGroup)
         {

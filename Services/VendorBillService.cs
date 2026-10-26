@@ -73,6 +73,9 @@ namespace RealEstateManager.Services
                 AccountingDate = bill.AccountingDate == default ? bill.BillDate : bill.AccountingDate,
                 DueDate = bill.DueDate,
                 PropertyId = bill.PropertyId,
+                DevelopmentProjectId = bill.DevelopmentProjectId,
+                DevelopmentCostCategory = bill.Lines.Where(x => x.DevelopmentProjectId == bill.DevelopmentProjectId && x.DevelopmentCostCategory != null)
+                    .Select(x => x.DevelopmentCostCategory!).FirstOrDefault() ?? DevelopmentCostCategories.Construction,
                 ExpenseCategory = bill.ExpenseCategory,
                 Notes = bill.Notes,
                 Status = bill.Status,
@@ -131,6 +134,26 @@ namespace RealEstateManager.Services
 
             ValidateHeader(modelState, model);
 
+            // A bill linked to a project as a whole: every line is that project's cost.
+            // Lines without their own tag take the bill's project and default category;
+            // a line naming a different project is a mistake, not a split.
+            DevelopmentProject? billProject = null;
+            if (model.DevelopmentProjectId.HasValue)
+            {
+                billProject = await _db.DevelopmentProjects.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.DevelopmentProjectId.Value);
+                if (billProject == null || !billProject.TakesCosts)
+                {
+                    modelState.AddModelError(nameof(model.DevelopmentProjectId), "Choose a development project that takes costs.");
+                    return null;
+                }
+
+                if (!DevelopmentCostCategories.All.Contains(model.DevelopmentCostCategory))
+                    model.DevelopmentCostCategory = DevelopmentCostCategories.Construction;
+
+                foreach (var line in lines.Where(x => string.IsNullOrWhiteSpace(x.DevelopmentCost)))
+                    line.DevelopmentCost = DevelopmentProjectService.CostTag(billProject.Id, model.DevelopmentCostCategory);
+            }
+
             // A development cost goes to its project's work-in-progress account, so the
             // project's cost always agrees with the ledger.
             var projectTags = new Dictionary<VendorBillLineViewModel, (int ProjectId, string Category)>();
@@ -145,6 +168,19 @@ namespace RealEstateManager.Services
 
                 if (project == null)
                     continue;
+
+                if (billProject != null && project.Id != billProject.Id)
+                {
+                    modelState.AddModelError(string.Empty,
+                        $"Line {i + 1}: this bill is for {billProject.Code} {billProject.Name}, but the line is tagged to {project.Code}. " +
+                        "Split costs of another project onto their own bill.");
+                    continue;
+                }
+
+                // The project decides whether its input VAT is recovered, so a line cannot
+                // claim back tax the project's supplies will not support.
+                if (!string.IsNullOrWhiteSpace(project.InputTaxAttribution))
+                    lines[i].InputTaxAttribution = project.InputTaxAttribution;
 
                 lines[i].AccountId = project.WipAccountId;
                 lines[i].PropertyId ??= project.PropertyId;
@@ -204,7 +240,8 @@ namespace RealEstateManager.Services
             bill.BillDate = model.BillDate.Date;
             bill.AccountingDate = model.AccountingDate.Date;
             bill.DueDate = model.DueDate.Date;
-            bill.PropertyId = model.PropertyId;
+            bill.PropertyId = model.PropertyId ?? billProject?.PropertyId;
+            bill.DevelopmentProjectId = billProject?.Id;
             bill.ExpenseCategory = Trim(model.ExpenseCategory) ?? string.Empty;
             bill.Notes = Trim(model.Notes);
             bill.VendorIsVatRegistered = canChargeVat;

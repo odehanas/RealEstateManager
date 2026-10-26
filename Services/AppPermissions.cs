@@ -264,6 +264,7 @@ namespace RealEstateManager.Services
                 ["Assistant"] = new[] { AppPermissions.AssistantUse },
                 ["Performance"] = new[] { AppPermissions.PerformanceView, AppPermissions.OwnerOversight },
                 ["ReportBuilder"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
+                ["ProjectCosts"] = new[] { AppPermissions.AccountingManage, AppPermissions.ReportsView, AppPermissions.OwnerOversight },
                 ["AuthorizationMatrix"] = new[] { AppPermissions.OwnerOversight },
                 ["ApprovalLimits"] = new[] { AppPermissions.OwnerOversight },
                 ["PaymentApprovals"] = new[] { AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight },

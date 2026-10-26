@@ -267,6 +267,7 @@ namespace RealEstateManager.Services
                 StartDate = project.StartDate,
                 ExpectedCompletionDate = project.ExpectedCompletionDate,
                 MainContractorVendorId = project.MainContractorVendorId,
+                InputTaxAttribution = project.InputTaxAttribution,
                 Notes = project.Notes,
                 HasCosts = await HasCostsAsync(project.Id),
                 Budget = DevelopmentCostCategories.All
@@ -333,6 +334,9 @@ namespace RealEstateManager.Services
             project.StartDate = model.StartDate?.Date;
             project.ExpectedCompletionDate = model.ExpectedCompletionDate?.Date;
             project.MainContractorVendorId = model.MainContractorVendorId;
+            project.InputTaxAttribution = InputTaxAttributions.All.Contains(model.InputTaxAttribution ?? string.Empty)
+                ? model.InputTaxAttribution
+                : null;
             project.Notes = string.IsNullOrWhiteSpace(model.Notes) ? null : model.Notes.Trim();
 
             foreach (var input in model.Budget.Where(x => DevelopmentCostCategories.All.Contains(x.Category)))
