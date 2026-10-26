@@ -142,10 +142,10 @@
                     }
 
                     <span class="ms-1">
-                        <strong>@entry.EntryNumber</strong> | @entry.EntryDate.ToString("dd/MM/yyyy")
+                        <a asp-controller="Documents" asp-action="Entry" asp-route-id="@entry.JournalEntryId" class="fw-bold" title="Open the journal entry">@entry.EntryNumber</a> | @entry.EntryDate.ToString("dd/MM/yyyy")
                         @if (!string.IsNullOrWhiteSpace(entry.SourceType))
                         {
-                            <span>| @entry.SourceType</span>
+                            <span>| <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@entry.JournalEntryId" title="Open the original document">@RealEstateManager.Services.GeneralJournalReportService.SourceLabel(entry.SourceType)</a></span>
                         }
                         @if (entry.SourceId.HasValue)
                         {

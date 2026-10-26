@@ -6,7 +6,7 @@ namespace RealEstateManager.Services
     /// <summary>
     /// General Journal report: every journal entry in a period with its lines, and the
     /// source each entry came from (the document type, its number and, where the app has
-    /// a page for it, a link to that document).
+    /// a page for it, a link to that document via DocumentsController).
     /// </summary>
     public sealed class GeneralJournalReportService
     {
@@ -67,7 +67,6 @@ namespace RealEstateManager.Services
                 SourceType = string.IsNullOrWhiteSpace(x.SourceType) ? null : x.SourceType,
                 SourceLabel = SourceLabel(x.SourceType),
                 SourceId = x.SourceId,
-                SourceLink = SourceLink(x.SourceType, x.SourceId),
                 DocumentNumber = x.DocumentNumber,
                 ReferenceNumber = x.ReferenceNumber,
                 Description = x.Description,
@@ -164,20 +163,6 @@ namespace RealEstateManager.Services
             "FiscalYearClosing" => "Year-end closing",
             _ => sourceType
         };
-
-        /// <summary>The page of the source document, for the sources that have one.</summary>
-        public static (string Controller, string Action, int Id)? SourceLink(string? sourceType, int? sourceId)
-        {
-            if (sourceId is not int id)
-                return null;
-
-            return sourceType switch
-            {
-                "VendorBill" => ("VendorBills", "Details", id),
-                "VendorPayment" => ("VendorPayments", "Details", id),
-                _ => null
-            };
-        }
     }
 
     public sealed class GeneralJournalReport
@@ -203,7 +188,6 @@ namespace RealEstateManager.Services
         public string? SourceType { get; set; }
         public string SourceLabel { get; set; } = string.Empty;
         public int? SourceId { get; set; }
-        public (string Controller, string Action, int Id)? SourceLink { get; set; }
         public string? DocumentNumber { get; set; }
         public string? ReferenceNumber { get; set; }
         public string Description { get; set; } = string.Empty;

@@ -1,0 +1,111 @@
+﻿@model RealEstateManager.Domain.JournalEntry
+@using RealEstateManager.Services
+@{
+    ViewData["Title"] = $"Journal entry {Model.EntryNumber}";
+    string? documentUrl = ViewBag.DocumentUrl;
+    bool hasDocumentPage = ViewBag.HasDocumentPage;
+    bool canOpenLedger = ViewBag.CanOpenLedger;
+    var monthStart = new DateTime(Model.EntryDate.Year, Model.EntryDate.Month, 1);
+    var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+    var totalDebit = Model.Lines.Sum(x => x.Debit);
+    var totalCredit = Model.Lines.Sum(x => x.Credit);
+    var status = Model.IsPosted ? "Posted" : "Draft";
+    string Money(decimal value) => value == 0 ? "" : value.ToString("N2");
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <div class="text-muted small">Journal entry</div>
+        <h2 class="mb-0">@Model.EntryNumber
+            <span class="badge fs-6 align-middle @(status == "Posted" ? "bg-success" : status == "Draft" ? "bg-warning text-dark" : "bg-secondary")">@status</span>
+        </h2>
+        <div class="text-muted">@Model.Description</div>
+    </div>
+    <div class="d-flex gap-2 d-print-none">
+        @if (documentUrl != null)
+        {
+            <a href="@documentUrl" class="btn btn-dark">Open original document</a>
+        }
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">Back</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-body row g-3 small">
+        <div class="col-6 col-md-2"><div class="text-muted">Date</div><div class="fw-semibold">@Model.EntryDate.ToString("dd/MM/yyyy")</div></div>
+        <div class="col-6 col-md-2"><div class="text-muted">Period</div><div class="fw-semibold">@(Model.AccountingPeriod?.Name ?? "—")</div></div>
+        <div class="col-6 col-md-3">
+            <div class="text-muted">Source</div>
+            <div class="fw-semibold">@GeneralJournalReportService.SourceLabel(Model.SourceType)</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="text-muted">Original document</div>
+            <div class="fw-semibold">
+                @if (documentUrl != null)
+                {
+                    <a href="@documentUrl">@(Model.DocumentNumber ?? "Open")</a>
+                }
+                else
+                {
+                    @(Model.DocumentNumber ?? "—")
+                    @if (hasDocumentPage)
+                    {
+                        <div class="text-muted fw-normal">You do not have access to open it.</div>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.SourceType))
+                    {
+                        <div class="text-muted fw-normal">This entry is the record; there is no separate document page.</div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="col-6 col-md-2"><div class="text-muted">Reference</div><div class="fw-semibold">@(Model.ReferenceNumber ?? "—")</div></div>
+        <div class="col-6 col-md-3"><div class="text-muted">Journal type</div><div>@Model.JournalType</div></div>
+        <div class="col-6 col-md-3">
+            <div class="text-muted">Posted</div>
+            <div>@(Model.PostedAt.HasValue ? Model.PostedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "—") @(string.IsNullOrEmpty(Model.PostedBy) ? "" : "by " + Model.PostedBy)</div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Remarks))
+        {
+            <div class="col-12"><div class="text-muted">Remarks</div><div>@Model.Remarks</div></div>
+        }
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+            <thead class="table-light">
+                <tr><th>Account</th><th>Description</th><th>Property</th><th>Tenant / Supplier</th><th class="text-end">Debit</th><th class="text-end">Credit</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var line in Model.Lines.OrderByDescending(x => x.Debit > 0).ThenBy(x => x.Id))
+            {
+                <tr>
+                    <td>
+                        @if (canOpenLedger)
+                        {
+                            <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@line.AccountId"
+                               asp-route-fromDate="@monthStart.ToString("yyyy-MM-dd")" asp-route-toDate="@monthEnd.ToString("yyyy-MM-dd")"
+                               title="Open this account's ledger for the month">@line.Account?.Code @line.Account?.Name</a>
+                        }
+                        else
+                        {
+                            @($"{line.Account?.Code} {line.Account?.Name}")
+                        }
+                    </td>
+                    <td class="small">@line.Description</td>
+                    <td class="small">@line.Property?.Name</td>
+                    <td class="small">@(line.Tenant?.FullName ?? line.Vendor?.Name)</td>
+                    <td class="text-end">@Money(line.Debit)</td>
+                    <td class="text-end">@Money(line.Credit)</td>
+                </tr>
+            }
+            </tbody>
+            <tfoot class="table-light">
+                <tr><th colspan="4">Total</th><th class="text-end">@totalDebit.ToString("N2")</th><th class="text-end">@totalCredit.ToString("N2")</th></tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

@@ -24,6 +24,10 @@ namespace RealEstateManager.Models
 
     public class TenantStatementRowViewModel
     {
+        /// <summary>The original document, for the cross reference.</summary>
+        public string? SourceType { get; set; }
+        public int? SourceId { get; set; }
+
         public DateTime TransactionDate { get; set; }
         public string TransactionType { get; set; } = string.Empty;
         public string ReferenceNumber { get; set; } = string.Empty;

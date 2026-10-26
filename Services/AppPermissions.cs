@@ -290,6 +290,7 @@ namespace RealEstateManager.Services
                 ["Journal"] = new[] { AppPermissions.AccountingManage },
                 ["Closing"] = new[] { AppPermissions.AccountingManage },
                 ["Reports"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
+                ["Documents"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight, AppPermissions.AccountingManage },
                 ["TenantStatements"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
                 ["VendorStatements"] = new[] { AppPermissions.ReportsView, AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 ["OwnerSettlements"] = new[] { AppPermissions.AccountingManage },

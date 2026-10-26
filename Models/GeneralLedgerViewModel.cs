@@ -20,6 +20,7 @@
 
     public class GeneralLedgerRowViewModel
     {
+        public int JournalEntryId { get; set; }
         public DateTime EntryDate { get; set; }
         public string EntryNumber { get; set; } = string.Empty;
         public string? SourceType { get; set; }

@@ -136,7 +136,8 @@ namespace RealEstateManager.Services
 
                 rows.Add(new GeneralLedgerRowViewModel
                 {
-                    EntryDate = line.JournalEntry!.EntryDate,
+                    JournalEntryId = line.JournalEntry!.Id,
+                    EntryDate = line.JournalEntry.EntryDate,
                     EntryNumber = line.JournalEntry.EntryNumber,
                     SourceType = line.JournalEntry.SourceType,
                     Description = string.IsNullOrWhiteSpace(line.Description)

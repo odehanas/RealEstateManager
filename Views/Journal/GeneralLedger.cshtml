@@ -73,8 +73,8 @@
             {
                 <tr>
                     <td>@row.EntryDate.ToString("dd/MM/yyyy")</td>
-                    <td>@row.EntryNumber</td>
-                    <td>@row.SourceType</td>
+                    <td><a asp-controller="Documents" asp-action="Entry" asp-route-id="@row.JournalEntryId" title="Open the journal entry">@row.EntryNumber</a></td>
+                    <td><a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="Open the original document">@RealEstateManager.Services.GeneralJournalReportService.SourceLabel(row.SourceType)</a></td>
                     <td>@row.Description</td>
                     <td class="text-end">@row.Debit.ToString("N2")</td>
                     <td class="text-end">@row.Credit.ToString("N2")</td>

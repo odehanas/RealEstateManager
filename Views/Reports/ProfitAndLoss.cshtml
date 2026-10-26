@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Profit and Loss";
+    var ledgerFrom = (Model.StartDate).ToString("yyyy-MM-dd");
+    var ledgerTo = (Model.EndDate).ToString("yyyy-MM-dd");
 }
 
 <h2>Profit and Loss</h2>
@@ -25,7 +27,7 @@
         @foreach (var row in Model.Revenue)
         {
             <tr>
-                <td>@row.AccountCode</td>
+                <td>@if (row.AccountId > 0) { <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@row.AccountId" asp-route-fromDate="@ledgerFrom" asp-route-toDate="@ledgerTo" title="Open the ledger">@row.AccountCode</a> } else { @row.AccountCode }</td>
                 <td>@row.AccountName</td>
                 <td class="text-end">@row.Amount.ToString("N2")</td>
             </tr>
@@ -52,7 +54,7 @@
         @foreach (var row in Model.Expenses)
         {
             <tr>
-                <td>@row.AccountCode</td>
+                <td>@if (row.AccountId > 0) { <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@row.AccountId" asp-route-fromDate="@ledgerFrom" asp-route-toDate="@ledgerTo" title="Open the ledger">@row.AccountCode</a> } else { @row.AccountCode }</td>
                 <td>@row.AccountName</td>
                 <td class="text-end">@row.Amount.ToString("N2")</td>
             </tr>

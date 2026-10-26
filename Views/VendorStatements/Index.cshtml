@@ -103,7 +103,7 @@ else
                 <tr>
                     <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td>
                     <td>@row.TransactionType</td>
-                    <td>@row.ReferenceNumber</td>
+                    <td>@if (row.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="Open the original document">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td>
                     <td>@row.Description</td>
                     <td class="text-end">@(row.Debit == 0 ? "" : row.Debit.ToString("N2"))</td>
                     <td class="text-end">@(row.Credit == 0 ? "" : row.Credit.ToString("N2"))</td>
@@ -166,7 +166,7 @@ else
                 @foreach (var row in Model.AdvanceRows)
                 {
                     <tr>
-                        <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td><td>@row.TransactionType</td><td>@row.ReferenceNumber</td><td>@row.Description</td>
+                        <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td><td>@row.TransactionType</td><td>@if (row.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="Open the original document">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td><td>@row.Description</td>
                         <td class="text-end">@(row.Debit == 0 ? "" : row.Debit.ToString("N2"))</td>
                         <td class="text-end">@(row.Credit == 0 ? "" : row.Credit.ToString("N2"))</td>
                         <td class="text-end">@row.RunningBalance.ToString("N2")</td>

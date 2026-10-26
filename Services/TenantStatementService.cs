@@ -131,6 +131,8 @@ namespace RealEstateManager.Services
                 .Where(x => x.InvoiceDate.Date >= fromDate.Date && x.InvoiceDate.Date <= toDate.Date)
                 .Select(x => new TenantStatementRowViewModel
                 {
+                    SourceType = "CustomerInvoice",
+                    SourceId = x.Id,
                     TransactionDate = x.InvoiceDate.Date,
                     TransactionType = "Invoice",
                     ReferenceNumber = x.InvoiceNumber,
@@ -143,6 +145,8 @@ namespace RealEstateManager.Services
                 .Where(x => x.ReceiptDate.Date >= fromDate.Date && x.ReceiptDate.Date <= toDate.Date)
                 .Select(x => new TenantStatementRowViewModel
                 {
+                    SourceType = "CustomerReceipt",
+                    SourceId = x.Id,
                     TransactionDate = x.ReceiptDate.Date,
                     TransactionType = "Receipt",
                     ReferenceNumber = x.ReceiptNumber,
@@ -161,6 +165,8 @@ namespace RealEstateManager.Services
                     x.ClearedDate.Value.Date <= toDate.Date)
                 .Select(x => new TenantStatementRowViewModel
                 {
+                    SourceType = "PdcClearance",
+                    SourceId = x.Id,
                     TransactionDate = x.ClearedDate!.Value.Date,
                     TransactionType = "PDC Cleared",
                     ReferenceNumber = x.ChequeNumber,
@@ -175,6 +181,8 @@ namespace RealEstateManager.Services
                 .Where(x => x.CreditNoteDate.Date >= fromDate.Date && x.CreditNoteDate.Date <= toDate.Date)
                 .Select(x => new TenantStatementRowViewModel
                 {
+                    SourceType = "CustomerCreditNote",
+                    SourceId = x.Id,
                     TransactionDate = x.CreditNoteDate.Date,
                     TransactionType = "Credit Note",
                     ReferenceNumber = x.CreditNoteNumber,

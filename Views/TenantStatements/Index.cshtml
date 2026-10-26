@@ -119,7 +119,7 @@ else
                     <tr>
                         <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td>
                         <td>@row.TransactionType</td>
-                        <td>@row.ReferenceNumber</td>
+                        <td>@if (row.SourceId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-type="@row.SourceType" asp-route-id="@row.SourceId" title="Open the original document">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td>
                         <td>@row.Description</td>
                         <td class="text-end">@row.Debit.ToString("N2")</td>
                         <td class="text-end">@row.Credit.ToString("N2")</td>

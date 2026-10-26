@@ -216,6 +216,7 @@ builder.Services.AddScoped<CreditNoteService>();
 builder.Services.AddScoped<OpeningBalanceService>();
 builder.Services.AddScoped<FinancialReportService>();
 builder.Services.AddScoped<GeneralJournalReportService>();
+builder.Services.AddScoped<DocumentLinkService>();
 builder.Services.AddScoped<ManagementReportService>();
 builder.Services.AddScoped<LedgerInquiryService>();
 builder.Services.AddScoped<ManualJournalService>();

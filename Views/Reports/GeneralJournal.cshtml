@@ -118,24 +118,11 @@
             <tr class="gj-entry">
                 <td>@e.EntryDate.ToString("dd/MM/yyyy")</td>
                 <td colspan="5">
-                    <strong>@e.EntryNumber</strong>
+                    <a asp-controller="Documents" asp-action="Entry" asp-route-id="@e.Id" class="fw-bold" title="Open the journal entry">@e.EntryNumber</a>
                     <span class="ms-2">Source: <strong>@e.SourceLabel</strong></span>
-                    @if (!string.IsNullOrEmpty(e.DocumentNumber))
+                    @if (!string.IsNullOrEmpty(e.DocumentNumber) || e.SourceType != null)
                     {
-                        <span class="ms-1">·
-                            @if (e.SourceLink is { } link)
-                            {
-                                <a asp-controller="@link.Controller" asp-action="@link.Action" asp-route-id="@link.Id">@e.DocumentNumber</a>
-                            }
-                            else
-                            {
-                                @e.DocumentNumber
-                            }
-                        </span>
-                    }
-                    else if (e.SourceLink is { } docLink)
-                    {
-                        <span class="ms-1">· <a asp-controller="@docLink.Controller" asp-action="@docLink.Action" asp-route-id="@docLink.Id">open document</a></span>
+                        <span class="ms-1">· <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@e.Id" title="Open the original document">@(e.DocumentNumber ?? "open document")</a></span>
                     }
                     @if (!string.IsNullOrEmpty(e.ReferenceNumber))
                     {

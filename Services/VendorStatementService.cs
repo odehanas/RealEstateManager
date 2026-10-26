@@ -67,6 +67,7 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.EntryDate).ThenBy(x => x.Id)
                 .Select(x => new VendorStatementRowViewModel
                 {
+                    JournalEntryId = x.Id,
                     TransactionDate = x.EntryDate.Date,
                     TransactionType = Describe(x.SourceType),
                     ReferenceNumber = string.IsNullOrWhiteSpace(x.DocumentNumber) ? x.EntryNumber : x.DocumentNumber!,
@@ -113,6 +114,7 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.JournalEntry!.EntryDate).ThenBy(x => x.JournalEntryId)
                 .Select(x => new VendorStatementRowViewModel
                 {
+                    JournalEntryId = x.JournalEntryId,
                     TransactionDate = x.JournalEntry!.EntryDate,
                     TransactionType = x.Debit > 0 ? "Advance paid" : "Advance applied",
                     ReferenceNumber = x.JournalEntry.DocumentNumber ?? x.JournalEntry.EntryNumber,
