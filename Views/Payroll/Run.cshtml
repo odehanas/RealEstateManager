@@ -193,7 +193,11 @@ else if (run.Payments.Count == 0 && Model.CanApprove)
                         <form asp-action="Pay" asp-route-id="@run.Id" method="post" class="d-flex flex-column gap-2">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="method" value="@method" />
-                            <div><label class="form-label small mb-0">Payment date</label><input name="paymentDate" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" /></div>
+                            <div><label class="form-label small mb-0">Payment date</label><input name="paymentDate" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@run.JournalEntry?.EntryDate.ToString("yyyy-MM-dd")" class="form-control" /></div>
+                            @if (run.JournalEntry != null)
+                            {
+                                <div class="small text-muted">Salary cost posted on @run.JournalEntry.EntryDate.ToString("dd/MM/yyyy"); pay on or after that date.</div>
+                            }
                             <div>
                                 <label class="form-label small mb-0">Paid from</label>
                                 <select name="bankAccountId" class="form-select">

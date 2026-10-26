@@ -428,7 +428,7 @@ namespace RealEstateManager.Services
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var (journal, problem) = await PostJournalAsync(run.CompanyId, run.PeriodEnd, $"Payroll {month}", RunSourceType, run.Id,
+            var (journal, problem) = await PostJournalAsync(run.CompanyId, AccrualDate(run, DateTime.Today), $"Payroll {month}", RunSourceType, run.Id,
                 lines, run.RunNumber, userName);
             if (problem != null)
                 return (false, problem);
@@ -443,6 +443,20 @@ namespace RealEstateManager.Services
             await transaction.CommitAsync();
 
             return (true, $"Payroll {run.RunNumber} approved: net salaries of {run.TotalNet:N2} are now payable.");
+        }
+
+        /// <summary>
+        /// The date the salary cost is posted on: the day the payroll is approved when that
+        /// falls inside its month - salaries in the UAE are often paid before the month end,
+        /// and the payment must not reach the ledger before the cost it settles - otherwise
+        /// the month end. The cost always lands in the payroll's own month.
+        /// </summary>
+        public static DateTime AccrualDate(PayrollRun run, DateTime approvedOn)
+        {
+            var day = approvedOn.Date;
+            if (day > run.PeriodEnd)
+                return run.PeriodEnd;
+            return day < run.PeriodStart ? run.PeriodStart : day;
         }
 
         /// <summary>
@@ -561,6 +575,13 @@ namespace RealEstateManager.Services
             var payable = await RequireAccountsAsync(settings, ("Salaries payable", settings.SalariesPayableAccountId));
             if (payable.Problem != null)
                 return (false, payable.Problem, null);
+
+            // Salaries cannot be paid in the ledger before the payroll put them there.
+            var costDate = run.JournalEntryId.HasValue
+                ? await _db.JournalEntries.Where(x => x.Id == run.JournalEntryId.Value).Select(x => (DateTime?)x.EntryDate).FirstOrDefaultAsync()
+                : null;
+            if (costDate.HasValue && request.PaymentDate.Date < costDate.Value.Date)
+                return (false, $"The payroll was posted on {costDate.Value:dd/MM/yyyy}; the payment date cannot be earlier.", null);
 
             var payment = new PayrollPayment
             {
