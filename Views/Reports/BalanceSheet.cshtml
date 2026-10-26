@@ -4,7 +4,21 @@
     ViewData["Title"] = "Balance Sheet";
     var ledgerFrom = (new DateTime(Model.AsOfDate.Year, 1, 1)).ToString("yyyy-MM-dd");
     var ledgerTo = (Model.AsOfDate).ToString("yyyy-MM-dd");
+    // Every account figure opens the general ledger behind it (drill-down).
+    string? LedgerUrl(int accountId) => accountId > 0
+        ? Url.Action("GeneralLedger", "Journal", new { accountId, fromDate = ledgerFrom, toDate = ledgerTo })
+        : null;
+    Microsoft.AspNetCore.Html.IHtmlContent Drill(string? url, string text) => new Microsoft.AspNetCore.Html.HtmlString(url == null
+        ? System.Net.WebUtility.HtmlEncode(text)
+        : $"<a href=\"{System.Net.WebUtility.HtmlEncode(url)}\" class=\"drill\" title=\"Open the general ledger\">{System.Net.WebUtility.HtmlEncode(text)}</a>");
+    var equityAccounts = ViewBag.EquityAccountIds as Dictionary<string, int> ?? new();
+    int EquityId(string code) => equityAccounts.TryGetValue(code, out var id) ? id : 0;
 }
+
+<style>
+    a.drill { color: inherit; text-decoration: none; border-bottom: 1px dotted #6c757d; }
+    a.drill:hover { color: var(--bs-link-color); border-bottom-style: solid; }
+</style>
 
 <h2>Balance Sheet</h2>
 
@@ -27,9 +41,9 @@
         @foreach (var row in Model.Assets)
         {
             <tr>
-                <td>@if (row.AccountId > 0) { <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@row.AccountId" asp-route-fromDate="@ledgerFrom" asp-route-toDate="@ledgerTo" title="Open the ledger">@row.AccountCode</a> } else { @row.AccountCode }</td>
-                <td>@row.AccountName</td>
-                <td class="text-end">@row.Amount.ToString("N2")</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountCode)</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountName)</td>
+                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td>
             </tr>
         }
     </tbody>
@@ -54,9 +68,9 @@
         @foreach (var row in Model.Liabilities)
         {
             <tr>
-                <td>@if (row.AccountId > 0) { <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@row.AccountId" asp-route-fromDate="@ledgerFrom" asp-route-toDate="@ledgerTo" title="Open the ledger">@row.AccountCode</a> } else { @row.AccountCode }</td>
-                <td>@row.AccountName</td>
-                <td class="text-end">@row.Amount.ToString("N2")</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountCode)</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountName)</td>
+                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td>
             </tr>
         }
     </tbody>
@@ -72,29 +86,29 @@
 <table class="table table-bordered table-striped">
     <tbody>
         <tr>
-            <td>31100</td>
-            <td>Share Capital</td>
-            <td class="text-end">@Model.ShareCapital.ToString("N2")</td>
+            <td>@Drill(LedgerUrl(EquityId("31100")), "31100")</td>
+            <td>@Drill(LedgerUrl(EquityId("31100")), "Share Capital")</td>
+            <td class="text-end">@Drill(LedgerUrl(EquityId("31100")), Model.ShareCapital.ToString("N2"))</td>
         </tr>
         <tr>
-            <td>32100</td>
-            <td>Retained Earnings - Prior Years</td>
-            <td class="text-end">@Model.RetainedEarningsPriorYears.ToString("N2")</td>
+            <td>@Drill(LedgerUrl(EquityId("32100")), "32100")</td>
+            <td>@Drill(LedgerUrl(EquityId("32100")), "Retained Earnings - Prior Years")</td>
+            <td class="text-end">@Drill(LedgerUrl(EquityId("32100")), Model.RetainedEarningsPriorYears.ToString("N2"))</td>
         </tr>
 
         @foreach (var row in Model.OtherEquityRows)
         {
             <tr>
-                <td>@if (row.AccountId > 0) { <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@row.AccountId" asp-route-fromDate="@ledgerFrom" asp-route-toDate="@ledgerTo" title="Open the ledger">@row.AccountCode</a> } else { @row.AccountCode }</td>
-                <td>@row.AccountName</td>
-                <td class="text-end">@row.Amount.ToString("N2")</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountCode)</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountName)</td>
+                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td>
             </tr>
         }
 
         <tr>
             <td></td>
-            <td>Current Year Profit / Loss</td>
-            <td class="text-end">@Model.CurrentYearProfitOrLoss.ToString("N2")</td>
+            <td><a asp-action="ProfitAndLoss" asp-route-asOfDate="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="drill" title="Open the profit and loss">Current Year Profit / Loss</a></td>
+            <td class="text-end"><a asp-action="ProfitAndLoss" asp-route-asOfDate="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="drill" title="Open the profit and loss">@Model.CurrentYearProfitOrLoss.ToString("N2")</a></td>
         </tr>
     </tbody>
     <tfoot>

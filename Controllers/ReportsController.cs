@@ -71,6 +71,14 @@ namespace RealEstateManager.Controllers
 
             var reportDate = (asOfDate ?? DateTime.Today).Date;
             var model = await _financialReportService.GetBalanceSheetAsync(company.Id, reportDate);
+            // Share capital and prior-year retained earnings are fixed lines on the
+            // statement; their accounts let those lines open the ledger too.
+            ViewBag.EquityAccountIds = await _db.Accounts.AsNoTracking()
+                .Where(x => x.CompanyId == company.Id && (x.Code == "31100" || x.Code == "32100"))
+                .GroupBy(x => x.Code)
+                .Select(g => new { Code = g.Key, Id = g.Min(x => x.Id) })
+                .ToDictionaryAsync(x => x.Code, x => x.Id);
+
             return View(model);
         }
 

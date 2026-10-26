@@ -4,7 +4,19 @@
     ViewData["Title"] = "Trial Balance";
     var ledgerFrom = (new DateTime(Model.AsOfDate.Year, 1, 1)).ToString("yyyy-MM-dd");
     var ledgerTo = (Model.AsOfDate).ToString("yyyy-MM-dd");
+    // Every account figure opens the general ledger behind it (drill-down).
+    string? LedgerUrl(int accountId) => accountId > 0
+        ? Url.Action("GeneralLedger", "Journal", new { accountId, fromDate = ledgerFrom, toDate = ledgerTo })
+        : null;
+    Microsoft.AspNetCore.Html.IHtmlContent Drill(string? url, string text) => new Microsoft.AspNetCore.Html.HtmlString(url == null
+        ? System.Net.WebUtility.HtmlEncode(text)
+        : $"<a href=\"{System.Net.WebUtility.HtmlEncode(url)}\" class=\"drill\" title=\"Open the general ledger\">{System.Net.WebUtility.HtmlEncode(text)}</a>");
 }
+
+<style>
+    a.drill { color: inherit; text-decoration: none; border-bottom: 1px dotted #6c757d; }
+    a.drill:hover { color: var(--bs-link-color); border-bottom-style: solid; }
+</style>
 
 <h2>Trial Balance</h2>
 
@@ -28,11 +40,11 @@
         @foreach (var row in Model.Rows)
         {
             <tr>
-                <td>@if (row.AccountId > 0) { <a asp-controller="Journal" asp-action="GeneralLedger" asp-route-accountId="@row.AccountId" asp-route-fromDate="@ledgerFrom" asp-route-toDate="@ledgerTo" title="Open the ledger">@row.AccountCode</a> } else { @row.AccountCode }</td>
-                <td>@row.AccountName</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountCode)</td>
+                <td>@Drill(LedgerUrl(row.AccountId), row.AccountName)</td>
                 <td>@row.AccountType</td>
-                <td class="text-end">@row.DebitBalance.ToString("N2")</td>
-                <td class="text-end">@row.CreditBalance.ToString("N2")</td>
+                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.DebitBalance.ToString("N2"))</td>
+                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.CreditBalance.ToString("N2"))</td>
             </tr>
         }
     </tbody>
