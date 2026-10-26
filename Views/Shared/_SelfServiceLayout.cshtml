@@ -47,6 +47,10 @@
 <div class="content">
     @if (TempData["SelfServiceMessage"] is string m) { <div class="alert alert-success py-2">@m</div> }
     @if (TempData["SelfServiceError"] is string e) { <div class="alert alert-danger py-2">@e</div> }
+    @if (TempData[RealEstateManager.Services.ExpiredFormFilter.MessageKey] is string formExpired)
+    {
+        <div class="alert alert-warning">@formExpired</div>
+    }
     @RenderBody()
 </div>
 @if (isSignedIn)

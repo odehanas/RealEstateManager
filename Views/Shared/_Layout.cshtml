@@ -623,6 +623,10 @@
                 @postingWarning Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> once the reason is resolved.
             </div>
         }
+        @if (TempData[RealEstateManager.Services.ExpiredFormFilter.MessageKey] is string formExpired)
+        {
+            <div class="alert alert-warning">@formExpired</div>
+        }
         @RenderBody()
     </div>
 

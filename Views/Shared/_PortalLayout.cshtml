@@ -74,6 +74,10 @@
     {
         <div class="alert alert-success py-2">@message</div>
     }
+    @if (TempData[RealEstateManager.Services.ExpiredFormFilter.MessageKey] is string formExpired)
+    {
+        <div class="alert alert-warning">@formExpired</div>
+    }
     @RenderBody()
 </div>
 

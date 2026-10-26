@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -188,10 +189,18 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new PasswordChangeRequiredFilter());
     options.Filters.AddService<SubscriptionEnforcementFilter>();
     options.Filters.AddService<PermissionEnforcementFilter>();
+    options.Filters.Add(new ExpiredFormFilter());
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+// Sign-in cookies and form tokens are protected with keys kept in the database
+// (SQL/34), so a republish or app pool recycle neither signs people out nor
+// rejects a form that was open at the time.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<ApplicationDbContext>()
+    .SetApplicationName("RealEstateManager");
 
 builder.Services.AddScoped<VatDeterminationService>();
 builder.Services.AddScoped<VatReturnService>();
