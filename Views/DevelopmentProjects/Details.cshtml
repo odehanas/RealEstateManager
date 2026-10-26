@@ -25,6 +25,7 @@
         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
         @if (p.Status != DevelopmentProjectStatuses.Cancelled)
         {
+            <a asp-controller="ProjectCosts" asp-action="Index" asp-route-projectId="@p.Id" class="btn btn-outline-dark btn-sm">Costs &amp; WIP report</a>
             <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-primary btn-sm">Edit</a>
         }
     </div>

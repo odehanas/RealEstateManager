@@ -134,6 +134,31 @@
                     </select>
                     <div class="form-text">Pre-fills new lines. Each line may differ.</div>
                 </div>
+
+                @if (projects.Count > 0)
+                {
+                    <div class="col-md-4">
+                        <label asp-for="DevelopmentProjectId" class="form-label">Development project (contractor / subcontractor bill)</label>
+                        <select asp-for="DevelopmentProjectId" class="form-select">
+                            <option value="">-- not a project bill --</option>
+                            @foreach (var project in projects)
+                            {
+                                <option value="@project.ProjectId" selected="@(project.ProjectId == Model.DevelopmentProjectId ? "selected" : null)">@project.ProjectLabel</option>
+                            }
+                        </select>
+                        <div class="form-text">Every line becomes a cost of this project, posted to its work-in-progress account.</div>
+                    </div>
+                    <div class="col-md-2">
+                        <label asp-for="DevelopmentCostCategory" class="form-label">Cost category</label>
+                        <select asp-for="DevelopmentCostCategory" class="form-select">
+                            @foreach (var category in RealEstateManager.Domain.DevelopmentCostCategories.All)
+                            {
+                                <option value="@category" selected="@(category == Model.DevelopmentCostCategory ? "selected" : null)">@RealEstateManager.Domain.DevelopmentCostCategories.Describe(category)</option>
+                            }
+                        </select>
+                        <div class="form-text">For lines without their own.</div>
+                    </div>
+                }
             </div>
         </div>
     </div>

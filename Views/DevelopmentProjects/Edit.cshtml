@@ -57,6 +57,17 @@
                 <option value="">--</option>
             </select>
         </div>
+        <div class="col-md-4">
+            <label asp-for="InputTaxAttribution" class="form-label"></label>
+            <select asp-for="InputTaxAttribution" class="form-select">
+                <option value="">Decide on each bill line</option>
+                @foreach (var attribution in InputTaxAttributions.All)
+                {
+                    <option value="@attribution">@InputTaxAttributions.Describe(attribution)</option>
+                }
+            </select>
+            <div class="form-text">Applied to every bill line of this project. Commercial or zero-rated first sale: recoverable. Residential to let: not recoverable (VAT becomes cost). Mixed: apportioned.</div>
+        </div>
         <div class="col-md-3">
             <label asp-for="StartDate" class="form-label"></label>
             <input asp-for="StartDate" type="date" class="form-control" />

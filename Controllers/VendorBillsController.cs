@@ -57,6 +57,7 @@ namespace RealEstateManager.Controllers
                 .AsNoTracking()
                 .Include(x => x.Vendor)
                 .Include(x => x.Property)
+                .Include(x => x.DevelopmentProject)
                 .Include(x => x.JournalEntry)
                     .ThenInclude(x => x!.AccountingPeriod)
                 .Include(x => x.Lines)

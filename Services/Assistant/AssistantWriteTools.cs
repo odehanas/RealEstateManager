@@ -715,6 +715,8 @@ namespace RealEstateManager.Services.Assistant
                     ("due_date", Schema.Date("Due date, default the bill date"), false),
                     ("property", Schema.Str("Property code it relates to, if any"), false),
                     ("category", Schema.Str("Expense category, e.g. Maintenance, Utilities"), false),
+                    ("project", Schema.Str("Development project code, for a contractor or subcontractor bill; every line becomes its cost"), false),
+                    ("project_cost_category", Schema.Enum("Cost category for a project bill", DevelopmentCostCategories.All), false),
                     ("lines", Schema.Array("Bill lines",
                         Schema.Object(
                             ("description", Schema.Str("What was supplied"), true),
@@ -742,8 +744,18 @@ namespace RealEstateManager.Services.Assistant
                     if (!args.TryGetProperty("lines", out var lines) || lines.ValueKind != JsonValueKind.Array || lines.GetArrayLength() == 0)
                         return AssistantProposal.Refused("Give the bill lines.");
 
+                    int? projectId = null;
+                    var projectText = Args.Str(args, "project");
+                    if (projectText != null)
+                    {
+                        projectId = await ctx.Db.DevelopmentProjects.Where(x => x.Code == projectText || x.Name == projectText).Select(x => (int?)x.Id).FirstOrDefaultAsync();
+                        if (projectId == null) return AssistantProposal.Refused($"No development project '{projectText}'.");
+                    }
+
                     var model = new VendorBillEditViewModel
                     {
+                        DevelopmentProjectId = projectId,
+                        DevelopmentCostCategory = Args.Str(args, "project_cost_category") ?? DevelopmentCostCategories.Construction,
                         VendorId = vendor.Id,
                         VendorReference = Args.Str(args, "vendor_reference"),
                         BillDate = billDate,
@@ -780,7 +792,8 @@ namespace RealEstateManager.Services.Assistant
                     return new AssistantProposal
                     {
                         Ok = true,
-                        Summary = $"Draft bill from {vendor.Code} {vendor.Name}{reference}, dated {billDate:dd/MM/yyyy}, due {dueDate:dd/MM/yyyy}, " +
+                        Summary = (projectText != null ? $"Project {projectText} ({model.DevelopmentCostCategory}): " : string.Empty) +
+                                  $"Draft bill from {vendor.Code} {vendor.Name}{reference}, dated {billDate:dd/MM/yyyy}, due {dueDate:dd/MM/yyyy}, " +
                                   $"{net:N2} {ctx.Currency} before VAT. Lines: {string.Join("; ", described)}. " +
                                   "VAT is worked out by the system; post it from Vendor Bills after review.",
                         Warnings = vendor.IsVatRegistered ? new List<string>() : new List<string> { "The vendor is not VAT registered, so no VAT is charged." },

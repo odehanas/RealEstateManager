@@ -14,6 +14,14 @@
         public Property? Property { get; set; }
 
         /// <summary>
+        /// The development project this bill is for - a contractor's or subcontractor's
+        /// progress invoice, a consultant's fee. Every line is then a cost of this project:
+        /// lines without their own project tag take it, with the bill's default category.
+        /// </summary>
+        public int? DevelopmentProjectId { get; set; }
+        public DevelopmentProject? DevelopmentProject { get; set; }
+
+        /// <summary>
         /// Our own internal reference, issued by the system in a single sequence per
         /// company - BILL-2026-0001. Equivalent to Odoo's BILL/2026/0001.
         /// </summary>

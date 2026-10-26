@@ -32,6 +32,15 @@ namespace RealEstateManager.Models
         /// <summary>Header-level property. Used as the default for new lines only.</summary>
         public int? PropertyId { get; set; }
 
+        /// <summary>
+        /// The development project the whole bill is for. Lines without their own project
+        /// tag become costs of this project, in <see cref="DevelopmentCostCategory"/>.
+        /// </summary>
+        public int? DevelopmentProjectId { get; set; }
+
+        /// <summary>The cost category for lines that take the bill's project.</summary>
+        public string DevelopmentCostCategory { get; set; } = RealEstateManager.Domain.DevelopmentCostCategories.Construction;
+
         public string ExpenseCategory { get; set; } = string.Empty;
         public string? Notes { get; set; }
 

@@ -42,6 +42,15 @@ namespace RealEstateManager.Domain
         public DateTime? CompletionDate { get; set; }
         public string? CompletionCertificateNumber { get; set; }
 
+        /// <summary>
+        /// How input VAT on this project's costs is treated, applied to every bill line
+        /// tagged to it: Taxable (commercial, or first supply of new residential that is
+        /// zero rated - recovered), Exempt (residential to be let or resold later - not
+        /// recovered, so it becomes part of the cost) or Residual (mixed - apportioned).
+        /// Null leaves it to each bill line.
+        /// </summary>
+        public string? InputTaxAttribution { get; set; }
+
         public int? MainContractorVendorId { get; set; }
         public Vendor? MainContractorVendor { get; set; }
 

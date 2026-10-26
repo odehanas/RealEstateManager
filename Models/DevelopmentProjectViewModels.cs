@@ -29,6 +29,10 @@ namespace RealEstateManager.Models
         [Display(Name = "Main contractor")]
         public int? MainContractorVendorId { get; set; }
 
+        /// <summary>Taxable, Exempt or Residual; empty leaves it to each bill line.</summary>
+        [Display(Name = "Input VAT on this project's costs")]
+        public string? InputTaxAttribution { get; set; }
+
         [StringLength(1000)]
         public string? Notes { get; set; }
 
