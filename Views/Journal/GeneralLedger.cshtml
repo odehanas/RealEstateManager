@@ -4,11 +4,31 @@
 @{
     ViewData["Title"] = "General Ledger";
     var accounts = ViewBag.Accounts as List<Account> ?? new();
+    string? returnUrl = ViewBag.ReturnUrl;
+    string? returnTo = ViewBag.ReturnTo;
+    var reportDate = (Model?.ToDate ?? DateTime.Today).ToString("yyyy-MM-dd");
 }
 
-<h2>General Ledger</h2>
+<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    @if (returnUrl != null)
+    {
+        <a href="@returnUrl" class="btn btn-outline-dark btn-sm">&larr; Back to @returnTo</a>
+    }
+    <h2 class="mb-0 me-auto">General Ledger</h2>
+    <div class="btn-group btn-group-sm d-print-none" role="group" aria-label="Open a report">
+        <a asp-controller="Reports" asp-action="TrialBalance" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">Trial Balance</a>
+        <a asp-controller="Reports" asp-action="BalanceSheet" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">Balance Sheet</a>
+        <a asp-controller="Reports" asp-action="ProfitAndLoss" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">Profit &amp; Loss</a>
+        <a asp-controller="Reports" asp-action="GeneralJournal" asp-route-toDate="@reportDate" class="btn btn-outline-secondary">General Journal</a>
+    </div>
+</div>
 
 <form method="get" class="row g-3 mb-4">
+    @if (returnUrl != null)
+    {
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <input type="hidden" name="returnTo" value="@returnTo" />
+    }
     <div class="col-md-4">
         <label class="form-label">Account</label>
         <select name="accountId" class="form-select">

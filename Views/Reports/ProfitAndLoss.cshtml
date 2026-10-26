@@ -6,7 +6,7 @@
     var ledgerTo = (Model.EndDate).ToString("yyyy-MM-dd");
     // Every account figure opens the general ledger behind it (drill-down).
     string? LedgerUrl(int accountId) => accountId > 0
-        ? Url.Action("GeneralLedger", "Journal", new { accountId, fromDate = ledgerFrom, toDate = ledgerTo })
+        ? Url.Action("GeneralLedger", "Journal", new { accountId, fromDate = ledgerFrom, toDate = ledgerTo, returnUrl = Context.Request.Path + Context.Request.QueryString, returnTo = ViewData["Title"] })
         : null;
     Microsoft.AspNetCore.Html.IHtmlContent Drill(string? url, string text) => new Microsoft.AspNetCore.Html.HtmlString(url == null
         ? System.Net.WebUtility.HtmlEncode(text)

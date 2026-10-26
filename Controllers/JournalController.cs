@@ -99,8 +99,15 @@ namespace RealEstateManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GeneralLedger(int? accountId, DateTime? fromDate, DateTime? toDate)
+        public async Task<IActionResult> GeneralLedger(int? accountId, DateTime? fromDate, DateTime? toDate, string? returnUrl, string? returnTo)
         {
+            // The report the user drilled down from, for the way back.
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                ViewBag.ReturnUrl = returnUrl;
+                ViewBag.ReturnTo = string.IsNullOrWhiteSpace(returnTo) ? "report" : returnTo;
+            }
+
             ViewBag.Accounts = await _db.Accounts
                 .OrderBy(x => x.Code)
                 .ToListAsync();
