@@ -1,5 +1,6 @@
 @model RealEstateManager.Models.EmployeeDetailsViewModel
 @using RealEstateManager.Domain
+@inject RealEstateManager.Services.PermissionService PermissionService
 
 @{
     var e = Model.Employee;
@@ -28,6 +29,17 @@
 @if (TempData["HrSuccess"] is string ok)
 {
     <div class="alert alert-success">@ok</div>
+}
+@if (TempData["HrError"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+@if (TempData["PortalTemporaryPassword"] is string temporary)
+{
+    <div class="alert alert-warning">
+        Temporary password: <code class="fs-5">@temporary</code> &mdash; give it to the employee now; it is not shown again.
+        They sign in at <strong>@($"{Context.Request.Scheme}://{Context.Request.Host}/me")</strong> and must choose their own password.
+    </div>
 }
 @foreach (var doc in Model.ExpiringDocuments)
 {
@@ -107,6 +119,45 @@
         </div>
     </div>
 </div>
+
+@if (await PermissionService.HasPermissionAsync(User, RealEstateManager.Services.AppPermissions.HrManage))
+{
+    var portalUser = Model.PortalUser;
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light"><h6 class="mb-0">Employee portal (payslips, leave and certificates on their phone)</h6></div>
+        <div class="card-body small">
+            @if (portalUser == null)
+            {
+                <p class="mb-2">No portal login yet.</p>
+            }
+            else
+            {
+                <p class="mb-2">
+                    Username <strong>@portalUser.Username</strong> ·
+                    @(portalUser.IsActive ? "active" : "disabled")
+                    @(portalUser.MustChangePassword ? "· still on the temporary password" : "")
+                    @(portalUser.LastLoginAt.HasValue ? $"· last sign-in {portalUser.LastLoginAt.Value.ToLocalTime():dd/MM/yyyy HH:mm}" : "· never signed in")
+                    @(portalUser.LockedOutUntil > DateTime.UtcNow ? "· locked after wrong passwords" : "")
+                </p>
+            }
+            <div class="d-flex flex-wrap gap-2">
+                <form asp-action="IssuePortalAccess" asp-route-id="@e.Id" method="post" class="d-flex gap-2">
+                    @Html.AntiForgeryToken()
+                    <input name="username" class="form-control form-control-sm" style="width:220px" value="@(portalUser?.Username ?? e.Mobile ?? e.Email)" placeholder="Username (mobile or email)" />
+                    <button class="btn btn-sm btn-dark">@(portalUser == null ? "Give portal access" : "Reset password")</button>
+                </form>
+                @if (portalUser != null)
+                {
+                    <form asp-action="SetPortalAccess" asp-route-id="@e.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="active" value="@(portalUser.IsActive ? "false" : "true")" />
+                        <button class="btn btn-sm @(portalUser.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(portalUser.IsActive ? "Disable" : "Enable")</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+}
 
 <div class="card shadow-sm mb-3">
     <div class="card-header bg-light"><h6 class="mb-0">End-of-service gratuity — how it is worked out</h6></div>

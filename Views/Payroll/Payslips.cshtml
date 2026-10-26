@@ -35,7 +35,7 @@
     </style>
 </head>
 <body>
-<div class="toolbar"><strong>Payslips @run.PeriodStart.ToString("MMMM yyyy")</strong><span>@Model.Lines.Count payslip(s)</span><button onclick="window.print()">Print</button></div>
+<div class="toolbar">@if (ViewBag.BackUrl is string back) { <a href="@back" style="color:#fff">&larr; Back</a> }<strong>Payslips @run.PeriodStart.ToString("MMMM yyyy")</strong><span>@Model.Lines.Count payslip(s)</span><button onclick="window.print()">Print</button></div>
 
 @foreach (var l in Model.Lines)
 {

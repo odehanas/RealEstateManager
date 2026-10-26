@@ -50,6 +50,16 @@ namespace RealEstateManager.Services
             return user.GetPortalTenantId().HasValue;
         }
 
+        /// <summary>True when the principal is an employee signed in to the self-service portal.</summary>
+        public static bool IsEmployeePortalUser(this ClaimsPrincipal user) =>
+            TryGetIntClaim(user, AppClaimTypes.EmployeePortalEmployeeId).HasValue;
+
+        public static int? GetPortalEmployeeId(this ClaimsPrincipal user) =>
+            TryGetIntClaim(user, AppClaimTypes.EmployeePortalEmployeeId);
+
+        public static int? GetEmployeePortalUserId(this ClaimsPrincipal user) =>
+            TryGetIntClaim(user, AppClaimTypes.EmployeePortalUserId);
+
         public static string GetPortalTenantName(this ClaimsPrincipal user)
         {
             return user.FindFirstValue(AppClaimTypes.PortalTenantName) ?? string.Empty;

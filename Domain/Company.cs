@@ -13,6 +13,19 @@ namespace RealEstateManager.Domain
         /// takes effect. When off, its creator activates it.
         /// </summary>
         public bool RequireContractApproval { get; set; }
+
+        /// <summary>
+        /// When on, every payment (supplier payments, petty cash, owner settlements and
+        /// withdrawals, payroll, salary advances) needs someone whose approval level covers
+        /// the amount before it reaches the accounts.
+        /// </summary>
+        public bool RequirePaymentApproval { get; set; }
+
+        /// <summary>
+        /// Whether the person who enters a payment may release it themselves when it is within
+        /// their own limit. Petty cash is never self-released: someone else always checks it.
+        /// </summary>
+        public bool AllowSelfReleaseWithinLimit { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // ---------------------------------------------------------------------

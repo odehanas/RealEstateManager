@@ -1,0 +1,125 @@
+@model RealEstateManager.Controllers.OversightController.OversightViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Owner Monitor";
+    var large = Model.Postings.Where(x => x.Amount >= Model.LargeAmount).ToList();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">Owner Monitor</h2>
+        <div class="text-muted">What happened in the business, who did it, and what is waiting for you. Read only.</div>
+    </div>
+    <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
+        <div><label class="form-label small mb-0">From</label><input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+        <div><label class="form-label small mb-0">To</label><input type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+        <div><label class="form-label small mb-0">Large if over</label><input name="large" value="@Model.LargeAmount.ToString("0")" class="form-control form-control-sm" style="width:110px" /></div>
+        <button class="btn btn-sm btn-dark">Show</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">Print</button>
+    </form>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="small text-muted text-uppercase">Cash and bank now</div><div class="fs-3 fw-bold">@Model.CashBalance.ToString("N2")</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="small text-muted text-uppercase">Money in / out in the period</div>
+        <div class="fs-5 fw-bold text-success">+@Model.MoneyIn.ToString("N2")</div><div class="fs-5 fw-bold text-danger">−@Model.MoneyOut.ToString("N2")</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm h-100 @(Model.PendingPayments > 0 ? "border-warning" : "")"><div class="card-body">
+        <div class="small text-muted text-uppercase">Payments waiting for release</div>
+        <div class="fs-3 fw-bold">@Model.PendingPayments</div><div>@Model.PendingPaymentAmount.ToString("N2")</div>
+        @if (Model.PendingPayments > 0) { <a asp-controller="PaymentApprovals" asp-action="Index" class="small">Open the queue</a> }
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm h-100"><div class="card-body">
+        <div class="small text-muted text-uppercase">Authority delegated now</div>
+        @if (Model.ActiveDelegations.Count == 0) { <div class="text-muted">None</div> }
+        @foreach (var d in Model.ActiveDelegations) { <div class="small"><strong>@d.ToName</strong> up to @(d.MaxAmount?.ToString("N0") ?? "any amount") until @d.EndDate.ToString("dd/MM")</div> }
+        <a asp-controller="ApprovalLimits" asp-action="Index" class="small">Approval limits</a>
+    </div></div></div>
+</div>
+
+@if (Model.LockedUsers.Count > 0 || Model.Failures.Count > 0 || Model.Drafts.Count > 0 || large.Count > 0)
+{
+    <div class="card shadow-sm mb-3 border-danger">
+        <div class="card-header bg-light"><h5 class="mb-0">Needs your attention</h5></div>
+        <ul class="list-group list-group-flush">
+            @foreach (var u in Model.LockedUsers) { <li class="list-group-item">Account <strong>@u.Username</strong> is locked after repeated wrong passwords, until @u.LockedOutUntil?.ToLocalTime().ToString("dd/MM HH:mm").</li> }
+            @if (Model.Failures.Count > 0) { <li class="list-group-item">@Model.Failures.Count request(s) refused or failed in the period (blocked access or errors) — see the bottom of this page.</li> }
+            @if (large.Count > 0) { <li class="list-group-item">@large.Count posting(s) over @Model.LargeAmount.ToString("N0"), highlighted below.</li> }
+            @if (Model.Drafts.Count > 0) { <li class="list-group-item">@Model.Drafts.Count journal(s) left as drafts for more than a week (oldest @Model.Drafts[0].EntryDate.ToString("dd/MM/yyyy")).</li> }
+        </ul>
+    </div>
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-light"><h5 class="mb-0">Payments released and waiting</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <tr><th>Entered</th><th>By</th><th>Payment</th><th class="text-end">Amount</th><th>Status</th><th>Released / decided by</th></tr>
+            @if (Model.Payments.Count == 0) { <tr><td colspan="6" class="text-muted">None in the period.</td></tr> }
+            @foreach (var p in Model.Payments)
+            {
+                <tr>
+                    <td class="small">@p.RequestedAt.ToLocalTime().ToString("dd/MM HH:mm")</td><td class="small">@p.RequestedByName</td>
+                    <td class="small">@p.Description</td><td class="text-end">@p.Amount.ToString("N2")</td>
+                    <td><span class="badge @(p.Status == PaymentApprovalStatuses.Pending ? "bg-warning text-dark" : p.Status == PaymentApprovalStatuses.Rejected ? "bg-danger" : "bg-success")">@(p.Status == PaymentApprovalStatuses.SelfReleased ? "Within own limit" : p.Status)</span></td>
+                    <td class="small">@p.DecidedByName @p.DecidedAt?.ToLocalTime().ToString("dd/MM HH:mm")</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-light"><h5 class="mb-0">Postings to the accounts</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <tr><th>Date</th><th>Entry</th><th>Type</th><th>Description</th><th class="text-end">Amount</th><th>Posted by</th></tr>
+            @if (Model.Postings.Count == 0) { <tr><td colspan="6" class="text-muted">Nothing posted in the period.</td></tr> }
+            @foreach (var j in Model.Postings)
+            {
+                <tr class="@(j.Amount >= Model.LargeAmount ? "table-warning" : "")">
+                    <td class="small">@j.EntryDate.ToString("dd/MM/yyyy")</td><td class="small">@j.EntryNumber</td><td class="small">@j.SourceType</td>
+                    <td class="small">@j.Description</td><td class="text-end">@j.Amount.ToString("N2")</td><td class="small">@j.PostedBy</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-light"><h5 class="mb-0">What staff changed</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <tr><th>When</th><th>Who</th><th>Action</th><th>Result</th><th>From</th></tr>
+            @if (Model.Changes.Count == 0) { <tr><td colspan="5" class="text-muted">No changes in the period.</td></tr> }
+            @foreach (var c in Model.Changes)
+            {
+                <tr>
+                    <td class="small">@c.OccurredAt.ToLocalTime().ToString("dd/MM HH:mm")</td><td class="small">@(c.DisplayName ?? c.Username)</td>
+                    <td class="small">@c.ActivityName</td>
+                    <td class="small">@(c.IsSuccess ? "OK" : $"Failed {c.StatusCode}")</td><td class="small">@c.IpAddress</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+@if (Model.Failures.Count > 0)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light"><h5 class="mb-0">Refused and failed requests</h5></div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <tr><th>When</th><th>Who</th><th>Tried</th><th>Code</th><th>From</th></tr>
+                @foreach (var f in Model.Failures)
+                {
+                    <tr><td class="small">@f.OccurredAt.ToLocalTime().ToString("dd/MM HH:mm")</td><td class="small">@(f.DisplayName ?? f.Username ?? "anonymous")</td><td class="small">@f.RequestPath</td><td>@f.StatusCode</td><td class="small">@f.IpAddress</td></tr>
+                }
+            </table>
+        </div>
+    </div>
+}

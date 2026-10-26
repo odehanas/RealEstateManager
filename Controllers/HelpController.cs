@@ -104,5 +104,12 @@ namespace RealEstateManager.Controllers
         [AllowAnonymous]
         [HttpGet]
         public IActionResult Training() => View();
+
+        /// <summary>
+        /// For owners: the controls the system enforces, the ones to adopt as policy, and
+        /// plain answers to the security questions owners ask. Signed-in owners only.
+        /// </summary>
+        [HttpGet]
+        public IActionResult Controls() => View();
     }
 }

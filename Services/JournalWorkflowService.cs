@@ -26,10 +26,112 @@ namespace RealEstateManager.Services
     public class JournalWorkflowService
     {
         private readonly ApplicationDbContext _db;
+        private readonly ApprovalAuthorityService _authority;
+        private readonly CompanyContextOverride _systemContext;
+        private readonly IHttpContextAccessor _http;
 
-        public JournalWorkflowService(ApplicationDbContext db)
+        public JournalWorkflowService(
+            ApplicationDbContext db,
+            ApprovalAuthorityService authority,
+            CompanyContextOverride systemContext,
+            IHttpContextAccessor http)
         {
             _db = db;
+            _authority = authority;
+            _systemContext = systemContext;
+            _http = http;
+        }
+
+        /// <summary>Message prefix the screens recognise: the payment is waiting for release, not refused.</summary>
+        public const string AwaitingApprovalPrefix = "Waiting for approval:";
+
+        // =====================================================================
+        //  PAYMENT RELEASE
+        // =====================================================================
+
+        /// <summary>
+        /// Whether this draft is a payment that payment approval holds back, and if so why
+        /// it may not be posted yet. Sample data built by the system in the background is
+        /// not held. A payment is releasable once approved for its current amount.
+        /// </summary>
+        private async Task<string?> GetPaymentApprovalBlockAsync(JournalEntry entry)
+        {
+            if (_systemContext.CompanyId.HasValue || !entry.CompanyId.HasValue)
+                return null;
+            if (!ApprovalAuthorityService.ControlledSourceTypes.Contains(entry.SourceType ?? string.Empty))
+                return null;
+            if (!await _authority.IsPaymentApprovalOnAsync(entry.CompanyId.Value))
+                return null;
+
+            var amount = entry.Lines.Sum(x => x.Debit);
+            var released = await _db.PaymentApprovals.AsNoTracking().AnyAsync(x =>
+                x.JournalEntryId == entry.Id && x.Amount == amount &&
+                (x.Status == PaymentApprovalStatuses.Approved || x.Status == PaymentApprovalStatuses.SelfReleased));
+
+            return released
+                ? null
+                : $"This payment of {amount:N2} has not been approved for release. It waits in Controls ▸ Payment Approvals.";
+        }
+
+        /// <summary>
+        /// A payment a screen has just recorded: released at once when the person who
+        /// entered it may release that amount themselves, otherwise queued for the level that
+        /// can. Returns null when it was posted, or the message for the screen.
+        /// </summary>
+        /// <summary>The signed-in staff member, for the record of who posted what; null for background work.</summary>
+        private string? CurrentUserName()
+        {
+            var user = _http.HttpContext?.User;
+            var name = user?.FindFirst(AppClaimTypes.DisplayName)?.Value ?? user?.FindFirst(AppClaimTypes.Username)?.Value;
+            return name is { Length: > 200 } ? name[..200] : name;
+        }
+
+        private async Task<string?> RouteNewPaymentAsync(JournalEntry entry)
+        {
+            var companyId = entry.CompanyId!.Value;
+            var amount = entry.Lines.Sum(x => x.Debit);
+            var user = _http.HttpContext?.User;
+            var userId = user?.GetAppUserId();
+            var userName = CurrentUserName() ?? "User";
+            var company = await _db.Companies.AsNoTracking().FirstAsync(x => x.Id == companyId);
+            var requiredLevel = await _authority.RequiredLevelAsync(companyId, amount);
+
+            var authority = userId.HasValue
+                ? await _authority.GetAuthorityAsync(userId.Value, companyId, user!.IsInRole("SystemAdmin"))
+                : null;
+            var canSelfRelease = company.AllowSelfReleaseWithinLimit &&
+                                 !ApprovalAuthorityService.AlwaysSecondPerson.Contains(entry.SourceType ?? string.Empty) &&
+                                 authority != null && authority.Covers(amount);
+
+            var approval = new PaymentApproval
+            {
+                CompanyId = companyId,
+                JournalEntryId = entry.Id,
+                SourceType = entry.SourceType ?? string.Empty,
+                Description = entry.Description.Length > 300 ? entry.Description[..299] : entry.Description,
+                Amount = amount,
+                RequiredLevel = requiredLevel,
+                Status = canSelfRelease ? PaymentApprovalStatuses.SelfReleased : PaymentApprovalStatuses.Pending,
+                RequestedByAppUserId = userId,
+                RequestedByName = userName,
+                RequestedAt = DateTime.UtcNow
+            };
+            if (canSelfRelease)
+            {
+                approval.DecidedByAppUserId = userId;
+                approval.DecidedByName = userName;
+                approval.DecidedAt = DateTime.UtcNow;
+                approval.Comment = $"Within {userName}'s own authority ({authority!.Describe()}).";
+            }
+
+            _db.PaymentApprovals.Add(approval);
+            await _db.SaveChangesAsync();
+
+            if (!canSelfRelease)
+                return $"{AwaitingApprovalPrefix} {amount:N2} needs release by {requiredLevel} level or above. It reaches the accounts once approved in Controls ▸ Payment Approvals.";
+
+            var result = await PostAsync(entry.Id);
+            return result.Success ? null : result.Message;
         }
 
         // =====================================================================
@@ -45,6 +147,7 @@ namespace RealEstateManager.Services
             var entry = await _db.JournalEntries
                 .AsNoTracking()
                 .Include(x => x.AccountingPeriod)
+                .Include(x => x.Lines)
                 .FirstOrDefaultAsync(x => x.Id == journalEntryId);
 
             if (entry == null)
@@ -70,7 +173,7 @@ namespace RealEstateManager.Services
             }
             else
             {
-                var reason = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry);
+                var reason = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry) ?? await GetPaymentApprovalBlockAsync(entry);
                 state.CanPost = reason == null;
                 state.BlockReason = reason;
             }
@@ -91,7 +194,7 @@ namespace RealEstateManager.Services
             if (entry.IsPosted)
                 return JournalWorkflowResult.Failed("This entry is already posted.");
 
-            var blocked = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry);
+            var blocked = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry) ?? await GetPaymentApprovalBlockAsync(entry);
             if (blocked != null)
                 return JournalWorkflowResult.Failed(blocked);
 
@@ -100,6 +203,7 @@ namespace RealEstateManager.Services
             entry.IsPosted = true;
             entry.Status = "Posted";
             entry.PostedAt = DateTime.UtcNow;
+            entry.PostedBy ??= CurrentUserName();
 
             // Re-apply whatever the document side of the transaction expects, so posting
             // is the exact mirror of resetting.
@@ -120,6 +224,14 @@ namespace RealEstateManager.Services
         /// </summary>
         public async Task<string?> PostNewEntryAsync(int journalEntryId)
         {
+            var entry = await LoadEntryAsync(journalEntryId);
+            if (entry != null && !entry.IsPosted && await GetPaymentApprovalBlockAsync(entry) != null)
+            {
+                // Other checks first: a payment that could never post is not worth queueing.
+                var other = GetPostBlockReason(entry) ?? await GetDependencyBlockReasonAsync(entry);
+                return other ?? await RouteNewPaymentAsync(entry);
+            }
+
             var result = await PostAsync(journalEntryId);
             return result.Success ? null : result.Message;
         }

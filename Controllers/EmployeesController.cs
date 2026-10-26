@@ -141,8 +141,30 @@ namespace RealEstateManager.Controllers
                     .Where(x => x.EmployeeId == id)
                     .OrderByDescending(x => x.PayrollRun!.Year).ThenByDescending(x => x.PayrollRun!.Month)
                     .Take(24).ToListAsync(),
-                ExpiringDocuments = (await _hr.GetExpiringDocumentsAsync(60)).Where(x => x.EmployeeId == id).ToList()
+                ExpiringDocuments = (await _hr.GetExpiringDocumentsAsync(60)).Where(x => x.EmployeeId == id).ToList(),
+                PortalUser = await _db.EmployeePortalUsers.AsNoTracking().FirstOrDefaultAsync(x => x.EmployeeId == id)
             });
+        }
+
+        /// <summary>Creates or resets the employee's self-service login and shows the temporary password once.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> IssuePortalAccess(int id, string? username, [FromServices] EmployeePortalService portal)
+        {
+            var (success, message, temporary) = await portal.IssueAccessAsync(id, username);
+            TempData[success ? "HrSuccess" : "HrError"] = message;
+            if (temporary != null)
+                TempData["PortalTemporaryPassword"] = temporary;
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetPortalAccess(int id, bool active, [FromServices] EmployeePortalService portal)
+        {
+            await portal.SetActiveAsync(id, active);
+            TempData["HrSuccess"] = active ? "Portal access enabled." : "Portal access disabled - the employee can no longer sign in.";
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         /// <summary>Documents of current employees that have expired or expire soon.</summary>

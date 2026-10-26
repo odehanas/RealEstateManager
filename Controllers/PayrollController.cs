@@ -121,8 +121,18 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Approve(int id)
+        public async Task<IActionResult> Approve(int id, [FromServices] PaymentApprovalService approvals)
         {
+            // With payment approval on, the approver's authority must cover the month's net pay.
+            var net = await _db.PayrollRuns.AsNoTracking().Where(x => x.Id == id).Select(x => x.TotalNet).FirstOrDefaultAsync();
+            var blocked = await approvals.CheckDirectAuthorityAsync(User.GetRequiredCurrentCompanyId(), User.GetAppUserId() ?? 0,
+                User.IsInRole("SystemAdmin"), net, "A payroll with net pay");
+            if (blocked != null)
+            {
+                Flash(false, blocked);
+                return RedirectToAction(nameof(Run), new { id });
+            }
+
             var (success, message) = await _payroll.ApproveAsync(id, User.GetAppUserId() ?? 0, CurrentUserName(), User.IsInRole("SystemAdmin"));
             Flash(success, message);
             return RedirectToAction(nameof(Run), new { id });

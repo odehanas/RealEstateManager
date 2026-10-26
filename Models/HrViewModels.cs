@@ -29,6 +29,9 @@ namespace RealEstateManager.Models
         public List<EmployeeAdvance> Advances { get; set; } = new();
         public List<PayrollRunLine> Payslips { get; set; } = new();
         public List<HrService.ExpiringDocument> ExpiringDocuments { get; set; } = new();
+
+        /// <summary>The employee's self-service login, if one was issued.</summary>
+        public EmployeePortalUser? PortalUser { get; set; }
     }
 
     public class LeaveListViewModel

@@ -1,0 +1,74 @@
+@model List<RealEstateManager.Domain.PaymentApproval>
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Payment Approvals";
+    var blocks = (Dictionary<int, string?>)ViewBag.Blocks;
+    bool all = ViewBag.All;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">Payment Approvals</h2>
+        <div class="text-muted">Payments held until someone whose authority covers the amount releases them. Nobody releases a payment they entered.</div>
+    </div>
+    <a asp-action="Index" asp-route-all="@(!all)" class="btn btn-outline-dark">@(all ? "Waiting only" : "Show decided too")</a>
+</div>
+
+@if (TempData["ApprovalSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
+@if (TempData["ApprovalError"] is string err) { <div class="alert alert-danger">@err</div> }
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border">Nothing is waiting.</div>
+}
+
+@foreach (var a in Model)
+{
+    var pending = a.Status == PaymentApprovalStatuses.Pending;
+    var block = pending && blocks.TryGetValue(a.Id, out var b) ? b : null;
+    <div class="card shadow-sm mb-3 @(pending ? "border-warning" : "")">
+        <div class="card-header bg-light d-flex flex-wrap justify-content-between gap-2">
+            <div>
+                <strong>@a.Amount.ToString("N2")</strong> — @a.Description
+                <div class="small text-muted">
+                    @a.SourceType · entered by @a.RequestedByName on @a.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · needs <strong>@a.RequiredLevel</strong> or above
+                </div>
+            </div>
+            <span class="badge align-self-start @(a.Status switch { PaymentApprovalStatuses.Pending => "bg-warning text-dark", PaymentApprovalStatuses.Rejected => "bg-danger", _ => "bg-success" })">
+                @(a.Status == PaymentApprovalStatuses.SelfReleased ? "Released within own limit" : a.Status)
+            </span>
+        </div>
+        <div class="card-body">
+            @if (a.JournalEntry != null)
+            {
+                <table class="table table-sm mb-2">
+                    <tr><th>Account</th><th>Details</th><th class="text-end">Debit</th><th class="text-end">Credit</th></tr>
+                    @foreach (var l in a.JournalEntry.Lines)
+                    {
+                        <tr><td>@l.Account?.Code @l.Account?.Name</td><td class="small">@l.Description</td><td class="text-end">@(l.Debit == 0 ? "" : l.Debit.ToString("N2"))</td><td class="text-end">@(l.Credit == 0 ? "" : l.Credit.ToString("N2"))</td></tr>
+                    }
+                </table>
+                <div class="small text-muted mb-2">Journal @a.JournalEntry.EntryNumber dated @a.JournalEntry.EntryDate.ToString("dd/MM/yyyy") @(a.JournalEntry.DocumentNumber != null ? "· " + a.JournalEntry.DocumentNumber : "")</div>
+            }
+            @if (!pending)
+            {
+                <div class="small">@a.DecidedByName @a.DecidedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") — @a.Comment</div>
+            }
+            else if (block != null)
+            {
+                <div class="text-muted small">@block</div>
+            }
+            else
+            {
+                <form method="post" class="d-flex flex-wrap gap-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@a.Id" />
+                    <input name="comment" class="form-control" style="max-width:420px" placeholder="Comment (required to turn down)" />
+                    <button class="btn btn-success" asp-action="Approve" onclick="return confirm('Release and post this payment of @a.Amount.ToString("N2")?');">Approve &amp; release</button>
+                    <button class="btn btn-outline-danger" asp-action="Reject">Turn down</button>
+                </form>
+            }
+        </div>
+    </div>
+}

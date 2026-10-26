@@ -90,7 +90,9 @@ namespace RealEstateManager.Controllers
                 var notPosted = await _journalWorkflowService.PostNewEntryAsync(journalId);
                 TempData["PettyCashMessage"] = notPosted == null
                     ? $"Voucher posted: {model.Description} for {model.Amount:N2}."
-                    : $"Voucher saved as a draft but not posted: {notPosted}";
+                    : notPosted.StartsWith(JournalWorkflowService.AwaitingApprovalPrefix)
+                        ? $"Voucher recorded for {model.Amount:N2}. {notPosted}"
+                        : $"Voucher saved as a draft but not posted: {notPosted}";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
             catch (Exception ex)
@@ -138,7 +140,9 @@ namespace RealEstateManager.Controllers
                 var notPosted = await _journalWorkflowService.PostNewEntryAsync(journalId);
                 TempData["PettyCashMessage"] = notPosted == null
                     ? $"Replenishment posted: {model.Amount:N2} added to the float."
-                    : $"Replenishment saved as a draft but not posted: {notPosted}";
+                    : notPosted.StartsWith(JournalWorkflowService.AwaitingApprovalPrefix)
+                        ? $"Replenishment recorded for {model.Amount:N2}. {notPosted}"
+                        : $"Replenishment saved as a draft but not posted: {notPosted}";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
             catch (Exception ex)

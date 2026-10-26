@@ -366,6 +366,8 @@ namespace RealEstateManager.Services
                 Username = normalizedUsername,
                 DisplayName = model.DisplayName.Trim(),
                 PasswordHash = _passwordHashingService.HashPassword(model.Password),
+                // The administrator knows this password; the user must replace it.
+                MustChangePassword = true,
                 IsActive = model.IsActive,
                 IsSystemAdmin = model.IsSystemAdmin,
                 CreatedAt = DateTime.UtcNow
@@ -461,6 +463,9 @@ namespace RealEstateManager.Services
             if (!string.IsNullOrWhiteSpace(model.Password))
             {
                 user.PasswordHash = _passwordHashingService.HashPassword(model.Password);
+                user.MustChangePassword = true;
+                user.FailedLoginAttempts = 0;
+                user.LockedOutUntil = null;
             }
 
             await SaveUserCompanyAccessesAsync(user, model, selectedCompanyIds, model.DefaultCompanyId!.Value);

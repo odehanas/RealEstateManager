@@ -1,0 +1,129 @@
+@model RealEstateManager.Controllers.ApprovalLimitsController.LimitsViewModel
+
+@{
+    ViewData["Title"] = "Approval Limits";
+    var today = DateTime.Today;
+}
+
+<h2 class="mb-1">Approval Limits</h2>
+<p class="text-muted">Who may release payments, and up to how much. Owners can change these at any time.</p>
+
+@if (TempData["ApprovalSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
+@if (TempData["ApprovalError"] is string err) { <div class="alert alert-danger">@err</div> }
+
+<div class="card shadow-sm mb-3 @(Model.Company.RequirePaymentApproval ? "border-success" : "border-warning")">
+    <div class="card-body">
+        <form asp-action="Switches" method="post" class="d-flex flex-wrap gap-4 align-items-center">
+            @Html.AntiForgeryToken()
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="requirePaymentApproval" value="true" id="sw1" @(Model.Company.RequirePaymentApproval ? "checked" : "") />
+                <label class="form-check-label fw-semibold" for="sw1">Payments need approval</label>
+                <div class="small text-muted">Supplier payments, petty cash, owner settlements and withdrawals, development costs; payroll and salary advances are checked against the approver's limit.</div>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="allowSelfRelease" value="true" id="sw2" @(Model.Company.AllowSelfReleaseWithinLimit ? "checked" : "") />
+                <label class="form-check-label fw-semibold" for="sw2">The person entering a payment may release it within their own limit</label>
+                <div class="small text-muted">Off = every payment needs a second person. Petty cash always needs a second person.</div>
+            </div>
+            <button class="btn btn-dark ms-auto">Save</button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h5 class="mb-0">Levels</h5></div>
+            <div class="card-body">
+                <form asp-action="SaveLevels" method="post">
+                    @Html.AntiForgeryToken()
+                    <table class="table table-sm">
+                        <tr><th>Level</th><th>Releases up to</th></tr>
+                        @foreach (var l in Model.Levels)
+                        {
+                            <tr>
+                                <td><input type="hidden" name="ids" value="@l.Id" /><input name="names" value="@l.Name" class="form-control form-control-sm" /></td>
+                                <td><input name="limits" value="@l.MaxAmount?.ToString("0.##")" class="form-control form-control-sm" placeholder="no limit" /></td>
+                            </tr>
+                        }
+                        <tr>
+                            <td><input name="newName" class="form-control form-control-sm" placeholder="Add a level, e.g. Finance Manager" /></td>
+                            <td><input name="newLimit" class="form-control form-control-sm" placeholder="limit" /></td>
+                        </tr>
+                    </table>
+                    <div class="small text-muted mb-2">Leave the limit blank for no limit (the owners' level). A payment goes to the lowest level whose limit covers it.</div>
+                    <button class="btn btn-dark">Save levels</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h5 class="mb-0">People</h5></div>
+            <div class="card-body">
+                <form asp-action="AssignLevels" method="post">
+                    @Html.AntiForgeryToken()
+                    <table class="table table-sm align-middle">
+                        <tr><th>User</th><th>Level</th><th>Authority today</th></tr>
+                        @foreach (var u in Model.Users)
+                        {
+                            <tr>
+                                <td>@u.Name <span class="small text-muted">@u.Username</span><input type="hidden" name="userIds" value="@u.AppUserId" /></td>
+                                <td>
+                                    <select name="levelIds" class="form-select form-select-sm">
+                                        <option value="">No authority</option>
+                                        @foreach (var l in Model.Levels)
+                                        {
+                                            <option value="@l.Id" selected="@(l.Id == u.LevelId)">@l.Name</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td class="small">@u.Authority</td>
+                            </tr>
+                        }
+                    </table>
+                    <button class="btn btn-dark">Save assignments</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-3">
+    <div class="card-header bg-light"><h5 class="mb-0">Delegate authority while you are away</h5></div>
+    <div class="card-body">
+        <form asp-action="Delegate" method="post" class="row g-2 align-items-end mb-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <label class="form-label">To</label>
+                <select name="toAppUserId" class="form-select">
+                    <option value="">Choose</option>
+                    @foreach (var u in Model.Users) { <option value="@u.AppUserId">@u.Name</option> }
+                </select>
+            </div>
+            <div class="col-md-2"><label class="form-label">Up to</label><input name="maxAmount" class="form-control" placeholder="blank = your limit" /></div>
+            <div class="col-md-2"><label class="form-label">From</label><input type="date" name="startDate" value="@today.ToString("yyyy-MM-dd")" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">Until</label><input type="date" name="endDate" value="@today.AddDays(14).ToString("yyyy-MM-dd")" class="form-control" /></div>
+            <div class="col-md-3"><label class="form-label">Reason</label><input name="reason" class="form-control" placeholder="Owner travelling" /></div>
+            <div class="col-12"><button class="btn btn-dark">Delegate</button> <span class="small text-muted ms-2">It ends by itself on the last day; you can end it earlier below.</span></div>
+        </form>
+        <table class="table table-sm">
+            <tr><th>From</th><th>To</th><th>Up to</th><th>Period</th><th>Reason</th><th>Status</th><th></th></tr>
+            @foreach (var d in Model.Delegations)
+            {
+                var status = d.RevokedAt != null ? $"Ended by {d.RevokedByName}" : d.IsActiveOn(today) ? "Active" : d.StartDate > today ? "Starts later" : "Expired";
+                <tr>
+                    <td>@d.FromName</td><td>@d.ToName</td><td>@(d.MaxAmount?.ToString("N2") ?? "No limit")</td>
+                    <td>@d.StartDate.ToString("dd/MM/yyyy") – @d.EndDate.ToString("dd/MM/yyyy")</td><td class="small">@d.Reason</td>
+                    <td><span class="badge @(status == "Active" ? "bg-success" : "bg-secondary")">@status</span></td>
+                    <td>
+                        @if (d.RevokedAt == null && d.EndDate >= today)
+                        {
+                            <form asp-action="Revoke" asp-route-id="@d.Id" method="post">@Html.AntiForgeryToken()<button class="btn btn-sm btn-outline-danger">End now</button></form>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

@@ -8,6 +8,7 @@
 @inject PlatformOwnerService PlatformOwnerService
 @inject ApprovalService ApprovalService
 @inject PeriodClosingService PeriodClosingService
+@inject PaymentApprovalService PaymentApprovals
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
@@ -65,6 +66,11 @@
     var canManageHr = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.HrManage);
     var canRunPayroll = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PayrollManage, AppPermissions.PayrollApprove);
     var showHrMenu = canManageHr || canRunPayroll;
+    var isOwner = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.OwnerOversight);
+    var canReleasePayments = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight);
+    var paymentsWaiting = canReleasePayments && currentCompanyId.HasValue ? await PaymentApprovals.CountPendingAsync() : 0;
+    var showControlsMenu = isOwner || canReleasePayments;
+    showReportsMenu = showReportsMenu || isOwner;
     if (subscriptionBlocked)
     {
         showMasterDataMenu = false;
@@ -72,6 +78,7 @@
         showOperationsMenu = false;
         showReportsMenu = false;
         showHrMenu = false;
+        showControlsMenu = false;
     }
     var companies = isAuthenticated && CurrentCompanyAccessor.UserId.HasValue
         ? await AppAuthService.GetAccessibleCompaniesAsync(CurrentCompanyAccessor.UserId.Value, currentCompanyId)
@@ -375,6 +382,33 @@
                             </li>
                         }
 
+                        @if (showControlsMenu)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="controlsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Controls
+                                    @if (paymentsWaiting > 0) { <span class="badge bg-danger">@paymentsWaiting</span> }
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="controlsDropdown">
+                                    @if (isOwner)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Oversight" asp-action="Index">Owner Monitor</a></li>
+                                    }
+                                    <li>
+                                        <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="PaymentApprovals" asp-action="Index">
+                                            Payment Approvals
+                                            @if (paymentsWaiting > 0) { <span class="badge bg-danger ms-2">@paymentsWaiting</span> }
+                                        </a>
+                                    </li>
+                                    @if (isOwner)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="ApprovalLimits" asp-action="Index">Approval Limits &amp; Delegation</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Help" asp-action="Controls">Controls &amp; Security Guide</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
                         @if (showHrMenu)
                         {
                             <li class="nav-item dropdown">
@@ -388,6 +422,7 @@
                                     {
                                         <li><a class="dropdown-item" asp-controller="Attendance" asp-action="Index">Attendance</a></li>
                                         <li><a class="dropdown-item" asp-controller="Leave" asp-action="Index">Leave</a></li>
+                                        <li><a class="dropdown-item" asp-controller="EmployeeRequests" asp-action="Index">Employee Requests</a></li>
                                         <li><a class="dropdown-item" asp-controller="Employees" asp-action="Documents">Expiring Documents</a></li>
                                         <li><a class="dropdown-item" asp-controller="Departments" asp-action="Index">Departments</a></li>
                                     }
@@ -554,7 +589,12 @@
                 <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
             </div>
         }
-        @if (TempData["PostingWarning"] is string postingWarning)
+        @if (TempData["PostingWarning"] is string awaiting && awaiting.Contains(JournalWorkflowService.AwaitingApprovalPrefix))
+        {
+            @* A payment held for release by someone with enough authority: recorded, not refused. *@
+            <div class="alert alert-info">Recorded. @awaiting[awaiting.IndexOf(JournalWorkflowService.AwaitingApprovalPrefix)..]</div>
+        }
+        else if (TempData["PostingWarning"] is string postingWarning)
         {
             @* A screen that posts on save could not post: the entry is kept as a draft. *@
             <div class="alert alert-warning">

@@ -2174,6 +2174,7 @@ namespace RealEstateManager.Data
 
             ConfigurePeriodClosing(modelBuilder);
             ConfigureHr(modelBuilder);
+            ConfigureControls(modelBuilder);
         }
     }
 }
