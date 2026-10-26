@@ -248,9 +248,9 @@
                         }
                         <dt>Journal Entry</dt>
                         <dd>
-                            @if (Model.JournalEntryId.HasValue)
+                            @if (Model.JournalEntry != null)
                             {
-                                var entryDate = Model.JournalEntry!.EntryDate;
+                                var entryDate = Model.JournalEntry.EntryDate;
                                 <a asp-controller="Journal" asp-action="Index"
                                    asp-route-fromDate="@entryDate.ToString("yyyy-MM-dd")"
                                    asp-route-toDate="@entryDate.ToString("yyyy-MM-dd")"
@@ -261,6 +261,11 @@
                                 <span class="badge @(isPosted ? "bg-success" : "bg-warning text-dark")">
                                     @(isPosted ? "Posted" : "Draft")
                                 </span>
+                            }
+                            else if (Model.JournalEntryId.HasValue)
+                            {
+                                @* The bill points at an entry that is gone or belongs to another company. *@
+                                <span class="text-danger">Entry #@Model.JournalEntryId not found</span>
                             }
                             else
                             {
