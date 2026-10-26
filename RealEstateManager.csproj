@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RazorLangVersion>8.0</RazorLangVersion>
+    <UserSecretsId>86668dd3-6719-4333-876a-5e71a4787da8</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
