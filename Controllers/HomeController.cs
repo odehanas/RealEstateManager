@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
@@ -439,6 +442,34 @@ namespace RealEstateManager.Controllers
         private static bool IsDebitNature(string accountType)
         {
             return accountType == "Asset" || accountType == "Expense";
+        }
+    
+
+        // The page shown when a request fails on the live site (UseExceptionHandler). The
+        // system administrator also sees the cause, so a failure can be traced without
+        // the server logs; everyone else sees only the reference.
+        [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            var failure = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            var model = new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                Path = failure?.Path
+            };
+
+            if (failure?.Error != null)
+            {
+                HttpContext.RequestServices.GetRequiredService<ILogger<HomeController>>()
+                    .LogError(failure.Error, "Request to {Path} failed", failure.Path);
+
+                if (User.IsInRole("SystemAdmin"))
+                    model.Detail = failure.Error.ToString();
+            }
+
+            return View(model);
         }
     }
 }
