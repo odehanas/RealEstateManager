@@ -21,8 +21,8 @@ namespace RealEstateManager.Services.Assistant
         private const int MaxAggregateRows = 20000;
 
         /// <summary>Entity name → the screen whose permission reading it needs.</summary>
-        private static readonly Dictionary<string, (string Controller, string Action)> Queryable =
-            new(StringComparer.OrdinalIgnoreCase)
+        public static readonly IReadOnlyDictionary<string, (string Controller, string Action)> Queryable =
+            new Dictionary<string, (string Controller, string Action)>(StringComparer.OrdinalIgnoreCase)
             {
                 ["Property"] = ("Properties", "Index"),
                 ["Unit"] = ("Units", "Index"),

@@ -29,7 +29,7 @@ namespace RealEstateManager.Services
             finally
             {
                 var endpoint = context.GetEndpoint();
-                if (endpoint != null)
+                if (endpoint != null && !IsAssistantHousekeeping(context, requestException))
                 {
                     var routeValues = context.Request.RouteValues;
                     var controllerName = routeValues.TryGetValue("controller", out var controller) ? controller?.ToString() : null;
@@ -59,5 +59,19 @@ namespace RealEstateManager.Services
                 }
             }
         }
+
+        /// <summary>
+        /// The assistant panel's background calls - its transcript, token usage, lookups and
+        /// the end of a session - are kept in the assistant's own tables. Logging each one here
+        /// would bury real activity, so only their failures are recorded. Starting a session
+        /// and confirming or cancelling an entry are still logged.
+        /// </summary>
+        private static readonly HashSet<string> AssistantHousekeeping =
+            new(StringComparer.OrdinalIgnoreCase) { "Log", "Usage", "Tool", "End" };
+
+        private static bool IsAssistantHousekeeping(HttpContext context, Exception? error) =>
+            error == null && context.Response.StatusCode < 400 &&
+            string.Equals(context.Request.RouteValues["controller"]?.ToString(), "Assistant", StringComparison.OrdinalIgnoreCase) &&
+            AssistantHousekeeping.Contains(context.Request.RouteValues["action"]?.ToString() ?? string.Empty);
     }
 }

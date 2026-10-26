@@ -12,7 +12,7 @@ namespace RealEstateManager.Services.Assistant
         {
             "AppUser", "AppUserCompany", "AppUserPermission", "TenantPortalUser", "EmployeePortalUser",
             "CompanySubscription", "ActivationCode", "SubscriptionActivationCode", "AuditLog", "SchemaScriptHistory",
-            "AssistantSession", "AssistantMessage", "AssistantPendingAction", "UserFeedback", "Company"
+            "AssistantSession", "AssistantMessage", "AssistantPendingAction", "UserFeedback", "Company", "SavedReport"
         };
 
         public static IEnumerable<AssistantTool> All()

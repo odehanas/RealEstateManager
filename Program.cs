@@ -238,6 +238,7 @@ builder.Services.AddScoped<CustomerReceiptService>();
 builder.Services.AddScoped<MasterDataCreationService>();
 builder.Services.AddScoped<LeaseCreationService>();
 builder.Services.AddScoped<PdcReceiptEntryService>();
+builder.Services.AddScoped<RealEstateManager.Services.Reporting.ReportEngine>();
 builder.Services.AddScoped<RealEstateManager.Services.Assistant.AssistantService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
