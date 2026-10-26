@@ -14,6 +14,22 @@
         "--urls=http://localhost:5199"
       ],
       "port": 5199
+    },
+    {
+      "name": "rem-assistant",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "C:\\Users\\anas\\OneDrive - ega.rak.ae\\Documents\\Applications\\RealEstateManager\\RealEstateManager.csproj",
+        "--no-launch-profile",
+        "--",
+        "--ConnectionStrings:DefaultConnection=Server=(localdb)\\ClaudeREM;Database=RemDemo;Trusted_Connection=True;TrustServerCertificate=True",
+        "--Assistant:Enabled=true",
+        "--Assistant:OpenAIApiKey=test-dummy-key-not-real",
+        "--urls=http://localhost:5199"
+      ],
+      "port": 5199
     }
   ]
 }

@@ -106,6 +106,51 @@ namespace RealEstateManager.Services
             return journalEntry;
         }
 
+        /// <summary>
+        /// Why a cheque cannot be cleared on a date, by form field; empty when it can.
+        /// Shared by the Clear screen and the AI assistant.
+        /// </summary>
+        public static List<(string Field, string Message)> CheckClearance(PdcReceipt pdc, DateTime clearedDate)
+        {
+            var errors = new List<(string Field, string Message)>();
+
+            if (pdc.Status == "Cleared")
+            {
+                errors.Add((string.Empty, "This PDC is already cleared."));
+            }
+
+            if (clearedDate.Date < pdc.ReceivedDate.Date)
+            {
+                errors.Add(("ClearedDate", "Cleared date cannot be earlier than received date."));
+            }
+
+            // The cleared date is the accounting date of the cash movement, so it cannot
+            // be in the future either.
+            if (clearedDate.Date > DateTime.Today)
+            {
+                errors.Add(("ClearedDate",
+                    "The cleared date cannot be in the future - it is the date the cash entry is posted. " +
+                    "Clear the cheque on the day the bank actually honours it."));
+            }
+
+            return errors;
+        }
+
+        /// <summary>
+        /// Clearing before the date written on the cheque is usually a mistake - a bank
+        /// will not honour a post-dated cheque early. It is not forbidden, because the
+        /// parties can agree to present it early, so this is a warning to confirm, not a refusal.
+        /// </summary>
+        public static string? EarlyClearanceWarning(PdcReceipt pdc, DateTime clearedDate)
+        {
+            if (clearedDate.Date >= pdc.ChequeDate.Date)
+                return null;
+
+            var daysEarly = (int)(pdc.ChequeDate.Date - clearedDate.Date).TotalDays;
+            return $"This would clear the cheque {daysEarly} day(s) before its cheque date of " +
+                   $"{pdc.ChequeDate:dd/MM/yyyy}. A bank will not normally honour a post-dated cheque early.";
+        }
+
         public async Task<JournalEntry> ClearPdcAsync(int pdcReceiptId, DateTime clearedDate)
         {
             var pdc = await _db.PdcReceipts

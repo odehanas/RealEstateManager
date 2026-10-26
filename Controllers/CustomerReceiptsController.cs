@@ -10,17 +10,12 @@ namespace RealEstateManager.Controllers
     public class CustomerReceiptsController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly AccountingPostingService _postingService;
-        private readonly JournalWorkflowService _journalWorkflowService;
+        private readonly CustomerReceiptService _receiptService;
 
-        public CustomerReceiptsController(
-            ApplicationDbContext db,
-            AccountingPostingService postingService,
-            JournalWorkflowService journalWorkflowService)
+        public CustomerReceiptsController(ApplicationDbContext db, CustomerReceiptService receiptService)
         {
             _db = db;
-            _postingService = postingService;
-            _journalWorkflowService = journalWorkflowService;
+            _receiptService = receiptService;
         }
 
         [HttpGet]
@@ -68,51 +63,9 @@ namespace RealEstateManager.Controllers
             await LoadInvoicesAsync(model.CustomerInvoiceId);
 
             var companyId = User.GetRequiredCurrentCompanyId();
-            var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
-            if (company == null)
+            foreach (var error in await _receiptService.ValidateAsync(companyId, model))
             {
-                ModelState.AddModelError(string.Empty, "No company record found.");
-            }
-
-            var invoice = await _db.CustomerInvoices
-                .Include(x => x.Lease)
-                    .ThenInclude(x => x!.Tenant)
-                .Include(x => x.JournalEntry)
-                .FirstOrDefaultAsync(x => x.Id == model.CustomerInvoiceId);
-
-            if (invoice == null)
-            {
-                ModelState.AddModelError(nameof(model.CustomerInvoiceId), "Selected invoice was not found.");
-            }
-            else if (invoice.JournalEntry == null || !invoice.JournalEntry.IsPosted)
-            {
-                // A receipt credits Accounts Receivable. A draft invoice has not debited it,
-                // so receiving against one would reduce a receivable that was never raised.
-                ModelState.AddModelError(nameof(model.CustomerInvoiceId),
-                    $"Invoice {invoice.InvoiceNumber} has not been posted yet. Post it from Customer Invoices first.");
-            }
-
-            if (model.Amount <= 0)
-            {
-                ModelState.AddModelError(nameof(model.Amount), "Receipt amount must be greater than zero.");
-            }
-
-            if (invoice != null)
-            {
-                var outstanding = invoice.TotalAmount - invoice.AmountPaid;
-                if (model.Amount > outstanding)
-                {
-                    ModelState.AddModelError(nameof(model.Amount), "Receipt amount cannot exceed the outstanding invoice balance.");
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(model.ReceiptNumber))
-            {
-                var receiptNumberExists = await _db.CustomerReceipts.AnyAsync(x => x.ReceiptNumber == model.ReceiptNumber);
-                if (receiptNumberExists)
-                {
-                    ModelState.AddModelError(nameof(model.ReceiptNumber), "Receipt number already exists.");
-                }
+                ModelState.AddModelError(error.Field, error.Message);
             }
 
             if (!ModelState.IsValid)
@@ -120,43 +73,11 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            // The receipt and its journal must succeed or fail together. Without this
-            // transaction a posting failure left the receipt saved but unposted, and
-            // because the invoice's AmountPaid is only updated by a successful posting,
-            // the "cannot exceed outstanding" check above would not stop the user
-            // entering the same payment again - producing duplicate orphan receipts.
-            // PdcReceiptsController already works this way; this brings receipts in line.
             try
             {
-                await using var transaction = await _db.Database.BeginTransactionAsync();
-
-                // The invoice is guaranteed posted by the check above. This used to build
-                // its journal on the fly, which under draft-first produced only a draft.
-
-                var receipt = new CustomerReceipt
-                {
-                    CompanyId = companyId,
-                    CustomerInvoiceId = invoice!.Id,
-                    ReceiptNumber = string.IsNullOrWhiteSpace(model.ReceiptNumber)
-                        ? await GenerateReceiptNumberAsync()
-                        : model.ReceiptNumber.Trim(),
-                    ReceiptDate = model.ReceiptDate,
-                    Amount = model.Amount,
-                    PaymentMethod = model.PaymentMethod
-                };
-
-                _db.CustomerReceipts.Add(receipt);
-                await _db.SaveChangesAsync();
-
-                var journal = await _postingService.PostCustomerReceiptAsync(receipt.Id);
-
-                await transaction.CommitAsync();
-
-                // "Save and Post" posts: the receipt goes into the accounts now, through the
-                // same checks as Journal Inquiry. If one of them refuses, it stays a draft.
-                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journal.Id);
-                if (notPosted != null)
-                    TempData["PostingWarning"] = $"Receipt {receipt.ReceiptNumber} was saved as a draft but not posted: {notPosted}";
+                var result = await _receiptService.CreateAsync(companyId, model);
+                if (result.NotPostedReason != null)
+                    TempData["PostingWarning"] = $"Receipt {result.Receipt.ReceiptNumber} was saved as a draft but not posted: {result.NotPostedReason}";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -187,13 +108,6 @@ namespace RealEstateManager.Controllers
 
             ViewBag.Invoices = invoices;
             ViewBag.SelectedInvoiceId = selectedInvoiceId;
-        }
-
-        private async Task<string> GenerateReceiptNumberAsync()
-        {
-            var today = DateTime.Today;
-            var count = await _db.CustomerReceipts.CountAsync(x => x.ReceiptDate.Date == today) + 1;
-            return $"REC-{today:yyyyMMdd}-{count:D3}";
         }
     }
 }

@@ -350,41 +350,19 @@ namespace RealEstateManager.Controllers
 
             PopulateClearModel(model, pdc);
 
-            if (pdc.Status == "Cleared")
+            foreach (var (field, message) in PdcService.CheckClearance(pdc, model.ClearedDate))
             {
-                ModelState.AddModelError(string.Empty, "This PDC is already cleared.");
+                ModelState.AddModelError(field == "ClearedDate" ? nameof(model.ClearedDate) : field, message);
             }
 
-            if (model.ClearedDate.Date < pdc.ReceivedDate.Date)
+            // Clearing before the cheque date is allowed, but only once the user confirms it.
+            var earlyWarning = PdcService.EarlyClearanceWarning(pdc, model.ClearedDate);
+            if (ModelState.IsValid && earlyWarning != null && !model.ConfirmEarlyClearance)
             {
-                ModelState.AddModelError(nameof(model.ClearedDate), "Cleared date cannot be earlier than received date.");
-            }
-
-            // The cleared date is the accounting date of the cash movement, so it cannot
-            // be in the future either.
-            if (model.ClearedDate.Date > DateTime.Today)
-            {
-                ModelState.AddModelError(nameof(model.ClearedDate),
-                    "The cleared date cannot be in the future - it is the date the cash entry is posted. " +
-                    "Clear the cheque on the day the bank actually honours it.");
-            }
-
-            // Clearing before the date written on the cheque is usually a mistake - a bank
-            // will not honour a post-dated cheque early. It is not forbidden, because the
-            // parties can agree to present it early, so this asks for confirmation rather
-            // than refusing outright.
-            if (ModelState.IsValid
-                && model.ClearedDate.Date < pdc.ChequeDate.Date
-                && !model.ConfirmEarlyClearance)
-            {
-                var daysEarly = (int)(pdc.ChequeDate.Date - model.ClearedDate.Date).TotalDays;
-
                 model.RequiresEarlyClearanceConfirmation = true;
 
                 ModelState.AddModelError(string.Empty,
-                    $"This would clear the cheque {daysEarly} day(s) before its cheque date of " +
-                    $"{pdc.ChequeDate:dd/MM/yyyy}. A bank will not normally honour a post-dated cheque early. " +
-                    "Check the cleared date, or confirm below to go ahead anyway.");
+                    earlyWarning + " Check the cleared date, or confirm below to go ahead anyway.");
 
                 return View(model);
             }

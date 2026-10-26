@@ -259,6 +259,24 @@ Cause:
 - run monthly depreciation posting
 - confirm journal entries are posted correctly
 
+## AI Assistant (feature/ai-assistant)
+Voice and text assistant for staff, on OpenAI's realtime model (config Assistant:Model, default gpt-realtime-2.1-mini).
+- Browser connects to OpenAI over WebRTC with a 10-minute key minted by POST /Assistant/Session; the API key stays on the server.
+- Every tool call returns to POST /Assistant/Tool and is checked against the user's sign-in, company and permissions
+  (each tool carries the permission of its screen via PermissionCatalog). Queries are LINQ over ApplicationDbContext only.
+- Tools: help search, data model, context; finders for properties, units, tenants, vendors, accounts, leases, invoices,
+  receipts, PDCs, vendor bills, journals, service requests, approvals, employees; tenant/vendor statements, TB, P&L,
+  balance sheet, general ledger; generic query_records / aggregate_records over a whitelist of company-filtered entities.
+- Writes are proposals (AssistantPendingActions) confirmed only by a click (POST /Assistant/Confirm/{id}): create tenant,
+  create vendor, customer receipt, clear PDC, draft manual journal, post journal, submit/activate draft lease,
+  update/reply to a service request. Audit row ActivityName "Assistant/<tool>".
+- Shared logic extracted for the screens and the assistant: CustomerReceiptService, MasterDataCreationService,
+  PdcService.CheckClearance / EarlyClearanceWarning.
+- Config section "Assistant": Enabled, OpenAIApiKey (environment secret Assistant__OpenAIApiKey only), Model, Voice,
+  TranscriptionModel, MaxSessionMinutes 15, MaxToolCallsPerSession 60, DailySessionLimitPerCompany 100, PendingActionMinutes 10.
+- Permission Assistant.Use (SQL/29_AddAiAssistant.sql grants it to company administrators). Owner steps: docs/AI-Assistant-Owner-Guide.md.
+- Not in v1: raw SQL, receiving new PDCs, vendor bills/payments, creating leases, revenue recognition runs.
+
 ## Future Planned Work
 - closed-period validation improvements
 - print-friendly reports

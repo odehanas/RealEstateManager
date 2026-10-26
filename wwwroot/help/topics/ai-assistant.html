@@ -1,0 +1,59 @@
+<p>The <strong>AI Assistant</strong> answers questions about your company's records and about how RealEstateManager
+works, by voice or by typing. It can also prepare entries for you &mdash; a receipt, a tenant, a journal &mdash; but it
+never saves anything itself: every change appears as a card that you confirm with a click.</p>
+
+<div class="box ok">
+    <div class="box-title">Where it is</div>
+    <p>The round <strong>Assistant</strong> button at the bottom right of every screen opens the assistant panel. You only
+    see it if your administrator has switched the assistant on and given you the <strong>Use the AI Assistant</strong>
+    permission.</p>
+</div>
+
+<h3>Asking questions</h3>
+<ol class="steps">
+    <li>Open the panel and type a question, then press <strong>Send</strong>. Or select the <strong>microphone</strong>
+        and simply speak; the first time, the browser asks for permission to use the microphone.</li>
+    <li>The assistant looks the answer up in your records and replies. When you talk, it answers aloud and the
+        conversation is written in the panel as well.</li>
+    <li>Ask follow-up questions in the same way. <strong>Mute</strong> pauses the microphone; <strong>End session</strong>
+        or closing the panel finishes the conversation.</li>
+</ol>
+
+<p>Examples: <em>"Which tenants are overdue?"</em>, <em>"How many units are vacant in Marina Heights?"</em>,
+<em>"Show contract OWN-R-0001-U01-C001-2026"</em>, <em>"What was the profit for September?"</em>,
+<em>"Trial balance at 30 September"</em>, <em>"Which cheques fall due this month?"</em>,
+<em>"How do I close a month?"</em>. It understands English and Arabic.</p>
+
+<h3>Having it prepare an entry</h3>
+<p>Ask in plain words, for example <em>"Record 5,000 received by bank transfer against invoice INV-&hellip;"</em> or
+<em>"Clear cheque 104207 today"</em>. The assistant runs the same checks as the screen &mdash; closed periods, balances,
+duplicates, approvals &mdash; and shows a <strong>Please confirm</strong> card describing exactly what will happen.</p>
+<ul>
+    <li><strong>Confirm</strong> saves it through the same process as the screen and shows the reference, with a link
+        to the record.</li>
+    <li><strong>Cancel</strong> drops it. Nothing was saved.</li>
+    <li>A card left unconfirmed expires after ten minutes.</li>
+</ul>
+
+<div class="box">
+    <div class="box-title">Saying "yes" is not enough</div>
+    <p>Only a click on <strong>Confirm</strong> saves anything. This is deliberate: a misheard word must never
+    change your accounts.</p>
+</div>
+
+<p>It can prepare: new tenants and vendors, customer receipts, clearing a post-dated cheque, draft manual journals,
+posting a draft journal, putting a draft contract forward for approval (or activating it when approval is not
+required), and replying to or updating a tenant service request.</p>
+
+<h3>What it will not do</h3>
+<ul>
+    <li>Anything your own permissions do not allow &mdash; it tells you which permission or screen is involved.</li>
+    <li>Approve contracts or payments, delete posted records, reset posted entries, close periods, or manage users,
+        permissions, companies or subscriptions.</li>
+    <li>See any company other than the one you are working in.</li>
+</ul>
+
+<h3>Privacy</h3>
+<p>Your questions, and the records the assistant reads to answer them, are sent to OpenAI to produce the reply.
+OpenAI does not use data sent through its business API to train its models. Passwords and sign-in details are never
+sent. The conversation and every confirmed action are kept in the system's audit records.</p>

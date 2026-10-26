@@ -9,6 +9,7 @@
 @inject ApprovalService ApprovalService
 @inject PeriodClosingService PeriodClosingService
 @inject PaymentApprovalService PaymentApprovals
+@inject RealEstateManager.Services.Assistant.AssistantService Assistant
 
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
@@ -89,6 +90,10 @@
     var helpTopic = HelpCatalog.ForScreen(
         ViewContext.RouteData.Values["controller"]?.ToString(),
         ViewContext.RouteData.Values["action"]?.ToString());
+
+    // The AI assistant: only when switched on in the server settings, for staff with
+    // the Assistant.Use permission, in a company whose subscription is running.
+    var showAssistant = isAuthenticated && !subscriptionBlocked && await Assistant.IsAvailableAsync(User);
 }
 
 <!DOCTYPE html>
@@ -101,6 +106,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @* Help topic typography. Every rule is scoped under .help-content, so it cannot touch the application's own tables. *@
     <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
+    @if (showAssistant)
+    {
+        <link rel="stylesheet" href="~/css/assistant.css" asp-append-version="true" />
+    }
     @* Print rules for the whole application. media="print" so it costs nothing on screen. *@
     <link rel="stylesheet" href="~/css/document-print.css" media="print" asp-append-version="true" />
 </head>
@@ -632,6 +641,50 @@
         </div>
     }
 
+    @if (showAssistant)
+    {
+        @* ------------------------------------------------------------------
+           The AI assistant. Talk or type; it reads the company's records and
+           prepares entries, but nothing is saved until the user clicks Confirm.
+           ------------------------------------------------------------------ *@
+        <button type="button" class="assistant-fab" id="assistantFab"
+                data-bs-toggle="offcanvas" data-bs-target="#assistantPanel" aria-controls="assistantPanel"
+                title="AI Assistant">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            <span>Assistant</span>
+        </button>
+
+        <div class="offcanvas offcanvas-end assistant-panel" tabindex="-1" id="assistantPanel" aria-labelledby="assistantPanelTitle"
+             data-controller="@ViewContext.RouteData.Values["controller"]" data-action="@ViewContext.RouteData.Values["action"]">
+            <div class="offcanvas-header">
+                <div>
+                    <div class="assistant-panel-sub">@currentCompanyName</div>
+                    <h5 class="offcanvas-title mb-0" id="assistantPanelTitle">AI Assistant</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="assistant-status" id="assistantStatus">Ask about your properties, tenants, invoices or reports - by voice or text.</div>
+            <div class="offcanvas-body assistant-log" id="assistantLog" aria-live="polite">
+                <div class="assistant-hint">
+                    Try: <em>"Which tenants are overdue?"</em>, <em>"Vacant units in Tower A"</em>,
+                    <em>"Trial balance at 30 September"</em>, <em>"How do I clear a PDC?"</em>.
+                    Anything that changes your records is shown as a card for you to confirm.
+                </div>
+            </div>
+            <form class="assistant-compose" id="assistantForm" autocomplete="off">
+                <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantMic" title="Talk to the assistant" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+                </button>
+                <input type="text" class="form-control" id="assistantInput" placeholder="Type a question…" maxlength="2000" />
+                <button type="submit" class="btn btn-primary" id="assistantSend">Send</button>
+            </form>
+            <div class="assistant-footer">
+                <button type="button" class="btn btn-link btn-sm p-0" id="assistantMute" hidden>Mute</button>
+                <button type="button" class="btn btn-link btn-sm p-0 ms-auto" id="assistantEnd" hidden>End session</button>
+            </div>
+        </div>
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -694,6 +747,10 @@
             });
         })();
     </script>
+    @if (showAssistant)
+    {
+        <script src="~/js/assistant.js" asp-append-version="true"></script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

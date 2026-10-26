@@ -11,15 +11,18 @@ namespace RealEstateManager.Controllers
         private readonly ApplicationDbContext _db;
         private readonly CodeGenerationService _codeGenerationService;
         private readonly MasterDataUniquenessService _uniquenessService;
+        private readonly MasterDataCreationService _creationService;
 
         public VendorsController(
             ApplicationDbContext db,
             CodeGenerationService codeGenerationService,
-            MasterDataUniquenessService uniquenessService)
+            MasterDataUniquenessService uniquenessService,
+            MasterDataCreationService creationService)
         {
             _db = db;
             _codeGenerationService = codeGenerationService;
             _uniquenessService = uniquenessService;
+            _creationService = creationService;
         }
 
         [HttpGet]
@@ -43,36 +46,18 @@ namespace RealEstateManager.Controllers
         public async Task<IActionResult> Create(Vendor model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
-            var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
-            if (company == null)
-            {
-                ModelState.AddModelError(string.Empty, "No company record found.");
-            }
 
             // The code is generated, never typed. Anything posted from the form is ignored.
             ModelState.Remove(nameof(model.Code));
 
-            // A registration with no number behind it cannot support an input tax claim,
-            // and would let bills charge VAT the supplier may not be entitled to.
-            if (model.IsVatRegistered && string.IsNullOrWhiteSpace(model.TrnNumber))
-            {
-                ModelState.AddModelError(nameof(model.TrnNumber),
-                    "A VAT registered supplier must have a TRN on file.");
-            }
-
-            await _uniquenessService.ValidateVendorAsync(ModelState, companyId, model);
+            await _creationService.ValidateVendorAsync(companyId, model, ModelState);
 
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            model.Code = await _codeGenerationService.GenerateVendorCodeAsync();
-            model.CompanyId = companyId;
-            model.IsActive = true;
-
-            _db.Vendors.Add(model);
-            await _db.SaveChangesAsync();
+            await _creationService.CreateVendorAsync(companyId, model);
 
             return RedirectToAction(nameof(Index));
         }

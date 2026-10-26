@@ -20,6 +20,10 @@ builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 
 builder.Services.Configure<FeedbackNotificationOptions>(builder.Configuration.GetSection("FeedbackNotifications"));
 builder.Services.Configure<PlatformOwnerOptions>(builder.Configuration.GetSection("PlatformOwner"));
+// The AI assistant. Its OpenAI key comes from the hosting environment variable
+// Assistant__OpenAIApiKey (locally: dotnet user-secrets), never from appsettings.json.
+builder.Services.Configure<RealEstateManager.Services.Assistant.AssistantOptions>(builder.Configuration.GetSection("Assistant"));
+builder.Services.AddHttpClient("openai", client => client.Timeout = TimeSpan.FromSeconds(30));
 builder.Services.AddSingleton<PlatformOwnerService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -230,6 +234,9 @@ builder.Services.AddScoped<AttendanceService>();
 builder.Services.AddScoped<ApprovalAuthorityService>();
 builder.Services.AddScoped<PaymentApprovalService>();
 builder.Services.AddScoped<EmployeePortalService>();
+builder.Services.AddScoped<CustomerReceiptService>();
+builder.Services.AddScoped<MasterDataCreationService>();
+builder.Services.AddScoped<RealEstateManager.Services.Assistant.AssistantService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<LeaseWorkflowService>();
