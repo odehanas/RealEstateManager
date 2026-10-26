@@ -43,7 +43,7 @@ namespace RealEstateManager.Controllers
             new Capability("Viewing", "Financial reports, statements and Build Your Own Report", new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight }),
             new Capability("Viewing", "Business Performance page", new[] { AppPermissions.PerformanceView, AppPermissions.OwnerOversight }),
             new Capability("Viewing", "Owner Monitor: postings and payment releases day by day", new[] { AppPermissions.OwnerOversight }),
-            new Capability("Viewing", "Activity log: what staff changed, refused attempts, locked accounts", Array.Empty<string>(), AdminsOnly: true),
+            new Capability("Viewing", "Activity log (Audit Logs): what staff changed, refused attempts", Array.Empty<string>(), AdminsOnly: true),
             new Capability("Control", "Set approval limits and delegate authority while away", new[] { AppPermissions.OwnerOversight }),
             new Capability("Control", "Users, roles and permissions of this company", Array.Empty<string>(), AdminsOnly: true),
             new Capability("Control", "All companies, subscriptions, database updates", Array.Empty<string>(), SystemAdminOnly: true),

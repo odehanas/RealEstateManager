@@ -12,7 +12,7 @@
     <p class="text-muted">What the system enforces to protect the company's money and data, what the owners should adopt as policy, and answers to the questions owners usually ask.</p>
 
     <div class="row g-3 mb-3">
-        <div class="col-md-4"><a asp-controller="Oversight" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Owner Monitor</strong><div class="small text-muted">Cash, postings, releases, staff changes and refused attempts, day by day.</div></div></a></div>
+        <div class="col-md-4"><a asp-controller="Performance" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Business Performance</strong><div class="small text-muted">Results, collections, occupancy, and what waits for your decision.</div></div></a></div>
         <div class="col-md-4"><a asp-controller="ApprovalLimits" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Approval Limits &amp; Delegation</strong><div class="small text-muted">Who may release how much, and temporary authority while you travel.</div></div></a></div>
         <div class="col-md-4"><a asp-controller="PaymentApprovals" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Payment Approvals</strong><div class="small text-muted">Payments waiting for a second person, with their accounting lines.</div></div></a></div>
     </div>
@@ -29,7 +29,7 @@
                 <tr><td><strong>Payroll and salary advances</strong></td><td>Approving a payroll posts it to the ledger, so the approver's limit must cover the total net pay. Salary advances are checked the same way. Payslips reach employees only after approval.</td></tr>
                 <tr><td><strong>Closed periods</strong></td><td>Once a month is closed, nothing can be posted into it. Reopening needs a request and a separate approver.</td></tr>
                 <tr><td><strong>Roles and permissions</strong></td><td>Each user sees and does only what their permissions allow, company by company. Owners can be given read-only oversight of all reports without being able to change anything.</td></tr>
-                <tr><td><strong>Audit trail</strong></td><td>Every change made by staff is logged with user, time and address, as are refused attempts (access denied) and errors. The Owner Monitor summarises them.</td></tr>
+                <tr><td><strong>Audit trail</strong></td><td>Every change made by staff is logged with user, time and address, as are refused attempts (access denied) and errors. Administrators review them in System Setup &rsaquo; Audit Logs; owners see the business, not the log.</td></tr>
                 <tr><td><strong>Separate portals</strong></td><td>Tenants (/portal) and employees (/me) sign in with their own accounts and cookies and can only ever see their own records &mdash; never a company screen. Employees see approved payslips, their leave balance and advances, request leave and certificates.</td></tr>
                 <tr><td><strong>Sign-in protection</strong></td><td>Five wrong passwords lock an account for 15 minutes, stopping password guessing from the internet. The default ADMIN password and any password set by an administrator must be changed at first sign-in. New passwords need at least 10 characters with upper and lower case letters and a digit.</td></tr>
                 <tr><td><strong>Password storage</strong></td><td>Passwords are never stored &mdash; only a salted PBKDF2-SHA256 hash with 100,000 iterations. Nobody, including the developer, can read a user's password.</td></tr>
@@ -43,7 +43,7 @@
         <li><strong>Switch payment approval on</strong> for every live company, and set limits that suit the business.</li>
         <li><strong>One person, one login.</strong> Never share accounts &mdash; the audit trail is only as good as the logins behind it.</li>
         <li><strong>Remove access the day someone leaves</strong>: disable their staff user and their employee portal login.</li>
-        <li><strong>Review the Owner Monitor weekly</strong>: large postings, payments released, staff changes, refused attempts, old drafts.</li>
+        <li><strong>Review Business Performance and the Owner Monitor weekly</strong>: results, collections, large postings, payments released, old drafts. Administrators check the Audit Logs.</li>
         <li><strong>Bank reconciliation every month</strong>, prepared by one person and reviewed by another, before the month is closed.</li>
         <li><strong>Petty cash counts</strong> by surprise at least monthly, matched to the vouchers in the system.</li>
         <li><strong>Vendor bank details</strong>: confirm any change by phone on a known number before paying &mdash; the most common fraud is a fake "new bank account" email.</li>
@@ -76,6 +76,6 @@
         <dd>The hosting provider backs up the database. Ask your administrator to confirm the schedule and to test a restore at least twice a year.</dd>
 
         <dt>What should we do if we suspect a breach?</dt>
-        <dd>Disable the affected users, change administrator passwords, ask the administrator to rotate the database password, and review the Owner Monitor and audit log for the period.</dd>
+        <dd>Disable the affected users, change administrator passwords, ask the administrator to rotate the database password, and review the audit log for the period (System Setup &rsaquo; Audit Logs).</dd>
     </dl>
 </div>
