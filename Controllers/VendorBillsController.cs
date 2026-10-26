@@ -73,6 +73,14 @@ namespace RealEstateManager.Controllers
             ViewBag.Company = await _db.Companies.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == bill.CompanyId);
 
+            // Payments and advance applications that settled the bill, by clearing document.
+            ViewBag.Clearings = await _db.VendorClearingLines.AsNoTracking()
+                .Where(x => x.VendorBillId == id)
+                .Include(x => x.VendorClearing).ThenInclude(x => x!.VendorPayment)
+                .Include(x => x.VendorClearing).ThenInclude(x => x!.AdvancePayment)
+                .OrderBy(x => x.VendorClearing!.ClearingDate).ThenBy(x => x.Id)
+                .ToListAsync();
+
             return View(bill);
         }
 

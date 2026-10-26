@@ -1,49 +1,64 @@
 ﻿@model IEnumerable<RealEstateManager.Domain.VendorPayment>
-
+@using RealEstateManager.Domain
 @{
     ViewData["Title"] = "Vendor Payments";
+    var bills = (Dictionary<int, string>)ViewBag.Bills;
+    var applications = (List<VendorClearing>)ViewBag.Applications;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Vendor Payments</h2>
-    <a asp-action="Create" class="btn btn-dark">New Vendor Payment</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">Vendor Payments</h2>
+        <div class="text-muted">Payments of open bills (each with its clearing document), advances paid before a bill, and advances applied to bills.</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ApplyAdvance" class="btn btn-outline-dark">Apply advance to bills</a>
+        <a asp-action="Create" asp-route-advance="true" class="btn btn-outline-dark">Pay an advance</a>
+        <a asp-action="Create" class="btn btn-dark">New Vendor Payment</a>
+    </div>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Payment</th>
-            <th>Date</th>
-            <th>Bill</th>
-            <th>Vendor</th>
-            <th>Property</th>
-            <th>Method</th>
-            <th class="text-end">Amount</th>
-            <th>GL</th>
-        </tr>
+@if (TempData["PaymentSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
+
+<table class="table table-bordered table-striped table-sm align-middle">
+    <thead class="table-light">
+        <tr><th>Payment</th><th>Date</th><th>Vendor</th><th>Type</th><th>Clearing document</th><th>Bills settled</th><th>Method / ref.</th><th class="text-end">Amount</th><th class="text-end">Advance open</th><th>Status</th></tr>
     </thead>
     <tbody>
-        @foreach (var payment in Model)
-        {
-            <tr>
-                <td>@payment.PaymentNumber</td>
-                <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
-                <td>@payment.VendorBill?.BillNumber</td>
-                <td>@payment.VendorBill?.Vendor?.Name</td>
-                <td>@payment.VendorBill?.Property?.Name</td>
-                <td>@payment.PaymentMethod</td>
-                <td class="text-end">@payment.Amount.ToString("N2")</td>
-                <td>
-                    @if (payment.JournalEntryId.HasValue)
-                    {
-                        <span class="badge bg-success">Posted</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning text-dark">Not Posted</span>
-                    }
-                </td>
-            </tr>
-        }
+    @foreach (var p in Model)
+    {
+        var posted = p.JournalEntry?.IsPosted == true;
+        <tr>
+            <td><a asp-action="Details" asp-route-id="@p.Id">@p.PaymentNumber</a></td>
+            <td>@p.PaymentDate.ToString("dd/MM/yyyy")</td>
+            <td>@(p.Vendor?.Name ?? p.VendorBill?.Vendor?.Name)</td>
+            <td>@(p.IsAdvance ? "Advance" : "Payment")</td>
+            <td>@p.ClearingNumber</td>
+            <td class="small">@(bills.TryGetValue(p.Id, out var b) ? b : p.VendorBill?.BillNumber)</td>
+            <td class="small">@p.PaymentMethod @p.Reference</td>
+            <td class="text-end">@p.Amount.ToString("N2")</td>
+            <td class="text-end">@(p.IsAdvance ? p.AdvanceOpen.ToString("N2") : "")</td>
+            <td>@if (posted) { <span class="badge bg-success">Posted</span> } else { <span class="badge bg-warning text-dark">Awaiting approval / draft</span> }</td>
+        </tr>
+    }
     </tbody>
 </table>
+
+@if (applications.Count > 0)
+{
+    <h4 class="mt-4">Advances applied to bills</h4>
+    <table class="table table-bordered table-sm align-middle">
+        <thead class="table-light"><tr><th>Clearing document</th><th>Date</th><th>Vendor</th><th>Advance</th><th>Bills settled</th><th class="text-end">Amount</th><th>Status</th></tr></thead>
+        <tbody>
+        @foreach (var c in applications)
+        {
+            <tr>
+                <td>@c.ClearingNumber</td><td>@c.ClearingDate.ToString("dd/MM/yyyy")</td><td>@c.Vendor?.Name</td>
+                <td><a asp-action="Details" asp-route-id="@c.AdvancePaymentId">@c.AdvancePayment?.PaymentNumber</a></td>
+                <td class="small">@string.Join(", ", c.Lines.Select(l => l.VendorBill?.BillNumber))</td>
+                <td class="text-end">@c.Amount.ToString("N2")</td><td>@c.Status</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

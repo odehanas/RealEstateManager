@@ -49,7 +49,8 @@ namespace RealEstateManager.Services.Reporting
             ["PayrollRun"] = "Payroll runs", ["PayrollRunLine"] = "Payslips (payroll lines)", ["AttendanceRecord"] = "Attendance",
             ["PaymentApproval"] = "Payment approvals",
             ["VendorBillLine"] = "Vendor bill lines (project costs, VAT)",
-            ["DevelopmentTransfer"] = "Development completions (transfers out of WIP)"
+            ["DevelopmentTransfer"] = "Development completions (transfers out of WIP)",
+            ["VendorClearingLine"] = "Vendor clearing documents (bills settled by payments and advances)"
         };
 
         public sealed record SourceInfo(string Key, string Label);

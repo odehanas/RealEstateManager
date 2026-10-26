@@ -2181,6 +2181,7 @@ namespace RealEstateManager.Data
             ConfigureControls(modelBuilder);
             ConfigureAssistant(modelBuilder);
             ConfigureReporting(modelBuilder);
+            ConfigurePayables(modelBuilder);
         }
     }
 }

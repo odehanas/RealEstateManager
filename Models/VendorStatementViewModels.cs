@@ -26,6 +26,13 @@ namespace RealEstateManager.Models
 
         /// <summary>Posted bills not yet fully paid, as at the end of the period.</summary>
         public List<VendorOpenBillViewModel> OpenBills { get; set; } = new();
+
+        /// <summary>
+        /// Advances paid to the vendor (SAP special G/L "A"), kept apart from what we owe:
+        /// open advances are money the vendor owes back in goods or services.
+        /// </summary>
+        public decimal AdvancesOpen { get; set; }
+        public List<VendorStatementRowViewModel> AdvanceRows { get; set; } = new();
     }
 
     public class VendorStatementRowViewModel

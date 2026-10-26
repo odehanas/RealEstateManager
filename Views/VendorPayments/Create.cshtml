@@ -1,69 +1,227 @@
-﻿@model RealEstateManager.Models.VendorPaymentCreateViewModel
-@using RealEstateManager.Domain
-
+﻿@model RealEstateManager.Services.VendorClearingService.PaymentRequest
 @{
     ViewData["Title"] = "Vendor Payment";
-    var bills = ViewBag.Bills as List<VendorBill> ?? new();
-    var selectedBillId = ViewBag.SelectedBillId as int?;
+    var vendors = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Vendors;
+    var cashAccounts = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.CashAccounts;
+    int? defaultCash = ViewBag.DefaultCashAccountId;
+    int? preselectBill = ViewBag.PreselectBillId;
 }
+<style>
+    .vp-items td, .vp-items th { font-size: .88rem; vertical-align: middle; }
+    .vp-items input.amount { max-width: 140px; text-align: right; margin-left: auto; }
+    .vp-items tr.selected { background: #eef6ff; }
+    .vp-total { font-size: 1.3rem; font-weight: 700; }
+</style>
 
-<h2>Vendor Payment</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Vendor Payment</h2>
+        <div class="text-muted">Choose the vendor, then the open bills to pay - in full or in part. The payment gets a clearing document number. To pay before a bill arrives, choose <strong>Advance</strong>.</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+</div>
 
-<form asp-action="Create" method="post">
+<div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+<form asp-action="Create" method="post" id="vpForm">
     @Html.AntiForgeryToken()
-
-    <div asp-validation-summary="All" class="text-danger mb-3"></div>
-
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label asp-for="VendorBillId" class="form-label">Vendor Bill</label>
-            <select asp-for="VendorBillId" class="form-select">
-                <option value="">Select Bill</option>
-                @foreach (var bill in bills)
-                {
-                    var outstanding = bill.TotalAmount - bill.AmountPaid;
-                    var isSelected = Model.VendorBillId == bill.Id || selectedBillId == bill.Id;
-
-                    <option value="@bill.Id" selected="@(isSelected ? "selected" : null)">
-                        @bill.BillNumber - @bill.Vendor?.Name - Outstanding: @outstanding.ToString("N2")
-                    </option>
-                }
-            </select>
-        </div>
-
-        <div class="col-md-3">
-            <label asp-for="PaymentNumber" class="form-label"></label>
-            <input asp-for="PaymentNumber" class="form-control" />
-            <small class="text-muted">Leave blank to auto-generate.</small>
-        </div>
-
-        <div class="col-md-3">
-            <label asp-for="PaymentDate" class="form-label"></label>
-            <input asp-for="PaymentDate" type="date" class="form-control" />
-        </div>
-
-        <div class="col-md-4">
-            <label asp-for="Amount" class="form-label"></label>
-            <input asp-for="Amount" class="form-control" />
-        </div>
-
-        <div class="col-md-4">
-            <label asp-for="PaymentMethod" class="form-label"></label>
-            <select asp-for="PaymentMethod" class="form-select">
-                <option>Bank</option>
-                <option>Cash</option>
-                <option>Cheque</option>
-                <option>Transfer</option>
-            </select>
+    <div class="card shadow-sm mb-3">
+        <div class="card-body row g-3">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold" for="VendorId">1. Vendor</label>
+                <select asp-for="VendorId" class="form-select" id="VendorId">
+                    <option value="0">Choose the vendor…</option>
+                    @foreach (var v in vendors) { <option value="@v.Value" selected="@(v.Value == Model.VendorId.ToString() ? "selected" : null)">@v.Text</option> }
+                </select>
+            </div>
+            <div class="col-md-7">
+                <label class="form-label fw-semibold">2. Payment type</label>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="IsAdvance" id="typeBills" value="false" @(Model.IsAdvance ? "" : "checked")>
+                    <label class="btn btn-outline-dark" for="typeBills">Pay open bills</label>
+                    <input type="radio" class="btn-check" name="IsAdvance" id="typeAdvance" value="true" @(Model.IsAdvance ? "checked" : "")>
+                    <label class="btn btn-outline-dark" for="typeAdvance">Advance (down payment)</label>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save and Post</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <div class="card shadow-sm mb-3" id="billsCard">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">3. Open items</h5>
+            <span class="small text-muted" id="itemsNote">Choose a vendor to see their open bills.</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0 vp-items">
+                <thead class="table-light">
+                    <tr><th style="width:36px"></th><th>Bill</th><th>Supplier ref</th><th>Bill date</th><th>Due</th><th>For</th><th class="text-end">Total</th><th class="text-end">Paid</th><th class="text-end">Open</th><th class="text-end" style="width:160px">Pay now</th></tr>
+                </thead>
+                <tbody id="itemsBody"></tbody>
+            </table>
+        </div>
+        <div class="card-body small text-muted" id="advancesNote" hidden></div>
     </div>
+
+    <div class="card shadow-sm mb-3" id="advanceCard" hidden>
+        <div class="card-header bg-light"><h5 class="mb-0">3. Advance (down payment)</h5></div>
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label asp-for="AdvanceAmount" class="form-label">Amount</label>
+                <input asp-for="AdvanceAmount" class="form-control" type="number" step="0.01" min="0" />
+            </div>
+            <div class="col-md-8 small text-muted">
+                Paid before any bill (SAP special G/L "A" down payment). It is recorded on <strong>11550 Advances to Suppliers</strong>, not in Accounts Payable,
+                and stays open until you apply it to the vendor's bills from <em>Vendor Payments ▸ Apply advance</em>.
+                If the supplier issues a tax invoice for the advance, record it as a vendor bill instead so its VAT can be recovered.
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light"><h5 class="mb-0">4. Payment details</h5></div>
+        <div class="card-body row g-3">
+            <div class="col-md-3">
+                <label asp-for="PaymentDate" class="form-label">Payment date</label>
+                <input asp-for="PaymentDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="PaidFromAccountId" class="form-label">Paid from</label>
+                <select asp-for="PaidFromAccountId" class="form-select">
+                    @foreach (var a in cashAccounts)
+                    {
+                        <option value="@a.Value" selected="@((Model.PaidFromAccountId?.ToString() ?? defaultCash?.ToString()) == a.Value ? "selected" : null)">@a.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="PaymentMethod" class="form-label">Method</label>
+                <select asp-for="PaymentMethod" class="form-select">
+                    <option>Bank</option><option>Cheque</option><option>Cash</option><option>Transfer</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="Reference" class="form-label">Cheque / transfer ref.</label>
+                <input asp-for="Reference" class="form-control" maxlength="100" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="PaymentNumber" class="form-label">Payment number</label>
+                <input asp-for="PaymentNumber" class="form-control" placeholder="automatic" />
+            </div>
+            <div class="col-md-8">
+                <label asp-for="Notes" class="form-label">Notes</label>
+                <input asp-for="Notes" class="form-control" maxlength="500" />
+            </div>
+            <div class="col-md-4 text-end align-self-end">
+                <div class="small text-muted">Total to pay</div>
+                <div class="vp-total" id="total">0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark" id="submitBtn">Save and Post</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<script>
+(function () {
+    var vendor = document.getElementById('VendorId');
+    var body = document.getElementById('itemsBody');
+    var note = document.getElementById('itemsNote');
+    var advNote = document.getElementById('advancesNote');
+    var total = document.getElementById('total');
+    var advAmount = document.getElementById('AdvanceAmount');
+    var preselect = @(preselectBill?.ToString() ?? "null");
+    var posted = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Allocations.ToDictionary(x => x.BillId.ToString(), x => x.Amount)));
+
+    function fmt(n) { return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function isAdvance() { return document.getElementById('typeAdvance').checked; }
+
+    function recalc() {
+        var sum = 0;
+        if (isAdvance()) { sum = parseFloat(advAmount.value) || 0; }
+        else {
+            body.querySelectorAll('tr[data-bill]').forEach(function (tr) {
+                var box = tr.querySelector('input[type=checkbox]');
+                var amt = tr.querySelector('input.amount');
+                amt.disabled = !box.checked;
+                tr.classList.toggle('selected', box.checked);
+                if (box.checked) { sum += parseFloat(amt.value) || 0; }
+            });
+        }
+        total.textContent = fmt(sum);
+    }
+
+    function cell(tr, text, cls) { var td = document.createElement('td'); if (cls) { td.className = cls; } td.textContent = text; tr.appendChild(td); return td; }
+
+    function load() {
+        body.innerHTML = '';
+        advNote.hidden = true;
+        if (!vendor.value || vendor.value === '0') { note.textContent = 'Choose a vendor to see their open bills.'; recalc(); return; }
+        note.textContent = 'Loading…';
+        fetch('/VendorPayments/OpenItems?vendorId=' + vendor.value, { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var i = 0;
+                data.bills.forEach(function (b) {
+                    if (b.open <= 0) { return; }
+                    var tr = document.createElement('tr');
+                    tr.setAttribute('data-bill', b.billId);
+                    var td = document.createElement('td');
+                    var box = document.createElement('input'); box.type = 'checkbox'; box.className = 'form-check-input';
+                    td.appendChild(box); tr.appendChild(td);
+                    cell(tr, b.billNumber); cell(tr, b.vendorReference || ''); cell(tr, b.billDate.substring(0, 10));
+                    var due = cell(tr, b.dueDate.substring(0, 10) + (b.daysOverdue > 0 ? ' (' + b.daysOverdue + 'd overdue)' : ''));
+                    if (b.daysOverdue > 0) { due.className = 'text-danger'; }
+                    cell(tr, [b.property, b.project].filter(Boolean).join(' · '));
+                    cell(tr, fmt(b.total), 'text-end'); cell(tr, fmt(b.paid + b.pending), 'text-end');
+                    cell(tr, fmt(b.open), 'text-end fw-semibold');
+                    var payTd = document.createElement('td'); payTd.className = 'text-end';
+                    var id = document.createElement('input'); id.type = 'hidden'; id.name = 'Allocations[' + i + '].BillId'; id.value = b.billId;
+                    var amt = document.createElement('input'); amt.type = 'number'; amt.step = '0.01'; amt.min = '0'; amt.max = b.open;
+                    amt.className = 'form-control form-control-sm amount'; amt.name = 'Allocations[' + i + '].Amount'; amt.value = b.open.toFixed(2);
+                    payTd.appendChild(id); payTd.appendChild(amt); tr.appendChild(payTd);
+                    if (posted[b.billId] !== undefined) { box.checked = true; amt.value = posted[b.billId]; }
+                    if (preselect === b.billId) { box.checked = true; }
+                    box.addEventListener('change', recalc);
+                    amt.addEventListener('input', function () {
+                        if ((parseFloat(amt.value) || 0) > b.open) { amt.value = b.open.toFixed(2); }
+                        recalc();
+                    });
+                    body.appendChild(tr);
+                    i++;
+                });
+                note.textContent = i === 0 ? 'This vendor has no open bills.' : i + ' open bill(s). Tick the ones to pay; change the amount for a part payment.';
+                if (data.advances.length) {
+                    var open = data.advances.reduce(function (s, a) { return s + a.open; }, 0);
+                    advNote.hidden = false;
+                    advNote.innerHTML = '';
+                    advNote.appendChild(document.createTextNode('This vendor has ' + fmt(open) + ' of advances not yet applied (' +
+                        data.advances.map(function (a) { return a.paymentNumber; }).join(', ') + '). '));
+                    var link = document.createElement('a');
+                    link.href = '/VendorPayments/ApplyAdvance?vendorId=' + vendor.value;
+                    link.textContent = 'Apply an advance to these bills instead of paying again';
+                    advNote.appendChild(link);
+                }
+                recalc();
+            })
+            .catch(function () { note.textContent = 'The open items could not be loaded.'; });
+    }
+
+    function mode() {
+        document.getElementById('billsCard').hidden = isAdvance();
+        document.getElementById('advanceCard').hidden = !isAdvance();
+        recalc();
+    }
+
+    vendor.addEventListener('change', load);
+    document.querySelectorAll('input[name=IsAdvance]').forEach(function (r) { r.addEventListener('change', mode); });
+    advAmount.addEventListener('input', recalc);
+    document.getElementById('vpForm').addEventListener('submit', function (e) {
+        if (!vendor.value || vendor.value === '0') { e.preventDefault(); alert('Choose the vendor first.'); }
+    });
+    mode();
+    load();
+})();
+</script>
 }

@@ -533,13 +533,23 @@ namespace RealEstateManager.Services
             return journalEntry;
         }
 
+        /// <summary>
+        /// A payment to a vendor. Paying open bills (SAP F-53):
+        ///
+        ///   Dr  Accounts Payable        one line per bill, tagged with the bill and vendor
+        ///       Cr  Bank / Cash         the account paid from
+        ///
+        /// An advance / down payment (SAP F-48, special G/L indicator A) is kept apart from
+        /// Accounts Payable until applied to bills:
+        ///
+        ///   Dr  11550 Advances to Suppliers   tagged with the vendor
+        ///       Cr  Bank / Cash
+        /// </summary>
         public async Task<JournalEntry> PostVendorPaymentAsync(int vendorPaymentId)
         {
             var payment = await _db.VendorPayments
                 .Include(x => x.VendorBill)
-                    .ThenInclude(x => x!.Vendor)
-                .Include(x => x.VendorBill)
-                    .ThenInclude(x => x!.Property)
+                .Include(x => x.Vendor)
                 .Include(x => x.JournalEntry)
                 .FirstOrDefaultAsync(x => x.Id == vendorPaymentId);
 
@@ -555,58 +565,153 @@ namespace RealEstateManager.Services
 
             var settings = await GetCompanyAccountSettingAsync(payment.CompanyId);
 
-            var cashAccount = await GetMappedAccountAsync(
-                payment.CompanyId,
-                settings.DefaultCashAccountId,
-                "Default Cash");
+            var cashAccount = payment.PaidFromAccountId.HasValue
+                ? await _db.Accounts.FirstAsync(x => x.Id == payment.PaidFromAccountId.Value)
+                : await GetMappedAccountAsync(payment.CompanyId, settings.DefaultCashAccountId, "Default Cash");
 
-            var accountsPayableAccount = await GetMappedAccountAsync(
-                payment.CompanyId,
-                settings.AccountsPayableAccountId,
-                "Accounts Payable");
+            var vendorId = payment.VendorId ?? payment.VendorBill?.VendorId
+                ?? throw new InvalidOperationException($"Payment {payment.PaymentNumber} has no vendor.");
 
-            var bill = payment.VendorBill!;
-            var lines = new List<JournalEntryLine>
+            var lines = new List<JournalEntryLine>();
+            string reference;
+
+            if (payment.IsAdvance)
             {
-                new()
+                var advances = await GetSupplierAdvancesAccountAsync(payment.CompanyId);
+                lines.Add(new JournalEntryLine
                 {
-                    AccountId = accountsPayableAccount.Id,
+                    AccountId = advances.Id,
                     Debit = payment.Amount,
-                    Credit = 0m,
-                    Description = $"Settlement of vendor bill {bill.BillNumber}",
-                    PropertyId = bill.PropertyId,
-                    VendorId = bill.VendorId,
-                    VendorBillId = bill.Id
-                },
-                new()
+                    Description = $"Advance (down payment) {payment.PaymentNumber}" + (payment.Vendor != null ? $" to {payment.Vendor.Name}" : string.Empty),
+                    VendorId = vendorId
+                });
+                reference = "Advance";
+            }
+            else
+            {
+                var accountsPayableAccount = await GetMappedAccountAsync(
+                    payment.CompanyId,
+                    settings.AccountsPayableAccountId,
+                    "Accounts Payable");
+
+                var allocations = await _db.VendorClearingLines
+                    .Include(x => x.VendorBill)
+                    .Where(x => x.VendorClearing!.VendorPaymentId == payment.Id && x.VendorClearing.ClearingType == VendorClearingTypes.Payment)
+                    .ToListAsync();
+
+                // A payment recorded before clearing documents pays its one bill.
+                var applied = allocations.Count > 0
+                    ? allocations.Select(x => (Bill: x.VendorBill!, x.Amount)).ToList()
+                    : new List<(VendorBill Bill, decimal Amount)>
+                    {
+                        (payment.VendorBill ?? throw new InvalidOperationException($"Payment {payment.PaymentNumber} is not applied to any bill."), payment.Amount)
+                    };
+
+                foreach (var (bill, amount) in applied)
                 {
-                    AccountId = cashAccount.Id,
-                    Debit = 0m,
-                    Credit = payment.Amount,
-                    Description = $"Vendor payment {payment.PaymentNumber}",
-                    PropertyId = bill.PropertyId,
-                    VendorId = bill.VendorId,
-                    VendorBillId = bill.Id
+                    lines.Add(new JournalEntryLine
+                    {
+                        AccountId = accountsPayableAccount.Id,
+                        Debit = amount,
+                        Description = $"Settlement of vendor bill {bill.BillNumber}" + (bill.VendorReference != null ? $" ({bill.VendorReference})" : string.Empty),
+                        PropertyId = bill.PropertyId,
+                        VendorId = vendorId,
+                        VendorBillId = bill.Id
+                    });
                 }
-            };
+
+                reference = payment.ClearingNumber ?? string.Join(", ", applied.Select(x => x.Bill.BillNumber));
+            }
+
+            lines.Add(new JournalEntryLine
+            {
+                AccountId = cashAccount.Id,
+                Credit = payment.Amount,
+                Description = $"Vendor payment {payment.PaymentNumber}" + (string.IsNullOrWhiteSpace(payment.Reference) ? string.Empty : $" ref {payment.Reference}"),
+                PropertyId = lines.Count == 1 ? lines[0].PropertyId : null,
+                VendorId = vendorId,
+                VendorBillId = lines.Count == 1 ? lines[0].VendorBillId : null
+            });
 
             var journalEntry = await CreateJournalEntryAsync(
                 payment.CompanyId,
                 payment.PaymentDate,
-                $"Posting vendor payment {payment.PaymentNumber}",
+                payment.IsAdvance ? $"Advance to vendor {payment.PaymentNumber}" : $"Posting vendor payment {payment.PaymentNumber}",
                 "VendorPayment",
                 payment.Id,
                 lines,
                 journalType: "Auto",
                 documentNumber: payment.PaymentNumber,
-                referenceNumber: bill.BillNumber);
+                referenceNumber: reference.Length > 100 ? reference[..100] : reference);
 
-            // Settlement of the bill is applied when the journal is posted.
+            // Settlement of the bills is applied when the journal is posted.
             payment.JournalEntryId = journalEntry.Id;
 
             await _db.SaveChangesAsync();
             return journalEntry;
         }
+
+        /// <summary>
+        /// An advance applied to the vendor's bills (SAP F-54). No money moves: the advance
+        /// already paid settles the bills.
+        ///
+        ///   Dr  Accounts Payable                one line per bill
+        ///       Cr  11550 Advances to Suppliers
+        /// </summary>
+        public async Task<JournalEntry> PostVendorAdvanceClearingAsync(int vendorClearingId)
+        {
+            var clearing = await _db.VendorClearings
+                .Include(x => x.Lines).ThenInclude(x => x.VendorBill)
+                .Include(x => x.AdvancePayment)
+                .FirstOrDefaultAsync(x => x.Id == vendorClearingId)
+                ?? throw new InvalidOperationException("The clearing document was not found.");
+
+            if (clearing.JournalEntryId.HasValue)
+                return await _db.JournalEntries.Include(x => x.Lines).FirstAsync(x => x.Id == clearing.JournalEntryId.Value);
+
+            var settings = await GetCompanyAccountSettingAsync(clearing.CompanyId);
+            var accountsPayableAccount = await GetMappedAccountAsync(clearing.CompanyId, settings.AccountsPayableAccountId, "Accounts Payable");
+            var advances = await GetSupplierAdvancesAccountAsync(clearing.CompanyId);
+
+            var lines = clearing.Lines.Select(x => new JournalEntryLine
+            {
+                AccountId = accountsPayableAccount.Id,
+                Debit = x.Amount,
+                Description = $"Bill {x.VendorBill!.BillNumber} settled from advance {clearing.AdvancePayment?.PaymentNumber}",
+                PropertyId = x.VendorBill.PropertyId,
+                VendorId = clearing.VendorId,
+                VendorBillId = x.VendorBillId
+            }).ToList();
+
+            lines.Add(new JournalEntryLine
+            {
+                AccountId = advances.Id,
+                Credit = clearing.Lines.Sum(x => x.Amount),
+                Description = $"Advance {clearing.AdvancePayment?.PaymentNumber} applied ({clearing.ClearingNumber})",
+                VendorId = clearing.VendorId
+            });
+
+            var journalEntry = await CreateJournalEntryAsync(
+                clearing.CompanyId,
+                clearing.ClearingDate,
+                $"Advance applied to bills {clearing.ClearingNumber}",
+                VendorClearingService.AdvanceSourceType,
+                clearing.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: clearing.ClearingNumber,
+                referenceNumber: clearing.AdvancePayment?.PaymentNumber);
+
+            clearing.JournalEntryId = journalEntry.Id;
+            await _db.SaveChangesAsync();
+            return journalEntry;
+        }
+
+        /// <summary>11550 Advances to Suppliers: where down payments wait until applied to bills.</summary>
+        private async Task<Account> GetSupplierAdvancesAccountAsync(int companyId) =>
+            await _db.Accounts.FirstOrDefaultAsync(x => x.CompanyId == companyId && x.Code == VendorClearingService.SupplierAdvancesAccountCode)
+            ?? throw new InvalidOperationException(
+                $"Account {VendorClearingService.SupplierAdvancesAccountCode} Advances to Suppliers is missing from the chart of accounts. Add it under Assets to pay vendor advances.");
 
         /// <summary>
         /// A cost capitalised into a development project without a supplier bill - the land

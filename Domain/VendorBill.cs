@@ -21,6 +21,10 @@
         public int? DevelopmentProjectId { get; set; }
         public DevelopmentProject? DevelopmentProject { get; set; }
 
+        /// <summary>The clearing document that settled the bill in full, and when.</summary>
+        public string? ClearingNumber { get; set; }
+        public DateTime? ClearedDate { get; set; }
+
         /// <summary>
         /// Our own internal reference, issued by the system in a single sequence per
         /// company - BILL-2026-0001. Equivalent to Odoo's BILL/2026/0001.

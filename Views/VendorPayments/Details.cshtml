@@ -1,0 +1,83 @@
+@model RealEstateManager.Domain.VendorPayment
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = $"Payment {Model.PaymentNumber}";
+    var clearings = (List<VendorClearing>)ViewBag.Clearings;
+    var posted = Model.JournalEntry?.IsPosted == true;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">@(Model.IsAdvance ? "Advance" : "Payment") @Model.PaymentNumber</h2>
+        <div class="text-muted">@Model.Vendor?.Name · @Model.PaymentDate.ToString("dd MMMM yyyy") · @Model.Amount.ToString("N2")</div>
+    </div>
+    <div class="d-flex gap-2">
+        @if (Model.IsAdvance && posted && Model.AdvanceOpen > 0)
+        {
+            <a asp-action="ApplyAdvance" asp-route-advanceId="@Model.Id" class="btn btn-dark">Apply to bills</a>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (TempData["PaymentSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-5">Type</dt><dd class="col-7">@(Model.IsAdvance ? "Advance (down payment, special G/L)" : "Payment of open bills")</dd>
+                <dt class="col-5">Clearing document</dt><dd class="col-7">@(Model.ClearingNumber ?? (Model.IsAdvance ? "- (an advance clears nothing until applied)" : "-"))</dd>
+                <dt class="col-5">Paid from</dt><dd class="col-7">@(Model.PaidFromAccount != null ? Model.PaidFromAccount.Code + " " + Model.PaidFromAccount.Name : "Default cash account")</dd>
+                <dt class="col-5">Method / reference</dt><dd class="col-7">@Model.PaymentMethod @Model.Reference</dd>
+                <dt class="col-5">Journal entry</dt><dd class="col-7">@(Model.JournalEntry?.EntryNumber) @(posted ? "(posted)" : "(awaiting approval or draft)")</dd>
+                @if (!string.IsNullOrEmpty(Model.Notes)) { <dt class="col-5">Notes</dt><dd class="col-7">@Model.Notes</dd> }
+            </dl>
+        </div></div>
+    </div>
+    @if (Model.IsAdvance)
+    {
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <div class="small text-muted text-uppercase">Advance</div>
+                <div class="d-flex justify-content-between"><span>Paid</span><strong>@Model.Amount.ToString("N2")</strong></div>
+                <div class="d-flex justify-content-between"><span>Applied to bills</span><strong>@Model.AdvanceApplied.ToString("N2")</strong></div>
+                <div class="d-flex justify-content-between border-top mt-1 pt-1"><span>Still open on 11550 Advances to Suppliers</span><strong>@Model.AdvanceOpen.ToString("N2")</strong></div>
+            </div></div>
+        </div>
+    }
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light"><h5 class="mb-0">@(Model.IsAdvance ? "Applications of this advance to bills" : "Bills settled by this payment")</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0 align-middle">
+            <thead class="table-light"><tr><th>Clearing document</th><th>Date</th><th>Bill</th><th>Supplier ref</th><th class="text-end">Bill total</th><th class="text-end">Settled here</th><th>Bill now</th><th>Status</th></tr></thead>
+            <tbody>
+            @if (clearings.Count == 0 && Model.VendorBill != null)
+            {
+                <tr><td>-</td><td>@Model.PaymentDate.ToString("dd/MM/yyyy")</td><td><a asp-controller="VendorBills" asp-action="Details" asp-route-id="@Model.VendorBillId">@Model.VendorBill.BillNumber</a></td><td>@Model.VendorBill.VendorReference</td><td class="text-end">@Model.VendorBill.TotalAmount.ToString("N2")</td><td class="text-end">@Model.Amount.ToString("N2")</td><td>@Model.VendorBill.Status</td><td>Recorded before clearing documents</td></tr>
+            }
+            @if (clearings.Count == 0 && Model.VendorBill == null)
+            {
+                <tr><td colspan="8" class="text-muted">Not applied to any bill yet.</td></tr>
+            }
+            @foreach (var c in clearings)
+            {
+                foreach (var l in c.Lines)
+                {
+                    <tr>
+                        <td>@c.ClearingNumber</td><td>@c.ClearingDate.ToString("dd/MM/yyyy")</td>
+                        <td><a asp-controller="VendorBills" asp-action="Details" asp-route-id="@l.VendorBillId">@l.VendorBill?.BillNumber</a></td>
+                        <td>@l.VendorBill?.VendorReference</td>
+                        <td class="text-end">@l.VendorBill?.TotalAmount.ToString("N2")</td>
+                        <td class="text-end fw-semibold">@l.Amount.ToString("N2")</td>
+                        <td>@(l.VendorBill?.ClearingNumber != null ? $"Cleared by {l.VendorBill.ClearingNumber}" : $"Open {(l.VendorBill!.TotalAmount - l.VendorBill.AmountPaid):N2}")</td>
+                        <td>@c.Status</td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

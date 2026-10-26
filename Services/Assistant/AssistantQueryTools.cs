@@ -54,7 +54,8 @@ namespace RealEstateManager.Services.Assistant
                 ["AttendanceRecord"] = ("Attendance", "Index"),
                 ["PaymentApproval"] = ("PaymentApprovals", "Index"),
                 ["VendorBillLine"] = ("VendorBills", "Index"),
-                ["DevelopmentTransfer"] = ("DevelopmentProjects", "Index")
+                ["DevelopmentTransfer"] = ("DevelopmentProjects", "Index"),
+                ["VendorClearingLine"] = ("VendorPayments", "Index")
             };
 
         public static bool IsQueryable(string entity) => Queryable.ContainsKey(entity);

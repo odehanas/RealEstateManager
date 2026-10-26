@@ -1379,6 +1379,7 @@ namespace RealEstateManager.Services
             "CustomerReceipt" => "receipt(s)",
             "VendorBill" => "supplier bill(s)",
             "VendorPayment" => "supplier payment(s)",
+            VendorClearingService.AdvanceSourceType => "advance application(s)",
             "RevenueRecognitionSchedule" => "revenue recognition",
             "PrepaymentRecognition" => "prepayment amortisation",
             "FixedAssetDepreciation" => "depreciation",

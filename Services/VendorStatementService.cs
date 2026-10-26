@@ -105,8 +105,33 @@ namespace RealEstateManager.Services
             foreach (var bill in openBills)
                 bill.DaysOverdue = Math.Max(0, (to - bill.DueDate.Date).Days);
 
+            // Advances (down payments) sit on 11550 Advances to Suppliers, not in payables.
+            var advanceLines = await _db.JournalEntryLines.AsNoTracking()
+                .Where(x => x.Account != null && x.Account.Code == VendorClearingService.SupplierAdvancesAccountCode &&
+                            x.VendorId == vendorId && x.JournalEntry != null && x.JournalEntry.IsPosted &&
+                            x.JournalEntry.EntryDate <= to)
+                .OrderBy(x => x.JournalEntry!.EntryDate).ThenBy(x => x.JournalEntryId)
+                .Select(x => new VendorStatementRowViewModel
+                {
+                    TransactionDate = x.JournalEntry!.EntryDate,
+                    TransactionType = x.Debit > 0 ? "Advance paid" : "Advance applied",
+                    ReferenceNumber = x.JournalEntry.DocumentNumber ?? x.JournalEntry.EntryNumber,
+                    Description = x.Description ?? string.Empty,
+                    Debit = x.Debit,
+                    Credit = x.Credit
+                })
+                .ToListAsync();
+            var advanceRunning = 0m;
+            foreach (var row in advanceLines)
+            {
+                advanceRunning += row.Debit - row.Credit;
+                row.RunningBalance = advanceRunning;
+            }
+
             return new VendorStatementViewModel
             {
+                AdvancesOpen = advanceRunning,
+                AdvanceRows = advanceLines,
                 VendorId = vendorId,
                 FromDate = from,
                 ToDate = to,
@@ -126,6 +151,7 @@ namespace RealEstateManager.Services
         {
             "VendorBill" => "Bill",
             "VendorPayment" => "Payment",
+            VendorClearingService.AdvanceSourceType => "Advance applied",
             "PrepaymentSchedule" => "Prepayment",
             "FixedAssetAcquisition" => "Asset purchase",
             "ManualJournal" or null or "" => "Journal",

@@ -380,12 +380,17 @@ namespace RealEstateManager.Services
                 case "VendorPayment":
                 {
                     var bill = await _db.VendorPayments
-                        .Where(x => x.Id == id)
+                        .Where(x => x.Id == id && x.VendorBillId != null)
                         .Select(x => new
                         {
                             x.VendorBill!.BillNumber,
                             Posted = x.VendorBill.JournalEntry != null && x.VendorBill.JournalEntry.IsPosted
                         })
+                        .FirstOrDefaultAsync()
+                        ?? await _db.VendorClearingLines
+                        .Where(x => x.VendorClearing!.VendorPaymentId == id &&
+                                    (x.VendorBill!.JournalEntry == null || !x.VendorBill.JournalEntry.IsPosted))
+                        .Select(x => new { x.VendorBill!.BillNumber, Posted = false })
                         .FirstOrDefaultAsync();
 
                     return bill is { Posted: false }
@@ -476,6 +481,7 @@ namespace RealEstateManager.Services
                                      ?? await BlockIfInvoiceHasSettlementsAsync(entry.SourceId),
                 "CustomerCreditNote" => await BlockIfReportedAsync(entry.SourceId, isCreditNote: true),
                 "VendorBill" => await BlockIfBillHasPaymentsAsync(entry.SourceId),
+                "VendorPayment" => await BlockIfAdvanceAppliedAsync(entry.SourceId),
                 "PdcReceiptMemo" => await BlockIfPdcClearedAsync(entry.SourceId),
                 _ => null
             };
@@ -538,8 +544,33 @@ namespace RealEstateManager.Services
             var payments = await _db.VendorPayments
                 .CountAsync(x => x.VendorBillId == billId.Value && x.JournalEntryId != null);
 
-            return payments > 0
-                ? $"This bill has {payments} posted payment(s) against it. Reset those first."
+            var clearings = await _db.VendorClearingLines
+                .Where(x => x.VendorBillId == billId.Value && x.VendorClearing!.Status == VendorClearingStatuses.Posted)
+                .Select(x => x.VendorClearing!.ClearingNumber)
+                .Distinct()
+                .ToListAsync();
+
+            if (payments > 0)
+                return $"This bill has {payments} posted payment(s) against it. Reset those first.";
+
+            return clearings.Count > 0
+                ? $"This bill is settled by clearing document(s) {string.Join(", ", clearings)}. Reset those payments or advance applications first."
+                : null;
+        }
+
+        /// <summary>An advance that has been applied to bills cannot be taken back until those applications are.</summary>
+        private async Task<string?> BlockIfAdvanceAppliedAsync(int? paymentId)
+        {
+            if (!paymentId.HasValue)
+                return null;
+
+            var applied = await _db.VendorClearings
+                .Where(x => x.AdvancePaymentId == paymentId.Value && x.Status == VendorClearingStatuses.Posted)
+                .Select(x => x.ClearingNumber)
+                .ToListAsync();
+
+            return applied.Count > 0
+                ? $"This advance has been applied to bills by {string.Join(", ", applied)}. Reset those applications first."
                 : null;
         }
 
@@ -681,12 +712,36 @@ namespace RealEstateManager.Services
 
                     if (payment == null) break;
 
+                    var clearing = await _db.VendorClearings
+                        .Include(x => x.Lines).ThenInclude(x => x.VendorBill)
+                        .FirstOrDefaultAsync(x => x.VendorPaymentId == payment.Id && x.ClearingType == VendorClearingTypes.Payment);
 
-                    if (payment.VendorBill != null)
+                    if (clearing != null)
                     {
+                        ApplyClearing(clearing, posting);
+                    }
+                    else if (payment.VendorBill != null)
+                    {
+                        // A payment recorded before clearing documents pays its one bill.
                         payment.VendorBill.AmountPaid += posting ? payment.Amount : -payment.Amount;
                         RecomputeBillStatus(payment.VendorBill);
                     }
+
+                    break;
+                }
+
+                case VendorClearingService.AdvanceSourceType:
+                {
+                    var clearing = await _db.VendorClearings
+                        .Include(x => x.Lines).ThenInclude(x => x.VendorBill)
+                        .Include(x => x.AdvancePayment)
+                        .FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+
+                    if (clearing == null) break;
+
+                    ApplyClearing(clearing, posting);
+                    if (clearing.AdvancePayment != null)
+                        clearing.AdvancePayment.AdvanceApplied += posting ? clearing.Amount : -clearing.Amount;
 
                     break;
                 }
@@ -760,6 +815,37 @@ namespace RealEstateManager.Services
                 invoice.Status = "PartiallyPaid";
             else
                 invoice.Status = "Paid";
+        }
+
+        /// <summary>
+        /// Settles (or, on reset, unsettles) the bills of a clearing document. A bill paid in
+        /// full carries the number of the clearing document that completed it, as an SAP
+        /// cleared item carries its clearing document.
+        /// </summary>
+        private static void ApplyClearing(VendorClearing clearing, bool posting)
+        {
+            foreach (var line in clearing.Lines)
+            {
+                var bill = line.VendorBill;
+                if (bill == null) continue;
+
+                bill.AmountPaid += posting ? line.Amount : -line.Amount;
+                RecomputeBillStatus(bill);
+
+                if (posting && bill.AmountPaid >= bill.TotalAmount)
+                {
+                    bill.ClearingNumber = clearing.ClearingNumber;
+                    bill.ClearedDate = clearing.ClearingDate;
+                }
+                else if (!posting && bill.AmountPaid < bill.TotalAmount)
+                {
+                    // Open again, whichever clearing completed it.
+                    bill.ClearingNumber = null;
+                    bill.ClearedDate = null;
+                }
+            }
+
+            clearing.Status = posting ? VendorClearingStatuses.Posted : VendorClearingStatuses.Reversed;
         }
 
         private static void RecomputeBillStatus(VendorBill bill)
