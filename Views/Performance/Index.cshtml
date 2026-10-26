@@ -1,0 +1,153 @@
+@model RealEstateManager.Controllers.PerformanceController.PerformanceViewModel
+@{
+    ViewData["Title"] = "Business Performance";
+    var c = Model.Currency;
+    string Money(decimal v) => v.ToString("N0");
+    string Change(decimal now, decimal before) =>
+        before == 0 ? "" : $" · {(now - before) / Math.Abs(before) * 100:+0;-0}% vs last year";
+    var occupancy = Model.UnitsTotal == 0 ? 0 : Model.UnitsOccupied * 100m / Model.UnitsTotal;
+    var maxBar = Model.Months.Select(m => Math.Max(m.Revenue, m.Expenses)).DefaultIfEmpty(0).Max();
+    if (maxBar == 0) { maxBar = 1; }
+}
+<style>
+    .perf-card .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: #5b6774; }
+    .perf-card .value { font-size: 1.55rem; font-weight: 700; line-height: 1.2; }
+    .perf-card .sub { font-size: .8rem; color: #5b6774; }
+    .perf-chart { display: flex; align-items: flex-end; gap: 6px; height: 170px; padding-top: 10px; }
+    .perf-month { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+    .perf-bars { display: flex; gap: 2px; align-items: flex-end; height: 140px; width: 100%; justify-content: center; }
+    .perf-bars div { width: 42%; border-radius: 3px 3px 0 0; }
+    .perf-rev { background: #1e6fd9; }
+    .perf-exp { background: #e3a008; }
+    .perf-month span { font-size: .68rem; color: #5b6774; margin-top: 3px; }
+    .perf-legend span { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 12px; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">Business Performance</h2>
+        <div class="text-muted">How the business is doing, and what is waiting for your decision. Figures from posted entries, @Model.Today.ToString("dd MMMM yyyy").</div>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+</div>
+
+<div class="card shadow-sm mb-3 @(Model.Decisions.Count > 0 ? "border-warning" : "")">
+    <div class="card-header bg-light d-flex justify-content-between">
+        <h5 class="mb-0">Waiting for your decision</h5>
+        <span class="badge @(Model.Decisions.Count > 0 ? "bg-warning text-dark" : "bg-success")">@Model.Decisions.Count</span>
+    </div>
+    @if (Model.Decisions.Count == 0)
+    {
+        <div class="card-body text-muted">Nothing is waiting for you.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <tr><th>What</th><th>Reference</th><th>Details</th><th class="text-end">Amount</th><th>Asked by</th><th></th></tr>
+                @foreach (var d in Model.Decisions)
+                {
+                    <tr>
+                        <td><span class="badge bg-secondary">@d.Kind</span></td>
+                        <td class="small">@d.Reference</td>
+                        <td class="small">@d.Description</td>
+                        <td class="text-end">@(d.Amount.HasValue ? d.Amount.Value.ToString("N2") : "")</td>
+                        <td class="small">@d.By · @d.At.ToLocalTime().ToString("dd/MM")</td>
+                        <td class="text-end"><a href="@d.Link" class="btn btn-sm btn-dark">Review</a></td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Revenue this year</div><div class="value">@Money(Model.RevenueYtd)</div>
+        <div class="sub">@c@Change(Model.RevenueYtd, Model.RevenueLastYtd)</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Net profit this year</div><div class="value @(Model.NetYtd < 0 ? "text-danger" : "text-success")">@Money(Model.NetYtd)</div>
+        <div class="sub">expenses @Money(Model.ExpensesYtd)@Change(Model.NetYtd, Model.NetLastYtd)</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Cash and bank</div><div class="value">@Money(Model.CashBalance)</div>
+        <div class="sub">collected @Money(Model.CollectedThisMonth) this month, @Money(Model.CollectedYtd) this year</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Occupancy</div><div class="value">@occupancy.ToString("0")%</div>
+        <div class="sub">@Model.UnitsOccupied of @Model.UnitsTotal units · @Model.UnitsVacant vacant · rent roll @Money(Model.RentRoll) a year</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Owed by tenants</div><div class="value">@Money(Model.Receivables)</div>
+        <div class="sub @(Model.Overdue > 0 ? "text-danger" : "")">@Money(Model.Overdue) overdue</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Cheques in hand</div><div class="value">@Money(Model.PdcOnHand)</div>
+        <div class="sub">@Model.PdcDue30Count due in 30 days · @Money(Model.PdcDue30)</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Owed to suppliers</div><div class="value">@Money(Model.Payables)</div>
+        <div class="sub">@Money(Model.PayablesDue30) due in 30 days</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
+        <div class="label">Contracts ending in 90 days</div><div class="value">@Model.Expiring.Count</div>
+        <div class="sub">@Money(Model.Expiring.Sum(x => x.AnnualRent)) annual rent to renew</div>
+    </div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light d-flex justify-content-between">
+                <h5 class="mb-0">Revenue and expenses, last 12 months</h5>
+                <span class="small perf-legend"><span class="perf-rev"></span>Revenue<span class="perf-exp"></span>Expenses</span>
+            </div>
+            <div class="card-body">
+                <div class="perf-chart">
+                    @foreach (var m in Model.Months)
+                    {
+                        <div class="perf-month" title="@m.Month.ToString("MMMM yyyy"): revenue @m.Revenue.ToString("N0"), expenses @m.Expenses.ToString("N0"), net @m.Net.ToString("N0")">
+                            <div class="perf-bars">
+                                <div class="perf-rev" style="height:@((m.Revenue / maxBar * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                <div class="perf-exp" style="height:@((m.Expenses / maxBar * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                            </div>
+                            <span>@m.Month.ToString("MMM")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h5 class="mb-0">Overdue rent by age</h5></div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between"><span>1–30 days</span><strong>@Money(Model.Aging[0])</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>31–60 days</span><strong>@Money(Model.Aging[1])</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>61–90 days</span><strong>@Money(Model.Aging[2])</strong></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Over 90 days</span><strong class="@(Model.Aging[3] > 0 ? "text-danger" : "")">@Money(Model.Aging[3])</strong></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-light"><h5 class="mb-0">Contracts ending in the next 90 days</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <tr><th>Contract</th><th>Tenant</th><th>Unit</th><th>Ends</th><th class="text-end">Annual rent</th></tr>
+            @if (Model.Expiring.Count == 0) { <tr><td colspan="5" class="text-muted">None.</td></tr> }
+            @foreach (var l in Model.Expiring)
+            {
+                <tr>
+                    <td class="small">@l.ContractNumber</td><td>@l.Tenant?.FullName</td>
+                    <td class="small">@l.Unit?.Property?.Name / @l.Unit?.UnitNumber</td>
+                    <td>@l.EndDate.ToString("dd/MM/yyyy") <span class="text-muted small">(@((l.EndDate - Model.Today).Days) days)</span></td>
+                    <td class="text-end">@l.AnnualRent.ToString("N2")</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+<p class="small text-muted">All amounts in @c. Collections are receipts plus cleared cheques. Detailed reports are under Reports.</p>

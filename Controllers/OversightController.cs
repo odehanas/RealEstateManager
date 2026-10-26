@@ -15,9 +15,14 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
 
-        public OversightController(ApplicationDbContext db)
+        private readonly AppAuthService _auth;
+        private readonly FinancialReportService _reports;
+
+        public OversightController(ApplicationDbContext db, AppAuthService auth, FinancialReportService reports)
         {
             _db = db;
+            _auth = auth;
+            _reports = reports;
         }
 
         public sealed class PostingRow
@@ -49,12 +54,21 @@ namespace RealEstateManager.Controllers
             public List<AppUser> LockedUsers { get; set; } = new();
             public List<ApprovalDelegation> ActiveDelegations { get; set; } = new();
             public List<JournalEntry> Drafts { get; set; } = new();
+
+            /// <summary>
+            /// The activity log (staff changes, refused requests, locked accounts) is for the
+            /// system and company administrators. An owner sees the business, not the log.
+            /// </summary>
+            public bool ShowActivityLog { get; set; }
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(DateTime? from, DateTime? to, decimal large = 10000m)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
+            var userId = User.GetAppUserId();
+            var showLog = User.IsInRole("SystemAdmin") ||
+                          (userId.HasValue && await _auth.IsCompanyAdminAsync(userId.Value, companyId));
             var end = (to ?? DateTime.Today).Date;
             var start = (from ?? end.AddDays(-6)).Date;
             var endExclusive = end.AddDays(1);
@@ -75,7 +89,9 @@ namespace RealEstateManager.Controllers
                 From = start,
                 To = end,
                 LargeAmount = large,
-                CashBalance = await cashLines.SumAsync(x => (decimal?)(x.Debit - x.Credit)) ?? 0m,
+                // From the trial balance, so opening balances are included.
+                CashBalance = (await _reports.GetTrialBalanceAsync(companyId, DateTime.Today)).Rows
+                    .Where(x => x.AccountCode.StartsWith("111")).Sum(x => x.NetBalance),
                 MoneyIn = await cashMovements.SumAsync(x => (decimal?)x.Debit) ?? 0m,
                 MoneyOut = await cashMovements.SumAsync(x => (decimal?)x.Credit) ?? 0m,
                 PendingPayments = await _db.PaymentApprovals.CountAsync(x => x.Status == PaymentApprovalStatuses.Pending),
@@ -105,16 +121,18 @@ namespace RealEstateManager.Controllers
                     .OrderByDescending(x => x.RequestedAt).Take(200).ToListAsync(),
 
                 // Every change staff made (form posts), not the pages they only looked at.
-                Changes = await _db.AuditLogs.AsNoTracking()
+                ShowActivityLog = showLog,
+
+                Changes = !showLog ? new List<AuditLog>() : await _db.AuditLogs.AsNoTracking()
                     .Where(x => x.CompanyId == companyId && x.HttpMethod == "POST" && x.OccurredAt >= startUtc && x.OccurredAt < endUtc)
                     .OrderByDescending(x => x.OccurredAt).Take(300).ToListAsync(),
 
-                Failures = await _db.AuditLogs.AsNoTracking()
+                Failures = !showLog ? new List<AuditLog>() : await _db.AuditLogs.AsNoTracking()
                     .Where(x => (x.CompanyId == companyId || x.CompanyId == null) && x.OccurredAt >= startUtc && x.OccurredAt < endUtc &&
                                 (x.StatusCode == 403 || x.StatusCode >= 500))
                     .OrderByDescending(x => x.OccurredAt).Take(100).ToListAsync(),
 
-                LockedUsers = await _db.AppUsers.AsNoTracking()
+                LockedUsers = !showLog ? new List<AppUser>() : await _db.AppUsers.AsNoTracking()
                     .Where(x => x.LockedOutUntil != null && x.LockedOutUntil > DateTime.UtcNow &&
                                 x.CompanyAccesses.Any(c => c.CompanyId == companyId))
                     .ToListAsync(),

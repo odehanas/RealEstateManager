@@ -510,6 +510,316 @@ namespace RealEstateManager.Services.Assistant
             };
         }
 
+        /// <summary>Contracts, cheques and supplier bills: the day-to-day data entry.</summary>
+        public static IEnumerable<AssistantTool> DataEntry()
+        {
+            // ---------------------------------------------------------------- draft contract
+            yield return new AssistantTool
+            {
+                Name = "propose_create_lease",
+                Description = "Prepare a new DRAFT tenancy contract. Collect tenant, unit, start date, annual rent and payment frequency first (ask the user for anything missing). Saved as a draft when confirmed; then offer propose_submit_lease.",
+                Screen = ("Leases", "Create"),
+                IsWrite = true,
+                Parameters = Schema.Object(
+                    ("tenant", Schema.Str("Tenant code or name; create the tenant first if new"), true),
+                    ("unit", Schema.Str("Unit number/code"), true),
+                    ("start_date", Schema.Date("First day of the contract"), true),
+                    ("end_date", Schema.Date("Last day; default one year less a day"), false),
+                    ("annual_rent", Schema.Num("Annual rent; default the unit's standard rent"), false),
+                    ("billing_frequency_months", Schema.Int("Months per instalment: 1, 2, 3, 4, 6 or 12 (12 = one cheque)"), true),
+                    ("security_deposit", Schema.Num("Security deposit, default 0"), false),
+                    ("notes", Schema.Str("Notes"), false)),
+                Propose = async (ctx, args) =>
+                {
+                    var (tenant, tenantError) = await AssistantReadTools.ResolveTenantAsync(ctx.Db, Args.Required(args, "tenant"));
+                    if (tenant == null) return AssistantProposal.Refused(tenantError!);
+                    var (unit, unitError) = await ResolveUnitAsync(ctx.Db, Args.Required(args, "unit"));
+                    if (unit == null) return AssistantProposal.Refused(unitError!);
+
+                    var start = Args.Date(args, "start_date") ?? throw new AssistantArgumentException("'start_date' is required.");
+                    var model = new LeaseCreateViewModel
+                    {
+                        TenantId = tenant.Id,
+                        UnitId = unit.Id,
+                        StartDate = start,
+                        EndDate = Args.Date(args, "end_date") ?? start.AddYears(1).AddDays(-1),
+                        AnnualRent = Args.Dec(args, "annual_rent") ?? unit.StandardAnnualRent,
+                        BillingFrequencyMonths = Args.Int(args, "billing_frequency_months") ?? 1,
+                        SecurityDepositAmount = Args.Dec(args, "security_deposit") ?? 0m,
+                        Notes = Args.Str(args, "notes")
+                    };
+                    if (model.AnnualRent <= 0) return AssistantProposal.Refused("Give the annual rent.");
+
+                    var service = ctx.Get<LeaseCreationService>();
+                    var errors = await service.ValidateAsync(ctx.CompanyId, model);
+                    if (errors.Count > 0) return AssistantProposal.Refused(string.Join(" ", errors.Select(e => e.Message)));
+
+                    var vat = await service.DerivedVatCategoryAsync(unit.Id, model.StartDate);
+                    var instalments = 12 / model.BillingFrequencyMonths;
+                    var warnings = new List<string>();
+                    if (unit.StandardAnnualRent > 0 && model.AnnualRent < unit.StandardAnnualRent)
+                        warnings.Add($"The rent is below the unit's standard rent of {unit.StandardAnnualRent:N2} {ctx.Currency}.");
+                    if (unit.Status != "Vacant")
+                        warnings.Add($"The unit is currently marked {unit.Status}.");
+
+                    return new AssistantProposal
+                    {
+                        Ok = true,
+                        Summary = $"Draft contract for {tenant.Code} {tenant.FullName}, unit {unit.Property?.Code}/{unit.UnitNumber}, " +
+                                  $"{model.StartDate:dd/MM/yyyy} to {model.EndDate:dd/MM/yyyy}, rent {model.AnnualRent:N2} {ctx.Currency} a year " +
+                                  $"in {instalments} instalment(s) of {model.AnnualRent / instalments:N2}, deposit {model.SecurityDepositAmount:N2}, VAT treatment {vat}. " +
+                                  "The contract number is assigned when saved; it has no effect until approved or activated.",
+                        Warnings = warnings,
+                        Normalized = model
+                    };
+                },
+                Execute = async (ctx, args) =>
+                {
+                    var model = args.Deserialize<LeaseCreateViewModel>(Json)!;
+                    var service = ctx.Get<LeaseCreationService>();
+                    var errors = await service.ValidateAsync(ctx.CompanyId, model);
+                    if (errors.Count > 0) return AssistantActionResult.Failed(string.Join(" ", errors.Select(e => e.Message)));
+
+                    var lease = await service.CreateDraftAsync(ctx.CompanyId, ctx.UserId, model);
+                    var needsApproval = await ctx.Get<LeaseWorkflowService>().ApprovalRequiredAsync();
+                    return new AssistantActionResult
+                    {
+                        Ok = true, Reference = lease.ContractNumber, Link = $"/Leases/Edit/{lease.Id}",
+                        Message = $"Draft contract {lease.ContractNumber} saved. Next: " +
+                                  (needsApproval ? "send it for approval." : "activate it to raise its invoices.")
+                    };
+                }
+            };
+
+            // ---------------------------------------------------------------- receive PDCs
+            yield return new AssistantTool
+            {
+                Name = "propose_receive_pdcs",
+                Description = "Prepare receiving one or more post-dated cheques for a contract (e.g. 4 quarterly cheques). Each is recorded on the received date and cleared later. Ask for any missing cheque number, date or amount.",
+                Screen = ("PdcReceipts", "Create"),
+                IsWrite = true,
+                Parameters = Schema.Object(
+                    ("contract", Schema.Str("Contract number"), true),
+                    ("bank", Schema.Str("Bank the cheques are drawn on"), false),
+                    ("received_date", Schema.Date("Date the cheques were handed over, default today"), false),
+                    ("cheques", Schema.Array("The cheques",
+                        Schema.Object(
+                            ("cheque_number", Schema.Str("Cheque number"), true),
+                            ("cheque_date", Schema.Date("Date written on the cheque"), true),
+                            ("amount", Schema.Num("Amount"), true),
+                            ("invoice_number", Schema.Str("Invoice it pays, if any; otherwise it is an advance"), false))), true)),
+                Propose = async (ctx, args) =>
+                {
+                    var number = Args.Required(args, "contract");
+                    var lease = await ctx.Db.Leases.Include(x => x.Tenant).FirstOrDefaultAsync(x => x.ContractNumber == number);
+                    if (lease == null) return AssistantProposal.Refused($"No contract {number}.");
+                    if (!args.TryGetProperty("cheques", out var cheques) || cheques.ValueKind != JsonValueKind.Array || cheques.GetArrayLength() == 0)
+                        return AssistantProposal.Refused("List the cheques.");
+
+                    var received = Args.Date(args, "received_date") ?? DateTime.Today;
+                    var closed = await ClosedPeriodMessageAsync(ctx.Db, received, "A PDC receipt");
+                    if (closed != null) return AssistantProposal.Refused(closed);
+
+                    var bank = Args.Str(args, "bank");
+                    var service = ctx.Get<PdcReceiptEntryService>();
+                    var models = new List<PdcReceiptCreateViewModel>();
+                    var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var cheque in cheques.EnumerateArray().Take(24))
+                    {
+                        var model = new PdcReceiptCreateViewModel
+                        {
+                            LeaseId = lease.Id,
+                            ChequeNumber = Args.Required(cheque, "cheque_number"),
+                            BankName = bank,
+                            ChequeDate = Args.Date(cheque, "cheque_date") ?? throw new AssistantArgumentException("Each cheque needs its date."),
+                            ReceivedDate = received,
+                            Amount = Args.Dec(cheque, "amount") ?? 0m,
+                            SettlementMode = "Advance"
+                        };
+
+                        var invoiceNumber = Args.Str(cheque, "invoice_number");
+                        if (invoiceNumber != null)
+                        {
+                            var invoiceId = await ctx.Db.CustomerInvoices.Where(x => x.InvoiceNumber == invoiceNumber).Select(x => (int?)x.Id).FirstOrDefaultAsync();
+                            if (invoiceId == null) return AssistantProposal.Refused($"No invoice {invoiceNumber}.");
+                            model.CustomerInvoiceId = invoiceId;
+                            model.SettlementMode = "Receivable";
+                        }
+
+                        if (!seen.Add(model.ChequeNumber))
+                            return AssistantProposal.Refused($"Cheque {model.ChequeNumber} is listed twice.");
+                        var errors = await service.ValidateAsync(ctx.CompanyId, model);
+                        if (errors.Count > 0)
+                            return AssistantProposal.Refused($"Cheque {model.ChequeNumber}: " + string.Join(" ", errors.Select(e => e.Message)));
+                        models.Add(model);
+                    }
+
+                    var total = models.Sum(x => x.Amount);
+                    var warnings = new List<string>();
+                    var instalments = lease.BillingFrequencyMonths > 0 ? 12 / lease.BillingFrequencyMonths : 1;
+                    if (lease.AnnualRent > 0 && models.Count == instalments && Math.Abs(total - lease.AnnualRent) > 1m)
+                        warnings.Add($"The cheques total {total:N2} but the annual rent is {lease.AnnualRent:N2} (VAT or other charges may explain it).");
+
+                    var list = string.Join("; ", models.Select(m => $"#{m.ChequeNumber} dated {m.ChequeDate:dd/MM/yyyy} {m.Amount:N2}" +
+                                                                    (m.SettlementMode == "Receivable" ? " against an invoice" : " as advance")));
+                    return new AssistantProposal
+                    {
+                        Ok = true,
+                        Summary = $"Receive {models.Count} cheque(s) from {lease.Tenant?.FullName} for contract {lease.ContractNumber}, " +
+                                  $"{bank ?? "bank not given"}, received {received:dd/MM/yyyy}, total {total:N2} {ctx.Currency}: {list}. " +
+                                  "They are held as PDCs on hand; the tenant's balance changes only when each is cleared.",
+                        Warnings = warnings,
+                        Normalized = models
+                    };
+                },
+                Execute = async (ctx, args) =>
+                {
+                    var models = args.Deserialize<List<PdcReceiptCreateViewModel>>(Json)!;
+                    var service = ctx.Get<PdcReceiptEntryService>();
+                    var done = new List<string>();
+                    foreach (var model in models)
+                    {
+                        var errors = await service.ValidateAsync(ctx.CompanyId, model);
+                        if (errors.Count > 0)
+                            return AssistantActionResult.Failed(Partial(done) + $"Cheque {model.ChequeNumber}: " + string.Join(" ", errors.Select(e => e.Message)));
+                        try
+                        {
+                            var result = await service.CreateAsync(ctx.CompanyId, model);
+                            done.Add(result.Pdc.ChequeNumber + (result.NotPostedReason != null ? " (draft: " + result.NotPostedReason + ")" : string.Empty));
+                        }
+                        catch (Exception ex)
+                        {
+                            return AssistantActionResult.Failed(Partial(done) + $"Cheque {model.ChequeNumber} was not saved: {ex.Message}");
+                        }
+                    }
+
+                    return new AssistantActionResult
+                    {
+                        Ok = true, Reference = string.Join(", ", models.Select(m => m.ChequeNumber)), Link = "/PdcReceipts",
+                        Message = $"{done.Count} cheque(s) received: {string.Join(", ", done)}."
+                    };
+                }
+            };
+
+            // ---------------------------------------------------------------- vendor bill
+            yield return new AssistantTool
+            {
+                Name = "propose_vendor_bill",
+                Description = "Prepare a DRAFT supplier bill: vendor, their invoice number, date, due date and the lines with expense account and amount before VAT. Saved as a draft for review and posting on the Vendor Bills screen.",
+                Screen = ("VendorBills", "Create"),
+                IsWrite = true,
+                Parameters = Schema.Object(
+                    ("vendor", Schema.Str("Vendor code or name"), true),
+                    ("vendor_reference", Schema.Str("The supplier's own invoice number"), false),
+                    ("bill_date", Schema.Date("Date on the supplier's invoice"), true),
+                    ("due_date", Schema.Date("Due date, default the bill date"), false),
+                    ("property", Schema.Str("Property code it relates to, if any"), false),
+                    ("category", Schema.Str("Expense category, e.g. Maintenance, Utilities"), false),
+                    ("lines", Schema.Array("Bill lines",
+                        Schema.Object(
+                            ("description", Schema.Str("What was supplied"), true),
+                            ("account", Schema.Str("Expense account code"), true),
+                            ("amount", Schema.Num("Amount before VAT"), true),
+                            ("vat", Schema.Bool("VAT charged on this line (default true if the vendor is VAT registered)"), false))), true)),
+                Propose = async (ctx, args) =>
+                {
+                    var (vendor, vendorError) = await AssistantReadTools.ResolveVendorAsync(ctx.Db, Args.Required(args, "vendor"));
+                    if (vendor == null) return AssistantProposal.Refused(vendorError!);
+                    var billDate = Args.Date(args, "bill_date") ?? throw new AssistantArgumentException("'bill_date' is required.");
+                    var dueDate = Args.Date(args, "due_date") ?? billDate;
+                    if (dueDate < billDate) return AssistantProposal.Refused("The due date cannot fall before the bill date.");
+                    var closed = await ClosedPeriodMessageAsync(ctx.Db, billDate, "A vendor bill");
+                    if (closed != null) return AssistantProposal.Refused(closed);
+
+                    int? propertyId = null;
+                    var propertyText = Args.Str(args, "property");
+                    if (propertyText != null)
+                    {
+                        propertyId = await ctx.Db.Properties.Where(x => x.Code == propertyText || x.Name == propertyText).Select(x => (int?)x.Id).FirstOrDefaultAsync();
+                        if (propertyId == null) return AssistantProposal.Refused($"No property '{propertyText}'.");
+                    }
+
+                    if (!args.TryGetProperty("lines", out var lines) || lines.ValueKind != JsonValueKind.Array || lines.GetArrayLength() == 0)
+                        return AssistantProposal.Refused("Give the bill lines.");
+
+                    var model = new VendorBillEditViewModel
+                    {
+                        VendorId = vendor.Id,
+                        VendorReference = Args.Str(args, "vendor_reference"),
+                        BillDate = billDate,
+                        AccountingDate = billDate,
+                        DueDate = dueDate,
+                        PropertyId = propertyId,
+                        ExpenseCategory = Args.Str(args, "category") ?? "General"
+                    };
+
+                    var described = new List<string>();
+                    foreach (var line in lines.EnumerateArray().Take(30))
+                    {
+                        var (account, error) = await AssistantReadTools.ResolveAccountAsync(ctx.Db, Args.Required(line, "account"));
+                        if (account == null) return AssistantProposal.Refused(error!);
+                        if (!account.IsPostable || account.IsGroup) return AssistantProposal.Refused($"{account.Code} {account.Name} is a heading account; choose a postable one.");
+                        var amount = Args.Dec(line, "amount") ?? 0m;
+                        if (amount <= 0) return AssistantProposal.Refused("Each line needs an amount above zero.");
+                        var taxable = vendor.IsVatRegistered && Args.Bool(line, "vat", true);
+                        var description = Args.Required(line, "description");
+                        model.Lines.Add(new VendorBillLineViewModel
+                        {
+                            Description = description,
+                            AccountId = account.Id,
+                            PropertyId = propertyId,
+                            Quantity = 1m,
+                            UnitPrice = amount,
+                            IsTaxable = taxable
+                        });
+                        described.Add($"{account.Code} {description}: {amount:N2}{(taxable ? " + VAT" : string.Empty)}");
+                    }
+
+                    var net = model.Lines.Sum(x => x.UnitPrice);
+                    var reference = model.VendorReference != null ? $", their invoice {model.VendorReference}" : string.Empty;
+                    return new AssistantProposal
+                    {
+                        Ok = true,
+                        Summary = $"Draft bill from {vendor.Code} {vendor.Name}{reference}, dated {billDate:dd/MM/yyyy}, due {dueDate:dd/MM/yyyy}, " +
+                                  $"{net:N2} {ctx.Currency} before VAT. Lines: {string.Join("; ", described)}. " +
+                                  "VAT is worked out by the system; post it from Vendor Bills after review.",
+                        Warnings = vendor.IsVatRegistered ? new List<string>() : new List<string> { "The vendor is not VAT registered, so no VAT is charged." },
+                        Normalized = model
+                    };
+                },
+                Execute = async (ctx, args) =>
+                {
+                    var model = args.Deserialize<VendorBillEditViewModel>(Json)!;
+                    var state = new ModelStateDictionary();
+                    var bill = await ctx.Get<VendorBillService>().SaveAsync(state, ctx.CompanyId, model);
+                    if (bill == null) return AssistantActionResult.Failed(Errors(state));
+                    return new AssistantActionResult
+                    {
+                        Ok = true, Reference = bill.BillNumber, Link = $"/VendorBills/Details/{bill.Id}",
+                        Message = $"Draft bill {bill.BillNumber} saved for {bill.TotalAmount:N2} including VAT. Review and post it from Vendor Bills."
+                    };
+                }
+            };
+        }
+
+        private static string Partial(List<string> done) =>
+            done.Count == 0 ? string.Empty : $"Saved before the problem: {string.Join(", ", done)}. ";
+
+        private static async Task<(Unit? Unit, string? Error)> ResolveUnitAsync(ApplicationDbContext db, string text)
+        {
+            var exact = await db.Units.Include(x => x.Property).FirstOrDefaultAsync(x => x.UnitNumber == text);
+            if (exact != null) return (exact, null);
+            var matches = await db.Units.Include(x => x.Property)
+                .Where(x => x.UnitNumber.Contains(text) || (x.Property!.Code + "/" + x.UnitNumber).Contains(text))
+                .Take(6).ToListAsync();
+            return matches.Count switch
+            {
+                1 => (matches[0], null),
+                0 => (null, $"No unit matches '{text}'. Use find_units."),
+                _ => (null, $"Several units match '{text}': {string.Join("; ", matches.Select(m => m.Property?.Code + "/" + m.UnitNumber + " (" + m.Status + ")"))}. Ask which one.")
+            };
+        }
+
         // ---------------------------------------------------------------- helpers
 
         private static Tenant TenantFrom(JsonElement args) => new()

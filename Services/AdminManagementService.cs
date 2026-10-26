@@ -271,6 +271,10 @@ namespace RealEstateManager.Services
                         .ThenBy(link => link.Company!.Name)
                         .Select(link => $"{link.Company!.Name}{(link.IsCompanyAdmin ? " (Administrator)" : string.Empty)}" +
                                         $"{(link.IsDefault ? " (Default)" : string.Empty)}")),
+                RoleDisplay = RoleTemplates.Name(RoleTemplates.Detect(
+                    x.IsSystemAdmin,
+                    x.CompanyAccesses.Any(link => link.IsCompanyAdmin),
+                    x.Permissions.Select(p => p.PermissionKey).ToList())),
                 PermissionsDisplay = x.IsSystemAdmin
                     ? "Full Access"
                     : string.Join(", ",

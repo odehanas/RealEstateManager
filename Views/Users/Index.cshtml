@@ -17,7 +17,10 @@
             </p>
         }
     </div>
-    <a asp-action="Create" class="btn btn-primary">Add User</a>
+    <div class="d-flex gap-2">
+        <a asp-controller="AuthorizationMatrix" asp-action="Index" class="btn btn-outline-dark">Authorization Matrix</a>
+        <a asp-action="Create" class="btn btn-primary">Add User</a>
+    </div>
 </div>
 
 @if (TempData["SuccessMessage"] is string successMessage)
@@ -31,7 +34,7 @@
             <th>Username</th>
             <th>Name</th>
             <th>Status</th>
-            <th>Type</th>
+            <th>Role</th>
             <th>Companies</th>
             <th>Permissions</th>
             <th>Last Login</th>
@@ -45,7 +48,7 @@
                 <td>@item.Username</td>
                 <td>@item.DisplayName</td>
                 <td>@(item.IsActive ? "Active" : "Inactive")</td>
-                <td>@(item.IsSystemAdmin ? "System Admin" : item.CompaniesDisplay.Contains("(Administrator)") ? "Company Admin" : "User")</td>
+                <td>@item.RoleDisplay</td>
                 <td>@item.CompaniesDisplay</td>
                 <td>@(string.IsNullOrWhiteSpace(item.PermissionsDisplay) ? "-" : item.PermissionsDisplay)</td>
                 <td>@(item.LastLoginAt.HasValue ? item.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>

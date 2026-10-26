@@ -13,6 +13,9 @@ namespace RealEstateManager.Models
         public DateTime? LastLoginAt { get; set; }
         public string CompaniesDisplay { get; set; } = string.Empty;
         public string PermissionsDisplay { get; set; } = string.Empty;
+
+        /// <summary>The standard role the permissions amount to, e.g. Manager (Approver), or Custom.</summary>
+        public string RoleDisplay { get; set; } = string.Empty;
     }
 
     public class AppUserFormViewModel

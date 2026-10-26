@@ -23,12 +23,17 @@ namespace RealEstateManager.Services
         private readonly ApplicationDbContext _db;
         private readonly ApprovalService _approvals;
         private readonly ICurrentCompanyAccessor _currentCompany;
+        private readonly ApprovalAuthorityService _authority;
+        private readonly IHttpContextAccessor _http;
 
-        public LeaseWorkflowService(ApplicationDbContext db, ApprovalService approvals, ICurrentCompanyAccessor currentCompany)
+        public LeaseWorkflowService(ApplicationDbContext db, ApprovalService approvals, ICurrentCompanyAccessor currentCompany,
+            ApprovalAuthorityService authority, IHttpContextAccessor http)
         {
             _db = db;
             _approvals = approvals;
             _currentCompany = currentCompany;
+            _authority = authority;
+            _http = http;
         }
 
         public string DocumentType => ApprovalDocumentTypes.Lease;
@@ -160,6 +165,21 @@ namespace RealEstateManager.Services
 
             if (lease.Status != LeaseStatuses.PendingApproval)
                 return $"The contract is {LeaseStatuses.Describe(lease.Status).ToLowerInvariant()}, not awaiting approval.";
+
+            // With limits on contracts, the approver's level must cover the annual rent,
+            // exactly as for payments; bigger contracts go up to a manager or the owner.
+            var company = await _db.Companies.AsNoTracking().FirstAsync(x => x.Id == lease.CompanyId);
+            if (company.ApplyLimitsToContracts && _currentCompany.UserId.HasValue)
+            {
+                var isSystemAdmin = _http.HttpContext?.User.IsInRole("SystemAdmin") == true;
+                var authority = await _authority.GetAuthorityAsync(_currentCompany.UserId.Value, lease.CompanyId, isSystemAdmin);
+                if (authority == null || !authority.Covers(lease.AnnualRent))
+                {
+                    var needed = await _authority.RequiredLevelAsync(lease.CompanyId, lease.AnnualRent);
+                    return $"This contract's annual rent of {lease.AnnualRent:N2} is above your approval authority " +
+                           $"({authority?.Describe() ?? "none"}). It needs {needed} level or above.";
+                }
+            }
 
             return await CheckUnitFreeAsync(lease.Id, lease.UnitId, lease.StartDate, lease.EndDate);
         }

@@ -70,7 +70,8 @@
     var isOwner = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.OwnerOversight);
     var canReleasePayments = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight);
     var paymentsWaiting = canReleasePayments && currentCompanyId.HasValue ? await PaymentApprovals.CountPendingAsync() : 0;
-    var showControlsMenu = isOwner || canReleasePayments;
+    var canViewPerformance = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PerformanceView, AppPermissions.OwnerOversight);
+    var showControlsMenu = isOwner || canReleasePayments || canViewPerformance;
     showReportsMenu = showReportsMenu || isOwner;
     if (subscriptionBlocked)
     {
@@ -399,18 +400,27 @@
                                     @if (paymentsWaiting > 0) { <span class="badge bg-danger">@paymentsWaiting</span> }
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="controlsDropdown">
+                                    @if (canViewPerformance)
+                                    {
+                                        <li><a class="dropdown-item fw-semibold" asp-controller="Performance" asp-action="Index">Business Performance</a></li>
+                                    }
                                     @if (isOwner)
                                     {
                                         <li><a class="dropdown-item" asp-controller="Oversight" asp-action="Index">Owner Monitor</a></li>
                                     }
+                                    @if (canReleasePayments)
+                                    {
                                     <li>
                                         <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="PaymentApprovals" asp-action="Index">
                                             Payment Approvals
                                             @if (paymentsWaiting > 0) { <span class="badge bg-danger ms-2">@paymentsWaiting</span> }
                                         </a>
                                     </li>
+                                    }
                                     @if (isOwner)
                                     {
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item" asp-controller="AuthorizationMatrix" asp-action="Index">Authorization Matrix</a></li>
                                         <li><a class="dropdown-item" asp-controller="ApprovalLimits" asp-action="Index">Approval Limits &amp; Delegation</a></li>
                                         <li><a class="dropdown-item" asp-controller="Help" asp-action="Controls">Controls &amp; Security Guide</a></li>
                                     }

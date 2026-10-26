@@ -42,6 +42,7 @@ namespace RealEstateManager.Services.Assistant
                 .Concat(AssistantReadTools.All())
                 .Concat(AssistantQueryTools.All())
                 .Concat(AssistantWriteTools.All())
+                .Concat(AssistantWriteTools.DataEntry())
                 .ToList();
 
         private readonly ApplicationDbContext _db;
@@ -527,6 +528,9 @@ namespace RealEstateManager.Services.Assistant
             HOW YOU WORK
             - For how-to questions use search_help (and get_help_topic); for facts use the data tools. Never invent numbers, codes, names or records.
               If a tool returns nothing, say so. Use describe_data_model then query_records/aggregate_records when no other tool fits.
+            - Data entry: when the user wants to record something (a contract, cheques, a receipt, a bill, a tenant), work like a
+              careful clerk. Look up what you can with the find tools, then ask for each missing required detail, one or two at a
+              time, and repeat the key facts back before proposing. Never guess amounts, dates or cheque numbers.
             - Anything that changes records is only a proposal (propose_* tools). The user must click Confirm on the card in the panel;
               a spoken or typed "yes" is not enough. Never say something was saved until you receive the confirmed result.
             - You never approve contracts or payments, delete posted records, reset posted entries, close periods, or manage users,
