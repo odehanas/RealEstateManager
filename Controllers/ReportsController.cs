@@ -13,6 +13,7 @@ namespace RealEstateManager.Controllers
         private readonly VatReturnService _vatReturnService;
         private readonly OwnerReportService _ownerReportService;
         private readonly CashFlowService _cashFlowService;
+        private readonly GeneralJournalReportService _generalJournal;
 
         public ReportsController(
             ApplicationDbContext db,
@@ -20,7 +21,8 @@ namespace RealEstateManager.Controllers
             ManagementReportService managementReportService,
             VatReturnService vatReturnService,
             OwnerReportService ownerReportService,
-            CashFlowService cashFlowService)
+            CashFlowService cashFlowService,
+            GeneralJournalReportService generalJournal)
         {
             _db = db;
             _financialReportService = financialReportService;
@@ -28,6 +30,7 @@ namespace RealEstateManager.Controllers
             _vatReturnService = vatReturnService;
             _ownerReportService = ownerReportService;
             _cashFlowService = cashFlowService;
+            _generalJournal = generalJournal;
         }
 
         [HttpGet]
@@ -218,6 +221,60 @@ namespace RealEstateManager.Controllers
 
             var model = await _cashFlowService.GetCashFlowAsync(company.Id, from, to);
             return View(model);
+        }
+
+        /// <summary>
+        /// General Journal: every entry in the period with its lines and the source it
+        /// came from. format=csv downloads it, one row per line.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GeneralJournal(
+            DateTime? fromDate, DateTime? toDate, string? source, string? status, string? search, string? format)
+        {
+            var to = (toDate ?? DateTime.Today).Date;
+            var from = (fromDate ?? new DateTime(to.Year, to.Month, 1)).Date;
+            if (from > to)
+                (from, to) = (to, from);
+
+            var model = await _generalJournal.GetAsync(from, to, source, status, search);
+
+            if (string.Equals(format, "csv", StringComparison.OrdinalIgnoreCase))
+            {
+                var csv = new System.Text.StringBuilder();
+                csv.AppendLine("Entry,Date,Period,Source,Document,Reference,Entry description,Status,Posted by,Account code,Account,Line description,Property,Debit,Credit");
+                foreach (var entry in model.Entries)
+                {
+                    foreach (var line in entry.Lines)
+                    {
+                        csv.AppendLine(string.Join(",", new[]
+                        {
+                            entry.EntryNumber, entry.EntryDate.ToString("yyyy-MM-dd"), entry.PeriodName, entry.SourceLabel,
+                            entry.DocumentNumber, entry.ReferenceNumber, entry.Description, entry.Status, entry.PostedBy,
+                            line.AccountCode, line.AccountName, line.Description, line.Property,
+                            line.Debit.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture),
+                            line.Credit.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
+                        }.Select(Csv)));
+                    }
+                }
+
+                var bytes = System.Text.Encoding.UTF8.GetPreamble().Concat(System.Text.Encoding.UTF8.GetBytes(csv.ToString())).ToArray();
+                return File(bytes, "text/csv", $"general-journal-{from:yyyyMMdd}-{to:yyyyMMdd}.csv");
+            }
+
+            ViewBag.Sources = await _generalJournal.SourcesAsync();
+            return View(model);
+        }
+
+        // A CSV cell: quoted when needed, and a leading = + - @ neutralised so a
+        // spreadsheet never runs it as a formula.
+        private static string Csv(string? value)
+        {
+            value ??= string.Empty;
+            if (value.Length > 0 && "=+-@".Contains(value[0]))
+                value = "'" + value;
+            return value.IndexOfAny(new[] { ',', '"', '\n', '\r' }) >= 0
+                ? "\"" + value.Replace("\"", "\"\"") + "\""
+                : value;
         }
 
         private static DateTime GetFiscalYearStart(DateTime reportDate, int fiscalYearStartMonth)

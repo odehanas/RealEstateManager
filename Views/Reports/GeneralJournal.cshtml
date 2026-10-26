@@ -1,0 +1,185 @@
+﻿@model RealEstateManager.Services.GeneralJournalReport
+@using RealEstateManager.Services
+@{
+    ViewData["Title"] = "General Journal";
+    var sources = ViewBag.Sources as List<(string Key, string Label)> ?? new();
+    string Money(decimal value) => value == 0 ? "" : value.ToString("N2");
+    var balanced = Model.TotalDebit == Model.TotalCredit;
+}
+<style>
+    .gj-entry td { background: #f4f6f9; font-size: .88rem; }
+    .gj-line td { font-size: .86rem; }
+    .gj-line td.acct { padding-left: 1.5rem; }
+    .gj-total td { font-size: .82rem; border-bottom: 2px solid #c9ced6; }
+    @@media print {
+        .navbar, footer, .no-print, #assistantLauncher { display: none !important; }
+        .gj-entry { break-inside: avoid; }
+    }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">General Journal</h2>
+        <div class="text-muted">Every journal entry from @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"), with its lines and the source it came from.</div>
+    </div>
+    <div class="d-flex gap-2 no-print">
+        <a class="btn btn-outline-secondary" asp-action="GeneralJournal"
+           asp-route-fromDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.To.ToString("yyyy-MM-dd")"
+           asp-route-source="@Model.Source" asp-route-status="@Model.Status" asp-route-search="@Model.Search" asp-route-format="csv">Export CSV</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+<form method="get" class="card card-body shadow-sm mb-3 no-print">
+    <div class="row g-2 align-items-end">
+        <div class="col-6 col-md-2">
+            <label class="form-label small" for="fromDate">From</label>
+            <input type="date" class="form-control" id="fromDate" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small" for="toDate">To</label>
+            <input type="date" class="form-control" id="toDate" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small" for="source">Source</label>
+            <select class="form-select" id="source" name="source">
+                <option value="">All sources</option>
+                @foreach (var s in sources)
+                {
+                    <option value="@s.Key" selected="@(s.Key == Model.Source ? "selected" : null)">@s.Label</option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small" for="status">Status</label>
+            <select class="form-select" id="status" name="status">
+                <option value="@GeneralJournalReportService.StatusPosted" selected="@(Model.Status == GeneralJournalReportService.StatusPosted ? "selected" : null)">Posted</option>
+                <option value="@GeneralJournalReportService.StatusDraft" selected="@(Model.Status == GeneralJournalReportService.StatusDraft ? "selected" : null)">Drafts only</option>
+                <option value="@GeneralJournalReportService.StatusAll" selected="@(Model.Status == GeneralJournalReportService.StatusAll ? "selected" : null)">All</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small" for="search">Entry / document no.</label>
+            <input class="form-control" id="search" name="search" value="@Model.Search" placeholder="e.g. BILL-2026" />
+        </div>
+        <div class="col-md-1 d-grid">
+            <button type="submit" class="btn btn-dark">Show</button>
+        </div>
+    </div>
+</form>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">Entries</div>
+            <div class="fs-4 fw-semibold">@Model.Entries.Count</div>
+            <div class="small @(balanced ? "text-success" : "text-danger")">
+                Debits @Model.TotalDebit.ToString("N2") · Credits @Model.TotalCredit.ToString("N2") @(balanced ? "· balanced" : "· NOT balanced")
+            </div>
+        </div></div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white small fw-semibold">By source</div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Source</th><th class="text-end">Entries</th><th class="text-end">Amount</th></tr></thead>
+                    <tbody>
+                        @foreach (var s in Model.BySource)
+                        {
+                            <tr><td>@s.SourceLabel</td><td class="text-end">@s.Entries</td><td class="text-end">@s.Debit.ToString("N2")</td></tr>
+                        }
+                        @if (Model.BySource.Count == 0)
+                        {
+                            <tr><td colspan="3" class="text-muted">No entries.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-sm align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th style="width:110px">Date</th>
+                <th>Account</th>
+                <th>Description</th>
+                <th>Property</th>
+                <th class="text-end" style="width:130px">Debit</th>
+                <th class="text-end" style="width:130px">Credit</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var e in Model.Entries)
+        {
+            <tr class="gj-entry">
+                <td>@e.EntryDate.ToString("dd/MM/yyyy")</td>
+                <td colspan="5">
+                    <strong>@e.EntryNumber</strong>
+                    <span class="ms-2">Source: <strong>@e.SourceLabel</strong></span>
+                    @if (!string.IsNullOrEmpty(e.DocumentNumber))
+                    {
+                        <span class="ms-1">·
+                            @if (e.SourceLink is { } link)
+                            {
+                                <a asp-controller="@link.Controller" asp-action="@link.Action" asp-route-id="@link.Id">@e.DocumentNumber</a>
+                            }
+                            else
+                            {
+                                @e.DocumentNumber
+                            }
+                        </span>
+                    }
+                    else if (e.SourceLink is { } docLink)
+                    {
+                        <span class="ms-1">· <a asp-controller="@docLink.Controller" asp-action="@docLink.Action" asp-route-id="@docLink.Id">open document</a></span>
+                    }
+                    @if (!string.IsNullOrEmpty(e.ReferenceNumber))
+                    {
+                        <span class="ms-1 text-muted">· Ref @e.ReferenceNumber</span>
+                    }
+                    @if (e.Status != GeneralJournalReportService.StatusPosted)
+                    {
+                        <span class="badge @(e.Status == "Draft" ? "bg-warning text-dark" : "bg-secondary") ms-2">@e.Status</span>
+                    }
+                    <div class="text-muted small">
+                        @e.Description
+                        @if (!string.IsNullOrEmpty(e.PeriodName)) { <span>· @e.PeriodName</span> }
+                        @if (!string.IsNullOrEmpty(e.PostedBy)) { <span>· posted by @e.PostedBy@(e.PostedAt.HasValue ? " on " + e.PostedAt.Value.ToLocalTime().ToString("dd/MM/yyyy") : "")</span> }
+                    </div>
+                </td>
+            </tr>
+            @foreach (var l in e.Lines)
+            {
+                <tr class="gj-line">
+                    <td></td>
+                    <td class="acct">@l.AccountCode @l.AccountName</td>
+                    <td class="small">@l.Description</td>
+                    <td class="small">@l.Property</td>
+                    <td class="text-end">@Money(l.Debit)</td>
+                    <td class="text-end">@Money(l.Credit)</td>
+                </tr>
+            }
+            <tr class="gj-total">
+                <td colspan="4"></td>
+                <td class="text-end fw-semibold">@e.TotalDebit.ToString("N2")</td>
+                <td class="text-end fw-semibold">@e.TotalCredit.ToString("N2")</td>
+            </tr>
+        }
+        @if (Model.Entries.Count == 0)
+        {
+            <tr><td colspan="6" class="text-muted">No journal entries match these filters.</td></tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr class="table-light">
+                <th colspan="4">Total for the period</th>
+                <th class="text-end">@Model.TotalDebit.ToString("N2")</th>
+                <th class="text-end">@Model.TotalCredit.ToString("N2")</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
