@@ -12,15 +12,18 @@ namespace RealEstateManager.Controllers
         private readonly ApplicationDbContext _db;
         private readonly PdcService _pdcService;
         private readonly JournalWorkflowService _journalWorkflowService;
+        private readonly PdcReceiptEntryService _pdcEntry;
 
         public PdcReceiptsController(
             ApplicationDbContext db,
             PdcService pdcService,
-            JournalWorkflowService journalWorkflowService)
+            JournalWorkflowService journalWorkflowService,
+            PdcReceiptEntryService pdcEntry)
         {
             _db = db;
             _pdcService = pdcService;
             _journalWorkflowService = journalWorkflowService;
+            _pdcEntry = pdcEntry;
         }
 
         [HttpGet]
@@ -79,99 +82,9 @@ namespace RealEstateManager.Controllers
             await LoadLookupsAsync(model.LeaseId, model.CustomerInvoiceId);
 
             var companyId = User.GetRequiredCurrentCompanyId();
-            var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
-            if (company == null)
+            foreach (var error in await _pdcEntry.ValidateAsync(companyId, model))
             {
-                ModelState.AddModelError(string.Empty, "No company record found.");
-            }
-
-            var lease = await _db.Leases
-                .Include(x => x.Unit)
-                    .ThenInclude(x => x!.Property)
-                .Include(x => x.Tenant)
-                .FirstOrDefaultAsync(x => x.Id == model.LeaseId);
-
-            if (lease == null)
-            {
-                ModelState.AddModelError(nameof(model.LeaseId), "Selected lease was not found.");
-            }
-
-            CustomerInvoice? invoice = null;
-
-            if (model.CustomerInvoiceId.HasValue)
-            {
-                invoice = await _db.CustomerInvoices
-                    .Include(x => x.Lease)
-                    .FirstOrDefaultAsync(x => x.Id == model.CustomerInvoiceId.Value);
-
-                if (invoice == null)
-                {
-                    ModelState.AddModelError(nameof(model.CustomerInvoiceId), "Selected invoice was not found.");
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(model.ChequeNumber))
-            {
-                ModelState.AddModelError(nameof(model.ChequeNumber), "Cheque number is required.");
-            }
-
-            if (model.Amount <= 0m)
-            {
-                ModelState.AddModelError(nameof(model.Amount), "PDC amount must be greater than zero.");
-            }
-
-            // The received date is the ACCOUNTING date - the memorandum journal is posted
-            // on it. A future received date would post the entry into a future period,
-            // where it is invisible in today's Trial Balance and Balance Sheet. The
-            // classic mistake is typing the cheque's future date into this field, so it
-            // is rejected rather than silently accepted.
-            if (model.ReceivedDate.Date > DateTime.Today)
-            {
-                ModelState.AddModelError(nameof(model.ReceivedDate),
-                    "The received date cannot be in the future - it is the date the accounting entry is posted. " +
-                    "Enter the date the cheque was physically handed over. The future date written on the cheque goes in Cheque Date.");
-            }
-
-            if (model.ChequeDate.Date < model.ReceivedDate.Date)
-            {
-                ModelState.AddModelError(nameof(model.ChequeDate),
-                    "The cheque date is earlier than the received date. Check the two dates - a post-dated cheque is dated on or after the day you receive it.");
-            }
-
-            if (model.SettlementMode != "Advance" && model.SettlementMode != "Receivable")
-            {
-                ModelState.AddModelError(nameof(model.SettlementMode), "Settlement mode must be Advance or Receivable.");
-            }
-
-            if (model.SettlementMode == "Receivable" && !model.CustomerInvoiceId.HasValue)
-            {
-                ModelState.AddModelError(nameof(model.CustomerInvoiceId), "Invoice is required when settlement mode is Receivable.");
-            }
-
-            if (invoice != null && invoice.LeaseId != model.LeaseId)
-            {
-                ModelState.AddModelError(nameof(model.CustomerInvoiceId), "Selected invoice does not belong to the selected lease.");
-            }
-
-            if (invoice != null && model.SettlementMode == "Receivable")
-            {
-                var outstanding = invoice.TotalAmount - invoice.AmountPaid;
-                if (model.Amount > outstanding)
-                {
-                    ModelState.AddModelError(nameof(model.Amount), "PDC amount cannot exceed the outstanding invoice balance.");
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(model.ChequeNumber) && company != null)
-            {
-                var chequeExists = await _db.PdcReceipts.AnyAsync(x =>
-                    x.CompanyId == companyId &&
-                    x.ChequeNumber == model.ChequeNumber.Trim());
-
-                if (chequeExists)
-                {
-                    ModelState.AddModelError(nameof(model.ChequeNumber), "Cheque number already exists.");
-                }
+                ModelState.AddModelError(error.Field, error.Message);
             }
 
             if (!ModelState.IsValid)
@@ -181,42 +94,9 @@ namespace RealEstateManager.Controllers
 
             try
             {
-                await using var transaction = await _db.Database.BeginTransactionAsync();
-
-                var pdc = new PdcReceipt
-                {
-                    CompanyId = companyId,
-                    LeaseId = model.LeaseId,
-                    TenantId = lease!.TenantId,
-                    CustomerInvoiceId = model.SettlementMode == "Receivable"
-                        ? model.CustomerInvoiceId
-                        : null,
-                    ChequeNumber = model.ChequeNumber.Trim(),
-                    BankName = string.IsNullOrWhiteSpace(model.BankName)
-                        ? null
-                        : model.BankName.Trim(),
-                    ChequeDate = model.ChequeDate.Date,
-                    ReceivedDate = model.ReceivedDate.Date,
-                    Amount = model.Amount,
-                    SettlementMode = model.SettlementMode,
-                    Status = "Draft",
-                    Notes = string.IsNullOrWhiteSpace(model.Notes)
-                        ? null
-                        : model.Notes.Trim()
-                };
-
-                _db.PdcReceipts.Add(pdc);
-                await _db.SaveChangesAsync();
-
-                var journal = await _pdcService.ReceivePdcAsync(pdc.Id);
-
-                await transaction.CommitAsync();
-
-                // The cheque is recorded as received at once, through the same checks as
-                // Journal Inquiry; if one refuses, the memorandum entry stays a draft.
-                var notPosted = await _journalWorkflowService.PostNewEntryAsync(journal.Id);
-                if (notPosted != null)
-                    TempData["PostingWarning"] = $"Cheque {pdc.ChequeNumber} was saved as a draft but not posted: {notPosted}";
+                var result = await _pdcEntry.CreateAsync(companyId, model);
+                if (result.NotPostedReason != null)
+                    TempData["PostingWarning"] = $"Cheque {result.Pdc.ChequeNumber} was saved as a draft but not posted: {result.NotPostedReason}";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -350,41 +230,19 @@ namespace RealEstateManager.Controllers
 
             PopulateClearModel(model, pdc);
 
-            if (pdc.Status == "Cleared")
+            foreach (var (field, message) in PdcService.CheckClearance(pdc, model.ClearedDate))
             {
-                ModelState.AddModelError(string.Empty, "This PDC is already cleared.");
+                ModelState.AddModelError(field == "ClearedDate" ? nameof(model.ClearedDate) : field, message);
             }
 
-            if (model.ClearedDate.Date < pdc.ReceivedDate.Date)
+            // Clearing before the cheque date is allowed, but only once the user confirms it.
+            var earlyWarning = PdcService.EarlyClearanceWarning(pdc, model.ClearedDate);
+            if (ModelState.IsValid && earlyWarning != null && !model.ConfirmEarlyClearance)
             {
-                ModelState.AddModelError(nameof(model.ClearedDate), "Cleared date cannot be earlier than received date.");
-            }
-
-            // The cleared date is the accounting date of the cash movement, so it cannot
-            // be in the future either.
-            if (model.ClearedDate.Date > DateTime.Today)
-            {
-                ModelState.AddModelError(nameof(model.ClearedDate),
-                    "The cleared date cannot be in the future - it is the date the cash entry is posted. " +
-                    "Clear the cheque on the day the bank actually honours it.");
-            }
-
-            // Clearing before the date written on the cheque is usually a mistake - a bank
-            // will not honour a post-dated cheque early. It is not forbidden, because the
-            // parties can agree to present it early, so this asks for confirmation rather
-            // than refusing outright.
-            if (ModelState.IsValid
-                && model.ClearedDate.Date < pdc.ChequeDate.Date
-                && !model.ConfirmEarlyClearance)
-            {
-                var daysEarly = (int)(pdc.ChequeDate.Date - model.ClearedDate.Date).TotalDays;
-
                 model.RequiresEarlyClearanceConfirmation = true;
 
                 ModelState.AddModelError(string.Empty,
-                    $"This would clear the cheque {daysEarly} day(s) before its cheque date of " +
-                    $"{pdc.ChequeDate:dd/MM/yyyy}. A bank will not normally honour a post-dated cheque early. " +
-                    "Check the cleared date, or confirm below to go ahead anyway.");
+                    earlyWarning + " Check the cleared date, or confirm below to go ahead anyway.");
 
                 return View(model);
             }

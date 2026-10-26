@@ -26,6 +26,13 @@ namespace RealEstateManager.Domain
         /// their own limit. Petty cash is never self-released: someone else always checks it.
         /// </summary>
         public bool AllowSelfReleaseWithinLimit { get; set; } = true;
+
+        /// <summary>
+        /// When on, approving a tenancy contract also needs an approval level that covers the
+        /// contract's annual rent - the same limits as payments. Off: any contract approver may
+        /// approve any contract (still never their own).
+        /// </summary>
+        public bool ApplyLimitsToContracts { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // ---------------------------------------------------------------------

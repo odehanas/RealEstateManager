@@ -15,6 +15,7 @@ namespace RealEstateManager.Controllers
         private readonly LeaseWorkflowService _workflow;
         private readonly ApprovalService _approvals;
         private readonly RealEstateVatService _realEstateVat;
+        private readonly LeaseCreationService _leaseCreation;
 
         public LeasesController(
             ApplicationDbContext db,
@@ -22,8 +23,10 @@ namespace RealEstateManager.Controllers
             ContractQrService contractQrService,
             LeaseWorkflowService workflow,
             ApprovalService approvals,
-            RealEstateVatService realEstateVat)
+            RealEstateVatService realEstateVat,
+            LeaseCreationService leaseCreation)
         {
+            _leaseCreation = leaseCreation;
             _db = db;
             _codeGenerationService = codeGenerationService;
             _contractQrService = contractQrService;
@@ -137,54 +140,13 @@ namespace RealEstateManager.Controllers
             ViewBag.ApprovalRequired = await _workflow.ApprovalRequiredAsync();
 
             var companyId = User.GetRequiredCurrentCompanyId();
-            var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
-            if (company == null)
-            {
-                ModelState.AddModelError(string.Empty, "No company record found.");
-            }
-
-            var unit = await _db.Units
-                .Include(x => x.Property)
-                .FirstOrDefaultAsync(x => x.Id == model.UnitId);
-
-            if (unit == null)
-            {
-                ModelState.AddModelError(nameof(model.UnitId), "Selected unit was not found.");
-            }
-
-            var tenant = await _db.Tenants.FirstOrDefaultAsync(x => x.Id == model.TenantId);
-            if (tenant == null)
-            {
-                ModelState.AddModelError(nameof(model.TenantId), "Selected tenant was not found.");
-            }
-
-            if (model.StartDate >= model.EndDate)
-            {
-                ModelState.AddModelError(nameof(model.EndDate), "End date must be later than start date.");
-            }
-
-            if (model.BillingFrequencyMonths <= 0 || 12 % model.BillingFrequencyMonths != 0)
-            {
-                ModelState.AddModelError(nameof(model.BillingFrequencyMonths), "Billing frequency must be 1, 2, 3, 4, 6, or 12.");
-            }
 
             // The contract code is generated from the unit code, never typed.
             ModelState.Remove(nameof(model.ContractNumber));
 
-            // A contract that is active or awaiting approval holds the unit for its dates.
-            var clash = await _workflow.CheckUnitFreeAsync(0, model.UnitId, model.StartDate, model.EndDate);
-            if (clash != null)
+            foreach (var error in await _leaseCreation.ValidateAsync(companyId, model))
             {
-                ModelState.AddModelError(nameof(model.UnitId), clash);
-            }
-
-            // Overriding the derived VAT treatment is allowed, but never silently:
-            // a wrong treatment is a tax error, so the reason is on the record.
-            if (!string.IsNullOrWhiteSpace(model.VatCategoryOverride) &&
-                string.IsNullOrWhiteSpace(model.VatOverrideReason))
-            {
-                ModelState.AddModelError(nameof(model.VatOverrideReason),
-                    "Give a reason when overriding the VAT treatment derived from the unit.");
+                ModelState.AddModelError(error.Field, error.Message);
             }
 
             if (!ModelState.IsValid)
@@ -192,42 +154,7 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            // VAT treatment comes from the unit, falling back to the property, and for a new
-            // residential building from whether this is the unit's first supply (zero rated
-            // within three years of completion, exempt afterwards). It is never typed in
-            // freehand: an override must be a deliberate choice with a reason.
-            var derivedCategory = (await _realEstateVat.DetermineAsync(unit!.Id, model.StartDate)).Category;
-            var effectiveCategory = string.IsNullOrWhiteSpace(model.VatCategoryOverride)
-                ? derivedCategory
-                : model.VatCategoryOverride!;
-
-            var lease = new Lease
-            {
-                CompanyId = companyId,
-                UnitId = model.UnitId,
-                TenantId = model.TenantId,
-                ContractNumber = await _codeGenerationService.GenerateContractCodeAsync(
-                    model.UnitId, model.TenantId, model.StartDate),
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                AnnualRent = model.AnnualRent,
-                BillingFrequencyMonths = model.BillingFrequencyMonths,
-                SecurityDepositAmount = model.SecurityDepositAmount,
-                // Every contract starts as a draft: no invoices, no effect on the unit.
-                // It takes effect when activated, or when approved if the company requires it.
-                Status = LeaseStatuses.Draft,
-                Notes = model.Notes,
-                CreatedAt = DateTime.UtcNow,
-                CreatedByAppUserId = User.GetAppUserId()
-            };
-
-            VatDeterminationService.ApplyToLease(
-                lease,
-                effectiveCategory,
-                effectiveCategory == derivedCategory ? null : model.VatOverrideReason);
-
-            _db.Leases.Add(lease);
-            await _db.SaveChangesAsync();
+            var lease = await _leaseCreation.CreateDraftAsync(companyId, User.GetAppUserId(), model);
 
             return await AfterSaveAsync(lease, nextStep);
         }

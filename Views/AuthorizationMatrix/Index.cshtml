@@ -1,0 +1,168 @@
+@model RealEstateManager.Controllers.AuthorizationMatrixController.MatrixViewModel
+@using RealEstateManager.Controllers
+@using RealEstateManager.Services
+@{
+    ViewData["Title"] = "Authorization Matrix";
+    var company = Model.Company;
+    var roles = RoleTemplates.Assignable.Where(r => r.Key != RoleTemplates.CompanyAdmin).ToList();
+    var limitsOn = company.RequirePaymentApproval;
+
+    // What one role can do on one line of the matrix.
+    (string Text, string Css) Cell(AuthorizationMatrixController.Capability cap, string role, string[] permissions)
+    {
+        if (role == RoleTemplates.SystemAdmin) return ("Yes", "yes");
+        if (cap.SystemAdminOnly) return ("No", "no");
+        if (role == RoleTemplates.CompanyAdmin) return cap.Limited && limitsOn ? ("Yes, up to limit", "limit") : ("Yes", "yes");
+        if (cap.AdminsOnly) return ("No", "no");
+        if (!cap.Permissions.Any(p => permissions.Contains(p))) return ("No", "no");
+        var limited = cap.Limited && (cap.What.Contains("contract") ? company.ApplyLimitsToContracts : limitsOn);
+        return limited ? ("Yes, up to limit", "limit") : ("Yes", "yes");
+    }
+
+    var permissionColumns = PermissionCatalog.All.ToList();
+}
+<style>
+    .am td.yes { background: #e8f5ee; color: #146c43; font-weight: 600; text-align: center; }
+    .am td.limit { background: #fff6e0; color: #8a5a00; font-weight: 600; text-align: center; }
+    .am td.no { color: #9aa4ae; text-align: center; }
+    .am th.rot { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: .72rem; font-weight: 600; padding: 6px 2px; }
+    .am .tick { text-align: center; color: #146c43; font-weight: 700; }
+    .flow { counter-reset: step; list-style: none; padding-left: 0; }
+    .flow li { counter-increment: step; position: relative; padding-left: 2.2rem; margin-bottom: .5rem; }
+    .flow li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: #0f2740; color: #fff; text-align: center; font-weight: 700; font-size: .85rem; line-height: 1.6rem; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
+    <div>
+        <h2 class="mb-0">Authorization Matrix</h2>
+        <div class="text-muted">Who may do what in @company.Name, and how approvals and limits work. Change roles in Users &amp; Permissions, limits in Approval Limits.</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-dark btn-sm">Users &amp; Permissions</a>
+        <a asp-controller="ApprovalLimits" asp-action="Index" class="btn btn-outline-dark btn-sm">Approval Limits</a>
+        <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4 am">
+    <div class="card-header bg-light"><h5 class="mb-0">1. Roles and what they may do</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Area</th><th>Activity</th>
+                    <th class="text-center">System Admin</th>
+                    <th class="text-center">Company Admin</th>
+                    @foreach (var r in roles) { <th class="text-center">@r.Name</th> }
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var cap in AuthorizationMatrixController.Capabilities)
+            {
+                <tr>
+                    <td class="small text-muted">@cap.Area</td>
+                    <td>@cap.What</td>
+                    @{ var sa = Cell(cap, RoleTemplates.SystemAdmin, Array.Empty<string>()); var ca = Cell(cap, RoleTemplates.CompanyAdmin, Array.Empty<string>()); }
+                    <td class="@sa.Css">@sa.Text</td>
+                    <td class="@ca.Css">@ca.Text</td>
+                    @foreach (var r in roles)
+                    {
+                        var cell = Cell(cap, r.Key, r.Permissions);
+                        <td class="@cell.Css">@cell.Text</td>
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-body small text-muted">
+        <strong>System Admin</strong>: all companies, all modules (that is you). <strong>Company Admin</strong>: everything inside one company.
+        @foreach (var r in roles) { <span><strong>@r.Name</strong>: @r.Summary </span> }
+        "Up to limit" means the person's approval level must cover the amount; anything bigger goes up to the next level.
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h5 class="mb-0">2. Approval levels in this company</h5></div>
+            <table class="table table-sm mb-0">
+                <tr><th>Level</th><th class="text-end">May approve up to</th><th>People</th></tr>
+                @foreach (var level in Model.Levels)
+                {
+                    <tr>
+                        <td><strong>@level.Name</strong></td>
+                        <td class="text-end">@(level.MaxAmount.HasValue ? level.MaxAmount.Value.ToString("N0") + " " + company.BaseCurrency : "No limit")</td>
+                        <td class="small">@string.Join(", ", Model.People.Where(p => p.Level == level.Name).Select(p => p.Name))</td>
+                    </tr>
+                }
+            </table>
+            <div class="card-body small">
+                <div class="mb-1">Payments need approval: <strong class="@(company.RequirePaymentApproval ? "text-success" : "text-danger")">@(company.RequirePaymentApproval ? "ON" : "OFF")</strong></div>
+                <div class="mb-1">Entering person may release within own limit: <strong>@(company.AllowSelfReleaseWithinLimit ? "Yes" : "No - always a second person")</strong></div>
+                <div class="mb-1">Limits apply to contracts: <strong>@(company.ApplyLimitsToContracts ? "Yes (annual rent)" : "No - any contract approver")</strong></div>
+                @if (Model.Delegations.Count > 0)
+                {
+                    <div class="mt-2"><strong>Delegated authority now:</strong>
+                        @foreach (var d in Model.Delegations)
+                        {
+                            <div>@d.ToName up to @(d.MaxAmount?.ToString("N0") ?? "the owner's limit") until @d.EndDate.ToString("dd/MM/yyyy"), from @d.FromName (@d.Reason)</div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h5 class="mb-0">How an approval travels</h5></div>
+            <div class="card-body">
+                <ol class="flow mb-3">
+                    <li><strong>Data Entry</strong> prepares the record: a payment, petty cash voucher, contract or payroll. It is saved, but nothing reaches the accounts yet.</li>
+                    <li>The system works out the level needed from the amount, e.g. with the levels above
+                        @{ var ordered = Model.Levels.ToList(); }
+                        @if (ordered.Count >= 3 && ordered[0].MaxAmount.HasValue && ordered[1].MaxAmount.HasValue)
+                        {
+                            <span>a payment of up to @ordered[0].MaxAmount!.Value.ToString("N0") needs <strong>@ordered[0].Name</strong>, up to @ordered[1].MaxAmount!.Value.ToString("N0") needs <strong>@ordered[1].Name</strong>, and anything above goes to <strong>@ordered[2].Name</strong>.</span>
+                        }
+                    </li>
+                    <li>It appears in <strong>Payment Approvals</strong> / <strong>Contract Approvals</strong> and on the <strong>Business Performance</strong> page of everyone whose limit covers it.</li>
+                    <li>An approver reviews it and approves or turns it down with a reason. <strong>Nobody approves what they entered.</strong> Petty cash always needs a second person.</li>
+                    <li>On approval it posts to the accounts (or the contract takes effect). Every step is recorded with who and when.</li>
+                    <li>When an owner is away, they <strong>delegate</strong> a higher limit to a manager for set dates; it ends by itself.</li>
+                </ol>
+                <div class="small text-muted">Example: an accountant on Data Entry records a 7,500 maintenance payment. It needs the Owner level, so a Manager (limit 5,000) cannot release it; the Owner sees it on Business Performance and approves it from their phone or laptop.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4 am">
+    <div class="card-header bg-light"><h5 class="mb-0">3. People in @company.Name</h5></div>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th><th>Role</th><th>Approval level</th><th>May approve</th>
+                    @foreach (var p in permissionColumns) { <th class="rot" title="@p.Description">@p.Name</th> }
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var person in Model.People)
+            {
+                <tr>
+                    <td><strong>@person.Name</strong><div class="small text-muted">@person.Username</div></td>
+                    <td class="small">@person.Role</td>
+                    <td class="small">@person.Level</td>
+                    <td class="small">@person.Authority</td>
+                    @foreach (var p in permissionColumns)
+                    {
+                        <td class="tick">@(person.IsSystemAdmin || person.Permissions.Contains(p.Key) ? "✓" : "")</td>
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-body small text-muted">"Custom" means the person's ticks differ from the standard roles. Choose a role on the user's page to bring them back in line.</div>
+</div>

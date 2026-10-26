@@ -25,6 +25,11 @@
                 <label class="form-check-label fw-semibold" for="sw2">The person entering a payment may release it within their own limit</label>
                 <div class="small text-muted">Off = every payment needs a second person. Petty cash always needs a second person.</div>
             </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="applyLimitsToContracts" value="true" id="sw3" @(Model.Company.ApplyLimitsToContracts ? "checked" : "") />
+                <label class="form-check-label fw-semibold" for="sw3">Apply the limits to contracts too</label>
+                <div class="small text-muted">The approver's level must cover the contract's annual rent. Off = any contract approver may approve any contract (never their own).</div>
+            </div>
             <button class="btn btn-dark ms-auto">Save</button>
         </form>
     </div>

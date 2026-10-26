@@ -97,6 +97,7 @@
                 System Admin ignores the permission matrix and always has full access.
             </div>
         }
+        <partial name="_RolePresets" />
         @for (var groupIndex = 0; groupIndex < Model.PermissionGroups.Count; groupIndex++)
         {
             <div class="border rounded p-3 mb-3">

@@ -146,6 +146,13 @@ namespace RealEstateManager.Services
             });
         }
 
+        /// <summary>A topic's text without markup, for the AI assistant to read.</summary>
+        public string GetPlainText(string key)
+        {
+            var topic = GetTopic(key);
+            return topic == null ? string.Empty : PlainText(RawTopicHtml(topic.Key));
+        }
+
         /// <summary>
         /// Topics matching every word of the query, in the title, the summary or the text,
         /// best matches first, each with a short excerpt around the first hit.

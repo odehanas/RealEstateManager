@@ -90,23 +90,26 @@
     </div>
 </div>
 
-<div class="card shadow-sm mb-3">
-    <div class="card-header bg-light"><h5 class="mb-0">What staff changed</h5></div>
-    <div class="table-responsive">
-        <table class="table table-sm mb-0">
-            <tr><th>When</th><th>Who</th><th>Action</th><th>Result</th><th>From</th></tr>
-            @if (Model.Changes.Count == 0) { <tr><td colspan="5" class="text-muted">No changes in the period.</td></tr> }
-            @foreach (var c in Model.Changes)
-            {
-                <tr>
-                    <td class="small">@c.OccurredAt.ToLocalTime().ToString("dd/MM HH:mm")</td><td class="small">@(c.DisplayName ?? c.Username)</td>
-                    <td class="small">@c.ActivityName</td>
-                    <td class="small">@(c.IsSuccess ? "OK" : $"Failed {c.StatusCode}")</td><td class="small">@c.IpAddress</td>
-                </tr>
-            }
-        </table>
+@if (Model.ShowActivityLog)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-light"><h5 class="mb-0">What staff changed</h5></div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <tr><th>When</th><th>Who</th><th>Action</th><th>Result</th><th>From</th></tr>
+                @if (Model.Changes.Count == 0) { <tr><td colspan="5" class="text-muted">No changes in the period.</td></tr> }
+                @foreach (var c in Model.Changes)
+                {
+                    <tr>
+                        <td class="small">@c.OccurredAt.ToLocalTime().ToString("dd/MM HH:mm")</td><td class="small">@(c.DisplayName ?? c.Username)</td>
+                        <td class="small">@c.ActivityName</td>
+                        <td class="small">@(c.IsSuccess ? "OK" : $"Failed {c.StatusCode}")</td><td class="small">@c.IpAddress</td>
+                    </tr>
+                }
+            </table>
+        </div>
     </div>
-</div>
+}
 
 @if (Model.Failures.Count > 0)
 {

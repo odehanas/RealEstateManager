@@ -59,6 +59,15 @@ namespace RealEstateManager.Services
         public const string ReportsView = "Reports.View";
 
         /// <summary>
+        /// Talk or type to the AI assistant. It only ever reads and does what the user's
+        /// other permissions allow; this decides whether they see it at all.
+        /// </summary>
+        public const string AssistantUse = "Assistant.Use";
+
+        /// <summary>The Business Performance page: results, collections, occupancy and what waits for a decision.</summary>
+        public const string PerformanceView = "Performance.View";
+
+        /// <summary>
         /// Handle what tenants submit through the self-service portal: maintenance
         /// calls, requests for more time to pay, complaints. Kept separate from the
         /// accounting permissions because the people who answer tenants are usually not
@@ -156,6 +165,24 @@ namespace RealEstateManager.Services
             },
             new()
             {
+                Key = AppPermissions.PerformanceView,
+                Group = "Owners & Controls",
+                Name = "View Business Performance",
+                Description =
+                    "The Business Performance page: profit, collections, receivables, occupancy, cheques and contracts " +
+                    "coming due, and everything waiting for this person's approval. Read only."
+            },
+            new()
+            {
+                Key = AppPermissions.AssistantUse,
+                Group = "General",
+                Name = "Use the AI Assistant",
+                Description =
+                    "Ask the assistant by voice or text about the system and the company's figures, and have it prepare " +
+                    "entries for the user to confirm. It can only see and do what the user's other permissions allow."
+            },
+            new()
+            {
                 Key = AppPermissions.HrManage,
                 Group = "HR & Payroll",
                 Name = "Manage Employees",
@@ -234,6 +261,9 @@ namespace RealEstateManager.Services
                 ["Leases"] = new[] { AppPermissions.LeasesManage },
                 ["Approvals"] = new[] { AppPermissions.LeasesApprove },
                 ["Oversight"] = new[] { AppPermissions.OwnerOversight },
+                ["Assistant"] = new[] { AppPermissions.AssistantUse },
+                ["Performance"] = new[] { AppPermissions.PerformanceView, AppPermissions.OwnerOversight },
+                ["AuthorizationMatrix"] = new[] { AppPermissions.OwnerOversight },
                 ["ApprovalLimits"] = new[] { AppPermissions.OwnerOversight },
                 ["PaymentApprovals"] = new[] { AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight },
                 ["EmployeeRequests"] = new[] { AppPermissions.HrManage },
@@ -295,6 +325,14 @@ namespace RealEstateManager.Services
                 ["Payroll.Approve"] = new[] { AppPermissions.PayrollApprove },
                 ["Payroll.ReturnToDraft"] = new[] { AppPermissions.PayrollApprove },
                 ["Payroll.Settings"] = new[] { AppPermissions.PayrollManage },
+
+                // An approver reads payroll runs but does not prepare or pay them.
+                ["Payroll.Create"] = new[] { AppPermissions.PayrollManage },
+                ["Payroll.UpdateLine"] = new[] { AppPermissions.PayrollManage },
+                ["Payroll.Recalculate"] = new[] { AppPermissions.PayrollManage },
+                ["Payroll.Delete"] = new[] { AppPermissions.PayrollManage },
+                ["Payroll.Pay"] = new[] { AppPermissions.PayrollManage },
+                ["Payroll.CancelPayment"] = new[] { AppPermissions.PayrollManage },
 
                 ["Help.Controls"] = new[] { AppPermissions.OwnerOversight },
 

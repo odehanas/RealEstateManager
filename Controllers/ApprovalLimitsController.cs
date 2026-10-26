@@ -77,12 +77,13 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Switches(bool requirePaymentApproval, bool allowSelfRelease)
+        public async Task<IActionResult> Switches(bool requirePaymentApproval, bool allowSelfRelease, bool applyLimitsToContracts)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
             var company = await _db.Companies.FirstAsync(x => x.Id == companyId);
             company.RequirePaymentApproval = requirePaymentApproval;
             company.AllowSelfReleaseWithinLimit = allowSelfRelease;
+            company.ApplyLimitsToContracts = applyLimitsToContracts;
             await _db.SaveChangesAsync();
             Flash(true, requirePaymentApproval
                 ? "Payment approval is ON: every payment needs someone whose limit covers it."
