@@ -1,0 +1,164 @@
+@model RealEstateManager.Models.EmployeeDetailsViewModel
+@using RealEstateManager.Domain
+
+@{
+    var e = Model.Employee;
+    ViewData["Title"] = e.FullName;
+
+    string Expiry(DateTime? date)
+    {
+        if (!date.HasValue) return "";
+        var days = (date.Value.Date - DateTime.Today).Days;
+        return days < 0 ? "bg-danger" : days <= 60 ? "bg-warning text-dark" : "bg-light text-dark border";
+    }
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">@e.FullName <span class="text-muted fw-normal fs-5">@e.EmployeeCode</span></h2>
+        <div class="text-muted">@e.JobTitle @(e.Department != null ? "· " + e.Department.Name : "") @(e.Property != null ? "· " + e.Property.Name : "")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <span class="badge fs-6 @(e.Status == EmployeeStatuses.Active ? "bg-success" : "bg-secondary") align-self-center">@e.Status</span>
+        <a asp-action="Edit" asp-route-id="@e.Id" class="btn btn-dark">Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (TempData["HrSuccess"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+@foreach (var doc in Model.ExpiringDocuments)
+{
+    <div class="alert @(doc.DaysLeft < 0 ? "alert-danger" : "alert-warning") py-2">
+        <strong>@doc.Document</strong> @(doc.DaysLeft < 0 ? $"expired {-doc.DaysLeft} day(s) ago" : $"expires in {doc.DaysLeft} day(s)") (@doc.Expiry.ToString("dd/MM/yyyy")).
+    </div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="small text-muted text-uppercase">Monthly gross</div>
+            <div class="fs-3 fw-bold">@e.MonthlyGross.ToString("N2")</div>
+            <div class="small">Basic @e.BasicSalary.ToString("N2") · Allowances @((e.HousingAllowance + e.TransportAllowance + e.OtherAllowance).ToString("N2"))</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="small text-muted text-uppercase">Annual leave available</div>
+            <div class="fs-3 fw-bold">@Model.LeaveBalance.Available.ToString("0.##") days</div>
+            <div class="small">Earned @Model.LeaveBalance.Accrued.ToString("0.##") + opening @Model.LeaveBalance.Opening.ToString("0.##") − taken @Model.LeaveBalance.Taken.ToString("0.##")
+                @if (Model.LeaveBalance.Pending > 0) { <text>· @Model.LeaveBalance.Pending.ToString("0.##") pending</text> }</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="small text-muted text-uppercase">End-of-service gratuity today</div>
+            <div class="fs-3 fw-bold">@Model.Gratuity.Amount.ToString("N2")</div>
+            <div class="small">
+                @Model.Gratuity.ServiceYears years of service.
+                @if (!Model.Gratuity.Eligible) { <span class="text-danger">Not yet payable: less than one year.</span> }
+                @if (Model.Gratuity.Capped) { <span>Capped at two years' basic pay.</span> }
+            </div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="small text-muted text-uppercase">Provided in the accounts</div>
+            <div class="fs-3 fw-bold">@Model.GratuityProvisionBooked.ToString("N2")</div>
+            <div class="small">Charged by approved payrolls, plus any opening provision.</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h6 class="mb-0">Personal and contract</h6></div>
+            <table class="table table-sm mb-0">
+                <tr><th class="w-50">Arabic name</th><td dir="rtl">@e.NameArabic</td></tr>
+                <tr><th>Gender · Nationality</th><td>@e.Gender · @e.Nationality</td></tr>
+                <tr><th>Date of birth</th><td>@e.DateOfBirth?.ToString("dd/MM/yyyy")</td></tr>
+                <tr><th>Mobile · Email</th><td>@e.Mobile @e.Email</td></tr>
+                <tr><th>Emergency contact</th><td>@e.EmergencyContactName @e.EmergencyContactPhone</td></tr>
+                <tr><th>Joined · Probation ends</th><td>@e.JoiningDate.ToString("dd/MM/yyyy") · @e.ProbationEndDate?.ToString("dd/MM/yyyy")</td></tr>
+                <tr><th>Contract</th><td>@e.ContractType @(e.ContractEndDate.HasValue ? "until " + e.ContractEndDate.Value.ToString("dd/MM/yyyy") : "")</td></tr>
+                @if (e.LeavingDate.HasValue)
+                {
+                    <tr><th>Last working day</th><td>@e.LeavingDate.Value.ToString("dd/MM/yyyy") — @e.LeavingReason</td></tr>
+                }
+                <tr><th>Paid by</th><td>@SalaryPaymentMethods.Describe(e.PaymentMethod) · @e.BankName @e.Iban</td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h6 class="mb-0">Documents</h6></div>
+            <table class="table table-sm mb-0">
+                <tr><th>Document</th><th>Number</th><th>Expiry</th></tr>
+                <tr><td>Passport</td><td>@e.PassportNumber</td><td><span class="badge @Expiry(e.PassportExpiry)">@e.PassportExpiry?.ToString("dd/MM/yyyy")</span></td></tr>
+                <tr><td>Emirates ID</td><td>@e.EmiratesIdNumber</td><td><span class="badge @Expiry(e.EmiratesIdExpiry)">@e.EmiratesIdExpiry?.ToString("dd/MM/yyyy")</span></td></tr>
+                <tr><td>Residence visa</td><td>@e.ResidenceVisaNumber</td><td><span class="badge @Expiry(e.ResidenceVisaExpiry)">@e.ResidenceVisaExpiry?.ToString("dd/MM/yyyy")</span></td></tr>
+                <tr><td>Labour card</td><td>@e.LabourCardNumber</td><td><span class="badge @Expiry(e.LabourCardExpiry)">@e.LabourCardExpiry?.ToString("dd/MM/yyyy")</span></td></tr>
+                <tr><td>Health insurance</td><td>@e.HealthInsuranceNumber</td><td><span class="badge @Expiry(e.HealthInsuranceExpiry)">@e.HealthInsuranceExpiry?.ToString("dd/MM/yyyy")</span></td></tr>
+                <tr><td>MOHRE person code</td><td colspan="2">@(e.MohrePersonCode ?? "—")</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-light"><h6 class="mb-0">End-of-service gratuity — how it is worked out</h6></div>
+    <div class="card-body small">
+        Daily basic pay @Model.Gratuity.DailyBasic.ToString("N2") (basic ÷ 30) ×
+        (@Model.Gratuity.FirstFiveYearsDays.ToString("0.##") days for the first five years at 21 days a year
+        + @Model.Gratuity.LaterYearsDays.ToString("0.##") days for later years at 30 days a year)
+        = <strong>@Model.Gratuity.Amount.ToString("N2")</strong>, never more than two years' basic pay.
+        Under UAE law nothing is payable before one year of continuous service.
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light d-flex justify-content-between"><h6 class="mb-0">Leave</h6><a asp-controller="Leave" asp-action="Index" class="small">All leave</a></div>
+            <table class="table table-sm mb-0">
+                <tr><th>Type</th><th>From</th><th>To</th><th class="text-end">Days</th><th>Status</th></tr>
+                @foreach (var l in Model.Leave)
+                {
+                    <tr><td>@l.LeaveType</td><td>@l.StartDate.ToString("dd/MM/yyyy")</td><td>@l.EndDate.ToString("dd/MM/yyyy")</td><td class="text-end">@l.Days.ToString("0.##")</td><td>@l.Status</td></tr>
+                }
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light"><h6 class="mb-0">Payslips</h6></div>
+            <table class="table table-sm mb-0">
+                <tr><th>Month</th><th class="text-end">Gross</th><th class="text-end">Deductions</th><th class="text-end">Net</th><th></th></tr>
+                @foreach (var p in Model.Payslips)
+                {
+                    <tr>
+                        <td>@p.PayrollRun!.RunNumber</td>
+                        <td class="text-end">@p.Gross.ToString("N2")</td>
+                        <td class="text-end">@p.TotalDeductions.ToString("N2")</td>
+                        <td class="text-end">@p.Net.ToString("N2")</td>
+                        <td><a asp-controller="Payroll" asp-action="Payslip" asp-route-id="@p.Id" target="_blank">Payslip</a></td>
+                    </tr>
+                }
+            </table>
+            @if (Model.Advances.Count > 0)
+            {
+                <div class="card-header bg-light border-top"><h6 class="mb-0">Salary advances</h6></div>
+                <table class="table table-sm mb-0">
+                    <tr><th>Date</th><th class="text-end">Amount</th><th class="text-end">Monthly</th><th class="text-end">Outstanding</th></tr>
+                    @foreach (var a in Model.Advances)
+                    {
+                        <tr><td>@a.AdvanceDate.ToString("dd/MM/yyyy")</td><td class="text-end">@a.Amount.ToString("N2")</td><td class="text-end">@a.MonthlyInstalment.ToString("N2")</td><td class="text-end">@a.Outstanding.ToString("N2")</td></tr>
+                    }
+                </table>
+            }
+        </div>
+    </div>
+</div>

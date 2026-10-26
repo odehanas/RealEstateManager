@@ -1,0 +1,66 @@
+@model RealEstateManager.Models.PayrollIndexViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Payroll";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">Payroll</h2>
+        <div class="text-muted">Prepare the month, have it approved, then pay by WPS, bank transfer or cheque.</div>
+    </div>
+    <a asp-action="Settings" class="btn btn-outline-secondary">Payroll settings</a>
+</div>
+
+@if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
+@if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="row g-2 align-items-end">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <label class="form-label">Month</label>
+                <select name="month" class="form-select">
+                    @for (var m = 1; m <= 12; m++)
+                    {
+                        <option value="@m" selected="@(m == Model.NewMonth)">@(new DateTime(2000, m, 1).ToString("MMMM"))</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2"><label class="form-label">Year</label><input name="year" type="number" value="@Model.NewYear" class="form-control" /></div>
+            <div class="col-md-3"><button class="btn btn-dark w-100">Prepare payroll</button></div>
+            <div class="col-md-4 text-muted small">@Model.ActiveEmployees active employee(s). Unpaid leave and salary advances are picked up automatically.</div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-light">
+        <tr><th>Payroll</th><th>Month</th><th class="text-end">Employees</th><th class="text-end">Gross</th><th class="text-end">Deductions</th><th class="text-end">Net</th><th>Status</th><th>Prepared · Approved</th></tr>
+    </thead>
+    <tbody>
+        @if (Model.Runs.Count == 0) { <tr><td colspan="8" class="text-muted">No payroll yet.</td></tr> }
+        @foreach (var r in Model.Runs)
+        {
+            var badge = r.Status switch
+            {
+                PayrollRunStatuses.Draft => "bg-secondary",
+                PayrollRunStatuses.Approved => "bg-primary",
+                PayrollRunStatuses.PartlyPaid => "bg-warning text-dark",
+                _ => "bg-success"
+            };
+            <tr>
+                <td><a asp-action="Run" asp-route-id="@r.Id">@r.RunNumber</a></td>
+                <td>@r.PeriodStart.ToString("MMMM yyyy")</td>
+                <td class="text-end">@r.Lines.Count</td>
+                <td class="text-end">@r.TotalGross.ToString("N2")</td>
+                <td class="text-end">@r.TotalDeductions.ToString("N2")</td>
+                <td class="text-end fw-semibold">@r.TotalNet.ToString("N2")</td>
+                <td><span class="badge @badge">@r.Status</span></td>
+                <td class="small">@r.PreparedByName · @r.ApprovedByName</td>
+            </tr>
+        }
+    </tbody>
+</table>

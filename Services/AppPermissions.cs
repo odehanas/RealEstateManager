@@ -34,6 +34,18 @@ namespace RealEstateManager.Services
         /// administrators.
         /// </summary>
         public const string PeriodReopenApprove = "Closing.ApproveReopen";
+
+        /// <summary>Employees, their documents, departments, leave and salary advances.</summary>
+        public const string HrManage = "HR.Manage";
+
+        /// <summary>Prepare the monthly payroll and pay it: WPS file, bank transfer, cheques.</summary>
+        public const string PayrollManage = "Payroll.Manage";
+
+        /// <summary>
+        /// Approve a prepared payroll into the accounts. Kept apart from preparing it, so
+        /// the person who enters the salaries is not the one who releases them.
+        /// </summary>
+        public const string PayrollApprove = "Payroll.Approve";
         public const string ReportsView = "Reports.View";
 
         /// <summary>
@@ -113,6 +125,29 @@ namespace RealEstateManager.Services
                 Description =
                     "Open a closed accounting period again when someone has asked for it with a reason, or turn " +
                     "the request down. Nobody can approve their own request unless they are the company's only approver."
+            },
+            new()
+            {
+                Key = AppPermissions.HrManage,
+                Group = "HR & Payroll",
+                Name = "Manage Employees",
+                Description = "Employees, their contracts and UAE documents, departments, leave and salary advances."
+            },
+            new()
+            {
+                Key = AppPermissions.PayrollManage,
+                Group = "HR & Payroll",
+                Name = "Prepare & Pay Payroll",
+                Description = "Prepare the monthly payroll, print payslips and pay salaries by WPS file, bank transfer or cheque."
+            },
+            new()
+            {
+                Key = AppPermissions.PayrollApprove,
+                Group = "HR & Payroll",
+                Name = "Approve Payroll",
+                Description =
+                    "Approve a prepared payroll into the accounts. Nobody can approve a payroll they prepared " +
+                    "unless they are the company's only payroll approver."
             },
             new()
             {
@@ -200,6 +235,14 @@ namespace RealEstateManager.Services
                 ["BuildingView"] = new[] { AppPermissions.ReportsView },
                 ["OwnerWithdrawals"] = new[] { AppPermissions.AccountingManage },
 
+                ["Employees"] = new[] { AppPermissions.HrManage, AppPermissions.PayrollManage },
+                ["Departments"] = new[] { AppPermissions.HrManage },
+                ["Leave"] = new[] { AppPermissions.HrManage },
+                ["EmployeeAdvances"] = new[] { AppPermissions.HrManage, AppPermissions.PayrollManage },
+                ["PayrollAdjustments"] = new[] { AppPermissions.HrManage, AppPermissions.PayrollManage },
+                ["Attendance"] = new[] { AppPermissions.HrManage },
+                ["Payroll"] = new[] { AppPermissions.PayrollManage, AppPermissions.PayrollApprove },
+
                 // Uploading photos and marking units on them changes the property record.
                 ["BuildingPhotos"] = new[] { AppPermissions.MasterDataManage }
             };
@@ -214,6 +257,11 @@ namespace RealEstateManager.Services
                 ["Closing.ReopenRequests"] = new[] { AppPermissions.PeriodReopenApprove, AppPermissions.AccountingManage },
                 ["Closing.ApproveReopen"] = new[] { AppPermissions.PeriodReopenApprove },
                 ["Closing.RejectReopen"] = new[] { AppPermissions.PeriodReopenApprove },
+
+                // Approving puts the payroll into the ledger; preparing it does not.
+                ["Payroll.Approve"] = new[] { AppPermissions.PayrollApprove },
+                ["Payroll.ReturnToDraft"] = new[] { AppPermissions.PayrollApprove },
+                ["Payroll.Settings"] = new[] { AppPermissions.PayrollManage },
                 ["InvestmentProperty.SetUpBuilding"] = new[] { AppPermissions.AccountingManage }
             };
 
