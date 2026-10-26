@@ -294,6 +294,24 @@ app.Use(async (context, next) =>
     headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
     headers["Content-Security-Policy"] = "frame-ancestors 'self'; base-uri 'self'; object-src 'none'";
+
+    // Pages and data are never kept by the browser: after a publish everyone sees the
+    // current screens, and after signing out the back button cannot reopen someone's
+    // figures. Scripts, styles and images (versioned by asp-append-version) still cache.
+    context.Response.OnStarting(() =>
+    {
+        var type = context.Response.ContentType ?? string.Empty;
+        if ((type.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) ||
+             type.StartsWith("application/json", StringComparison.OrdinalIgnoreCase)) &&
+            !context.Response.Headers.ContainsKey("Cache-Control"))
+        {
+            context.Response.Headers["Cache-Control"] = "no-store, no-cache, max-age=0";
+            context.Response.Headers["Pragma"] = "no-cache";
+        }
+
+        return Task.CompletedTask;
+    });
+
     await next();
 });
 
