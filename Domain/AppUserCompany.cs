@@ -17,5 +17,9 @@ namespace RealEstateManager.Domain
         /// Held per company, so a customer's administrator has no say over any other company.
         /// </summary>
         public bool IsCompanyAdmin { get; set; }
+
+        /// <summary>The user's rung on this company's payment approval ladder; none means no authority to release payments.</summary>
+        public int? ApprovalLevelId { get; set; }
+        public ApprovalLevel? ApprovalLevel { get; set; }
     }
 }

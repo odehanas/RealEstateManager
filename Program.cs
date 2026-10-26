@@ -61,9 +61,13 @@ builder.Services
         // handlers, and each writes its own redirect - whichever runs last wins.
         // Each handler therefore answers only for its own half of the site, otherwise
         // the whole application would redirect to whichever login was registered last.
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
         options.Events.OnRedirectToLogin = context =>
         {
-            if (IsPortalRequest(context.Request))
+            if (IsPortalRequest(context.Request) || IsEmployeePortalRequest(context.Request))
                 return Task.CompletedTask;
 
             context.Response.Redirect(context.RedirectUri);
@@ -72,7 +76,7 @@ builder.Services
 
         options.Events.OnRedirectToAccessDenied = context =>
         {
-            if (IsPortalRequest(context.Request))
+            if (IsPortalRequest(context.Request) || IsEmployeePortalRequest(context.Request))
                 return Task.CompletedTask;
 
             context.Response.Redirect(context.RedirectUri);
@@ -86,6 +90,8 @@ builder.Services
         options.Cookie.Name = "RealEstateManager.TenantPortal";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax;
+        // Only sent to /portal, so a staff page never sees a tenant signed in alongside.
+        options.Cookie.Path = "/portal";
         options.LoginPath = "/portal/login";
         options.LogoutPath = "/portal/logout";
         options.AccessDeniedPath = "/portal/login";
@@ -112,10 +118,43 @@ builder.Services
             context.Response.Redirect(context.RedirectUri);
             return Task.CompletedTask;
         };
+    })
+    // Employee self-service portal at /me, used on phones. Like the tenant portal: its
+    // own cookie and lifetime, answering only for its own paths.
+    .AddCookie(AppAuthSchemes.EmployeePortal, options =>
+    {
+        options.Cookie.Name = "RealEstateManager.EmployeePortal";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        // Only sent to /me: an HR officer signed in to the portal on their own PC can
+        // still use the staff screens in the same browser.
+        options.Cookie.Path = "/me";
+        options.LoginPath = "/me/login";
+        options.LogoutPath = "/me/logout";
+        options.AccessDeniedPath = "/me/login";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+
+        options.Events.OnRedirectToLogin = context =>
+        {
+            if (IsEmployeePortalRequest(context.Request))
+                context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            if (IsEmployeePortalRequest(context.Request))
+                context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
     });
 
 static bool IsPortalRequest(HttpRequest request) =>
     request.Path.StartsWithSegments("/portal", StringComparison.OrdinalIgnoreCase);
+
+static bool IsEmployeePortalRequest(HttpRequest request) =>
+    request.Path.StartsWithSegments("/me", StringComparison.OrdinalIgnoreCase);
 
 builder.Services.AddAuthorization(options =>
 {
@@ -134,13 +173,15 @@ builder.Services.AddControllersWithViews(options =>
     // in its own half of the application.
     options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder(
             CookieAuthenticationDefaults.AuthenticationScheme,
-            AppAuthSchemes.TenantPortal)
+            AppAuthSchemes.TenantPortal,
+            AppAuthSchemes.EmployeePortal)
         .RequireAuthenticatedUser()
         .Build()));
 
     // Must run before the staff filters: those assume a staff principal, and a
     // tenant has no company permissions to check.
     options.Filters.AddService<PortalBoundaryFilter>();
+    options.Filters.Add(new PasswordChangeRequiredFilter());
     options.Filters.AddService<SubscriptionEnforcementFilter>();
     options.Filters.AddService<PermissionEnforcementFilter>();
 });
@@ -186,6 +227,9 @@ builder.Services.AddScoped<PeriodClosingService>();
 builder.Services.AddScoped<HrService>();
 builder.Services.AddScoped<PayrollService>();
 builder.Services.AddScoped<AttendanceService>();
+builder.Services.AddScoped<ApprovalAuthorityService>();
+builder.Services.AddScoped<PaymentApprovalService>();
+builder.Services.AddScoped<EmployeePortalService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<LeaseWorkflowService>();
@@ -227,6 +271,20 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Browser-side protection on every response: no framing by other sites (clickjacking),
+// no MIME sniffing, no full URLs leaking to other sites, no camera/microphone/location.
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "SAMEORIGIN";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
+    headers["Content-Security-Policy"] = "frame-ancestors 'self'; base-uri 'self'; object-src 'none'";
+    await next();
+});
+
 app.UseStaticFiles();
 
 app.UseRouting();

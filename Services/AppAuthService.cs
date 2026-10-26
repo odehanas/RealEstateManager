@@ -21,10 +21,22 @@ namespace RealEstateManager.Services
             _passwordHashingService = passwordHashingService;
         }
 
-        public async Task<AppUser?> ValidateCredentialsAsync(string username, string password)
+        public const int MaxFailedAttempts = 5;
+        public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
+
+        /// <summary>The password every new installation's ADMIN starts with; it must not survive the first sign-in.</summary>
+        public const string BootstrapAdminPassword = "Admin@123";
+
+        /// <summary>
+        /// Checks a staff sign-in. Five wrong passwords lock the account for fifteen minutes,
+        /// which stops anyone guessing passwords from outside. A user still on the bootstrap
+        /// password, or one an administrator set, is flagged to choose their own.
+        /// </summary>
+        public async Task<(AppUser? User, string? Error)> ValidateCredentialsAsync(string username, string password)
         {
+            const string failure = "Invalid username or password.";
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                return null;
+                return (null, failure);
 
             var normalizedUsername = username.Trim().ToUpperInvariant();
 
@@ -32,11 +44,33 @@ namespace RealEstateManager.Services
                 .FirstOrDefaultAsync(x => x.Username == normalizedUsername && x.IsActive);
 
             if (user == null)
-                return null;
+                return (null, failure);
 
-            return _passwordHashingService.VerifyPassword(password, user.PasswordHash)
-                ? user
-                : null;
+            if (user.LockedOutUntil.HasValue && user.LockedOutUntil > DateTime.UtcNow)
+            {
+                var minutes = Math.Max(1, (int)Math.Ceiling((user.LockedOutUntil.Value - DateTime.UtcNow).TotalMinutes));
+                return (null, $"This account is locked after {MaxFailedAttempts} wrong passwords. Try again in {minutes} minute(s), or ask an administrator.");
+            }
+
+            if (!_passwordHashingService.VerifyPassword(password, user.PasswordHash))
+            {
+                user.FailedLoginAttempts++;
+                if (user.FailedLoginAttempts >= MaxFailedAttempts)
+                {
+                    user.LockedOutUntil = DateTime.UtcNow.Add(LockoutDuration);
+                    user.FailedLoginAttempts = 0;
+                }
+
+                await _db.SaveChangesAsync();
+                return (null, failure);
+            }
+
+            user.FailedLoginAttempts = 0;
+            user.LockedOutUntil = null;
+            if (password == BootstrapAdminPassword)
+                user.MustChangePassword = true;
+            await _db.SaveChangesAsync();
+            return (user, null);
         }
 
         public async Task<List<CompanyOptionViewModel>> GetAccessibleCompaniesAsync(int userId, int? currentCompanyId = null)
@@ -127,6 +161,11 @@ namespace RealEstateManager.Services
             if (user.IsSystemAdmin)
             {
                 claims.Add(new Claim(ClaimTypes.Role, "SystemAdmin"));
+            }
+
+            if (user.MustChangePassword)
+            {
+                claims.Add(new Claim(AppClaimTypes.MustChangePassword, "true"));
             }
 
             return claims;

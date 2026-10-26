@@ -23,6 +23,7 @@ namespace RealEstateManager.Services
     public class PortalBoundaryFilter : IAsyncAuthorizationFilter
     {
         private const string PortalControllerPrefix = "Portal";
+        private const string SelfServiceControllerPrefix = "SelfService";
 
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
@@ -35,6 +36,25 @@ namespace RealEstateManager.Services
                 return Task.CompletedTask;
 
             var controllerName = context.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+
+            // Employees in their self-service portal: SelfService* controllers only, and
+            // nobody else may use those.
+            var isSelfServiceController = controllerName.StartsWith(SelfServiceControllerPrefix, StringComparison.OrdinalIgnoreCase);
+            if (user.IsEmployeePortalUser())
+            {
+                if (!isSelfServiceController)
+                    context.Result = new RedirectToActionResult("Index", "SelfService", null);
+                return Task.CompletedTask;
+            }
+
+            if (isSelfServiceController)
+            {
+                context.Result = user.IsTenantPortalUser()
+                    ? new RedirectToActionResult("Index", "Portal", null)
+                    : new RedirectToActionResult("Index", "Home", null);
+                return Task.CompletedTask;
+            }
+
             var isPortalController = controllerName.StartsWith(PortalControllerPrefix, StringComparison.OrdinalIgnoreCase);
             var isPortalUser = user.IsTenantPortalUser();
 

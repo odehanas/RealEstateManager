@@ -61,6 +61,12 @@ namespace RealEstateManager.Services
                 return;
             }
 
+            if (user.IsEmployeePortalUser())
+            {
+                context.Result = new RedirectToActionResult("Unavailable", "SelfServiceAccount", null);
+                return;
+            }
+
             var currentPath = context.HttpContext.Request.Path + context.HttpContext.Request.QueryString;
             context.Result = new RedirectToActionResult(
                 "Index",

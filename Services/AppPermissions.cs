@@ -35,6 +35,16 @@ namespace RealEstateManager.Services
         /// </summary>
         public const string PeriodReopenApprove = "Closing.ApproveReopen";
 
+        /// <summary>
+        /// The owners' seat: the Owner Monitor (everything posted, released and changed),
+        /// read access to every report and master data, and control of the approval limits
+        /// and delegations. Grants no right to enter or change transactions.
+        /// </summary>
+        public const string OwnerOversight = "Owner.Oversight";
+
+        /// <summary>Release payments held for approval, up to the person's approval level.</summary>
+        public const string PaymentsApprove = "Payments.Approve";
+
         /// <summary>Employees, their documents, departments, leave and salary advances.</summary>
         public const string HrManage = "HR.Manage";
 
@@ -128,6 +138,24 @@ namespace RealEstateManager.Services
             },
             new()
             {
+                Key = AppPermissions.OwnerOversight,
+                Group = "Owners & Controls",
+                Name = "Owner Oversight",
+                Description =
+                    "The Owner Monitor (every posting, payment release and change, day by day), read access to all reports " +
+                    "and master data, and control of approval limits and delegations. Cannot enter or change transactions."
+            },
+            new()
+            {
+                Key = AppPermissions.PaymentsApprove,
+                Group = "Owners & Controls",
+                Name = "Release Payments",
+                Description =
+                    "Release payments waiting for approval, up to the limit of the person's approval level. " +
+                    "Nobody releases a payment they entered."
+            },
+            new()
+            {
                 Key = AppPermissions.HrManage,
                 Group = "HR & Payroll",
                 Name = "Manage Employees",
@@ -167,9 +195,9 @@ namespace RealEstateManager.Services
         private static readonly Dictionary<string, string[]> MasterDataReadPermissions =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["Properties"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage },
-                ["Units"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage },
-                ["Tenants"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage },
+                ["Properties"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
+                ["Units"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
+                ["Tenants"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
 
                 // An accountant entering a bill must be able to find the supplier, so
                 // Accounting.Manage carries read access - but not the right to create
@@ -178,7 +206,8 @@ namespace RealEstateManager.Services
                 {
                     AppPermissions.MasterDataView,
                     AppPermissions.MasterDataManage,
-                    AppPermissions.AccountingManage
+                    AppPermissions.AccountingManage,
+                    AppPermissions.OwnerOversight
                 }
             };
 
@@ -204,6 +233,10 @@ namespace RealEstateManager.Services
             {
                 ["Leases"] = new[] { AppPermissions.LeasesManage },
                 ["Approvals"] = new[] { AppPermissions.LeasesApprove },
+                ["Oversight"] = new[] { AppPermissions.OwnerOversight },
+                ["ApprovalLimits"] = new[] { AppPermissions.OwnerOversight },
+                ["PaymentApprovals"] = new[] { AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight },
+                ["EmployeeRequests"] = new[] { AppPermissions.HrManage },
                 ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["AccountMappings"] = new[] { AppPermissions.AccountingManage },
@@ -224,15 +257,15 @@ namespace RealEstateManager.Services
                 ["ManualJournals"] = new[] { AppPermissions.AccountingManage },
                 ["Journal"] = new[] { AppPermissions.AccountingManage },
                 ["Closing"] = new[] { AppPermissions.AccountingManage },
-                ["Reports"] = new[] { AppPermissions.ReportsView },
-                ["TenantStatements"] = new[] { AppPermissions.ReportsView },
-                ["VendorStatements"] = new[] { AppPermissions.ReportsView, AppPermissions.AccountingManage },
+                ["Reports"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
+                ["TenantStatements"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
+                ["VendorStatements"] = new[] { AppPermissions.ReportsView, AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 ["OwnerSettlements"] = new[] { AppPermissions.AccountingManage },
                 ["DevelopmentProjects"] = new[] { AppPermissions.AccountingManage },
-                ["InvestmentProperty"] = new[] { AppPermissions.ReportsView },
+                ["InvestmentProperty"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
                 ["UnitSales"] = new[] { AppPermissions.AccountingManage },
                 ["CapitalAssetVat"] = new[] { AppPermissions.AccountingManage },
-                ["BuildingView"] = new[] { AppPermissions.ReportsView },
+                ["BuildingView"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
                 ["OwnerWithdrawals"] = new[] { AppPermissions.AccountingManage },
 
                 ["Employees"] = new[] { AppPermissions.HrManage, AppPermissions.PayrollManage },
@@ -250,7 +283,7 @@ namespace RealEstateManager.Services
         private static readonly Dictionary<string, string[]> ActionPermissionMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView },
+                ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
 
                 // The approver's desk for reopening closed periods. An approver need not
                 // be an accountant, so these do not require Accounting.Manage.
@@ -262,6 +295,12 @@ namespace RealEstateManager.Services
                 ["Payroll.Approve"] = new[] { AppPermissions.PayrollApprove },
                 ["Payroll.ReturnToDraft"] = new[] { AppPermissions.PayrollApprove },
                 ["Payroll.Settings"] = new[] { AppPermissions.PayrollManage },
+
+                ["Help.Controls"] = new[] { AppPermissions.OwnerOversight },
+
+                // Handing an employee a portal login is HR's call, not payroll's.
+                ["Employees.IssuePortalAccess"] = new[] { AppPermissions.HrManage },
+                ["Employees.SetPortalAccess"] = new[] { AppPermissions.HrManage },
                 ["InvestmentProperty.SetUpBuilding"] = new[] { AppPermissions.AccountingManage }
             };
 

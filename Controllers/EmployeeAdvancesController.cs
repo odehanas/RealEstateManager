@@ -40,8 +40,16 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind(Prefix = "NewAdvance")] EmployeeAdvance advance)
+        public async Task<IActionResult> Create([Bind(Prefix = "NewAdvance")] EmployeeAdvance advance, [FromServices] PaymentApprovalService approvals)
         {
+            var blocked = await approvals.CheckDirectAuthorityAsync(User.GetRequiredCurrentCompanyId(), User.GetAppUserId() ?? 0,
+                User.IsInRole("SystemAdmin"), advance.Amount, "A salary advance");
+            if (blocked != null)
+            {
+                TempData["HrError"] = blocked + " Ask someone with that authority to record it.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var name = User.FindFirst(AppClaimTypes.DisplayName)?.Value ?? User.FindFirst(AppClaimTypes.Username)?.Value ?? "User";
             var (success, message) = await _payroll.CreateAdvanceAsync(User.GetRequiredCurrentCompanyId(), advance, name);
             TempData[success ? "HrSuccess" : "HrError"] = message;

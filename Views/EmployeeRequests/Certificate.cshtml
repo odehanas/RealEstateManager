@@ -1,0 +1,99 @@
+@model RealEstateManager.Domain.EmployeeRequest
+@using RealEstateManager.Domain
+@{
+    Layout = null;
+    var company = (Company)ViewBag.Company;
+    var e = Model.Employee!;
+    var issued = (Model.DecidedAt ?? DateTime.UtcNow).ToLocalTime();
+    var title = Model.RequestType switch
+    {
+        EmployeeRequestTypes.SalaryCertificate => "SALARY CERTIFICATE",
+        EmployeeRequestTypes.SalaryTransferLetter => "SALARY TRANSFER LETTER",
+        _ => "EMPLOYMENT CERTIFICATE"
+    };
+    var showSalary = Model.RequestType != EmployeeRequestTypes.EmploymentCertificate;
+    var stillEmployed = !EmployeeStatuses.HasLeft(e.Status);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title @Model.ReferenceNumber</title>
+    <style>
+        @@page { size: A4 portrait; margin: 20mm; }
+        body { font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; color: #1f2933; background: #f2f4f7; margin: 0; line-height: 1.55; }
+        .toolbar { background: #0f2740; color: #fff; padding: 10px 16px; display: flex; gap: 12px; align-items: center; }
+        .toolbar a { color: #fff; }
+        .page { background: #fff; max-width: 180mm; margin: 14px auto; padding: 16mm; box-shadow: 0 0 12px rgba(0,0,0,.08); }
+        .head { border-bottom: 2px solid #0f2740; padding-bottom: 8px; margin-bottom: 18px; }
+        .head h1 { font-size: 16pt; margin: 0; color: #0f2740; }
+        .muted { color: #5b6774; font-size: 9.5pt; }
+        h2 { text-align: center; letter-spacing: .08em; font-size: 13pt; margin: 18px 0; }
+        table { border-collapse: collapse; margin: 10px 0; }
+        td { padding: 3px 14px 3px 0; }
+        .num { text-align: right; }
+        .sign { margin-top: 50px; }
+        @@media print { body { background: #fff; } .toolbar { display: none; } .page { box-shadow: none; margin: 0; padding: 0; max-width: none; } }
+        @@media (max-width: 640px) { .page { padding: 16px; } }
+    </style>
+</head>
+<body>
+<div class="toolbar"><a href="javascript:history.back()">&larr; Back</a><strong>@title</strong><button onclick="window.print()">Print</button></div>
+<div class="page">
+    <div class="head">
+        <h1>@(company.LegalName ?? company.Name)</h1>
+        <div class="muted">@company.AddressLine1 @company.AddressLine2 @company.City @(company.Phone != null ? "· " + company.Phone : "") @(company.Email != null ? "· " + company.Email : "")</div>
+        @if (!string.IsNullOrEmpty(company.TradeLicenseNumber)) { <div class="muted">Trade licence @company.TradeLicenseNumber</div> }
+    </div>
+
+    <div style="display:flex;justify-content:space-between">
+        <div>Ref: <strong>@Model.ReferenceNumber</strong></div>
+        <div>Date: @issued.ToString("dd MMMM yyyy")</div>
+    </div>
+
+    <p style="margin-top:18px"><strong>@Model.AddressedTo</strong></p>
+    <h2>@title</h2>
+
+    <p>
+        This is to certify that <strong>@e.FullName</strong>@(string.IsNullOrEmpty(e.Nationality) ? "" : $", {e.Nationality} national"),
+        @(string.IsNullOrEmpty(e.PassportNumber) ? "" : $"holder of passport number {e.PassportNumber}, ")
+        @(stillEmployed ? "is employed" : "was employed") with us as <strong>@e.JobTitle</strong>@(e.Department != null ? $" in the {e.Department.Name} department" : "")
+        since @e.JoiningDate.ToString("dd MMMM yyyy")@(stillEmployed || !e.LeavingDate.HasValue ? "" : $" until {e.LeavingDate:dd MMMM yyyy}").
+    </p>
+
+    @if (showSalary)
+    {
+        <p>@(stillEmployed ? "The employee's current monthly salary is" : "The employee's last monthly salary was") as follows:</p>
+        <table>
+            <tr><td>Basic salary</td><td class="num">AED @e.BasicSalary.ToString("N2")</td></tr>
+            <tr><td>Housing allowance</td><td class="num">AED @e.HousingAllowance.ToString("N2")</td></tr>
+            <tr><td>Transport allowance</td><td class="num">AED @e.TransportAllowance.ToString("N2")</td></tr>
+            @if (e.OtherAllowance != 0) { <tr><td>Other allowances</td><td class="num">AED @e.OtherAllowance.ToString("N2")</td></tr> }
+            <tr><td><strong>Total monthly salary</strong></td><td class="num"><strong>AED @e.MonthlyGross.ToString("N2")</strong></td></tr>
+        </table>
+        <p class="muted">@RealEstateManager.Services.AmountInWords.Dirhams(e.MonthlyGross)</p>
+    }
+
+    @if (Model.RequestType == EmployeeRequestTypes.SalaryTransferLetter)
+    {
+        <p>
+            We undertake to transfer the employee's monthly salary to their account with <strong>@Model.AddressedTo</strong>
+            and not to change this arrangement without the bank's written clearance. In the event the employee leaves our
+            service, we shall transfer their end of service benefits to the same account.
+        </p>
+    }
+
+    <p>
+        This certificate is issued at the employee's request@(string.IsNullOrEmpty(Model.Purpose) ? "" : $" for {Model.Purpose}")
+        and without any responsibility on the part of the company.
+    </p>
+
+    <div class="sign">
+        <div>For <strong>@(company.LegalName ?? company.Name)</strong></div>
+        <div style="margin-top:44px;border-top:1px solid #5b6774;width:60mm;padding-top:4px">Authorised signatory and stamp</div>
+        <div class="muted" style="margin-top:6px">Issued by @Model.DecidedByName</div>
+    </div>
+</div>
+</body>
+</html>

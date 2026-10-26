@@ -132,10 +132,10 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            var user = await _appAuthService.ValidateCredentialsAsync(model.Username, model.Password);
+            var (user, error) = await _appAuthService.ValidateCredentialsAsync(model.Username, model.Password);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                ModelState.AddModelError(string.Empty, error ?? "Invalid username or password.");
                 return View(model);
             }
 
@@ -147,6 +147,12 @@ namespace RealEstateManager.Controllers
             }
 
             await _appAuthService.SignInAsync(HttpContext, user, companyId.Value);
+
+            if (user.MustChangePassword)
+            {
+                TempData["ErrorMessage"] = "Please choose your own password before continuing.";
+                return RedirectToAction("ChangePassword", "Profile");
+            }
 
             if (!string.IsNullOrWhiteSpace(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {

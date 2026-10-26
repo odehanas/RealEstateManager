@@ -1,0 +1,71 @@
+@using System.Security.Claims
+@using RealEstateManager.Services
+@{
+    var isSignedIn = User.IsEmployeePortalUser();
+    var name = User.FindFirst(ClaimTypes.Name)?.Value ?? "";
+    var company = User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value ?? "";
+    string Active(string action) =>
+        string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), action, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - My HR</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root { --navy:#0f2740; --accent:#1e6fd9; --line:#d8dee6; }
+        body { background:#f2f4f7; padding-bottom:78px; }
+        .bar { background:var(--navy); color:#fff; padding:.7rem 1rem; }
+        .bar .who { font-size:.78rem; opacity:.8; }
+        .bar .name { font-weight:700; line-height:1.2; }
+        .content { max-width:760px; margin:0 auto; padding:1rem; }
+        .tabbar { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); display:flex; z-index:50; box-shadow:0 -2px 10px rgba(15,39,64,.06); }
+        .tabbar a { flex:1; text-align:center; padding:.55rem .2rem .45rem; text-decoration:none; color:#5b6774; font-size:.7rem; line-height:1.2; }
+        .tabbar a.active { color:var(--accent); font-weight:700; }
+        .tabbar svg { width:22px; height:22px; display:block; margin:0 auto .15rem; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+        .card { border-radius:12px; border:0; }
+        .stat .label { font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#5b6774; }
+        .stat .value { font-size:1.45rem; font-weight:700; }
+        .form-control, .form-select, .btn { min-height:44px; }
+    </style>
+</head>
+<body>
+<div class="bar">
+    <div class="content d-flex justify-content-between align-items-center py-0">
+        <div><div class="who">@company · My HR</div><div class="name">@name</div></div>
+        @if (isSignedIn)
+        {
+            <div class="d-flex gap-2">
+                <a asp-controller="SelfServiceAccount" asp-action="ChangePassword" class="btn btn-sm btn-outline-light">Password</a>
+                <form asp-controller="SelfServiceAccount" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button class="btn btn-sm btn-light">Sign out</button></form>
+            </div>
+        }
+    </div>
+</div>
+<div class="content">
+    @if (TempData["SelfServiceMessage"] is string m) { <div class="alert alert-success py-2">@m</div> }
+    @if (TempData["SelfServiceError"] is string e) { <div class="alert alert-danger py-2">@e</div> }
+    @RenderBody()
+</div>
+@if (isSignedIn)
+{
+    <nav class="tabbar">
+        <a class="@Active("Index")" asp-controller="SelfService" asp-action="Index">
+            <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Home
+        </a>
+        <a class="@(Active("Payslips") + Active("Payslip"))" asp-controller="SelfService" asp-action="Payslips">
+            <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.8"/></svg>Payslips
+        </a>
+        <a class="@Active("Leave")" asp-controller="SelfService" asp-action="Leave">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>Leave
+        </a>
+        <a class="@Active("Requests")" asp-controller="SelfService" asp-action="Requests">
+            <svg viewBox="0 0 24 24"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M14 2.5V7h4"/><path d="M9 12h6M9 15.5h4"/></svg>Certificates
+        </a>
+    </nav>
+}
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
