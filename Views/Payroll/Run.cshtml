@@ -1,0 +1,274 @@
+@model RealEstateManager.Models.PayrollRunViewModel
+@using RealEstateManager.Domain
+
+@{
+    var run = Model.Run;
+    ViewData["Title"] = run.RunNumber;
+    var isDraft = run.Status == PayrollRunStatuses.Draft;
+    var lines = run.Lines.OrderBy(x => x.EmployeeCode).ToList();
+}
+
+<style>
+    .pr-num { width: 82px; }
+    .pr-table td, .pr-table th { white-space: nowrap; }
+    @@media print {
+        nav, .navbar, .no-print, footer { display: none !important; }
+        .pr-table input { border: 0; padding: 0; width: auto; }
+    }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-0">Payroll @run.PeriodStart.ToString("MMMM yyyy") <span class="text-muted fs-5">@run.RunNumber</span></h2>
+        <div class="text-muted">Prepared by @run.PreparedByName @(run.ApprovedByName != null ? $"· Approved by {run.ApprovedByName} on {run.ApprovedAt?.ToLocalTime():dd/MM/yyyy}" : "")</div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 no-print">
+        <span class="badge fs-6 align-self-center @(isDraft ? "bg-secondary" : run.Status == PayrollRunStatuses.Paid ? "bg-success" : "bg-primary")">@run.Status</span>
+        <a asp-action="Payslips" asp-route-id="@run.Id" target="_blank" class="btn btn-outline-dark">All payslips</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print register</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success no-print">@ok</div> }
+@if (TempData["HrError"] is string err) { <div class="alert alert-danger no-print">@err</div> }
+
+<div class="row g-3 mb-3">
+    @foreach (var (label, value) in new[] { ("Employees", run.Lines.Count.ToString()), ("Gross pay", run.TotalGross.ToString("N2")),
+                                            ("Deductions", run.TotalDeductions.ToString("N2")), ("Net pay", run.TotalNet.ToString("N2")),
+                                            ("Gratuity provision", run.TotalGratuityAccrual.ToString("N2")) })
+    {
+        <div class="col">
+            <div class="card shadow-sm h-100"><div class="card-body py-2">
+                <div class="small text-muted text-uppercase">@label</div>
+                <div class="fs-4 fw-bold">@value</div>
+            </div></div>
+        </div>
+    }
+</div>
+
+@if (isDraft)
+{
+    <div class="card shadow-sm mb-3 no-print">
+        <div class="card-body d-flex flex-wrap gap-2 align-items-center">
+            <span class="me-auto">
+                Overtime, bonuses, penalties and absence come from approved
+                <a asp-controller="PayrollAdjustments" asp-action="Index" asp-route-month="@run.PeriodStart.ToString("yyyy-MM")">payroll transactions</a>
+                (and from <a asp-controller="Attendance" asp-action="Month" asp-route-year="@run.Year" asp-route-month="@run.Month">attendance</a>);
+                unpaid leave from approved leave. This draft updates itself when they change. Then approve.
+            </span>
+            <form asp-action="Recalculate" asp-route-id="@run.Id" method="post">@Html.AntiForgeryToken()<button class="btn btn-outline-dark">Recalculate from employee records</button></form>
+            <form asp-action="Delete" asp-route-id="@run.Id" method="post" onsubmit="return confirm('Delete this draft payroll?');">@Html.AntiForgeryToken()<button class="btn btn-outline-danger">Delete draft</button></form>
+            @if (Model.CanApprove)
+            {
+                if (Model.FourEyesBlock != null)
+                {
+                    <span class="text-danger small">@Model.FourEyesBlock</span>
+                }
+                else
+                {
+                    <form asp-action="Approve" asp-route-id="@run.Id" method="post"
+                          onsubmit="return confirm('Approve payroll @run.RunNumber? Net salaries of @run.TotalNet.ToString("N2") will be posted as payable.');">
+                        @Html.AntiForgeryToken()<button class="btn btn-success">Approve payroll</button>
+                    </form>
+                }
+            }
+            else
+            {
+                <span class="text-muted small">A payroll approver approves it.</span>
+            }
+        </div>
+    </div>
+}
+else if (run.Payments.Count == 0 && Model.CanApprove)
+{
+    <div class="no-print mb-3">
+        <form asp-action="ReturnToDraft" asp-route-id="@run.Id" method="post" onsubmit="return confirm('Take this payroll out of the accounts and back to draft?');">
+            @Html.AntiForgeryToken()<button class="btn btn-sm btn-outline-warning">Return to draft for a correction</button>
+            @if (run.JournalEntry != null) { <span class="small text-muted ms-2">Journal @run.JournalEntry.EntryNumber</span> }
+        </form>
+    </div>
+}
+
+<div class="table-responsive mb-4">
+    <table class="table table-sm table-bordered table-striped align-middle pr-table">
+        <thead class="table-light">
+            <tr>
+                <th>Employee</th>
+                <th class="text-end">Days paid</th>
+                <th class="text-end">Basic</th>
+                <th class="text-end">Allowances</th>
+                <th class="text-end">OT hours</th>
+                <th class="text-end">Overtime</th>
+                <th class="text-end">Unpaid / absent days</th>
+                <th class="text-end">Additions</th>
+                <th class="text-end">Advance</th>
+                <th class="text-end">Deductions</th>
+                <th class="text-end">Net</th>
+                <th>Paid by</th>
+                @if (isDraft) { <th class="no-print"></th> }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in lines)
+            {
+                var formId = $"line-{l.Id}";
+                <tr>
+                    <td>
+                        <div class="fw-semibold">@l.EmployeeCode @l.EmployeeName</div>
+                        <div class="small text-muted">@l.JobTitle @(l.PropertyId.HasValue && Model.PropertyNames.TryGetValue(l.PropertyId.Value, out var p) ? "· " + p : "")</div>
+                    </td>
+                    <td class="text-end">@l.DaysPaid.ToString("0.##")/@l.DaysInMonth</td>
+                    <td class="text-end">@l.Basic.ToString("N2")</td>
+                    <td class="text-end">@l.Allowances.ToString("N2")</td>
+                    <td class="text-end">@l.OvertimeHours.ToString("0.##")</td>
+                    <td class="text-end">@l.OvertimeAmount.ToString("N2")</td>
+                    <td class="text-end">@l.UnpaidLeaveDays.ToString("0.##") / @l.AbsenceDays.ToString("0.##")</td>
+                    <td class="text-end">@l.Bonus.ToString("N2")</td>
+                    @if (isDraft)
+                    {
+                        <td class="text-end"><input form="@formId" name="advanceRecovery" value="@l.AdvanceRecovery.ToString("0.##")" class="form-control form-control-sm pr-num text-end" /></td>
+                    }
+                    else
+                    {
+                        <td class="text-end">@l.AdvanceRecovery.ToString("N2")</td>
+                    }
+                    <td class="text-end">@l.OtherDeductions.ToString("N2") <div class="small text-muted">@l.DeductionNote</div></td>
+                    <td class="text-end fw-bold">@l.Net.ToString("N2")</td>
+                    <td class="small">
+                        @SalaryPaymentMethods.Describe(l.PaymentMethod)
+                        @if (l.IsPaid) { <span class="badge bg-success">Paid</span> }
+                        @if (l.ChequeNumber != null) { <div>Chq @l.ChequeNumber</div> }
+                        <div><a asp-action="Payslip" asp-route-id="@l.Id" target="_blank" class="no-print">Payslip</a></div>
+                    </td>
+                    @if (isDraft)
+                    {
+                        <td class="no-print">
+                            <form id="@formId" asp-action="UpdateLine" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@l.Id" />
+                                <input type="hidden" name="runId" value="@run.Id" />
+                                <button class="btn btn-sm btn-dark" title="Save the advance recovery">Save</button>
+                            </form>
+                            <a asp-controller="PayrollAdjustments" asp-action="Index" asp-route-employeeId="@l.EmployeeId" class="btn btn-sm btn-outline-dark mt-1">+ / − Transaction</a>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+        <tfoot class="fw-bold table-light">
+            <tr>
+                <td>Total</td><td></td>
+                <td class="text-end">@lines.Sum(x => x.Basic).ToString("N2")</td>
+                <td class="text-end">@lines.Sum(x => x.Allowances).ToString("N2")</td>
+                <td></td>
+                <td class="text-end">@lines.Sum(x => x.OvertimeAmount).ToString("N2")</td>
+                <td></td>
+                <td class="text-end">@lines.Sum(x => x.Bonus).ToString("N2")</td>
+                <td class="text-end">@lines.Sum(x => x.AdvanceRecovery).ToString("N2")</td>
+                <td class="text-end">@lines.Sum(x => x.OtherDeductions).ToString("N2")</td>
+                <td class="text-end">@lines.Sum(x => x.Net).ToString("N2")</td>
+                <td colspan="@(isDraft ? 2 : 1)"></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@if (!isDraft && Model.CanManage)
+{
+    <h4 class="no-print">Pay salaries</h4>
+    @if (Model.Unpaid.Count == 0)
+    {
+        <div class="alert alert-success no-print">Every salary in this payroll is paid.</div>
+    }
+    <div class="row g-3 mb-4 no-print">
+        @foreach (var (method, count, amount) in Model.Unpaid)
+        {
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">@SalaryPaymentMethods.Describe(method) — @count employee(s), @amount.ToString("N2")</h6>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Pay" asp-route-id="@run.Id" method="post" class="d-flex flex-column gap-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="method" value="@method" />
+                            <div><label class="form-label small mb-0">Payment date</label><input name="paymentDate" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@run.JournalEntry?.EntryDate.ToString("yyyy-MM-dd")" class="form-control" /></div>
+                            @if (run.JournalEntry != null)
+                            {
+                                <div class="small text-muted">Salary cost posted on @run.JournalEntry.EntryDate.ToString("dd/MM/yyyy"); pay on or after that date.</div>
+                            }
+                            <div>
+                                <label class="form-label small mb-0">Paid from</label>
+                                <select name="bankAccountId" class="form-select">
+                                    @foreach (var b in Model.BankAccounts)
+                                    {
+                                        <option value="@b.Value" selected="@(b.Value == Model.Settings.DefaultBankAccountId?.ToString())">@b.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            @if (method == SalaryPaymentMethods.Cheque)
+                            {
+                                <div><label class="form-label small mb-0">First cheque number</label><input name="firstChequeNumber" class="form-control" placeholder="e.g. 000451" /></div>
+                                <div class="small text-muted">Each employee gets the next number in the cheque book.</div>
+                            }
+                            else
+                            {
+                                <div><label class="form-label small mb-0">Reference (optional)</label><input name="reference" class="form-control" /></div>
+                            }
+                            <button class="btn btn-dark">
+                                @(method switch { SalaryPaymentMethods.Wps => "Create WPS file and record payment", SalaryPaymentMethods.BankTransfer => "Create transfer list and record payment", _ => "Number cheques and record payment" })
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (run.Payments.Count > 0)
+{
+    <h4>Payments</h4>
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light"><tr><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Employees</th><th class="text-end">Amount</th><th>Paid from</th><th class="no-print">Documents</th><th class="no-print"></th></tr></thead>
+        <tbody>
+            @foreach (var pay in run.Payments.OrderBy(x => x.PaymentDate))
+            {
+                <tr>
+                    <td>@pay.PaymentDate.ToString("dd/MM/yyyy")</td>
+                    <td>@SalaryPaymentMethods.Describe(pay.Method)</td>
+                    <td>@pay.Reference</td>
+                    <td class="text-end">@pay.EmployeeCount</td>
+                    <td class="text-end">@pay.TotalAmount.ToString("N2")</td>
+                    <td>@pay.BankAccount?.Code @pay.BankAccount?.Name</td>
+                    <td class="no-print">
+                        @if (pay.Method == SalaryPaymentMethods.Wps)
+                        {
+                            <a asp-action="Download" asp-route-id="@pay.Id" class="btn btn-sm btn-dark">Download SIF</a>
+                        }
+                        else if (pay.Method == SalaryPaymentMethods.BankTransfer)
+                        {
+                            <a asp-action="Download" asp-route-id="@pay.Id" class="btn btn-sm btn-dark">Transfer list (CSV)</a>
+                            <a asp-action="BankLetter" asp-route-id="@pay.Id" target="_blank" class="btn btn-sm btn-outline-dark">Letter to bank</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Cheques" asp-route-id="@pay.Id" target="_blank" class="btn btn-sm btn-dark">Print — laser / inkjet</a>
+                            <a asp-action="Cheques" asp-route-id="@pay.Id" asp-route-a4="true" target="_blank" class="btn btn-sm btn-outline-dark">On A4</a>
+                            <a asp-action="ChequesDotMatrix" asp-route-id="@pay.Id" class="btn btn-sm btn-outline-dark">Dot matrix file</a>
+                        }
+                    </td>
+                    <td class="no-print">
+                        <form asp-action="CancelPayment" method="post" onsubmit="return confirm('Cancel this payment? The salaries become payable again.');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="paymentId" value="@pay.Id" />
+                            <input type="hidden" name="runId" value="@run.Id" />
+                            <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,88 @@
+@model RealEstateManager.Models.LeaveListViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = "Leave";
+}
+
+<h2>Leave</h2>
+<p class="text-muted">Book leave, then approve it. Approved annual leave comes off the balance; approved unpaid leave is deducted by that month's payroll.</p>
+
+@if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
+@if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light"><h5 class="mb-0">Book leave</h5></div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" class="row g-2 align-items-end">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <label class="form-label">Employee</label>
+                <select asp-for="NewRequest.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">Choose</option></select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Type</label>
+                <select asp-for="NewRequest.LeaveType" class="form-select">
+                    @foreach (var t in LeaveTypes.All) { <option value="@t">@t</option> }
+                </select>
+            </div>
+            <div class="col-md-2"><label class="form-label">From</label><input asp-for="NewRequest.StartDate" type="date" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">To</label><input asp-for="NewRequest.EndDate" type="date" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">Reason</label><input asp-for="NewRequest.Reason" class="form-control" /></div>
+            <div class="col-md-1"><button class="btn btn-dark w-100">Book</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="btn-group mb-2">
+    @foreach (var s in new[] { LeaveStatuses.Pending, LeaveStatuses.Approved, LeaveStatuses.Rejected, LeaveStatuses.Cancelled, "All" })
+    {
+        <a asp-action="Index" asp-route-status="@s" class="btn btn-sm @(s == Model.Status ? "btn-dark" : "btn-outline-dark")">@s</a>
+    }
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-light">
+            <tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th class="text-end">Days</th><th>Reason</th><th>Status</th><th style="width:300px">Decision</th></tr>
+        </thead>
+        <tbody>
+            @if (Model.Requests.Count == 0) { <tr><td colspan="8" class="text-muted">Nothing here.</td></tr> }
+            @foreach (var r in Model.Requests)
+            {
+                <tr>
+                    <td><a asp-controller="Employees" asp-action="Details" asp-route-id="@r.EmployeeId">@r.Employee?.EmployeeCode</a> @r.Employee?.FullName</td>
+                    <td>@r.LeaveType</td>
+                    <td>@r.StartDate.ToString("dd/MM/yyyy")</td>
+                    <td>@r.EndDate.ToString("dd/MM/yyyy")</td>
+                    <td class="text-end">@r.Days.ToString("0.##")</td>
+                    <td class="small">@r.Reason</td>
+                    <td>
+                        @r.Status
+                        @if (r.DecidedByName != null) { <div class="small text-muted">@r.DecidedByName @r.DecisionComment</div> }
+                    </td>
+                    <td>
+                        @if (r.Status == LeaveStatuses.Pending)
+                        {
+                            <form method="post" class="d-flex gap-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <input name="comment" class="form-control form-control-sm" placeholder="Comment" />
+                                <button class="btn btn-sm btn-success" asp-action="Approve">Approve</button>
+                                <button class="btn btn-sm btn-outline-danger" asp-action="Reject">Reject</button>
+                            </form>
+                        }
+                        else if (r.Status == LeaveStatuses.Approved)
+                        {
+                            <form method="post" asp-action="Cancel">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.Id" />
+                                <button class="btn btn-sm btn-outline-secondary">Cancel leave</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -32,6 +32,9 @@ namespace RealEstateManager.Models
         /// <summary>Periods that have started and are not closed yet; null when the user does not keep the books.</summary>
         public UnclosedPeriodsSummary? UnclosedPeriods { get; set; }
 
+        /// <summary>HR alerts; null when the user does not handle HR or payroll.</summary>
+        public HrDashboardAlerts? HrAlerts { get; set; }
+
         public int OutstandingInvoicesCount { get; set; }
         public decimal OutstandingReceivables { get; set; }
         public int OverdueInvoicesCount { get; set; }
@@ -110,5 +113,17 @@ namespace RealEstateManager.Models
         public decimal Amount { get; set; }
         public string Status { get; set; } = string.Empty;
         public string SettlementMode { get; set; } = string.Empty;
+    }
+
+    public class HrDashboardAlerts
+    {
+        public int ActiveEmployees { get; set; }
+        public int ExpiredDocuments { get; set; }
+        public int ExpiringDocuments { get; set; }
+        public int PendingLeave { get; set; }
+
+        /// <summary>Last month, when its payroll is missing or not approved yet.</summary>
+        public string? PayrollDueMonth { get; set; }
+        public string? PayrollDueStatus { get; set; }
     }
 }

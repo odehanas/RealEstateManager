@@ -1,0 +1,52 @@
+@model RealEstateManager.Models.BankLetterViewModel
+@{
+    Layout = null;
+    var p = Model.Payment;
+    var c = Model.Company;
+    var lines = p.Lines.OrderBy(x => x.EmployeeCode).ToList();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Salary transfer instruction @Model.Run.RunNumber</title>
+    <style>
+        @@page { size: A4 portrait; margin: 18mm; }
+        body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10.5pt; color: #1f2933; max-width: 180mm; margin: 20px auto; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+        th, td { border: 1px solid #c9d3df; padding: 4px 6px; text-align: left; }
+        th { background: #eef2f7; }
+        .num { text-align: right; white-space: nowrap; }
+        .toolbar { margin-bottom: 16px; }
+        @@media print { .toolbar { display: none; } body { margin: 0; } }
+    </style>
+</head>
+<body>
+<div class="toolbar"><button onclick="window.print()">Print</button></div>
+
+<p><strong>@(c.LegalName ?? c.Name)</strong><br />@c.AddressLine1 @c.City<br />@c.Phone</p>
+<p>Date: @DateTime.Today.ToString("dd MMMM yyyy")</p>
+<p>To: The Manager<br />@(Model.Settings.SalaryBankName ?? "Our bank")</p>
+
+<p><strong>Subject: Salary transfer for @Model.Run.PeriodStart.ToString("MMMM yyyy")</strong></p>
+
+<p>Dear Sir / Madam,</p>
+<p>Please debit our account @(string.IsNullOrEmpty(c.BankIban) ? "" : $"IBAN {c.BankIban}") with
+   <strong>AED @p.TotalAmount.ToString("N2")</strong> (@RealEstateManager.Services.AmountInWords.Dirhams(p.TotalAmount))
+   and transfer the salaries below to the accounts shown, value date @p.PaymentDate.ToString("dd/MM/yyyy").</p>
+
+<table>
+    <tr><th>#</th><th>Employee</th><th>Bank</th><th>IBAN</th><th class="num">Amount (AED)</th></tr>
+    @for (var i = 0; i < lines.Count; i++)
+    {
+        <tr><td>@(i + 1)</td><td>@lines[i].EmployeeName</td><td>@lines[i].BankName</td><td>@lines[i].Iban</td><td class="num">@lines[i].Net.ToString("N2")</td></tr>
+    }
+    <tr><th colspan="4">Total — @lines.Count transfer(s)</th><th class="num">@p.TotalAmount.ToString("N2")</th></tr>
+</table>
+
+<p>The same list is attached as a file for upload. Reference: @(p.Reference ?? Model.Run.RunNumber).</p>
+<p>Yours faithfully,</p>
+<br /><br />
+<p>______________________ &nbsp;&nbsp;&nbsp; ______________________<br />Authorised signatory &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Authorised signatory</p>
+</body>
+</html>

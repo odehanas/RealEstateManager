@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
+using RealEstateManager.Domain;
 using RealEstateManager.Models;
 using RealEstateManager.Services;
 
@@ -14,14 +15,17 @@ namespace RealEstateManager.Controllers
         private readonly ManagementReportService _reports;
         private readonly PeriodClosingService _closing;
         private readonly PermissionService _permissions;
+        private readonly HrService _hr;
 
         public HomeController(
             ApplicationDbContext db,
             OpeningBalanceService openingBalanceService,
             ManagementReportService reports,
             PeriodClosingService closing,
-            PermissionService permissions)
+            PermissionService permissions,
+            HrService hr)
         {
+            _hr = hr;
             _db = db;
             _openingBalanceService = openingBalanceService;
             _reports = reports;
@@ -102,6 +106,29 @@ namespace RealEstateManager.Controllers
                 await _permissions.HasAnyPermissionAsync(User, AppPermissions.AccountingManage, AppPermissions.PeriodReopenApprove))
             {
                 model.UnclosedPeriods = await _closing.GetUnclosedPeriodsAsync(dashboardCompanyId.Value, today);
+            }
+
+            // Documents running out and a payroll still to do, for HR and payroll staff.
+            if (dashboardCompanyId.HasValue &&
+                await _permissions.HasAnyPermissionAsync(User, AppPermissions.HrManage, AppPermissions.PayrollManage, AppPermissions.PayrollApprove))
+            {
+                var documents = await _hr.GetExpiringDocumentsAsync(30);
+                var lastMonth = monthStart.AddMonths(-1);
+                var lastRun = await _db.PayrollRuns.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Year == lastMonth.Year && x.Month == lastMonth.Month);
+                var activeEmployees = await _db.Employees.AsNoTracking().CountAsync(x => x.Status == EmployeeStatuses.Active);
+
+                model.HrAlerts = new HrDashboardAlerts
+                {
+                    ActiveEmployees = activeEmployees,
+                    ExpiredDocuments = documents.Count(x => x.DaysLeft < 0),
+                    ExpiringDocuments = documents.Count(x => x.DaysLeft >= 0),
+                    PendingLeave = await _db.LeaveRequests.AsNoTracking().CountAsync(x => x.Status == LeaveStatuses.Pending),
+                    PayrollDueMonth = activeEmployees > 0 && (lastRun == null || lastRun.Status == PayrollRunStatuses.Draft)
+                        ? lastMonth.ToString("MMMM yyyy")
+                        : null,
+                    PayrollDueStatus = lastRun == null ? "not prepared" : lastRun.Status == PayrollRunStatuses.Draft ? "waiting for approval" : null
+                };
             }
 
             // Posted invoices only. A lease raises all its future invoices as drafts,

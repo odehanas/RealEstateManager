@@ -1,0 +1,81 @@
+@model RealEstateManager.Models.ChequePrintViewModel
+@using System.Globalization
+@using RealEstateManager.Services
+@{
+    // A standalone page: nothing but the cheques, placed in millimetres for a laser or
+    // inkjet printer. Printed from the browser at 100% (actual size).
+    Layout = null;
+    var s = Model.Settings;
+    string Mm(decimal v) => v.ToString("0.##", CultureInfo.InvariantCulture) + "mm";
+    var pageW = Model.OnA4 ? 210m : s.ChequeWidthMm;
+    var pageH = Model.OnA4 ? 297m : s.ChequeHeightMm;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.Title</title>
+    <style>
+        @@page { size: @Mm(pageW) @Mm(pageH); margin: 0; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body { font-family: Arial, Helvetica, sans-serif; background: #e9ecef; }
+        .sheet { position: relative; width: @Mm(pageW); height: @Mm(pageH); background: #fff; margin: 12px auto; overflow: hidden; page-break-after: always; break-after: page; }
+        .sheet:last-child { page-break-after: auto; break-after: auto; }
+        .cheque { position: absolute; left: 0; top: 0; width: @Mm(s.ChequeWidthMm); height: @Mm(s.ChequeHeightMm); font-size: @(s.ChequeFontSizePt.ToString(CultureInfo.InvariantCulture))pt; }
+        .f { position: absolute; white-space: nowrap; line-height: 1.25; }
+        .words { white-space: normal; }
+        .test .cheque { outline: 1px dashed #999; }
+        .test .f { outline: 1px dotted #d63384; }
+        .test .label { position: absolute; font-size: 7pt; color: #d63384; transform: translateY(-110%); }
+        .toolbar { font: 14px Arial; background: #0f2740; color: #fff; padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .toolbar button { padding: 6px 14px; font-weight: bold; }
+        @@media print {
+            body { background: #fff; }
+            .toolbar { display: none; }
+            .sheet { margin: 0; }
+            .test .label { display: none; }
+        }
+    </style>
+</head>
+<body class="@(Model.IsTest ? "test" : "")">
+<div class="toolbar">
+    <strong>@Model.Title</strong>
+    <span>@Model.Cheques.Count cheque(s). Print at <b>100% / Actual size</b>, no headers or footers, paper size
+        @(Model.OnA4 ? "A4 with the cheque at the top-left" : $"{s.ChequeWidthMm:0} × {s.ChequeHeightMm:0} mm (custom)").</span>
+    <button type="button" onclick="window.print()">Print</button>
+    @if (Model.IsTest)
+    {
+        <span>Test on plain paper first, hold it against a cheque, then adjust the offsets in Payroll Settings.</span>
+    }
+</div>
+
+@foreach (var c in Model.Cheques)
+{
+    <div class="sheet">
+        <div class="cheque">
+            @if (s.PrintAccountPayeeOnly)
+            {
+                <div class="f" style="left:@Mm(4 + s.OffsetXMm);top:@Mm(4 + s.OffsetYMm);font-weight:bold;border-top:1px solid #000;border-bottom:1px solid #000;transform:rotate(-12deg);transform-origin:left top;font-size:8pt;">A/C PAYEE ONLY</div>
+            }
+            <div class="f" style="left:@Mm(s.DateXMm + s.OffsetXMm);top:@Mm(s.DateYMm + s.OffsetYMm);">
+                @if (Model.IsTest) { <span class="label">Date</span> }
+                @ChequePrintService.FormatDate(s, c.Date)
+            </div>
+            <div class="f" style="left:@Mm(s.PayeeXMm + s.OffsetXMm);top:@Mm(s.PayeeYMm + s.OffsetYMm);">
+                @if (Model.IsTest) { <span class="label">Payee</span> }
+                **@c.Payee.ToUpperInvariant()**
+            </div>
+            <div class="f words" style="left:@Mm(s.AmountWordsXMm + s.OffsetXMm);top:@Mm(s.AmountWordsYMm + s.OffsetYMm);width:@Mm(s.AmountWordsWidthMm);">
+                @if (Model.IsTest) { <span class="label">Amount in words</span> }
+                @c.AmountInWords
+            </div>
+            <div class="f" style="left:@Mm(s.AmountXMm + s.OffsetXMm);top:@Mm(s.AmountYMm + s.OffsetYMm);font-weight:bold;">
+                @if (Model.IsTest) { <span class="label">Amount</span> }
+                @ChequePrintService.FormatAmount(c.Amount)
+            </div>
+        </div>
+    </div>
+}
+</body>
+</html>

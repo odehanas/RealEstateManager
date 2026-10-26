@@ -2173,6 +2173,7 @@ namespace RealEstateManager.Data
             });
 
             ConfigurePeriodClosing(modelBuilder);
+            ConfigureHr(modelBuilder);
         }
     }
 }

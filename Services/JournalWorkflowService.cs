@@ -688,7 +688,13 @@ namespace RealEstateManager.Services
                 // Unit sales change the contract's and the unit's state; corrections are journals.
                 "UnitSaleReceipt",
                 "UnitSaleHandover",
-                "CapitalAssetVatAdjustment"
+                "CapitalAssetVatAdjustment",
+
+                // Payroll keeps its own state (approved, paid, advances recovered); it is
+                // returned to draft or a payment cancelled from the payroll screens.
+                "PayrollRun",
+                "PayrollPayment",
+                "EmployeeAdvance"
             };
 
         private static string DescribeSourceType(string sourceType) => sourceType switch
@@ -705,6 +711,9 @@ namespace RealEstateManager.Services
             "DevelopmentTransfer" => "completion transfer",
             "InvestmentPropertySetup" => "investment property allocation",
             "UnitSaleReceipt" => "unit sale payment",
+            "PayrollRun" => "payroll (use HR & Payroll ▸ Payroll to return it to draft)",
+            "PayrollPayment" => "salary payment (cancel it from the payroll run)",
+            "EmployeeAdvance" => "salary advance",
             "OwnerWithdrawal" => "owner withdrawal",
             "UnitSaleHandover" => "unit handover",
             "CapitalAssetVatAdjustment" => "capital asset VAT adjustment",

@@ -62,12 +62,16 @@
     // Operations opens for either job: keeping the books, or answering tenants.
     var showOperationsMenu = canManageAccounting || canHandleServiceRequests;
     var showReportsMenu = canViewReports;
+    var canManageHr = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.HrManage);
+    var canRunPayroll = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PayrollManage, AppPermissions.PayrollApprove);
+    var showHrMenu = canManageHr || canRunPayroll;
     if (subscriptionBlocked)
     {
         showMasterDataMenu = false;
         showAccountsMenu = false;
         showOperationsMenu = false;
         showReportsMenu = false;
+        showHrMenu = false;
     }
     var companies = isAuthenticated && CurrentCompanyAccessor.UserId.HasValue
         ? await AppAuthService.GetAccessibleCompaniesAsync(CurrentCompanyAccessor.UserId.Value, currentCompanyId)
@@ -366,6 +370,35 @@
                                     <li>
                                         <a class="dropdown-item" asp-controller="Journal" asp-action="Index">Journal Inquiry</a>
                                     </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showHrMenu)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="hrDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    HR &amp; Payroll
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="hrDropdown">
+                                    <li><h6 class="dropdown-header">People</h6></li>
+                                    <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Employees</a></li>
+                                    @if (canManageHr)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Attendance" asp-action="Index">Attendance</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Leave" asp-action="Index">Leave</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Employees" asp-action="Documents">Expiring Documents</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Departments" asp-action="Index">Departments</a></li>
+                                    }
+                                    @if (canRunPayroll)
+                                    {
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><h6 class="dropdown-header">Payroll</h6></li>
+                                        <li><a class="dropdown-item" asp-controller="PayrollAdjustments" asp-action="Index">Payroll Transactions</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Index">Payroll Runs</a></li>
+                                        <li><a class="dropdown-item" asp-controller="EmployeeAdvances" asp-action="Index">Salary Advances</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Settings">Payroll Settings</a></li>
                                     }
                                 </ul>
                             </li>

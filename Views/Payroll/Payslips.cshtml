@@ -1,0 +1,104 @@
+@model RealEstateManager.Models.PayslipsViewModel
+@using RealEstateManager.Domain
+@{
+    Layout = null;
+    var run = Model.Run;
+    var company = Model.Company;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payslips @run.RunNumber</title>
+    <style>
+        @@page { size: A4 portrait; margin: 14mm; }
+        * { box-sizing: border-box; }
+        body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10pt; color: #1f2933; background: #f2f4f7; margin: 0; }
+        .toolbar { background: #0f2740; color: #fff; padding: 10px 16px; display: flex; gap: 12px; align-items: center; }
+        .toolbar button { padding: 6px 14px; font-weight: bold; }
+        .slip { background: #fff; max-width: 190mm; margin: 14px auto; padding: 12mm; box-shadow: 0 0 12px rgba(0,0,0,.08); page-break-after: always; break-after: page; }
+        .slip:last-child { page-break-after: auto; break-after: auto; }
+        .head { display: flex; justify-content: space-between; border-bottom: 2px solid #0f2740; padding-bottom: 8px; margin-bottom: 10px; }
+        .head h1 { font-size: 15pt; margin: 0; color: #0f2740; }
+        .muted { color: #5b6774; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th, td { border: 1px solid #d8dee6; padding: 5px 8px; text-align: left; }
+        th { background: #eef2f7; }
+        .num { text-align: right; white-space: nowrap; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
+        .net { background: #0f2740; color: #fff; font-weight: bold; font-size: 12pt; }
+        .sign { display: flex; justify-content: space-between; margin-top: 26px; }
+        .sign div { border-top: 1px solid #5b6774; width: 45%; padding-top: 4px; font-size: 9pt; }
+        @@media print { body { background: #fff; } .toolbar { display: none; } .slip { box-shadow: none; margin: 0; padding: 0; max-width: none; } }
+        @@media (max-width: 640px) { .slip { padding: 14px; } .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="toolbar"><strong>Payslips @run.PeriodStart.ToString("MMMM yyyy")</strong><span>@Model.Lines.Count payslip(s)</span><button onclick="window.print()">Print</button></div>
+
+@foreach (var l in Model.Lines)
+{
+    <div class="slip">
+        <div class="head">
+            <div>
+                <h1>@(company.LegalName ?? company.Name)</h1>
+                <div class="muted">@company.AddressLine1 @company.City</div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:13pt;font-weight:bold">PAYSLIP</div>
+                <div>@run.PeriodStart.ToString("MMMM yyyy")</div>
+                @if (run.Status == PayrollRunStatuses.Draft) { <div style="color:#b42318;font-weight:bold">DRAFT — not approved</div> }
+            </div>
+        </div>
+
+        <div class="grid">
+            <div><span class="muted">Employee</span> <strong>@l.EmployeeCode @l.EmployeeName</strong></div>
+            <div><span class="muted">Job title</span> @l.JobTitle</div>
+            <div><span class="muted">Department</span> @l.DepartmentName</div>
+            <div><span class="muted">Days paid</span> @l.DaysPaid.ToString("0.##") of @l.DaysInMonth
+                @(l.UnpaidLeaveDays > 0 ? $"· {l.UnpaidLeaveDays:0.##} unpaid leave" : "") @(l.AbsenceDays > 0 ? $"· {l.AbsenceDays:0.##} absent" : "")</div>
+            <div><span class="muted">Paid by</span> @SalaryPaymentMethods.Describe(l.PaymentMethod) @(l.ChequeNumber != null ? "· cheque " + l.ChequeNumber : "")</div>
+            <div><span class="muted">Bank</span> @l.BankName @(string.IsNullOrEmpty(l.Iban) ? "" : "···" + l.Iban[^4..])</div>
+        </div>
+
+        <table>
+            <tr><th>Earnings</th><th class="num">Amount</th><th>Deductions</th><th class="num">Amount</th></tr>
+            <tr><td>Basic salary</td><td class="num">@l.Basic.ToString("N2")</td><td>Salary advance recovery</td><td class="num">@l.AdvanceRecovery.ToString("N2")</td></tr>
+            <tr><td>Housing allowance</td><td class="num">@l.Housing.ToString("N2")</td><td>Penalties and other deductions</td><td class="num">@l.OtherDeductions.ToString("N2")</td></tr>
+            <tr><td>Transport allowance</td><td class="num">@l.Transport.ToString("N2")</td><td></td><td></td></tr>
+            <tr><td>Other allowances</td><td class="num">@l.OtherAllowance.ToString("N2")</td><td></td><td></td></tr>
+            <tr><td>Overtime (@l.OvertimeHours.ToString("0.##") h)</td><td class="num">@l.OvertimeAmount.ToString("N2")</td><td></td><td></td></tr>
+            <tr><td>Bonus, commission and other additions</td><td class="num">@l.Bonus.ToString("N2")</td><td></td><td></td></tr>
+            <tr><th>Total earnings</th><th class="num">@l.Gross.ToString("N2")</th><th>Total deductions</th><th class="num">@l.TotalDeductions.ToString("N2")</th></tr>
+            <tr class="net"><td colspan="3">Net salary (AED)</td><td class="num">@l.Net.ToString("N2")</td></tr>
+        </table>
+        <div class="muted" style="margin-top:6px">@RealEstateManager.Services.AmountInWords.Dirhams(Math.Max(0, l.Net))</div>
+
+        @if (Model.Transactions.TryGetValue(l.EmployeeId, out var transactions) && transactions.Count > 0)
+        {
+            <table>
+                <tr><th>Date</th><th>Transaction</th><th>Details</th><th class="num">Quantity</th><th class="num">Amount</th></tr>
+                @foreach (var (t, value) in transactions)
+                {
+                    var def = PayrollAdjustmentCategories.Get(t.Category);
+                    <tr>
+                        <td>@t.Date.ToString("dd/MM/yyyy")</td>
+                        <td>@(def.IsAddition ? "+" : "−") @def.Name</td>
+                        <td>@t.Description</td>
+                        <td class="num">@(def.Unit == PayrollAdjustmentCategories.Money ? "" : $"{t.Quantity:0.##} {def.Unit}")</td>
+                        <td class="num">@value.ToString("N2")</td>
+                    </tr>
+                }
+            </table>
+            @if (l.AbsenceDays > 0)
+            {
+                <div class="muted" style="margin-top:4px">Unauthorised absence of @l.AbsenceDays.ToString("0.##") day(s) is taken off the days paid above.</div>
+            }
+        }
+
+        <div class="sign"><div>Employee signature</div><div>Authorised signatory</div></div>
+    </div>
+}
+</body>
+</html>
