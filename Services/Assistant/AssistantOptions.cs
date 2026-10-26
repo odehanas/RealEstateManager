@@ -19,6 +19,12 @@ namespace RealEstateManager.Services.Assistant
         /// <summary>Turns the user's speech into text for the on-screen transcript.</summary>
         public string TranscriptionModel { get; set; } = "gpt-4o-mini-transcribe";
 
+        /// <summary>
+        /// Vision model that reads scanned supplier invoices (the OCR). Uses the same key.
+        /// GPT-5.4 mini, released March 2026, reads PDFs and images through the Responses API.
+        /// </summary>
+        public string DocumentModel { get; set; } = "gpt-5.4-mini";
+
         public int MaxSessionMinutes { get; set; } = 15;
 
         public int MaxToolCallsPerSession { get; set; } = 60;

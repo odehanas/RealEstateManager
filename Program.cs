@@ -25,6 +25,8 @@ builder.Services.Configure<PlatformOwnerOptions>(builder.Configuration.GetSectio
 // Assistant__OpenAIApiKey (locally: dotnet user-secrets), never from appsettings.json.
 builder.Services.Configure<RealEstateManager.Services.Assistant.AssistantOptions>(builder.Configuration.GetSection("Assistant"));
 builder.Services.AddHttpClient("openai", client => client.Timeout = TimeSpan.FromSeconds(30));
+// Reading a scanned invoice takes longer than a lookup.
+builder.Services.AddHttpClient("openai-documents", client => client.Timeout = TimeSpan.FromSeconds(120));
 builder.Services.AddSingleton<PlatformOwnerService>();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -253,6 +255,7 @@ builder.Services.AddScoped<RealEstateManager.Services.Reporting.ReportEngine>();
 builder.Services.AddScoped<ProjectCostReportService>();
 builder.Services.AddScoped<VendorClearingService>();
 builder.Services.AddScoped<RealEstateManager.Services.Assistant.AssistantService>();
+builder.Services.AddScoped<RealEstateManager.Services.Assistant.InvoiceScanService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<LeaseWorkflowService>();

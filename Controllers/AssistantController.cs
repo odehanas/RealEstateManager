@@ -76,6 +76,13 @@ namespace RealEstateManager.Controllers
                 return Json(new { output = outcome.Output, pendingAction = outcome.PendingAction });
             });
 
+        /// <summary>A scanned invoice attached in the panel, read for the model. Nothing is saved.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(12 * 1024 * 1024)]
+        public Task<IActionResult> ReadDocument([FromForm] int sessionId, IFormFile? file) =>
+            Guard(async () => Json(new { output = await _assistant.ReadDocumentAsync(User, sessionId, file) }));
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public Task<IActionResult> Confirm(int id) =>

@@ -162,7 +162,7 @@ namespace RealEstateManager.Services.Assistant
                     ["name"] = t.Name,
                     ["description"] = t.Description,
                     ["parameters"] = t.Parameters.DeepClone()
-                }).ToArray())
+                }).Concat(AssistantScreenTools.Definitions()).ToArray())
             };
 
             if (mode == "voice")
@@ -390,6 +390,63 @@ namespace RealEstateManager.Services.Assistant
             }
         }
 
+        /// <summary>
+        /// Reads a supplier invoice the user attached in the panel (OCR by the vision model)
+        /// and returns what it says, matched to this company's vendors and accounts, for
+        /// the model to fill the form on screen or prepare the bill. Nothing is saved.
+        /// </summary>
+        public async Task<string> ReadDocumentAsync(ClaimsPrincipal user, int sessionId, IFormFile? file)
+        {
+            var (companyId, userId, _) = await RequireUserAsync(user);
+            var session = await RequireSessionAsync(sessionId, userId);
+            if (session.ToolCalls >= _options.MaxToolCallsPerSession)
+                throw new AssistantException(429, "This session has reached its limit. Start a new one.");
+            session.ToolCalls++;
+            await _db.SaveChangesAsync();
+
+            InvoiceScanService.ScanResult scan;
+            try
+            {
+                scan = await _services.GetRequiredService<InvoiceScanService>().ScanAsync(file, companyId);
+            }
+            catch (InvoiceScanService.ScanException ex)
+            {
+                throw new AssistantException(400, ex.Message);
+            }
+
+            var accountIds = scan.Bill.Lines.Where(x => x.AccountId.HasValue).Select(x => x.AccountId!.Value).Distinct().ToList();
+            var accounts = await _db.Accounts.AsNoTracking().Where(x => accountIds.Contains(x.Id))
+                .ToDictionaryAsync(x => x.Id, x => x.Code + " " + x.Name);
+            var invoice = scan.Invoice;
+            var result = new
+            {
+                document = file?.FileName,
+                supplier_as_printed = invoice.SupplierName,
+                supplier_trn = invoice.SupplierTrn,
+                matched_vendor = scan.VendorCode == null ? null : $"{scan.VendorCode} {scan.VendorName}",
+                invoice_number = invoice.InvoiceNumber,
+                invoice_date = scan.Bill.BillDate.ToString("yyyy-MM-dd"),
+                due_date = scan.Bill.DueDate.ToString("yyyy-MM-dd"),
+                currency = invoice.Currency,
+                lines = scan.Bill.Lines.Select(x => new
+                {
+                    description = x.Description,
+                    quantity = x.Quantity,
+                    unit_price = x.UnitPrice,
+                    vat = x.IsTaxable,
+                    suggested_account = x.AccountId.HasValue && accounts.TryGetValue(x.AccountId.Value, out var a) ? a : null
+                }),
+                subtotal = invoice.Subtotal,
+                vat_amount = invoice.VatAmount,
+                total = invoice.Total,
+                warnings = scan.Warnings
+            };
+
+            var output = Serialize(result);
+            await LogToolAsync(session, "read_document", Serialize(new { file = file?.FileName, size = file?.Length }), result, null);
+            return output;
+        }
+
         private async Task<AssistantToolContext> ContextAsync(ClaimsPrincipal user, int companyId, int userId, string userName, AssistantSession? session, string? screen)
         {
             var currency = await _db.Companies.Where(x => x.Id == companyId).Select(x => x.BaseCurrency).FirstOrDefaultAsync() ?? "AED";
@@ -531,6 +588,14 @@ namespace RealEstateManager.Services.Assistant
             - Data entry: when the user wants to record something (a contract, cheques, a receipt, a bill, a tenant), work like a
               careful clerk. Look up what you can with the find tools, then ask for each missing required detail, one or two at a
               time, and repeat the key facts back before proposing. Never guess amounts, dates or cheque numbers.
+            - Filling the form on screen: when the user is on an entry screen (a "Create" or "Edit" form) and asks you to fill it,
+              or gives you an order to enter there, call read_screen_form, then fill_screen_form with the field names it gave you.
+              This works for every form in the system. Use add_rows to add line rows first when there are more lines than rows.
+              You never submit: tell the user to check the highlighted fields and click the screen's own Save button.
+            - Scanned documents: the user can attach a supplier invoice with the paperclip. You then receive what it says
+              (read by OCR) in a message. Repeat the supplier, number, date, lines (description, quantity, unit price) and total,
+              point out the warnings, then either fill the vendor bill form if they are on it, or prepare it with propose_vendor_bill
+              (create the vendor first with propose_create_vendor when none matched). Ask for the expense account when none is suggested.
             - Anything that changes records is only a proposal (propose_* tools). The user must click Confirm on the card in the panel;
               a spoken or typed "yes" is not enough. Never say something was saved until you receive the confirmed result.
             - You never approve contracts or payments, delete posted records, reset posted entries, close periods, or manage users,

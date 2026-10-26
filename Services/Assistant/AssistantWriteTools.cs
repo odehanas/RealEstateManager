@@ -705,7 +705,7 @@ namespace RealEstateManager.Services.Assistant
             yield return new AssistantTool
             {
                 Name = "propose_vendor_bill",
-                Description = "Prepare a DRAFT supplier bill: vendor, their invoice number, date, due date and the lines with expense account and amount before VAT. Saved as a draft for review and posting on the Vendor Bills screen.",
+                Description = "Prepare a DRAFT supplier bill: vendor, their invoice number, date, due date and the lines with expense account, quantity and unit price (or amount) before VAT. Also used for a scanned invoice the user attached. Saved as a draft for review and posting on the Vendor Bills screen.",
                 Screen = ("VendorBills", "Create"),
                 IsWrite = true,
                 Parameters = Schema.Object(
@@ -721,7 +721,9 @@ namespace RealEstateManager.Services.Assistant
                         Schema.Object(
                             ("description", Schema.Str("What was supplied"), true),
                             ("account", Schema.Str("Expense account code"), true),
-                            ("amount", Schema.Num("Amount before VAT"), true),
+                            ("quantity", Schema.Num("Quantity, default 1"), false),
+                            ("unit_price", Schema.Num("Price per unit before VAT"), false),
+                            ("amount", Schema.Num("Line amount before VAT, when there is no unit price"), false),
                             ("vat", Schema.Bool("VAT charged on this line (default true if the vendor is VAT registered)"), false))), true)),
                 Propose = async (ctx, args) =>
                 {
@@ -771,8 +773,11 @@ namespace RealEstateManager.Services.Assistant
                         var (account, error) = await AssistantReadTools.ResolveAccountAsync(ctx.Db, Args.Required(line, "account"));
                         if (account == null) return AssistantProposal.Refused(error!);
                         if (!account.IsPostable || account.IsGroup) return AssistantProposal.Refused($"{account.Code} {account.Name} is a heading account; choose a postable one.");
-                        var amount = Args.Dec(line, "amount") ?? 0m;
-                        if (amount <= 0) return AssistantProposal.Refused("Each line needs an amount above zero.");
+                        var quantity = Args.Dec(line, "quantity") ?? 1m;
+                        if (quantity <= 0) return AssistantProposal.Refused("A line's quantity must be above zero.");
+                        var unitPrice = Args.Dec(line, "unit_price") ?? (Args.Dec(line, "amount") ?? 0m) / quantity;
+                        var amount = Math.Round(quantity * unitPrice, 2);
+                        if (amount <= 0) return AssistantProposal.Refused("Each line needs a unit price or amount above zero.");
                         var taxable = vendor.IsVatRegistered && Args.Bool(line, "vat", true);
                         var description = Args.Required(line, "description");
                         model.Lines.Add(new VendorBillLineViewModel
@@ -780,14 +785,15 @@ namespace RealEstateManager.Services.Assistant
                             Description = description,
                             AccountId = account.Id,
                             PropertyId = propertyId,
-                            Quantity = 1m,
-                            UnitPrice = amount,
+                            Quantity = quantity,
+                            UnitPrice = unitPrice,
                             IsTaxable = taxable
                         });
-                        described.Add($"{account.Code} {description}: {amount:N2}{(taxable ? " + VAT" : string.Empty)}");
+                        described.Add($"{account.Code} {description}: " + (quantity != 1m ? $"{quantity:0.##} x {unitPrice:N2} = " : string.Empty) +
+                                      $"{amount:N2}{(taxable ? " + VAT" : string.Empty)}");
                     }
 
-                    var net = model.Lines.Sum(x => x.UnitPrice);
+                    var net = model.Lines.Sum(x => Math.Round(x.Quantity * x.UnitPrice, 2));
                     var reference = model.VendorReference != null ? $", their invoice {model.VendorReference}" : string.Empty;
                     return new AssistantProposal
                     {

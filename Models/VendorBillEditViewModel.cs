@@ -70,6 +70,9 @@ namespace RealEstateManager.Models
         public decimal? ReceivedVat { get; set; }
         public decimal? ReceivedTotal { get; set; }
         public string? ReceivedSupplierName { get; set; }
+
+        /// <summary>The scanned invoice this bill was read from, if any.</summary>
+        public string? ScannedFileName { get; set; }
     }
 
     public class VendorBillLineViewModel

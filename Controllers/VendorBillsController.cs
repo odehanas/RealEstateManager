@@ -118,6 +118,29 @@ namespace RealEstateManager.Controllers
             return await SaveAsync(model);
         }
 
+        /// <summary>
+        /// Reads a scanned or photographed supplier invoice and opens the new-bill form
+        /// filled in from it. Nothing is saved until the user checks it and saves.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequestSizeLimit(12 * 1024 * 1024)]
+        public async Task<IActionResult> Scan(IFormFile? file, [FromServices] RealEstateManager.Services.Assistant.InvoiceScanService scanner)
+        {
+            try
+            {
+                var result = await scanner.ScanAsync(file, User.GetRequiredCurrentCompanyId());
+                ViewBag.ScanWarnings = result.Warnings;
+                await LoadListsAsync();
+                return View("Edit", result.Bill);
+            }
+            catch (RealEstateManager.Services.Assistant.InvoiceScanService.ScanException ex)
+            {
+                TempData["BillError"] = ex.Message;
+                return RedirectToAction(nameof(Create));
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {

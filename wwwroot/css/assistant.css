@@ -83,6 +83,9 @@
 
 .assistant-footer { display: flex; padding: 0 12px 8px; }
 
+/* A field the assistant typed into, until the user has looked at it. */
+.assistant-filled { outline: 3px solid #f0b429 !important; outline-offset: 1px; background-color: #fff8e1 !important; transition: outline-color .3s; }
+
 @keyframes assistant-pulse {
     0% { box-shadow: 0 0 0 0 rgba(180, 35, 24, .45); }
     70% { box-shadow: 0 0 0 10px rgba(180, 35, 24, 0); }

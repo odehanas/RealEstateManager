@@ -687,7 +687,8 @@
             <div class="offcanvas-body assistant-log" id="assistantLog" aria-live="polite">
                 <div class="assistant-hint">
                     Try: <em>"Which tenants are overdue?"</em>, <em>"Vacant units in Tower A"</em>,
-                    <em>"Trial balance at 30 September"</em>, <em>"How do I clear a PDC?"</em>.
+                    <em>"Trial balance at 30 September"</em>, <em>"How do I clear a PDC?"</em>,
+                    <em>"Fill this form for me"</em>, or attach a scanned invoice with the paperclip.
                     Anything that changes your records is shown as a card for you to confirm.
                 </div>
             </div>
@@ -695,6 +696,10 @@
                 <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantMic" title="Talk to the assistant" aria-pressed="false">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
                 </button>
+                <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantAttach" title="Attach a scanned supplier invoice (PDF, JPG, PNG)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"/></svg>
+                </button>
+                <input type="file" id="assistantFile" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,application/pdf,image/*" hidden />
                 <input type="text" class="form-control" id="assistantInput" placeholder="Type a question…" maxlength="2000" />
                 <button type="submit" class="btn btn-primary" id="assistantSend">Send</button>
             </form>
