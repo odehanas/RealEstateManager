@@ -2176,6 +2176,7 @@ namespace RealEstateManager.Data
             ConfigureHr(modelBuilder);
             ConfigureControls(modelBuilder);
             ConfigureAssistant(modelBuilder);
+            ConfigureReporting(modelBuilder);
         }
     }
 }
