@@ -41,6 +41,7 @@ namespace RealEstateManager.Services.Assistant
             AssistantKnowledgeTools.All()
                 .Concat(AssistantReadTools.All())
                 .Concat(AssistantQueryTools.All())
+                .Concat(AssistantMarketTools.All())
                 .Concat(AssistantWriteTools.All())
                 .Concat(AssistantWriteTools.DataEntry())
                 .ToList();
@@ -588,6 +589,10 @@ namespace RealEstateManager.Services.Assistant
             - Data entry: when the user wants to record something (a contract, cheques, a receipt, a bill, a tenant), work like a
               careful clerk. Look up what you can with the find tools, then ask for each missing required detail, one or two at a
               time, and repeat the key facts back before proposing. Never guess amounts, dates or cheque numbers.
+            - Outside data: for market rents or a rent benchmark in a city or area, use market_rent_benchmark. It searches the web
+              and puts the company's own rents beside the market. Always give the sources with their dates, say whether the figures
+              are asking or contracted rents, call them indicative, and point out units well below or above the market. If the user
+              does not say the kind of unit, ask. Never present a web figure as the company's own data.
             - Filling the form on screen: when the user is on an entry screen (a "Create" or "Edit" form) and asks you to fill it,
               or gives you an order to enter there, call read_screen_form, then fill_screen_form with the field names it gave you.
               This works for every form in the system. Use add_rows to add line rows first when there are more lines than rows.

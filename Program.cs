@@ -256,6 +256,8 @@ builder.Services.AddScoped<ProjectCostReportService>();
 builder.Services.AddScoped<VendorClearingService>();
 builder.Services.AddScoped<RealEstateManager.Services.Assistant.AssistantService>();
 builder.Services.AddScoped<RealEstateManager.Services.Assistant.InvoiceScanService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<RealEstateManager.Services.Assistant.MarketRentService>();
 builder.Services.AddScoped<SampleDataService>();
 builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddScoped<LeaseWorkflowService>();

@@ -25,6 +25,9 @@ namespace RealEstateManager.Services.Assistant
         /// </summary>
         public string DocumentModel { get; set; } = "gpt-5.4-mini";
 
+        /// <summary>Model that searches the web for market data such as rent benchmarks. Uses the same key.</summary>
+        public string ResearchModel { get; set; } = "gpt-5.4-mini";
+
         public int MaxSessionMinutes { get; set; } = 15;
 
         public int MaxToolCallsPerSession { get; set; } = 60;
