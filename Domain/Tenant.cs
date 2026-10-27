@@ -14,6 +14,10 @@
         public string? Nationality { get; set; }
         public string? IdNumber { get; set; }
         public string? PassportNumber { get; set; }
+
+        /// <summary>Emirates ID and passport expiry, watched on the Document Expiry page.</summary>
+        public DateTime? IdExpiryDate { get; set; }
+        public DateTime? PassportExpiryDate { get; set; }
         public string? Address { get; set; }
 
         // Commercial licence number for a corporate tenant. Together with the Emirates

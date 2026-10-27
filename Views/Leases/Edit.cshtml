@@ -151,6 +151,11 @@ else if (termsLocked)
     </div>
 </form>
 
+@if (id is int leaseId && leaseId > 0)
+{
+    <partial name="_RecordDocuments" model="@((RecordDocumentEntities.Lease, leaseId))" />
+}
+
 @if (history.Count > 0)
 {
     <h5 class="mt-5">Approval history</h5>

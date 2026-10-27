@@ -193,6 +193,8 @@ namespace RealEstateManager.Controllers
             tenant.Nationality = model.Nationality;
             tenant.IdNumber = model.IdNumber;
             tenant.PassportNumber = model.PassportNumber;
+            tenant.IdExpiryDate = model.IdExpiryDate?.Date;
+            tenant.PassportExpiryDate = model.PassportExpiryDate?.Date;
             tenant.TradeLicenseNumber = model.TradeLicenseNumber;
             tenant.TrnNumber = model.TrnNumber;
             tenant.Address = model.Address;

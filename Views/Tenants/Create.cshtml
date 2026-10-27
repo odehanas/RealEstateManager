@@ -58,9 +58,21 @@
             <input asp-for="IdNumber" class="form-control" />
         </div>
 
+        <div class="col-md-2">
+            <label asp-for="IdExpiryDate" class="form-label">EID expiry</label>
+            <input asp-for="IdExpiryDate" type="date" class="form-control @(Model.IdExpiryDate < DateTime.Today ? "is-invalid" : "")" />
+            @if (Model.IdExpiryDate < DateTime.Today) { <div class="invalid-feedback d-block">Expired</div> }
+        </div>
+
         <div class="col-md-4">
             <label asp-for="PassportNumber" class="form-label"></label>
             <input asp-for="PassportNumber" class="form-control" />
+        </div>
+
+        <div class="col-md-2">
+            <label asp-for="PassportExpiryDate" class="form-label">Passport expiry</label>
+            <input asp-for="PassportExpiryDate" type="date" class="form-control @(Model.PassportExpiryDate < DateTime.Today ? "is-invalid" : "")" />
+            @if (Model.PassportExpiryDate < DateTime.Today) { <div class="invalid-feedback d-block">Expired</div> }
         </div>
 
         <div class="col-md-12">

@@ -74,6 +74,13 @@ namespace RealEstateManager.Services
         /// the people who keep the books.
         /// </summary>
         public const string ServiceRequestsManage = "ServiceRequests.Manage";
+
+        /// <summary>
+        /// The maintenance team: sees only the maintenance jobs assigned to them, records
+        /// the work and the materials used, and closes the job. New maintenance requests
+        /// go to these users automatically, the least busy first.
+        /// </summary>
+        public const string MaintenanceExecute = "Maintenance.Execute";
     }
 
     public sealed class PermissionDefinition
@@ -128,6 +135,15 @@ namespace RealEstateManager.Services
                 Description =
                     "Answer maintenance calls, payment postponement requests and complaints raised " +
                     "by tenants through the self-service portal."
+            },
+            new()
+            {
+                Key = AppPermissions.MaintenanceExecute,
+                Group = "Operations",
+                Name = "Carry Out Maintenance Jobs",
+                Description =
+                    "For maintenance engineers and technicians only: new maintenance requests are assigned to them, " +
+                    "and they see just their own jobs, record the work and materials used, and resolve them."
             },
             new()
             {
@@ -270,6 +286,9 @@ namespace RealEstateManager.Services
                 ["PaymentApprovals"] = new[] { AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight },
                 ["EmployeeRequests"] = new[] { AppPermissions.HrManage },
                 ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
+                ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage },
+                // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
+                ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["AccountMappings"] = new[] { AppPermissions.AccountingManage },
                 ["OwnerWithdrawalCategories"] = new[] { AppPermissions.AccountingManage },
@@ -317,6 +336,10 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
+
+                // The owner's view of the maintenance operation.
+                ["MaintenanceJobs.Dashboard"] = new[] { AppPermissions.OwnerOversight, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
+                ["MaintenanceJobs.Details"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
 
                 // Typing opening balances is the same right as on the chart of accounts.
                 ["OpeningBalances.Save"] = new[] { AppPermissions.AccountingManage },

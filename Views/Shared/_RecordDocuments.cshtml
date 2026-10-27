@@ -1,0 +1,116 @@
+﻿@model (string EntityType, int EntityId)
+@using Microsoft.EntityFrameworkCore
+@using RealEstateManager.Domain
+@inject RealEstateManager.Data.ApplicationDbContext Db
+@inject PermissionService PermissionService
+@inject RealEstateManager.Services.Assistant.IdDocumentScanService Scanner
+@*
+    Documents kept with a tenant or a contract, with their expiry. Rendered under the
+    record's own form (a form of its own: forms cannot be nested).
+*@
+@{
+    var (entityType, entityId) = Model;
+    var documents = await Db.RecordDocuments.AsNoTracking()
+        .Where(x => x.EntityType == entityType && x.EntityId == entityId)
+        .OrderBy(x => x.DocumentType).ThenByDescending(x => x.UploadedAt)
+        .Select(x => new { x.Id, x.DocumentType, x.DocumentNumber, x.IssueDate, x.ExpiryDate, x.FileName, x.SizeBytes, x.UploadedAt, x.UploadedByName })
+        .ToListAsync();
+    var canManage = entityType == RecordDocumentEntities.Lease
+        ? await PermissionService.HasAnyPermissionAsync(User, AppPermissions.LeasesManage, AppPermissions.MasterDataManage)
+        : await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
+    var types = RecordDocumentTypes.For(entityType);
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    var title = entityType == RecordDocumentEntities.Lease ? "Contract documents" : "Tenant documents";
+    var hint = entityType == RecordDocumentEntities.Lease
+        ? "Attach the contract attested by the municipality, and the registration certificate."
+        : "Attach the Emirates ID (front and back) and passport." + (Scanner.IsAvailable ? " They are read automatically: the number and expiry date are filled in for you." : "");
+    var missingAttested = entityType == RecordDocumentEntities.Lease && documents.All(d => d.DocumentType != RecordDocumentTypes.AttestedContract);
+}
+
+<div class="card shadow-sm mt-4" id="documents">
+    <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <strong>@title</strong>
+        <a asp-controller="RecordDocuments" asp-action="Expiry" class="small">Document expiry control</a>
+    </div>
+
+    @if (TempData["DocumentSuccess"] != null) { <div class="alert alert-success m-3 mb-0">@TempData["DocumentSuccess"]</div> }
+    @if (TempData["DocumentError"] != null) { <div class="alert alert-danger m-3 mb-0">@TempData["DocumentError"]</div> }
+    @if (missingAttested)
+    {
+        <div class="alert alert-warning m-3 mb-0 small">No attested contract is on file for this contract yet.</div>
+    }
+
+    @if (documents.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead class="table-light"><tr><th>Document</th><th>Number</th><th>Issued</th><th>Expires</th><th>File</th><th>Uploaded</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var d in documents)
+                    {
+                        var expired = d.ExpiryDate.HasValue && d.ExpiryDate.Value < DateTime.Today;
+                        var soon = !expired && d.ExpiryDate.HasValue && d.ExpiryDate.Value <= DateTime.Today.AddDays(60);
+                        <tr>
+                            <td>@d.DocumentType</td>
+                            <td>@d.DocumentNumber</td>
+                            <td>@d.IssueDate?.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @d.ExpiryDate?.ToString("dd/MM/yyyy")
+                                @if (expired) { <span class="badge bg-danger">expired</span> }
+                                else if (soon) { <span class="badge bg-warning text-dark">expires soon</span> }
+                            </td>
+                            <td><a asp-controller="RecordDocuments" asp-action="Open" asp-route-id="@d.Id" target="_blank" rel="noopener">@d.FileName</a> <span class="text-muted small">@((d.SizeBytes / 1024.0).ToString("N0")) KB</span></td>
+                            <td class="small text-muted">@d.UploadedAt.ToLocalTime().ToString("dd/MM/yyyy") @d.UploadedByName</td>
+                            <td class="text-end">
+                                @if (canManage)
+                                {
+                                    <form asp-controller="RecordDocuments" asp-action="Remove" asp-route-id="@d.Id" method="post" class="d-inline"
+                                          onsubmit="return confirm('Remove this document?');">
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button class="btn btn-sm btn-link text-danger p-0">Remove</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="card-body text-muted small py-2">No documents attached yet.</div>
+    }
+
+    @if (canManage)
+    {
+        <form asp-controller="RecordDocuments" asp-action="Upload" method="post" enctype="multipart/form-data" class="card-body border-top row g-2 align-items-end">
+            <input type="hidden" name="entityType" value="@entityType" />
+            <input type="hidden" name="entityId" value="@entityId" />
+            <input type="hidden" name="returnUrl" value="@(returnUrl + "#documents")" />
+            <div class="col-md-3">
+                <label class="form-label small mb-0" for="docType">Document</label>
+                <select id="docType" name="documentType" class="form-select form-select-sm" required>
+                    @foreach (var t in types) { <option value="@t">@t</option> }
+                </select>
+            </div>
+            <div class="col-md-3"><label class="form-label small mb-0" for="docFile">File (PDF, JPG, PNG, 5 MB)</label><input id="docFile" type="file" name="file" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png" required /></div>
+            <div class="col-md-2"><label class="form-label small mb-0" for="docNumber">Number</label><input id="docNumber" name="documentNumber" class="form-control form-control-sm" maxlength="100" placeholder="@(entityType == RecordDocumentEntities.Lease ? "attestation no." : "read if empty")" /></div>
+            <div class="col-md-2"><label class="form-label small mb-0" for="docIssue">Issued</label><input id="docIssue" type="date" name="issueDate" class="form-control form-control-sm" /></div>
+            <div class="col-md-2"><label class="form-label small mb-0" for="docExpiry">Expires</label><input id="docExpiry" type="date" name="expiryDate" class="form-control form-control-sm" /></div>
+            <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <span class="small text-muted">@hint</span>
+                <div class="d-flex align-items-center gap-3">
+                    @if (entityType == RecordDocumentEntities.Tenant && Scanner.IsAvailable)
+                    {
+                        <div class="form-check small mb-0">
+                            <input class="form-check-input" type="checkbox" name="readIt" value="true" id="readIt" checked />
+                            <label class="form-check-label" for="readIt">Read the Emirates ID / passport</label>
+                        </div>
+                    }
+                    <button type="submit" class="btn btn-sm btn-dark" onclick="this.textContent='Uploading…'">Upload</button>
+                </div>
+            </div>
+        </form>
+    }
+</div>

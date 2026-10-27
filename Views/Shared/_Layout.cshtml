@@ -40,6 +40,7 @@
         AppPermissions.MasterDataManage);
     var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
     var canHandleServiceRequests = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
+    var canDoMaintenance = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.MaintenanceExecute);
     // Approvers see the queue in the menu with how many contracts wait for them (not their own).
     var canApproveContracts = isAuthenticated && currentCompanyId.HasValue
                               && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesApprove);
@@ -62,7 +63,7 @@
     var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors || canApproveContracts;
     var showAccountsMenu = canManageAccounting;
     // Operations opens for either job: keeping the books, or answering tenants.
-    var showOperationsMenu = canManageAccounting || canHandleServiceRequests;
+    var showOperationsMenu = canManageAccounting || canHandleServiceRequests || canDoMaintenance;
     var showReportsMenu = canViewReports;
     var canManageHr = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.HrManage);
     var canRunPayroll = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PayrollManage, AppPermissions.PayrollApprove);
@@ -259,6 +260,9 @@
                                         <li>
                                             <a class="dropdown-item" asp-controller="Tenants" asp-action="Index">Tenants</a>
                                         </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">Document Expiry</a>
+                                        </li>
                                     }
                                     @if (canManageLeases)
                                     {
@@ -302,13 +306,21 @@
                                     </li>
                                     }
 
-                                    @if (canHandleServiceRequests)
+                                    @if (canHandleServiceRequests || canDoMaintenance)
                                     {
                                         <li><hr class="dropdown-divider" /></li>
                                         <li><h6 class="dropdown-header">Tenant Services</h6></li>
+                                        @if (canHandleServiceRequests)
+                                        {
                                         <li>
                                             <a class="dropdown-item" asp-controller="ServiceRequests" asp-action="Index">
                                                 Tenant Requests
+                                            </a>
+                                        </li>
+                                        }
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Index">
+                                                @(canHandleServiceRequests ? "Maintenance Jobs" : "My Maintenance Jobs")
                                             </a>
                                         </li>
                                     }
@@ -407,6 +419,8 @@
                                     @if (isOwner)
                                     {
                                         <li><a class="dropdown-item" asp-controller="Oversight" asp-action="Index">Owner Monitor</a></li>
+                                        <li><a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Dashboard">Maintenance Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">Document Expiry</a></li>
                                     }
                                     @if (canReleasePayments)
                                     {
@@ -519,6 +533,9 @@
                                     <li><h6 class="dropdown-header">Management &mdash; Owners</h6></li>
                                     <li>
                                         <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerTenancySchedule">Owner Tenancy Schedule</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerProfitability">Owner Property Profitability</a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerWithdrawals">Owner Withdrawals</a>
