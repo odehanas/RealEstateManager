@@ -10,6 +10,14 @@
     <a asp-action="Requests" class="btn btn-outline-secondary btn-sm">Cancel</a>
 </div>
 
+@if (ViewBag.MaintenanceHold is string hold)
+{
+    <div class="alert alert-warning" id="maintenanceHold">
+        <strong>Maintenance requests are on hold.</strong> @hold
+        You can still send other requests, such as asking for more time to pay.
+    </div>
+}
+
 <form asp-action="NewRequest" method="post" id="requestForm">
     @Html.AntiForgeryToken()
 

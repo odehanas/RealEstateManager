@@ -94,6 +94,8 @@ namespace RealEstateManager.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            ConfigureMaintenance(modelBuilder);
+            ConfigureRecordDocuments(modelBuilder);
 
             modelBuilder.Entity<Company>()
                 .Property(x => x.Name)

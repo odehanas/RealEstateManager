@@ -165,6 +165,15 @@ namespace RealEstateManager.Services
                 }
             }
 
+            // A tenant behind on payments must contact the office before asking for
+            // maintenance. Staff raising a request on a tenant's behalf are not stopped.
+            if (portalUserId.HasValue && model.RequestType == ServiceRequestTypes.Maintenance)
+            {
+                var standing = await TenantStandingService.GetAsync(_db, tenantId);
+                if (!standing.IsHealthy)
+                    modelState.AddModelError(string.Empty, standing.Message!);
+            }
+
             if (model.PreferredVisitDate.HasValue &&
                 model.PreferredVisitDate.Value.Date < DateTime.Today)
             {
@@ -197,7 +206,11 @@ namespace RealEstateManager.Services
                 RequestedNewDueDate = invoice != null ? model.RequestedNewDueDate?.Date : null,
                 Status = ServiceRequestStatuses.Submitted,
                 SubmittedAt = DateTime.UtcNow,
-                SubmittedByPortalUserId = portalUserId
+                SubmittedByPortalUserId = portalUserId,
+                // Maintenance goes straight to the maintenance team, the least busy first.
+                AssignedToAppUserId = model.RequestType == ServiceRequestTypes.Maintenance
+                    ? await MaintenanceService.PickTechnicianAsync(_db, tenant.CompanyId)
+                    : null
             };
 
             _db.TenantServiceRequests.Add(request);
@@ -495,6 +508,13 @@ namespace RealEstateManager.Services
 
             if (newStatus == ServiceRequestStatuses.Acknowledged && request.AcknowledgedAt == null)
                 request.AcknowledgedAt = now;
+
+            // Starting work also counts as the first response when nobody acknowledged it.
+            if (newStatus == ServiceRequestStatuses.InProgress)
+            {
+                request.AcknowledgedAt ??= now;
+                request.WorkStartedAt ??= now;
+            }
 
             if (newStatus == ServiceRequestStatuses.Resolved || newStatus == ServiceRequestStatuses.Rejected)
                 request.ResolvedAt = now;

@@ -1,0 +1,143 @@
+﻿@model RealEstateManager.Services.MaintenanceService.Dashboard
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Maintenance Dashboard";
+    var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
+    var technicianId = ViewBag.TechnicianId as int?;
+
+    string Hours(double? hours) => hours == null ? "-" : hours < 48 ? $"{hours:0.#} h" : $"{hours / 24:0.#} days";
+}
+
+<style>
+    .kpi .value { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+    .kpi .label { color: #6c757d; font-size: .82rem; }
+    .kpi .note { font-size: .78rem; color: #6c757d; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Maintenance Dashboard</h2>
+        <div class="text-muted">Jobs raised from @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"), and every job still open.</div>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">Maintenance Jobs</a>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">From</label><input id="fromDate" type="date" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="toDate">To</label><input id="toDate" type="date" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    @if (technicians.Count > 0)
+    {
+        <div class="col-auto">
+            <label class="form-label small mb-0" for="tech">Technician</label>
+            <select id="tech" name="technicianId" class="form-select form-select-sm">
+                <option value="">All</option>
+                @foreach (var t in technicians) { <option value="@t.Id" selected="@(t.Id == technicianId ? "selected" : null)">@t.Name</option> }
+            </select>
+        </div>
+    }
+    <div class="col-auto"><button class="btn btn-sm btn-dark">Show</button></div>
+</form>
+
+@if (!Model.HasTechnicians)
+{
+    <div class="alert alert-warning">No maintenance user is set up, so new jobs wait unassigned. Create one in System Setup &gt; Users with <strong>Carry Out Maintenance Jobs</strong>.</div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Jobs received</div><div class="value">@Model.Received</div><div class="note">@Model.Done done &middot; @Model.Rejected declined</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Still open</div><div class="value @(Model.OverdueOpen > 0 ? "text-danger" : "")">@Model.OpenCount</div><div class="note">@Model.OverdueOpen past target &middot; @Model.Unassigned unassigned</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Average first response</div><div class="value">@Hours(Model.AvgResponseHours)</div><div class="note">from request to the engineer's response</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Average time to complete</div><div class="value">@Hours(Model.AvgResolveHours)</div><div class="note">@(Model.OnTimePercent.HasValue ? $"{Model.OnTimePercent:0}% done within target" : "no completed jobs")</div></div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Materials used</div><div class="value">@Model.MaterialsCost.ToString("N0")</div><div class="note">on these jobs</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Maintenance store</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">balance of account @MaintenanceStandards.StockAccountCode</div></div></div></div>
+    <div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-body small text-muted">
+        <strong class="text-dark">Targets by priority</strong><br />
+        Urgent: respond in 2 h, done in 24 h &middot; High: 8 h / 3 days &middot; Normal: 24 h / 5 days &middot; Low: 2 days / 10 days.
+        A job past its target shows in red.
+    </div></div></div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-white"><strong>Jobs still open</strong> <span class="text-muted small">worst first</span></div>
+    @if (!Model.Open.Any())
+    {
+        <div class="card-body text-muted small">Nothing open.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light"><tr><th>Job</th><th>Priority</th><th>What</th><th>Unit</th><th>Technician</th><th>Status</th><th class="text-end">First response</th><th class="text-end">Open for</th></tr></thead>
+                <tbody>
+                    @foreach (var job in Model.Open)
+                    {
+                        <tr>
+                            <td><a asp-action="Details" asp-route-id="@job.Id">@job.Number</a></td>
+                            <td>@job.Priority</td>
+                            <td>@job.Subject</td>
+                            <td>@job.Place</td>
+                            <td>@(job.Technician ?? "not assigned")</td>
+                            <td><span class="badge @ServiceRequestStatuses.BadgeClass(job.Status)">@ServiceRequestStatuses.Describe(job.Status)</span></td>
+                            <td class="text-end @(job.ResponseLate ? "text-danger" : "")">@(job.ResponseHours.HasValue ? Hours(job.ResponseHours) : "waiting")</td>
+                            <td class="text-end @(job.ResolveLate ? "text-danger fw-semibold" : "")">@Hours(job.AgeHours)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white"><strong>By technician</strong></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Technician</th><th class="text-end">Jobs</th><th class="text-end">Open</th><th class="text-end">Done</th><th class="text-end">Avg to complete</th><th class="text-end">Past target</th></tr></thead>
+                    <tbody>
+                        @foreach (var t in Model.ByTechnician)
+                        {
+                            <tr><td>@t.Name</td><td class="text-end">@t.Jobs</td><td class="text-end">@t.Open</td><td class="text-end">@t.Done</td><td class="text-end">@Hours(t.AvgResolveHours)</td><td class="text-end @(t.Late > 0 ? "text-danger" : "")">@t.Late</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white"><strong>By property</strong></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Property</th><th class="text-end">Jobs</th><th class="text-end">Open</th><th class="text-end">Materials</th></tr></thead>
+                    <tbody>
+                        @foreach (var p in Model.ByProperty)
+                        {
+                            <tr><td>@p.Name</td><td class="text-end">@p.Jobs</td><td class="text-end">@p.Open</td><td class="text-end">@p.Materials.ToString("N2")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white"><strong>By kind of job</strong></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Category</th><th class="text-end">Jobs</th><th class="text-end">Avg to complete</th></tr></thead>
+                    <tbody>
+                        @foreach (var c in Model.ByCategory)
+                        {
+                            <tr><td>@c.Name</td><td class="text-end">@c.Jobs</td><td class="text-end">@Hours(c.AvgResolveHours)</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -112,6 +112,7 @@ namespace RealEstateManager.Controllers
         {
             var tenantId = User.GetRequiredPortalTenantId();
             var model = await _serviceRequestService.BuildCreateModelAsync(tenantId);
+            ViewBag.MaintenanceHold = (await TenantStandingService.GetAsync(HttpContext.RequestServices.GetRequiredService<RealEstateManager.Data.ApplicationDbContext>(), tenantId)).Message;
             return View(model);
         }
 
@@ -128,6 +129,7 @@ namespace RealEstateManager.Controllers
             {
                 // Rebuild the dropdowns, which are not posted back with the form.
                 await _serviceRequestService.PopulateOptionsAsync(model, tenantId);
+                ViewBag.MaintenanceHold = (await TenantStandingService.GetAsync(HttpContext.RequestServices.GetRequiredService<RealEstateManager.Data.ApplicationDbContext>(), tenantId)).Message;
                 return View(model);
             }
 

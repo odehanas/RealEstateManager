@@ -50,7 +50,8 @@ namespace RealEstateManager.Services
                         ActivityName = controllerName != null && actionName != null ? $"{controllerName}/{actionName}" : endpoint.DisplayName,
                         IsSuccess = requestException == null && context.Response.StatusCode < 400,
                         StatusCode = requestException == null ? context.Response.StatusCode : StatusCodes.Status500InternalServerError,
-                        ErrorMessage = requestException?.Message,
+                        // The column holds 1000 characters; a longer message would stop the log being written at all.
+                        ErrorMessage = requestException?.Message is { Length: > 1000 } longMessage ? longMessage[..1000] : requestException?.Message,
                         IpAddress = context.Connection.RemoteIpAddress?.ToString(),
                         OccurredAt = occurredAt
                     };

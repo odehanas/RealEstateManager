@@ -1,0 +1,99 @@
+﻿@model List<RealEstateManager.Services.MaintenanceService.JobRow>
+@using RealEstateManager.Domain
+@{
+    var seesAll = ViewBag.SeesAll as bool? ?? false;
+    var show = ViewBag.Show as string ?? "Open";
+    var technicianId = ViewBag.TechnicianId as int?;
+    var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
+    ViewData["Title"] = seesAll ? "Maintenance Jobs" : "My Maintenance Jobs";
+
+    string Hours(double? hours) => hours == null ? "-" : hours < 48 ? $"{hours:0.#} h" : $"{hours / 24:0.#} days";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@ViewData["Title"]</h2>
+        <div class="text-muted">
+            @(seesAll ? "Every maintenance job raised by tenants, with who is doing it." : "The maintenance jobs assigned to you. Open one to record the work and the materials used.")
+        </div>
+    </div>
+    @if (seesAll)
+    {
+        <a asp-action="Dashboard" class="btn btn-outline-primary">Maintenance Dashboard</a>
+    }
+</div>
+
+<form method="get" class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <div class="btn-group" role="group" aria-label="Which jobs">
+        @foreach (var option in new[] { "Open", "Done", "All" })
+        {
+            <a asp-action="Index" asp-route-show="@option" asp-route-technicianId="@technicianId"
+               class="btn btn-sm @(show == option ? "btn-dark" : "btn-outline-dark")">@option</a>
+        }
+    </div>
+    @if (seesAll && technicians.Count > 0)
+    {
+        <input type="hidden" name="show" value="@show" />
+        <select name="technicianId" class="form-select form-select-sm" style="max-width:240px" onchange="this.form.submit()" aria-label="Technician">
+            <option value="">All technicians</option>
+            @foreach (var t in technicians)
+            {
+                <option value="@t.Id" selected="@(t.Id == technicianId ? "selected" : null)">@t.Name</option>
+            }
+        </select>
+    }
+</form>
+
+@if (seesAll && technicians.Count == 0)
+{
+    <div class="alert alert-warning">
+        No user carries out maintenance jobs yet. Create a user for the maintenance engineer in
+        <strong>System Setup &gt; Users</strong> and give them <strong>Carry Out Maintenance Jobs</strong>;
+        new maintenance requests are then assigned to them automatically.
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="card shadow-sm"><div class="card-body text-muted">No jobs to show.</div></div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Job</th>
+                        <th>Priority</th>
+                        <th>What</th>
+                        <th>Unit</th>
+                        <th>Tenant</th>
+                        @if (seesAll) { <th>Technician</th> }
+                        <th>Status</th>
+                        <th class="text-end">Age</th>
+                        <th class="text-end">Materials</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var job in Model)
+                    {
+                        <tr>
+                            <td><a asp-action="Details" asp-route-id="@job.Id" class="fw-semibold">@job.Number</a></td>
+                            <td>
+                                <span class="badge @(job.Priority == ServiceRequestPriorities.Urgent ? "bg-danger" : job.Priority == ServiceRequestPriorities.High ? "bg-warning text-dark" : "bg-secondary")">@job.Priority</span>
+                            </td>
+                            <td>@job.Subject @if (!string.IsNullOrWhiteSpace(job.Category)) { <span class="text-muted small">(@job.Category)</span> }</td>
+                            <td>@job.Place</td>
+                            <td>@job.Tenant</td>
+                            @if (seesAll) { <td>@(job.Technician ?? "not assigned")</td> }
+                            <td><span class="badge @ServiceRequestStatuses.BadgeClass(job.Status)">@ServiceRequestStatuses.Describe(job.Status)</span></td>
+                            <td class="text-end @(job.IsOpen && job.ResolveLate ? "text-danger fw-semibold" : "")" title="@(job.IsOpen && job.ResolveLate ? "Past the target time for this priority" : "")">@Hours(job.AgeHours)</td>
+                            <td class="text-end">@(job.Materials == 0m ? "" : job.Materials.ToString("N2"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

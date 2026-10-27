@@ -91,6 +91,9 @@ namespace RealEstateManager.Domain
         public int? SubmittedByPortalUserId { get; set; }
 
         public DateTime? AcknowledgedAt { get; set; }
+
+        /// <summary>When the maintenance technician started work on the job.</summary>
+        public DateTime? WorkStartedAt { get; set; }
         public DateTime? ResolvedAt { get; set; }
         public DateTime? ClosedAt { get; set; }
 
