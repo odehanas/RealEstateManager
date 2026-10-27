@@ -116,9 +116,27 @@ namespace RealEstateManager.Controllers
                 CurrencyName = company.BaseCurrency == "AED" ? "UAE Dirhams (AED)" : company.BaseCurrency
             };
 
+            // Billed in the owner's name: the owner is the supplier, the company the agent.
+            var ownerBilled = invoice.IsIssuedForOwner || (invoice.JournalEntryId == null && property.BillsInOwnerName);
+            if (ownerBilled)
+            {
+                model.SupplierName = invoice.IssuedForOwnerName ?? property.OwnerName!;
+                model.SupplierLegalName = null;
+                model.SupplierTrn = invoice.IsIssuedForOwner ? invoice.IssuedForOwnerTrn : property.OwnerTrn;
+                model.SupplierAddressLine1 = $"c/o {company.LegalName ?? company.Name}";
+                model.IssuedByAgent = company.LegalName ?? company.Name;
+                if (string.IsNullOrWhiteSpace(model.SupplierTrn))
+                    model.TaxInvoiceType = TaxInvoiceTypes.NotApplicable;
+            }
+
             // Surface anything that would make this document non-compliant, on screen
             // only, so it is never handed over unknowingly.
-            if (VatCategories.IsTaxable(invoice.VatCategory) || invoice.VatCategory == VatCategories.ZeroRated)
+            if (ownerBilled)
+            {
+                if (!string.IsNullOrWhiteSpace(model.SupplierTrn) && string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
+                    model.ComplianceWarnings.Add("No tax invoice number in the owner's series has been allocated yet - post the invoice first.");
+            }
+            else if (VatCategories.IsTaxable(invoice.VatCategory) || invoice.VatCategory == VatCategories.ZeroRated)
             {
                 if (string.IsNullOrWhiteSpace(company.TrnNumber))
                     model.ComplianceWarnings.Add("The company has no TRN. Set it under Setup ▸ Companies before issuing tax invoices.");

@@ -27,8 +27,15 @@ namespace RealEstateManager.Models
 
         /// <summary>5 when the company is VAT registered, otherwise 0.</summary>
         public decimal CommissionVatRate { get; set; }
-        public decimal OwnerShare => Contracts.Sum(x => x.OwnerShare);
-        public decimal OwnerShareCollected => Contracts.Sum(x => x.OwnerShareCollected);
+        /// <summary>VAT on rent invoiced in the owner's name: collected for the owner, theirs to declare.</summary>
+        public decimal RentVatForOwner => Contracts.Sum(x => x.RentVatForOwner);
+
+        /// <summary>Maintenance and other costs of the owner's properties charged to the owner.</summary>
+        public List<OwnerExpenseRow> Expenses { get; set; } = new();
+        public decimal OwnerExpenses => Expenses.Sum(x => x.Amount);
+
+        public decimal OwnerShare => Contracts.Sum(x => x.OwnerShare) - OwnerExpenses;
+        public decimal OwnerShareCollected => Contracts.Sum(x => x.OwnerShareCollected) - OwnerExpenses;
 
         /// <summary>Settlements posted on or before the cut-off.</summary>
         public decimal PreviouslySettled { get; set; }
@@ -55,8 +62,23 @@ namespace RealEstateManager.Models
         public int PropertyCount { get; set; }
     }
 
+    /// <summary>A cost of an owner's property charged to the owner (Due to Landlords).</summary>
+    public class OwnerExpenseRow
+    {
+        public DateTime Date { get; set; }
+        public string PropertyCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Source { get; set; } = string.Empty;
+        public string EntryNumber { get; set; } = string.Empty;
+        public int JournalEntryId { get; set; }
+        public decimal Amount { get; set; }
+    }
+
     public class OwnerSettlementContractRow
     {
+        /// <summary>VAT on the rent when it was invoiced in the owner's name (part of the owner's share).</summary>
+        public decimal RentVatForOwner { get; set; }
+
         public int LeaseId { get; set; }
         public string PropertyCode { get; set; } = string.Empty;
         public string PropertyName { get; set; } = string.Empty;

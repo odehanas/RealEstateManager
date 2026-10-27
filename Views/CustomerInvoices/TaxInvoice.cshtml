@@ -229,6 +229,16 @@
         </div>
     }
 
+    @if (Model.IssuedByAgent != null)
+    {
+        <div class="note">
+            <strong>Issued on behalf of the landlord.</strong>
+            @Model.IssuedByAgent manages this property and issues this @(isTaxInvoice ? "tax invoice" : "invoice") as agent for
+            @Model.SupplierName@(string.IsNullOrWhiteSpace(Model.SupplierTrn) ? ", who is not registered for VAT, so no VAT is charged" : string.Empty).
+            Payment made to @Model.IssuedByAgent settles it.
+        </div>
+    }
+
     <div class="foot">
         @Model.SupplierName
         @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn)) { <text> &middot; TRN @Model.SupplierTrn</text> }

@@ -150,6 +150,7 @@ namespace RealEstateManager.Controllers
             property.VatCategory = string.IsNullOrWhiteSpace(model.VatCategory) ? property.VatCategory : model.VatCategory;
             property.OwnerName = model.OwnerName;
             property.OwnerTrn = string.IsNullOrWhiteSpace(model.OwnerTrn) ? null : model.OwnerTrn.Trim();
+            property.RentBilledInOwnerName = model.OwnershipType == "Managed" && model.RentBilledInOwnerName;
             property.AssetValue = model.AssetValue;
             property.CommissionPercentage = model.CommissionPercentage;
             property.IsActive = model.IsActive;

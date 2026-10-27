@@ -74,9 +74,10 @@ namespace RealEstateManager.Services
         /// Whether a document for this customer and supply date must go on the network.
         /// Pending means yes and nothing has been produced yet.
         /// </summary>
-        public static string DetermineStatus(Company company, Tenant tenant, DateTime supplyDate)
+        public static string DetermineStatus(Company company, Tenant tenant, DateTime supplyDate, bool issuedForOwner = false)
         {
-            if (!company.EInvoicingEnabled)
+            // Issued in an owner's name: the owner's document, not the company's to submit.
+            if (issuedForOwner || !company.EInvoicingEnabled)
                 return EInvoiceStatuses.NotRequired;
 
             if (!PartyTypes.IsInScope(tenant.PartyType))
@@ -120,7 +121,7 @@ namespace RealEstateManager.Services
                 var tenant = invoice.Lease?.Tenant;
                 if (tenant == null) continue;
 
-                var status = DetermineStatus(company, tenant, SupplyDateOf(invoice));
+                var status = DetermineStatus(company, tenant, SupplyDateOf(invoice), invoice.IsIssuedForOwner);
                 if (status != invoice.EInvoiceStatus)
                 {
                     invoice.EInvoiceStatus = status;
@@ -164,7 +165,7 @@ namespace RealEstateManager.Services
             if (invoice != null && invoice.EInvoiceStatus != EInvoiceStatuses.NotRequired)
                 return company.EInvoicingEnabled ? EInvoiceStatuses.Pending : EInvoiceStatuses.NotRequired;
 
-            return DetermineStatus(company, tenant, note.CreditNoteDate);
+            return DetermineStatus(company, tenant, note.CreditNoteDate, invoice?.IsIssuedForOwner == true);
         }
 
         // =====================================================================

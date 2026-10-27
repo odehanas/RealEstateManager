@@ -630,7 +630,7 @@ namespace RealEstateManager.Services
                         {
                             var company = await _db.Companies.FirstAsync(x => x.Id == invoice.CompanyId);
                             invoice.EInvoiceStatus = EInvoiceService.DetermineStatus(
-                                company, invoice.Lease.Tenant, EInvoiceService.SupplyDateOf(invoice));
+                                company, invoice.Lease.Tenant, EInvoiceService.SupplyDateOf(invoice), invoice.IsIssuedForOwner);
                         }
                     }
                     else if (invoice.EInvoiceStatus == EInvoiceStatuses.Generated)

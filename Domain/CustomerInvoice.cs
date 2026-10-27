@@ -38,6 +38,16 @@
         public string? RecipientTrn { get; set; }
 
         /// <summary>
+        /// The owner the invoice was issued for, when the company billed in the owner's
+        /// name (see Property.RentBilledInOwnerName). Null for the company's own invoices.
+        /// Kept as it was at posting, so a reprint shows the document as issued.
+        /// </summary>
+        public string? IssuedForOwnerName { get; set; }
+        public string? IssuedForOwnerTrn { get; set; }
+
+        public bool IsIssuedForOwner => IssuedForOwnerName != null;
+
+        /// <summary>
         /// The rental period this invoice bills. Shown on the e-invoice as the invoicing
         /// period. Null on invoices raised before it was recorded; it is then derived
         /// from the lease's billing frequency.

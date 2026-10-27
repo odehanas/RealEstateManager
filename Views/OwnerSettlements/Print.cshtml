@@ -81,6 +81,11 @@
                 {
                     <tr><td>Less: VAT on commission</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
                 }
+                @{ var adjustments = Model.OwnerShare - (Model.GrossRent - Model.Commission - Model.CommissionVat); }
+                @if (adjustments != 0m)
+                {
+                    <tr><td>VAT on rent billed in your name, less maintenance and expenses charged to you</td><td class="text-end">@adjustments.ToString("N2")</td></tr>
+                }
                 <tr class="fw-bold"><td>Your share</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
                 <tr><td>Less: paid to you before</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
                 <tr><td>Balance due before this payment</td><td class="text-end">@((Model.OwnerShare - Model.PreviouslySettled).ToString("N2"))</td></tr>

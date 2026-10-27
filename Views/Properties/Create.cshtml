@@ -76,6 +76,18 @@
             <div class="form-text">Managed properties only, if the owner is VAT registered. Printed on our commission tax invoice.</div>
         </div>
 
+        <div class="col-md-8">
+            <div class="form-check mt-md-4">
+                <input asp-for="RentBilledInOwnerName" class="form-check-input" type="checkbox" />
+                <label asp-for="RentBilledInOwnerName" class="form-check-label">Invoice tenants in the owner's name (we act as the owner's agent)</label>
+            </div>
+            <div class="form-text">
+                Managed properties only. Rent invoices show the owner as supplier with the owner's TRN; when the owner has no TRN
+                no VAT is charged. The rent VAT is the owner's and stays off our VAT return; our commission is invoiced to the owner
+                under our TRN. Applies to contracts and invoices posted after it is switched on.
+            </div>
+        </div>
+
         <div class="col-md-4">
             <label asp-for="AssetValue" class="form-label"></label>
             <input asp-for="AssetValue" class="form-control" />

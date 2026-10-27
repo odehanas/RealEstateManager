@@ -1,0 +1,101 @@
+﻿@model RealEstateManager.Services.OwnerProfitabilityService.Report
+@{
+    ViewData["Title"] = "Owner Property Profitability";
+    var rows = Model.Rows;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">Owner Property Profitability</h2>
+        <div class="text-muted">
+            Managed properties, @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"): what each property earned its owner,
+            and what it earned us in commission.
+        </div>
+    </div>
+    <a asp-controller="OwnerSettlements" asp-action="Index" class="btn btn-outline-secondary">Owner Settlements</a>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">From</label><input id="fromDate" type="date" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="toDate">To</label><input id="toDate" type="date" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto">
+        <label class="form-label small mb-0" for="owner">Owner</label>
+        <select id="owner" name="owner" class="form-select form-select-sm">
+            <option value="">All owners</option>
+            @foreach (var o in Model.Owners) { <option value="@o" selected="@(o == Model.Owner ? "selected" : null)">@o</option> }
+        </select>
+    </div>
+    <div class="col-auto"><button class="btn btn-sm btn-dark">Show</button></div>
+</form>
+
+@if (rows.Count == 0)
+{
+    <div class="card shadow-sm"><div class="card-body text-muted">No managed properties for this selection.</div></div>
+}
+else
+{
+    <div class="row g-3 mb-3">
+        <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Rent billed (before VAT)</div><div class="h4 mb-0">@rows.Sum(x => x.RentBilled).ToString("N2")</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Owners' net income</div><div class="h4 mb-0 text-success">@rows.Sum(x => x.OwnerNetIncome).ToString("N2")</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Our commission income</div><div class="h4 mb-0 text-primary">@rows.Sum(x => x.Commission).ToString("N2")</div></div></div></div>
+        <div class="col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Costs charged to owners</div><div class="h4 mb-0">@rows.Sum(x => x.Expenses).ToString("N2")</div></div></div></div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Property</th>
+                        <th>Owner</th>
+                        <th class="text-end">Let</th>
+                        <th class="text-end">Rent billed</th>
+                        <th class="text-end">Commission</th>
+                        <th class="text-end">VAT on commission</th>
+                        <th class="text-end">Maintenance &amp; costs</th>
+                        <th class="text-end">Owner's net income</th>
+                        <th class="text-end">Owner margin</th>
+                        <th class="text-end">VAT collected for owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in rows)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Properties" asp-action="Details" asp-route-id="@r.PropertyId">@r.PropertyCode</a> @r.PropertyName
+                                @if (r.BilledInOwnerName) { <span class="badge bg-info text-dark" title="Tenants are invoiced in the owner's name">owner billed</span> }
+                            </td>
+                            <td>@r.OwnerName @if (!string.IsNullOrWhiteSpace(r.OwnerTrn)) { <span class="text-muted small">TRN @r.OwnerTrn</span> } else { <span class="text-muted small">no TRN</span> }</td>
+                            <td class="text-end">@r.Let / @r.Units</td>
+                            <td class="text-end">@r.RentBilled.ToString("N2")</td>
+                            <td class="text-end">@r.Commission.ToString("N2") <span class="text-muted small">(@r.CommissionPercentage.ToString("0.##")%)</span></td>
+                            <td class="text-end">@r.CommissionVat.ToString("N2")</td>
+                            <td class="text-end">@r.Expenses.ToString("N2")</td>
+                            <td class="text-end fw-semibold">@r.OwnerNetIncome.ToString("N2")</td>
+                            <td class="text-end">@(r.OwnerMarginPercent.HasValue ? r.OwnerMarginPercent.Value.ToString("0.0") + "%" : "-")</td>
+                            <td class="text-end">@(r.RentVatForOwner == 0m ? "-" : r.RentVatForOwner.ToString("N2"))</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="table-light fw-semibold">
+                        <td colspan="3" class="text-end">Totals</td>
+                        <td class="text-end">@rows.Sum(x => x.RentBilled).ToString("N2")</td>
+                        <td class="text-end">@rows.Sum(x => x.Commission).ToString("N2")</td>
+                        <td class="text-end">@rows.Sum(x => x.CommissionVat).ToString("N2")</td>
+                        <td class="text-end">@rows.Sum(x => x.Expenses).ToString("N2")</td>
+                        <td class="text-end">@rows.Sum(x => x.OwnerNetIncome).ToString("N2")</td>
+                        <td></td>
+                        <td class="text-end">@rows.Sum(x => x.RentVatForOwner).ToString("N2")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <p class="small text-muted">
+        Owner's net income = rent billed less our commission, the VAT on it (@Model.CommissionVatRate.ToString("0.##")%) and maintenance and other costs charged to the owner.
+        VAT on rent invoiced in an owner's name is collected for the owner and is the owner's to declare; it is not income.
+        Our own profitability by property is in the Profit &amp; Loss by Property report.
+    </p>
+}

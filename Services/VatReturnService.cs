@@ -42,6 +42,7 @@ namespace RealEstateManager.Services
                 .Where(x => x.CompanyId == companyId
                             && x.JournalEntryId != null
                             && x.Status != "Cancelled"
+                            && x.IssuedForOwnerName == null   // billed in an owner's name: the owner's return
                             && x.InvoiceDate >= startDate
                             && x.InvoiceDate <= endDate)
                 .Select(x => new { x.VatCategory, x.Subtotal, x.VatAmount })
@@ -156,6 +157,7 @@ namespace RealEstateManager.Services
                 .AsNoTracking()
                 .Where(x => x.CompanyId == companyId
                             && x.JournalEntry != null && x.JournalEntry.IsPosted
+                            && x.CustomerInvoice!.IssuedForOwnerName == null
                             && x.CreditNoteDate >= startDate
                             && x.CreditNoteDate <= endDate)
                 .Select(x => new { x.VatCategory, x.Subtotal, x.VatAmount })

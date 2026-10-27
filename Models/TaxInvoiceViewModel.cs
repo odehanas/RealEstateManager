@@ -6,6 +6,8 @@ namespace RealEstateManager.Models
     /// </summary>
     public class TaxInvoiceViewModel
     {
+        /// <summary>The company that issued it as the owner's agent, when billed in the owner's name.</summary>
+        public string? IssuedByAgent { get; set; }
         // Supplier
         public string SupplierName { get; set; } = string.Empty;
         public string? SupplierLegalName { get; set; }

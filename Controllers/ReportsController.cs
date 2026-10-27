@@ -273,6 +273,24 @@ namespace RealEstateManager.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Each managed property's result for its owner (rent less commission, its VAT and
+        /// costs charged to the owner) beside the commission it earned the company.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> OwnerProfitability(DateTime? fromDate, DateTime? toDate, string? owner,
+            [FromServices] OwnerProfitabilityService profitability)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var company = await _db.Companies.AsNoTracking().FirstAsync(x => x.Id == companyId);
+            var to = (toDate ?? DateTime.Today).Date;
+            var from = (fromDate ?? GetFiscalYearStart(to, company.FiscalYearStartMonth)).Date;
+            if (from > to)
+                (from, to) = (to, from);
+
+            return View(await profitability.GetAsync(companyId, from, to, owner));
+        }
+
         // A CSV cell: quoted when needed, and a leading = + - @ neutralised so a
         // spreadsheet never runs it as a formula.
         private static string Csv(string? value)

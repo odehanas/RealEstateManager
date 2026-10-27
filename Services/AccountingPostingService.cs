@@ -52,6 +52,7 @@ namespace RealEstateManager.Services
                 "VAT Payable");
 
             var ownershipType = invoice.Lease!.Unit!.Property!.OwnershipType;
+            var billedForOwner = invoice.Lease.Unit.Property.BillsInOwnerName;
 
             var offsetAccount = ownershipType == "Managed"
                 ? await GetMappedAccountAsync(invoice.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords")
@@ -98,12 +99,16 @@ namespace RealEstateManager.Services
 
             if (invoice.VatAmount > 0)
             {
+                // Billed in the owner's name, the VAT is the owner's to pay to the FTA:
+                // it is passed on to them with the rent, not declared by the company.
                 lines.Add(new JournalEntryLine
                 {
-                    AccountId = vatPayableAccount.Id,
+                    AccountId = billedForOwner ? offsetAccount.Id : vatPayableAccount.Id,
                     Debit = 0m,
                     Credit = invoice.VatAmount,
-                    Description = $"VAT on invoice {invoice.InvoiceNumber}",
+                    Description = billedForOwner
+                        ? $"VAT on invoice {invoice.InvoiceNumber}, the owner's to declare"
+                        : $"VAT on invoice {invoice.InvoiceNumber}",
                     PropertyId = propertyId,
                     UnitId = unitId,
                     TenantId = tenantId,
@@ -131,7 +136,30 @@ namespace RealEstateManager.Services
             // only once: the series must stay sequential and gap-free, so re-posting never
             // issues a second number for the same supply.
             var isTaxableSupply = invoice.VatAmount > 0m || invoice.VatCategory == VatCategories.ZeroRated;
-            if (isTaxableSupply && string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
+            if (billedForOwner)
+            {
+                // The owner is the supplier. A registered owner's tax invoice is numbered in
+                // the owner's own series for the property, never in the company's.
+                var property = invoice.Lease.Unit.Property;
+                invoice.IssuedForOwnerName = property.OwnerName!.Trim();
+                invoice.IssuedForOwnerTrn = string.IsNullOrWhiteSpace(property.OwnerTrn) ? null : property.OwnerTrn.Trim();
+                invoice.EInvoiceStatus = EInvoiceStatuses.NotRequired;
+                if (isTaxableSupply && invoice.IssuedForOwnerTrn != null && string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
+                {
+                    var tenant = invoice.Lease.Tenant!;
+                    invoice.RecipientTrn = tenant.TrnNumber;
+                    invoice.TaxInvoiceType = VatDeterminationService.ResolveInvoiceType(invoice.VatCategory, tenant.TrnNumber);
+                    invoice.DateOfSupply ??= invoice.InvoiceDate;
+                    var prefix = $"OTI-{property.Code}-{invoice.InvoiceDate:yyyy}-";
+                    var used = await _db.CustomerInvoices.CountAsync(x => x.TaxInvoiceNumber != null && x.TaxInvoiceNumber.StartsWith(prefix));
+                    invoice.TaxInvoiceNumber = $"{prefix}{used + 1:D4}";
+                }
+                else if (invoice.IssuedForOwnerTrn == null)
+                {
+                    invoice.TaxInvoiceType = TaxInvoiceTypes.NotApplicable;
+                }
+            }
+            else if (isTaxableSupply && string.IsNullOrWhiteSpace(invoice.TaxInvoiceNumber))
             {
                 var tenant = invoice.Lease!.Tenant!;
 
@@ -215,7 +243,11 @@ namespace RealEstateManager.Services
 
             if (note.VatAmount > 0m)
             {
-                var vatPayableAccount = await GetMappedAccountAsync(note.CompanyId, settings.VatPayableAccountId, "VAT Payable");
+                // An invoice issued in the owner's name had its VAT passed to the owner;
+                // the credit takes it back from the owner, not from the company's VAT.
+                var vatPayableAccount = invoice.IsIssuedForOwner
+                    ? await GetMappedAccountAsync(note.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords")
+                    : await GetMappedAccountAsync(note.CompanyId, settings.VatPayableAccountId, "VAT Payable");
 
                 lines.Add(new JournalEntryLine
                 {
@@ -1503,6 +1535,54 @@ namespace RealEstateManager.Services
                 x.CompanyId == companyId &&
                 x.StartDate <= entryDate.Date &&
                 x.EndDate >= entryDate.Date);
+        }
+
+        /// <summary>
+        /// Material taken from the maintenance store for a job:
+        ///   Dr  Due to Landlords (managed property: the owner bears it)
+        ///       or Property Maintenance (the company's own property)
+        ///   Cr  Maintenance Materials Stock
+        /// </summary>
+        public async Task<JournalEntry> PostMaintenanceMaterialAsync(int materialId)
+        {
+            var material = await _db.MaintenanceMaterials
+                .Include(x => x.ServiceRequest).ThenInclude(x => x!.Property)
+                .FirstOrDefaultAsync(x => x.Id == materialId)
+                ?? throw new InvalidOperationException("The material was not found.");
+
+            if (material.JournalEntryId.HasValue)
+                return await _db.JournalEntries.Include(x => x.Lines).FirstAsync(x => x.Id == material.JournalEntryId.Value);
+
+            var job = material.ServiceRequest!;
+            var stock = await _db.Accounts.FirstOrDefaultAsync(x => x.CompanyId == material.CompanyId && x.Code == MaintenanceStandards.StockAccountCode)
+                ?? throw new InvalidOperationException($"Account {MaintenanceStandards.StockAccountCode} {MaintenanceStandards.StockAccountName} is missing from the chart of accounts.");
+
+            Account charge;
+            if (material.ChargedTo == "Owner")
+            {
+                var settings = await GetCompanyAccountSettingAsync(material.CompanyId);
+                charge = await GetMappedAccountAsync(material.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords");
+            }
+            else
+            {
+                charge = await _db.Accounts.FirstOrDefaultAsync(x => x.CompanyId == material.CompanyId && x.Code == MaintenanceStandards.MaintenanceExpenseAccountCode)
+                    ?? throw new InvalidOperationException($"Account {MaintenanceStandards.MaintenanceExpenseAccountCode} Property Maintenance is missing from the chart of accounts.");
+            }
+
+            var text = $"Job {job.RequestNumber}: {material.Description}";
+            var lines = new List<JournalEntryLine>
+            {
+                new() { AccountId = charge.Id, Debit = material.Amount, Credit = 0m, Description = text, PropertyId = job.PropertyId, UnitId = job.UnitId, TenantId = job.TenantId },
+                new() { AccountId = stock.Id, Debit = 0m, Credit = material.Amount, Description = text, PropertyId = job.PropertyId, UnitId = job.UnitId }
+            };
+
+            var journal = await CreateJournalEntryAsync(
+                material.CompanyId, material.MaterialDate, $"Maintenance materials for job {job.RequestNumber}",
+                "MaintenanceMaterial", material.Id, lines, documentNumber: job.RequestNumber);
+
+            material.JournalEntryId = journal.Id;
+            await _db.SaveChangesAsync();
+            return journal;
         }
 
         private async Task<JournalEntry> CreateJournalEntryAsync(

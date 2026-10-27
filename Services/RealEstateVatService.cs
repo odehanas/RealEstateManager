@@ -35,6 +35,12 @@ namespace RealEstateManager.Services
                        ?? throw new InvalidOperationException("The unit was not found.");
             var property = unit.Property!;
 
+            // Invoiced in the name of an owner who is not registered for VAT: no VAT can
+            // be charged on the rent at all.
+            if (property.BillsInOwnerName && string.IsNullOrWhiteSpace(property.OwnerTrn))
+                return new VatDecision(VatCategories.Exempt,
+                    $"Invoiced in the owner's name, and {property.OwnerName} is not registered for VAT - no VAT is charged.");
+
             var category = VatDeterminationService.ResolveCategory(property, unit);
             if (category == VatCategories.Standard)
                 return new VatDecision(VatCategories.Standard, "Commercial property - standard rated at 5%.");

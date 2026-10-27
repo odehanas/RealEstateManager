@@ -31,6 +31,18 @@ namespace RealEstateManager.Domain
         /// tax invoice to a registered owner must show it.
         /// </summary>
         public string? OwnerTrn { get; set; }
+
+        /// <summary>
+        /// Managed property option: tenants are invoiced in the owner's name, the company
+        /// acting as the owner's agent. The rent invoice carries the owner's TRN (no VAT
+        /// when the owner is not registered), its VAT is the owner's and stays off the
+        /// company's VAT return; the company's own income is its commission, invoiced to
+        /// the owner under the company's TRN.
+        /// </summary>
+        public bool RentBilledInOwnerName { get; set; }
+
+        /// <summary>Whether tenants of this property are invoiced in the owner's name.</summary>
+        public bool BillsInOwnerName => OwnershipType == "Managed" && RentBilledInOwnerName && !string.IsNullOrWhiteSpace(OwnerName);
         public decimal AssetValue { get; set; } = 0m;
         public decimal CommissionPercentage { get; set; } = 0m;
 

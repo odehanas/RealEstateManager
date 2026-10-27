@@ -155,7 +155,11 @@ namespace RealEstateManager.Services
                             x.Status != "Cancelled" &&
                             x.InvoiceDate <= asOf)
                 .GroupBy(x => x.LeaseId)
-                .Select(g => new { LeaseId = g.Key, Net = g.Sum(x => x.Subtotal), Gross = g.Sum(x => x.TotalAmount) })
+                .Select(g => new
+                {
+                    LeaseId = g.Key, Net = g.Sum(x => x.Subtotal), Gross = g.Sum(x => x.TotalAmount),
+                    OwnerVat = g.Sum(x => x.IssuedForOwnerName != null ? x.VatAmount : 0m)
+                })
                 .ToListAsync();
 
             var credits = await _db.CustomerCreditNotes.AsNoTracking()
@@ -163,7 +167,11 @@ namespace RealEstateManager.Services
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
                             x.CreditNoteDate <= asOf)
                 .GroupBy(x => x.CustomerInvoice!.LeaseId)
-                .Select(g => new { LeaseId = g.Key, Net = g.Sum(x => x.Subtotal), Gross = g.Sum(x => x.TotalAmount) })
+                .Select(g => new
+                {
+                    LeaseId = g.Key, Net = g.Sum(x => x.Subtotal), Gross = g.Sum(x => x.TotalAmount),
+                    OwnerVat = g.Sum(x => x.CustomerInvoice!.IssuedForOwnerName != null ? x.VatAmount : 0m)
+                })
                 .ToListAsync();
 
             var receipts = await _db.CustomerReceipts.AsNoTracking()
@@ -204,6 +212,10 @@ namespace RealEstateManager.Services
                     ? 0m
                     : Math.Round(collectedGross * billedNet / billedGross, 2);
 
+                // Invoiced in the owner's name, the rent VAT was collected for the owner.
+                var ownerVat = (invoice?.OwnerVat ?? 0m) - (credit?.OwnerVat ?? 0m);
+                var collectedOwnerVat = billedGross == 0m ? 0m : Math.Round(collectedGross * ownerVat / billedGross, 2);
+
                 var commission = Math.Round(billedNet * pct / 100m, 2);
                 var collectedCommission = Math.Round(collectedNet * pct / 100m, 2);
 
@@ -233,14 +245,41 @@ namespace RealEstateManager.Services
                     RentCollected = collectedNet,
                     Commission = commission,
                     CommissionVat = commissionVat,
-                    OwnerShare = billedNet - commission - commissionVat,
-                    OwnerShareCollected = collectedNet - collectedCommission - collectedCommissionVat
+                    RentVatForOwner = ownerVat,
+                    OwnerShare = billedNet - commission - commissionVat + ownerVat,
+                    OwnerShareCollected = collectedNet - collectedCommission - collectedCommissionVat + collectedOwnerVat
                 });
             }
 
             model.Contracts = model.Contracts
                 .OrderBy(x => x.PropertyCode).ThenBy(x => x.UnitNumber).ThenBy(x => x.StartDate)
                 .ToList();
+
+            // Costs of the owner's properties charged to the owner: maintenance materials,
+            // supplier bills and petty cash booked against Due to Landlords.
+            var dueToLandlords = await _db.CompanyAccountSettings.AsNoTracking()
+                .Where(x => x.CompanyId == companyId).Select(x => x.DueToLandlordsAccountId).FirstOrDefaultAsync();
+            if (dueToLandlords.HasValue)
+            {
+                var chargeSources = new[] { "MaintenanceMaterial", "VendorBill", "PettyCashExpense", "ManualJournal" };
+                model.Expenses = await _db.JournalEntryLines.AsNoTracking()
+                    .Where(x => x.AccountId == dueToLandlords.Value && x.Debit > 0m && x.PropertyId != null &&
+                                propertyIds.Contains(x.PropertyId.Value) &&
+                                x.JournalEntry!.IsPosted && x.JournalEntry.EntryDate <= asOf &&
+                                chargeSources.Contains(x.JournalEntry.SourceType!))
+                    .OrderBy(x => x.JournalEntry!.EntryDate).ThenBy(x => x.Id)
+                    .Select(x => new OwnerExpenseRow
+                    {
+                        Date = x.JournalEntry!.EntryDate,
+                        PropertyCode = x.Property!.Code,
+                        Description = x.Description ?? x.JournalEntry.Description,
+                        Source = x.JournalEntry.SourceType!,
+                        EntryNumber = x.JournalEntry.EntryNumber,
+                        JournalEntryId = x.JournalEntryId,
+                        Amount = x.Debit - x.Credit
+                    })
+                    .ToListAsync();
+            }
 
             var settlements = await _db.OwnerSettlements.AsNoTracking()
                 .Include(x => x.JournalEntry)
