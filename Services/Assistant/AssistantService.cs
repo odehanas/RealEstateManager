@@ -44,6 +44,7 @@ namespace RealEstateManager.Services.Assistant
                 .Concat(AssistantMarketTools.All())
                 .Concat(AssistantWriteTools.All())
                 .Concat(AssistantWriteTools.DataEntry())
+                .Concat(AssistantUnitTools.All())
                 .ToList();
 
         private readonly ApplicationDbContext _db;
@@ -163,7 +164,7 @@ namespace RealEstateManager.Services.Assistant
                     ["name"] = t.Name,
                     ["description"] = t.Description,
                     ["parameters"] = t.Parameters.DeepClone()
-                }).Concat(AssistantScreenTools.Definitions()).ToArray())
+                }).Concat(AssistantScreenTools.Definitions()).Concat(AssistantScreenTools.Navigation()).ToArray())
             };
 
             if (mode == "voice")
@@ -593,6 +594,11 @@ namespace RealEstateManager.Services.Assistant
               and puts the company's own rents beside the market. Always give the sources with their dates, say whether the figures
               are asking or contracted rents, call them indicative, and point out units well below or above the market. If the user
               does not say the kind of unit, ask. Never present a web figure as the company's own data.
+            - Units: to add units to a property, use propose_create_units (one card for many units). Ask for the property, how many,
+              the usage type, area and standard rent, and floors when they differ, then repeat them back before proposing.
+            - Opening screens: when the user asks to open a screen, or prefers to finish an entry on the screen, use list_screens for the
+              path and open_screen, with the values gathered so far as fields. Opening a page ends this conversation: ask your questions first,
+              and tell the user the form will be filled for them to check and save.
             - Filling the form on screen: when the user is on an entry screen (a "Create" or "Edit" form) and asks you to fill it,
               or gives you an order to enter there, call read_screen_form, then fill_screen_form with the field names it gave you.
               This works for every form in the system. Use add_rows to add line rows first when there are more lines than rows.

@@ -12,6 +12,8 @@ namespace RealEstateManager.Services.Assistant
     {
         public const string ReadForm = "read_screen_form";
         public const string FillForm = "fill_screen_form";
+        public const string ListScreens = "list_screens";
+        public const string OpenScreen = "open_screen";
 
         public static IEnumerable<JsonNode> Definitions()
         {
@@ -32,6 +34,27 @@ namespace RealEstateManager.Services.Assistant
                         Schema.Object(
                             ("name", Schema.Str("Field name, e.g. VendorReference or Lines[0].Quantity"), true),
                             ("value", Schema.Str("Value to enter"), true))), true)));
+        }
+
+        /// <summary>Opening another screen, optionally with its form filled in on arrival.</summary>
+        public static IEnumerable<JsonNode> Navigation()
+        {
+            yield return Definition(ListScreens,
+                "List the screens in the user's menu (only those they may open) with their paths. New-record forms are " +
+                "usually /<Screen>/Create, e.g. /Units/Create, /Tenants/Create, /VendorBills/Create.",
+                Schema.Object());
+
+            yield return Definition(OpenScreen,
+                "Open a screen in the user's browser, optionally filling in its form when it opens (for the user to check and save). " +
+                "Use it when the user asks to open a screen, or wants to finish an entry themselves. Opening a page ENDS this conversation, " +
+                "so collect everything first and say so in one short sentence. Give fields by the label shown on the screen " +
+                "(e.g. Property, Area (sq ft), Standard annual rent) or by field name.",
+                Schema.Object(
+                    ("path", Schema.Str("The screen's path from list_screens, e.g. /Units/Create"), true),
+                    ("fields", Schema.Array("Values to fill in when it opens",
+                        Schema.Object(
+                            ("name", Schema.Str("Label on the screen, or field name"), true),
+                            ("value", Schema.Str("Value to enter"), true))), false)));
         }
 
         private static JsonNode Definition(string name, string description, JsonObject parameters) => new JsonObject

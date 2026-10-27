@@ -83,6 +83,9 @@
 
 .assistant-footer { display: flex; padding: 0 12px 8px; }
 
+/* Shown on a screen the assistant opened and filled in. */
+.assistant-banner { position: fixed; top: 70px; right: 16px; z-index: 1080; max-width: 420px; display: flex; align-items: flex-start; }
+
 /* A field the assistant typed into, until the user has looked at it. */
 .assistant-filled { outline: 3px solid #f0b429 !important; outline-offset: 1px; background-color: #fff8e1 !important; transition: outline-color .3s; }
 

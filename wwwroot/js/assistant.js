@@ -361,7 +361,8 @@
     // the form; the user saves it with the screen's own button, which runs the screen's
     // own checks and permissions on the server.
 
-    var screenTools = { read_screen_form: readScreenForm, fill_screen_form: fillScreenForm };
+    var screenTools = { read_screen_form: readScreenForm, fill_screen_form: fillScreenForm, list_screens: listScreens, open_screen: openScreen };
+    var PENDING_FILL = 'assistant.pendingFill';
 
     function visible(el) { return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length); }
 
@@ -465,8 +466,23 @@
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
         el.classList.add('assistant-filled');
-        setTimeout(function () { el.classList.remove('assistant-filled'); }, 6000);
+        var clear = function () { el.classList.remove('assistant-filled'); };
+        el.addEventListener('focus', clear, { once: true });
+        setTimeout(clear, 30000);
         return true;
+    }
+
+    // A field found by the label the user sees, when the model gives a label rather than a name.
+    function byLabel(form, label) {
+        // "Usage Type", "UsageType" and "usage type:" are the same label.
+        var squash = function (text) { return (text || '').toLowerCase().replace(/[^a-z0-9؀-ۿ]/g, ''); };
+        var wanted = squash(label);
+        if (!wanted) { return null; }
+        var fields = fieldsOf(form).map(function (el) { return { el: el, label: squash(labelOf(el)) }; });
+        var hit = fields.find(function (f) { return f.label === wanted; }) ||
+            fields.find(function (f) { return f.label.indexOf(wanted) === 0; }) ||
+            fields.find(function (f) { return f.label.indexOf(wanted) >= 0; });
+        return hit ? hit.el : null;
     }
 
     function fillScreenForm(args) {
@@ -487,7 +503,7 @@
         var filled = [], missing = [], noChoice = [];
         (args.fields || []).forEach(function (f) {
             var candidates = form.querySelectorAll('[name="' + CSS.escape(f.name || '') + '"]');
-            var el = Array.prototype.find.call(candidates, function (c) { return c.type !== 'hidden' && !c.disabled; });
+            var el = Array.prototype.find.call(candidates, function (c) { return c.type !== 'hidden' && !c.disabled; }) || byLabel(form, f.name);
             if (!el) { missing.push(f.name); return; }
             if (setValue(el, f.value)) { filled.push(f.name); } else { noChoice.push(f.name + ' (no choice matches "' + f.value + '")'); }
         });
@@ -504,6 +520,68 @@
             note: 'Not saved. Tell the user to check the highlighted fields and click the screen\'s Save button.' +
                 (missing.length ? ' For fields not found, call read_screen_form for the right names (add rows first if needed).' : '')
         };
+    }
+
+    function listScreens() {
+        var seen = {}, screens = [];
+        document.querySelectorAll('nav a[href], .navbar a[href]').forEach(function (a) {
+            var path = a.getAttribute('href') || '';
+            if (path.charAt(0) !== '/' || path.indexOf('//') === 0 || /^\/(Auth|Assistant)\b/i.test(path) || seen[path]) { return; }
+            seen[path] = true;
+            var dropdown = a.closest('.dropdown');
+            var toggle = dropdown && dropdown.querySelector('.dropdown-toggle');
+            screens.push({ screen: (toggle ? clean(toggle.textContent) + ' > ' : '') + clean(a.textContent), path: path });
+        });
+        return { screens: screens, note: 'New-record forms are usually /<Screen>/Create, e.g. /Units/Create.' };
+    }
+
+    function openScreen(args) {
+        var path = String(args.path || '').trim();
+        // Only this site's own screens, never a sign-out or another site.
+        if (!/^\/(?!\/)[A-Za-z0-9_\-\/]*(\?[A-Za-z0-9_\-=&%.]*)?$/.test(path) || /^\/(Auth|Assistant|portal|me)(\/|$)/i.test(path) || /logout/i.test(path)) {
+            return { error: 'That is not a screen of this system. Use a path from list_screens.' };
+        }
+        var fields = Array.isArray(args.fields) ? args.fields.slice(0, 60) : [];
+        try {
+            sessionStorage.setItem(PENDING_FILL, JSON.stringify({ path: path.split('?')[0].toLowerCase(), fields: fields, at: Date.now() }));
+        } catch (e) { /* the page still opens, unfilled */ }
+        note('Opening ' + path + (fields.length ? ' and filling in ' + fields.length + ' field(s)…' : '…'));
+        setTimeout(function () { window.location.assign(path); }, 2500);
+        return {
+            opening: path,
+            note: 'The screen is opening and this conversation ends. ' + (fields.length ? 'The fields are filled in there for the user to check and save. ' : '') +
+                'Tell the user that in one short sentence now.'
+        };
+    }
+
+    // On arrival at a screen the assistant opened: fill in what it gathered.
+    function applyPendingFill() {
+        var pending = null;
+        try {
+            pending = JSON.parse(sessionStorage.getItem(PENDING_FILL) || 'null');
+            sessionStorage.removeItem(PENDING_FILL);
+        } catch (e) { return; }
+        if (!pending || !pending.fields || !pending.fields.length || Date.now() - pending.at > 120000) { return; }
+        if (location.pathname.toLowerCase().replace(/\/$/, '') !== pending.path.replace(/\/$/, '')) { return; }
+
+        setTimeout(function () {
+            var result = fillScreenForm({ fields: pending.fields });
+            var box = document.createElement('div');
+            box.className = 'alert alert-warning shadow assistant-banner';
+            box.setAttribute('role', 'status');
+            box.textContent = result.error
+                ? 'The assistant could not fill this screen: ' + result.error
+                : 'The assistant filled ' + result.filled.length + ' field(s), highlighted in yellow. Check them, then click Save.' +
+                  (result.not_found.length || result.not_matched.length
+                      ? ' Not filled: ' + result.not_found.concat(result.not_matched).join(', ') + '.' : '');
+            var close = document.createElement('button');
+            close.type = 'button';
+            close.className = 'btn-close ms-2';
+            close.setAttribute('aria-label', 'Close');
+            close.addEventListener('click', function () { box.remove(); });
+            box.appendChild(close);
+            document.body.appendChild(box);
+        }, 400);
     }
 
     // Runs a screen tool and returns its result the way the server's tools do.
@@ -576,6 +654,8 @@
     });
 
     endButton.addEventListener('click', function () { endSession(); });
+
+    applyPendingFill();
 
     attachButton.addEventListener('click', function () { attachInput.click(); });
     attachInput.addEventListener('change', function () {
