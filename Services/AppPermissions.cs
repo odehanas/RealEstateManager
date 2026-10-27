@@ -318,6 +318,9 @@ namespace RealEstateManager.Services
             {
                 ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
 
+                // Typing opening balances is the same right as on the chart of accounts.
+                ["OpeningBalances.Save"] = new[] { AppPermissions.AccountingManage },
+
                 // The approver's desk for reopening closed periods. An approver need not
                 // be an accountant, so these do not require Accounting.Manage.
                 ["Closing.ReopenRequests"] = new[] { AppPermissions.PeriodReopenApprove, AppPermissions.AccountingManage },

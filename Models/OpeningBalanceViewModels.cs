@@ -38,10 +38,25 @@ namespace RealEstateManager.Models
 
         public decimal DebitOpeningBalance { get; set; }
         public decimal CreditOpeningBalance { get; set; }
+
+        /// <summary>
+        /// Typed in on this screen. Sub-ledger control accounts take their figure from
+        /// the tenants, vendors or assets, and the opening balance control account is
+        /// worked out from every other account, so neither is typed.
+        /// </summary>
+        public bool IsEditable { get; set; }
+    }
+
+    /// <summary>One account's figure as posted back from the Opening Balances screen.</summary>
+    public class OpeningBalanceEntry
+    {
+        public int AccountId { get; set; }
+        public decimal OpeningBalance { get; set; }
     }
 
     public class OpeningBalanceSubLedgerRow
     {
+        public int EntityId { get; set; }
         public string EntityCode { get; set; } = string.Empty;
         public string EntityName { get; set; } = string.Empty;
         public decimal OpeningBalance { get; set; }
@@ -49,6 +64,7 @@ namespace RealEstateManager.Models
 
     public class OpeningBalanceFixedAssetRow
     {
+        public int AssetId { get; set; }
         public string AssetCode { get; set; } = string.Empty;
         public string AssetName { get; set; } = string.Empty;
         public decimal OpeningCost { get; set; }

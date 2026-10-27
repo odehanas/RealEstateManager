@@ -236,6 +236,7 @@ namespace RealEstateManager.Services
                     ReportingGroup = account.ReportingGroup,
                     Source = info.Source,
                     IsControlAccount = info.Source != SourceManual,
+                    IsEditable = info.Source == SourceManual && account.Code != OpeningBalanceControlAccountCode,
                     ManualOpeningBalance = info.ManualOpeningBalance,
                     SubLedgerTotal = info.SubLedgerTotal,
                     EffectiveOpeningBalance = effective,
@@ -254,6 +255,7 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.Code)
                 .Select(x => new OpeningBalanceSubLedgerRow
                 {
+                    EntityId = x.Id,
                     EntityCode = x.Code,
                     EntityName = x.FullName,
                     OpeningBalance = x.OpeningBalance
@@ -266,6 +268,7 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.Code)
                 .Select(x => new OpeningBalanceSubLedgerRow
                 {
+                    EntityId = x.Id,
                     EntityCode = x.Code,
                     EntityName = x.Name,
                     OpeningBalance = x.OpeningBalance
@@ -279,6 +282,7 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.AssetCode)
                 .Select(x => new OpeningBalanceFixedAssetRow
                 {
+                    AssetId = x.Id,
                     AssetCode = x.AssetCode,
                     AssetName = x.Name,
                     OpeningCost = x.OpeningCost,

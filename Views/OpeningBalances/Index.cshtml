@@ -1,8 +1,20 @@
 @model RealEstateManager.Models.OpeningBalanceReconciliationViewModel
+@inject PermissionService PermissionService
 
 @{
     ViewData["Title"] = "Opening Balances";
+
+    // Typing balances needs the same right as the chart of accounts; anyone else sees the figures only.
+    var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
+    var canEditMasterData = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
+    var entryIndex = 0;
 }
+
+<style>
+    .ob-input { max-width: 150px; margin-left: auto; text-align: right; }
+    .ob-input.ob-changed { border-color: #f0b429; background: #fff8e1; }
+    .ob-savebar { position: sticky; bottom: 0; z-index: 5; }
+</style>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -10,6 +22,10 @@
         <div class="text-muted">
             Per-account opening balances combined with sub-ledger detail for
             Accounts Receivable, Accounts Payable and Fixed Assets.
+            @if (canEdit)
+            {
+                <text>Type the figures straight into the Manual OB column and save.</text>
+            }
         </div>
     </div>
     <div>
@@ -19,6 +35,11 @@
         <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-secondary">Fixed Assets</a>
     </div>
 </div>
+
+@if (TempData["OpeningBalanceMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["OpeningBalanceMessage"]</div>
+}
 
 <div class="row g-3 mb-4">
     <div class="col-md-4">
@@ -66,10 +87,17 @@
     </div>
 }
 
+<form asp-action="Save" method="post" id="openingForm">
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <strong>GL Account Opening Balances</strong>
-        <span class="text-muted small">Postable accounts only</span>
+        <span class="text-muted small">
+            Postable accounts only.
+            @if (canEdit)
+            {
+                <text>Enter each balance on the account's normal side (debit for assets and expenses, credit for liabilities, equity and revenue); a negative figure goes to the other side.</text>
+            }
+        </span>
     </div>
     <div class="table-responsive">
         <table class="table table-sm table-hover mb-0">
@@ -90,7 +118,16 @@
                 @foreach (var row in Model.Rows)
                 {
                     <tr>
-                        <td><code>@row.AccountCode</code></td>
+                        <td>
+                            @if (canEdit)
+                            {
+                                <a asp-controller="ChartOfAccounts" asp-action="Edit" asp-route-id="@row.AccountId" title="Open the account"><code>@row.AccountCode</code></a>
+                            }
+                            else
+                            {
+                                <code>@row.AccountCode</code>
+                            }
+                        </td>
                         <td>@row.AccountName</td>
                         <td><span class="badge bg-secondary">@row.AccountType</span></td>
                         <td>
@@ -108,15 +145,37 @@
                                 case "FixedAssetAccumDepreciation":
                                     <span class="badge bg-primary">Fixed Asset Acc. Dep.</span>
                                     break;
+                                case "OpeningBalanceControl":
+                                    <span class="badge bg-warning text-dark">Balancing line</span>
+                                    break;
                                 default:
                                     <span class="badge bg-secondary">Manual</span>
                                     break;
                             }
                         </td>
                         <td class="text-end">
-                            @if (row.IsControlAccount)
+                            @if (row.Source == RealEstateManager.Services.OpeningBalanceService.SourceOpeningBalanceControl)
                             {
-                                <span class="text-muted">&mdash;</span>
+                                <span class="text-muted small" title="The difference left by every other account's opening balance">worked out</span>
+                            }
+                            else if (row.IsControlAccount)
+                            {
+                                var (controller, label) = row.Source switch
+                                {
+                                    "AccountsReceivable" => ("Tenants", "Edit per tenant"),
+                                    "AccountsPayable" => ("Vendors", "Edit per vendor"),
+                                    _ => ("FixedAssets", "Edit per asset")
+                                };
+                                <a asp-controller="@controller" asp-action="Index" class="small" title="This figure is the total of the detail below">@label</a>
+                            }
+                            else if (canEdit && row.IsEditable)
+                            {
+                                <input type="hidden" name="entries[@entryIndex].AccountId" value="@row.AccountId" class="ob-id" />
+                                <input type="number" step="0.01" name="entries[@entryIndex].OpeningBalance"
+                                       value="@row.ManualOpeningBalance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                       data-original="@row.ManualOpeningBalance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                       class="form-control form-control-sm ob-input" aria-label="Opening balance of @row.AccountCode @row.AccountName" />
+                                entryIndex++;
                             }
                             else
                             {
@@ -148,7 +207,16 @@
             </tfoot>
         </table>
     </div>
+    @if (canEdit)
+    {
+        <div class="card-footer bg-white d-flex align-items-center gap-2 ob-savebar">
+            <button type="submit" class="btn btn-dark btn-sm" id="obSave">Save opening balances</button>
+            <span class="text-muted small" id="obChanged">No changes yet.</span>
+            <span class="ms-auto text-muted small">Totals and the balancing line are recalculated when you save.</span>
+        </div>
+    }
 </div>
+</form>
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -170,7 +238,7 @@
                     @foreach (var t in Model.TenantOpeningBalances.Where(x => x.OpeningBalance != 0m))
                     {
                         <tr>
-                            <td><code>@t.EntityCode</code></td>
+                            <td>@if (canEditMasterData) { <a asp-controller="Tenants" asp-action="Edit" asp-route-id="@t.EntityId" title="Edit the tenant's opening balance"><code>@t.EntityCode</code></a> } else { <code>@t.EntityCode</code> }</td>
                             <td>@t.EntityName</td>
                             <td class="text-end">@t.OpeningBalance.ToString("N2")</td>
                         </tr>
@@ -211,7 +279,7 @@
                     @foreach (var v in Model.VendorOpeningBalances.Where(x => x.OpeningBalance != 0m))
                     {
                         <tr>
-                            <td><code>@v.EntityCode</code></td>
+                            <td>@if (canEditMasterData) { <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@v.EntityId" title="Edit the vendor's opening balance"><code>@v.EntityCode</code></a> } else { <code>@v.EntityCode</code> }</td>
                             <td>@v.EntityName</td>
                             <td class="text-end">@v.OpeningBalance.ToString("N2")</td>
                         </tr>
@@ -256,7 +324,7 @@
                     @foreach (var fa in Model.FixedAssetOpeningBalances.Where(x => x.OpeningCost != 0m || x.OpeningAccumulatedDepreciation != 0m))
                     {
                         <tr>
-                            <td><code>@fa.AssetCode</code></td>
+                            <td><a asp-controller="FixedAssets" asp-action="Acquisition" asp-route-id="@fa.AssetId" title="Open the asset"><code>@fa.AssetCode</code></a></td>
                             <td>@fa.AssetName</td>
                             <td>@fa.AssetAccountDisplay</td>
                             <td>@fa.AccumulatedDepreciationAccountDisplay</td>
@@ -282,3 +350,42 @@
         <div class="card-body text-muted">No fixed asset opening balances captured.</div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('openingForm');
+            const status = document.getElementById('obChanged');
+            if (!form || !status) return;
+            const inputs = Array.from(form.querySelectorAll('.ob-input'));
+            const isChanged = i => (parseFloat(i.value || '0') || 0).toFixed(2) !== i.dataset.original;
+
+            function refresh() {
+                const changed = inputs.filter(isChanged);
+                inputs.forEach(i => i.classList.toggle('ob-changed', isChanged(i)));
+                status.textContent = changed.length === 0 ? 'No changes yet.' : changed.length + ' account(s) changed, not saved yet.';
+            }
+
+            inputs.forEach(i => i.addEventListener('input', refresh));
+            // Only the accounts that changed are sent, numbered from 0 so the list binds.
+            form.addEventListener('submit', function () {
+                let index = 0;
+                inputs.forEach(i => {
+                    const id = i.previousElementSibling;
+                    if (isChanged(i)) {
+                        id.name = 'entries[' + index + '].AccountId';
+                        i.name = 'entries[' + index + '].OpeningBalance';
+                        index++;
+                    } else {
+                        id.removeAttribute('name');
+                        i.removeAttribute('name');
+                    }
+                });
+            });
+            window.addEventListener('beforeunload', function (e) {
+                if (!form.dataset.submitting && inputs.some(isChanged)) { e.preventDefault(); e.returnValue = ''; }
+            });
+            form.addEventListener('submit', () => form.dataset.submitting = '1');
+        })();
+    </script>
+}
