@@ -883,11 +883,11 @@ namespace RealEstateManager.Services.Assistant
             return present.Count == 0 ? string.Empty : " - " + string.Join(", ", present);
         }
 
-        private static async Task<string?> JournalNumberAsync(ApplicationDbContext db, int? id) =>
+        internal static async Task<string?> JournalNumberAsync(ApplicationDbContext db, int? id) =>
             id.HasValue ? await db.JournalEntries.Where(x => x.Id == id.Value).Select(x => x.EntryNumber).FirstOrDefaultAsync() : null;
 
         /// <summary>The same words the closed-period lock uses, said before anything is prepared.</summary>
-        private static async Task<string?> ClosedPeriodMessageAsync(ApplicationDbContext db, DateTime date, string what)
+        internal static async Task<string?> ClosedPeriodMessageAsync(ApplicationDbContext db, DateTime date, string what)
         {
             var hit = await db.AccountingPeriods.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.IsClosed && x.StartDate <= date.Date && x.EndDate >= date.Date);

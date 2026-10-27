@@ -45,6 +45,7 @@ namespace RealEstateManager.Services.Assistant
                 .Concat(AssistantWriteTools.All())
                 .Concat(AssistantWriteTools.DataEntry())
                 .Concat(AssistantUnitTools.All())
+                .Concat(AssistantOperationTools.All())
                 .ToList();
 
         private readonly ApplicationDbContext _db;
@@ -594,6 +595,10 @@ namespace RealEstateManager.Services.Assistant
               and puts the company's own rents beside the market. Always give the sources with their dates, say whether the figures
               are asking or contracted rents, call them indicative, and point out units well below or above the market. If the user
               does not say the kind of unit, ask. Never present a web figure as the company's own data.
+            - Operations with their own guided entry: petty cash vouchers (propose_petty_cash_voucher), paying vendors
+              (propose_vendor_payment), renewing a contract (propose_renew_lease), posting rent invoices (propose_post_customer_invoices),
+              credit notes (propose_credit_note) and new properties (propose_create_property). Ask for what is missing, repeat it back, then propose.
+              Ending a contract early is not in the system yet: say so and do not try to imitate it with other entries.
             - Units: to add units to a property, use propose_create_units (one card for many units). Ask for the property, how many,
               the usage type, area and standard rent, and floors when they differ, then repeat them back before proposing.
             - Opening screens: when the user asks to open a screen, or prefers to finish an entry on the screen, use list_screens for the
