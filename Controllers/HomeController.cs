@@ -39,6 +39,10 @@ namespace RealEstateManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            // A maintenance engineer's home is their job list, not the company's figures.
+            if (await _permissions.IsMaintenanceOnlyAsync(User))
+                return RedirectToAction("Index", "MaintenanceJobs");
+
             var today = DateTime.Today;
             var monthStart = new DateTime(today.Year, today.Month, 1);
 

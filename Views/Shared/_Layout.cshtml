@@ -41,6 +41,8 @@
     var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
     var canHandleServiceRequests = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
     var canDoMaintenance = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.MaintenanceExecute);
+    // A maintenance engineer and nothing else: their jobs and the help, no company figures or subscription.
+    var isMaintenanceOnly = isAuthenticated && canDoMaintenance && await PermissionService.IsMaintenanceOnlyAsync(User);
     // Approvers see the queue in the menu with how many contracts wait for them (not their own).
     var canApproveContracts = isAuthenticated && currentCompanyId.HasValue
                               && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesApprove);
@@ -119,7 +121,7 @@
     <header>
         <nav class="navbar navbar-expand-xl navbar-dark bg-dark shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">RealEstateManager</a>
+                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">RealEstateManager</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                     <span class="navbar-toggler-icon"></span>
@@ -137,7 +139,7 @@
                     <ul class="navbar-nav me-auto mb-2 mb-xl-0">
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@(isMaintenanceOnly ? "My Jobs" : "Home")</a>
                         </li>
 
                         <li class="nav-item dropdown">
@@ -222,10 +224,13 @@
                                 @if (currentCompanyId.HasValue)
                                 {
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Subscription &amp; Help</h6></li>
+                                    <li><h6 class="dropdown-header">@(isMaintenanceOnly ? "Help" : "Subscription & Help")</h6></li>
+                                    @if (!isMaintenanceOnly)
+                                    {
                                     <li>
                                         <a class="dropdown-item" asp-controller="Subscription" asp-action="Index">Subscription</a>
                                     </li>
+                                    }
                                     <li>
                                         <a class="dropdown-item" asp-controller="Help" asp-action="Index">Help</a>
                                     </li>
@@ -235,9 +240,12 @@
                                     <li>
                                         <a class="dropdown-item" asp-controller="Help" asp-action="Training" target="_blank">Training Workbook</a>
                                     </li>
+                                    @if (!isMaintenanceOnly)
+                                    {
                                     <li>
                                         <a class="dropdown-item" asp-controller="Feedback" asp-action="Index">Send Feedback</a>
                                     </li>
+                                    }
                                 }
                             </ul>
                         </li>
@@ -604,6 +612,10 @@
         {
             @* The page shows the subscription itself (the dashboard's status note). *@
         }
+        else if (subscriptionBlocked && subscriptionStatus != null && isMaintenanceOnly)
+        {
+            <div class="alert alert-danger">The system is not available for <strong>@subscriptionStatus.CompanyName</strong> at the moment. Please contact your administrator.</div>
+        }
         else if (subscriptionBlocked && subscriptionStatus != null)
         {
             <div class="alert alert-danger">
@@ -618,7 +630,7 @@
                 <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
             </div>
         }
-        else if (subscriptionEndingSoon && subscriptionStatus != null)
+        else if (subscriptionEndingSoon && subscriptionStatus != null && !isMaintenanceOnly)
         {
             @* Warned in time: a customer should never first learn of the end date by being locked out. *@
             <div class="alert alert-warning">

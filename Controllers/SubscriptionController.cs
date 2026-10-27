@@ -17,6 +17,10 @@ namespace RealEstateManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(bool expired = false, string? returnUrl = null)
         {
+            // The subscription is the company's business, not the maintenance team's.
+            if (await HttpContext.RequestServices.GetRequiredService<PermissionService>().IsMaintenanceOnlyAsync(User))
+                return RedirectToAction("Index", "MaintenanceJobs");
+
             var companyId = User.GetRequiredCurrentCompanyId();
             var model = await _subscriptionService.BuildCurrentCompanyViewModelAsync(companyId, returnUrl);
             ViewBag.ExpiredMessage = expired;
@@ -27,6 +31,9 @@ namespace RealEstateManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Activate(string activationCode, string? returnUrl = null)
         {
+            if (await HttpContext.RequestServices.GetRequiredService<PermissionService>().IsMaintenanceOnlyAsync(User))
+                return RedirectToAction("Index", "MaintenanceJobs");
+
             var companyId = User.GetRequiredCurrentCompanyId();
 
             try
