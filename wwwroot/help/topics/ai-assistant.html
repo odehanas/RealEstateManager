@@ -41,9 +41,42 @@ duplicates, approvals &mdash; and shows a <strong>Please confirm</strong> card d
     change your accounts.</p>
 </div>
 
-<p>It can prepare: new tenants and vendors, customer receipts, clearing a post-dated cheque, draft manual journals,
-posting a draft journal, putting a draft contract forward for approval (or activating it when approval is not
-required), and replying to or updating a tenant service request.</p>
+<p>It can prepare, each with its own confirm card:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Area</th><th>Entries</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Master data</strong></td><td>New properties, units (many at once, codes generated), tenants and vendors</td></tr>
+        <tr><td><strong>Leasing</strong></td><td>A draft contract, renewing a contract (a new draft from the day after it ends), sending a draft for approval or activating it</td></tr>
+        <tr><td><strong>Receivables</strong></td><td>Receipts against invoices, receiving a set of post-dated cheques, clearing a cheque, posting a contract's draft rent invoices, a draft credit note</td></tr>
+        <tr><td><strong>Payables</strong></td><td>A draft vendor bill (with quantity and unit price), paying a vendor's open bills or an advance &mdash; payment approval limits still apply</td></tr>
+        <tr><td><strong>Cash and accounting</strong></td><td>Petty cash vouchers, draft manual journals, posting a draft journal</td></tr>
+        <tr><td><strong>Tenant requests</strong></td><td>Replying to or updating a tenant service request</td></tr>
+    </tbody>
+</table>
+<p>For each, it asks for anything missing, repeats the facts back, then shows the card. Ending a contract early is not
+in the system yet; the assistant says so.</p>
+
+<h3>Filling in the screen you are on</h3>
+<p>On any entry form &mdash; a new bill, contract, tenant, journal &mdash; say <em>"fill this in"</em> and give the
+details. The assistant reads the form, types the values (adding line rows if needed) and highlights them in yellow.
+It never saves: you check the fields and select the screen's own <strong>Save</strong>.</p>
+
+<h3>Opening a screen for you</h3>
+<p>Ask <em>"Open a new unit for Marina Heights, 7th floor, 1,250 sq ft, rent 82,000"</em>. The assistant opens the screen
+from your menu with those fields filled in; a yellow banner says what was filled and anything it could not find. Opening
+a page ends the conversation, so the assistant asks its questions first. It only opens this system's own screens that
+your permissions allow.</p>
+
+<h3>Reading a scanned invoice</h3>
+<p>Select the <strong>paperclip</strong> and choose a supplier invoice (PDF or photo). The assistant reads it, repeats
+the supplier, number, date, lines and total with any warnings, and either fills the bill form you are on or prepares a
+draft bill for you to confirm.</p>
+
+<h3>Market rent benchmark</h3>
+<p>Ask <em>"What is the market rent for a 2-bedroom apartment on Al Marjan Island?"</em>. The assistant searches the web
+and returns the typical rent, the range, the rent per sq ft, whether the figures are <strong>asking</strong> or
+<strong>contracted</strong> rents, and every source with its date &mdash; beside <strong>your own</strong> rents for the
+same kind of unit there and the gap in percent. The figures are indicative. A search is kept for a day.</p>
 
 <h3>What it will not do</h3>
 <ul>
@@ -57,3 +90,5 @@ required), and replying to or updating a tenant service request.</p>
 <p>Your questions, and the records the assistant reads to answer them, are sent to OpenAI to produce the reply.
 OpenAI does not use data sent through its business API to train its models. Passwords and sign-in details are never
 sent. The conversation and every confirmed action are kept in the system's audit records.</p>
+<p>A scanned invoice, Emirates ID or passport you upload is sent to OpenAI to be read. A market rent search sends only
+the place and the kind of unit &mdash; never a tenant, contract or company figure.</p>

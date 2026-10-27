@@ -1,0 +1,93 @@
+<p>Maintenance requests raised by tenants are worked as <strong>jobs</strong> by the maintenance team. Each job records
+who did it, when it was answered, started and finished, and the materials it used. The owner follows the whole
+operation on the <strong>Maintenance Dashboard</strong>.</p>
+
+<h3>Setting up the maintenance team</h3>
+<ol class="steps">
+    <li>Open <span class="path">System Setup ▸ Users &amp; Permissions</span> and select <strong>New User</strong> for the
+        maintenance engineer or technician.</li>
+    <li>Under <strong>Role</strong>, select <strong>Maintenance Engineer / Technician</strong>. This ticks only the
+        permission <strong>Carry Out Maintenance Jobs</strong>.</li>
+    <li>Grant access to the company and <strong>Save</strong>.</li>
+</ol>
+<p>From then on, every new maintenance request from a tenant is assigned to a maintenance user automatically. With
+more than one, the job goes to the one with the fewest open jobs. If nobody has the permission yet, jobs wait
+unassigned and the Maintenance Jobs screen says so.</p>
+
+<h3>What the maintenance user sees</h3>
+<p><span class="path">Operations ▸ Tenant Services ▸ My Maintenance Jobs</span></p>
+<p>A maintenance user sees <strong>only the jobs assigned to them</strong> &mdash; not the accounts, not other
+requests, and not other technicians' jobs. The list opens on the <strong>Open</strong> jobs, worst first (Urgent,
+then High, then oldest); <strong>Done</strong> and <strong>All</strong> show the rest. The age turns red once a job is
+past its target time.</p>
+
+<h3>Working a job</h3>
+<ol class="steps">
+    <li>Open the job. The card shows what the tenant asked, the unit, the tenant's phone number, the preferred visit
+        date and the timeline.</li>
+    <li>Select <strong>Acknowledge &mdash; I have seen it</strong>. This is the first response the dashboard measures.</li>
+    <li>Select <strong>Start work</strong> when you begin. (Starting also counts as the first response if you skipped
+        acknowledging.)</li>
+    <li>Record the <strong>materials</strong> used, as below, and add <strong>messages</strong> as you go. Notes are
+        <em>internal</em> by default; untick the box for a message the tenant should read.</li>
+    <li>Write <strong>What was done</strong> and select <strong>Mark as done</strong>. The tenant reads this text in the
+        portal.</li>
+</ol>
+<p>A supervisor &mdash; anyone with <strong>Handle Tenant Requests</strong> &mdash; sees every job, can
+<strong>Assign</strong> it to another technician, <strong>Reopen</strong> it, and <strong>Close the job</strong> once
+nothing more is expected. A technician cannot close a job.</p>
+
+<h3>Materials</h3>
+<p>Under <strong>Materials used</strong>, enter the item, quantity and unit cost, and where it came from:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:24%">From</th><th>What happens</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Maintenance store</strong></td><td>Taken from the items you keep for maintenance. The cost is posted
+            at once out of account <code>11650</code> Maintenance Materials Stock.</td></tr>
+        <tr><td><strong>Bought for the job</strong></td><td>Give the bill or petty cash receipt number it was bought on. The
+            item is recorded against the job; its cost is booked by that bill or voucher.</td></tr>
+    </tbody>
+</table>
+<p>Who bears the cost depends on the property:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>21500 Due to Landlords (managed property &mdash; the owner bears it)<br/>or 52100 Property Maintenance (owned property)</td><td class="num dr">Amount</td><td class="num">&mdash;</td></tr>
+        <tr><td>11650 Maintenance Materials Stock</td><td class="num">&mdash;</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p>The entry carries the property and unit, so the cost shows on the owner's statement and in
+<a href="#owner-reports">Owner Property Profitability</a>.</p>
+
+<div class="box">
+    <div class="box-title">The maintenance store is a control account, not an inventory system</div>
+    <p>Buy stock for the store with a <a href="#vendor-bills">vendor bill</a> (or petty cash) charged to account
+    <code>11650</code>. Items taken out for jobs reduce it. The balance is shown on the Maintenance Dashboard; a negative
+    balance means items were issued before their purchase was booked.</p>
+</div>
+
+<h3>Target times</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Priority</th><th>First response within</th><th>Done within</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Urgent</strong></td><td>2 hours</td><td>24 hours</td></tr>
+        <tr><td><strong>High</strong></td><td>8 hours</td><td>3 days</td></tr>
+        <tr><td><strong>Normal</strong></td><td>24 hours</td><td>5 days</td></tr>
+        <tr><td><strong>Low</strong></td><td>2 days</td><td>10 days</td></tr>
+    </tbody>
+</table>
+
+<h3>The Maintenance Dashboard</h3>
+<p><span class="path">Controls ▸ Maintenance Dashboard</span> &mdash; for the owner (Owner Oversight), supervisors
+and report viewers.</p>
+<p>Choose a <strong>From</strong> and <strong>To</strong> date (the last 90 days by default) and, if you like, one
+technician. It covers the jobs raised in the period and every job still open:</p>
+<ul>
+    <li><strong>Jobs received</strong>, how many are done and declined.</li>
+    <li><strong>Still open</strong>, how many are past their target and how many are unassigned.</li>
+    <li><strong>Average first response</strong> &mdash; from the request to the engineer acknowledging it.</li>
+    <li><strong>Average time to complete</strong>, and the share done within target.</li>
+    <li><strong>Materials used</strong> and the <strong>maintenance store</strong> balance.</li>
+    <li>The open jobs, worst first, and breakdowns <strong>by technician</strong>, <strong>by property</strong> and
+        <strong>by kind of job</strong>.</li>
+</ul>

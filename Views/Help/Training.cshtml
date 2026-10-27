@@ -881,6 +881,153 @@
     </div>
 </section>
 
+
+@* =========================================================== 8 MAINTENANCE, OWNERS, DOCUMENTS *@
+<section class="section" id="m8">
+    <span class="section-tag">Module 8</span>
+    <h2>Maintenance, owners and documents</h2>
+    <p class="intro">The maintenance team and the owner's maintenance dashboard, invoicing a managed property in the owner's name,
+    keeping tenants' and contracts' documents with their expiry, and letting the system read scanned papers for you.</p>
+
+    <div class="scenario" id="t32">
+        <div class="scenario-head"><span class="id">T32</span><h3>Set up the maintenance team and complete a job</h3></div>
+        <div class="facts"><span><b>Role:</b> Administrator, then maintenance engineer, then supervisor</span><span><b>Menu:</b> System Setup ▸ Users · Operations ▸ My Maintenance Jobs</span><span><b>Time:</b> 25 min</span></div>
+        <ol class="steps">
+            <li>As administrator, open <span class="btn">New User</span>: username <strong>maint1</strong>, display name "Ali (Maintenance)". Under Role select <span class="btn">Maintenance Engineer / Technician</span>, grant the practice company, <span class="btn">Save</span>.</li>
+            <li>Sign in to the tenant portal as Sara Ahmed (your trainer gives you the login). <span class="btn">New request</span>: Maintenance / repair, "Kitchen tap leaking", priority Normal, for Palm Residences Apartment 704. Send it.</li>
+            <li>Sign in as <strong>maint1</strong>. Only <span class="path">Operations ▸ Tenant Services ▸ My Maintenance Jobs</span> is in the menu, and the new job is in the list.</li>
+            <li>Open the job. Select <span class="btn">Acknowledge — I have seen it</span>, then <span class="btn">Start work</span>.</li>
+            <li>Add material from the <strong>maintenance store</strong>: "Tap cartridge 35mm", qty <strong>2</strong>, unit cost <strong>45</strong>. Add a second item <strong>bought for the job</strong>: "Flexible hose", qty 1, cost 30 — first without a receipt number (refused), then with receipt PC-T32.</li>
+            <li>Write "Replaced the tap cartridge and the hose; no more leak." and select <span class="btn">Mark as done</span>.</li>
+            <li>Sign in as a supervisor (Handle Tenant Requests), open the job from <span class="path">Operations ▸ Maintenance Jobs</span> and select <span class="btn">Close the job</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The job was assigned to Ali automatically. The timeline shows the request, first response, start and resolution times. The store item posted Dr 52100 Property Maintenance (Palm Residences) 90 · Cr 11650 Maintenance Materials Stock 90; the bought hose has no entry of its own (its receipt books it). Sara sees "Replaced the tap cartridge…" in her portal. Ali cannot close the job.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t33">
+        <div class="scenario-head"><span class="id">T33</span><h3>Maintenance on hold for a tenant with an overdue invoice</h3></div>
+        <div class="facts"><span><b>Role:</b> Leasing officer / accountant</span><span><b>Menu:</b> Tenant portal · Operations ▸ Customer Receipts</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>Check that Omar Haddad has a posted invoice past its due date and not paid (your trainer sets one up if needed).</li>
+            <li>In the portal as Omar, open <span class="btn">New request</span>. A yellow notice says maintenance requests are on hold, with the amount overdue. Try to send a maintenance request anyway: it is refused with the same reason.</li>
+            <li>Send a request for <strong>more time to pay</strong> instead: it goes through.</li>
+            <li>Record a receipt for the overdue invoice in full (T7).</li>
+            <li>Back in the portal, open <span class="btn">New request</span> again and send the maintenance request.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The hold appears only while money is overdue (or a returned cheque is not replaced) and lifts by itself once the receipt is posted. Staff can still raise a request for the tenant.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t34">
+        <div class="scenario-head"><span class="id">T34</span><h3>Read the Maintenance Dashboard</h3></div>
+        <div class="facts"><span><b>Role:</b> Owner / supervisor</span><span><b>Menu:</b> Controls ▸ Maintenance Dashboard</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>Open the dashboard for the last 90 days.</li>
+            <li>Read the cards: jobs received, still open (and past target, unassigned), average first response, average time to complete, the share done within target, materials used and the maintenance store balance.</li>
+            <li>Choose technician <strong>Ali (Maintenance)</strong> and <span class="btn">Show</span>.</li>
+            <li>Look at <strong>By property</strong>: Palm Residences shows the 90 of materials from T32.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            T32's job counts as done within target (Normal: respond within 24 h, done within 5 days). The store balance is negative by 90 if no stock purchase has been booked yet — book one with a vendor bill to account 11650 and it turns positive.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t35">
+        <div class="scenario-head"><span class="id">T35</span><h3>Invoice a managed property in the owner's name</h3></div>
+        <div class="facts"><span><b>Role:</b> Master data owner, then accountant</span><span><b>Menu:</b> Master Data ▸ Properties · Operations ▸ Customer Invoices</span><span><b>Time:</b> 15 min</span></div>
+        <ol class="steps">
+            <li>Open Garden Villas (managed, landlord Khalid Rahman) in edit. Leave Owner TRN empty, tick <strong>Invoice tenants in the owner's name</strong> and <span class="btn">Save</span>.</li>
+            <li>Post the next draft rent invoice of the Garden Villas contract (from T3) and open it with <span class="btn">Tax Invoice</span>.</li>
+            <li>Open the <span class="path">Reporting ▸ VAT Return</span> for the invoice's quarter.</li>
+            <li>Your trainer shows the same on a commercial managed property whose owner has a TRN.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The document names Khalid Rahman as supplier, "c/o" the company, with the note that the company issues it as agent; as he has no TRN it is a plain invoice with no VAT. The invoice is not on the company's VAT return. For an owner with a TRN: 5% VAT, a number like OTI-&lt;property&gt;-2026-0001, and the VAT credited to 21500 Due to Landlords instead of 21400 VAT Payable.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t36">
+        <div class="scenario-head"><span class="id">T36</span><h3>The owner's results: statement and profitability</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant / owner</span><span><b>Menu:</b> Operations ▸ Owner Settlements · Reporting ▸ Owner Property Profitability</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>Take a store item for a Garden Villas maintenance job (as in T32): "AC capacitor", qty 1, cost 120. The job card says it is charged to the owner.</li>
+            <li>Open the Owner Settlements statement for Khalid Rahman.</li>
+            <li>Open <span class="path">Reporting ▸ Owner Property Profitability</span> for the year to date.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The material posted Dr 21500 Due to Landlords · Cr 11650 120, tagged to Garden Villas. The statement lists it under "maintenance and expenses charged to the owner" and the owner's share is 120 lower. The profitability report shows Garden Villas' rent, our 5% commission, its VAT, the 120 of costs, the owner's net income and margin — and our commission as the company's income.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t37">
+        <div class="scenario-head"><span class="id">T37</span><h3>Keep a tenant's Emirates ID and passport</h3></div>
+        <div class="facts"><span><b>Role:</b> Master data owner</span><span><b>Menu:</b> Master Data ▸ Tenants · Master Data ▸ Document Expiry</span><span><b>Time:</b> 15 min</span></div>
+        <ol class="steps">
+            <li>Open Sara Ahmed in edit and go to <strong>Tenant documents</strong> at the bottom.</li>
+            <li>Upload a scan or photo of an Emirates ID (your trainer provides a sample): type Emirates ID, leave number and dates empty, keep <strong>Read the Emirates ID / passport</strong> ticked, <span class="btn">Upload</span>.</li>
+            <li>Read the message, then look at the EID expiry field on the form.</li>
+            <li>Upload a passport with reading switched off: number P1234567, expiry a date last month.</li>
+            <li>Open <span class="path">Master Data ▸ Document Expiry</span>.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The ID number (if Sara had none), the expiry date and nationality were filled in; a different number already on file is reported, not overwritten. The passport expiry shows in red as expired on the form, and Sara's passport heads the Document Expiry list as expired.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t38">
+        <div class="scenario-head"><span class="id">T38</span><h3>Attach the attested contract</h3></div>
+        <div class="facts"><span><b>Role:</b> Leasing officer</span><span><b>Menu:</b> Master Data ▸ Leases</span><span><b>Time:</b> 5 min</span></div>
+        <ol class="steps">
+            <li>Open the contract from T1. Under <strong>Contract documents</strong> it says no attested contract is on file.</li>
+            <li>Upload the PDF of the contract attested by the municipality: type "Attested contract (Municipality)", number RAK-ATT-T38.</li>
+            <li>Open Document Expiry again.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The warning is gone and the count of running contracts without an attested copy is one lower.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t39">
+        <div class="scenario-head"><span class="id">T39</span><h3>Read a scanned supplier invoice</h3></div>
+        <div class="facts"><span><b>Role:</b> Accountant</span><span><b>Menu:</b> Operations ▸ Vendor Bills ▸ New</span><span><b>Time:</b> 10 min</span></div>
+        <ol class="steps">
+            <li>On <span class="btn">New Vendor Bill</span>, use <strong>Read a scanned invoice</strong> with a supplier invoice from Coastal Facility Services (your trainer provides the PDF). <span class="btn">Read invoice</span>.</li>
+            <li>Compare every field with the document: supplier, their number, dates, each line's description, quantity and unit price, VAT, and the figures in the blue panel.</li>
+            <li>Choose any missing account, <span class="btn">Save Draft</span>, then post it.</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            The bill's totals equal the invoice's. Warnings explain anything that differs (a discount line, an unknown supplier). Nothing is saved until you save.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t40">
+        <div class="scenario-head"><span class="id">T40</span><h3>Let the AI Assistant do the typing (optional)</h3></div>
+        <div class="facts"><span><b>Role:</b> Any user with the assistant</span><span><b>Menu:</b> Assistant button</span><span><b>Time:</b> 15 min</span></div>
+        <ol class="steps">
+            <li>Open the assistant: "Record a petty cash voucher of 150 for cleaning materials, paid to Al Noor Supermarket, receipt R-5531, property Marina Heights." Check the card and <span class="btn">Confirm</span>.</li>
+            <li>Open a New Vendor Bill, then ask: "Fill this in for Coastal Facility Services, invoice CFS-9, 12 AC filters at 150." Check the yellow fields and save it yourself.</li>
+            <li>Select the paperclip and attach the invoice from T39: the assistant repeats what it read.</li>
+            <li>Ask: "Open a new unit for Marina Heights, 7th floor, 1,250 sq ft, rent 82,000."</li>
+            <li>Ask: "What is the market rent for a 2-bedroom apartment in Al Marjan Island?"</li>
+        </ol>
+        <div class="expect"><strong>Expected result</strong>
+            Only a click on Confirm or on the screen's Save button saves anything. The market rent answer gives sources with dates beside your own rents for the same kind of unit.
+        </div>
+        <div class="signoff"><span><i class="box"></i>Done</span><span>Trainee: ____________</span><span>Trainer: ____________</span><span>Date: ________</span></div>
+    </div>
+</section>
+
 @* =========================================================== APPENDICES *@
 <section class="section" id="a1">
     <span class="section-tag">Appendix A</span>
@@ -896,6 +1043,11 @@
         <tr><td>"The most that can be paid to … is …"</td><td>The landlord payment exceeds the balance.</td><td>Pay no more than the balance shown.</td></tr>
         <tr><td>I saved it but it is not in the Trial Balance</td><td>It is a draft.</td><td>Post it from Journal Inquiry (0.3).</td></tr>
         <tr><td>Reset to Draft is refused</td><td>Something depends on it (a receipt, a payment, a cleared cheque) or the month is closed.</td><td>Reset the later item first, or post a correcting journal.</td></tr>
+        <tr><td>"Maintenance requests are on hold for your account…"</td><td>The tenant has an overdue invoice or a returned cheque not replaced.</td><td>Collect the money or the replacement cheque; the hold lifts by itself (T33).</td></tr>
+        <tr><td>"No user carries out maintenance jobs yet"</td><td>Nobody has the Maintenance Engineer role, so jobs wait unassigned.</td><td>Create the maintenance user (T32); assign waiting jobs from the job card.</td></tr>
+        <tr><td>"Give the bill or receipt number the item was bought on"</td><td>A material bought for a job needs its bill or receipt.</td><td>Enter the bill or petty cash receipt number.</td></tr>
+        <tr><td>"No vendor matched … Select the supplier, or create it first"</td><td>The scanned invoice's supplier is not in Vendors.</td><td>Choose the supplier, or create the vendor and read the invoice again.</td></tr>
+        <tr><td>"Check: the document reads …, but the tenant record has …"</td><td>The Emirates ID or passport number on the scan differs from the tenant's.</td><td>Check which is right and correct the tenant if needed.</td></tr>
         <tr><td>A red light in the Closing Cockpit</td><td>A process for the month has not reached the ledger.</td><td>Use the line's Run button or open the screen named beside it.</td></tr>
     </table></div>
 </section>

@@ -97,3 +97,15 @@ month posted after its invoice run) is picked up by the next run. A company with
 <p>Find the settlement's journal in <span class="path">Operations ▸ Journal Inquiry</span> (source <em>OwnerSettlement</em>)
 and reset it to draft. A draft settlement no longer counts as paid, but still holds back the amount until it is posted
 again, so nothing is paid twice by mistake.</p>
+
+<h3>Rent invoiced in the owner's name, and costs charged to the owner</h3>
+<p>Two lines can appear between the commission and the owner's share:</p>
+<ul>
+    <li><strong>Add: VAT on rent invoiced in the owner's name</strong> &mdash; for a property set to
+        <a href="#properties">invoice tenants in the owner's name</a>, the VAT collected from tenants belongs to the
+        owner, who declares and pays it to the FTA. It is passed on with the rent.</li>
+    <li><strong>Less: maintenance and expenses charged to the owner</strong> &mdash; materials taken from the maintenance
+        store for the owner's units (see <a href="#maintenance-jobs">Maintenance Jobs</a>), and other costs booked to
+        Due to Landlords for the owner's properties. Each is listed with its date, property and entry.</li>
+</ul>
+<p>The amount that may be paid to the owner follows: it can never exceed the owner's share after these lines.</p>

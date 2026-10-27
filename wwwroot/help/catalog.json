@@ -38,7 +38,8 @@
         { "key": "units", "title": "Units", "path": "Master Data ▸ Units", "summary": "The rentable spaces inside a property.", "screens": ["Units"] },
         { "key": "tenants", "title": "Tenants", "path": "Master Data ▸ Tenants", "summary": "The tenant register, identifiers and opening balances.", "screens": ["Tenants"] },
         { "key": "vendors", "title": "Vendors", "path": "Master Data ▸ Vendors", "summary": "Suppliers, their TRN and whether they may charge VAT.", "screens": ["Vendors"] },
-        { "key": "leases", "title": "Lease Contracts", "path": "Master Data ▸ Leases", "summary": "Contracts, approval in two levels, contract codes, VAT, the invoice schedule and the printed contract.", "screens": ["Leases", "Approvals"] }
+        { "key": "leases", "title": "Lease Contracts", "path": "Master Data ▸ Leases", "summary": "Contracts, approval in two levels, contract codes, VAT, the invoice schedule, the printed contract and the attested copy.", "screens": ["Leases", "Approvals"] },
+        { "key": "document-expiry", "title": "Document Expiry", "path": "Master Data ▸ Document Expiry", "summary": "Expired and expiring Emirates IDs, passports, contract and property documents, and contracts without an attested copy.", "screens": ["RecordDocuments"] }
       ]
     },
     {
@@ -61,7 +62,8 @@
         { "key": "fixed-assets", "title": "Fixed Assets & Depreciation", "path": "Operations ▸ Fixed Assets", "summary": "Acquisition costs, capitalisation and monthly depreciation.", "screens": ["FixedAssets"] },
         { "key": "manual-journals", "title": "Manual Journals", "path": "Operations ▸ Manual Journals", "summary": "Adjustments, accruals, corrections and owner drawings.", "screens": ["ManualJournals"] },
         { "key": "journal-inquiry", "title": "Journal Inquiry", "path": "Operations ▸ Journal Inquiry", "summary": "Finding journals, posting drafts and resetting posted entries.", "screens": ["Journal.Index", "Journal.Post", "Journal.ResetToDraft", "Journal.PostAllDrafts"] },
-        { "key": "tenant-requests", "title": "Tenant Requests", "path": "Operations ▸ Tenant Requests", "summary": "Answering maintenance, payment postponement and other tenant requests.", "screens": ["ServiceRequests"] }
+        { "key": "tenant-requests", "title": "Tenant Requests", "path": "Operations ▸ Tenant Requests", "summary": "Answering maintenance, payment postponement and other tenant requests; the payment hold on maintenance.", "screens": ["ServiceRequests"] },
+        { "key": "maintenance-jobs", "title": "Maintenance Jobs & Dashboard", "path": "Operations ▸ Tenant Services ▸ Maintenance Jobs", "summary": "The maintenance team's jobs, materials used, target times and the owner's maintenance dashboard.", "screens": ["MaintenanceJobs"] }
       ]
     },
     {
@@ -72,13 +74,13 @@
         { "key": "profit-and-loss", "title": "Profit & Loss", "path": "Reporting ▸ Profit & Loss", "summary": "Revenue less expenses for the year to date.", "screens": ["Reports.ProfitAndLoss"] },
         { "key": "balance-sheet", "title": "Balance Sheet", "path": "Reporting ▸ Balance Sheet", "summary": "Assets, liabilities and equity at a date.", "screens": ["Reports.BalanceSheet"] },
         { "key": "cash-flow", "title": "Statement of Cash Flows", "path": "Reporting ▸ Statement of Cash Flows", "summary": "Cash in and out by operating, investing and financing activity (IAS 7).", "screens": ["Reports.CashFlow"] },
-        { "key": "general-ledger", "title": "General Ledger, Tenant & Vendor Statements", "path": "Reporting ▸ General Ledger", "summary": "Movement on one account, one tenant's running account, and one supplier's account.", "screens": ["Journal.GeneralLedger", "TenantStatements", "VendorStatements"] },
+        { "key": "general-ledger", "title": "General Ledger, Tenant & Vendor Statements", "path": "Reporting ▸ General Ledger", "summary": "Movement on one account, one tenant's running account, and one supplier's account.", "screens": ["Journal.GeneralLedger", "TenantStatements", "VendorStatements", "Reports.GeneralJournal", "Documents"] },
         { "key": "investment-property", "title": "Investment Property Note", "path": "Reporting ▸ Investment Property Note", "summary": "Cost model: carrying amount movement, depreciation and fair values by property (IAS 40).", "screens": ["InvestmentProperty"] },
         { "key": "real-estate-vat", "title": "Real Estate VAT", "path": "Operations ▸ Capital Assets Scheme (VAT)", "summary": "Zero-rated first supplies of new residential units, exempt later ones, and the ten-year Capital Assets Scheme.", "screens": ["CapitalAssetVat"] },
         { "key": "vat-return", "title": "VAT Return", "path": "Reporting ▸ VAT Return", "summary": "Output and input tax for a tax period, and the annual wash-up.", "screens": ["Reports.VatReturn"] },
         { "key": "building-view", "title": "Building View", "path": "Reporting ▸ Building View", "summary": "Each building drawn floor by floor, units coloured by rent health; select a unit for its details.", "screens": ["BuildingView"] },
         { "key": "management-reports", "title": "Tenant & Property Reports", "path": "Reporting ▸ Management — Tenants & Properties", "summary": "P&L by property, property utilization, tenant health and ranking.", "screens": ["Reports.ProfitAndLossByProperty", "Reports.PropertyUtilization", "Reports.TenantHealth"] },
-        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule and owner withdrawals.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals"] }
+        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule, owner withdrawals and owner property profitability.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals", "Reports.OwnerProfitability"] }
       ]
     },
     {

@@ -81,3 +81,20 @@ and deleting needs <em>Create &amp; Edit Master Data</em>; anyone who can view p
     <p>If you can see the list but not the <strong>Add</strong> and <strong>Edit</strong> buttons, your account has
     <em>View Master Data</em> only. Ask the master data owner to make the change.</p>
 </div>
+
+<h3>Invoicing tenants in the owner's name (managed properties)</h3>
+<p>Some owners want the tenants' invoices issued in <strong>their</strong> name, with the company acting as their
+managing agent. Tick <strong>Invoice tenants in the owner's name</strong> on a managed property (under the Owner TRN).
+It is off by default and applies to contracts and invoices posted after it is switched on.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:30%"></th><th>Owner with a TRN</th><th>Owner without a TRN</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Supplier on the invoice</strong></td><td colspan="2">The owner, "c/o" the company, with a note that the company issues it as agent and that paying the company settles it</td></tr>
+        <tr><td><strong>VAT on the rent</strong></td><td>Charged as usual (commercial 5%)</td><td>None &mdash; the owner cannot charge VAT; the document is a plain invoice</td></tr>
+        <tr><td><strong>Document number</strong></td><td>The owner's own series: <code>OTI-&lt;property&gt;-&lt;year&gt;-0001</code></td><td>The invoice number</td></tr>
+        <tr><td><strong>Where the VAT goes</strong></td><td colspan="2">To 21500 Due to Landlords &mdash; it is the owner's to declare. It is left out of the company's VAT return and e-invoicing.</td></tr>
+        <tr><td><strong>Our commission</strong></td><td colspan="2">Unchanged: invoiced to the owner as a tax invoice under the company's TRN (see <a href="#owner-settlements">Owner Settlements</a>)</td></tr>
+    </tbody>
+</table>
+<p>The owner's statement adds the VAT collected for them, and <a href="#owner-reports">Owner Property Profitability</a>
+shows it in its own column.</p>

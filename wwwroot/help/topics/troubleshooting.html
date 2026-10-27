@@ -92,6 +92,24 @@ opening balances.</p>
     <li>Confirm the tenant's opening balance was entered on the tenant record, not on the AR account.</li>
 </ol>
 
+<h3>A tenant cannot request maintenance</h3>
+<p>The tenant has an overdue invoice or a returned cheque not yet replaced, so maintenance requests are on hold. The
+portal tells them the amount. Once the money is received or the cheque replaced, the hold lifts by itself. See
+<a href="#tenant-requests">Tenant Requests</a>.</p>
+
+<h3>New maintenance jobs are not assigned to anyone</h3>
+<p>No user has <strong>Carry Out Maintenance Jobs</strong> in this company. Give the maintenance engineer the
+<strong>Maintenance Engineer / Technician</strong> role &mdash; see <a href="#maintenance-jobs">Maintenance Jobs</a>.
+A supervisor can assign waiting jobs from the job card.</p>
+
+<h3>A tenant is told "Invalid username or password"</h3>
+<p>Check the username and that portal access is active on the tenant's <strong>Portal Access</strong> page; reset the
+password there if needed. Tenants can sign in on the main Login page or the portal address.</p>
+
+<h3>A scanned invoice or ID could not be read</h3>
+<p>Reading uses the AI Assistant's OpenAI service. If it is not switched on, or the scan is unclear, enter the details
+by hand. A blurred photo, a password-protected PDF or a file over the size limit cannot be read.</p>
+
 <h3>After an update, a screen shows a database error</h3>
 <p>A message such as <em>"Invalid column name"</em> or <em>"Invalid object name"</em> right after a new version
 means a database change was not applied. Database changes now apply themselves when the site starts.</p>
