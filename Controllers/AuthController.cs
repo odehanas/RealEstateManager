@@ -125,7 +125,10 @@ namespace RealEstateManager.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(
+            LoginViewModel model,
+            [FromServices] TenantPortalAuthService tenantPortal,
+            [FromServices] EmployeePortalService employeePortal)
         {
             if (!ModelState.IsValid)
             {
@@ -135,6 +138,25 @@ namespace RealEstateManager.Controllers
             var (user, error) = await _appAuthService.ValidateCredentialsAsync(model.Username, model.Password);
             if (user == null)
             {
+                // Tenants and employees have their own portals (/portal and /me). One who
+                // signs in here with their portal password is taken to their portal rather
+                // than told the password is wrong. Each portal keeps its own lockout.
+                var tenant = await tenantPortal.SignInAsync(model.Username, model.Password);
+                if (tenant.Success)
+                {
+                    return tenant.MustChangePassword
+                        ? RedirectToAction("ChangePassword", "PortalAccount")
+                        : RedirectToAction("Index", "Portal");
+                }
+
+                var (isEmployee, _, employeeMustChange) = await employeePortal.SignInAsync(model.Username, model.Password);
+                if (isEmployee)
+                {
+                    return employeeMustChange
+                        ? RedirectToAction("ChangePassword", "SelfServiceAccount")
+                        : RedirectToAction("Index", "SelfService");
+                }
+
                 ModelState.AddModelError(string.Empty, error ?? "Invalid username or password.");
                 return View(model);
             }
