@@ -27,6 +27,7 @@ namespace RealEstateManager.Services
         private const string VideosPath = "help/videos/videos.json";
 
         private readonly IWebHostEnvironment _environment;
+        private readonly Localization.UiText _text;
         private readonly ConcurrentDictionary<string, (DateTimeOffset TopicStamp, DateTimeOffset ShotsStamp, DateTimeOffset VideosStamp, string Html)> _contentCache =
             new(StringComparer.OrdinalIgnoreCase);
 
@@ -42,10 +43,18 @@ namespace RealEstateManager.Services
         private Dictionary<string, HelpVideo> _videos = new(StringComparer.OrdinalIgnoreCase);
         private DateTimeOffset _videosStamp = DateTimeOffset.MinValue;
 
-        public HelpCatalogService(IWebHostEnvironment environment)
+        public HelpCatalogService(IWebHostEnvironment environment, Localization.UiText text)
         {
             _environment = environment;
+            _text = text;
         }
+
+        /// <summary>
+        /// Screenshot captions, call-outs and video titles come from the capture tools in
+        /// English; in Arabic they are looked up in the dictionary like the screens' text.
+        /// </summary>
+        private string Tr(string? english) =>
+            string.IsNullOrEmpty(english) || !Localization.UiLanguages.IsArabic ? english ?? string.Empty : _text[english];
 
         public IReadOnlyList<HelpGroup> Groups => Catalog.Groups;
 
@@ -59,7 +68,8 @@ namespace RealEstateManager.Services
         {
             get
             {
-                var stamp = _environment.WebRootFileProvider.GetFileInfo(CatalogPath).LastModified;
+                var stamp = _environment.WebRootFileProvider.GetFileInfo(CatalogPath).LastModified
+                            + (_environment.WebRootFileProvider.GetFileInfo("help/catalog.ar.json").LastModified - DateTimeOffset.MinValue);
                 if (stamp == _catalogStamp)
                     return _catalog;
 
@@ -245,7 +255,53 @@ namespace RealEstateManager.Services
                 catalog.Groups.Add(group);
             }
 
+            ApplyArabic(catalog);
             return catalog;
+        }
+
+        /// <summary>
+        /// Arabic titles, menu paths and summaries from help/catalog.ar.json:
+        /// { "groups": { key: title }, "topics": { key: { "title", "path", "summary" } } }.
+        /// A topic without them keeps its English.
+        /// </summary>
+        private void ApplyArabic(HelpCatalog catalog)
+        {
+            var file = _environment.WebRootFileProvider.GetFileInfo("help/catalog.ar.json");
+            if (!file.Exists)
+                return;
+
+            using var stream = file.CreateReadStream();
+            var raw = JsonSerializer.Deserialize<RawArabicCatalog>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (raw == null)
+                return;
+
+            foreach (var group in catalog.Groups)
+            {
+                if (raw.Groups.TryGetValue(group.Key, out var title))
+                    group.TitleAr = title;
+                foreach (var topic in group.Topics)
+                {
+                    topic.GroupTitleAr = group.TitleAr;
+                    if (!raw.Topics.TryGetValue(topic.Key, out var ar))
+                        continue;
+                    topic.TitleAr = ar.Title;
+                    topic.PathAr = ar.Path;
+                    topic.SummaryAr = ar.Summary;
+                }
+            }
+        }
+
+        private sealed class RawArabicCatalog
+        {
+            public Dictionary<string, string> Groups { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, RawArabicTopic> Topics { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+        }
+
+        private sealed class RawArabicTopic
+        {
+            public string? Title { get; set; }
+            public string? Path { get; set; }
+            public string? Summary { get; set; }
         }
 
         /// <summary>
@@ -255,7 +311,13 @@ namespace RealEstateManager.Services
         /// </summary>
         private string RawTopicHtml(string key)
         {
-            var file = _environment.WebRootFileProvider.GetFileInfo($"help/topics/{key}.html");
+            // In Arabic, help/topics/ar/<key>.html when it has been translated.
+            var arabic = Localization.UiLanguages.IsArabic
+                ? _environment.WebRootFileProvider.GetFileInfo($"help/topics/ar/{key}.html")
+                : null;
+            var file = arabic is { Exists: true } ? arabic : _environment.WebRootFileProvider.GetFileInfo($"help/topics/{key}.html");
+            // Keyed by language, because the screenshots' and videos' words follow it too.
+            var cacheKey = Localization.UiLanguages.IsArabic ? "ar:" + key : key;
             if (!file.Exists)
                 return "<p class=\"text-muted\">This help topic has not been written yet.</p>";
 
@@ -267,7 +329,7 @@ namespace RealEstateManager.Services
             var videos = Videos;
             var videosStamp = _videosStamp;
 
-            if (_contentCache.TryGetValue(key, out var cached)
+            if (_contentCache.TryGetValue(cacheKey, out var cached)
                 && cached.TopicStamp == file.LastModified
                 && cached.ShotsStamp == shotsStamp
                 && cached.VideosStamp == videosStamp)
@@ -282,7 +344,7 @@ namespace RealEstateManager.Services
             html = ShotPattern.Replace(html, match => RenderShot(match.Groups[1].Value, shots));
             html = VideoPattern.Replace(html, match => RenderVideo(match.Groups[1].Value, videos));
 
-            _contentCache[key] = (file.LastModified, shotsStamp, videosStamp, html);
+            _contentCache[cacheKey] = (file.LastModified, shotsStamp, videosStamp, html);
             return html;
         }
 
@@ -341,7 +403,7 @@ namespace RealEstateManager.Services
         /// they stay on target at any width - in the narrow help panel, on the full
         /// topic page and in the printed manual alike.
         /// </summary>
-        private static string RenderShot(string key, Dictionary<string, HelpShot> shots)
+        private string RenderShot(string key, Dictionary<string, HelpShot> shots)
         {
             if (!shots.TryGetValue(key, out var shot))
                 return string.Empty; // Not captured yet: show nothing rather than a broken image.
@@ -358,25 +420,28 @@ namespace RealEstateManager.Services
                 $"top:{m.Y.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%\" " +
                 $"aria-hidden=\"true\">{m.Number}</span>"));
 
+            // The address bar reads like a menu path; each part is a menu name.
+            var addressText = string.Join(" ▸ ", (shot.Address ?? string.Empty).Split(" ▸ ").Select(Tr));
+
             var legend = shot.Markers.Count == 0
                 ? string.Empty
                 : "<ol class=\"shot-legend\">" +
                   string.Concat(shot.Markers.Select(m =>
-                      $"<li value=\"{m.Number}\"><span class=\"shot-legend-no\">{m.Number}</span>{enc(m.Label)}</li>")) +
+                      $"<li value=\"{m.Number}\"><span class=\"shot-legend-no\">{m.Number}</span>{enc(Tr(m.Label))}</li>")) +
                   "</ol>";
 
             var address = shot.Frame == "phone"
                 ? string.Empty
                 : $"<div class=\"shot-bar\"><span class=\"shot-dots\"><i></i><i></i><i></i></span>" +
-                  $"<span class=\"shot-address\">{enc(shot.Address)}</span></div>";
+                  $"<span class=\"shot-address\">{enc(addressText)}</span></div>";
 
             return
                 $"<figure class=\"shot {frame}\">" +
                 $"<div class=\"shot-window\">{address}" +
                 $"<div class=\"shot-canvas\">" +
                 $"<img src=\"{src}\" width=\"{shot.Width}\" height=\"{shot.Height}\" loading=\"lazy\" " +
-                $"alt=\"{enc(shot.Caption)}\" data-shot-zoom=\"{src}\" />{markers}</div></div>" +
-                $"<figcaption>{enc(shot.Caption)}</figcaption>{legend}</figure>";
+                $"alt=\"{enc(Tr(shot.Caption))}\" data-shot-zoom=\"{src}\" />{markers}</div></div>" +
+                $"<figcaption>{enc(Tr(shot.Caption))}</figcaption>{legend}</figure>";
         }
 
         // =====================================================================
@@ -441,7 +506,7 @@ namespace RealEstateManager.Services
         /// presses play. On paper - the printed manual and the PDF - a video cannot play,
         /// so a short note stands in for it there (see help.css).
         /// </summary>
-        private static string RenderVideo(string key, Dictionary<string, HelpVideo> videos)
+        private string RenderVideo(string key, Dictionary<string, HelpVideo> videos)
         {
             if (!videos.TryGetValue(key, out var video))
                 return string.Empty;
@@ -452,15 +517,16 @@ namespace RealEstateManager.Services
                 ? string.Empty
                 : $" poster=\"/help/videos/{enc(video.Poster)}?v={video.Version}\"";
             var length = $"{video.Seconds / 60}:{video.Seconds % 60:00}";
+            var title = Tr(video.Title);
 
             return
                 $"<figure class=\"help-video\">" +
                 $"<video controls preload=\"none\" playsinline{poster} src=\"{src}\" " +
-                $"aria-label=\"Video: {enc(video.Title)}\"></video>" +
-                $"<figcaption><span class=\"help-video-badge\">Video</span>{enc(video.Title)} " +
+                $"aria-label=\"{enc(Tr("Video:"))} {enc(title)}\"></video>" +
+                $"<figcaption><span class=\"help-video-badge\">{enc(Tr("Video"))}</span>{enc(title)} " +
                 $"<span class=\"help-video-length\">{length}</span></figcaption>" +
-                $"<p class=\"help-video-print\">Video: <strong>{enc(video.Title)}</strong> ({length}) - " +
-                $"watch it in the Help on screen.</p>" +
+                $"<p class=\"help-video-print\">{enc(Tr("Video:"))} <strong>{enc(title)}</strong> ({length}) - " +
+                $"{enc(Tr("watch it in the Help on screen."))}</p>" +
                 $"</figure>";
         }
 
@@ -563,22 +629,34 @@ namespace RealEstateManager.Services
 
     public class HelpGroup
     {
+        private string _title = string.Empty;
         public string Key { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
+
+        /// <summary>In the reader's language: the Arabic title when there is one.</summary>
+        public string Title { get => Localization.UiLanguages.IsArabic && TitleAr != null ? TitleAr : _title; set => _title = value; }
+        public string? TitleAr { get; set; }
         public List<HelpTopic> Topics { get; } = new();
     }
 
     public class HelpTopic
     {
+        private string _title = string.Empty, _path = string.Empty, _summary = string.Empty, _groupTitle = string.Empty;
+        private static bool Ar => Localization.UiLanguages.IsArabic;
+
         public string Key { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
+        public string Title { get => Ar && TitleAr != null ? TitleAr : _title; set => _title = value; }
 
         /// <summary>Where the screen is in the menus, e.g. "Operations ▸ Vendor Bills".</summary>
-        public string Path { get; set; } = string.Empty;
+        public string Path { get => Ar && PathAr != null ? PathAr : _path; set => _path = value; }
 
-        public string Summary { get; set; } = string.Empty;
+        public string Summary { get => Ar && SummaryAr != null ? SummaryAr : _summary; set => _summary = value; }
         public string GroupKey { get; set; } = string.Empty;
-        public string GroupTitle { get; set; } = string.Empty;
+        public string GroupTitle { get => Ar && GroupTitleAr != null ? GroupTitleAr : _groupTitle; set => _groupTitle = value; }
+
+        public string? TitleAr { get; set; }
+        public string? PathAr { get; set; }
+        public string? SummaryAr { get; set; }
+        public string? GroupTitleAr { get; set; }
 
         /// <summary>Position in the manual, 1-based.</summary>
         public int Order { get; set; }

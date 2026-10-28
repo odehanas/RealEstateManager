@@ -1,0 +1,50 @@
+<p>الاستعلام عن القيود هو سجل التدقيق والمكان الذي تتحول فيه المسودات إلى قيود مرحّلة. كل قيد في الشركة —
+تلقائياً أو يدوياً، مسودة أو مرحّلاً — مدرج هنا برقمه وتاريخه ووصفه ومصدره وقيمته.</p>
+
+<h3>البحث عن القيود</h3>
+<ol class="steps">
+    <li>حدد تاريخي <strong>من</strong> و<strong>إلى</strong>.</li>
+    <li>اختيارياً، اختر <strong>نوع المصدر</strong> لرؤية نوع واحد من الحركات فقط.</li>
+    <li>اجعل <strong>المرحّل فقط</strong> = <strong>لا</strong> لتضمين المسودات، أو <strong>نعم</strong> لرؤية ما في الحسابات فقط.</li>
+    <li>اختر <strong>انتقال</strong>.</li>
+</ol>
+<p>يحمل كل بند قيد العقار والوحدة والمستأجر والعقد والمورد والمستند المصدر الذي جاء منه، فيمكن
+تتبع أي رقم في تقرير إلى الحركة التي سببته.</p>
+
+<figure data-shot="journal-inquiry"></figure>
+
+<h3>الترحيل والإعادة</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">الزر</th><th>ما يفعله</th></tr></thead>
+    <tbody>
+        <tr><td><strong>ترحيل</strong></td><td>يُدخل مسودة واحدة في الحسابات.</td></tr>
+        <tr><td><strong>ترحيل كل المسودات (n)</strong></td><td>يرحّل كل مسودة تطابق التصفية الحالية. يُرحّل كل منها على حدة؛ وتُدرج القيود التي يتعذر ترحيلها مع السبب، وتمر البقية.</td></tr>
+        <tr><td><strong>إعادة إلى مسودة</strong></td><td>يسحب قيداً مرحّلاً واحداً من الحسابات ليُصحح مستنده.</td></tr>
+        <tr><td>شارة <strong>الفترة مقفلة</strong></td><td>تظهر بدلاً من الأزرار عندما تكون فترة القيد مقفلة.</td></tr>
+    </tbody>
+</table>
+<p>اقرأ <a href="#draft-post-reset">المسودة والترحيل والإعادة إلى مسودة</a> لمعرفة الشاشات التي تترك مسودات ومتى تُرفض الإعادة.</p>
+
+<div class="box ok">
+    <div class="box-title">عادة جيدة في نهاية اليوم</div>
+    <p>صفِّ بتاريخ اليوم مع <strong>المرحّل فقط = لا</strong> ورحّل ما ينتظر. فالمسودات المتروكة هي
+    أشيع سبب لنقص الأرقام في التقارير.</p>
+</div>
+
+<h3>أنواع المصادر</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:36%">نوع المصدر</th><th>يُنشئه</th></tr></thead>
+    <tbody>
+        <tr><td><code>CustomerInvoice</code></td><td>ترحيل فاتورة عميل</td></tr>
+        <tr><td><code>CustomerReceipt</code></td><td>حفظ سند قبض عميل</td></tr>
+        <tr><td><code>PdcReceiptMemo</code> / <code>PdcDeposit</code> / <code>PdcClearance</code> / <code>PdcBounce</code> / <code>PdcWithdrawal</code></td><td>استلام شيك مؤجل وإيداعه وتحصيله وارتجاعه وسحبه</td></tr>
+        <tr><td><code>SecurityDeposit</code></td><td>حفظ مبلغ تأمين</td></tr>
+        <tr><td><code>RevenueRecognitionSchedule</code></td><td>معالجة الاعتراف بالإيرادات</td></tr>
+        <tr><td><code>VendorBill</code> / <code>VendorPayment</code></td><td>ترحيل فاتورة مورد أو حفظ دفعة</td></tr>
+        <tr><td><code>PettyCashExpense</code> / <code>PettyCashReplenishment</code></td><td>سندات النثرية وتعبئتها</td></tr>
+        <tr><td><code>FixedAsset…</code></td><td>الاقتناء والرسملة والإهلاك</td></tr>
+        <tr><td><code>PrepaymentSchedule</code> / <code>PrepaymentRecognition</code></td><td>إعداد المدفوعات المقدمة وإطفاؤها</td></tr>
+        <tr><td><code>ManualJournal</code></td><td>قيد يدوي</td></tr>
+        <tr><td><code>FiscalYearClosing</code></td><td>إقفال السنة المالية</td></tr>
+    </tbody>
+</table>

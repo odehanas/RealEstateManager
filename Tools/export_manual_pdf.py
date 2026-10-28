@@ -9,9 +9,10 @@ USAGE
     python Tools/export_manual_pdf.py                         # from the live site
     python Tools/export_manual_pdf.py http://localhost:5199   # from a local copy
 
-It prints both pages with headless Chrome (or Edge) and writes the results to
-wwwroot/manual/RealEstateManager-User-Manual.pdf and
-wwwroot/manual/RealEstateManager-Training-Workbook.pdf. Commit and publish them as usual.
+It prints both pages, in English and in Arabic, with headless Chrome (or Edge) and writes
+the results to wwwroot/manual/RealEstateManager-User-Manual.pdf,
+wwwroot/manual/RealEstateManager-Training-Workbook.pdf and their -ar.pdf Arabic editions.
+Commit and publish them as usual.
 
 No sign-in is needed: both pages are deliberately public, because they are product
 documentation and carry no company data.
@@ -27,6 +28,9 @@ PROJECT = pathlib.Path(__file__).resolve().parent.parent
 DOCUMENTS = [
     ("/Help/Manual", PROJECT / "wwwroot" / "manual" / "RealEstateManager-User-Manual.pdf"),
     ("/Help/Training", PROJECT / "wwwroot" / "manual" / "RealEstateManager-Training-Workbook.pdf"),
+    # The Arabic editions: ?lang=ar shows the same pages in Arabic, right to left.
+    ("/Help/Manual?lang=ar", PROJECT / "wwwroot" / "manual" / "RealEstateManager-User-Manual-ar.pdf"),
+    ("/Help/Training?lang=ar", PROJECT / "wwwroot" / "manual" / "RealEstateManager-Training-Workbook-ar.pdf"),
 ]
 
 BROWSERS = [

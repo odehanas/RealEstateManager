@@ -1,0 +1,113 @@
+# Sheet 13: help screenshots and videos (captions, call-outs, video titles) - whole texts.
+# The address bar of a screenshot is translated part by part, from the menu names.
+Video ||| فيديو
+Video: ||| فيديو:
+watch it in the Help on screen. ||| شاهده في المساعدة على الشاشة.
+The dashboard: portfolio, occupancy, collections and receivables at a glance. ||| لوحة المعلومات: المحفظة والإشغال والتحصيلات والذمم المدينة بنظرة واحدة.
+The Help button opens the instructions for the screen you are on, beside your work. ||| يفتح زر المساعدة تعليمات الشاشة التي أنت فيها، بجانب عملك.
+Help button — or press F1 ||| زر المساعدة — أو اضغط F1
+The topic for this screen ||| موضوع هذه الشاشة
+The chart of accounts, with the opening-balance check at the top. ||| دليل الحسابات، مع فحص الأرصدة الافتتاحية في الأعلى.
+Green when opening balances agree, red with the difference when not ||| أخضر عند توازن الأرصدة الافتتاحية، وأحمر مع الفرق عند عدمه
+Account Mapping: which account each automatic posting uses. ||| ربط الحسابات: الحساب الذي يستخدمه كل ترحيل تلقائي.
+The opening balance reconciliation. Net Imbalance must be 0.00. ||| مطابقة الأرصدة الافتتاحية. يجب أن يكون صافي عدم التوازن 0.00.
+VAT Settings: your TRN, tax invoice details and the provisional recovery rate. ||| إعدادات الضريبة: رقمك الضريبي، وبيانات الفاتورة الضريبية، ونسبة الاسترداد المؤقتة.
+E-Invoicing Settings: the readiness check, your revenue band and provider, and the identity printed on every e-invoice. ||| إعدادات الفوترة الإلكترونية: فحص الجاهزية، وشريحة إيراداتك ومزودك، والهوية المطبوعة على كل فاتورة إلكترونية.
+Readiness check — what is still missing ||| فحص الجاهزية — ما لا يزال ناقصاً
+Revenue band — sets your deadlines ||| شريحة الإيرادات — تحدد مواعيدك النهائية
+Switch on once the provider is appointed ||| فعّلها بعد تعيين المزود
+Your Accredited Service Provider ||| مزود الخدمة المعتمد الخاص بك
+Emirate — required on every e-invoice ||| الإمارة — مطلوبة في كل فاتورة إلكترونية
+Period Closing: the twelve monthly periods and their status. ||| إقفال الفترات: الفترات الشهرية الاثنتا عشرة وحالتها.
+Users and the permissions each one holds. ||| المستخدمون والصلاحيات التي يحملها كل منهم.
+The property list. Codes are issued by the system. ||| قائمة العقارات. والرموز يصدرها النظام.
+Adding a property. The code is previewed as you choose ownership and type. ||| إضافة عقار. يُعرض الرمز مسبقاً أثناء اختيار الملكية والنوع.
+Ownership — drives the accounting ||| الملكية — تحدد المعالجة المحاسبية
+Type — part of the code ||| النوع — جزء من الرمز
+The code the property will receive ||| الرمز الذي سيحصل عليه العقار
+Units grouped by property, with their status and asking rent. ||| الوحدات مجمعة حسب العقار، مع حالتها والإيجار المطلوب.
+The tenant register. The Portal button issues a tenant their login. ||| سجل المستأجرين. يصدر زر البوابة حساب دخول المستأجر.
+Portal — issue or reset the tenant's login ||| البوابة — إصدار حساب دخول المستأجر أو إعادة تعيينه
+A supplier record. 'VAT registered (active)' decides whether their bills carry VAT. ||| سجل مورد. يحدد 'مسجل في الضريبة (ساري)' ما إذا كانت فواتيره تحمل ضريبة.
+TRN — required for a registered supplier ||| الرقم الضريبي — مطلوب للمورد المسجل
+Trade licence — must be unique ||| الرخصة التجارية — يجب أن تكون فريدة
+Lease contracts with their system-issued contract codes. ||| عقود الإيجار مع رموز العقود التي يصدرها النظام.
+Draft Contract — the printable tenancy agreement ||| مسودة العقد — عقد الإيجار القابل للطباعة
+QR Label for the contract file ||| ملصق QR لملف العقد
+The draft tenancy agreement, filled in from the lease. ||| مسودة عقد الإيجار، معبأة من العقد.
+A tenant's portal login: its status, and where to issue or reset it. ||| حساب دخول المستأجر إلى البوابة: حالته، ومكان إصداره أو إعادة تعيينه.
+Journal Inquiry with drafts showing. Drafts are not in any report until posted. ||| الاستعلام عن القيود مع عرض المسودات. لا تظهر المسودات في أي تقرير حتى تُرحّل.
+Posted Only = No lists drafts ||| المرحّل فقط = لا يعرض المسودات
+Post All Drafts matching the filter ||| ترحيل كل المسودات المطابقة للتصفية
+Post one entry ||| ترحيل قيد واحد
+Customer invoices. Draft invoices carry a Post button; posted ones can be printed, received against or credited, and show where they stand for e-invoicing. ||| فواتير العملاء. الفواتير المسودة تحمل زر ترحيل؛ والمرحّلة يمكن طباعتها أو استلام دفعة مقابلها أو إصدار إشعار دائن عليها، وتعرض وضعها في الفوترة الإلكترونية.
+Post — puts the invoice into the accounts ||| ترحيل — يُدخل الفاتورة إلى الحسابات
+Receive a payment ||| استلام دفعة
+Credit note — reduce or cancel the invoice ||| إشعار دائن — خفض الفاتورة أو إلغاؤها
+E-invoice status ||| حالة الفاتورة الإلكترونية
+A credit note against one invoice: the statutory reason, the amount, and the VAT reversed automatically. ||| إشعار دائن على فاتورة واحدة: السبب النظامي، والمبلغ، والضريبة المعكوسة تلقائياً.
+Reason, from the statutory list ||| السبب، من القائمة النظامية
+Or credit everything outstanding ||| أو إصدار إشعار دائن بكل المستحق
+Net amount — VAT is added for you ||| المبلغ الصافي — تُضاف الضريبة تلقائياً
+The E-Invoice Monitor: every document to send, ordered by its 14-day deadline. ||| مراقبة الفواتير الإلكترونية: كل مستند للإرسال، مرتباً حسب مهلته البالغة 14 يوماً.
+Deadlines at a glance ||| المواعيد النهائية بنظرة واحدة
+Download the files for your provider ||| تنزيل الملفات لمزودك
+Record them as sent — this locks them ||| تسجيلها كمرسلة — وهذا يقفلها
+Record the provider's answer ||| تسجيل رد المزود
+Suppliers' e-invoices: matched to the vendor by TRN, then booked as a bill in one click. ||| الفواتير الإلكترونية للموردين: تُطابق مع المورد بالرقم الضريبي، ثم تُسجل كفاتورة مورد بنقرة واحدة.
+Upload the files from your provider ||| رفع الملفات من مزودك
+Already booked as a vendor bill ||| مسجلة بالفعل كفاتورة مورد
+No vendor with this TRN yet ||| لا يوجد مورد بهذا الرقم الضريبي بعد
+A full tax invoice — the tenant is VAT registered, so both TRNs are shown. ||| فاتورة ضريبية كاملة — المستأجر مسجل في الضريبة، فيظهر الرقمان الضريبيان.
+Recording a receipt against an invoice. It is saved as a draft. ||| تسجيل سند قبض مقابل فاتورة. يُحفظ كمسودة.
+The post-dated cheque register: received, cleared and still in hand. ||| سجل الشيكات المؤجلة: المستلمة، والمحصّلة، والتي لا تزال في الحوزة.
+Clear — when the bank honours the cheque ||| تحصيل — عندما يصرف البنك الشيك
+Edit — correct dates or cheque details ||| تعديل — تصحيح التواريخ أو بيانات الشيك
+Security deposits held, each a liability until refunded or forfeited. ||| التأمينات المحتفظ بها، وكل منها التزام حتى يُسترد أو يُصادر.
+Vendor bills: tax invoices and commercial invoices, drafts and posted. ||| فواتير الموردين: الفواتير الضريبية والتجارية، المسودة والمرحّلة.
+A draft bill from a supplier who is not VAT registered: no VAT anywhere, and the full amount is a cost. ||| فاتورة مسودة من مورد غير مسجل في الضريبة: لا ضريبة في أي مكان، والمبلغ كله تكلفة.
+Supplier — decides whether VAT applies ||| المورد — يحدد ما إذا كانت الضريبة تُطبق
+The supplier's own bill number ||| رقم فاتورة المورد الخاص
+Accounting date — the period it lands in ||| التاريخ المحاسبي — الفترة التي يقع فيها
+Tax invoice or commercial invoice ||| فاتورة ضريبية أو فاتورة تجارية
+Add a line ||| إضافة سطر
+A posted multi-line tax invoice, partly paid. Irrecoverable VAT is shown on the line it belongs to. ||| فاتورة ضريبية مرحّلة متعددة البنود، مدفوعة جزئياً. وتظهر الضريبة غير القابلة للاسترداد في البند الذي تخصه.
+Register a payment ||| تسجيل دفعة
+Print with letterhead and sign-off strip ||| طباعة مع الترويسة وشريط التوقيعات
+Paying a posted bill. Only posted bills are offered. ||| سداد فاتورة مرحّلة. لا تُعرض إلا الفواتير المرحّلة.
+A petty cash float: vouchers, the top-up and the running balance. ||| عهدة مصروفات نثرية: السندات، والتعويض، والرصيد الجاري.
+A manual journal. It is saved as a draft and posted from Journal Inquiry. ||| قيد يدوي. يُحفظ كمسودة ويُرحّل من الاستعلام عن القيود.
+The tenant request queue: urgent first, oldest first, with ageing. ||| قائمة طلبات المستأجرين: العاجل أولاً، والأقدم أولاً، مع أعمارها.
+Working a request: the conversation, an internal staff note, and the update panel. ||| العمل على طلب: المحادثة، وملاحظة داخلية للموظفين، ولوحة التحديث.
+Internal note — never shown to the tenant ||| ملاحظة داخلية — لا تظهر للمستأجر أبداً
+Tick to keep a message among staff ||| أشّر لإبقاء الرسالة بين الموظفين
+Move the request along ||| تحريك الطلب إلى المرحلة التالية
+Response the tenant reads ||| الرد الذي يقرؤه المستأجر
+The trial balance: total debits equal total credits. ||| ميزان المراجعة: إجمالي المدين يساوي إجمالي الدائن.
+Profit & Loss for the year to date. ||| الأرباح والخسائر للسنة حتى تاريخه.
+The balance sheet: assets equal liabilities plus equity. ||| الميزانية العمومية: الأصول تساوي الالتزامات زائد حقوق الملكية.
+The Statement of Cash Flows (IAS 7, direct method). ||| قائمة التدفقات النقدية (معيار المحاسبة الدولي 7، الطريقة المباشرة).
+The general ledger for Accounts Receivable: opening balance, movements and running balance. ||| الأستاذ العام للذمم المدينة: الرصيد الافتتاحي، والحركات، والرصيد الجاري.
+A tenant statement with an overdue balance. ||| كشف حساب مستأجر عليه رصيد متأخر.
+The VAT return for the third quarter: output tax, recoverable input tax and the recovery rate. ||| الإقرار الضريبي للربع الثالث: ضريبة المخرجات، وضريبة المدخلات القابلة للاسترداد، ونسبة الاسترداد.
+Profit & Loss by property, with the portfolio total. ||| الأرباح والخسائر حسب العقار، مع إجمالي المحفظة.
+Occupancy, area utilization and the rent gap per property. ||| الإشغال واستغلال المساحة وفجوة الإيجار لكل عقار.
+Every tenant scored and ranked, with the figures behind each score. ||| كل مستأجر مقيّم ومرتب، مع الأرقام التي تقف خلف كل درجة.
+The owner tenancy schedule, grouped by owner, including vacant units. ||| جدول إيجارات المالك، مجمعاً حسب المالك، بما فيه الوحدات الشاغرة.
+Owner withdrawals analysed by category — company profit untouched. ||| مسحوبات المالك محللة حسب الفئة — دون المساس بربح الشركة.
+The tenant's account page on a phone. ||| صفحة حساب المستأجر على الهاتف.
+The tenant's invoices, overdue ones highlighted. ||| فواتير المستأجر، مع تمييز المتأخرة.
+The tenant's requests and their status. ||| طلبات المستأجر وحالتها.
+Raising a request from a phone. ||| تقديم طلب من الهاتف.
+The same request as the tenant sees it — the staff internal note is not there. ||| الطلب نفسه كما يراه المستأجر — والملاحظة الداخلية للموظفين غير موجودة.
+Signing in and finding your way ||| تسجيل الدخول والتنقل
+Adding a property, a unit and a tenant ||| إضافة عقار ووحدة ومستأجر
+Creating a lease ||| إنشاء عقد إيجار
+Posting an invoice and receiving the rent ||| ترحيل فاتورة واستلام الإيجار
+Entering a supplier bill and paying it ||| إدخال فاتورة مورد وسدادها
+Petty cash ||| المصروفات النثرية
+Month-end ||| نهاية الشهر
+The reports ||| التقارير
+The tenant portal ||| بوابة المستأجرين
+New Payment ||| دفعة جديدة
+Period Closing ||| إقفال الفترات

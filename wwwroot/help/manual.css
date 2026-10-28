@@ -147,3 +147,6 @@ body {
     .help-content .wf-canvas,
     .help-content table { break-inside: avoid; }
 }
+
+/* Spaced-out letters break the joins of Arabic script. */
+[dir="rtl"] * { letter-spacing: 0 !important; }

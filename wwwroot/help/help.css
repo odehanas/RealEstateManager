@@ -40,7 +40,7 @@
 
 .help-content p { margin: 0 0 .8em; }
 .help-content ul,
-.help-content ol { margin: 0 0 .9em; padding-left: 1.35em; }
+.help-content ol { margin: 0 0 .9em; padding-inline-start: 1.35em; }
 .help-content li { margin-bottom: .3em; }
 
 .help-content code {
@@ -68,7 +68,7 @@
 .help-content th {
     background: var(--hc-navy);
     color: #fff;
-    text-align: left;
+    text-align: start;
     padding: 6px 8px;
     font-weight: 600;
     border: 1px solid var(--hc-navy);
@@ -82,7 +82,7 @@
 
 .help-content tbody tr:nth-child(even) td { background: #f7f9fb; }
 .help-content td.num,
-.help-content th.num { text-align: right; white-space: nowrap; }
+.help-content th.num { text-align: end; white-space: nowrap; }
 
 .help-content .je th { background: var(--hc-navy-soft); }
 .help-content .je td:first-child { width: 46%; }
@@ -92,7 +92,7 @@
 
 /* ---- Callouts -------------------------------------------------------------- */
 .help-content .box {
-    border-left: 4px solid var(--hc-accent);
+    border-inline-start: 4px solid var(--hc-accent);
     background: #eef4ff;
     padding: 10px 14px;
     margin: 1em 0;
@@ -100,25 +100,26 @@
 }
 
 .help-content .box .box-title { font-weight: 700; color: var(--hc-navy); margin-bottom: 3px; }
-.help-content .box.warn { border-left-color: #e0a800; background: #fff8e6; }
-.help-content .box.ok { border-left-color: #2e9e5b; background: #eefaf1; }
+.help-content .box.warn { border-inline-start-color: #e0a800; background: #fff8e6; }
+.help-content .box.ok { border-inline-start-color: #2e9e5b; background: #eefaf1; }
 .help-content .box p:last-child,
 .help-content .box ul:last-child { margin-bottom: 0; }
 
 /* ---- Numbered steps -------------------------------------------------------- */
-.help-content ol.steps { counter-reset: step; list-style: none; padding-left: 0; }
+.help-content ol.steps { counter-reset: step; list-style: none; padding-inline-start: 0; }
 
 .help-content ol.steps > li {
     counter-increment: step;
     position: relative;
-    padding: 0 0 .55em 30px;
+    padding: 0 0 .55em;
+    padding-inline-start: 30px;
     margin-bottom: .2em;
 }
 
 .help-content ol.steps > li::before {
     content: counter(step);
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     top: 1px;
     width: 20px;
     height: 20px;
@@ -327,7 +328,7 @@
     display: inline-block;
     width: 7px;
     height: 7px;
-    margin-right: 7px;
+    margin-inline-end: 7px;
     border-radius: 50%;
     background: #2e9e5b;
     vertical-align: 1px;
@@ -526,7 +527,7 @@
 
 .help-content .help-video-badge {
     display: inline-block;
-    margin-right: .5em;
+    margin-inline-end: .5em;
     padding: 0 .6em;
     border-radius: 999px;
     background: #f0b429;
@@ -552,3 +553,6 @@
         border-radius: 6px;
     }
 }
+
+/* Spaced-out letters break the joins of Arabic script. */
+[dir="rtl"] * { letter-spacing: 0 !important; }

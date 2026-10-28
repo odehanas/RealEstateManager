@@ -1,0 +1,238 @@
+<!-- Icon definitions used by the workflow diagram below. Kept inside the topic so it renders
+     anywhere it is shown: the help panel, the topic page and the full manual. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-property" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/></symbol>
+    <symbol id="i-unit" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 9h16M4 15h16M12 3v18"/><circle cx="9.2" cy="12" r=".9"/></symbol>
+    <symbol id="i-tenant" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-contract" viewBox="0 0 24 24"><path d="M6 2.5h8l4 4V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M14 2.5V7h4"/><path d="M9 12h6M9 15.5h4"/><path d="M9 19c1-1.4 2-1.4 3 0s2 1.4 3 0"/></symbol>
+    <symbol id="i-pdc" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2"/><path d="M2.5 10h19"/><path d="M6 14.5h5M15.5 14.5h2.5"/><path d="M17 3v4M15 5h4"/></symbol>
+    <symbol id="i-invoice" viewBox="0 0 24 24"><path d="M6 2.5h12v19l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z"/><path d="M9 8h6M9 11.5h6M9 15h3"/></symbol>
+    <symbol id="i-payment" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.8"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
+    <symbol id="i-coa" viewBox="0 0 24 24"><path d="M4 5h16M4 9.5h16M4 14h10M4 18.5h10"/><path d="M16.5 15.5l2 2 3.5-3.5"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M10 13a4 4 0 0 0 5.7.3l2.6-2.6a4 4 0 0 0-5.6-5.7l-1.5 1.5"/><path d="M14 11a4 4 0 0 0-5.7-.3l-2.6 2.6a4 4 0 0 0 5.6 5.7l1.5-1.5"/></symbol>
+    <symbol id="i-opening" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M4 7h16"/><path d="M7 7l-3 6h6zM17 7l-3 6h6z"/><path d="M8 21h8"/></symbol>
+    <symbol id="i-deposit" viewBox="0 0 24 24"><path d="M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z"/><path d="M8.5 12.2l2.4 2.4 4.6-4.6"/></symbol>
+    <symbol id="i-revenue" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/><path d="M8.5 14.5l2.2 2.2 4.3-4.3"/></symbol>
+    <symbol id="i-vendor" viewBox="0 0 24 24"><path d="M3 9.5l1.8-5A1.5 1.5 0 0 1 6.2 3.5h11.6a1.5 1.5 0 0 1 1.4 1l1.8 5"/><path d="M3 9.5h18v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5z"/><path d="M9 13.5h6"/></symbol>
+    <symbol id="i-bill" viewBox="0 0 24 24"><path d="M5 2.5h14v19l-2.3-1.5-2.3 1.5-2.4-1.5-2.3 1.5L5 21.5z"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4"/></symbol>
+    <symbol id="i-payout" viewBox="0 0 24 24"><path d="M3 7.5h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M15.5 13h1.5"/><path d="M17 4.5l4 3-4 3"/><path d="M21 7.5h-7"/></symbol>
+    <symbol id="i-asset" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M7 8V5.5A1.5 1.5 0 0 1 8.5 4h7A1.5 1.5 0 0 1 17 5.5V8"/><path d="M3 13.5h18M11 13.5v2.5h2v-2.5"/></symbol>
+    <symbol id="i-prepaid" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v6l3.5 2"/></symbol>
+    <symbol id="i-journal" viewBox="0 0 24 24"><path d="M5 3.5h13a1.5 1.5 0 0 1 1.5 1.5v15a1.5 1.5 0 0 1-1.5 1.5H5z"/><path d="M5 3.5v18"/><path d="M9 8.5h7M9 12h7M9 15.5h4"/></symbol>
+    <symbol id="i-closing" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><circle cx="12" cy="15.7" r="1.3"/></symbol>
+    <symbol id="i-report" viewBox="0 0 24 24"><path d="M3 20.5h18"/><rect x="5" y="11" width="3.6" height="8"/><rect x="10.2" y="6.5" width="3.6" height="12.5"/><rect x="15.4" y="3" width="3.6" height="16"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 26 14"><path d="M1 7h22"/><path d="M18.5 2.5L23 7l-4.5 4.5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 14 14"><path d="M7 1v10"/><path d="M3 8l4 4 4-4"/></symbol>
+  </defs>
+</svg>
+
+<p>هذه خريطة العمل في RealEstateManager. اعمل بالترتيب: كل خطوة تعتمد على
+التي قبلها، لأن السجل الذي تنشئه في كل مرحلة يُختار في المرحلة التالية. والمخطط نفسه
+متاح داخل التطبيق كشاشة تفاعلية في <span class="path">العمليات ▸ دليل سير العمل</span>.</p>
+
+<!-- ---------- MAIN FLOW ---------- -->
+<div class="wf-canvas">
+    <div class="wf-band-title">مسار العمل الرئيسي — ابدأ من هنا</div>
+
+    <div class="wf-row">
+        <div class="wf-node">
+            <span class="step-no">الخطوة 1</span>
+            <div class="tile"><svg><use href="#i-property"/></svg></div>
+            <div class="lbl">العقارات</div>
+            <div class="hint">سجّل المبنى. مملوك أو مُدار.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node">
+            <span class="step-no">الخطوة 2</span>
+            <div class="tile"><svg><use href="#i-unit"/></svg></div>
+            <div class="lbl">الوحدات</div>
+            <div class="hint">أضف الوحدات القابلة للتأجير داخل العقار.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node">
+            <span class="step-no">الخطوة 3</span>
+            <div class="tile"><svg><use href="#i-tenant"/></svg></div>
+            <div class="lbl">المستأجرون</div>
+            <div class="hint">سجّل الشاغل وبياناته.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node">
+            <span class="step-no">الخطوة 4</span>
+            <div class="tile"><svg><use href="#i-contract"/></svg></div>
+            <div class="lbl">العقود</div>
+            <div class="hint">أجّر الوحدة للمستأجر. تُنشأ الفواتير تلقائياً.</div>
+        </div>
+    </div>
+
+    <div class="wf-elbow">
+        <span class="line"></span>
+        <svg><use href="#i-down"/></svg>
+        <span>يتبع أدناه</span>
+        <svg><use href="#i-down"/></svg>
+        <span class="line"></span>
+    </div>
+
+    <div class="wf-row">
+        <div class="wf-node">
+            <span class="step-no">الخطوة 5</span>
+            <div class="tile"><svg><use href="#i-pdc"/></svg></div>
+            <div class="lbl">الشيكات المؤجلة</div>
+            <div class="hint">سجّل الشيكات المؤجلة المستلمة عند التوقيع.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node">
+            <span class="step-no">الخطوة 6</span>
+            <div class="tile"><svg><use href="#i-invoice"/></svg></div>
+            <div class="lbl">الفوترة</div>
+            <div class="hint">رحّل فواتير الإيجار عند استحقاقها.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node">
+            <span class="step-no">الخطوة 7</span>
+            <div class="tile"><svg><use href="#i-payment"/></svg></div>
+            <div class="lbl">المدفوعات<br/>المستلمة</div>
+            <div class="hint">سجّل التحصيلات وسدّد الفاتورة.</div>
+        </div>
+    </div>
+
+    <div class="wf-legend">
+        <span class="k"><span class="sw"></span> مسار العمل الرئيسي</span>
+        <span class="k"><span class="sw s2"></span> الأنشطة المساندة وأنشطة نهاية الفترة</span>
+    </div>
+</div>
+
+<!-- ---------- SETUP BAND ---------- -->
+<div class="wf-canvas">
+    <div class="wf-band-title">قبل أن تبدأ — إعداد الشركة لمرة واحدة</div>
+    <div class="wf-row">
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-coa"/></svg></div>
+            <div class="lbl">دليل<br/>الحسابات</div>
+            <div class="hint">مُعدّ تلقائياً. راجعه ووسّعه.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-map"/></svg></div>
+            <div class="lbl">ربط<br/>الحسابات</div>
+            <div class="hint">يحدد للنظام الحساب الذي يستخدمه كل قيد.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-opening"/></svg></div>
+            <div class="lbl">الأرصدة<br/>الافتتاحية</div>
+            <div class="hint">انقل الأرصدة السابقة. يجب أن يكون صافيها صفراً.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- SUPPORTING BAND ---------- -->
+<div class="wf-canvas">
+    <div class="wf-band-title">مع العقد — التأمينات والإيرادات والذمم الدائنة</div>
+    <div class="wf-row">
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-deposit"/></svg></div>
+            <div class="lbl">مبالغ<br/>التأمين</div>
+            <div class="hint">تأمين قابل للرد محتفظ به كالتزام.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-revenue"/></svg></div>
+            <div class="lbl">الاعتراف<br/>بالإيرادات</div>
+            <div class="hint">يُفرج عن إيجار شهر في نهاية كل شهر.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-vendor"/></svg></div>
+            <div class="lbl">الموردون</div>
+            <div class="hint">الموردون ومقدمو الخدمات.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-bill"/></svg></div>
+            <div class="lbl">فواتير<br/>الموردين</div>
+            <div class="hint">المصروفات والضريبة القابلة للاسترداد.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-payout"/></svg></div>
+            <div class="lbl">دفعات<br/>الموردين</div>
+            <div class="hint">سدّد الذمة الدائنة.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------- PERIOD END BAND ---------- -->
+<div class="wf-canvas">
+    <div class="wf-band-title">نهاية الفترة — كل شهر، ثم كل سنة</div>
+    <div class="wf-row">
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-asset"/></svg></div>
+            <div class="lbl">الإهلاك</div>
+            <div class="hint">شغّل دفعة الإهلاك الشهري.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-prepaid"/></svg></div>
+            <div class="lbl">المدفوعات المقدمة</div>
+            <div class="hint">أطفئ المصروفات المدفوعة مقدماً.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-journal"/></svg></div>
+            <div class="lbl">القيود<br/>اليدوية</div>
+            <div class="hint">التسويات والمستحقات.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-report"/></svg></div>
+            <div class="lbl">التقارير</div>
+            <div class="hint">ميزان المراجعة، الأرباح والخسائر، الميزانية العمومية.</div>
+        </div>
+        <div class="wf-arrow"><svg><use href="#i-arrow"/></svg></div>
+        <div class="wf-node support">
+            <div class="tile"><svg><use href="#i-closing"/></svg></div>
+            <div class="lbl">الإقفال</div>
+            <div class="hint">أقفل الفترة، ثم السنة المالية.</div>
+        </div>
+    </div>
+</div>
+
+<h3>ما يحدث في كل خطوة</h3>
+<table class="t-compact">
+    <thead>
+        <tr><th style="width:15%">الخطوة</th><th style="width:26%">المكان</th><th>ما تُنشئه</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>1. العقارات</strong></td><td><span class="path">البيانات الرئيسية ▸ العقارات</span></td><td>سجل المبنى ونوع ملكيته. لا قيود محاسبية.</td></tr>
+        <tr><td><strong>2. الوحدات</strong></td><td><span class="path">البيانات الرئيسية ▸ الوحدات</span></td><td>وحدات قابلة للتأجير، تبدأ كل منها <em>شاغرة</em>. لا قيود محاسبية.</td></tr>
+        <tr><td><strong>3. المستأجرون</strong></td><td><span class="path">البيانات الرئيسية ▸ المستأجرون</span></td><td>سجل المستأجر وأي رصيد مدين افتتاحي.</td></tr>
+        <tr><td><strong>4. العقود</strong></td><td><span class="path">البيانات الرئيسية ▸ العقود</span></td><td>العقد، <strong>إضافة إلى</strong> جدول الفواتير المسودة الكامل <strong>وإلى</strong> خطة الاعتراف الشهري بالإيرادات. تصبح الوحدة <em>مشغولة</em>.</td></tr>
+        <tr><td><strong>5. الشيكات المؤجلة</strong></td><td><span class="path">العمليات ▸ الشيكات المؤجلة</span></td><td>سجل شيك وقيد نظامي مؤرخ بتاريخ الاستلام (شيكات مؤجلة في الحوزة / مقابل الشيكات المؤجلة)، يُرحّل عند الحفظ. ثم يُودع الشيك في البنك ويُحصّل أو يرتجع.</td></tr>
+        <tr><td><strong>6. الفوترة</strong></td><td><span class="path">العمليات ▸ فواتير العملاء</span></td><td>الذمة المدينة، والتزام الإيرادات المؤجلة، وأي ضريبة مستحقة.</td></tr>
+        <tr><td><strong>7. المدفوعات</strong></td><td><span class="path">العمليات ▸ سندات قبض العملاء</span></td><td>سند القبض، يُرحّل عند الحفظ: يدخل النقد، وتنخفض الذمة المدينة، وتتقدم حالة الفاتورة إلى مدفوعة جزئياً أو مدفوعة.</td></tr>
+    </tbody>
+</table>
+
+<div class="box ok">
+    <div class="box-title">القاعدة الوحيدة التي تجعل المسار يعمل</div>
+    <p>لا يمكنك تخطي أي خطوة، لأن كل شاشة تختار سجلاً أنشأته الشاشة التي قبلها.
+    فلا وحدة بدون عقار، ولا عقد بدون وحدة ومستأجر، ولا فاتورة بدون عقد،
+    ولا سند قبض بدون فاتورة. إذا كانت القائمة المنسدلة فارغة فالخطوة السابقة لم تكتمل.</p>
+</div>
+
+<div class="box warn">
+    <div class="box-title">رحّل مسوداتك</div>
+    <p>قد تترك الخطوتان 5 و7 قيوداً <strong>مسودة</strong> لا تصل إلى التقارير حتى تُرحّل من
+    <span class="path">العمليات ▸ الاستعلام عن القيود</span>. انظر <a href="#draft-post-reset">المسودة والترحيل والإعادة إلى مسودة</a>.</p>
+</div>
+
+<h3>أسبوع أول نموذجي</h3>
+<ol class="steps">
+    <li><strong>اليوم 1 — الإعداد.</strong> راجع دليل الحسابات، وأكّد ربط الحسابات، وأدخل الأرصدة الافتتاحية وتأكد من توازنها.</li>
+    <li><strong>اليوم 2 — المحفظة.</strong> أدخل كل عقار، ثم كل وحدة تحت كل عقار.</li>
+    <li><strong>اليوم 3 — الأشخاص.</strong> أدخل المستأجرين (مع الأرصدة الافتتاحية عند الانتقال من نظام آخر) والموردين.</li>
+    <li><strong>اليوم 4 — العقود.</strong> أدخل كل عقد سارٍ. وراجع جدول الفواتير المُنشأ بعد كل عقد.</li>
+    <li><strong>اليوم 5 — الشيكات.</strong> سجّل الشيكات المؤجلة المحتفظ بها لكل عقد.</li>
+    <li><strong>اليوم 6 — التحقق.</strong> رحّل كل مسودة من الاستعلام عن القيود، ثم شغّل ميزان المراجعة وتأكد من تساوي إجمالي المدين والدائن.</li>
+</ol>

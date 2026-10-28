@@ -12,7 +12,7 @@
     </div>
     <div class="d-flex gap-2 flex-wrap">
         <a asp-action="Manual" target="_blank" class="btn btn-dark">@T["Full manual"]</a>
-        <a href="~/manual/RealEstateManager-User-Manual.pdf" target="_blank" class="btn btn-outline-dark">@T["Download PDF"]</a>
+        <a href="~/manual/RealEstateManager-User-Manual@(RealEstateManager.Services.Localization.UiLanguages.IsArabic ? "-ar" : "").pdf" target="_blank" class="btn btn-outline-dark">@T["Download PDF"]</a>
         <a asp-action="Training" target="_blank" class="btn btn-outline-dark">@T["Training workbook"]</a>
     </div>
 </div>

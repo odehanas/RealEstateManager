@@ -99,11 +99,13 @@ namespace RealEstateManager.Controllers
         /// <summary>
         /// The Training Workbook: practice transactions for new users, step by step with
         /// the result to expect. Public for the same reason as the manual, so its PDF can
-        /// be produced straight from this page.
+        /// be produced straight from this page. Arabic readers get the Arabic copy, which is
+        /// written out in full rather than translated phrase by phrase.
         /// </summary>
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult Training() => View();
+        public IActionResult Training() =>
+            View(Services.Localization.UiLanguages.IsArabic ? "TrainingAr" : "Training");
 
         /// <summary>
         /// For owners: the controls the system enforces, the ones to adopt as policy, and

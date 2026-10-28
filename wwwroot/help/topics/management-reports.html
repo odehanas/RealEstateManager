@@ -118,10 +118,8 @@ the score so the ranking can always be explained to the tenant or to management.
     <li><strong>Tenure (yrs)</strong> runs from the tenant's earliest lease start date to the as-of date, across all their contracts.</li>
 </ul>
 
-<div class="box warn">
-    <div class="box-title">PDC reliability needs a bounce workflow to discriminate</div>
-    <p>The PDC register supports a <em>Bounced</em> status, but no screen currently sets it — a cheque is
-    either <em>Received</em> or <em>Cleared</em>. Until a bounce action exists, the PDC reliability
-    component scores 100% for every tenant who has had a cheque clear, and therefore does not yet
-    separate good payers from bad ones. The other three components carry the ranking in the meantime.</p>
+<div class="box">
+    <div class="box-title">PDC reliability counts every returned cheque</div>
+    <p>A cheque recorded as <em>Bounced</em> on the <a href="#pdc-receipts">PDC Receipts</a> screen counts against the
+    tenant here even after it has been replaced, because it is part of how the tenant has paid.</p>
 </div>

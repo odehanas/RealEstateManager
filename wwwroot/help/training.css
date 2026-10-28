@@ -101,7 +101,7 @@ code, .path { font-family: Consolas, "Courier New", monospace; font-size: 92%; }
 
 .scenario {
     border: 1px solid var(--line);
-    border-left: 4px solid var(--accent);
+    border-inline-start: 4px solid var(--accent);
     border-radius: 6px;
     padding: 12px 14px 10px;
     margin: 0 0 16px;
@@ -115,9 +115,9 @@ code, .path { font-family: Consolas, "Courier New", monospace; font-size: 92%; }
 .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 9pt; color: var(--muted); margin: 4px 0 8px; }
 .facts b { color: var(--ink); font-weight: 600; }
 
-ol.steps { margin: .3em 0 .6em; padding-left: 1.5em; }
-ol.steps > li { margin: .25em 0; padding-left: .2em; }
-ol.steps ul { margin: .2em 0; padding-left: 1.2em; }
+ol.steps { margin: .3em 0 .6em; padding-inline-start: 1.5em; }
+ol.steps > li { margin: .25em 0; padding-inline-start: .2em; }
+ol.steps ul { margin: .2em 0; padding-inline-start: 1.2em; }
 
 .data, .expect, .watch { border-radius: 5px; padding: 8px 12px; margin: 8px 0; break-inside: avoid; }
 .data { background: #f6f8fb; border: 1px dashed #b7c4d3; }
@@ -129,20 +129,20 @@ ol.steps ul { margin: .2em 0; padding-left: 1.2em; }
 .expect > strong:first-child { color: var(--ok); }
 .watch > strong:first-child { color: var(--warn); }
 .data > strong:first-child { color: var(--navy); }
-.data ul, .expect ul, .watch ul { margin: .2em 0; padding-left: 1.2em; }
+.data ul, .expect ul, .watch ul { margin: .2em 0; padding-inline-start: 1.2em; }
 
 /* Tables scroll sideways inside their box on a narrow screen instead of
    pushing the page wider than the phone. */
 .tbl { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 6px 0 8px; }
 table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
-th, td { border: 1px solid var(--line); padding: 4px 7px; text-align: left; vertical-align: top; }
+th, td { border: 1px solid var(--line); padding: 4px 7px; text-align: start; vertical-align: top; }
 th { background: #eef2f7; color: var(--navy); font-weight: 600; }
-td.num, th.num { text-align: right; white-space: nowrap; }
+td.num, th.num { text-align: end; white-space: nowrap; }
 table.je td:first-child { min-width: 150px; }
 
 .signoff { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 9pt; color: var(--muted); border-top: 1px dotted var(--line); padding-top: 6px; margin-top: 6px; }
 .signoff span { white-space: nowrap; }
-.box { display: inline-block; width: 11px; height: 11px; border: 1.5px solid var(--muted); border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+.box { display: inline-block; width: 11px; height: 11px; border: 1.5px solid var(--muted); border-radius: 2px; vertical-align: -1px; margin-inline-end: 4px; }
 
 .end-note { margin-top: 26px; padding-top: 14px; border-top: 2px solid var(--accent); font-size: 9pt; color: var(--muted); }
 
@@ -162,7 +162,7 @@ table.je td:first-child { min-width: 150px; }
     h3 { font-size: 17px; }
     .scenario { padding: 12px 12px 8px; border-radius: 8px; }
     .facts { font-size: 13px; flex-direction: column; gap: 2px; }
-    ol.steps { padding-left: 1.3em; }
+    ol.steps { padding-inline-start: 1.3em; }
     ol.steps > li { margin: .45em 0; }
     table { font-size: 13px; }
     th, td { padding: 6px 7px; }
@@ -183,3 +183,6 @@ table.je td:first-child { min-width: 150px; }
     .tbl { overflow: visible; }
     table, .data, .expect, .watch, .signoff { break-inside: avoid; }
 }
+
+/* Spaced-out letters break the joins of Arabic script. */
+[dir="rtl"] * { letter-spacing: 0 !important; }

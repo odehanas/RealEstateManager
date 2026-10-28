@@ -4,25 +4,27 @@
     // layout, and the PDF is produced straight from it.
     Layout = null;
     var chapter = 0;
+    var arabic = RealEstateManager.Services.Localization.UiLanguages.IsArabic;
+    var pdfSuffix = arabic ? "-ar" : "";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@(arabic ? "ar" : "en")" dir="@(arabic ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RealEstateManager — User Manual</title>
+    <title>RealEstateManager — @T["User Manual"]</title>
     <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/help/manual.css" asp-append-version="true" />
 </head>
 <body>
 
 <div class="toolbar">
-    <div><strong>RealEstateManager</strong> &nbsp;— User Manual</div>
+    <div><strong>RealEstateManager</strong> &nbsp;— @T["User Manual"]</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <a class="ghost" href="/Help">Help Center</a>
-        <a class="ghost" href="/Help/Training">Training Workbook</a>
-        <a class="ghost" href="/manual/RealEstateManager-User-Manual.pdf" target="_blank">Download PDF</a>
-        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+        <a class="ghost" href="/Help">@T["Help Center"]</a>
+        <a class="ghost" href="/Help/Training">@T["Training Workbook"]</a>
+        <a class="ghost" href="/manual/RealEstateManager-User-Manual@(pdfSuffix).pdf" target="_blank">@T["Download PDF"]</a>
+        <button type="button" onclick="window.print()">@T["Print / Save as PDF"]</button>
     </div>
 </div>
 
@@ -40,30 +42,29 @@
 
         <div>
             <div class="rule"></div>
-            <h1>User Manual</h1>
-            <div class="sub">Property, lease and accounting management —<br/>the complete operating guide</div>
+            <h1>@T["User Manual"]</h1>
+            <div class="sub">@T["Property, lease and accounting management —"]<br/>@T["the complete operating guide"]</div>
             <div class="chips">
-                <span class="chip">Properties &amp; Units</span>
-                <span class="chip">Tenants &amp; Contracts</span>
-                <span class="chip">PDC Management</span>
-                <span class="chip">Invoicing &amp; VAT</span>
-                <span class="chip">Double-Entry Accounting</span>
-                <span class="chip">Financial Reporting</span>
-                <span class="chip">Tenant Self-Service</span>
+                <span class="chip">@T["Properties & Units"]</span>
+                <span class="chip">@T["Tenants & Contracts"]</span>
+                <span class="chip">@T["PDC Management"]</span>
+                <span class="chip">@T["Invoicing & VAT"]</span>
+                <span class="chip">@T["Double-Entry Accounting"]</span>
+                <span class="chip">@T["Financial Reporting"]</span>
+                <span class="chip">@T["Tenant Self-Service"]</span>
             </div>
         </div>
 
         <div class="meta">
-            Applies to: the RealEstateManager web application<br/>
-            Audience: property administrators, leasing staff, accountants, system administrators<br/>
-            Edition: @DateTime.Today.ToString("MMMM yyyy") &nbsp;·&nbsp; The same topics appear under the
-            <strong>Help</strong> button on every screen
+            @T["Applies to: the RealEstateManager web application"]<br/>
+            @T["Audience: property administrators, leasing staff, accountants, system administrators"]<br/>
+            @T["Edition:"] @DateTime.Today.ToString("MMMM yyyy", arabic ? new System.Globalization.CultureInfo("ar-AE") : System.Globalization.CultureInfo.InvariantCulture) &nbsp;·&nbsp; @T.Html("The same topics appear under the <strong>Help</strong> button on every screen")
         </div>
     </section>
 
     <section class="contents" style="break-before: page; page-break-before: always;">
-        <h2>Contents</h2>
-        <p class="small" style="color:#5b6774">Every line is a link. In the PDF, click a line to jump to that chapter.</p>
+        <h2>@T["Contents"]</h2>
+        <p class="small" style="color:#5b6774">@T["Every line is a link. In the PDF, click a line to jump to that chapter."]</p>
         <div class="toc">
             @{ var tocNumber = 0; }
             @foreach (var group in Model.Groups)
@@ -90,7 +91,7 @@
                 <h2>@topic.Title</h2>
                 @if (!string.IsNullOrWhiteSpace(topic.Path))
                 {
-                    <p class="where">Where: <strong>@topic.Path</strong></p>
+                    <p class="where">@T["Where:"] <strong>@topic.Path</strong></p>
                 }
                 <div class="help-content">
                     @Html.Raw(Model.Content.GetValueOrDefault(topic.Key, string.Empty))
@@ -100,8 +101,8 @@
     }
 
     <div class="end-note">
-        <strong style="color:#0f2740">RealEstateManager — User Manual</strong><br/>
-        End of document. To print or save: <strong>Ctrl + P</strong> → <strong>Save as PDF</strong> → paper size <strong>A4</strong>.
+        <strong style="color:#0f2740">RealEstateManager — @T["User Manual"]</strong><br/>
+        @T.Html("End of document. To print or save: <strong>Ctrl + P</strong> → <strong>Save as PDF</strong> → paper size <strong>A4</strong>.")
     </div>
 </div>
 

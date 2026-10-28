@@ -1,0 +1,75 @@
+# Arabic for the workflow topic (applied in order; longer passages first)
+<p>This is the operating map of RealEstateManager. Work left to right: each step depends on the one ||| <p>هذه خريطة العمل في RealEstateManager. اعمل بالترتيب: كل خطوة تعتمد على
+before it, because the record you create at each stage is selected in the next. The same diagram is ||| التي قبلها، لأن السجل الذي تنشئه في كل مرحلة يُختار في المرحلة التالية. والمخطط نفسه
+available inside the application as a clickable home screen under <span class="path">Operations ▸ Workflow Guide</span>.</p> ||| متاح داخل التطبيق كشاشة تفاعلية في <span class="path">العمليات ▸ دليل سير العمل</span>.</p>
+Main operating flow — start here ||| مسار العمل الرئيسي — ابدأ من هنا
+<div class="hint">Register the building. Owned or Managed.</div> ||| <div class="hint">سجّل المبنى. مملوك أو مُدار.</div>
+<div class="hint">Add the rentable units inside the property.</div> ||| <div class="hint">أضف الوحدات القابلة للتأجير داخل العقار.</div>
+<div class="hint">Register the occupier and their details.</div> ||| <div class="hint">سجّل الشاغل وبياناته.</div>
+<div class="hint">Lease the unit to the tenant. Invoices auto-generate.</div> ||| <div class="hint">أجّر الوحدة للمستأجر. تُنشأ الفواتير تلقائياً.</div>
+<div class="hint">Log the post-dated cheques taken at signing.</div> ||| <div class="hint">سجّل الشيكات المؤجلة المستلمة عند التوقيع.</div>
+<div class="hint">Post the rent invoices when they fall due.</div> ||| <div class="hint">رحّل فواتير الإيجار عند استحقاقها.</div>
+<div class="hint">Record collections and settle the invoice.</div> ||| <div class="hint">سجّل التحصيلات وسدّد الفاتورة.</div>
+<div class="hint">Seeded automatically. Review and extend.</div> ||| <div class="hint">مُعدّ تلقائياً. راجعه ووسّعه.</div>
+<div class="hint">Tells the system which account each posting uses.</div> ||| <div class="hint">يحدد للنظام الحساب الذي يستخدمه كل قيد.</div>
+<div class="hint">Bring forward legacy balances. Must net to zero.</div> ||| <div class="hint">انقل الأرصدة السابقة. يجب أن يكون صافيها صفراً.</div>
+<div class="hint">Refundable deposit held as a liability.</div> ||| <div class="hint">تأمين قابل للرد محتفظ به كالتزام.</div>
+<div class="hint">Releases one month of rent at each month end.</div> ||| <div class="hint">يُفرج عن إيجار شهر في نهاية كل شهر.</div>
+<div class="hint">Suppliers and service providers.</div> ||| <div class="hint">الموردون ومقدمو الخدمات.</div>
+<div class="hint">Expenses and recoverable VAT.</div> ||| <div class="hint">المصروفات والضريبة القابلة للاسترداد.</div>
+<div class="hint">Settle the payable.</div> ||| <div class="hint">سدّد الذمة الدائنة.</div>
+<div class="hint">Run the monthly depreciation batch.</div> ||| <div class="hint">شغّل دفعة الإهلاك الشهري.</div>
+<div class="hint">Amortise prepaid expenses.</div> ||| <div class="hint">أطفئ المصروفات المدفوعة مقدماً.</div>
+<div class="hint">Adjustments and accruals.</div> ||| <div class="hint">التسويات والمستحقات.</div>
+<div class="hint">Trial Balance, P&amp;L, Balance Sheet.</div> ||| <div class="hint">ميزان المراجعة، الأرباح والخسائر، الميزانية العمومية.</div>
+<div class="hint">Close the period, then the fiscal year.</div> ||| <div class="hint">أقفل الفترة، ثم السنة المالية.</div>
+<span class="step-no">STEP ||| <span class="step-no">الخطوة
+<div class="lbl">Properties</div> ||| <div class="lbl">العقارات</div>
+<div class="lbl">Units</div> ||| <div class="lbl">الوحدات</div>
+<div class="lbl">Tenants</div> ||| <div class="lbl">المستأجرون</div>
+<div class="lbl">Contracts</div> ||| <div class="lbl">العقود</div>
+<div class="lbl">PDCs</div> ||| <div class="lbl">الشيكات المؤجلة</div>
+<div class="lbl">Invoicing</div> ||| <div class="lbl">الفوترة</div>
+<div class="lbl">Payments<br/>Received</div> ||| <div class="lbl">المدفوعات<br/>المستلمة</div>
+<div class="lbl">Chart of<br/>Accounts</div> ||| <div class="lbl">دليل<br/>الحسابات</div>
+<div class="lbl">Account<br/>Mapping</div> ||| <div class="lbl">ربط<br/>الحسابات</div>
+<div class="lbl">Opening<br/>Balances</div> ||| <div class="lbl">الأرصدة<br/>الافتتاحية</div>
+<div class="lbl">Security<br/>Deposits</div> ||| <div class="lbl">مبالغ<br/>التأمين</div>
+<div class="lbl">Revenue<br/>Recognition</div> ||| <div class="lbl">الاعتراف<br/>بالإيرادات</div>
+<div class="lbl">Vendors</div> ||| <div class="lbl">الموردون</div>
+<div class="lbl">Vendor<br/>Bills</div> ||| <div class="lbl">فواتير<br/>الموردين</div>
+<div class="lbl">Vendor<br/>Payments</div> ||| <div class="lbl">دفعات<br/>الموردين</div>
+<div class="lbl">Depreciation</div> ||| <div class="lbl">الإهلاك</div>
+<div class="lbl">Prepayments</div> ||| <div class="lbl">المدفوعات المقدمة</div>
+<div class="lbl">Manual<br/>Journals</div> ||| <div class="lbl">القيود<br/>اليدوية</div>
+<div class="lbl">Reports</div> ||| <div class="lbl">التقارير</div>
+<div class="lbl">Closing</div> ||| <div class="lbl">الإقفال</div>
+<span>continues below</span> ||| <span>يتبع أدناه</span>
+<span class="sw"></span> Main operating flow</span> ||| <span class="sw"></span> مسار العمل الرئيسي</span>
+<span class="sw s2"></span> Supporting &amp; period-end activity</span> ||| <span class="sw s2"></span> الأنشطة المساندة وأنشطة نهاية الفترة</span>
+Before you start — one-time company setup ||| قبل أن تبدأ — إعداد الشركة لمرة واحدة
+Alongside the lease — deposits, revenue &amp; payables ||| مع العقد — التأمينات والإيرادات والذمم الدائنة
+Period end — every month, then every year ||| نهاية الفترة — كل شهر، ثم كل سنة
+<h3>What happens at each step</h3> ||| <h3>ما يحدث في كل خطوة</h3>
+<tr><th style="width:15%">Step</th><th style="width:26%">Where</th><th>What it creates</th></tr> ||| <tr><th style="width:15%">الخطوة</th><th style="width:26%">المكان</th><th>ما تُنشئه</th></tr>
+<tr><td><strong>1. Properties</strong></td><td><span class="path">Master Data ▸ Properties</span></td><td>The building record and its ownership type. No accounting.</td></tr> ||| <tr><td><strong>1. العقارات</strong></td><td><span class="path">البيانات الرئيسية ▸ العقارات</span></td><td>سجل المبنى ونوع ملكيته. لا قيود محاسبية.</td></tr>
+<tr><td><strong>2. Units</strong></td><td><span class="path">Master Data ▸ Units</span></td><td>Rentable units, each starting as <em>Vacant</em>. No accounting.</td></tr> ||| <tr><td><strong>2. الوحدات</strong></td><td><span class="path">البيانات الرئيسية ▸ الوحدات</span></td><td>وحدات قابلة للتأجير، تبدأ كل منها <em>شاغرة</em>. لا قيود محاسبية.</td></tr>
+<tr><td><strong>3. Tenants</strong></td><td><span class="path">Master Data ▸ Tenants</span></td><td>The tenant register and any opening receivable balance.</td></tr> ||| <tr><td><strong>3. المستأجرون</strong></td><td><span class="path">البيانات الرئيسية ▸ المستأجرون</span></td><td>سجل المستأجر وأي رصيد مدين افتتاحي.</td></tr>
+<tr><td><strong>4. Contracts</strong></td><td><span class="path">Master Data ▸ Leases</span></td><td>The lease, <strong>plus</strong> the complete draft invoice schedule <strong>plus</strong> the monthly revenue-recognition plan. The unit becomes <em>Occupied</em>.</td></tr> ||| <tr><td><strong>4. العقود</strong></td><td><span class="path">البيانات الرئيسية ▸ العقود</span></td><td>العقد، <strong>إضافة إلى</strong> جدول الفواتير المسودة الكامل <strong>وإلى</strong> خطة الاعتراف الشهري بالإيرادات. تصبح الوحدة <em>مشغولة</em>.</td></tr>
+<tr><td><strong>5. PDCs</strong></td><td><span class="path">Operations ▸ PDC Receipts</span></td><td>A cheque record and a memorandum journal dated on the received date (PDC On Hand / PDC Contra), posted on save.</td></tr> ||| <tr><td><strong>5. الشيكات المؤجلة</strong></td><td><span class="path">العمليات ▸ الشيكات المؤجلة</span></td><td>سجل شيك وقيد نظامي مؤرخ بتاريخ الاستلام (شيكات مؤجلة في الحوزة / مقابل الشيكات المؤجلة)، يُرحّل عند الحفظ. ثم يُودع الشيك في البنك ويُحصّل أو يرتجع.</td></tr>
+<tr><td><strong>6. Invoicing</strong></td><td><span class="path">Operations ▸ Customer Invoices</span></td><td>The receivable, the deferred-revenue liability and any VAT payable.</td></tr> ||| <tr><td><strong>6. الفوترة</strong></td><td><span class="path">العمليات ▸ فواتير العملاء</span></td><td>الذمة المدينة، والتزام الإيرادات المؤجلة، وأي ضريبة مستحقة.</td></tr>
+<tr><td><strong>7. Payments</strong></td><td><span class="path">Operations ▸ Customer Receipts</span></td><td>The receipt, posted on save: cash in, receivable down, invoice status advanced to Partially Paid or Paid.</td></tr> ||| <tr><td><strong>7. المدفوعات</strong></td><td><span class="path">العمليات ▸ سندات قبض العملاء</span></td><td>سند القبض، يُرحّل عند الحفظ: يدخل النقد، وتنخفض الذمة المدينة، وتتقدم حالة الفاتورة إلى مدفوعة جزئياً أو مدفوعة.</td></tr>
+<div class="box-title">The one rule that makes the flow work</div> ||| <div class="box-title">القاعدة الوحيدة التي تجعل المسار يعمل</div>
+<p>You cannot skip a step, because each screen selects a record created by the previous screen. ||| <p>لا يمكنك تخطي أي خطوة، لأن كل شاشة تختار سجلاً أنشأته الشاشة التي قبلها.
+There is no unit without a property, no lease without a unit and a tenant, no invoice without a lease, ||| فلا وحدة بدون عقار، ولا عقد بدون وحدة ومستأجر، ولا فاتورة بدون عقد،
+and no receipt without an invoice. If a dropdown is empty, the previous step has not been completed.</p> ||| ولا سند قبض بدون فاتورة. إذا كانت القائمة المنسدلة فارغة فالخطوة السابقة لم تكتمل.</p>
+<div class="box-title">Post your drafts</div> ||| <div class="box-title">رحّل مسوداتك</div>
+<p>Steps 5 and 7 save <strong>draft</strong> journals that do not reach the reports until posted from ||| <p>قد تترك الخطوتان 5 و7 قيوداً <strong>مسودة</strong> لا تصل إلى التقارير حتى تُرحّل من
+<span class="path">Operations ▸ Journal Inquiry</span>. See <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p> ||| <span class="path">العمليات ▸ الاستعلام عن القيود</span>. انظر <a href="#draft-post-reset">المسودة والترحيل والإعادة إلى مسودة</a>.</p>
+<h3>A typical first week</h3> ||| <h3>أسبوع أول نموذجي</h3>
+<li><strong>Day 1 — Setup.</strong> Review the Chart of Accounts, confirm Account Mapping, enter Opening Balances and confirm they are balanced.</li> ||| <li><strong>اليوم 1 — الإعداد.</strong> راجع دليل الحسابات، وأكّد ربط الحسابات، وأدخل الأرصدة الافتتاحية وتأكد من توازنها.</li>
+<li><strong>Day 2 — Portfolio.</strong> Enter every property, then every unit under each property.</li> ||| <li><strong>اليوم 2 — المحفظة.</strong> أدخل كل عقار، ثم كل وحدة تحت كل عقار.</li>
+<li><strong>Day 3 — People.</strong> Enter tenants (with opening balances if migrating) and vendors.</li> ||| <li><strong>اليوم 3 — الأشخاص.</strong> أدخل المستأجرين (مع الأرصدة الافتتاحية عند الانتقال من نظام آخر) والموردين.</li>
+<li><strong>Day 4 — Contracts.</strong> Enter each live lease. Check the generated invoice schedule after each one.</li> ||| <li><strong>اليوم 4 — العقود.</strong> أدخل كل عقد سارٍ. وراجع جدول الفواتير المُنشأ بعد كل عقد.</li>
+<li><strong>Day 5 — Cheques.</strong> Log the PDCs held against each lease.</li> ||| <li><strong>اليوم 5 — الشيكات.</strong> سجّل الشيكات المؤجلة المحتفظ بها لكل عقد.</li>
+<li><strong>Day 6 — Verify.</strong> Post every draft in Journal Inquiry, then run the Trial Balance and confirm total debit equals total credit.</li> ||| <li><strong>اليوم 6 — التحقق.</strong> رحّل كل مسودة من الاستعلام عن القيود، ثم شغّل ميزان المراجعة وتأكد من تساوي إجمالي المدين والدائن.</li>

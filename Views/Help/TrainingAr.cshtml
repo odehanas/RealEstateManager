@@ -1,0 +1,1127 @@
+@{
+    // The Arabic copy of Training.cshtml: the same exercises, written for the Arabic screens.
+    // The practice data (names, numbers, amounts) stays as typed in the English copy.
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RealEstateManager — كراسة التدريب</title>
+    <link rel="stylesheet" href="~/help/training.css" asp-append-version="true" />
+</head>
+<body>
+
+<div class="toolbar">
+    <div><strong>RealEstateManager</strong> &nbsp;— كراسة التدريب</div>
+    <div class="actions">
+        <a class="ghost" href="/Help/Manual">دليل المستخدم</a>
+        <a class="ghost" href="/manual/RealEstateManager-Training-Workbook-ar.pdf" target="_blank">تنزيل PDF</a>
+        <button type="button" onclick="window.print()">طباعة / حفظ كملف PDF</button>
+    </div>
+</div>
+
+<div class="sheet">
+
+<section class="cover">
+    <div>
+        <div class="brandmark">
+            <svg viewBox="0 0 24 24" width="34" height="34" style="stroke:#8ec2ff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round">
+                <path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/>
+            </svg>
+            RealEstateManager
+        </div>
+    </div>
+    <div>
+        <div class="rule"></div>
+        <h1>كراسة التدريب</h1>
+        <div class="sub">حركات تدريبية للمستخدمين الجدد —<br/>خطوة بخطوة، مع النتيجة المتوقعة</div>
+        <div class="chips">
+            <span class="chip">عقود الإيجار</span>
+            <span class="chip">الفواتير وسندات القبض</span>
+            <span class="chip">الشيكات المؤجلة</span>
+            <span class="chip">فواتير الموردين</span>
+            <span class="chip">المصروفات النثرية والقيود</span>
+            <span class="chip">الأصول الثابتة</span>
+            <span class="chip">تسويات الملاك</span>
+            <span class="chip">إقفال نهاية الشهر</span>
+        </div>
+    </div>
+    <div class="meta">
+        موجهة إلى: موظفي التأجير الجدد والمحاسبين والمشرفين، أثناء العمل في شركة تدريبية<br/>
+        تفترض: أن الشركة ودليل الحسابات والبيانات الرئيسية مُعدّة مسبقاً — انظر دليل المستخدم<br/>
+        الإصدار: @DateTime.Today.ToString("MMMM yyyy", new System.Globalization.CultureInfo("ar-AE"))
+    </div>
+</section>
+
+@* =========================================================== CONTENTS *@
+<section>
+    <h2>المحتويات</h2>
+    <div class="toc">
+        <div class="grp">
+            <div class="grp-title">قبل أن تبدأ</div>
+            <a href="#how"><span class="num">0.1</span>طريقة استخدام هذه الكراسة</a>
+            <a href="#cast"><span class="num">0.2</span>الشركة التدريبية</a>
+            <a href="#draft"><span class="num">0.3</span>المسودة والترحيل والاستعلام عن القيود</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">1 · التأجير</div>
+            <a href="#t1"><span class="num">T1</span>عقد تجاري يُفعّل فوراً</a>
+            <a href="#t2"><span class="num">T2</span>عقد سكني عبر الاعتماد</a>
+            <a href="#t3"><span class="num">T3</span>عقد في عقار مُدار</a>
+            <a href="#t4"><span class="num">T4</span>طباعة العقد وملصق QR الخاص به</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">2 · ذمم المستأجرين</div>
+            <a href="#t5"><span class="num">T5</span>ترحيل فاتورة إيجار وطباعتها</a>
+            <a href="#t6"><span class="num">T6</span>إشعار دائن لخصم على الإيجار</a>
+            <a href="#t7"><span class="num">T7</span>سند قبض بتحويل بنكي</a>
+            <a href="#t8"><span class="num">T8</span>الدفعات الجزئية</a>
+            <a href="#t9"><span class="num">T9</span>استلام شيكات مؤجلة</a>
+            <a href="#t10"><span class="num">T10</span>تحصيل شيك وتصحيح آخر</a>
+            <a href="#t11"><span class="num">T11</span>التأمين</a>
+            <a href="#t12"><span class="num">T12</span>طلب مستأجر: مهلة للسداد</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">3 · ذمم الموردين</div>
+            <a href="#t13"><span class="num">T13</span>فاتورة من مورد مسجل في الضريبة</a>
+            <a href="#t14"><span class="num">T14</span>فاتورة من مورد غير مسجل</a>
+            <a href="#t15"><span class="num">T15</span>تصحيح فاتورة مرحّلة</a>
+            <a href="#t16"><span class="num">T16</span>فاتورة متأخرة لشهر مقفل</a>
+            <a href="#t17"><span class="num">T17</span>السداد للموردين</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">4 · النقد والأستاذ العام</div>
+            <a href="#t18"><span class="num">T18</span>عهدة المصروفات النثرية</a>
+            <a href="#t19"><span class="num">T19</span>التأمين السنوي كمصروف مدفوع مقدماً</a>
+            <a href="#t20"><span class="num">T20</span>القيود اليدوية</a>
+            <a href="#t21"><span class="num">T21</span>سحب المالك</a>
+            <a href="#t22"><span class="num">T22</span>أصل ثابت: الشراء والرسملة والإهلاك</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">5 · الملاك</div>
+            <a href="#t23"><span class="num">T23</span>فواتير العمولة الضريبية</a>
+            <a href="#t24"><span class="num">T24</span>السداد للمالك</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">6 · نهاية الشهر ونهاية السنة</div>
+            <a href="#t25"><span class="num">T25</span>إقفال الشهر من لوحة الإقفال</a>
+            <a href="#t26"><span class="num">T26</span>إعادة فتح شهر مقفل بطلب</a>
+            <a href="#t27"><span class="num">T27</span>الإقرار الضريبي وسداد الضريبة</a>
+            <a href="#t28"><span class="num">T28</span>مراجعة التقارير</a>
+            <a href="#t29"><span class="num">T29</span>إقفال نهاية السنة</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">7 · متقدم (اختياري)</div>
+            <a href="#t30"><span class="num">T30</span>تكاليف مشروع التطوير</a>
+            <a href="#t31"><span class="num">T31</span>بيع وحدة</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">8 · الصيانة والملاك والمستندات</div>
+            <a href="#t32"><span class="num">T32</span>إعداد فريق الصيانة وإنجاز عمل</a>
+            <a href="#t33"><span class="num">T33</span>تعليق الصيانة لمستأجر عليه فاتورة متأخرة</a>
+            <a href="#t34"><span class="num">T34</span>قراءة لوحة الصيانة</a>
+            <a href="#t35"><span class="num">T35</span>فوترة عقار مُدار باسم المالك</a>
+            <a href="#t36"><span class="num">T36</span>نتائج المالك: كشف الحساب والربحية</a>
+            <a href="#t37"><span class="num">T37</span>حفظ الهوية الإماراتية وجواز السفر لمستأجر</a>
+            <a href="#t38"><span class="num">T38</span>إرفاق العقد الموثق</a>
+            <a href="#t39"><span class="num">T39</span>قراءة فاتورة مورد ممسوحة ضوئياً</a>
+            <a href="#t40"><span class="num">T40</span>دع المساعد الذكي يكتب عنك (اختياري)</a>
+        </div>
+        <div class="grp">
+            <div class="grp-title">الملاحق</div>
+            <a href="#a1"><span class="num">أ</span>رسائل قد تراها</a>
+            <a href="#a2"><span class="num">ب</span>سجل تقدم المتدرب</a>
+        </div>
+    </div>
+</section>
+
+@* =========================================================== 0 *@
+<section class="section" id="how">
+    <span class="section-tag">قبل أن تبدأ</span>
+    <h2>0.1 طريقة استخدام هذه الكراسة</h2>
+    <p>
+        كل سيناريو عمل حقيقي ستؤديه في وظيفتك، مكتوب كتمرين قصير. نفّذها
+        <strong>بالترتيب</strong>: فالسيناريوهات اللاحقة تستخدم العقود والفواتير التي أنشأتها السابقة،
+        والأرقام المتوقعة تفترض أنك نفذتها.
+    </p>
+    <ul>
+        <li><strong>اعمل في الشركة التدريبية</strong>، لا في الشركة الفعلية أبداً. تحقق من اسم الشركة أعلى
+            كل شاشة قبل أن تبدأ.</li>
+        <li><strong>القوائم مكتوبة كمسارات</strong>: <span class="path">العمليات ▸ سندات قبض العملاء</span> تعني
+            افتح قائمة <em>العمليات</em> واختر <em>سندات قبض العملاء</em>. وتظهر الأزرار هكذا
+            <span class="btn">حفظ وترحيل</span>.</li>
+        <li><strong>التواريخ.</strong> "<em>اليوم 1</em>" يعني أول يوم في الشهر الحالي، و"<em>اليوم 10</em>"
+            العاشر منه، و"<em>نهاية الشهر</em>" آخر يوم فيه. استخدم السنة الحالية.</li>
+        <li><strong>ينتهي كل سيناريو بالنتيجة المتوقعة</strong>، وعادةً قيد اليومية. افتح
+            <span class="path">العمليات ▸ الاستعلام عن القيود</span> وقارن. وإذا اختلفت أرقامك، فابحث عن السبب
+            قبل أن تنتقل — فهنا يكمن التعلم.</li>
+        <li><strong>يلزم شخصان</strong> لسيناريوهات الاعتماد (T2 وT26): المتدرب، ومدرب
+            يحمل صلاحية الاعتماد. ولا يستطيع أحد اعتماد عمله بنفسه.</li>
+        <li>يوقّع المدرب على كل سيناريو أسفل مربعه، وفي السجل في الملحق ب.</li>
+    </ul>
+    <div class="watch">
+        <strong>على الهاتف</strong>
+        يمكن قراءة الكراسة على الهاتف، لكن أدخل الحركات على حاسوب: فالنماذج فيها حقول كثيرة.
+        وتتحرك الجداول العريضة أفقياً داخل مربعها.
+    </div>
+
+    <h2 id="cast" style="margin-top:1.4em">0.2 الشركة التدريبية</h2>
+    <p>سيكون المدرب قد أنشأ هذه السجلات. اطلبها إن كان أي منها ناقصاً؛ وإعدادها مشروح في دليل المستخدم.
+    وتبقى الأسماء بالإنجليزية كما هي مسجلة في النظام.</p>
+
+    <h4>العقارات والوحدات</h4>
+    <div class="tbl"><table>
+        <tr><th>العقار</th><th>الملكية</th><th>الوحدة</th><th>الضريبة</th><th>ملاحظات</th></tr>
+        <tr><td>Marina Heights</td><td>مملوك</td><td>Office 301</td><td>أساسية 5%</td><td>مكاتب تجارية</td></tr>
+        <tr><td>Palm Residences</td><td>مملوك</td><td>Apartment 704</td><td>معفاة</td><td>سكني، ليس مبنى جديداً</td></tr>
+        <tr><td>Garden Villas</td><td>مُدار</td><td>Villa 12</td><td>معفاة</td><td>المالك: Khalid Rahman · العمولة 5%</td></tr>
+    </table></div>
+
+    <h4>المستأجرون</h4>
+    <div class="tbl"><table>
+        <tr><th>المستأجر</th><th>النوع</th><th>ملاحظات</th></tr>
+        <tr><td>Al Noor Trading LLC</td><td>شركة</td><td>لديها رقم ضريبي مسجل</td></tr>
+        <tr><td>Sara Ahmed</td><td>فرد</td><td>الهوية الإماراتية مسجلة</td></tr>
+        <tr><td>Omar Haddad</td><td>فرد</td><td>الهوية الإماراتية مسجلة</td></tr>
+    </table></div>
+
+    <h4>الموردون</h4>
+    <div class="tbl"><table>
+        <tr><th>المورد</th><th>مسجل في الضريبة</th><th>يُستخدم في</th></tr>
+        <tr><td>Coastal Facility Services LLC</td><td>نعم، برقم ضريبي</td><td>T13، T17</td></tr>
+        <tr><td>Quick Fix Plumbing</td><td>لا</td><td>T14، T15، T17</td></tr>
+        <tr><td>Gulf Shield Insurance</td><td>نعم، برقم ضريبي</td><td>T19</td></tr>
+        <tr><td>PowerGen Equipment Trading</td><td>نعم، برقم ضريبي</td><td>T22</td></tr>
+    </table></div>
+
+    <h4>الحسابات التي ستتعامل معها</h4>
+    <div class="tbl"><table>
+        <tr><th>الرمز</th><th>الحساب</th><th>الرمز</th><th>الحساب</th></tr>
+        <tr><td>11100</td><td>النقد وما في حكمه (البنك)</td><td>21300</td><td>تأمينات المستأجرين</td></tr>
+        <tr><td>11150</td><td>المصروفات النثرية (العهدة)</td><td>21400</td><td>ضريبة القيمة المضافة المستحقة</td></tr>
+        <tr><td>11200</td><td>الذمم المدينة</td><td>21500</td><td>مستحقات الملاك</td></tr>
+        <tr><td>11300</td><td>ضريبة القيمة المضافة القابلة للاسترداد</td><td>21600</td><td>مقابل الشيكات المؤجلة</td></tr>
+        <tr><td>11400</td><td>الشيكات المؤجلة في الحوزة</td><td>34100</td><td>الحساب الجاري للمالك</td></tr>
+        <tr><td>11500</td><td>المصروفات المدفوعة مقدماً</td><td>41100</td><td>إيرادات الإيجار – المملوكة</td></tr>
+        <tr><td>15200 / 15300</td><td>الأصول الثابتة / مجمع الإهلاك</td><td>42100</td><td>إيرادات أتعاب الإدارة</td></tr>
+        <tr><td>15400</td><td>حساب تسوية الأصول الثابتة</td><td>51100</td><td>مصروفات تشغيل العقارات</td></tr>
+        <tr><td>21100</td><td>الذمم الدائنة</td><td>52100</td><td>صيانة العقارات</td></tr>
+        <tr><td>21200</td><td>دفعات مقدمة من العملاء (إيجار غير مكتسب)</td><td>61100 / 62100 / 63100</td><td>الإدارية / الإهلاك / تكاليف التمويل</td></tr>
+    </table></div>
+
+    <h2 id="draft" style="margin-top:1.4em">0.3 المسودة والترحيل والاستعلام عن القيود</h2>
+    <p>
+        كل حركة تُنتج قيد يومية. والقيد <strong>المسودة</strong> لا يظهر في أي تقرير؛ أما
+        <strong>المرحّل</strong> فيظهر. بعض الشاشات ترحّل فوراً، وأخرى تترك مسودة ترحّلها بنفسك.
+    </p>
+    <div class="tbl"><table>
+        <tr><th>الشاشات</th><th>ماذا يفعل الحفظ</th></tr>
+        <tr><td>فواتير العملاء، وفواتير الموردين، والإشعارات الدائنة</td><td>زر <span class="btn">ترحيل</span> يُنشئ القيد ويرحّله بنقرة واحدة.</td></tr>
+        <tr><td>سندات القبض، والشيكات المؤجلة، والتأمينات، ودفعات الموردين، والمصروفات النثرية، ومسحوبات المالك</td><td><span class="btn">حفظ وترحيل</span> يرحّل فوراً. وإذا رُفض، تبين رسالة صفراء السبب ويبقى القيد مسودة.</td></tr>
+        <tr><td>القيود اليدوية، والاعتراف بالإيرادات، والمدفوعات المقدمة</td><td>الحفظ يُنشئ مسودة. رحّلها من <span class="path">العمليات ▸ الاستعلام عن القيود</span>.</td></tr>
+        <tr><td>الأصول الثابتة</td><td>تُرحّل فوراً.</td></tr>
+    </table></div>
+    <div class="data">
+        <strong>لترحيل المسودات</strong>
+        <span class="path">العمليات ▸ الاستعلام عن القيود</span> ← اضبط <em>المرحّل فقط</em> على <em>لا</em> ← <span class="btn">انتقال</span> ←
+        <span class="btn">ترحيل</span> لقيد واحد، أو <span class="btn">ترحيل كل المسودات</span> لكل ما في التصفية.
+    </div>
+</section>
+
+@* =========================================================== 1 LEASING *@
+<section class="section">
+    <span class="section-tag">الوحدة 1</span>
+    <h2>التأجير</h2>
+    <p class="intro">العقد هو المحرك لكل ما سواه: فعند نفاذه يُنشئ كل فواتير الإيجار لمدته وخطة الإيراد شهراً بشهر.</p>
+
+    <div class="scenario" id="t1">
+        <div class="scenario-head"><span class="id">T1</span><h3>عقد تجاري يُفعّل فوراً</h3></div>
+        <div class="facts"><span><b>الدور:</b> موظف التأجير</span><span><b>القائمة:</b> البيانات الرئيسية ▸ عقود الإيجار</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>توقّع Al Noor Trading LLC عقد إيجار لمدة سنة على Office 301، بدفع ربع سنوي.</p>
+        <div class="data"><strong>بيانات التمرين</strong>
+            الوحدة: Marina Heights – Office 301 · المستأجر: Al Noor Trading LLC · البداية: اليوم 1 · النهاية: بعد سنة ناقص يوم ·
+            الإيجار السنوي: 120,000 · الفوترة: ربع سنوي · التأمين: 10,000
+        </div>
+        <ol class="steps">
+            <li>افتح <span class="path">البيانات الرئيسية ▸ عقود الإيجار</span> واختر <span class="btn">إنشاء عقد</span>.</li>
+            <li>اختر <em>الوحدة</em> و<em>المستأجر</em>.</li>
+            <li>أدخل <em>تاريخ البداية</em> و<em>تاريخ النهاية</em> و<em>الإيجار السنوي</em>.</li>
+            <li>اضبط <em>دورية الفوترة</em> على <em>ربع سنوي</em>.</li>
+            <li>تحقق من المعاملة الضريبية المعروضة: يجب أن تكون <em>أساسية 5%</em> من الوحدة. ولا تغيّرها.</li>
+            <li>أدخل <em>مبلغ التأمين</em> 10,000.</li>
+            <li>اختر <span class="btn">حفظ وتفعيل</span>. (إذا كانت شركتك تتطلب الاعتماد، استخدم <span class="btn">حفظ وإرسال للاعتماد</span> واطلب من المدرب الاعتماد، كما في T2.)</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <ul>
+                <li>العقد <em>نشط</em> برمز عقد مُولّد مثل <code>…-U301-C001-2026</code>. والوحدة <em>مشغولة</em>.</li>
+                <li>تعرض <span class="path">العمليات ▸ فواتير العملاء</span> <strong>4 فواتير مسودة</strong> بقيمة 30,000 + 1,500 ضريبة = <strong>31,500</strong>، بتاريخ اليوم 1 وكل ثلاثة أشهر بعده.</li>
+                <li>تعرض <span class="path">إعداد النظام ▸ الاعتراف بالإيرادات</span> <strong>12 قيداً مخططاً بقيمة 10,000</strong>، واحداً في نهاية كل شهر.</li>
+                <li>لا يوجد قيد بعد: فالعقد ليس حركة محاسبية.</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t2">
+        <div class="scenario-head"><span class="id">T2</span><h3>عقد سكني عبر الاعتماد</h3></div>
+        <div class="facts"><span><b>الدور:</b> موظف التأجير + المعتمد</span><span><b>القائمة:</b> البيانات الرئيسية ▸ عقود الإيجار، البيانات الرئيسية ▸ الاعتمادات</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <p>تستأجر Sara Ahmed الشقة Apartment 704. واعتماد العقود مفعّل، فيجب أن يعتمد شخص ثانٍ. ويعيده المعتمد أولاً مرة واحدة.</p>
+        <div class="data"><strong>بيانات التمرين</strong>
+            الوحدة: Palm Residences – Apartment 704 · المستأجر: Sara Ahmed · البداية: اليوم 1 · سنة واحدة · الإيجار السنوي: 72,000 · الفوترة: ربع سنوي ·
+            التأمين: 5,000 (يُكتب خطأً أولاً 50,000)
+        </div>
+        <ol class="steps">
+            <li><strong>المتدرب:</strong> أنشئ العقد كما في T1، لكن أدخل التأمين 50,000، واختر <span class="btn">حفظ وإرسال للاعتماد</span>.</li>
+            <li><strong>المعتمد:</strong> افتح <span class="path">البيانات الرئيسية ▸ الاعتمادات</span>، وافتح الطلب واقرأ الشروط والفواتير التي سيُنشئها.</li>
+            <li><strong>المعتمد:</strong> اختر <em>إعادة إلى المُنشئ</em> مع السبب "يجب أن يكون التأمين 5,000".</li>
+            <li><strong>المتدرب:</strong> عاد العقد إلى <em>مسودة</em>، مُعلَّماً <em>مُعاد</em> مع السبب. عدّله، وصحّح التأمين إلى 5,000، واختر <span class="btn">إرسال للاعتماد</span>.</li>
+            <li><strong>المعتمد:</strong> اعتمده.</li>
+            <li><strong>المتدرب:</strong> حاول اعتماد عقدك بنفسك في المرة القادمة — سيرفض النظام (قاعدة الشخصين).</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <ul>
+                <li>العقد <em>نشط</em>. ويعرض السجل في الأسفل الإرسال، والإعادة مع سببها، والاعتماد.</li>
+                <li>4 فواتير مسودة بقيمة <strong>18,000</strong> <strong>بلا ضريبة</strong> (سكني معفى)، و12 قيد اعتراف مخطط بقيمة <strong>6,000</strong>.</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المعتمد: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t3">
+        <div class="scenario-head"><span class="id">T3</span><h3>عقد في عقار مُدار</h3></div>
+        <div class="facts"><span><b>الدور:</b> موظف التأجير</span><span><b>القائمة:</b> البيانات الرئيسية ▸ عقود الإيجار</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>ندير Villa 12 لمالكها. والإيجار يعود للمالك؛ وعمولتنا البالغة 5% وحدها هي دخلنا.</p>
+        <div class="data"><strong>بيانات التمرين</strong>
+            الوحدة: Garden Villas – Villa 12 · المستأجر: Omar Haddad · البداية: اليوم 1 · سنة واحدة · الإيجار السنوي: 90,000 · الفوترة: نصف سنوي · التأمين: لا يوجد
+        </div>
+        <ol class="steps">
+            <li>أنشئ العقد وفعّله كما في T1.</li>
+            <li>افتح <span class="path">إعداد النظام ▸ الاعتراف بالإيرادات</span> وابحث عن قيود العقد.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <ul>
+                <li>فاتورتان مسودتان بقيمة <strong>45,000</strong> (بلا ضريبة)، بتاريخ اليوم 1 وبعد ستة أشهر.</li>
+                <li>12 قيد اعتراف مخطط بقيمة <strong>375</strong> لكل منها: 90,000 ÷ 12 × 5%. والعمولة وحدها تصبح إيراداً لنا.</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t4">
+        <div class="scenario-head"><span class="id">T4</span><h3>طباعة العقد وملصق QR الخاص به</h3></div>
+        <div class="facts"><span><b>الدور:</b> موظف التأجير</span><span><b>القائمة:</b> البيانات الرئيسية ▸ عقود الإيجار</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <ol class="steps">
+            <li>في صف عقد Al Noor، اختر <span class="btn">مسودة العقد</span>. تُفتح في تبويب جديد؛ اطبعها أو احفظها كملف PDF.</li>
+            <li>اختر <span class="btn">ملصق QR</span> واطبع الملصق لملف العقد.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            عقد إيجار كامل معبأ من العقد (الأطراف، والعين المؤجرة، والإيجار، وجدول الدفعات، والتأمين)، وملصق يعرض رمز العقد ورمز QR.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 2 RECEIVABLES *@
+<section class="section">
+    <span class="section-tag">الوحدة 2</span>
+    <h2>ذمم المستأجرين</h2>
+    <p class="intro">الفواتير يُنشئها العقد؛ ومهمتك ترحيلها عند استحقاقها، وتصحيحها بالإشعارات الدائنة، وتسجيل ما يدفعه المستأجرون.</p>
+
+    <div class="scenario" id="t5">
+        <div class="scenario-head"><span class="id">T5</span><h3>ترحيل فاتورة إيجار وطباعتها</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير العملاء</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>افتح <span class="path">العمليات ▸ فواتير العملاء</span>.</li>
+            <li>ابحث عن فاتورة <strong>اليوم 1</strong> لكل من العقود الثلاثة (Al Noor ‏31,500 · Sara ‏18,000 · Omar ‏45,000).</li>
+            <li>اختر <span class="btn">ترحيل</span> لكل منها. تصبح الحالة <em>مرحّلة</em>.</li>
+            <li>في فاتورة Al Noor اختر <span class="btn">فاتورة ضريبية</span>؛ وفي فاتورة Sara اختر <span class="btn">الفاتورة</span>. قارن بين المستندين.</li>
+            <li>اترك الفواتير اللاحقة مسودات: فهي تُرحّل عند استحقاقها.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة — Al Noor (مملوك، نسبة أساسية)</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr>
+                <tr><td>11200 الذمم المدينة</td><td class="num">31,500.00</td><td class="num"></td></tr>
+                <tr><td>21200 دفعات مقدمة من العملاء</td><td class="num"></td><td class="num">30,000.00</td></tr>
+                <tr><td>21400 ضريبة القيمة المضافة المستحقة</td><td class="num"></td><td class="num">1,500.00</td></tr>
+            </table></div>
+            فاتورة Sara بلا بند ضريبة. وفاتورة Omar تقيد لحساب <strong>21500 مستحقات الملاك</strong> مبلغ 45,000 بدلاً من 21200، لأن الإيجار يعود للمالك.
+            وفاتورة Al Noor <em>فاتورة ضريبية كاملة</em> تعرض الرقمين الضريبيين؛ أما فاتورة Sara <em>فاتورة</em> عادية لأن الإيجار المعفى لا يحمل ضريبة.
+        </div>
+        <div class="watch"><strong>لماذا لا يوجد إيراد؟</strong>
+            الفوترة ليست اكتساباً. فالفاتورة تُنشئ ذمة مدينة وإيجاراً غير مكتسب. ويأتي الإيراد شهراً بشهر عبر الاعتراف بالإيرادات (T25).
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t6">
+        <div class="scenario-head"><span class="id">T6</span><h3>إشعار دائن لخصم على الإيجار</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير العملاء</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>سُلّم Office 301 متأخراً ثلاثة أيام؛ ووافقت الإدارة على خصم 1,000 زائد الضريبة على الفاتورة الأولى.</p>
+        <ol class="steps">
+            <li>في فاتورة Al Noor لليوم 1، اختر <span class="btn">إشعار دائن</span>.</li>
+            <li><em>تاريخ الإشعار الدائن</em>: اليوم 5. <em>السبب</em>: اختر سبب الخصم من القائمة. <em>الشرح</em>: "خصم لتأخر تسليم Office 301".</li>
+            <li><em>المبلغ الصافي</em>: 1,000. وتُحتسب الضريبة البالغة 50 تلقائياً.</li>
+            <li>اترك <em>العكس إلى حساب</em> كما هو، واختر <span class="btn">حفظ وترحيل</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr>
+                <tr><td>21200 دفعات مقدمة من العملاء</td><td class="num">1,000.00</td><td class="num"></td></tr>
+                <tr><td>21400 ضريبة القيمة المضافة المستحقة</td><td class="num">50.00</td><td class="num"></td></tr>
+                <tr><td>11200 الذمم المدينة</td><td class="num"></td><td class="num">1,050.00</td></tr>
+            </table></div>
+            تعرض الفاتورة الآن 1,050 مُشعراً بها دائناً ورصيداً قدره <strong>30,450</strong>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t7">
+        <div class="scenario-head"><span class="id">T7</span><h3>سند قبض بتحويل بنكي</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير العملاء / سندات قبض العملاء</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <p>تحوّل Al Noor رصيد فاتورتها الأولى.</p>
+        <ol class="steps">
+            <li>في فاتورة Al Noor لليوم 1، اختر <span class="btn">استلام دفعة</span>. يُفتح نموذج سند القبض على تلك الفاتورة ويعرض المستحق 30,450.</li>
+            <li><em>رقم السند</em>: RCPT-T7 · <em>تاريخ السند</em>: اليوم 6 · <em>المبلغ</em>: 30,450 · <em>طريقة الدفع</em>: تحويل بنكي.</li>
+            <li>اختر <span class="btn">حفظ وترحيل</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr>
+                <tr><td>11100 النقد وما في حكمه</td><td class="num">30,450.00</td><td class="num"></td></tr>
+                <tr><td>11200 الذمم المدينة</td><td class="num"></td><td class="num">30,450.00</td></tr>
+            </table></div>
+            الفاتورة <em>مدفوعة</em>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t8">
+        <div class="scenario-head"><span class="id">T8</span><h3>الدفعات الجزئية</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ سندات قبض العملاء</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>يدفع Omar Haddad فاتورته نصف السنوية الأولى البالغة 45,000 على تحويلين.</p>
+        <ol class="steps">
+            <li>اختر <span class="btn">سند قبض جديد</span>، واختر فاتورة Omar لليوم 1، ورقم السند RCPT-T8A، والتاريخ اليوم 3، والمبلغ <strong>20,000</strong>، وتحويل بنكي، ثم <span class="btn">حفظ وترحيل</span>.</li>
+            <li>تحقق من الفاتورة: الحالة <em>مدفوعة جزئياً</em>، والرصيد 25,000.</li>
+            <li>سجّل سند قبض ثانياً RCPT-T8B في اليوم 12 بمبلغ <strong>25,000</strong>.</li>
+            <li>جرّب سند قبض ثالثاً بمبلغ 1 على الفاتورة نفسها — لن تُعرض بعد الآن، لأنه لا يوجد مستحق.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            قيدان، كل منهما مدين 11100 / دائن 11200. والفاتورة <em>مدفوعة</em>.
+        </div>
+        <div class="watch"><strong>سند قبض واحد لفاتورة واحدة</strong>
+            إذا دفع المستأجر عدة فواتير بتحويل واحد، أدخل سند قبض لكل فاتورة بالتاريخ والمرجع نفسيهما.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t9">
+        <div class="scenario-head"><span class="id">T9</span><h3>استلام شيكات مؤجلة</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب / أمين الصندوق</span><span><b>القائمة:</b> العمليات ▸ الشيكات المؤجلة</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <p>تسلّم Sara Ahmed أربعة شيكات، واحداً لكل فاتورة ربع سنوية.</p>
+        <div class="data"><strong>بيانات التمرين</strong>
+            <div class="tbl"><table>
+                <tr><th>رقم الشيك</th><th>البنك</th><th>تاريخ الشيك</th><th>مقابل الفاتورة</th><th class="num">المبلغ</th></tr>
+                <tr><td>100201</td><td>Emirates Practice Bank</td><td>اليوم 1</td><td>الربع الأول</td><td class="num">18,000</td></tr>
+                <tr><td>100202</td><td>Emirates Practice Bank</td><td>اليوم 1 + 3 أشهر</td><td>الربع الثاني</td><td class="num">18,000</td></tr>
+                <tr><td>100203</td><td>Emirates Practice Bank</td><td>اليوم 1 + 6 أشهر</td><td>الربع الثالث</td><td class="num">18,000</td></tr>
+                <tr><td>100204</td><td>Emirates Practice Bank</td><td>اليوم 1 + 9 أشهر</td><td>الربع الرابع</td><td class="num">18,000</td></tr>
+            </table></div>
+            تاريخ الاستلام للأربعة: اليوم 1.
+        </div>
+        <ol class="steps">
+            <li>افتح <span class="path">العمليات ▸ الشيكات المؤجلة</span> واختر <span class="btn">استلام شيك مؤجل</span>.</li>
+            <li>اختر عقد Sara و<em>طريقة التسوية</em> <strong>ذمم مدينة</strong>، ثم فاتورة الربع الأول.</li>
+            <li>أدخل رقم الشيك، والبنك، و<em>تاريخ الاستلام</em> اليوم 1، و<em>تاريخ الشيك</em> والمبلغ. اختر <span class="btn">حفظ واستلام</span>.</li>
+            <li>كرّر للشيكات الثلاثة الأخرى، كل منها مقابل فاتورته.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة — لكل شيك</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr>
+                <tr><td>11400 الشيكات المؤجلة في الحوزة</td><td class="num">18,000.00</td><td class="num"></td></tr>
+                <tr><td>21600 مقابل الشيكات المؤجلة</td><td class="num"></td><td class="num">18,000.00</td></tr>
+            </table></div>
+            زوج تذكيري بتاريخ <em>الاستلام</em>: يعرض الشيكات التي في حوزتك دون المساس بالنقد أو الذمم المدينة. الحالة <em>مستلم</em>.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t10">
+        <div class="scenario-head"><span class="id">T10</span><h3>تحصيل شيك وتصحيح آخر</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ الشيكات المؤجلة</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>صرف البنك الشيك 100201. اختر <span class="btn">تحصيل</span> عليه، وأدخل <em>تاريخ التحصيل</em> اليوم 4 واحفظ.</li>
+            <li>تلاحظ أن الشيك 100204 أُدخل بتاريخ شيك خاطئ. اختر <span class="btn">تعديل</span> عليه، وصحّح تاريخ الشيك بيوم واحد، واحفظ.</li>
+            <li>حاول تحصيل الشيك 100202 اليوم. اقرأ التحذير: تاريخ الشيك بعد أشهر والبنك لا يصرفه عادةً مبكراً. <strong>ألغِ.</strong></li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة — تحصيل 100201</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr>
+                <tr><td>21600 مقابل الشيكات المؤجلة</td><td class="num">18,000.00</td><td class="num"></td></tr>
+                <tr><td>11400 الشيكات المؤجلة في الحوزة</td><td class="num"></td><td class="num">18,000.00</td></tr>
+                <tr><td>11100 النقد وما في حكمه</td><td class="num">18,000.00</td><td class="num"></td></tr>
+                <tr><td>11200 الذمم المدينة</td><td class="num"></td><td class="num">18,000.00</td></tr>
+            </table></div>
+            الشيك <em>محصّل</em> وفاتورة Sara الأولى <em>مدفوعة</em>. وتبقى الشيكات الثلاثة الأخرى <em>مستلمة</em>.
+        </div>
+        <div class="watch"><strong>إيداع الشيكات في البنك أولاً</strong>
+            عندما ترسل الشيكات إلى البنك برسم التحصيل، استخدم <span class="btn">إيداع</span> قبل التحصيل: ينتقل الشيك إلى 11450 شيكات برسم التحصيل
+            ويُقيد لحساب المستأجر. ومن هناك يُحصّل أو يُسجّل <em>مرتجعاً</em>. انظر <em>الشيكات المؤجلة</em> في دليل المستخدم.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t11">
+        <div class="scenario-head"><span class="id">T11</span><h3>التأمين</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ التأمينات</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <ol class="steps">
+            <li>اختر <span class="btn">استلام التأمين</span> واختر عقد Al Noor.</li>
+            <li><em>الرقم المرجعي</em>: DEP-T11 · <em>تاريخ الاستلام</em>: اليوم 2 · <em>طريقة الدفع</em>: تحويل بنكي · <em>المبلغ</em>: 10,000.</li>
+            <li>اختر <span class="btn">حفظ وترحيل</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            مدين 11100 النقد 10,000 · دائن <strong>21300 تأمينات المستأجرين</strong> 10,000. والتأمين التزام، وليس دخلاً أبداً.
+        </div>
+        <div class="watch"><strong>لا يُسجل أبداً كسند قبض عميل</strong>
+            التأمين المُدخل كسند قبض يخفض رصيد إيجار المستأجر وينتهي إيراداً.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t12">
+        <div class="scenario-head"><span class="id">T12</span><h3>طلب مستأجر: مهلة للسداد</h3></div>
+        <div class="facts"><span><b>الدور:</b> خدمات المستأجرين</span><span><b>القائمة:</b> العمليات ▸ طلبات المستأجرين</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>باستخدام بوابة المستأجرين (يعطيك المدرب بيانات الدخول التدريبية لـ Sara)، تطلب Sara سداد فاتورة الربع الثاني متأخرة 15 يوماً.</p>
+        <ol class="steps">
+            <li><strong>بصفتك المستأجر</strong>، في البوابة، قدّم طلب <em>تأجيل دفعة</em> على فاتورة الربع الثاني مع التاريخ الجديد.</li>
+            <li><strong>بصفتك موظفاً</strong>، افتح <span class="path">العمليات ▸ طلبات المستأجرين</span> واختر <span class="btn">فتح</span> عليه.</li>
+            <li>اضبط الحالة على <em>تم التأكيد</em>، وأضف <em>ملاحظة داخلية</em> "سجل سداد جيد"، ثم <span class="btn">حفظ التحديث</span>.</li>
+            <li>اضبط <em>تم الحل</em> مع الرد "تمت الموافقة، يمكنك السداد بحلول &lt;التاريخ الجديد&gt;".</li>
+            <li>اختر <span class="btn">تطبيق تاريخ الاستحقاق الجديد على INV-…</span> وأكّد.</li>
+            <li>اضبط الطلب على <em>مغلق</em>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يتغير تاريخ استحقاق الفاتورة فقط. ولا يتحرك أي قيد أو مبلغ أو ضريبة. ويرى المستأجر الرد في البوابة لكنه لا يرى الملاحظة الداخلية أبداً.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 3 PAYABLES *@
+<section class="section">
+    <span class="section-tag">الوحدة 3</span>
+    <h2>ذمم الموردين</h2>
+    <p class="intro">تسجل فاتورة المورد ما تدين به لمورد. وتعتمد الضريبة على تسجيل المورد، ويعتمد ما يمكنك استرداده على الغرض من كل بند.</p>
+
+    <div class="scenario" id="t13">
+        <div class="scenario-head"><span class="id">T13</span><h3>فاتورة من مورد مسجل في الضريبة</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير الموردين</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <p>تفوتر Coastal Facility Services تنظيف هذا الشهر لمبنيين في مستند واحد.</p>
+        <div class="data"><strong>بيانات التمرين</strong>
+            رقم فاتورة المورد CFS-5510 · الفئة: تنظيف المباني · تاريخ الفاتورة والتاريخ المحاسبي: اليوم 8 · الاستحقاق: بعد 30 يوماً
+            <div class="tbl"><table>
+                <tr><th>البند</th><th>الحساب</th><th>العقار</th><th class="num">الكمية × السعر</th><th>خاضع</th><th>النسبة</th></tr>
+                <tr><td>تنظيف الردهة والمكاتب</td><td>51100</td><td>Marina Heights</td><td class="num">1 × 4,000</td><td>نعم</td><td>خاضعة</td></tr>
+                <tr><td>تنظيف السلالم</td><td>51100</td><td>Palm Residences</td><td class="num">1 × 2,000</td><td>نعم</td><td>معفاة</td></tr>
+            </table></div>
+        </div>
+        <ol class="steps">
+            <li>اختر <span class="btn">فاتورة مورد جديدة</span> واختر المورد. يظهر شريط أزرق <em>فاتورة ضريبية — تُطبق ضريبة 5%</em>.</li>
+            <li>أدخل رقم فاتورة المورد والفئة والتواريخ.</li>
+            <li>أدخل البندين كما في الأعلى؛ واستخدم <span class="btn">+ إضافة سطر</span> للثاني. ولاحظ تحديث الإجماليات.</li>
+            <li>اختر <span class="btn">حفظ كمسودة</span>، وراجع، ثم <span class="btn">ترحيل</span>.</li>
+            <li>اختر <span class="btn">طباعة</span> لرؤية مستند الفاتورة مع شريط التوقيعات.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <div class="tbl"><table class="je">
+                <tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr>
+                <tr><td>51100 · Marina Heights</td><td class="num">4,000.00</td><td class="num"></td></tr>
+                <tr><td>51100 · Palm Residences (2,000 + ضريبة غير قابلة للاسترداد 100)</td><td class="num">2,100.00</td><td class="num"></td></tr>
+                <tr><td>11300 ضريبة القيمة المضافة القابلة للاسترداد</td><td class="num">200.00</td><td class="num"></td></tr>
+                <tr><td>21100 الذمم الدائنة</td><td class="num"></td><td class="num">6,300.00</td></tr>
+            </table></div>
+            لا يمكن استرداد ضريبة البند السكني، فتُضاف إلى تكلفة ذلك البند. ويصدر رقم فاتورتك الخاص (BILL-…) عند الحفظ.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t14">
+        <div class="scenario-head"><span class="id">T14</span><h3>فاتورة من مورد غير مسجل</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير الموردين</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <div class="data"><strong>بيانات التمرين</strong>
+            Quick Fix Plumbing · الفاتورة QF-118 · اليوم 9 · بند واحد: "إصلاح تسرب، Apartment 704"، الحساب 52100، Palm Residences، ‏1 × <strong>850</strong>
+        </div>
+        <ol class="steps">
+            <li>اختر <span class="btn">فاتورة مورد جديدة</span> واختر Quick Fix Plumbing. يظهر شريط كهرماني <em>فاتورة تجارية — بلا ضريبة</em> وتتوقف عناصر الضريبة.</li>
+            <li>أدخل البيانات والبند، ثم <span class="btn">حفظ كمسودة</span>، ثم <span class="btn">ترحيل</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            مدين 52100 صيانة العقارات (Palm Residences) ‏850 · دائن 21100 الذمم الدائنة 850. ولا يوجد بند ضريبة إطلاقاً.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t15">
+        <div class="scenario-head"><span class="id">T15</span><h3>تصحيح فاتورة مرحّلة</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير الموردين</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <p>عند مراجعة المستندات، تلاحظ أن فاتورة السباك كانت 950 لا 850.</p>
+        <ol class="steps">
+            <li>في الفاتورة QF-118 اختر <span class="btn">إعادة تعيين</span>. يخرج القيد من الحسابات وتصبح الفاتورة قابلة للتعديل.</li>
+            <li>عدّل سعر البند إلى 950 واحفظ.</li>
+            <li>اختر <span class="btn">ترحيل</span> مجدداً.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            قيد واحد بقيمة 950 في الحسابات. ويعرض الاستعلام عن القيود أنه رُحّل مرة واحدة؛ ونسخة الـ 850 لم تعد تُحتسب في أي مكان.
+        </div>
+        <div class="watch"><strong>عندما تُرفض الإعادة</strong>
+            لا يمكن إعادة فاتورة بعد ترحيل دفعة مقابلها، أو إذا كانت فترتها مقفلة. أعد الدفعة أولاً، أو رحّل قيداً تصحيحياً في شهر مفتوح.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t16">
+        <div class="scenario-head"><span class="id">T16</span><h3>فاتورة متأخرة لشهر مقفل</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير الموردين</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <p>ترسل Coastal فاتورة تنظيف النوافذ للشهر الماضي (الفاتورة CFS-5490، ‏1,000 + الضريبة، Marina Heights، خاضعة) بعد إقفال الشهر الماضي.</p>
+        <ol class="steps">
+            <li>أنشئ الفاتورة مع <em>تاريخ الفاتورة</em> = التاريخ على مستند المورد (الشهر الماضي).</li>
+            <li>حاول الحفظ مع <em>التاريخ المحاسبي</em> في الشهر الماضي أيضاً ثم <span class="btn">ترحيل</span>: يُرفض لأن الفترة مقفلة.</li>
+            <li>اضبط <em>التاريخ المحاسبي</em> على اليوم 10 من هذا الشهر، ورحّل.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يقع القيد في هذا الشهر (مدين 51100 ‏1,000 · مدين 11300 ‏50 · دائن 21100 ‏1,050). ولا يزال تاريخ المورد مطبوعاً على الفاتورة.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t17">
+        <div class="scenario-head"><span class="id">T17</span><h3>السداد للموردين</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ دفعات الموردين</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>اختر <span class="btn">دفعة مورد جديدة</span>، واختر الفاتورة CFS-5510 (المستحق 6,300). رقم الدفعة PAY-T17A، اليوم 15، المبلغ <strong>3,000</strong>، تحويل بنكي، <span class="btn">حفظ وترحيل</span>.</li>
+            <li>ادفع المتبقي <strong>3,300</strong> بالدفعة PAY-T17B في اليوم 25.</li>
+            <li>ادفع QF-118 بالكامل (950) بالدفعة PAY-T17C في اليوم 15.</li>
+            <li>حاول دفع فاتورة <em>مسودة</em>: لن تُعرض — رحّل الفاتورة أولاً.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            كل دفعة: مدين 21100 الذمم الدائنة · دائن 11100 النقد. وتصبح CFS-5510 <em>مدفوعة جزئياً</em> ثم <em>مدفوعة</em>؛ وQF-118 <em>مدفوعة</em>.
+            ويعرض <span class="path">التقارير ▸ كشف حساب المورد</span> لـ Coastal ‏6,300 مفوترة و6,300 مدفوعة للفاتورة CFS-5510.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 4 CASH & GL *@
+<section class="section">
+    <span class="section-tag">الوحدة 4</span>
+    <h2>النقد والأستاذ العام</h2>
+
+    <div class="scenario" id="t18">
+        <div class="scenario-head"><span class="id">T18</span><h3>عهدة المصروفات النثرية</h3></div>
+        <div class="facts"><span><b>الدور:</b> مسؤول الموقع / المحاسب</span><span><b>القائمة:</b> العمليات ▸ المصروفات النثرية</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <ol class="steps">
+            <li>اختر العهدة 11150 المصروفات النثرية أعلى الشاشة. ولاحظ رصيدها الحالي.</li>
+            <li>اختر <span class="btn">سند مصروف جديد</span>: اليوم 11، مدفوع إلى "City Hardware"، "مواد تنظيف"، المصروف 51100، العقار Marina Heights، المبلغ <strong>120</strong>، المرجع إيصال رقم 7781. ‏<span class="btn">ترحيل السند</span>.</li>
+            <li>جرّب سنداً أكبر من رصيد العهدة. يُرفض: "سيجعل هذا السند رصيد العهدة دون الصفر". ألغه.</li>
+            <li>اختر <span class="btn">تعويض العهدة</span>: اليوم 12، حساب التمويل 11100، المبلغ <strong>2,000</strong>، المرجع TRF-T18. ‏<span class="btn">ترحيل التعويض</span>.</li>
+            <li>أضف سنداً ثانياً: اليوم 13، "Speedy Couriers"، رسوم بريد سريع، المصروف 61100، المبلغ <strong>45</strong>.</li>
+            <li>اختر <span class="btn">تحديث</span>، ثم <span class="btn">طباعة</span> تقرير المصروفات النثرية وقارن رصيده الختامي بجرد نقدي افتراضي.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            الرصيد الختامي = الرصيد الافتتاحي − 120 + 2,000 − 45. السندات: مدين المصروف · دائن 11150. التعويض: مدين 11150 · دائن 11100 — تحويل، لا مصروف.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t19">
+        <div class="scenario-head"><span class="id">T19</span><h3>التأمين السنوي كمصروف مدفوع مقدماً</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> إعداد النظام ▸ المدفوعات المقدمة المتكررة</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>يكلف تأمين المبنى للأشهر الاثني عشر القادمة 12,000، تفوترها Gulf Shield Insurance على الحساب.</p>
+        <ol class="steps">
+            <li>اختر <span class="btn">إعداد مدفوعات مقدمة جديد</span>.</li>
+            <li><em>الوصف</em>: "تأمين المبنى – 12 شهراً" · <em>تاريخ الدفع</em>: اليوم 1 · <em>المبلغ الإجمالي</em>: 12,000.</li>
+            <li><em>تاريخ أول اعتراف</em>: نهاية هذا الشهر · <em>أشهر الاعتراف</em>: 12.</li>
+            <li><em>حساب المدفوع مقدماً</em>: 11500 · <em>حساب المصروف</em>: 51100 · <em>الحساب المقابل</em>: 21100 الذمم الدائنة، مع المورد Gulf Shield Insurance.</li>
+            <li><span class="btn">حفظ إعداد المدفوعات المقدمة</span>، ثم رحّل قيد الإعداد المسودة من الاستعلام عن القيود.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            الإعداد: مدين 11500 المصروفات المدفوعة مقدماً 12,000 · دائن 21100 الذمم الدائنة 12,000، مع إنشاء فاتورة للمورد.
+            ويعرض الجدول 12 مبلغاً شهرياً بقيمة <strong>1,000</strong>، تُطلق في نهاية الشهر (T25).
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t20">
+        <div class="scenario-head"><span class="id">T20</span><h3>القيود اليدوية</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ القيود اليدوية</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <p>ثلاثة قيود لا تُنشئها أي شاشة أخرى. لكل منها: <span class="btn">قيد يدوي جديد</span>، وأدخل <em>تاريخ القيد</em> ووصفاً يفهمه غيرك، وأضف البنود، ثم <span class="btn">حفظ كمسودة</span>، ثم رحّل من الاستعلام عن القيود.</p>
+        <div class="tbl"><table>
+            <tr><th>#</th><th>التاريخ</th><th>الوصف</th><th>مدين</th><th>دائن</th><th class="num">المبلغ</th></tr>
+            <tr><td>أ</td><td>اليوم 20</td><td>رسوم بنكية للشهر، مرجع الكشف BS-T20</td><td>63100 تكاليف التمويل</td><td>11100 النقد</td><td class="num">75</td></tr>
+            <tr><td>ب</td><td>نهاية الشهر</td><td>استحقاق: كهرباء المناطق المشتركة، Marina Heights، لم تصل الفاتورة بعد</td><td>51100 (الوحدة: Office 301)</td><td>21100 الذمم الدائنة</td><td class="num">1,800</td></tr>
+            <tr><td>ج</td><td>اليوم 21</td><td>جرّب قيداً غير متوازن: مدين 63100 ‏100، دائن 11100 ‏90</td><td>—</td><td>—</td><td class="num">—</td></tr>
+        </table></div>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يُرحّل القيدان (أ) و(ب). ويُرفض القيد (ج) برسالة "قيد اليومية غير متوازن." — يجب أن يساوي المدين الدائن.
+        </div>
+        <div class="watch"><strong>اكتب الوصف لمدقق الحسابات</strong>
+            "استحقاق: كهرباء المناطق المشتركة، Marina Heights، لم تصل الفاتورة بعد" يشرح نفسه بعد ستة أشهر؛ أما "استحقاق" فلا.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t21">
+        <div class="scenario-head"><span class="id">T21</span><h3>سحب المالك</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ مسحوبات المالك</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <p>يدفع المالك رسوماً مدرسية خاصة بقيمة 5,000 من الحساب البنكي للشركة.</p>
+        <ol class="steps">
+            <li>أدخل <em>التاريخ</em> اليوم 14 و<em>المبلغ</em> 5,000.</li>
+            <li><em>أُنفق على</em>: فئة التعليم · <em>مدفوع من</em>: 11100.</li>
+            <li>الوصف "رسوم مدرسية – الفصل الأول"، المرجع TRF-T21، <span class="btn">حفظ وترحيل</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            مدين 34100 الحساب الجاري للمالك (فئة التعليم) 5,000 · دائن 11100 ‏5,000. ولا يُمس أي حساب مصروفات، فلا يتغير ربح الشركة.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t22">
+        <div class="scenario-head"><span class="id">T22</span><h3>أصل ثابت: الشراء والرسملة والإهلاك</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ الأصول الثابتة</span><span><b>الوقت:</b> 20 دقيقة</span></div>
+        <p>يُشترى مولد احتياطي لـ Marina Heights: ‏60,000 من PowerGen على الحساب، زائد 3,000 تركيب مدفوعة من البنك.</p>
+        <ol class="steps">
+            <li>اختر <span class="btn">إضافة أصل ثابت</span>: الرمز FA-GEN-01، الاسم "مولد احتياطي – Marina Heights"، حساب الأصل 15200، مجمع الإهلاك 15300، العمر الإنتاجي <strong>120</strong> شهراً، بداية الإهلاك اليوم 1، العقار Marina Heights. احفظ.</li>
+            <li>اختر <span class="btn">الاقتناء</span> على الأصل. ‏<span class="btn">إضافة تكلفة</span>: فاتورة المورد، 60,000، قابلة للرسملة، الحساب المقابل الذمم الدائنة مع المورد PowerGen.</li>
+            <li><span class="btn">إضافة تكلفة</span> مجدداً: التركيب، 3,000، قابلة للرسملة، الحساب المقابل 11100 النقد.</li>
+            <li>اختر <span class="btn">رسملة الأصل</span>.</li>
+            <li>افتح <span class="btn">الإهلاك</span> على الأصل واطلع على الجدول. (يُرحّل في نهاية الشهر في T25.)</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            <ul>
+                <li>التكاليف: مدين 15400 حساب تسوية الأصول الثابتة 60,000 / دائن 21100 (تُنشأ فاتورة مورد)، ومدين 15400 ‏3,000 / دائن 11100.</li>
+                <li>الرسملة: مدين 15200 الأصول الثابتة <strong>63,000</strong> · دائن 15400 ‏63,000.</li>
+                <li>الجدول: 120 قسطاً بقيمة <strong>525</strong> (63,000 ÷ 120).</li>
+            </ul>
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 5 LANDLORDS *@
+<section class="section">
+    <span class="section-tag">الوحدة 5</span>
+    <h2>ملاك العقارات المُدارة</h2>
+    <p class="intro">في Villa 12 نحصّل الإيجار للمالك، ونحتفظ بعمولتنا البالغة 5% زائد ضريبتها، وندفع له الباقي.</p>
+
+    <div class="scenario" id="t23">
+        <div class="scenario-head"><span class="id">T23</span><h3>فواتير العمولة الضريبية</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ تسويات الملاك</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <p>نفّذ هذا بعد ترحيل الاعتراف بإيرادات الشهر (الخطوة 2 في T25)، الذي ينقل العمولة البالغة 375 إلى الإيراد.</p>
+        <ol class="steps">
+            <li>تحت <em>فواتير العمولة الضريبية</em>، اختر <em>نهاية الشهر</em> = نهاية هذا الشهر واختر <span class="btn">تحقق</span>.</li>
+            <li>اختر <span class="btn">إصدار فواتير العمولة</span>.</li>
+            <li>اختر <span class="btn">الفاتورة</span> بجانب فاتورة Khalid Rahman واطبع الفاتورة الضريبية.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            فاتورة ضريبية مرحّلة واحدة (سلسلة TX-…) للعمولة 375 زائد ضريبة <strong>18.75</strong>: مدين 21500 مستحقات الملاك 18.75 · دائن 21400 ضريبة القيمة المضافة المستحقة 18.75.
+            ولا يمكن إعادتها إلى مسودة.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t24">
+        <div class="scenario-head"><span class="id">T24</span><h3>السداد للمالك</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ تسويات الملاك</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>اختر <span class="btn">كشف الحساب والدفع</span> لـ Khalid Rahman، مع <em>كشف الحساب كما في</em> نهاية هذا الشهر.</li>
+            <li>راجع الكشف: الإيجار المفوتر <strong>45,000</strong> · العمولة 5% <strong>2,250</strong> · الضريبة على العمولة <strong>112.50</strong> · حصة المالك <strong>42,637.50</strong>. ولأن Omar دفع بالكامل (T8)، فإن <em>المتاح من التحصيلات</em> أيضاً 42,637.50.</li>
+            <li>تحت <em>الدفع للمالك</em> أدخل 40,000 (دفعة جزئية)، اليوم 26، تحويل بنكي، مدفوع من 11100، المرجع TRF-T24.</li>
+            <li>اختر <span class="btn">حفظ وترحيل الدفعة</span> واطبع إشعار التسوية الذي يُفتح.</li>
+            <li>حاول دفع 5,000 أخرى: تُرفض، لأن أقصى ما يمكن دفعه بعد 2,637.50.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            مدين 21500 مستحقات الملاك 40,000 · دائن 11100 ‏40,000. رقم التسوية OS-السنة-0001. والرصيد المستحق للمالك 2,637.50.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 6 CLOSING *@
+<section class="section">
+    <span class="section-tag">الوحدة 6</span>
+    <h2>نهاية الشهر ونهاية السنة</h2>
+    <p class="intro">تتحقق لوحة الإقفال من أن كل إجراء متكرر وصل إلى الأستاذ العام قبل قفل الشهر. وبعد الإقفال، لا يمكن ترحيل أي شيء أو إعادته أو تغييره في ذلك الشهر.</p>
+
+    <div class="scenario" id="t25">
+        <div class="scenario-head"><span class="id">T25</span><h3>إقفال الشهر من لوحة الإقفال</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب / المشرف المالي</span><span><b>القائمة:</b> إعداد النظام ▸ لوحة الإقفال</span><span><b>الوقت:</b> 20 دقيقة</span></div>
+        <p>في التدريب، أقفل الشهر الذي كنت تعمل فيه. وقد يحرّك المدرب أولاً تواريخ التمرين بحيث يكون الشهر قد انتهى.</p>
+        <ol class="steps">
+            <li>افتح اللوحة. اختر مربع الشهر. واقرأ كل سطر في قائمة التحقق ولونه:
+                <ul>
+                    <li><strong>أخضر</strong> — تمت المعالجة والأستاذ متطابق.</li>
+                    <li><strong>كهرماني</strong> — للمراجعة؛ ولا يمنع الإقفال بعد أن تؤشر أنك راجعته.</li>
+                    <li><strong>أحمر</strong> — لم تتم المعالجة؛ ويمنع الإقفال.</li>
+                    <li><strong>رمادي</strong> — لا شيء للتنفيذ هذا الشهر.</li>
+                </ul>
+            </li>
+            <li><em>الاعتراف بالإيرادات</em> أحمر: اختر <span class="btn">تشغيل الاعتراف</span>. يصبح أخضر مع اعتراف <strong>16,375</strong> (10,000 + 6,000 + 375).</li>
+            <li><em>الإهلاك</em> أحمر (المولد): اختر <span class="btn">تشغيل الإهلاك</span>. أخضر بقيمة <strong>525</strong>.</li>
+            <li><em>إطفاء المدفوعات المقدمة</em> أحمر (التأمين): اختر <span class="btn">تشغيل الإطفاء</span>. أخضر بقيمة <strong>1,000</strong>.</li>
+            <li><em>لا توجد قيود مسودة</em>: إذا كان أحمر، اقرأ المسودات المدرجة. رحّل الصحيحة منها بـ <span class="btn">ترحيل كل المسودات</span>؛ واحذف أو صحّح ما لا يجب أن يوجد.</li>
+            <li>اقرأ الأسطر الكهرمانية (مثل الشيكات المستحقة غير المحصّلة). وقرر ما إذا كان كل منها مقبولاً.</li>
+            <li>نفّذ الآن T23 (فواتير العمولة)، ثم عد إلى هنا.</li>
+            <li>عندما لا يبقى شيء أحمر، أشّر على <em>راجعت التحذيرات الكهرمانية</em> واختر <span class="btn">إغلاق</span>.</li>
+            <li>حاول ترحيل أي شيء مؤرخ في ذلك الشهر — سند قبض، أو قيد، أو إعادة. وستُرفض كل محاولة.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يعرض المربع قفلاً. ويسجل سجل الفترة من أقفلها، ومتى، والتحذيرات المؤكد مراجعتها. ولم يعد قسم
+            <em>الفترات غير المقفلة</em> في لوحة المعلومات يُدرج الشهر.
+        </div>
+        <div class="tbl"><table class="je">
+            <tr><th>قيد نهاية الشهر</th><th>مدين</th><th>دائن</th><th class="num">المبلغ</th></tr>
+            <tr><td>الإيراد – Al Noor</td><td>21200 دفعات مقدمة من العملاء</td><td>41100 إيرادات الإيجار – المملوكة</td><td class="num">10,000.00</td></tr>
+            <tr><td>الإيراد – Sara</td><td>21200 دفعات مقدمة من العملاء</td><td>41100 إيرادات الإيجار – المملوكة</td><td class="num">6,000.00</td></tr>
+            <tr><td>العمولة – Villa 12</td><td>21500 مستحقات الملاك</td><td>42100 إيرادات أتعاب الإدارة</td><td class="num">375.00</td></tr>
+            <tr><td>الإهلاك – المولد</td><td>62100 مصروف الإهلاك</td><td>15300 مجمع الإهلاك</td><td class="num">525.00</td></tr>
+            <tr><td>التأمين – الشهر 1</td><td>51100 مصروفات تشغيل العقارات</td><td>11500 المصروفات المدفوعة مقدماً</td><td class="num">1,000.00</td></tr>
+        </table></div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t26">
+        <div class="scenario-head"><span class="id">T26</span><h3>إعادة فتح شهر مقفل بطلب</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب + المعتمد</span><span><b>القائمة:</b> إعداد النظام ▸ لوحة الإقفال / طلبات إعادة فتح الفترات</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <p>بعد الإقفال، تصل فاتورة مورد للشهر يجب أن تكون فيه.</p>
+        <ol class="steps">
+            <li><strong>المتدرب:</strong> اختر مربع الشهر المقفل. تحت <em>اطلب إعادة فتح هذه الفترة</em>، اكتب سبباً حقيقياً (15 حرفاً على الأقل)، مثل "فاتورة Coastal رقم CFS-5530 لمكافحة الحشرات لهذا الشهر وصلت بعد الإقفال"، واختر <span class="btn">طلب إعادة الفتح</span>.</li>
+            <li><strong>المعتمد:</strong> افتح <span class="path">إعداد النظام ▸ طلبات إعادة فتح الفترات</span> (تعرض الشارة الحمراء عدد المنتظر). واقرأ السبب.</li>
+            <li><strong>المعتمد:</strong> جرّب أولاً <span class="btn">رفض</span> دون تعليق — التعليق مطلوب. ثم أضف التعليق "معتمد – رحّل الفاتورة وأقفل مجدداً اليوم" واختر <span class="btn">اعتماد وإعادة فتح</span>.</li>
+            <li><strong>المتدرب:</strong> يعرض الشهر <em>أُعيد فتحه</em>. أدخل الفاتورة ورحّلها (500 + الضريبة، Marina Heights، خاضعة).</li>
+            <li><strong>المتدرب:</strong> أقفل الشهر مجدداً عبر قائمة التحقق، كما في T25.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يعرض الطلب <em>أُعيد إقفاله</em>. ويُدرج سجل الفترة: مقفل ← طُلبت إعادة الفتح ← أُعيد فتحه (مع السبب والمعتمد) ← مقفل مجدداً.
+            ولم يتمكن مقدم الطلب من اعتماد طلبه بنفسه.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المعتمد: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t27">
+        <div class="scenario-head"><span class="id">T27</span><h3>الإقرار الضريبي وسداد الضريبة</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> التقارير ▸ الإقرار الضريبي، العمليات ▸ القيود اليدوية</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <ol class="steps">
+            <li>افتح <span class="path">التقارير ▸ الإقرار الضريبي</span> للربع الحالي واختر <span class="btn">تحديث</span>.</li>
+            <li>ابحث عن كل مستند من مستنداتك: فاتورة Al Noor (أساسية)، والإشعار الدائن (<em>ناقصاً الإشعارات الدائنة</em>)، وفاتورتي Sara وOmar (معفاة)، وفاتورة العمولة (<em>عمولة الإدارة على الملاك</em>)، وفواتير الموردين حسب النسبة.</li>
+            <li>لاحظ <em>ضريبة المخرجات المستحقة</em> و<em>ضريبة المدخلات القابلة للاسترداد</em> و<em>صافي الضريبة المستحقة</em>.</li>
+            <li>سجّل السداد للهيئة الاتحادية للضرائب بقيد يدوي: مدين 21400 ضريبة القيمة المضافة المستحقة (ضريبة المخرجات) · دائن 11300 ضريبة القيمة المضافة القابلة للاسترداد (ضريبة المدخلات) · دائن 11100 النقد (الصافي). ورحّله.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            بمستندات هذه الكراسة فقط، ضريبة المخرجات 1,500 − 50 + 18.75 = <strong>1,468.75</strong>؛ وضريبة المدخلات القابلة للاسترداد هي 5% على بنود الفواتير الخاضعة.
+            وبعد قيد السداد، يعود 21400 و11300 إلى الصفر للربع.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t28">
+        <div class="scenario-head"><span class="id">T28</span><h3>مراجعة التقارير</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب / المشرف</span><span><b>القائمة:</b> التقارير</span><span><b>الوقت:</b> 20 دقيقة</span></div>
+        <p>افتح كل تقرير للشهر الذي أقفلته وأجب عن السؤال المقابل له.</p>
+        <div class="tbl"><table>
+            <tr><th>التقرير</th><th>السؤال</th></tr>
+            <tr><td>ميزان المراجعة</td><td>هل يساوي إجمالي المدين إجمالي الدائن؟</td></tr>
+            <tr><td>الأرباح والخسائر</td><td>هل إيرادات الإيجار 16,000 وإيرادات أتعاب الإدارة 375؟ وأين الإهلاك والتأمين؟</td></tr>
+            <tr><td>الميزانية العمومية</td><td>ماذا يحمل 21200 دفعات مقدمة من العملاء، ولماذا؟ وما الذي في 21300؟</td></tr>
+            <tr><td>كشف حساب المستأجر — Al Noor</td><td>فاتورة 31,500، وإشعار دائن 1,050، وسند قبض 30,450: هل الرصيد صفر؟</td></tr>
+            <tr><td>كشف حساب المورد — Coastal</td><td>ما الفواتير التي لا تزال غير مدفوعة؟</td></tr>
+            <tr><td>الأرباح والخسائر حسب العقار</td><td>أي مبنى يحمل إهلاك المولد والتنظيف؟</td></tr>
+            <tr><td>الأستاذ العام — 11100</td><td>هل يمكنك إيجاد كل سند قبض ودفعة من هذه الكراسة؟</td></tr>
+            <tr><td>مسحوبات المالك</td><td>هل الـ 5,000 تحت التعليم؟</td></tr>
+        </table></div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t29">
+        <div class="scenario-head"><span class="id">T29</span><h3>إقفال نهاية السنة</h3></div>
+        <div class="facts"><span><b>الدور:</b> المشرف المالي (يعرضه المدرب)</span><span><b>القائمة:</b> إعداد النظام ▸ لوحة الإقفال</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <p>يُنفذ مرة في السنة، بعد إقفال الأشهر الاثني عشر كلها. ويعرضه المدرب على سنة تدريبية.</p>
+        <ol class="steps">
+            <li>اختر السنة المالية في اللوحة. تحت <em>إقفال نهاية السنة</em>، اقرأ أي أسطر حمراء: كل الفترات مقفلة، والسنة السابقة مقفلة، وحساب الأرباح المحتجزة مربوط.</li>
+            <li>راجع المعاينة: الإيرادات المراد تصفيتها، والمصروفات المراد تصفيتها، وصافي الربح أو الخسارة المنقول إلى الأرباح المحتجزة.</li>
+            <li>اختر <span class="btn">إقفال السنة المالية</span> وأكّد.</li>
+            <li>افتح <em>الأرصدة الافتتاحية المنقولة إلى</em> السنة التالية وتحقق من تساوي المدين والدائن.</li>
+            <li>شغّل الأرباح والخسائر للسنة المقفلة: لا تزال تعرض نتيجة السنة. وشغّل الميزانية العمومية بعد يوم من بداية السنة الجديدة: النتيجة الآن في 32100 الأرباح المحتجزة.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            قيد إقفال مرحّل واحد في آخر يوم من السنة: كل حساب إيراد مدين، وكل حساب مصروف دائن، والفرق إلى 32100 الأرباح المحتجزة.
+            وتنتقل حسابات الميزانية العمومية إلى السنة الجديدة دون تغيير. وإذا أُعيد فتح أي شهر من تلك السنة لاحقاً، يُلغى إقفال السنة ويجب تشغيله مجدداً.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تمت المشاهدة</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 7 ADVANCED *@
+<section class="section">
+    <span class="section-tag">الوحدة 7 · اختيارية</span>
+    <h2>التطوير ومبيعات الوحدات</h2>
+    <p class="intro">للشركات التي تبني الوحدات أو تبيعها فقط. وسيُعد المدرب مشروعاً تدريبياً "Creek View" على أرض مملوكة.</p>
+
+    <div class="scenario" id="t30">
+        <div class="scenario-head"><span class="id">T30</span><h3>تكاليف مشروع التطوير</h3></div>
+        <div class="facts"><span><b>الدور:</b> محاسب المشروع</span><span><b>القائمة:</b> العمليات ▸ مشاريع التطوير، فواتير الموردين</span><span><b>الوقت:</b> 20 دقيقة</span></div>
+        <ol class="steps">
+            <li>افتح المشروع وقارن موازنته حسب فئة التكلفة بالتكلفة حتى تاريخه.</li>
+            <li>أدخل شهادة إنجاز مقاول كفاتورة مورد (مثلاً 250,000 + الضريبة). وفي البند، اختر المشروع وفئة الإنشاء تحت <em>العقار</em>: يتحول الحساب إلى حساب المشروع تلقائياً. ورحّلها.</li>
+            <li>في صفحة المشروع، استخدم <em>تسجيل تكلفة بدون فاتورة مورد</em> لرسوم بلدية بقيمة 15,000 مدفوعة من 11100، فئة التصاريح. ‏<span class="btn">تسجيل وترحيل</span>.</li>
+            <li>راجع الموازنة مقابل الفعلي لكل فئة، ودفتر التكاليف.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            تُقيد التكلفتان على حساب الأعمال قيد التنفيذ للمشروع (13100 للبيع، و15500 للتأجير، و15600 للاستخدام الذاتي). ولا يصل شيء إلى الأرباح والخسائر أثناء بناء المبنى.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t31">
+        <div class="scenario-head"><span class="id">T31</span><h3>بيع وحدة</h3></div>
+        <div class="facts"><span><b>الدور:</b> مسؤول المبيعات + المحاسب</span><span><b>القائمة:</b> العمليات ▸ مبيعات الوحدات</span><span><b>الوقت:</b> 20 دقيقة</span></div>
+        <ol class="steps">
+            <li>اختر <span class="btn">عقد بيع جديد</span>: وحدة مكتملة، والمشتري، وتاريخ اليوم، وسعر البيع 900,000 قبل الضريبة. واقرأ المعاملة الضريبية وسببها.</li>
+            <li>اختر <span class="btn">تقسيم 20 / 30 / 30 / 20</span> لتعبئة خطة الدفعات، وتحقق من أن مجموعها يساوي السعر شاملاً الضريبة، ثم <span class="btn">توقيع العقد</span>.</li>
+            <li>تحت <em>تسجيل دفعة</em>، سجّل القسط الأول المستلم بتحويل بنكي. ‏<span class="btn">تسجيل وترحيل</span>.</li>
+            <li>عندما يدفع المشتري (أو يقول المدرب ذلك)، أدخل تاريخ التسليم واختر <span class="btn">تسليم</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            قبل التسليم، تبقى الدفعات في 21250 دفعات مقدمة من مشتري الوحدات. وعند التسليم، يُعترف بالإيراد في 41200 وتنتقل تكلفة الوحدة إلى 51200 تكلفة العقارات المباعة؛ وتصبح الوحدة <em>مباعة</em> ويعرض العقد إجمالي الربح.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== 8 MAINTENANCE, OWNERS, DOCUMENTS *@
+<section class="section" id="m8">
+    <span class="section-tag">الوحدة 8</span>
+    <h2>الصيانة والملاك والمستندات</h2>
+    <p class="intro">فريق الصيانة ولوحة الصيانة للمالك، وفوترة عقار مُدار باسم المالك،
+    وحفظ مستندات المستأجرين والعقود مع تواريخ انتهائها، وترك النظام يقرأ الأوراق الممسوحة ضوئياً بدلاً منك.</p>
+
+    <div class="scenario" id="t32">
+        <div class="scenario-head"><span class="id">T32</span><h3>إعداد فريق الصيانة وإنجاز عمل</h3></div>
+        <div class="facts"><span><b>الدور:</b> المسؤول، ثم مهندس الصيانة، ثم المشرف</span><span><b>القائمة:</b> إعداد النظام ▸ المستخدمون · العمليات ▸ أعمال الصيانة الخاصة بي</span><span><b>الوقت:</b> 25 دقيقة</span></div>
+        <ol class="steps">
+            <li>بصفتك المسؤول، افتح <span class="btn">مستخدم جديد</span>: اسم المستخدم <strong>maint1</strong>، الاسم المعروض "Ali (Maintenance)". تحت الدور اختر <span class="btn">مهندس / فني صيانة</span>، وامنحه الشركة التدريبية، ثم <span class="btn">حفظ</span>.</li>
+            <li>سجّل الدخول إلى بوابة المستأجرين باسم Sara Ahmed (يعطيك المدرب بيانات الدخول). ‏<span class="btn">طلب جديد</span>: صيانة / إصلاح، "تسرب في صنبور المطبخ"، الأولوية عادية، لـ Palm Residences ‏Apartment 704. وأرسله.</li>
+            <li>سجّل الدخول باسم <strong>maint1</strong>. لا يظهر في القائمة إلا <span class="path">العمليات ▸ خدمات المستأجرين ▸ أعمال الصيانة الخاصة بي</span>، والعمل الجديد في القائمة.</li>
+            <li>افتح العمل. اختر <span class="btn">تأكيد — لقد اطلعت عليه</span>، ثم <span class="btn">بدء العمل</span>.</li>
+            <li>أضف مادة من <strong>مخزن الصيانة</strong>: "Tap cartridge 35mm"، الكمية <strong>2</strong>، تكلفة الوحدة <strong>45</strong>. وأضف مادة ثانية <strong>مشتراة للعمل</strong>: "Flexible hose"، الكمية 1، التكلفة 30 — أولاً دون رقم إيصال (تُرفض)، ثم مع الإيصال PC-T32.</li>
+            <li>اكتب "تم استبدال خرطوشة الصنبور والخرطوم؛ لا يوجد تسرب." واختر <span class="btn">تحديد كمنجز</span>.</li>
+            <li>سجّل الدخول كمشرف (معالجة طلبات المستأجرين)، وافتح العمل من <span class="path">العمليات ▸ أعمال الصيانة</span> واختر <span class="btn">إغلاق العمل</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            أُسند العمل إلى Ali تلقائياً. ويعرض الخط الزمني أوقات الطلب، وأول استجابة، والبدء، والحل. ورُحّلت مادة المخزن مدين 52100 صيانة العقارات (Palm Residences) ‏90 · دائن 11650 مخزون مواد الصيانة 90؛ أما الخرطوم المشترى فلا قيد خاصاً به (يسجله إيصاله). وترى Sara "تم استبدال خرطوشة الصنبور…" في بوابتها. ولا يستطيع Ali إغلاق العمل.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t33">
+        <div class="scenario-head"><span class="id">T33</span><h3>تعليق الصيانة لمستأجر عليه فاتورة متأخرة</h3></div>
+        <div class="facts"><span><b>الدور:</b> موظف التأجير / المحاسب</span><span><b>القائمة:</b> بوابة المستأجرين · العمليات ▸ سندات قبض العملاء</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>تحقق من أن لدى Omar Haddad فاتورة مرحّلة تجاوزت تاريخ استحقاقها ولم تُدفع (يُعدها المدرب عند الحاجة).</li>
+            <li>في البوابة باسم Omar، افتح <span class="btn">طلب جديد</span>. يبين تنبيه أصفر أن طلبات الصيانة معلقة، مع المبلغ المتأخر. وحاول إرسال طلب صيانة رغم ذلك: يُرفض للسبب نفسه.</li>
+            <li>أرسل بدلاً منه طلب <strong>مهلة للسداد</strong>: فيُقبل.</li>
+            <li>سجّل سند قبض للفاتورة المتأخرة بالكامل (T7).</li>
+            <li>عد إلى البوابة، وافتح <span class="btn">طلب جديد</span> مجدداً وأرسل طلب الصيانة.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يظهر التعليق فقط ما دام هناك مبلغ متأخر (أو شيك مرتجع لم يُستبدل) ويُرفع تلقائياً بمجرد ترحيل سند القبض. ولا يزال بإمكان الموظفين تقديم طلب نيابة عن المستأجر.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t34">
+        <div class="scenario-head"><span class="id">T34</span><h3>قراءة لوحة الصيانة</h3></div>
+        <div class="facts"><span><b>الدور:</b> المالك / المشرف</span><span><b>القائمة:</b> الرقابة ▸ لوحة الصيانة</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>افتح اللوحة لآخر 90 يوماً.</li>
+            <li>اقرأ البطاقات: الأعمال المستلمة، والمفتوحة (والمتجاوزة للهدف، وغير المسندة)، ومتوسط أول استجابة، ومتوسط وقت الإنجاز، ونسبة المنجز ضمن الهدف، والمواد المستخدمة ورصيد مخزن الصيانة.</li>
+            <li>اختر الفني <strong>Ali (Maintenance)</strong> ثم <span class="btn">عرض</span>.</li>
+            <li>انظر إلى <strong>حسب العقار</strong>: يعرض Palm Residences مواد بقيمة 90 من T32.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يُحتسب عمل T32 منجزاً ضمن الهدف (عادي: الاستجابة خلال 24 ساعة، والإنجاز خلال 5 أيام). ويكون رصيد المخزن سالباً بمقدار 90 إذا لم يُسجل شراء مخزون بعد — سجّل شراءً بفاتورة مورد على الحساب 11650 فيصبح موجباً.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t35">
+        <div class="scenario-head"><span class="id">T35</span><h3>فوترة عقار مُدار باسم المالك</h3></div>
+        <div class="facts"><span><b>الدور:</b> مسؤول البيانات الرئيسية، ثم المحاسب</span><span><b>القائمة:</b> البيانات الرئيسية ▸ العقارات · العمليات ▸ فواتير العملاء</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <ol class="steps">
+            <li>افتح Garden Villas (مُدار، المالك Khalid Rahman) للتعديل. اترك الرقم الضريبي للمالك فارغاً، وأشّر على <strong>فوترة المستأجرين باسم المالك</strong> ثم <span class="btn">حفظ</span>.</li>
+            <li>رحّل فاتورة الإيجار المسودة التالية لعقد Garden Villas (من T3) وافتحها بـ <span class="btn">فاتورة ضريبية</span>.</li>
+            <li>افتح <span class="path">التقارير ▸ الإقرار الضريبي</span> لربع الفاتورة.</li>
+            <li>يعرض المدرب الشيء نفسه على عقار تجاري مُدار لمالكه رقم ضريبي.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يسمي المستند Khalid Rahman كمورد، "بواسطة" الشركة، مع ملاحظة أن الشركة تصدره بصفتها وكيلاً؛ ولأنه لا رقم ضريبي له فهي فاتورة عادية بلا ضريبة. ولا تظهر الفاتورة في الإقرار الضريبي للشركة. وللمالك الذي له رقم ضريبي: ضريبة 5%، ورقم مثل OTI-&lt;العقار&gt;-2026-0001، وتُقيد الضريبة لحساب 21500 مستحقات الملاك بدلاً من 21400 ضريبة القيمة المضافة المستحقة.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t36">
+        <div class="scenario-head"><span class="id">T36</span><h3>نتائج المالك: كشف الحساب والربحية</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب / المالك</span><span><b>القائمة:</b> العمليات ▸ تسويات الملاك · التقارير ▸ ربحية عقارات المالك</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>اصرف مادة من المخزن لعمل صيانة في Garden Villas (كما في T32): "AC capacitor"، الكمية 1، التكلفة 120. وتبين بطاقة العمل أنها محمّلة على المالك.</li>
+            <li>افتح كشف تسويات الملاك لـ Khalid Rahman.</li>
+            <li>افتح <span class="path">التقارير ▸ ربحية عقارات المالك</span> للسنة حتى تاريخه.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            رُحّلت المادة مدين 21500 مستحقات الملاك 126 · دائن 11650 ‏120 · دائن 21400 ضريبة القيمة المضافة المستحقة 6، موسومة بـ Garden Villas، مع فاتورة ضريبية للتحميل تحت <span class="path">العمليات ▸ التكاليف المحمّلة على الملاك</span>. ويدرجها الكشف تحت "الصيانة والمصروفات المحمّلة على المالك" وتنخفض حصة المالك بمقدار 126. ويعرض تقرير الربحية إيجار Garden Villas، وعمولتنا 5%، وضريبتها، وتكاليف 120، وصافي دخل المالك وهامشه — وعمولتنا كدخل للشركة.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t37">
+        <div class="scenario-head"><span class="id">T37</span><h3>حفظ الهوية الإماراتية وجواز السفر لمستأجر</h3></div>
+        <div class="facts"><span><b>الدور:</b> مسؤول البيانات الرئيسية</span><span><b>القائمة:</b> البيانات الرئيسية ▸ المستأجرون · البيانات الرئيسية ▸ انتهاء المستندات</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <ol class="steps">
+            <li>افتح Sara Ahmed للتعديل وانتقل إلى <strong>مستندات المستأجر</strong> في الأسفل.</li>
+            <li>ارفع صورة ممسوحة أو صورة لهوية إماراتية (يوفر المدرب نموذجاً): النوع الهوية الإماراتية، اترك الرقم والتواريخ فارغة، وأبقِ <strong>قراءة الهوية الإماراتية / جواز السفر</strong> مؤشراً، ثم <span class="btn">رفع</span>.</li>
+            <li>اقرأ الرسالة، ثم انظر إلى حقل انتهاء الهوية في النموذج.</li>
+            <li>ارفع جواز سفر مع إيقاف القراءة: الرقم P1234567، والانتهاء تاريخ في الشهر الماضي.</li>
+            <li>افتح <span class="path">البيانات الرئيسية ▸ انتهاء المستندات</span>.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            عُبّئ رقم الهوية (إن لم يكن لدى Sara رقم)، وتاريخ الانتهاء والجنسية؛ والرقم المختلف المسجل مسبقاً يُبلَّغ عنه ولا يُستبدل. ويظهر انتهاء جواز السفر بالأحمر كمنتهٍ في النموذج، ويتصدر جواز Sara قائمة انتهاء المستندات كمنتهٍ.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t38">
+        <div class="scenario-head"><span class="id">T38</span><h3>إرفاق العقد الموثق</h3></div>
+        <div class="facts"><span><b>الدور:</b> موظف التأجير</span><span><b>القائمة:</b> البيانات الرئيسية ▸ عقود الإيجار</span><span><b>الوقت:</b> 5 دقائق</span></div>
+        <ol class="steps">
+            <li>افتح العقد من T1. تحت <strong>مستندات العقد</strong> يُذكر أنه لا يوجد عقد موثق مسجل.</li>
+            <li>ارفع ملف PDF للعقد الموثق من البلدية: النوع "عقد موثق (البلدية)"، الرقم RAK-ATT-T38.</li>
+            <li>افتح انتهاء المستندات مجدداً.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            يختفي التحذير وينخفض عدد العقود السارية دون نسخة موثقة بواحد.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t39">
+        <div class="scenario-head"><span class="id">T39</span><h3>قراءة فاتورة مورد ممسوحة ضوئياً</h3></div>
+        <div class="facts"><span><b>الدور:</b> المحاسب</span><span><b>القائمة:</b> العمليات ▸ فواتير الموردين ▸ جديد</span><span><b>الوقت:</b> 10 دقائق</span></div>
+        <ol class="steps">
+            <li>في <span class="btn">فاتورة مورد جديدة</span>، استخدم <strong>قراءة فاتورة ممسوحة ضوئياً</strong> مع فاتورة مورد من Coastal Facility Services (يوفر المدرب ملف PDF). ‏<span class="btn">قراءة الفاتورة</span>.</li>
+            <li>قارن كل حقل بالمستند: المورد، ورقمه، والتواريخ، ووصف كل بند وكميته وسعر وحدته، والضريبة، والأرقام في اللوحة الزرقاء.</li>
+            <li>اختر أي حساب ناقص، ثم <span class="btn">حفظ كمسودة</span>، ثم رحّلها.</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            تتساوى إجماليات الفاتورة مع إجماليات المستند. وتشرح التحذيرات أي اختلاف (بند خصم، أو مورد غير معروف). ولا يُحفظ شيء حتى تحفظ أنت.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+
+    <div class="scenario" id="t40">
+        <div class="scenario-head"><span class="id">T40</span><h3>دع المساعد الذكي يكتب عنك (اختياري)</h3></div>
+        <div class="facts"><span><b>الدور:</b> أي مستخدم لديه المساعد</span><span><b>القائمة:</b> زر المساعد</span><span><b>الوقت:</b> 15 دقيقة</span></div>
+        <ol class="steps">
+            <li>افتح المساعد: "سجّل سند مصروفات نثرية بقيمة 150 لمواد تنظيف، مدفوع إلى Al Noor Supermarket، الإيصال R-5531، العقار Marina Heights." راجع البطاقة ثم <span class="btn">تأكيد</span>.</li>
+            <li>افتح فاتورة مورد جديدة، ثم اطلب: "عبّئ هذه لـ Coastal Facility Services، الفاتورة CFS-9، ‏12 فلتر تكييف بسعر 150." راجع الحقول الصفراء واحفظها بنفسك.</li>
+            <li>اختر مشبك الورق وأرفق الفاتورة من T39: يعيد المساعد ذكر ما قرأه.</li>
+            <li>اطلب: "افتح وحدة جديدة في Marina Heights، الطابق السابع، 1,250 قدم مربع، الإيجار 82,000."</li>
+            <li>اسأل: "ما إيجار السوق لشقة بغرفتي نوم في جزيرة المرجان؟"</li>
+        </ol>
+        <div class="expect"><strong>النتيجة المتوقعة</strong>
+            لا يحفظ شيئاً إلا النقر على تأكيد أو على زر الحفظ في الشاشة. وتعطي إجابة إيجار السوق مصادر بتواريخها بجانب إيجاراتك أنت للنوع نفسه من الوحدات.
+        </div>
+        <div class="signoff"><span><i class="box"></i>تم</span><span>المتدرب: ____________</span><span>المدرب: ____________</span><span>التاريخ: ________</span></div>
+    </div>
+</section>
+
+@* =========================================================== APPENDICES *@
+<section class="section" id="a1">
+    <span class="section-tag">الملحق أ</span>
+    <h2>رسائل قد تراها، وما العمل</h2>
+    <div class="tbl"><table>
+        <tr><th>الرسالة أو الحالة</th><th>المعنى</th><th>ما العمل</th></tr>
+        <tr><td>"… مقفلة. … لا يمكن إنشاؤه أو ترحيله أو تغييره أو حذفه في فترة مقفلة."</td><td>يقع التاريخ في شهر مقفل.</td><td>أرّخه في شهر مفتوح، أو اطلب إعادة فتح الشهر (T26).</td></tr>
+        <tr><td>"الفاتورة … لم تُرحّل بعد"</td><td>تستلم مالاً أو تحصّل شيكاً مقابل فاتورة مسودة.</td><td>رحّل الفاتورة أولاً (T5).</td></tr>
+        <tr><td>"فاتورة المورد … لم تُرحّل بعد"</td><td>تدفع فاتورة مورد مسودة.</td><td>رحّل الفاتورة أولاً.</td></tr>
+        <tr><td>"قيد اليومية غير متوازن."</td><td>المدين والدائن مختلفان، أو في بند ما مبلغان.</td><td>راجع أرقام كل بند.</td></tr>
+        <tr><td>"هذا السند سيجعل رصيد العهدة أقل من صفر"</td><td>لا يكفي النقد في عهدة المصروفات النثرية.</td><td>عوّض العهدة أولاً.</td></tr>
+        <tr><td>"الوحدة محجوزة بالفعل لهذه التواريخ بالعقد …"</td><td>عقد آخر نافذ أو منتظر يغطي التواريخ.</td><td>تحقق من التواريخ، أو أنهِ العقد الآخر.</td></tr>
+        <tr><td>"أقصى ما يمكن دفعه لـ … هو …"</td><td>دفعة المالك تتجاوز الرصيد.</td><td>لا تدفع أكثر من الرصيد المعروض.</td></tr>
+        <tr><td>حفظته لكنه لا يظهر في ميزان المراجعة</td><td>إنه مسودة.</td><td>رحّله من الاستعلام عن القيود (0.3).</td></tr>
+        <tr><td>الإعادة إلى مسودة مرفوضة</td><td>شيء يعتمد عليه (سند قبض، أو دفعة، أو شيك محصّل) أو الشهر مقفل.</td><td>أعد العنصر اللاحق أولاً، أو رحّل قيداً تصحيحياً.</td></tr>
+        <tr><td>"طلبات الصيانة معلقة لحسابك…"</td><td>على المستأجر فاتورة متأخرة أو شيك مرتجع لم يُستبدل.</td><td>حصّل المال أو الشيك البديل؛ ويُرفع التعليق تلقائياً (T33).</td></tr>
+        <tr><td>"لا يوجد مستخدم ينفذ أعمال الصيانة بعد"</td><td>لا أحد لديه دور مهندس الصيانة، فتنتظر الأعمال دون إسناد.</td><td>أنشئ مستخدم الصيانة (T32)؛ وأسند الأعمال المنتظرة من بطاقة العمل.</td></tr>
+        <tr><td>"أدخل رقم الفاتورة أو الإيصال الذي اشتُريت به المادة."</td><td>المادة المشتراة لعمل ما تحتاج إلى فاتورتها أو إيصالها.</td><td>أدخل رقم الفاتورة أو إيصال المصروفات النثرية.</td></tr>
+        <tr><td>"لا يوجد مورد يطابق … اختر المورد"</td><td>مورد الفاتورة الممسوحة غير موجود في الموردين.</td><td>اختر المورد، أو أنشئه واقرأ الفاتورة مجدداً.</td></tr>
+        <tr><td>"تحقق: المستند يذكر …، لكن سجل المستأجر يحتوي على …"</td><td>رقم الهوية الإماراتية أو جواز السفر في المسح يختلف عن رقم المستأجر.</td><td>تحقق من الصحيح وصحّح سجل المستأجر عند الحاجة.</td></tr>
+        <tr><td>ضوء أحمر في لوحة الإقفال</td><td>إجراء للشهر لم يصل إلى الأستاذ.</td><td>استخدم زر التشغيل في السطر أو افتح الشاشة المذكورة بجانبه.</td></tr>
+    </table></div>
+</section>
+
+<section class="section" id="a2">
+    <span class="section-tag">الملحق ب</span>
+    <h2>سجل تقدم المتدرب</h2>
+    <p>المتدرب: ______________________________ &nbsp; الدور: ____________________ &nbsp; تاريخ البدء: ____________</p>
+    <div class="tbl"><table>
+        <tr><th>#</th><th>السيناريو</th><th>تم</th><th>الأحرف الأولى للمدرب</th><th>التاريخ</th></tr>
+        <tr><td>T1</td><td>عقد تجاري يُفعّل فوراً</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T2</td><td>عقد سكني عبر الاعتماد</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T3</td><td>عقد في عقار مُدار</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T4</td><td>طباعة العقد وملصق QR الخاص به</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T5</td><td>ترحيل فاتورة إيجار وطباعتها</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T6</td><td>إشعار دائن لخصم على الإيجار</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T7</td><td>سند قبض بتحويل بنكي</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T8</td><td>الدفعات الجزئية</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T9</td><td>استلام شيكات مؤجلة</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T10</td><td>تحصيل شيك وتصحيح آخر</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T11</td><td>التأمين</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T12</td><td>طلب مستأجر: مهلة للسداد</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T13</td><td>فاتورة من مورد مسجل في الضريبة</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T14</td><td>فاتورة من مورد غير مسجل</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T15</td><td>تصحيح فاتورة مرحّلة</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T16</td><td>فاتورة متأخرة لشهر مقفل</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T17</td><td>السداد للموردين</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T18</td><td>عهدة المصروفات النثرية</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T19</td><td>التأمين السنوي كمصروف مدفوع مقدماً</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T20</td><td>القيود اليدوية</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T21</td><td>سحب المالك</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T22</td><td>أصل ثابت: الشراء والرسملة والإهلاك</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T23</td><td>فواتير العمولة الضريبية</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T24</td><td>السداد للمالك</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T25</td><td>إقفال الشهر من لوحة الإقفال</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T26</td><td>إعادة فتح شهر مقفل بطلب</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T27</td><td>الإقرار الضريبي وسداد الضريبة</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T28</td><td>مراجعة التقارير</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T29</td><td>إقفال نهاية السنة (عرض توضيحي)</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T30</td><td>تكاليف مشروع التطوير (اختياري)</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T31</td><td>بيع وحدة (اختياري)</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T32</td><td>إعداد فريق الصيانة وإنجاز عمل</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T33</td><td>تعليق الصيانة لمستأجر عليه فاتورة متأخرة</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T34</td><td>قراءة لوحة الصيانة</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T35</td><td>فوترة عقار مُدار باسم المالك</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T36</td><td>نتائج المالك: كشف الحساب والربحية</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T37</td><td>حفظ الهوية الإماراتية وجواز السفر لمستأجر</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T38</td><td>إرفاق العقد الموثق</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T39</td><td>قراءة فاتورة مورد ممسوحة ضوئياً</td><td><i class="box"></i></td><td></td><td></td></tr>
+        <tr><td>T40</td><td>دع المساعد الذكي يكتب عنك (اختياري)</td><td><i class="box"></i></td><td></td><td></td></tr>
+    </table></div>
+    <p style="margin-top:18px">توقيع المتدرب: ______________________ &nbsp;&nbsp; توقيع المدرب: ______________________ &nbsp;&nbsp; التاريخ: ____________</p>
+    <div class="end-note">
+        تتبع الخطوات الشاشات كما هي في هذا الإصدار. ويشرح زر <strong>المساعدة</strong> في كل شاشة
+        حقولها بالكامل، ويغطي دليل المستخدم إعداد الشركة وبياناتها الرئيسية.
+    </div>
+</section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Sheet 12: the User Manual and Training Workbook shells (whole texts)
+Print / Save as PDF ||| طباعة / حفظ كملف PDF
+Property, lease and accounting management — ||| إدارة العقارات والعقود والمحاسبة —
+the complete operating guide ||| دليل التشغيل الكامل
+Properties & Units ||| العقارات والوحدات
+Tenants & Contracts ||| المستأجرون والعقود
+PDC Management ||| إدارة الشيكات المؤجلة
+Invoicing & VAT ||| الفوترة وضريبة القيمة المضافة
+Double-Entry Accounting ||| المحاسبة بالقيد المزدوج
+Financial Reporting ||| التقارير المالية
+Tenant Self-Service ||| الخدمة الذاتية للمستأجرين
+Applies to: the RealEstateManager web application ||| ينطبق على: تطبيق RealEstateManager على الويب
+Audience: property administrators, leasing staff, accountants, system administrators ||| الجمهور: مديرو العقارات، وموظفو التأجير، والمحاسبون، ومسؤولو النظام
+Edition: ||| الإصدار:
+The same topics appear under the <strong>Help</strong> button on every screen ||| تظهر الموضوعات نفسها تحت زر <strong>المساعدة</strong> في كل شاشة
+Contents ||| المحتويات
+Every line is a link. In the PDF, click a line to jump to that chapter. ||| كل سطر رابط. في ملف PDF، انقر على سطر للانتقال إلى ذلك الفصل.
+Where: ||| الموقع:
+End of document. To print or save: <strong>Ctrl + P</strong> → <strong>Save as PDF</strong> → paper size <strong>A4</strong>. ||| نهاية المستند. للطباعة أو الحفظ: <strong>Ctrl + P</strong> ← <strong>حفظ كملف PDF</strong> ← حجم الورق <strong>A4</strong>.

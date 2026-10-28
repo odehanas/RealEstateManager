@@ -27,12 +27,37 @@ the system rejects any entry that does not balance.</p>
             <td>21600 PDC Contra</td>
         </tr>
         <tr>
-            <td><strong>PDC cleared</strong><br/><span class="small muted">receivable mode</span></td>
+            <td><strong>PDC deposited</strong><br/><span class="small muted">sent to the bank</span></td>
+            <td>21600 PDC Contra <span class="small muted">(reversal)</span><br/>11450 Cheques Under Collection</td>
+            <td>11400 PDC On Hand <span class="small muted">(reversal)</span><br/>11200 Accounts Receivable, or 21200 Advances in advance mode</td>
+        </tr>
+        <tr>
+            <td><strong>PDC cleared</strong><br/><span class="small muted">after deposit</span></td>
+            <td>11100 Cash and Cash Equivalents</td>
+            <td>11450 Cheques Under Collection</td>
+        </tr>
+        <tr>
+            <td><strong>PDC bounced</strong><br/><span class="small muted">charged back</span></td>
+            <td>11200 Accounts Receivable, or 21200 Advances in advance mode</td>
+            <td>11450 Cheques Under Collection</td>
+        </tr>
+        <tr>
+            <td><strong>PDC withdrawn</strong><br/><span class="small muted">before deposit</span></td>
+            <td>21600 PDC Contra <span class="small muted">(reversal)</span></td>
+            <td>11400 PDC On Hand <span class="small muted">(reversal)</span></td>
+        </tr>
+        <tr>
+            <td><strong>Cheque charge invoice</strong><br/><span class="small muted">withdrawal or returned cheque</span></td>
+            <td>11200 Accounts Receivable — total</td>
+            <td>The mapped charge income account (43100 Other Income by default)<br/>21400 VAT Payable — VAT</td>
+        </tr>
+        <tr>
+            <td><strong>PDC cleared</strong><br/><span class="small muted">straight from hand, receivable mode</span></td>
             <td>21600 PDC Contra <span class="small muted">(reversal)</span><br/>11100 Cash and Cash Equivalents</td>
             <td>11400 PDC On Hand <span class="small muted">(reversal)</span><br/>11200 Accounts Receivable</td>
         </tr>
         <tr>
-            <td><strong>PDC cleared</strong><br/><span class="small muted">advance mode</span></td>
+            <td><strong>PDC cleared</strong><br/><span class="small muted">straight from hand, advance mode</span></td>
             <td>21600 PDC Contra <span class="small muted">(reversal)</span><br/>11100 Cash and Cash Equivalents</td>
             <td>11400 PDC On Hand <span class="small muted">(reversal)</span><br/>21200 Advances from Customers</td>
         </tr>

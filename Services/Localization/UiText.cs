@@ -162,7 +162,11 @@ namespace RealEstateManager.Services.Localization
 
         public Task InvokeAsync(HttpContext context)
         {
-            var language = UiLanguages.Clean(context.Request.Cookies[UiLanguages.CookieName]);
+            // ?lang=ar shows one page in that language without changing the reader's choice
+            // (the manual PDFs are printed this way).
+            var language = UiLanguages.Clean(context.Request.Query.TryGetValue("lang", out var asked)
+                ? asked.ToString()
+                : context.Request.Cookies[UiLanguages.CookieName]);
             CultureInfo.CurrentUICulture = language == UiLanguages.Arabic ? ArabicUi : EnglishUi;
             return _next(context);
         }

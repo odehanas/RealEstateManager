@@ -1,0 +1,60 @@
+<p>يتابع سجل الأصول الثابتة البنود طويلة الأجل — المصاعد، والمولدات، ومعدات التكييف، والمركبات،
+والتجهيزات — من الاقتناء مروراً بالرسملة حتى الإهلاك الشهري.</p>
+
+<h3>إنشاء أصل</h3>
+<ol class="steps">
+    <li>اختر <strong>أصل ثابت جديد</strong>.</li>
+    <li>أدخل <strong>رمز الأصل</strong> و<strong>الاسم</strong>.</li>
+    <li>اختر <strong>حساب الأصل</strong> و<strong>حساب مجمع الإهلاك</strong>
+        (الافتراضيان <code>15200</code> و<code>15300</code>).</li>
+    <li>أدخل <strong>العمر الإنتاجي (أشهر)</strong> و<strong>تاريخ بدء الإهلاك</strong>.</li>
+    <li>للأصول المنقولة من نظام سابق، أدخل <strong>التكلفة الافتتاحية</strong> و
+        <strong>مجمع الإهلاك الافتتاحي</strong>.</li>
+    <li><strong>حفظ</strong>.</li>
+</ol>
+
+<h3>تكاليف الاقتناء</h3>
+<p>افتح الأصل واختر <strong>الاقتناء</strong> لتجميع التكاليف التي تكوّن قيمته —
+فاتورة المورد، والشحن، والتركيب، والأتعاب المهنية. ويُرحّل كل قيد:</p>
+<table class="je">
+    <thead><tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr></thead>
+    <tbody>
+        <tr><td><code>15400</code> تسوية الأصول الثابتة <span class="small muted">(قابل للرسملة)</span><br/>أو حساب المصروف <span class="small muted">(غير قابل للرسملة)</span></td><td class="num dr">المبلغ</td><td class="num">—</td></tr>
+        <tr><td>الحساب المقابل — <code>11100</code> النقد أو <code>21100</code> الذمم الدائنة</td><td class="num">—</td><td class="num cr">المبلغ</td></tr>
+    </tbody>
+</table>
+<p>اختيار مورد مع حساب مقابل من الذمم الدائنة يُنشئ أيضاً فاتورة المورد تلقائياً، فتظهر
+الذمة في الدفتر الفرعي للمورد.</p>
+
+<h3>الرسملة</h3>
+<p>عندما يكتمل الأصل ويُستخدم، رسمله. ينتقل رصيد التسوية المتجمع إلى
+حساب الأصل ويُنشأ جدول الإهلاك على مدى العمر الإنتاجي:</p>
+<table class="je">
+    <thead><tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr></thead>
+    <tbody>
+        <tr><td><code>15200</code> الأصول الثابتة</td><td class="num dr">التكلفة المرسملة</td><td class="num">—</td></tr>
+        <tr><td><code>15400</code> تسوية الأصول الثابتة</td><td class="num">—</td><td class="num cr">التكلفة المرسملة</td></tr>
+    </tbody>
+</table>
+
+<h3>تشغيل الإهلاك</h3>
+<ol class="steps">
+    <li>افتح <strong>الإهلاك</strong> من شاشة الأصول الثابتة.</li>
+    <li>أدخل <strong>تاريخ الترحيل</strong> — عادة نهاية الشهر الذي يُقفل.</li>
+    <li>اختر <strong>ترحيل الإهلاك</strong>. يُرحّل كل قسط مجدول في ذلك التاريخ أو قبله.</li>
+</ol>
+
+<table class="je">
+    <thead><tr><th>الحساب</th><th class="num">مدين</th><th class="num">دائن</th></tr></thead>
+    <tbody>
+        <tr><td><code>62100</code> مصروف الإهلاك</td><td class="num dr">القسط الشهري</td><td class="num">—</td></tr>
+        <tr><td><code>15300</code> مجمع الإهلاك</td><td class="num">—</td><td class="num cr">القسط الشهري</td></tr>
+    </tbody>
+</table>
+
+<div class="box">
+    <div class="box-title">عرض مجمع الإهلاك</div>
+    <p>في دليل الحسابات هذا، يُصنف <code>15300</code> كأصل ويحمل رصيداً دائناً،
+    فيعمل كحساب مقابل للأصول. ولذلك يخفض إجمالي الأصول في الميزانية العمومية، وهذا هو
+    العرض الصحيح. لا "تصحح" إشارته.</p>
+</div>
