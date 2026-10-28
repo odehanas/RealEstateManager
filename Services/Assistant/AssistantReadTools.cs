@@ -273,7 +273,7 @@ namespace RealEstateManager.Services.Assistant
             yield return new AssistantTool
             {
                 Name = "find_pdcs",
-                Description = "Post-dated cheques. Status: Draft, Received (on hand), Cleared, Bounced, Cancelled, Replaced. due_within_days lists cheques on hand falling due. A PDC on hand does not reduce the tenant's balance until cleared.",
+                Description = "Post-dated cheques. Status: Draft, Received (on hand), Deposited (at the bank under collection), Cleared, Bounced (returned unpaid), Withdrawn (handed back to the tenant at their request, with a charge), Replaced, Cancelled. due_within_days lists cheques on hand falling due. A PDC on hand does not reduce the tenant's balance; it does once deposited (or cleared directly), and a bounce charges it back.",
                 Screen = ("PdcReceipts", "Index"),
                 Parameters = Schema.Object(
                     ("status", Schema.Str("Cheque status"), false),

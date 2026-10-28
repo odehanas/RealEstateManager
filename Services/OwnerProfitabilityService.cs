@@ -84,6 +84,7 @@ namespace RealEstateManager.Services
 
             var invoices = await _db.CustomerInvoices.AsNoTracking()
                 .Where(x => ids.Contains(x.Lease!.Unit!.PropertyId) && x.JournalEntry != null && x.JournalEntry.IsPosted &&
+                            x.ChargeType == null &&   // cheque charges are the company's income, not the owner's rent
                             x.Status != "Cancelled" && x.InvoiceDate >= from && x.InvoiceDate <= to)
                 .GroupBy(x => x.Lease!.Unit!.PropertyId)
                 .Select(g => new { PropertyId = g.Key, Net = g.Sum(x => x.Subtotal), OwnerVat = g.Sum(x => x.IssuedForOwnerName != null ? x.VatAmount : 0m) })

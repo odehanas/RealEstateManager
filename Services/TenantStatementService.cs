@@ -82,6 +82,8 @@ namespace RealEstateManager.Services
                 .Include(x => x.CustomerInvoice)
                 .Include(x => x.ClearanceJournalEntry)
                 .Include(x => x.MemorandumJournalEntry)
+                .Include(x => x.DepositJournalEntry)
+                .Include(x => x.BounceJournalEntry)
                 .Where(x =>
                     x.Lease != null &&
                     x.Lease.TenantId == tenantId &&
@@ -116,14 +118,14 @@ namespace RealEstateManager.Services
                 .Where(x => x.ReceiptDate.Date < fromDate.Date)
                 .Sum(x => x.Amount);
 
+            // A cheque credits the tenant when it is deposited for collection - or, when it
+            // went straight to the bank, when it cleared - and is charged back if it bounces.
             var openingClearedPdc = pdcReceipts
-                .Where(x =>
-                    x.Status == "Cleared" &&
-                    x.ClearanceJournalEntry != null &&
-                    x.ClearanceJournalEntry.IsPosted &&
-                    x.ClearedDate.HasValue &&
-                    x.ClearedDate.Value.Date < fromDate.Date)
-                .Sum(x => x.Amount);
+                    .Where(x => SettledOn(x) is { } d && d < fromDate.Date)
+                    .Sum(x => x.Amount)
+                - pdcReceipts
+                    .Where(x => ChargedBackOn(x) is { } d && d < fromDate.Date)
+                    .Sum(x => x.Amount);
 
             var rows = new List<TenantStatementRowViewModel>();
 
@@ -136,7 +138,7 @@ namespace RealEstateManager.Services
                     TransactionDate = x.InvoiceDate.Date,
                     TransactionType = "Invoice",
                     ReferenceNumber = x.InvoiceNumber,
-                    Description = BuildInvoiceDescription(x.Lease),
+                    Description = x.ChargeType != null ? $"{x.ChargeType} - {BuildLeaseDisplay(x.Lease)}" : BuildInvoiceDescription(x.Lease),
                     Debit = x.TotalAmount,
                     Credit = 0m
                 }));
@@ -156,25 +158,33 @@ namespace RealEstateManager.Services
                 }));
 
             rows.AddRange(pdcReceipts
-                .Where(x =>
-                    x.Status == "Cleared" &&
-                    x.ClearanceJournalEntry != null &&
-                    x.ClearanceJournalEntry.IsPosted &&
-                    x.ClearedDate.HasValue &&
-                    x.ClearedDate.Value.Date >= fromDate.Date &&
-                    x.ClearedDate.Value.Date <= toDate.Date)
+                .Where(x => SettledOn(x) is { } d && d >= fromDate.Date && d <= toDate.Date)
                 .Select(x => new TenantStatementRowViewModel
                 {
-                    SourceType = "PdcClearance",
+                    SourceType = x.WentThroughCollection ? PdcService.DepositSourceType : "PdcClearance",
                     SourceId = x.Id,
-                    TransactionDate = x.ClearedDate!.Value.Date,
-                    TransactionType = "PDC Cleared",
+                    TransactionDate = SettledOn(x)!.Value,
+                    TransactionType = x.WentThroughCollection ? "PDC Deposited" : "PDC Cleared",
                     ReferenceNumber = x.ChequeNumber,
-                    Description = x.SettlementMode == "Receivable"
-                        ? $"PDC cleared against receivable - {BuildLeaseDisplay(x.Lease)}"
-                        : $"PDC cleared as customer advance - {BuildLeaseDisplay(x.Lease)}",
+                    Description = (x.WentThroughCollection ? "PDC deposited" : "PDC cleared") +
+                                  (x.SettlementMode == "Receivable" ? " against receivable" : " as customer advance") +
+                                  $" - {BuildLeaseDisplay(x.Lease)}",
                     Debit = 0m,
                     Credit = x.Amount
+                }));
+
+            rows.AddRange(pdcReceipts
+                .Where(x => ChargedBackOn(x) is { } d && d >= fromDate.Date && d <= toDate.Date)
+                .Select(x => new TenantStatementRowViewModel
+                {
+                    SourceType = PdcService.BounceSourceType,
+                    SourceId = x.Id,
+                    TransactionDate = ChargedBackOn(x)!.Value,
+                    TransactionType = "PDC Returned",
+                    ReferenceNumber = x.ChequeNumber,
+                    Description = $"Cheque returned unpaid{(x.BounceReason != null ? $" ({x.BounceReason})" : "")} - {BuildLeaseDisplay(x.Lease)}",
+                    Debit = x.Amount,
+                    Credit = 0m
                 }));
 
             rows.AddRange(creditNotes
@@ -213,7 +223,9 @@ namespace RealEstateManager.Services
                     x.ReceivedDate.Date <= toDate.Date &&
                     x.Status != "Cancelled" &&
                     x.Status != "Replaced" &&
-                    (!x.ClearedDate.HasValue || x.ClearedDate.Value.Date > toDate.Date))
+                    !(SettledOn(x) is { } settled && settled <= toDate.Date) &&
+                    !(x.BouncedDate.HasValue && x.BouncedDate.Value.Date <= toDate.Date) &&
+                    !(x.WithdrawnDate.HasValue && x.WithdrawnDate.Value.Date <= toDate.Date))
                 .OrderBy(x => x.ReceivedDate)
                 .ThenBy(x => x.ChequeNumber)
                 .Select(x => new TenantStatementPdcItemViewModel
@@ -248,6 +260,16 @@ namespace RealEstateManager.Services
                 NotedPdcItems = notedPdcItems
             };
         }
+
+        /// <summary>When the cheque credited the tenant, if it has.</summary>
+        private static DateTime? SettledOn(Domain.PdcReceipt x) =>
+            x.DepositJournalEntry is { IsPosted: true } ? x.DepositedDate?.Date
+            : x.ClearanceJournalEntry is { IsPosted: true } ? x.ClearedDate?.Date
+            : null;
+
+        /// <summary>When a deposited cheque that bounced was charged back to the tenant.</summary>
+        private static DateTime? ChargedBackOn(Domain.PdcReceipt x) =>
+            x.DepositJournalEntry is { IsPosted: true } && x.BounceJournalEntry is { IsPosted: true } ? x.BouncedDate?.Date : null;
 
         private static int GetTransactionOrder(string transactionType)
         {

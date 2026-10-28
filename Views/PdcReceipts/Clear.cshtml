@@ -6,9 +6,20 @@
 
 <h2>Clear PDC</h2>
 
-<div class="alert alert-warning">
-    Clearing this cheque will reverse the memorandum entry and post the real accounting entry to bank and the settlement account.
-</div>
+@if (Model.DepositedDate.HasValue)
+{
+    <div class="alert alert-info">
+        This cheque was deposited on <strong>@Model.DepositedDate.Value.ToString("dd/MM/yyyy")</strong> and the tenant was credited then.
+        Clearing it moves the amount from Cheques Under Collection into the bank: <code>Dr Bank / Cr Cheques Under Collection</code>.
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        Clearing this cheque will reverse the memorandum entry and post the real accounting entry to bank and the settlement account.
+        To follow it through the bank, <a asp-action="Step" asp-route-id="@Model.PdcReceiptId" asp-route-kind="deposit">deposit it first</a>.
+    </div>
+}
 
 <form asp-action="Clear" method="post">
     @Html.AntiForgeryToken()

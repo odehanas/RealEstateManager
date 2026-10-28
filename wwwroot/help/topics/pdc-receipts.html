@@ -1,7 +1,18 @@
 <p><strong>Workflow step 5.</strong> Post-dated cheques are the normal way rent is secured in the region. A PDC is a
-cheque you hold today that the bank will only honour on a future date. The system tracks it in two stages, each
-with its own journal, so the cheque is visible in the accounts from the day you receive it without overstating
-cash.</p>
+cheque you hold today that the bank will only honour on a future date. The system follows it from your drawer to
+the bank and on to clearance &mdash; or back to the tenant if it bounces or is withdrawn &mdash; with a journal at
+each step, so the cheque is visible in the accounts from the day you receive it without overstating cash.</p>
+
+<table class="t-compact">
+    <thead><tr><th style="width:18%">Step</th><th style="width:22%">Status</th><th>What it does</th></tr></thead>
+    <tbody>
+        <tr><td>Receive</td><td><strong>On hand</strong> (Received)</td><td>Memorandum entry; the cheque is in your drawer.</td></tr>
+        <tr><td>Deposit</td><td><strong>At bank</strong> (Deposited)</td><td>Sent to the bank for collection; moves to <code>11450</code> Cheques Under Collection and <strong>the tenant is credited</strong>.</td></tr>
+        <tr><td>Clear</td><td><strong>Cleared</strong></td><td>The bank honoured it; the money is in the bank.</td></tr>
+        <tr><td>Bounced</td><td><strong>Bounced</strong></td><td>Returned unpaid; <strong>charged back to the tenant</strong>, plus any returned cheque charge.</td></tr>
+        <tr><td>Withdraw</td><td><strong>Withdrawn</strong></td><td>The tenant took it back before it was deposited; a <strong>withdrawal charge</strong> is invoiced to them.</td></tr>
+    </tbody>
+</table>
 
 <figure data-video="cheques"></figure>
 
@@ -48,9 +59,27 @@ the usual fix when a cheque was keyed with the wrong date. Changing the received
 journal to match. The amount, lease and settlement mode cannot be changed here; if those are wrong, reset the
 journal and record the cheque again.</p>
 
-<h3>Stage two — clearing the cheque</h3>
+<h3>Stage two — depositing the cheque to the bank</h3>
+<p>When cheques fall due, they go to the bank for collection. Select <strong>Deposit</strong> on a cheque, or tick
+several on the register, choose the date and select <strong>Deposit to Bank</strong> (<strong>Tick cheques due by that
+date</strong> ticks them for you). The cheque shows as <strong>At bank</strong>.</p>
+<p>Depositing reverses the memorandum and credits the tenant: in Receivable mode the invoice is settled now, and the
+cheque appears on the tenant's statement as a payment on the deposit date.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21600</code> PDC Contra <span class="small muted">(reverse memo)</span></td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11400</code> PDC On Hand <span class="small muted">(reverse memo)</span></td><td class="num">—</td><td class="num cr">Amount</td></tr>
+        <tr><td><code>11450</code> Cheques Under Collection</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11200</code> Accounts Receivable <span class="small muted">(Receivable mode)</span><br/><code>21200</code> Advances from Customers <span class="small muted">(Advance mode)</span></td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p class="small muted">Cheques Under Collection is mapped in <span class="path">System Setup ▸ Account Mappings ▸ PDC Setup</span>.
+A cheque only needs an invoice in the accounts before it is deposited, as with clearing below.</p>
+
+<h3>Stage three — clearing the cheque</h3>
 <ol class="steps">
-    <li>When the bank honours the cheque, select <strong>Clear</strong> on it.</li>
+    <li>When the bank honours the cheque, select <strong>Clear</strong> (<strong>Cleared</strong> on a cheque at the bank).</li>
     <li>Enter the <strong>Cleared Date</strong>. It cannot be earlier than the received date.</li>
     <li>If the cleared date is <strong>before the cheque date</strong>, you are warned that a bank will not normally
         honour a post-dated cheque early, and asked to confirm. Confirm only if the cheque really was presented early
@@ -66,8 +95,83 @@ journal and record the cheque again.</p>
         <tr><td><code>11200</code> Accounts Receivable <span class="small muted">(Receivable mode)</span><br/><code>21200</code> Advances from Customers <span class="small muted">(Advance mode)</span></td><td class="num">—</td><td class="num cr">Amount</td></tr>
     </tbody>
 </table>
-<p>In Receivable mode, posting the clearance also settles the invoice — its <em>Amount Paid</em> rises and its status
-moves to PartiallyPaid or Paid.</p>
+<p>That is the entry for a cheque cleared <strong>straight from on hand</strong>, without a deposit step. In
+Receivable mode, posting it also settles the invoice — its <em>Amount Paid</em> rises and its status moves to
+PartiallyPaid or Paid.</p>
+<p>A cheque that was <strong>deposited first</strong> was credited to the tenant then, so clearing only moves it into
+the bank:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11100</code> Cash and Cash Equivalents</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11450</code> Cheques Under Collection</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+
+<h3>When the bank returns a cheque — Bounced</h3>
+<ol class="steps">
+    <li>On a cheque at the bank, select <strong>Bounced</strong>.</li>
+    <li>Enter the date it was returned and the bank's <strong>reason</strong> (insufficient funds, signature mismatch...).</li>
+    <li>The <strong>charge to the tenant</strong> starts at the company's returned cheque charge (0 for none); change it if needed.</li>
+    <li>Select <strong>Record Bounce and Post</strong>.</li>
+</ol>
+<p>The amount is charged back to the tenant: in Receivable mode the invoice is open again; in Advance mode the advance
+is taken back. The tenant statement shows the deposit and then the <em>PDC Returned</em> line.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11200</code> Accounts Receivable <span class="small muted">(Receivable mode)</span><br/><code>21200</code> Advances from Customers <span class="small muted">(Advance mode)</span></td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11450</code> Cheques Under Collection</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p>A cheque recorded as bounced without being deposited here only has its memorandum reversed &mdash; the tenant was
+never credited, so there is nothing to charge back.</p>
+<div class="box warn">
+    <div class="box-title">A bounced cheque holds the tenant</div>
+    <p>Until it is replaced, the tenant counts as having a returned cheque: their maintenance requests are held and it
+    shows on Tenant Health and the building view. On the bounced cheque, select <strong>New cheque</strong> to receive the
+    replacement (it starts with the same lease, invoice and amount, and the old cheque becomes <strong>Replaced</strong>),
+    or <strong>Paid otherwise</strong> when the tenant settled by cash or transfer.</p>
+</div>
+
+<h3>When the tenant asks for a cheque back — Withdraw</h3>
+<p>A tenant may ask to take back a cheque you hold, to pay another way or swap it. That costs the business, so the
+tenant is charged.</p>
+<ol class="steps">
+    <li>On a cheque <strong>on hand</strong>, select <strong>Withdraw</strong>. (A cheque already at the bank cannot be
+        withdrawn; if the bank returns it, record it as bounced.)</li>
+    <li>Enter the date it was handed back and a note.</li>
+    <li>The <strong>charge to the tenant</strong> starts at the company's withdrawal charge (500 by default); type a
+        different amount if needed, or 0 for none. The screen shows the VAT and total.</li>
+    <li>Select <strong>Withdraw and Post</strong>.</li>
+</ol>
+<p>The memorandum is reversed and the cheque stays in the register as <strong>Withdrawn</strong>, with its charge. The
+rent it was for is still owed: in Receivable mode the invoice stays open. Replace it with <strong>New cheque</strong> or
+<strong>Paid otherwise</strong>, as for a bounced cheque.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>21600</code> PDC Contra <span class="small muted">(reverse memo)</span></td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11400</code> PDC On Hand <span class="small muted">(reverse memo)</span></td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+
+<h3>Charges to the tenant</h3>
+<p>A withdrawal or returned cheque charge is raised as its own <strong>tax invoice</strong> to the tenant (numbered
+<code>CHG-yyyy-nnnnn</code>, described as <em>Cheque withdrawal charge</em> or <em>Returned cheque charge</em>), with 5% VAT when
+the company is VAT registered. It is on the tenant's statement, is collected like any invoice, and is declared on the
+company's VAT return as a standard-rated supply.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>43100</code> Other Income <span class="small muted">(or the mapped cheque charges income)</span><br/><code>21400</code> VAT Payable</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+    </tbody>
+</table>
+<p>The charge is always the company's own income, issued in its own name, even for a managed property whose rent is
+billed in the owner's name &mdash; it is never part of what the owner is paid. The default amounts and the income account are
+set in <span class="path">System Setup ▸ Account Mappings ▸ PDC Setup</span>. To undo a withdrawal or bounce that
+carried a charge, credit the charge invoice first.</p>
 
 <div class="box warn">
     <div class="box-title">The invoice must be posted before the cheque clears</div>
@@ -83,7 +187,11 @@ moves to PartiallyPaid or Paid.</p>
     <li>Amount must be greater than zero.</li>
     <li>In Receivable mode an invoice is required, it must belong to the selected lease, and the cheque cannot exceed
         the invoice's outstanding balance.</li>
-    <li>A cheque cannot be cleared twice.</li>
+    <li>A cheque cannot be cleared twice, and a bounced, withdrawn or replaced cheque cannot be cleared.</li>
+    <li>Only a cheque on hand can be deposited or withdrawn; only one at the bank (or on hand) can bounce.</li>
+    <li>No step can be dated in the future, or before the step it follows.</li>
+    <li>Each step's journal can be reset only in reverse order: reset a clearance or bounce before the deposit, and the
+        deposit before the receipt.</li>
 </ul>
 
 <h3>PDC statuses</h3>
@@ -91,7 +199,11 @@ moves to PartiallyPaid or Paid.</p>
     <thead><tr><th style="width:20%">Status</th><th>Meaning</th></tr></thead>
     <tbody>
         <tr><td><strong>Draft</strong></td><td>Saved; memorandum journal not yet posted.</td></tr>
-        <tr><td><strong>Received</strong></td><td>Memorandum posted; the cheque is in your custody.</td></tr>
-        <tr><td><strong>Cleared</strong></td><td>Clearance posted; cash recorded and the memorandum reversed.</td></tr>
+        <tr><td><strong>Received</strong> (on hand)</td><td>Memorandum posted; the cheque is in your custody.</td></tr>
+        <tr><td><strong>Deposited</strong> (at bank)</td><td>Sent to the bank for collection; in Cheques Under Collection and credited to the tenant.</td></tr>
+        <tr><td><strong>Cleared</strong></td><td>Clearance posted; the money is in the bank.</td></tr>
+        <tr><td><strong>Bounced</strong></td><td>Returned unpaid by the bank and charged back to the tenant; waiting to be replaced.</td></tr>
+        <tr><td><strong>Withdrawn</strong></td><td>Handed back to the tenant at their request, with a charge; waiting to be replaced.</td></tr>
+        <tr><td><strong>Replaced</strong></td><td>A bounced or withdrawn cheque the tenant has since replaced or paid otherwise.</td></tr>
     </tbody>
 </table>

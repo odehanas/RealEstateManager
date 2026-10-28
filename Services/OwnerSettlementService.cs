@@ -152,6 +152,7 @@ namespace RealEstateManager.Services
             var invoices = await _db.CustomerInvoices.AsNoTracking()
                 .Where(x => leaseIds.Contains(x.LeaseId) &&
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
+                            x.ChargeType == null &&   // cheque charges are the company's income, not rent
                             x.Status != "Cancelled" &&
                             x.InvoiceDate <= asOf)
                 .GroupBy(x => x.LeaseId)
@@ -164,6 +165,7 @@ namespace RealEstateManager.Services
 
             var credits = await _db.CustomerCreditNotes.AsNoTracking()
                 .Where(x => x.CustomerInvoice != null && leaseIds.Contains(x.CustomerInvoice.LeaseId) &&
+                            x.CustomerInvoice.ChargeType == null &&
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
                             x.CreditNoteDate <= asOf)
                 .GroupBy(x => x.CustomerInvoice!.LeaseId)
@@ -176,6 +178,7 @@ namespace RealEstateManager.Services
 
             var receipts = await _db.CustomerReceipts.AsNoTracking()
                 .Where(x => x.CustomerInvoice != null && leaseIds.Contains(x.CustomerInvoice.LeaseId) &&
+                            x.CustomerInvoice.ChargeType == null &&
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
                             x.ReceiptDate <= asOf)
                 .GroupBy(x => x.CustomerInvoice!.LeaseId)

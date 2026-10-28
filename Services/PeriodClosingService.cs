@@ -390,13 +390,13 @@ namespace RealEstateManager.Services
             {
                 Key = "pdc",
                 Title = "Post-dated cheques due are presented",
-                Rule = "A cheque dated on or before the month end should be cleared, bounced or replaced.",
+                Rule = "A cheque dated on or before the month end should be deposited, and one at the bank cleared or recorded as bounced.",
                 LinkUrl = "/PdcReceipts",
                 LinkLabel = "PDC register"
             };
 
             var due = await _db.PdcReceipts.AsNoTracking()
-                .Where(x => x.CompanyId == companyId && x.Status == "Received" && x.ChequeDate <= end)
+                .Where(x => x.CompanyId == companyId && (x.Status == "Received" || x.Status == "Deposited") && x.ChequeDate <= end)
                 .Select(x => x.Amount)
                 .ToListAsync();
 

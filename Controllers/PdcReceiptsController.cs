@@ -40,6 +40,7 @@ namespace RealEstateManager.Controllers
                 // rather than leaving the user to trust that it matches the received date.
                 .Include(x => x.MemorandumJournalEntry)
                 .Include(x => x.ClearanceJournalEntry)
+                .Include(x => x.ChargeInvoice)
                 .OrderByDescending(x => x.ReceivedDate)
                 .ThenByDescending(x => x.Id)
                 .ToListAsync();
@@ -48,11 +49,24 @@ namespace RealEstateManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create(int? leaseId, int? invoiceId)
+        public async Task<IActionResult> Create(int? leaseId, int? invoiceId, int? replaces)
         {
-            await LoadLookupsAsync(leaseId, invoiceId);
-
             var model = new PdcReceiptCreateViewModel();
+
+            // A new cheque replacing a bounced or withdrawn one starts from the old one.
+            var old = replaces.HasValue ? await _db.PdcReceipts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == replaces.Value) : null;
+            if (old is { Status: PdcStatuses.Bounced or PdcStatuses.Withdrawn })
+            {
+                model.ReplacesPdcId = old.Id;
+                model.ReplacesChequeNumber = old.ChequeNumber;
+                model.Amount = old.Amount;
+                model.BankName = old.BankName;
+                model.SettlementMode = old.SettlementMode;
+                leaseId = old.LeaseId;
+                invoiceId = old.SettlementMode == "Receivable" ? old.CustomerInvoiceId : null;
+            }
+
+            await LoadLookupsAsync(leaseId, invoiceId);
 
             if (invoiceId.HasValue)
             {
@@ -63,7 +77,8 @@ namespace RealEstateManager.Controllers
                 {
                     model.LeaseId = invoice.LeaseId;
                     model.CustomerInvoiceId = invoice.Id;
-                    model.Amount = invoice.TotalAmount - invoice.AmountPaid;
+                    if (model.ReplacesPdcId == null)
+                        model.Amount = invoice.TotalAmount - invoice.AmountPaid;
                     model.SettlementMode = "Receivable";
                 }
             }
@@ -97,6 +112,12 @@ namespace RealEstateManager.Controllers
                 var result = await _pdcEntry.CreateAsync(companyId, model);
                 if (result.NotPostedReason != null)
                     TempData["PostingWarning"] = $"Cheque {result.Pdc.ChequeNumber} was saved as a draft but not posted: {result.NotPostedReason}";
+
+                if (model.ReplacesPdcId.HasValue)
+                {
+                    await _pdcService.MarkReplacedAsync(model.ReplacesPdcId.Value, $"Replaced by cheque {result.Pdc.ChequeNumber}");
+                    TempData["PdcMessage"] = $"Cheque {result.Pdc.ChequeNumber} is received and replaces cheque {model.ReplacesChequeNumber}.";
+                }
 
                 return RedirectToAction(nameof(Index));
             }
@@ -270,6 +291,181 @@ namespace RealEstateManager.Controllers
             }
         }
 
+        // =====================================================================
+        //  DEPOSIT, BOUNCE, WITHDRAW
+        // =====================================================================
+
+        /// <summary>Deposit, bounce or withdrawal of one cheque.</summary>
+        [HttpGet]
+        public async Task<IActionResult> Step(int id, string kind)
+        {
+            var pdc = await LoadPdcReceiptAsync(id);
+            if (pdc == null)
+                return NotFound();
+
+            var company = await _db.Companies.FirstAsync(x => x.Id == pdc.CompanyId);
+            var model = new PdcStepViewModel
+            {
+                PdcReceiptId = pdc.Id,
+                Kind = kind is PdcStepViewModel.Bounce or PdcStepViewModel.Withdraw ? kind : PdcStepViewModel.Deposit,
+                StepDate = DateTime.Today
+            };
+            model.Charge = model.Kind switch
+            {
+                PdcStepViewModel.Withdraw => company.PdcWithdrawalCharge,
+                PdcStepViewModel.Bounce => company.PdcBounceCharge,
+                _ => 0m
+            };
+            PopulateStepModel(model, pdc, company);
+
+            foreach (var error in StepErrors(model.Kind, pdc, model.StepDate).Where(e => !e.Contains("date", StringComparison.OrdinalIgnoreCase)))
+                ModelState.AddModelError(string.Empty, error);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Step(PdcStepViewModel model)
+        {
+            var pdc = await LoadPdcReceiptAsync(model.PdcReceiptId);
+            if (pdc == null)
+                return NotFound();
+
+            var company = await _db.Companies.FirstAsync(x => x.Id == pdc.CompanyId);
+            PopulateStepModel(model, pdc, company);
+
+            foreach (var error in StepErrors(model.Kind, pdc, model.StepDate))
+                ModelState.AddModelError(string.Empty, error);
+            if (model.Charge < 0m)
+                ModelState.AddModelError(nameof(model.Charge), "The charge cannot be negative.");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                string message;
+                var warnings = new List<string>();
+
+                if (model.Kind == PdcStepViewModel.Deposit)
+                {
+                    var journal = await _pdcService.DepositPdcAsync(pdc.Id, model.StepDate.Date);
+                    if (await _journalWorkflowService.PostNewEntryAsync(journal.Id) is { } notPosted)
+                        warnings.Add($"The deposit was saved as a draft but not posted: {notPosted}");
+                    message = $"Cheque {pdc.ChequeNumber} is deposited to the bank and now under collection.";
+                }
+                else
+                {
+                    var result = model.Kind == PdcStepViewModel.Bounce
+                        ? await _pdcService.BouncePdcAsync(pdc.Id, model.StepDate.Date, model.Reason, model.Charge)
+                        : await _pdcService.WithdrawPdcAsync(pdc.Id, model.StepDate.Date, model.Charge, model.Reason);
+
+                    if (await _journalWorkflowService.PostNewEntryAsync(result.Journal.Id) is { } notPosted)
+                        warnings.Add($"The entry was saved as a draft but not posted: {notPosted}");
+                    if (result.ChargeJournal != null && await _journalWorkflowService.PostNewEntryAsync(result.ChargeJournal.Id) is { } chargeNotPosted)
+                        warnings.Add($"Charge invoice {result.ChargeInvoice?.InvoiceNumber} was saved as a draft but not posted: {chargeNotPosted}");
+
+                    message = model.Kind == PdcStepViewModel.Bounce
+                        ? $"Cheque {pdc.ChequeNumber} is recorded as bounced" + (pdc.Status == PdcStatuses.Deposited ? " and charged back to the tenant." : ".")
+                        : $"Cheque {pdc.ChequeNumber} is withdrawn and handed back to the tenant.";
+                    if (result.ChargeInvoice != null)
+                        message += $" The tenant is charged {result.ChargeInvoice.TotalAmount:N2} on invoice {result.ChargeInvoice.InvoiceNumber}.";
+                }
+
+                TempData["PdcMessage"] = message;
+                if (warnings.Count > 0)
+                    TempData["PostingWarning"] = string.Join(" ", warnings);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+        }
+
+        /// <summary>Deposits every ticked cheque on hand to the bank on one date.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DepositSelected(int[] ids, DateTime depositDate)
+        {
+            if (ids.Length == 0)
+            {
+                TempData["PostingWarning"] = "Tick the cheques to deposit first.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var done = new List<string>();
+            var problems = new List<string>();
+
+            foreach (var id in ids.Distinct())
+            {
+                var pdc = await _db.PdcReceipts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                if (pdc == null)
+                    continue;
+
+                try
+                {
+                    var journal = await _pdcService.DepositPdcAsync(id, depositDate.Date);
+                    if (await _journalWorkflowService.PostNewEntryAsync(journal.Id) is { } notPosted)
+                        problems.Add($"{pdc.ChequeNumber}: saved as a draft, not posted - {notPosted}");
+                    else
+                        done.Add(pdc.ChequeNumber);
+                }
+                catch (Exception ex)
+                {
+                    problems.Add($"{pdc.ChequeNumber}: {ex.Message}");
+                }
+            }
+
+            if (done.Count > 0)
+                TempData["PdcMessage"] = $"{done.Count} cheque(s) deposited on {depositDate:dd/MM/yyyy}: {string.Join(", ", done)}.";
+            if (problems.Count > 0)
+                TempData["PostingWarning"] = string.Join(" ", problems);
+            return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>A bounced or withdrawn cheque closed off once the tenant has replaced it or paid.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkReplaced(int id, string? note)
+        {
+            try
+            {
+                await _pdcService.MarkReplacedAsync(id, note);
+                TempData["PdcMessage"] = "The cheque is marked as replaced.";
+            }
+            catch (Exception ex)
+            {
+                TempData["PostingWarning"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private static List<string> StepErrors(string kind, PdcReceipt pdc, DateTime date) => kind switch
+        {
+            PdcStepViewModel.Bounce => PdcService.CheckBounce(pdc, date),
+            PdcStepViewModel.Withdraw => PdcService.CheckWithdrawal(pdc, date),
+            _ => PdcService.CheckDeposit(pdc, date)
+        };
+
+        private static void PopulateStepModel(PdcStepViewModel model, PdcReceipt pdc, Company company)
+        {
+            model.ChequeNumber = pdc.ChequeNumber;
+            model.BankName = pdc.BankName;
+            model.ChequeDate = pdc.ChequeDate;
+            model.ReceivedDate = pdc.ReceivedDate;
+            model.DepositedDate = pdc.DepositedDate;
+            model.Amount = pdc.Amount;
+            model.SettlementMode = pdc.SettlementMode;
+            model.Status = pdc.Status;
+            model.LeaseDisplay = $"{pdc.Lease?.ContractNumber} - {pdc.Lease?.Tenant?.FullName} - {pdc.Lease?.Unit?.Property?.Code}/{pdc.Lease?.Unit?.UnitNumber}";
+            model.InvoiceDisplay = pdc.CustomerInvoice?.InvoiceNumber ?? "-";
+            model.VatRate = company.IsVatRegistered ? VatDeterminationService.RateFor(VatCategories.Standard) : 0m;
+        }
+
         private async Task LoadLookupsAsync(int? selectedLeaseId = null, int? selectedInvoiceId = null)
         {
             var leases = await _db.Leases
@@ -317,6 +513,7 @@ namespace RealEstateManager.Controllers
             model.ReceivedDate = pdc.ReceivedDate;
             model.Amount = pdc.Amount;
             model.SettlementMode = pdc.SettlementMode;
+            model.DepositedDate = pdc.Status == PdcStatuses.Deposited ? pdc.DepositedDate : null;
             model.LeaseDisplay = $"{pdc.Lease?.ContractNumber} - {pdc.Lease?.Tenant?.FullName} - {pdc.Lease?.Unit?.Property?.Code}/{pdc.Lease?.Unit?.UnitNumber}";
             model.InvoiceDisplay = pdc.CustomerInvoice?.InvoiceNumber ?? "-";
         }

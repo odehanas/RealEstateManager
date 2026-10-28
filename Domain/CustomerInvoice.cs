@@ -48,6 +48,15 @@
         public bool IsIssuedForOwner => IssuedForOwnerName != null;
 
         /// <summary>
+        /// Null for rent. Otherwise the kind of charge (see InvoiceChargeTypes) - a cheque
+        /// withdrawal or returned cheque charge - which is the company's own income, issued
+        /// in its own name, and never part of what an owner is paid.
+        /// </summary>
+        public string? ChargeType { get; set; }
+
+        public bool IsCharge => ChargeType != null;
+
+        /// <summary>
         /// The rental period this invoice bills. Shown on the e-invoice as the invoicing
         /// period. Null on invoices raised before it was recorded; it is then derived
         /// from the lease's billing frequency.

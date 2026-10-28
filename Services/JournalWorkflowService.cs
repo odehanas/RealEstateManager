@@ -483,6 +483,8 @@ namespace RealEstateManager.Services
                 "VendorBill" => await BlockIfBillHasPaymentsAsync(entry.SourceId),
                 "VendorPayment" => await BlockIfAdvanceAppliedAsync(entry.SourceId),
                 "PdcReceiptMemo" => await BlockIfPdcClearedAsync(entry.SourceId),
+                PdcService.DepositSourceType => await BlockIfPdcCollectedAsync(entry.SourceId),
+                PdcService.BounceSourceType or PdcService.WithdrawalSourceType => await BlockIfPdcChargedAsync(entry.SourceId),
                 _ => null
             };
         }
@@ -579,11 +581,58 @@ namespace RealEstateManager.Services
             if (!pdcId.HasValue)
                 return null;
 
-            var cleared = await _db.PdcReceipts
-                .AnyAsync(x => x.Id == pdcId.Value && x.ClearanceJournalEntryId != null);
+            var pdc = await _db.PdcReceipts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == pdcId.Value);
+            if (pdc == null)
+                return null;
 
-            return cleared
-                ? "This cheque has already cleared. Reset the clearance entry first."
+            if (pdc.ClearanceJournalEntryId != null && !pdc.WentThroughCollection)
+                return "This cheque has already cleared. Reset the clearance entry first.";
+
+            var later = new[] { pdc.DepositJournalEntryId, pdc.BounceJournalEntryId, pdc.WithdrawalJournalEntryId, pdc.ClearanceJournalEntryId }
+                .Where(x => x.HasValue).Select(x => x!.Value).ToList();
+            return later.Count > 0 && await _db.JournalEntries.AnyAsync(x => later.Contains(x.Id) && x.IsPosted)
+                ? "This cheque has been deposited, bounced or withdrawn since. Reset that entry first."
+                : null;
+        }
+
+        /// <summary>A deposit cannot be undone while the cheque's clearance or bounce from the bank stands.</summary>
+        private async Task<string?> BlockIfPdcCollectedAsync(int? pdcId)
+        {
+            if (!pdcId.HasValue)
+                return null;
+
+            var pdc = await _db.PdcReceipts.AsNoTracking()
+                .Where(x => x.Id == pdcId.Value)
+                .Select(x => new
+                {
+                    Cleared = x.ClearanceJournalEntry != null && x.ClearanceJournalEntry.IsPosted,
+                    Bounced = x.BounceJournalEntry != null && x.BounceJournalEntry.IsPosted
+                })
+                .FirstOrDefaultAsync();
+
+            return pdc switch
+            {
+                { Cleared: true } => "This cheque has cleared since it was deposited. Reset the clearance entry first.",
+                { Bounced: true } => "This cheque has bounced since it was deposited. Reset the bounce entry first.",
+                _ => null
+            };
+        }
+
+        /// <summary>The charge raised for a bounce or withdrawal stands on its own; it must be credited before the step is undone.</summary>
+        private async Task<string?> BlockIfPdcChargedAsync(int? pdcId)
+        {
+            if (!pdcId.HasValue)
+                return null;
+
+            var charge = await _db.PdcReceipts.AsNoTracking()
+                .Where(x => x.Id == pdcId.Value && x.ChargeInvoice != null &&
+                            x.ChargeInvoice.JournalEntry != null && x.ChargeInvoice.JournalEntry.IsPosted &&
+                            x.ChargeInvoice.CreditedAmount < x.ChargeInvoice.TotalAmount)
+                .Select(x => x.ChargeInvoice!.InvoiceNumber)
+                .FirstOrDefaultAsync();
+
+            return charge != null
+                ? $"The tenant was charged for this on invoice {charge}. Credit that invoice first (Customer Invoices ▸ Credit Note)."
                 : null;
         }
 
@@ -787,22 +836,67 @@ namespace RealEstateManager.Services
 
 
                     pdc.ClearedDate = posting ? entry.EntryDate : null;
-                    pdc.Status = posting ? "Cleared" : "Received";
+                    pdc.Status = posting ? PdcStatuses.Cleared
+                        : pdc.WentThroughCollection ? PdcStatuses.Deposited : PdcStatuses.Received;
 
                     // A cleared cheque in Receivable mode settles the invoice; an advance
-                    // does not touch it.
-                    if (pdc.SettlementMode == "Receivable" && pdc.CustomerInvoice != null)
-                    {
-                        pdc.CustomerInvoice.AmountPaid += posting ? pdc.Amount : -pdc.Amount;
-                        RecomputeInvoiceStatus(pdc.CustomerInvoice);
-                    }
+                    // does not touch it. One deposited first settled it when deposited.
+                    if (!pdc.WentThroughCollection)
+                        SettleInvoice(pdc, posting ? 1m : -1m);
 
+                    break;
+                }
+
+                case PdcService.DepositSourceType:
+                {
+                    var pdc = await _db.PdcReceipts.Include(x => x.CustomerInvoice).FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (pdc == null) break;
+
+                    // Deposited, the tenant is credited: the invoice is settled now.
+                    pdc.DepositedDate = posting ? entry.EntryDate : null;
+                    pdc.Status = posting ? PdcStatuses.Deposited : PdcStatuses.Received;
+                    SettleInvoice(pdc, posting ? 1m : -1m);
+                    break;
+                }
+
+                case PdcService.BounceSourceType:
+                {
+                    var pdc = await _db.PdcReceipts.Include(x => x.CustomerInvoice).FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (pdc == null) break;
+
+                    // A deposited cheque's credit to the tenant is taken back: the invoice is open again.
+                    var deposited = pdc.DepositJournalEntryId.HasValue &&
+                                    await _db.JournalEntries.AnyAsync(x => x.Id == pdc.DepositJournalEntryId && x.IsPosted);
+                    pdc.BouncedDate = posting ? entry.EntryDate : null;
+                    pdc.Status = posting ? PdcStatuses.Bounced : deposited ? PdcStatuses.Deposited : PdcStatuses.Received;
+                    if (deposited)
+                        SettleInvoice(pdc, posting ? -1m : 1m);
+                    break;
+                }
+
+                case PdcService.WithdrawalSourceType:
+                {
+                    var pdc = await _db.PdcReceipts.FirstOrDefaultAsync(x => x.Id == sourceId.Value);
+                    if (pdc == null) break;
+
+                    pdc.WithdrawnDate = posting ? entry.EntryDate : null;
+                    pdc.Status = posting ? PdcStatuses.Withdrawn : PdcStatuses.Received;
                     break;
                 }
 
                 // ManualJournal, PettyCashExpense, PettyCashReplenishment and anything
                 // else have no document state to keep in step.
             }
+        }
+
+        /// <summary>A cheque in Receivable mode settles (sign +1) or reopens (-1) its invoice.</summary>
+        private static void SettleInvoice(PdcReceipt pdc, decimal sign)
+        {
+            if (pdc.SettlementMode != "Receivable" || pdc.CustomerInvoice == null)
+                return;
+
+            pdc.CustomerInvoice.AmountPaid += sign * pdc.Amount;
+            RecomputeInvoiceStatus(pdc.CustomerInvoice);
         }
 
         private static void RecomputeInvoiceStatus(CustomerInvoice invoice)

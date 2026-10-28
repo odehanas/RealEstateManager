@@ -73,6 +73,14 @@ namespace RealEstateManager.Domain
         public int? PdcContraAccountId { get; set; }
         public Account? PdcContraAccount { get; set; }
 
+        /// <summary>Cheques deposited with the bank and not yet cleared (11450).</summary>
+        public int? ChequesUnderCollectionAccountId { get; set; }
+        public Account? ChequesUnderCollectionAccount { get; set; }
+
+        /// <summary>Income for cheque withdrawal and returned cheque charges; Other Income when not set.</summary>
+        public int? PdcChargeIncomeAccountId { get; set; }
+        public Account? PdcChargeIncomeAccount { get; set; }
+
         public int? FixedAssetDefaultAccountId { get; set; }
         public Account? FixedAssetDefaultAccount { get; set; }
 

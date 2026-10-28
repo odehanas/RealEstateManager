@@ -137,7 +137,8 @@ namespace RealEstateManager.Controllers
                 .OrderBy(x => x.EndDate).Take(15).ToListAsync();
 
             // ---- cheques on hand and bills to pay
-            var onHand = _db.PdcReceipts.AsNoTracking().Where(x => x.Status == "Received");
+            // On hand or at the bank awaiting clearance: not yet cash either way.
+            var onHand = _db.PdcReceipts.AsNoTracking().Where(x => x.Status == "Received" || x.Status == "Deposited");
             model.PdcOnHand = await onHand.SumAsync(x => (decimal?)x.Amount) ?? 0m;
             model.PdcDue30 = await onHand.Where(x => x.ChequeDate <= today.AddDays(30)).SumAsync(x => (decimal?)x.Amount) ?? 0m;
             model.PdcDue30Count = await onHand.CountAsync(x => x.ChequeDate <= today.AddDays(30));

@@ -16,8 +16,17 @@
     Use <strong>Receivable</strong> only when the cheque is linked to an outstanding invoice and should settle A/R once cleared.
 </div>
 
+@if (Model.ReplacesPdcId.HasValue)
+{
+    <div class="alert alert-warning">
+        This cheque replaces cheque <strong>@Model.ReplacesChequeNumber</strong>, which will be marked <strong>Replaced</strong> once this one is saved.
+    </div>
+}
+
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
+    <input asp-for="ReplacesPdcId" type="hidden" />
+    <input asp-for="ReplacesChequeNumber" type="hidden" />
 
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 

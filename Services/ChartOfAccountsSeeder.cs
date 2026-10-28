@@ -253,6 +253,7 @@ namespace RealEstateManager.Services
                 new() { CompanyId = company.Id, Code = "11250", Name = "Receivable from Unit Buyers", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11250 },
                 new() { CompanyId = company.Id, Code = "11300", Name = "VAT Recoverable", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11300 },
                 new() { CompanyId = company.Id, Code = "11400", Name = "PDC On Hand", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11400 },
+                new() { CompanyId = company.Id, Code = "11450", Name = "Cheques Under Collection", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11450 },
                 new() { CompanyId = company.Id, Code = "11600", Name = "Employee Advances", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11600 },
                 new() { CompanyId = company.Id, Code = "11650", Name = "Maintenance Materials Stock", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11650 },
                 new() { CompanyId = company.Id, Code = "11500", Name = "Prepaid Expenses", AccountType = "Asset", ReportingGroup = "Assets", ParentAccountId = accountsByCode["10000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 11500 },
@@ -379,6 +380,7 @@ namespace RealEstateManager.Services
             setting.AccountsReceivableAccountId ??= FindAccountId(accountsByCode, "11200");
             setting.VatRecoverableAccountId ??= FindAccountId(accountsByCode, "11300");
             setting.PdcOnHandAccountId ??= FindAccountId(accountsByCode, "11400");
+            setting.ChequesUnderCollectionAccountId ??= FindAccountId(accountsByCode, "11450");
             setting.PrepaidExpenseDefaultAccountId ??= FindAccountId(accountsByCode, "11500");
             setting.InvestmentPropertyAccountId ??= FindAccountId(accountsByCode, "15100");
             setting.FixedAssetDefaultAccountId ??= FindAccountId(accountsByCode, "15200");

@@ -109,6 +109,7 @@ namespace RealEstateManager.Services
                 .Where(x => leaseIds.Contains(x.LeaseId)
                             && x.JournalEntry != null
                             && x.JournalEntry.IsPosted
+                            && x.ChargeType == null   // rent only: cheque charges are the company's
                             && x.Status != "Cancelled"
                             && x.InvoiceDate <= asOfDate)
                 .GroupBy(x => x.LeaseId)

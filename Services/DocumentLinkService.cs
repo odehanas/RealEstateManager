@@ -32,7 +32,7 @@ namespace RealEstateManager.Services
             "VendorBill" or "VendorPayment" or VendorClearingService.AdvanceSourceType or
             "CustomerInvoice" or "CustomerCreditNote" or
             "OwnerSettlement" or "OwnerCommissionInvoice" or
-            "PdcReceiptMemo" or "PdcClearance" or
+            "PdcReceiptMemo" or "PdcClearance" or "PdcDeposit" or "PdcBounce" or "PdcWithdrawal" or
             "FixedAssetAcquisition" or "FixedAssetCapitalization" or "FixedAssetDepreciation" or
             "DevelopmentCost" or "DevelopmentTransfer" or
             "UnitSaleReceipt" or "UnitSaleHandover" or
@@ -50,6 +50,9 @@ namespace RealEstateManager.Services
                 case "OwnerSettlement": return ("OwnerSettlements", "Print", id);
                 case "OwnerCommissionInvoice": return ("OwnerSettlements", "CommissionInvoice", id);
                 case "PdcReceiptMemo":
+                case "PdcDeposit":
+                case "PdcBounce":
+                case "PdcWithdrawal":
                 case "PdcClearance": return ("PdcReceipts", "Edit", id);
                 case "FixedAssetAcquisition":
                 case "FixedAssetCapitalization": return ("FixedAssets", "Acquisition", id);

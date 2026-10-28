@@ -87,7 +87,7 @@ namespace RealEstateManager.Services
                     .OrderBy(x => x.DueDate)
                     .FirstOrDefault(),
 
-                PdcsOnHand = pdcs.Where(x => x.Status == "Received").ToList()
+                PdcsOnHand = pdcs.Where(x => x.Status == "Received" || x.Status == "Deposited").ToList()
             };
         }
 
@@ -211,7 +211,7 @@ namespace RealEstateManager.Services
                             && x.JournalEntry.IsPosted
                             && x.Status != "Cancelled"
                             && x.InvoiceDate <= toDate)
-                .Select(x => new { x.InvoiceDate, x.InvoiceNumber, x.TotalAmount, ContractNumber = x.Lease!.ContractNumber })
+                .Select(x => new { x.InvoiceDate, x.InvoiceNumber, x.TotalAmount, x.ChargeType, ContractNumber = x.Lease!.ContractNumber })
                 .ToListAsync();
 
             var receipts = await _db.CustomerReceipts
@@ -225,15 +225,29 @@ namespace RealEstateManager.Services
 
             // A cleared PDC settles the account, so it belongs on the statement as a
             // payment. One still on hand does not - the money has not moved.
-            var clearedPdcs = await _db.PdcReceipts
+            // Deposited for collection, it is credited on the deposit; a bounce charges it back.
+            var cheques = await _db.PdcReceipts
                 .AsNoTracking()
-                .Where(x => x.Lease!.TenantId == tenantId
-                            && x.Status == "Cleared"
-                            && x.ClearedDate != null
-                            && x.ClearedDate <= toDate
-                            && x.SettlementMode == "Receivable")
-                .Select(x => new { Date = x.ClearedDate!.Value, x.ChequeNumber, x.Amount })
+                .Where(x => x.Lease!.TenantId == tenantId && x.SettlementMode == "Receivable")
+                .Select(x => new
+                {
+                    x.ChequeNumber, x.Amount, x.BouncedDate,
+                    Deposited = x.DepositJournalEntry != null && x.DepositJournalEntry.IsPosted ? x.DepositedDate : null,
+                    Cleared = x.ClearanceJournalEntry != null && x.ClearanceJournalEntry.IsPosted ? x.ClearedDate : null,
+                    Bounced = x.BounceJournalEntry != null && x.BounceJournalEntry.IsPosted
+                })
                 .ToListAsync();
+
+            var clearedPdcs = cheques
+                .Select(x => new { Date = x.Deposited ?? x.Cleared, x.ChequeNumber, x.Amount, Deposited = x.Deposited != null })
+                .Where(x => x.Date != null && x.Date <= toDate)
+                .Select(x => new { Date = x.Date!.Value, x.ChequeNumber, x.Amount, x.Deposited })
+                .ToList();
+
+            var returnedPdcs = cheques
+                .Where(x => x.Deposited != null && x.Bounced && x.BouncedDate != null && x.BouncedDate <= toDate)
+                .Select(x => new { Date = x.BouncedDate!.Value, x.ChequeNumber, x.Amount })
+                .ToList();
 
             var creditNotes = await _db.CustomerCreditNotes
                 .AsNoTracking()
@@ -258,7 +272,7 @@ namespace RealEstateManager.Services
             {
                 Date = x.InvoiceDate,
                 Reference = x.InvoiceNumber,
-                Description = $"Rent invoice - contract {x.ContractNumber}",
+                Description = x.ChargeType != null ? $"{x.ChargeType} - contract {x.ContractNumber}" : $"Rent invoice - contract {x.ContractNumber}",
                 Charge = x.TotalAmount
             }));
 
@@ -274,8 +288,16 @@ namespace RealEstateManager.Services
             {
                 Date = x.Date,
                 Reference = x.ChequeNumber,
-                Description = $"Cheque {x.ChequeNumber} cleared",
+                Description = x.Deposited ? $"Cheque {x.ChequeNumber} deposited" : $"Cheque {x.ChequeNumber} cleared",
                 Payment = x.Amount
+            }));
+
+            entries.AddRange(returnedPdcs.Select(x => new PortalStatementLineViewModel
+            {
+                Date = x.Date,
+                Reference = x.ChequeNumber,
+                Description = $"Cheque {x.ChequeNumber} returned unpaid",
+                Charge = x.Amount
             }));
 
             var ordered = entries.OrderBy(x => x.Date).ThenBy(x => x.Reference).ToList();

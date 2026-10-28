@@ -55,11 +55,15 @@ namespace RealEstateManager.Services
                 "VAT Payable");
 
             var ownershipType = invoice.Lease!.Unit!.Property!.OwnershipType;
-            var billedForOwner = invoice.Lease.Unit.Property.BillsInOwnerName;
+            // A charge (a cheque withdrawal or returned cheque) is the company's own income,
+            // issued in its own name even where the rent is billed in the owner's.
+            var billedForOwner = invoice.Lease.Unit.Property.BillsInOwnerName && !invoice.IsCharge;
 
-            var offsetAccount = ownershipType == "Managed"
-                ? await GetMappedAccountAsync(invoice.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords")
-                : await GetMappedAccountAsync(invoice.CompanyId, settings.UnearnedRevenueAccountId, "Unearned Revenue");
+            var offsetAccount = invoice.IsCharge
+                ? await GetMappedAccountAsync(invoice.CompanyId, settings.PdcChargeIncomeAccountId ?? settings.OtherIncomeAccountId, "Cheque charges income")
+                : ownershipType == "Managed"
+                    ? await GetMappedAccountAsync(invoice.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords")
+                    : await GetMappedAccountAsync(invoice.CompanyId, settings.UnearnedRevenueAccountId, "Unearned Revenue");
 
             var propertyId = invoice.Lease.Unit.Property!.Id;
             var unitId = invoice.Lease.Unit.Id;
@@ -89,9 +93,11 @@ namespace RealEstateManager.Services
                     AccountId = offsetAccount.Id,
                     Debit = 0m,
                     Credit = invoice.Subtotal,
-                    Description = ownershipType == "Managed"
-                        ? "Liability to landlord from tenant billing"
-                        : "Unearned revenue from tenant billing",
+                    Description = invoice.IsCharge
+                        ? $"{invoice.ChargeType} {invoice.InvoiceNumber}"
+                        : ownershipType == "Managed"
+                            ? "Liability to landlord from tenant billing"
+                            : "Unearned revenue from tenant billing",
                     PropertyId = propertyId,
                     UnitId = unitId,
                     TenantId = tenantId,
@@ -221,7 +227,9 @@ namespace RealEstateManager.Services
             var receivableAccount = await GetMappedAccountAsync(note.CompanyId, settings.AccountsReceivableAccountId, "Accounts Receivable");
 
             var netAccountId = note.DebitAccountId
-                               ?? await GetInvoiceNetAccountIdAsync(note.CompanyId, lease.Unit!.Property!.OwnershipType);
+                               ?? (invoice.IsCharge
+                                   ? settings.PdcChargeIncomeAccountId ?? settings.OtherIncomeAccountId
+                                   : await GetInvoiceNetAccountIdAsync(note.CompanyId, lease.Unit!.Property!.OwnershipType));
             var netAccount = await GetMappedAccountAsync(note.CompanyId, netAccountId, "Credit note account");
 
             var propertyId = lease.Unit!.Property!.Id;

@@ -107,7 +107,7 @@ namespace RealEstateManager.Services
                 .ToListAsync();
 
             var bounced = await _db.PdcReceipts.AsNoTracking()
-                .Where(x => currentIds.Contains(x.LeaseId) && x.Status == "Bounced" && x.ChequeDate >= yearAgo)
+                .Where(x => currentIds.Contains(x.LeaseId) && (x.Status == "Bounced" || x.BouncedDate != null) && x.ChequeDate >= yearAgo)
                 .Select(x => new { x.LeaseId, x.Amount })
                 .ToListAsync();
 

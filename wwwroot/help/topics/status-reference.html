@@ -29,9 +29,13 @@
         <tr><td>Accepted</td><td>Validated, delivered and reported. Final.</td></tr>
         <tr><td>Rejected</td><td>Refused by the provider. Fix and generate again.</td></tr>
 
-        <tr><td rowspan="3"><strong>PDC receipt</strong></td><td>Draft</td><td>Transient state during creation.</td></tr>
-        <tr><td>Received</td><td>In custody; memorandum posted.</td></tr>
+        <tr><td rowspan="7"><strong>PDC receipt</strong></td><td>Draft</td><td>Transient state during creation.</td></tr>
+        <tr><td>Received</td><td>On hand; memorandum posted.</td></tr>
+        <tr><td>Deposited</td><td>At the bank for collection; in Cheques Under Collection and credited to the tenant.</td></tr>
         <tr><td>Cleared</td><td>Honoured by the bank; cash recorded.</td></tr>
+        <tr><td>Bounced</td><td>Returned unpaid; charged back to the tenant until replaced.</td></tr>
+        <tr><td>Withdrawn</td><td>Handed back to the tenant before deposit, with a withdrawal charge.</td></tr>
+        <tr><td>Replaced</td><td>A bounced or withdrawn cheque since replaced or paid otherwise.</td></tr>
 
         <tr><td rowspan="4"><strong>Vendor bill</strong></td><td>Draft</td><td>Entered, not posted.</td></tr>
         <tr><td>Posted</td><td>Journal written; payable outstanding.</td></tr>

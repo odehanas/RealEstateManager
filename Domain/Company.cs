@@ -5,6 +5,12 @@ namespace RealEstateManager.Domain
         /// <summary>How costs of owners' managed properties are passed on (see OwnerCostTreatments).</summary>
         public string OwnerCostTreatment { get; set; } = RealEstateManager.Domain.OwnerCostTreatments.Recharge;
 
+        /// <summary>Charged to a tenant who asks for a cheque back before it is deposited (editable on each withdrawal).</summary>
+        public decimal PdcWithdrawalCharge { get; set; } = 500m;
+
+        /// <summary>Charged to a tenant whose cheque is returned unpaid; 0 for none (editable on each bounce).</summary>
+        public decimal PdcBounceCharge { get; set; } = 0m;
+
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string BaseCurrency { get; set; } = "AED";

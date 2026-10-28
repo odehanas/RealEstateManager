@@ -24,6 +24,14 @@ namespace RealEstateManager.Models
         public int? PdcOnHandAccountId { get; set; }
         public int? PrepaidExpenseDefaultAccountId { get; set; }
         public int? PdcContraAccountId { get; set; }
+        public int? ChequesUnderCollectionAccountId { get; set; }
+        public int? PdcChargeIncomeAccountId { get; set; }
+
+        /// <summary>Default charge for a cheque withdrawn at the tenant's request, before VAT.</summary>
+        public decimal PdcWithdrawalCharge { get; set; } = 500m;
+
+        /// <summary>Default charge for a returned cheque, before VAT; 0 for none.</summary>
+        public decimal PdcBounceCharge { get; set; }
         public int? FixedAssetDefaultAccountId { get; set; }
         public int? FixedAssetClearingAccountId { get; set; }
         public int? AccumulatedDepreciationDefaultAccountId { get; set; }

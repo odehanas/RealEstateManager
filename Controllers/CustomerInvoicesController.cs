@@ -102,7 +102,7 @@ namespace RealEstateManager.Controllers
                 UnitNumber = unit.UnitNumber,
                 ContractNumber = lease.ContractNumber,
                 LeasePeriod = $"{lease.StartDate:dd/MM/yyyy} to {lease.EndDate:dd/MM/yyyy}",
-                LineDescription = "Rent for leased premises",
+                LineDescription = invoice.ChargeType ?? "Rent for leased premises",
                 LineDetail = $"{property.Name}, unit {unit.UnitNumber} — contract {lease.ContractNumber}",
 
                 VatCategory = invoice.VatCategory,
@@ -117,7 +117,7 @@ namespace RealEstateManager.Controllers
             };
 
             // Billed in the owner's name: the owner is the supplier, the company the agent.
-            var ownerBilled = invoice.IsIssuedForOwner || (invoice.JournalEntryId == null && property.BillsInOwnerName);
+            var ownerBilled = invoice.IsIssuedForOwner || (invoice.JournalEntryId == null && property.BillsInOwnerName && !invoice.IsCharge);
             if (ownerBilled)
             {
                 model.SupplierName = invoice.IssuedForOwnerName ?? property.OwnerName!;

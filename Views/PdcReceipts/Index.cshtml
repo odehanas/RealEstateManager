@@ -1,7 +1,13 @@
 ﻿@model IEnumerable<RealEstateManager.Domain.PdcReceipt>
+@using RealEstateManager.Domain
 
 @{
     ViewData["Title"] = "PDC Receipts";
+    var list = Model.ToList();
+    var onHand = list.Where(x => x.Status == PdcStatuses.Received).ToList();
+    var atBank = list.Where(x => x.Status == PdcStatuses.Deposited).ToList();
+    var bounced = list.Where(x => x.Status == PdcStatuses.Bounced).ToList();
+    var withdrawn = list.Where(x => x.Status == PdcStatuses.Withdrawn).ToList();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -14,95 +20,140 @@
     <div class="alert alert-success py-2">@pdcMessage</div>
 }
 
-<div class="alert alert-info">
-    <strong>PDCs hit the accounts on the day you receive them, not on the cheque date.</strong>
-    Receiving a cheque posts a memorandum entry dated on the <strong>Received</strong> date &mdash;
-    <code>Dr 11400 PDC On Hand / Cr 21600 PDC Contra</code>. Both are control accounts, so nothing touches
-    cash, revenue or the tenant's balance at that point; the pair nets to zero on the Balance Sheet while
-    still showing the cheques you hold.
-    <br /><br />
-    The cheque date only tells you when to present it. Clearing the cheque is what moves real cash, and that
-    entry is dated on the <strong>Cleared</strong> date.
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
+        <div class="text-muted small">On hand <span class="opacity-75">(11400)</span></div>
+        <div class="h5 mb-0">@onHand.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@onHand.Count cheque(s)</div>
+    </div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
+        <div class="text-muted small">At bank, under collection <span class="opacity-75">(11450)</span></div>
+        <div class="h5 mb-0">@atBank.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@atBank.Count cheque(s)</div>
+    </div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 @(bounced.Count > 0 ? "border-danger" : "")"><div class="card-body py-2">
+        <div class="text-muted small">Bounced, not yet replaced</div>
+        <div class="h5 mb-0 @(bounced.Count > 0 ? "text-danger" : "")">@bounced.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@bounced.Count cheque(s)</div>
+    </div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
+        <div class="text-muted small">Withdrawn, not yet replaced</div>
+        <div class="h5 mb-0">@withdrawn.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@withdrawn.Count cheque(s)</div>
+    </div></div></div>
 </div>
 
+<details class="alert alert-info">
+    <summary><strong>How a cheque moves through the accounts</strong></summary>
+    <ul class="mb-0 mt-2">
+        <li><strong>Received</strong> (received date): <code>Dr 11400 PDC On Hand / Cr 21600 PDC Contra</code> &mdash; a memorandum pair; nothing touches cash, revenue or the tenant yet.</li>
+        <li><strong>Deposited</strong> to the bank for collection: the memorandum is reversed and <code>Dr 11450 Cheques Under Collection / Cr the tenant</code> (receivable, or advance).</li>
+        <li><strong>Cleared</strong> by the bank: <code>Dr Bank / Cr 11450</code>. A cheque cleared without being deposited first goes straight from on hand to the bank.</li>
+        <li><strong>Bounced</strong>: <code>Dr the tenant / Cr 11450</code> &mdash; charged back, the invoice is open again, plus any returned cheque charge.</li>
+        <li><strong>Withdrawn</strong> by the tenant before deposit: the memorandum is reversed, the cheque stays here as withdrawn, and the withdrawal charge is invoiced to the tenant.</li>
+    </ul>
+</details>
+
+@if (onHand.Count > 0)
+{
+    <form asp-action="DepositSelected" method="post" id="depositForm" class="d-flex flex-wrap align-items-end gap-2 mb-2">
+        @Html.AntiForgeryToken()
+        <div>
+            <label class="form-label small mb-0" for="depositDate">Deposit ticked cheques on</label>
+            <input type="date" name="depositDate" id="depositDate" class="form-control form-control-sm" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary">Deposit to Bank</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="tickDue">Tick cheques due by that date</button>
+    </form>
+}
+
+<div class="table-responsive">
 <table class="table table-bordered table-striped table-sm align-middle">
     <thead>
         <tr>
+            <th></th>
             <th>Cheque No.</th>
             <th>Cheque Date <div class="fw-normal small opacity-75">not accounting</div></th>
             <th>Received <div class="fw-normal small opacity-75">memo posts here</div></th>
-            <th>Cleared <div class="fw-normal small opacity-75">cash posts here</div></th>
+            <th>Deposited <div class="fw-normal small opacity-75">tenant credited</div></th>
+            <th>Cleared / Returned</th>
             <th>Lease</th>
-            <th>Property</th>
-            <th>Unit</th>
+            <th>Property / Unit</th>
             <th>Tenant</th>
             <th>Invoice</th>
             <th>Bank</th>
             <th>Mode</th>
             <th>Status</th>
             <th class="text-end">Amount</th>
-            <th>GL</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var pdc in Model)
+        @foreach (var pdc in list)
         {
             var badgeClass = pdc.Status switch
             {
-                "Cleared" => "bg-success",
-                "Received" => "bg-primary",
-                "Bounced" => "bg-danger",
-                "Cancelled" => "bg-secondary",
-                "Replaced" => "bg-secondary",
+                PdcStatuses.Cleared => "bg-success",
+                PdcStatuses.Received => "bg-primary",
+                PdcStatuses.Deposited => "bg-info text-dark",
+                PdcStatuses.Bounced => "bg-danger",
+                PdcStatuses.Withdrawn => "bg-warning text-dark",
+                PdcStatuses.Cancelled or PdcStatuses.Replaced => "bg-secondary",
                 _ => "bg-warning text-dark"
             };
 
             <tr>
+                <td>
+                    @if (pdc.Status == PdcStatuses.Received)
+                    {
+                        <input type="checkbox" class="form-check-input deposit-tick" name="ids" value="@pdc.Id" form="depositForm"
+                               data-due="@pdc.ChequeDate.ToString("yyyy-MM-dd")" aria-label="Deposit cheque @pdc.ChequeNumber" />
+                    }
+                </td>
                 <td>@pdc.ChequeNumber</td>
                 <td>@pdc.ChequeDate.ToString("dd/MM/yyyy")</td>
                 <td>@pdc.ReceivedDate.ToString("dd/MM/yyyy")</td>
-                <td>@(pdc.ClearedDate.HasValue? pdc.ClearedDate.Value.ToString("dd/MM/yyyy") : "-")</td>
+                <td>@(pdc.DepositedDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                <td>
+                    @if (pdc.ClearedDate.HasValue) { <span class="text-success">@pdc.ClearedDate.Value.ToString("dd/MM/yyyy")</span> }
+                    else if (pdc.BouncedDate.HasValue) { <span class="text-danger" title="@pdc.BounceReason">Returned @pdc.BouncedDate.Value.ToString("dd/MM/yyyy")</span> }
+                    else if (pdc.WithdrawnDate.HasValue) { <span>Withdrawn @pdc.WithdrawnDate.Value.ToString("dd/MM/yyyy")</span> }
+                    else { <span>-</span> }
+                </td>
                 <td>@pdc.Lease?.ContractNumber</td>
-                <td>@pdc.Lease?.Unit?.Property?.Name</td>
-                <td>@pdc.Lease?.Unit?.UnitNumber</td>
+                <td>@pdc.Lease?.Unit?.Property?.Name / @pdc.Lease?.Unit?.UnitNumber</td>
                 <td>@pdc.Lease?.Tenant?.FullName</td>
-                <td>@(pdc.CustomerInvoice?.InvoiceNumber ?? "-")</td>
+                <td>
+                    @(pdc.CustomerInvoice?.InvoiceNumber ?? "-")
+                    @if (pdc.ChargeInvoice != null)
+                    {
+                        <div class="small"><a asp-controller="CustomerInvoices" asp-action="TaxInvoice" asp-route-id="@pdc.ChargeInvoice.Id" target="_blank"
+                              title="@pdc.ChargeInvoice.ChargeType">Charge @pdc.ChargeInvoice.InvoiceNumber (@pdc.ChargeInvoice.TotalAmount.ToString("N2"))</a></div>
+                    }
+                </td>
                 <td>@(string.IsNullOrWhiteSpace(pdc.BankName) ? "-" : pdc.BankName)</td>
                 <td>@pdc.SettlementMode</td>
-                <td>
-                    <span class="badge @badgeClass">@pdc.Status</span>
-                </td>
+                <td><span class="badge @badgeClass">@PdcStatuses.Describe(pdc.Status)</span></td>
                 <td class="text-end">@pdc.Amount.ToString("N2")</td>
                 <td>
-                    <div class="d-flex flex-column gap-1">
-                        @if (pdc.MemorandumJournalEntryId.HasValue)
-                        {
-                            <span class="badge bg-info text-dark"
-                                  title="Memorandum journal dated @pdc.MemorandumJournalEntry?.EntryDate.ToString("dd/MM/yyyy")">
-                                Memo @pdc.MemorandumJournalEntry?.EntryDate.ToString("dd/MM/yyyy")
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning text-dark">Memo Pending</span>
-                        }
-
-                        @if (pdc.ClearanceJournalEntryId.HasValue)
-                        {
-                            <span class="badge bg-success"
-                                  title="Clearance journal dated @pdc.ClearanceJournalEntry?.EntryDate.ToString("dd/MM/yyyy")">
-                                Cash @pdc.ClearanceJournalEntry?.EntryDate.ToString("dd/MM/yyyy")
-                            </span>
-                        }
-                    </div>
-                </td>
-                <td>
-                    <div class="d-flex gap-1">
+                    <div class="d-flex flex-wrap gap-1">
                         <a asp-action="Edit" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                        @if (pdc.Status != "Cleared")
+                        @if (pdc.Status == PdcStatuses.Received)
                         {
+                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="deposit" class="btn btn-sm btn-outline-primary">Deposit</a>
                             <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-dark">Clear</a>
+                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="withdraw" class="btn btn-sm btn-outline-warning">Withdraw</a>
+                        }
+                        else if (pdc.Status == PdcStatuses.Deposited)
+                        {
+                            <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-success">Cleared</a>
+                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="bounce" class="btn btn-sm btn-outline-danger">Bounced</a>
+                        }
+                        else if (pdc.Status is PdcStatuses.Bounced or PdcStatuses.Withdrawn)
+                        {
+                            <a asp-action="Create" asp-route-replaces="@pdc.Id" class="btn btn-sm btn-outline-dark">New cheque</a>
+                            <form asp-action="MarkReplaced" asp-route-id="@pdc.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Mark cheque @pdc.ChequeNumber as replaced - the tenant has paid another way?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="note" value="Settled otherwise" />
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Paid otherwise</button>
+                            </form>
                         }
                     </div>
                 </td>
@@ -110,3 +161,15 @@
         }
     </tbody>
 </table>
+</div>
+
+<script>
+    (function () {
+        var btn = document.getElementById('tickDue');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            var by = document.getElementById('depositDate').value;
+            document.querySelectorAll('.deposit-tick').forEach(function (c) { c.checked = c.dataset.due <= by; });
+        });
+    })();
+</script>

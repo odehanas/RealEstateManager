@@ -264,6 +264,111 @@ namespace RealEstateManager.Services.Assistant
                 }
             };
 
+            // ---------------------------------------------------------------- deposit, bounce, withdraw a PDC
+            yield return new AssistantTool
+            {
+                Name = "propose_pdc_step",
+                Description = "Prepare a step for a post-dated cheque: 'deposit' (sent to the bank for collection; the tenant is credited), " +
+                              "'bounce' (returned unpaid by the bank; charged back to the tenant, optional returned cheque charge) or " +
+                              "'withdraw' (the tenant takes it back before deposit; a withdrawal charge is invoiced, by default the company's set charge). " +
+                              "Posted when the user confirms.",
+                Screen = ("PdcReceipts", "Index"),
+                IsWrite = true,
+                Parameters = Schema.Object(
+                    ("cheque_number", Schema.Str("Cheque number"), true),
+                    ("step", Schema.Str("deposit, bounce or withdraw"), true),
+                    ("date", Schema.Date("Date of the step, default today"), false),
+                    ("charge", Schema.Num("Charge to the tenant before VAT, for bounce or withdraw; omit for the company's default"), false),
+                    ("reason", Schema.Str("The bank's reason for a bounce, or a note on a withdrawal"), false)),
+                Propose = async (ctx, args) =>
+                {
+                    var number = Args.Required(args, "cheque_number");
+                    var step = (Args.Str(args, "step") ?? "").Trim().ToLowerInvariant();
+                    if (step is not ("deposit" or "bounce" or "withdraw"))
+                        return AssistantProposal.Refused("The step must be deposit, bounce or withdraw.");
+
+                    var matches = await ctx.Db.PdcReceipts.Include(x => x.Lease).ThenInclude(x => x!.Tenant)
+                        .Where(x => x.ChequeNumber == number).ToListAsync();
+                    if (matches.Count != 1) return AssistantProposal.Refused($"No single cheque number {number}.");
+
+                    var pdc = matches[0];
+                    var date = Args.Date(args, "date") ?? DateTime.Today;
+                    var errors = step switch
+                    {
+                        "bounce" => PdcService.CheckBounce(pdc, date),
+                        "withdraw" => PdcService.CheckWithdrawal(pdc, date),
+                        _ => PdcService.CheckDeposit(pdc, date)
+                    };
+                    if (errors.Count > 0) return AssistantProposal.Refused(string.Join(" ", errors));
+                    var closed = await ClosedPeriodMessageAsync(ctx.Db, date, "A cheque entry");
+                    if (closed != null) return AssistantProposal.Refused(closed);
+
+                    var company = await ctx.Db.Companies.FirstAsync(x => x.Id == pdc.CompanyId);
+                    var charge = step == "deposit" ? 0m
+                        : Args.Dec(args, "charge") ?? (step == "withdraw" ? company.PdcWithdrawalCharge : company.PdcBounceCharge);
+                    if (charge < 0m) return AssistantProposal.Refused("The charge cannot be negative.");
+                    var price = PdcService.PriceCharge(company, charge);
+
+                    var what = step switch
+                    {
+                        "bounce" => pdc.Status == PdcStatuses.Deposited ? "as bounced and charge it back to the tenant" : "as bounced (it was never deposited, so only the memorandum is reversed)",
+                        "withdraw" => "as withdrawn and hand it back to the tenant",
+                        _ => "as deposited to the bank for collection, crediting the tenant"
+                    };
+                    return new AssistantProposal
+                    {
+                        Ok = true,
+                        Summary = $"Record cheque {pdc.ChequeNumber} of {pdc.Amount:N2} {ctx.Currency} from {pdc.Lease?.Tenant?.FullName}, " +
+                                  $"contract {pdc.Lease?.ContractNumber}, {what} on {date:dd/MM/yyyy}" +
+                                  (charge > 0m ? $", and invoice a charge of {price.Net:N2} + VAT {price.Vat:N2} = {price.Total:N2}." : "."),
+                        Normalized = new { pdcId = pdc.Id, step, date, charge, reason = Args.Str(args, "reason") }
+                    };
+                },
+                Execute = async (ctx, args) =>
+                {
+                    var pdcId = args.GetProperty("pdcId").GetInt32();
+                    var step = args.GetProperty("step").GetString();
+                    var date = args.GetProperty("date").GetDateTime();
+                    var charge = args.GetProperty("charge").GetDecimal();
+                    var reason = args.TryGetProperty("reason", out var r) && r.ValueKind == System.Text.Json.JsonValueKind.String ? r.GetString() : null;
+                    var service = ctx.Get<PdcService>();
+                    var workflow = ctx.Get<JournalWorkflowService>();
+
+                    try
+                    {
+                        var notes = new List<string>();
+                        string reference;
+                        if (step == "deposit")
+                        {
+                            var journal = await service.DepositPdcAsync(pdcId, date);
+                            if (await workflow.PostNewEntryAsync(journal.Id) is { } np) notes.Add($"saved as a draft but not posted: {np}");
+                            reference = journal.EntryNumber;
+                        }
+                        else
+                        {
+                            var result = step == "bounce"
+                                ? await service.BouncePdcAsync(pdcId, date, reason, charge)
+                                : await service.WithdrawPdcAsync(pdcId, date, charge, reason);
+                            if (await workflow.PostNewEntryAsync(result.Journal.Id) is { } np) notes.Add($"saved as a draft but not posted: {np}");
+                            if (result.ChargeJournal != null && await workflow.PostNewEntryAsync(result.ChargeJournal.Id) is { } cp)
+                                notes.Add($"charge invoice saved as a draft but not posted: {cp}");
+                            if (result.ChargeInvoice != null) notes.Add($"charge invoice {result.ChargeInvoice.InvoiceNumber} for {result.ChargeInvoice.TotalAmount:N2}");
+                            reference = result.Journal.EntryNumber;
+                        }
+
+                        return new AssistantActionResult
+                        {
+                            Ok = true, Reference = reference, Link = "/PdcReceipts", JournalEntryNumber = reference,
+                            Message = $"Cheque {step} recorded" + (notes.Count > 0 ? "; " + string.Join("; ", notes) : " and posted.")
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        return AssistantActionResult.Failed(ex.Message);
+                    }
+                }
+            };
+
             // ---------------------------------------------------------------- manual journal
             yield return new AssistantTool
             {

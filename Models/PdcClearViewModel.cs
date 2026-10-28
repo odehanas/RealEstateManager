@@ -15,6 +15,9 @@ namespace RealEstateManager.Models
 
         public string SettlementMode { get; set; } = "Advance";
 
+        /// <summary>Deposited for collection first: clearing only moves it from collection into the bank.</summary>
+        public DateTime? DepositedDate { get; set; }
+
         public string? LeaseDisplay { get; set; }
         public string? InvoiceDisplay { get; set; }
 

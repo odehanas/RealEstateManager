@@ -349,6 +349,7 @@ namespace RealEstateManager.Services
                 {
                     TenantId = x.TenantId ?? x.Lease!.TenantId,
                     x.Status,
+                    x.BouncedDate,
                     x.Amount
                 })
                 .ToListAsync();
@@ -406,8 +407,9 @@ namespace RealEstateManager.Services
                     : Math.Round((decimal)tenantReceipts.Average(r => (r.ReceiptDate - r.DueDate).TotalDays), 1);
 
                 var pdcCleared = tenantPdcs.Where(p => p.Status == "Cleared").ToList();
-                var pdcBounced = tenantPdcs.Where(p => p.Status == "Bounced").ToList();
-                var pdcOnHand = tenantPdcs.Where(p => p.Status == "Received").ToList();
+                // Every cheque returned, whether or not it has since been replaced: it is the tenant's record.
+                var pdcBounced = tenantPdcs.Where(p => p.BouncedDate != null || p.Status == "Bounced").ToList();
+                var pdcOnHand = tenantPdcs.Where(p => p.Status == "Received" || p.Status == "Deposited").ToList();
 
                 var firstLeaseStart = tenantLeases.Count == 0
                     ? (DateTime?)null

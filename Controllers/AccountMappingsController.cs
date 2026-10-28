@@ -55,6 +55,10 @@ namespace RealEstateManager.Controllers
                 PdcOnHandAccountId = setting?.PdcOnHandAccountId,
                 PrepaidExpenseDefaultAccountId = setting?.PrepaidExpenseDefaultAccountId,
                 PdcContraAccountId = setting?.PdcContraAccountId,
+                ChequesUnderCollectionAccountId = setting?.ChequesUnderCollectionAccountId,
+                PdcChargeIncomeAccountId = setting?.PdcChargeIncomeAccountId,
+                PdcWithdrawalCharge = company.PdcWithdrawalCharge,
+                PdcBounceCharge = company.PdcBounceCharge,
                 FixedAssetDefaultAccountId = setting?.FixedAssetDefaultAccountId,
                 FixedAssetClearingAccountId = setting?.FixedAssetClearingAccountId,
                 AccumulatedDepreciationDefaultAccountId = setting?.AccumulatedDepreciationDefaultAccountId
@@ -114,6 +118,10 @@ namespace RealEstateManager.Controllers
             setting.PdcOnHandAccountId = model.PdcOnHandAccountId;
             setting.PrepaidExpenseDefaultAccountId = model.PrepaidExpenseDefaultAccountId;
             setting.PdcContraAccountId = model.PdcContraAccountId;
+            setting.ChequesUnderCollectionAccountId = model.ChequesUnderCollectionAccountId;
+            setting.PdcChargeIncomeAccountId = model.PdcChargeIncomeAccountId;
+            company.PdcWithdrawalCharge = Math.Max(0m, Math.Round(model.PdcWithdrawalCharge, 2));
+            company.PdcBounceCharge = Math.Max(0m, Math.Round(model.PdcBounceCharge, 2));
             setting.FixedAssetDefaultAccountId = model.FixedAssetDefaultAccountId;
             setting.FixedAssetClearingAccountId = model.FixedAssetClearingAccountId;
             setting.AccumulatedDepreciationDefaultAccountId = model.AccumulatedDepreciationDefaultAccountId;

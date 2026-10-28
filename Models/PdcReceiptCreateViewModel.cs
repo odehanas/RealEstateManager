@@ -18,5 +18,9 @@ namespace RealEstateManager.Models
         public string SettlementMode { get; set; } = "Advance";
 
         public string? Notes { get; set; }
+
+        /// <summary>The bounced or withdrawn cheque this one replaces, marked Replaced once it is saved.</summary>
+        public int? ReplacesPdcId { get; set; }
+        public string? ReplacesChequeNumber { get; set; }
     }
 }

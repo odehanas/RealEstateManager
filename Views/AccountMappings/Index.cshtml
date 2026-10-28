@@ -323,6 +323,41 @@
                     }
                 </select>
             </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Cheques Under Collection</label>
+                <select asp-for="ChequesUnderCollectionAccountId" class="form-select">
+                    <option value="">Select Account</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+                <div class="form-text">Cheques deposited with the bank and not yet cleared (11450). The tenant is credited when a cheque is deposited.</div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Cheque charges income</label>
+                <select asp-for="PdcChargeIncomeAccountId" class="form-select">
+                    <option value="">Other Income (default)</option>
+                    @foreach (var account in accounts)
+                    {
+                        <option value="@account.Id">@account.Code - @account.Name</option>
+                    }
+                </select>
+                <div class="form-text">Where withdrawal and returned cheque charges to tenants are credited.</div>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="PdcWithdrawalCharge" class="form-label">Cheque withdrawal charge</label>
+                <input asp-for="PdcWithdrawalCharge" class="form-control" type="number" step="0.01" min="0" />
+                <div class="form-text">Before VAT; can be changed on each withdrawal.</div>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="PdcBounceCharge" class="form-label">Returned cheque charge</label>
+                <input asp-for="PdcBounceCharge" class="form-control" type="number" step="0.01" min="0" />
+                <div class="form-text">Before VAT; 0 for none. Can be changed on each bounce.</div>
+            </div>
         </div>
     </div>
 
