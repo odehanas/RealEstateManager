@@ -12,7 +12,7 @@
 </head>
 <body class="bg-light">
     <div class="container py-5" style="max-width:960px">
-        <h1 class="h3">This page could not be shown</h1>
+        <h1 class="h3">@T["This page could not be shown"]</h1>
         <p class="text-muted">Something went wrong while opening @(string.IsNullOrEmpty(Model.Path) ? "the page" : Model.Path). Nothing was saved by this request.</p>
 
         @if (Model.ShowRequestId)
@@ -23,14 +23,14 @@
         @if (!string.IsNullOrEmpty(Model.Detail))
         {
             <div class="card border-danger mt-4">
-                <div class="card-header bg-danger text-white">Cause (shown to the system administrator only)</div>
+                <div class="card-header bg-danger text-white">@T["Cause (shown to the system administrator only)"]</div>
                 <pre class="card-body small mb-0" style="white-space:pre-wrap">@Model.Detail</pre>
             </div>
         }
 
         <div class="mt-4 d-flex gap-2">
-            <a href="javascript:history.back()" class="btn btn-outline-secondary">Back</a>
-            <a href="~/" class="btn btn-dark">Home</a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">@T["Back"]</a>
+            <a href="~/" class="btn btn-dark">@T["Home"]</a>
         </div>
     </div>
 </body>

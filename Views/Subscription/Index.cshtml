@@ -1,25 +1,24 @@
 @model RealEstateManager.Models.CurrentSubscriptionViewModel
 
 @{
-    ViewData["Title"] = "Subscription";
+    ViewData["Title"] = T["Subscription"];
     var expiredMessage = ViewBag.ExpiredMessage is true;
 }
 
 <div class="row justify-content-center">
     <div class="col-lg-8">
-        <h2 class="mb-3">Subscription Control</h2>
+        <h2 class="mb-3">@T["Subscription Control"]</h2>
 
         @if (Model.IsSuspended)
         {
             <div class="alert alert-danger">
-                Access for this company has been suspended by your service provider. Your records are safe and unchanged.
-                Please contact them; access returns as soon as they reactivate the company or you enter a new activation code below.
+                @T["Access for this company has been suspended by your service provider. Your records are safe and unchanged. Please contact them; access returns as soon as they reactivate the company or you enter a new activation code below."]
             </div>
         }
         else if (expiredMessage || Model.IsExpired)
         {
             <div class="alert alert-danger">
-                Your company subscription has expired. Enter a valid activation code to continue using the processing screens.
+                @T["Your company subscription has expired. Enter a valid activation code to continue using the processing screens."]
             </div>
         }
         else if (Model.IsInTrial)
@@ -48,27 +47,27 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">Status</label>
+                        <label class="form-label">@T["Status"]</label>
                         <input class="form-control" value="@Model.StatusLabel" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Trial Start</label>
+                        <label class="form-label">@T["Trial Start"]</label>
                         <input class="form-control" value="@Model.TrialStartDate.ToString("dd/MM/yyyy")" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Trial End</label>
+                        <label class="form-label">@T["Trial End"]</label>
                         <input class="form-control" value="@Model.TrialEndDate.ToString("dd/MM/yyyy")" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Paid Until</label>
+                        <label class="form-label">@T["Paid Until"]</label>
                         <input class="form-control" value="@(Model.SubscriptionEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Access Until</label>
+                        <label class="form-label">@T["Access Until"]</label>
                         <input class="form-control" value="@(Model.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Days Remaining</label>
+                        <label class="form-label">@T["Days Remaining"]</label>
                         <input class="form-control" value="@Model.DaysRemaining" readonly />
                     </div>
                 </div>
@@ -77,7 +76,7 @@
 
         <div class="card shadow-sm">
             <div class="card-body">
-                <h4 class="mb-3">Activate Subscription</h4>
+                <h4 class="mb-3">@T["Activate Subscription"]</h4>
                 <form asp-action="Activate" method="post" class="row g-3">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
@@ -89,7 +88,7 @@
                     </div>
 
                     <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Apply Code</button>
+                        <button type="submit" class="btn btn-primary w-100">@T["Apply Code"]</button>
                     </div>
                 </form>
             </div>

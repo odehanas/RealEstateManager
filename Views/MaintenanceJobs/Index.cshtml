@@ -19,12 +19,12 @@
     </div>
     @if (seesAll)
     {
-        <a asp-action="Dashboard" class="btn btn-outline-primary">Maintenance Dashboard</a>
+        <a asp-action="Dashboard" class="btn btn-outline-primary">@T["Maintenance Dashboard"]</a>
     }
 </div>
 
 <form method="get" class="d-flex flex-wrap gap-2 align-items-center mb-3">
-    <div class="btn-group" role="group" aria-label="Which jobs">
+    <div class="btn-group" role="group" aria-label="@T["Which jobs"]">
         @foreach (var option in new[] { "Open", "Done", "All" })
         {
             <a asp-action="Index" asp-route-show="@option" asp-route-technicianId="@technicianId"
@@ -34,8 +34,8 @@
     @if (seesAll && technicians.Count > 0)
     {
         <input type="hidden" name="show" value="@show" />
-        <select name="technicianId" class="form-select form-select-sm" style="max-width:240px" onchange="this.form.submit()" aria-label="Technician">
-            <option value="">All technicians</option>
+        <select name="technicianId" class="form-select form-select-sm" style="max-width:240px" onchange="this.form.submit()" aria-label="@T["Technician"]">
+            <option value="">@T["All technicians"]</option>
             @foreach (var t in technicians)
             {
                 <option value="@t.Id" selected="@(t.Id == technicianId ? "selected" : null)">@t.Name</option>
@@ -47,15 +47,13 @@
 @if (seesAll && technicians.Count == 0)
 {
     <div class="alert alert-warning">
-        No user carries out maintenance jobs yet. Create a user for the maintenance engineer in
-        <strong>System Setup &gt; Users</strong> and give them <strong>Carry Out Maintenance Jobs</strong>;
-        new maintenance requests are then assigned to them automatically.
+        @T.Html("No user carries out maintenance jobs yet. Create a user for the maintenance engineer in <strong>System Setup &gt; Users</strong> and give them <strong>Carry Out Maintenance Jobs</strong>; new maintenance requests are then assigned to them automatically.")
     </div>
 }
 
 @if (Model.Count == 0)
 {
-    <div class="card shadow-sm"><div class="card-body text-muted">No jobs to show.</div></div>
+    <div class="card shadow-sm"><div class="card-body text-muted">@T["No jobs to show."]</div></div>
 }
 else
 {
@@ -64,15 +62,15 @@ else
             <table class="table table-sm table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Job</th>
-                        <th>Priority</th>
-                        <th>What</th>
-                        <th>Unit</th>
-                        <th>Tenant</th>
-                        @if (seesAll) { <th>Technician</th> }
-                        <th>Status</th>
-                        <th class="text-end">Age</th>
-                        <th class="text-end">Materials</th>
+                        <th>@T["Job"]</th>
+                        <th>@T["Priority"]</th>
+                        <th>@T["What"]</th>
+                        <th>@T["Unit"]</th>
+                        <th>@T["Tenant"]</th>
+                        @if (seesAll) { <th>@T["Technician"]</th> }
+                        <th>@T["Status"]</th>
+                        <th class="text-end">@T["Age"]</th>
+                        <th class="text-end">@T["Materials"]</th>
                     </tr>
                 </thead>
                 <tbody>

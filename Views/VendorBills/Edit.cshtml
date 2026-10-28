@@ -41,7 +41,7 @@
             }
         </p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to list"]</a>
 </div>
 
 @if (TempData["BillError"] != null)
@@ -55,12 +55,12 @@
     <form asp-action="Scan" method="post" enctype="multipart/form-data" id="scanForm" class="card shadow-sm mb-3 border-primary-subtle">
         <div class="card-body d-flex flex-wrap align-items-center gap-2">
             <div class="me-auto">
-                <strong>Read a scanned invoice</strong>
-                <div class="small text-muted">Upload the supplier's invoice (PDF, JPG or PNG, up to 10 MB). The supplier, their number, dates and each line's description, quantity and price are filled in for you to check.</div>
+                <strong>@T["Read a scanned invoice"]</strong>
+                <div class="small text-muted">@T["Upload the supplier's invoice (PDF, JPG or PNG, up to 10 MB). The supplier, their number, dates and each line's description, quantity and price are filled in for you to check."]</div>
             </div>
             <input type="file" name="file" class="form-control form-control-sm" style="max-width:300px"
                    accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,application/pdf,image/*" required />
-            <button type="submit" class="btn btn-primary btn-sm" id="scanButton">Read invoice</button>
+            <button type="submit" class="btn btn-primary btn-sm" id="scanButton">@T["Read invoice"]</button>
         </div>
     </form>
 }
@@ -110,7 +110,7 @@
                 total <strong>@Model.ReceivedTotal?.ToString("N2")</strong>.
                 @if (Model.VendorId == 0)
                 {
-                    <span class="text-danger">No vendor matched their TRN &mdash; select the supplier below.</span>
+                    <span class="text-danger">@T["No vendor matched their TRN — select the supplier below."]</span>
                 }
             </div>
         </div>
@@ -122,9 +122,9 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label asp-for="VendorId" class="form-label">Supplier</label>
+                    <label asp-for="VendorId" class="form-label">@T["Supplier"]</label>
                     <select asp-for="VendorId" class="form-select" id="vendorSelect" required>
-                        <option value="">-- select supplier --</option>
+                        <option value="">@T["-- select supplier --"]</option>
                         @foreach (var vendor in vendors)
                         {
                             <option value="@vendor.Id"
@@ -138,36 +138,36 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="VendorReference" class="form-label">Supplier's Bill No.</label>
-                    <input asp-for="VendorReference" class="form-control" placeholder="As printed on their invoice" />
+                    <label asp-for="VendorReference" class="form-label">@T["Supplier's Bill No."]</label>
+                    <input asp-for="VendorReference" class="form-control" placeholder="@T["As printed on their invoice"]" />
                     <div class="form-text">Their number. Ours is @(isNew ? "issued on save" : Model.BillNumber).</div>
                 </div>
 
                 <div class="col-md-5">
-                    <label asp-for="ExpenseCategory" class="form-label">Category / Subject</label>
-                    <input asp-for="ExpenseCategory" class="form-control" placeholder="e.g. Building maintenance" />
+                    <label asp-for="ExpenseCategory" class="form-label">@T["Category / Subject"]</label>
+                    <input asp-for="ExpenseCategory" class="form-control" placeholder="@T["e.g. Building maintenance"]" />
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="BillDate" class="form-label">Bill Date</label>
+                    <label asp-for="BillDate" class="form-label">@T["Bill Date"]</label>
                     <input asp-for="BillDate" type="date" class="form-control" />
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="AccountingDate" class="form-label">Accounting Date</label>
+                    <label asp-for="AccountingDate" class="form-label">@T["Accounting Date"]</label>
                     <input asp-for="AccountingDate" type="date" class="form-control" />
-                    <div class="form-text">Decides the period the journal lands in.</div>
+                    <div class="form-text">@T["Decides the period the journal lands in."]</div>
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="DueDate" class="form-label">Due Date</label>
+                    <label asp-for="DueDate" class="form-label">@T["Due Date"]</label>
                     <input asp-for="DueDate" type="date" class="form-control" />
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="PropertyId" class="form-label">Default Property</label>
+                    <label asp-for="PropertyId" class="form-label">@T["Default Property"]</label>
                     <select asp-for="PropertyId" class="form-select" id="defaultProperty">
-                        <option value="">-- none --</option>
+                        <option value="">@T["-- none --"]</option>
                         @foreach (var property in properties)
                         {
                             <option value="@property.Id" selected="@(property.Id == Model.PropertyId ? "selected" : null)">
@@ -175,31 +175,31 @@
                             </option>
                         }
                     </select>
-                    <div class="form-text">Pre-fills new lines. Each line may differ.</div>
+                    <div class="form-text">@T["Pre-fills new lines. Each line may differ."]</div>
                 </div>
 
                 @if (projects.Count > 0)
                 {
                     <div class="col-md-4">
-                        <label asp-for="DevelopmentProjectId" class="form-label">Development project (contractor / subcontractor bill)</label>
+                        <label asp-for="DevelopmentProjectId" class="form-label">@T["Development project (contractor / subcontractor bill)"]</label>
                         <select asp-for="DevelopmentProjectId" class="form-select">
-                            <option value="">-- not a project bill --</option>
+                            <option value="">@T["-- not a project bill --"]</option>
                             @foreach (var project in projects)
                             {
                                 <option value="@project.ProjectId" selected="@(project.ProjectId == Model.DevelopmentProjectId ? "selected" : null)">@project.ProjectLabel</option>
                             }
                         </select>
-                        <div class="form-text">Every line becomes a cost of this project, posted to its work-in-progress account.</div>
+                        <div class="form-text">@T["Every line becomes a cost of this project, posted to its work-in-progress account."]</div>
                     </div>
                     <div class="col-md-2">
-                        <label asp-for="DevelopmentCostCategory" class="form-label">Cost category</label>
+                        <label asp-for="DevelopmentCostCategory" class="form-label">@T["Cost category"]</label>
                         <select asp-for="DevelopmentCostCategory" class="form-select">
                             @foreach (var category in RealEstateManager.Domain.DevelopmentCostCategories.All)
                             {
                                 <option value="@category" selected="@(category == Model.DevelopmentCostCategory ? "selected" : null)">@RealEstateManager.Domain.DevelopmentCostCategories.Describe(category)</option>
                             }
                         </select>
-                        <div class="form-text">For lines without their own.</div>
+                        <div class="form-text">@T["For lines without their own."]</div>
                     </div>
                 }
             </div>
@@ -235,21 +235,21 @@
 
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <strong>Bill Lines</strong>
-            <button type="button" class="btn btn-sm btn-dark" id="addLine">+ Add line</button>
+            <strong>@T["Bill Lines"]</strong>
+            <button type="button" class="btn btn-sm btn-dark" id="addLine">@T["+ Add line"]</button>
         </div>
         <div class="table-responsive">
             <table class="table table-bordered table-sm mb-0 bill-lines" id="linesTable">
                 <thead>
                     <tr>
-                        <th style="width:26%">Description</th>
-                        <th style="width:20%">Account</th>
+                        <th style="width:26%">@T["Description"]</th>
+                        <th style="width:20%">@T["Account"]</th>
                         <th style="width:14%">Property@(projects.Count > 0 ? " / Project" : "")</th>
-                        <th style="width:8%" class="num">Qty</th>
-                        <th style="width:11%" class="num">Unit Price</th>
-                        <th style="width:6%">VAT</th>
-                        <th style="width:12%">Input Tax</th>
-                        <th style="width:10%" class="num">Line Total</th>
+                        <th style="width:8%" class="num">@T["Qty"]</th>
+                        <th style="width:11%" class="num">@T["Unit Price"]</th>
+                        <th style="width:6%">@T["VAT"]</th>
+                        <th style="width:12%">@T["Input Tax"]</th>
+                        <th style="width:10%" class="num">@T["Line Total"]</th>
                         <th style="width:3%"></th>
                     </tr>
                 </thead>
@@ -262,11 +262,11 @@
                                 <input type="hidden" name="Lines[@i].Id" value="@line.Id" />
                                 <input type="hidden" name="Lines[@i].IsDeleted" value="false" class="line-deleted" />
                                 <input type="text" name="Lines[@i].Description" value="@line.Description"
-                                       class="form-control form-control-sm" placeholder="What was supplied" />
+                                       class="form-control form-control-sm" placeholder="@T["What was supplied"]" />
                             </td>
                             <td>
                                 <select name="Lines[@i].AccountId" class="form-select form-select-sm">
-                                    <option value="">-- account --</option>
+                                    <option value="">@T["-- account --"]</option>
                                     @foreach (var account in accounts)
                                     {
                                         <option value="@account.Value" selected="@(account.Value == line.AccountId?.ToString() ? "selected" : null)">
@@ -286,13 +286,13 @@
                                     }
                                 </select>
                                 @* Checkbox first, hidden fallback second: the binder takes the first value. *@
-                                <div class="form-check small mt-1" title="Charge this line to the owner of the managed property, with 5% VAT">
+                                <div class="form-check small mt-1" title="@T["Charge this line to the owner of the managed property, with 5% VAT"]">
                                     <input type="checkbox" name="Lines[@i].RechargeToOwner" value="true" class="form-check-input line-recharge"
                                            checked="@(line.RechargeToOwner ? "checked" : null)" />
                                     <input type="hidden" name="Lines[@i].RechargeToOwner" value="false" />
-                                    <label class="form-check-label">Charge to owner</label>
+                                    <label class="form-check-label">@T["Charge to owner"]</label>
                                 </div>
-                                <select name="Lines[@i].OwnerCostCategory" class="form-select form-select-sm mt-1" title="Kind of cost, for the owner's reports">
+                                <select name="Lines[@i].OwnerCostCategory" class="form-select form-select-sm mt-1" title="@T["Kind of cost, for the owner's reports"]">
                                     @foreach (var category in RealEstateManager.Domain.OwnerCostCategories.All)
                                     {
                                         <option value="@category" selected="@(category == line.OwnerCostCategory ? "selected" : null)">@category</option>
@@ -301,8 +301,8 @@
                                 @if (projects.Count > 0)
                                 {
                                     @* A development cost: picking a project and category charges the line to the project's account. *@
-                                    <select name="Lines[@i].DevelopmentCost" class="form-select form-select-sm mt-1 line-project" title="Development cost">
-                                        <option value="">-- not a development cost --</option>
+                                    <select name="Lines[@i].DevelopmentCost" class="form-select form-select-sm mt-1 line-project" title="@T["Development cost"]">
+                                        <option value="">@T["-- not a development cost --"]</option>
                                         @foreach (var project in projects)
                                         {
                                             <optgroup label="@project.ProjectLabel">
@@ -347,7 +347,7 @@
                             </td>
                             <td class="num line-total">0.00</td>
                             <td class="text-center">
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-line" title="Remove line">&times;</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-line" title="@T["Remove line"]">&times;</button>
                             </td>
                         </tr>
                     }
@@ -358,22 +358,22 @@
 
     <div class="row g-3">
         <div class="col-md-7">
-            <label asp-for="Notes" class="form-label">Notes</label>
+            <label asp-for="Notes" class="form-label">@T["Notes"]</label>
             <textarea asp-for="Notes" class="form-control" rows="4"
-                      placeholder="Anything worth recording against this bill"></textarea>
+                      placeholder="@T["Anything worth recording against this bill"]"></textarea>
         </div>
         <div class="col-md-5">
             <div class="card shadow-sm">
                 <div class="card-body totals-box">
-                    <div class="row"><div class="col">Subtotal</div><div class="col text-end" id="sumSubtotal">0.00</div></div>
-                    <div class="row"><div class="col">VAT 5%</div><div class="col text-end" id="sumVat">0.00</div></div>
-                    <div class="row grand"><div class="col">Total</div><div class="col text-end" id="sumTotal">0.00</div></div>
+                    <div class="row"><div class="col">@T["Subtotal"]</div><div class="col text-end" id="sumSubtotal">0.00</div></div>
+                    <div class="row"><div class="col">@T["VAT 5%"]</div><div class="col text-end" id="sumVat">0.00</div></div>
+                    <div class="row grand"><div class="col">@T["Total"]</div><div class="col text-end" id="sumTotal">0.00</div></div>
                     <div class="row small text-muted">
-                        <div class="col">Recoverable input tax</div>
+                        <div class="col">@T["Recoverable input tax"]</div>
                         <div class="col text-end" id="sumRecoverable">0.00</div>
                     </div>
                     <div class="row small text-muted">
-                        <div class="col">Added to cost (irrecoverable)</div>
+                        <div class="col">@T["Added to cost (irrecoverable)"]</div>
                         <div class="col text-end" id="sumIrrecoverable">0.00</div>
                     </div>
                 </div>
@@ -382,8 +382,8 @@
     </div>
 
     <div class="mt-4 d-flex gap-2">
-        <button type="submit" class="btn btn-dark">Save Draft</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-dark">@T["Save Draft"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Cancel"]</a>
     </div>
 </form>
 

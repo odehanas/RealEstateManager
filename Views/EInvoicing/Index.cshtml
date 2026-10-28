@@ -1,7 +1,7 @@
 @model RealEstateManager.Models.EInvoiceMonitorViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "E-Invoice Monitor";
+    ViewData["Title"] = T["E-Invoice Monitor"];
 }
 
 <style>
@@ -17,15 +17,14 @@
 
 <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
     <div>
-        <h2 class="mb-1">E-Invoice Monitor</h2>
+        <h2 class="mb-1">@T["E-Invoice Monitor"]</h2>
         <p class="text-muted mb-0">
-            Every invoice and credit note to a business or government tenant must reach your
-            Accredited Service Provider within <strong>14 days</strong> of the supply.
+            @T.Html("Every invoice and credit note to a business or government tenant must reach your Accredited Service Provider within <strong>14 days</strong> of the supply.")
         </p>
     </div>
     <div class="d-flex gap-2">
-        <a asp-action="Settings" class="btn btn-outline-secondary">Settings</a>
-        <a asp-action="Received" class="btn btn-outline-secondary">Received from suppliers</a>
+        <a asp-action="Settings" class="btn btn-outline-secondary">@T["Settings"]</a>
+        <a asp-action="Received" class="btn btn-outline-secondary">@T["Received from suppliers"]</a>
     </div>
 </div>
 
@@ -34,7 +33,7 @@
 @if (!Model.Enabled)
 {
     <div class="alert alert-info">
-        <strong>E-invoicing is switched off for this company.</strong>
+        <strong>@T["E-invoicing is switched off for this company."]</strong>
         Nothing is queued until you appoint an Accredited Service Provider and switch it on in
         <a asp-action="Settings">E-Invoicing Settings</a>.
         @if (Model.AppointmentDeadline != null)
@@ -56,7 +55,7 @@ else
 @if (Model.CompanySetupProblems > 0 || Model.TenantsNeedingAttention > 0)
 {
     <div class="alert alert-warning">
-        <strong>Setup is incomplete:</strong>
+        <strong>@T["Setup is incomplete:"]</strong>
         @if (Model.CompanySetupProblems > 0)
         {
             <text>@Model.CompanySetupProblems item(s) missing from the company's details. </text>
@@ -73,25 +72,25 @@ else
     <div class="col-6 col-lg-3">
         <div class="einv-kpi @(Model.OverdueCount > 0 ? "danger" : "ok")">
             <div class="v">@Model.OverdueCount</div>
-            <div class="k">Past the 14-day deadline</div>
+            <div class="k">@T["Past the 14-day deadline"]</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="einv-kpi @(Model.DueSoonCount > 0 ? "warn" : "ok")">
             <div class="v">@Model.DueSoonCount</div>
-            <div class="k">Due within 3 days</div>
+            <div class="k">@T["Due within 3 days"]</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="einv-kpi info">
             <div class="v">@Model.ReadyCount</div>
-            <div class="k">Generated, ready to send</div>
+            <div class="k">@T["Generated, ready to send"]</div>
         </div>
     </div>
     <div class="col-6 col-lg-3">
         <div class="einv-kpi @(Model.AwaitingResponse.Count > 0 ? "info" : "ok")">
             <div class="v">@Model.AwaitingResponse.Count</div>
-            <div class="k">Sent, awaiting provider</div>
+            <div class="k">@T["Sent, awaiting provider"]</div>
         </div>
     </div>
 </div>
@@ -107,23 +106,23 @@ else
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div><strong>To send</strong> <span class="text-muted small ms-2">Ordered by deadline</span></div>
+        <div><strong>@T["To send"]</strong> <span class="text-muted small ms-2">@T["Ordered by deadline"]</span></div>
         <div class="d-flex gap-2">
             <form asp-action="Reassess" method="post">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-sm btn-outline-secondary"
-                        title="Re-apply the scope rules after changing settings or a tenant's customer type">Re-assess</button>
+                        title="@T["Re-apply the scope rules after changing settings or a tenant's customer type"]">@T["Re-assess"]</button>
             </form>
             <form asp-action="GenerateAll" method="post">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-sm btn-primary">Generate all</button>
+                <button type="submit" class="btn btn-sm btn-primary">@T["Generate all"]</button>
             </form>
         </div>
     </div>
 
     @if (Model.Outstanding.Count == 0)
     {
-        <div class="card-body text-muted">Nothing waiting. Every in-scope document has been sent.</div>
+        <div class="card-body text-muted">@T["Nothing waiting. Every in-scope document has been sent."]</div>
     }
     else
     {
@@ -133,14 +132,14 @@ else
                 <table class="table table-sm table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width:32px"><input type="checkbox" id="selectAll" title="Select all ready" /></th>
-                            <th>Document</th>
-                            <th>Tenant</th>
-                            <th>Supply date</th>
-                            <th>Deadline</th>
-                            <th class="text-end">Total</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th style="width:32px"><input type="checkbox" id="selectAll" title="@T["Select all ready"]" /></th>
+                            <th>@T["Document"]</th>
+                            <th>@T["Tenant"]</th>
+                            <th>@T["Supply date"]</th>
+                            <th>@T["Deadline"]</th>
+                            <th class="text-end">@T["Total"]</th>
+                            <th>@T["Status"]</th>
+                            <th>@T["Action"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -181,7 +180,7 @@ else
                                     </button>
                                     @if (row.Status != EInvoiceStatuses.Pending)
                                     {
-                                        <a class="btn btn-sm btn-outline-dark" asp-action="Download" asp-route-kind="@row.Kind" asp-route-id="@row.Id">XML</a>
+                                        <a class="btn btn-sm btn-outline-dark" asp-action="Download" asp-route-kind="@row.Kind" asp-route-id="@row.Id">@T["XML"]</a>
                                     }
                                 </td>
                             </tr>
@@ -194,22 +193,21 @@ else
                 <div class="row g-2 align-items-end">
                     <div class="col-md-5">
                         <div class="small text-muted mb-1">
-                            <strong>1.</strong> Download the ready files (all, or the ones ticked) and upload them in your provider's portal.
+                            @T.Html("<strong>1.</strong> Download the ready files (all, or the ones ticked) and upload them in your provider's portal.")
                         </div>
                         <button type="submit" class="btn btn-sm btn-dark" formaction="@Url.Action("DownloadBatch")">
-                            Download ready files (ZIP)
+                            @T["Download ready files (ZIP)"]
                         </button>
                     </div>
                     <div class="col-md-7">
                         <div class="small text-muted mb-1">
-                            <strong>2.</strong> Once uploaded, tick them and record that they were sent. This locks them &mdash;
-                            corrections then need a credit note.
+                            @T.Html("<strong>2.</strong> Once uploaded, tick them and record that they were sent. This locks them &mdash; corrections then need a credit note.")
                         </div>
                         <div class="input-group input-group-sm">
-                            <input type="text" name="providerReference" class="form-control" placeholder="Provider's batch / upload reference (optional)" />
+                            <input type="text" name="providerReference" class="form-control" placeholder="@T["Provider's batch / upload reference (optional)"]" />
                             <button type="submit" class="btn btn-success" formaction="@Url.Action("MarkSubmitted")"
                                     onclick="return confirm('Record the ticked documents as sent to your provider? They cannot be reset to draft afterwards.');">
-                                Mark ticked as sent
+                                @T["Mark ticked as sent"]
                             </button>
                         </div>
                     </div>
@@ -220,10 +218,10 @@ else
 </div>
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><strong>Sent &mdash; awaiting the provider's answer</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Sent &mdash; awaiting the provider's answer</strong>")</div>
     @if (Model.AwaitingResponse.Count == 0)
     {
-        <div class="card-body text-muted">Nothing awaiting an answer.</div>
+        <div class="card-body text-muted">@T["Nothing awaiting an answer."]</div>
     }
     else
     {
@@ -231,11 +229,11 @@ else
             <table class="table table-sm align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Document</th>
-                        <th>Tenant</th>
-                        <th>Sent</th>
-                        <th class="text-end">Total</th>
-                        <th style="width:45%">Provider's answer</th>
+                        <th>@T["Document"]</th>
+                        <th>@T["Tenant"]</th>
+                        <th>@T["Sent"]</th>
+                        <th class="text-end">@T["Total"]</th>
+                        <th style="width:45%">@T["Provider's answer"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -261,11 +259,11 @@ else
                                     <input type="hidden" name="kind" value="@row.Kind" />
                                     <input type="hidden" name="id" value="@row.Id" />
                                     <input type="text" name="providerReference" class="form-control form-control-sm" style="max-width:150px"
-                                           placeholder="Provider ref" value="@row.ProviderReference" />
+                                           placeholder="@T["Provider ref"]" value="@row.ProviderReference" />
                                     <input type="text" name="reason" class="form-control form-control-sm" style="max-width:200px"
-                                           placeholder="Rejection reason" />
-                                    <button type="submit" name="accepted" value="true" class="btn btn-sm btn-success">Accepted</button>
-                                    <button type="submit" name="accepted" value="false" class="btn btn-sm btn-outline-danger">Rejected</button>
+                                           placeholder="@T["Rejection reason"]" />
+                                    <button type="submit" name="accepted" value="true" class="btn btn-sm btn-success">@T["Accepted"]</button>
+                                    <button type="submit" name="accepted" value="false" class="btn btn-sm btn-outline-danger">@T["Rejected"]</button>
                                 </form>
                             </td>
                         </tr>
@@ -277,17 +275,17 @@ else
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header bg-light"><strong>Recently accepted</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Recently accepted</strong>")</div>
     @if (Model.RecentlyAccepted.Count == 0)
     {
-        <div class="card-body text-muted">None yet.</div>
+        <div class="card-body text-muted">@T["None yet."]</div>
     }
     else
     {
         <div class="table-responsive">
             <table class="table table-sm mb-0">
                 <thead>
-                    <tr><th>Document</th><th>Tenant</th><th>Accepted</th><th>Provider ref</th><th class="text-end">Total</th><th></th></tr>
+                    <tr><th>@T["Document"]</th><th>@T["Tenant"]</th><th>@T["Accepted"]</th><th>@T["Provider ref"]</th><th class="text-end">@T["Total"]</th><th></th></tr>
                 </thead>
                 <tbody>
                     @foreach (var row in Model.RecentlyAccepted)
@@ -298,7 +296,7 @@ else
                             <td>@row.ResponseAt?.ToLocalTime().ToString("dd/MM/yyyy")</td>
                             <td>@row.ProviderReference</td>
                             <td class="text-end">@row.Total.ToString("N2")</td>
-                            <td><a asp-action="Download" asp-route-kind="@row.Kind" asp-route-id="@row.Id" class="small">XML</a></td>
+                            <td><a asp-action="Download" asp-route-kind="@row.Kind" asp-route-id="@row.Id" class="small">@T["XML"]</a></td>
                         </tr>
                     }
                 </tbody>

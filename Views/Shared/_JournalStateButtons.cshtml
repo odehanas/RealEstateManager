@@ -10,11 +10,11 @@
 
 @if (!Model.JournalEntryId.HasValue)
 {
-    <span class="badge bg-secondary" title="No journal entry has been created yet">Not journalised</span>
+    <span class="badge bg-secondary" title="@T["No journal entry has been created yet"]">@T["Not journalised"]</span>
 }
 else if (Model.PeriodClosed)
 {
-    <span class="badge bg-dark" title="@Model.PeriodName is closed, so this entry is locked">Period locked</span>
+    <span class="badge bg-dark" title="@Model.PeriodName is closed, so this entry is locked">@T["Period locked"]</span>
 }
 else if (Model.IsPosted)
 {
@@ -22,7 +22,7 @@ else if (Model.IsPosted)
         @Html.AntiForgeryToken()
         <input type="hidden" name="id" value="@Model.JournalEntryId" />
         <input type="hidden" name="returnUrl" value="@returnUrl" />
-        <button type="submit" class="btn btn-sm btn-outline-warning">Reset to Draft</button>
+        <button type="submit" class="btn btn-sm btn-outline-warning">@T["Reset to Draft"]</button>
     </form>
 }
 else
@@ -31,6 +31,6 @@ else
         @Html.AntiForgeryToken()
         <input type="hidden" name="id" value="@Model.JournalEntryId" />
         <input type="hidden" name="returnUrl" value="@returnUrl" />
-        <button type="submit" class="btn btn-sm btn-dark">Post</button>
+        <button type="submit" class="btn btn-sm btn-dark">@T["Post"]</button>
     </form>
 }

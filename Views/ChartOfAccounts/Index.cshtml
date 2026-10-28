@@ -1,15 +1,15 @@
 @model RealEstateManager.Models.ChartOfAccountsIndexViewModel
 
 @{
-    ViewData["Title"] = "Chart of Accounts";
+    ViewData["Title"] = T["Chart of Accounts"];
     var ob = Model.OpeningBalances;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Chart of Accounts</h2>
+    <h2 class="mb-0">@T["Chart of Accounts"]</h2>
     <div class="d-flex gap-2">
-        <a asp-controller="OpeningBalances" asp-action="Index" class="btn btn-outline-secondary">Opening Balances Detail</a>
-        <a asp-action="Create" class="btn btn-dark">New Account</a>
+        <a asp-controller="OpeningBalances" asp-action="Index" class="btn btn-outline-secondary">@T["Opening Balances Detail"]</a>
+        <a asp-action="Create" class="btn btn-dark">@T["New Account"]</a>
     </div>
 </div>
 
@@ -19,10 +19,7 @@
     <div class="alert alert-secondary d-flex align-items-start gap-2">
         <span style="font-size:1.3rem;line-height:1">&#9432;</span>
         <div>
-            <strong>No opening balances have been entered.</strong>
-            That is correct if this company started from nothing. If you are migrating from another system,
-            enter each account's balance below &mdash; and remember that every debit needs a matching credit,
-            or the Trial Balance and Balance Sheet will not balance.
+            @T.Html("<strong>No opening balances have been entered.</strong> That is correct if this company started from nothing. If you are migrating from another system, enter each account's balance below &mdash; and remember that every debit needs a matching credit, or the Trial Balance and Balance Sheet will not balance.")
         </div>
     </div>
 }
@@ -31,7 +28,7 @@ else if (ob.IsBalanced)
     <div class="alert alert-success d-flex align-items-start gap-2">
         <span style="font-size:1.3rem;line-height:1">&#10004;</span>
         <div>
-            <strong>Opening balances are complete and balanced.</strong>
+            <strong>@T["Opening balances are complete and balanced."]</strong>
             @if (ob.HasControlAccount)
             {
                 <text>
@@ -54,7 +51,7 @@ else
         <div class="d-flex align-items-start gap-2">
             <span style="font-size:1.3rem;line-height:1">&#9888;</span>
             <div>
-                <strong>Opening balances are incomplete.</strong>
+                <strong>@T["Opening balances are incomplete."]</strong>
                 @if (ob.HasControlAccount)
                 {
                     <text>
@@ -84,8 +81,7 @@ else
                             }
                         </div>
                         <div class="mt-2">
-                            Enter the missing balance and this account returns to zero on its own. It cannot be
-                            cleared by posting a journal &mdash; the figure is derived, not stored.
+                            @T["Enter the missing balance and this account returns to zero on its own. It cannot be cleared by posting a journal — the figure is derived, not stored."]
                         </div>
                     </text>
                 }
@@ -97,9 +93,7 @@ else
                         <strong>@Math.Abs(ob.Difference).ToString("N2")</strong>. Your Trial Balance will be out by
                         exactly this amount.
                         <div class="mt-2">
-                            Account <code>39999</code> Opening Balance Control Account has not been created yet.
-                            Restart the application and it will be added automatically, after which the reports
-                            will balance and this figure will appear there instead.
+                            @T.Html("Account <code>39999</code> Opening Balance Control Account has not been created yet. Restart the application and it will be added automatically, after which the reports will balance and this figure will appear there instead.")
                         </div>
                     </text>
                 }
@@ -112,15 +106,15 @@ else
 {
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-light">
-            <strong>Opening Balance Position</strong>
-            <span class="text-muted small ms-2">Assets should equal liabilities plus equity</span>
+            <strong>@T["Opening Balance Position"]</strong>
+            <span class="text-muted small ms-2">@T["Assets should equal liabilities plus equity"]</span>
         </div>
         <div class="card-body">
             <div class="row g-3 align-items-center">
                 <div class="col-md-3 text-center">
-                    <div class="text-muted small text-uppercase">Assets</div>
+                    <div class="text-muted small text-uppercase">@T["Assets"]</div>
                     <div class="h4 mb-0">@ob.Assets.ToString("N2")</div>
-                    <div class="text-muted small">debit side</div>
+                    <div class="text-muted small">@T["debit side"]</div>
                 </div>
 
                 <div class="col-md-1 text-center">
@@ -128,7 +122,7 @@ else
                 </div>
 
                 <div class="col-md-3 text-center">
-                    <div class="text-muted small text-uppercase">Liabilities + Equity</div>
+                    <div class="text-muted small text-uppercase">@T["Liabilities + Equity"]</div>
                     <div class="h4 mb-0">@ob.LiabilitiesAndEquity.ToString("N2")</div>
                     <div class="text-muted small">
                         @ob.Liabilities.ToString("N2") + @ob.EquityExcludingControl.ToString("N2")
@@ -138,17 +132,17 @@ else
                 <div class="col-md-5">
                     <table class="table table-sm mb-0">
                         <tr>
-                            <td>Assets (debit side)</td>
+                            <td>@T["Assets (debit side)"]</td>
                             <td class="text-end fw-semibold">@ob.Assets.ToString("N2")</td>
                         </tr>
                         <tr>
-                            <td>Liabilities and equity (credit side)</td>
+                            <td>@T["Liabilities and equity (credit side)"]</td>
                             <td class="text-end fw-semibold">@ob.LiabilitiesAndEquity.ToString("N2")</td>
                         </tr>
                         <tr class="@(ob.IsBalanced ? "table-success" : "table-danger")">
                             <td>
-                                <strong>Held in <code>39999</code></strong>
-                                <div class="small text-muted">Still to be entered</div>
+                                <strong>@T.Html("Held in <code>39999</code>")</strong>
+                                <div class="small text-muted">@T["Still to be entered"]</div>
                             </td>
                             <td class="text-end fw-bold">@ob.ControlAccountBalance.ToString("N2")</td>
                         </tr>
@@ -159,7 +153,7 @@ else
             @if (ob.HasProfitAndLossOpeningBalances)
             {
                 <div class="alert alert-warning small mt-3 mb-0">
-                    <strong>Opening balances exist on revenue or expense accounts</strong>
+                    <strong>@T["Opening balances exist on revenue or expense accounts"]</strong>
                     (revenue @ob.Revenue.ToString("N2"), expenses @ob.Expenses.ToString("N2")).
                     That is unusual: prior-year trading results normally sit in
                     <code>32100</code> Retained Earnings &ndash; Prior Years, not in the profit and loss
@@ -177,7 +171,7 @@ else
     <div class="card-body">
         @if (!Model.Accounts.Any())
         {
-            <p class="text-muted mb-0">No accounts found.</p>
+            <p class="text-muted mb-0">@T["No accounts found."]</p>
         }
         else
         {

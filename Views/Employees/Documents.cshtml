@@ -1,14 +1,14 @@
 @model List<RealEstateManager.Services.HrService.ExpiringDocument>
 
 @{
-    ViewData["Title"] = "Expiring Documents";
+    ViewData["Title"] = T["Expiring Documents"];
     int days = ViewBag.Days;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">Expiring Documents</h2>
-        <div class="text-muted">Passports, Emirates IDs, visas, labour cards, insurance and limited contracts of current staff.</div>
+        <h2 class="mb-0">@T["Expiring Documents"]</h2>
+        <div class="text-muted">@T["Passports, Emirates IDs, visas, labour cards, insurance and limited contracts of current staff."]</div>
     </div>
     <div class="d-flex gap-2">
         <form method="get" class="d-flex gap-2">
@@ -19,14 +19,14 @@
                 }
             </select>
         </form>
-        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Employees</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Employees"]</a>
     </div>
 </div>
 
 <table class="table table-bordered table-striped">
     <thead class="table-light">
-        <tr><th>Employee</th><th>Document</th><th>Number</th><th>Expiry</th><th>Status</th></tr>
+        <tr><th>@T["Employee"]</th><th>@T["Document"]</th><th>@T["Number"]</th><th>@T["Expiry"]</th><th>@T["Status"]</th></tr>
     </thead>
     <tbody>
         @if (Model.Count == 0)

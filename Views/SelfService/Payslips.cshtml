@@ -1,13 +1,13 @@
 @model List<RealEstateManager.Domain.PayrollRunLine>
 @{
     Layout = "_SelfServiceLayout";
-    ViewData["Title"] = "Payslips";
+    ViewData["Title"] = T["Payslips"];
 }
 
-<h1 class="h5 mb-3">My payslips</h1>
+<h1 class="h5 mb-3">@T["My payslips"]</h1>
 @if (Model.Count == 0)
 {
-    <div class="card shadow-sm"><div class="card-body text-muted">Your payslips appear here once a payroll is approved.</div></div>
+    <div class="card shadow-sm"><div class="card-body text-muted">@T["Your payslips appear here once a payroll is approved."]</div></div>
 }
 else
 {

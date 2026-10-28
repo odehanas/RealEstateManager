@@ -2,49 +2,49 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Owner Monitor";
+    ViewData["Title"] = T["Owner Monitor"];
     var large = Model.Postings.Where(x => x.Amount >= Model.LargeAmount).ToList();
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">Owner Monitor</h2>
+        <h2 class="mb-0">@T["Owner Monitor"]</h2>
         <div class="text-muted">Money in and out, payments released and waiting, and the postings of the period. Read only. For results and trends see <a asp-controller="Performance" asp-action="Index">Business Performance</a>.</div>
     </div>
     <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
-        <div><label class="form-label small mb-0">From</label><input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
-        <div><label class="form-label small mb-0">To</label><input type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
-        <div><label class="form-label small mb-0">Large if over</label><input name="large" value="@Model.LargeAmount.ToString("0")" class="form-control form-control-sm" style="width:110px" /></div>
-        <button class="btn btn-sm btn-dark">Show</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">Print</button>
+        <div><label class="form-label small mb-0">@T["From"]</label><input type="date" name="from" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+        <div><label class="form-label small mb-0">@T["To"]</label><input type="date" name="to" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+        <div><label class="form-label small mb-0">@T["Large if over"]</label><input name="large" value="@Model.LargeAmount.ToString("0")" class="form-control form-control-sm" style="width:110px" /></div>
+        <button class="btn btn-sm btn-dark">@T["Show"]</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
     </form>
 </div>
 
 <div class="row g-3 mb-3">
     <div class="col-6 col-lg-3"><div class="card shadow-sm h-100"><div class="card-body">
-        <div class="small text-muted text-uppercase">Cash and bank now</div><div class="fs-3 fw-bold">@Model.CashBalance.ToString("N2")</div>
+        <div class="small text-muted text-uppercase">@T["Cash and bank now"]</div><div class="fs-3 fw-bold">@Model.CashBalance.ToString("N2")</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm h-100"><div class="card-body">
-        <div class="small text-muted text-uppercase">Money in / out in the period</div>
+        <div class="small text-muted text-uppercase">@T["Money in / out in the period"]</div>
         <div class="fs-5 fw-bold text-success">+@Model.MoneyIn.ToString("N2")</div><div class="fs-5 fw-bold text-danger">−@Model.MoneyOut.ToString("N2")</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm h-100 @(Model.PendingPayments > 0 ? "border-warning" : "")"><div class="card-body">
-        <div class="small text-muted text-uppercase">Payments waiting for release</div>
+        <div class="small text-muted text-uppercase">@T["Payments waiting for release"]</div>
         <div class="fs-3 fw-bold">@Model.PendingPayments</div><div>@Model.PendingPaymentAmount.ToString("N2")</div>
-        @if (Model.PendingPayments > 0) { <a asp-controller="PaymentApprovals" asp-action="Index" class="small">Open the queue</a> }
+        @if (Model.PendingPayments > 0) { <a asp-controller="PaymentApprovals" asp-action="Index" class="small">@T["Open the queue"]</a> }
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm h-100"><div class="card-body">
-        <div class="small text-muted text-uppercase">Authority delegated now</div>
-        @if (Model.ActiveDelegations.Count == 0) { <div class="text-muted">None</div> }
+        <div class="small text-muted text-uppercase">@T["Authority delegated now"]</div>
+        @if (Model.ActiveDelegations.Count == 0) { <div class="text-muted">@T["None"]</div> }
         @foreach (var d in Model.ActiveDelegations) { <div class="small"><strong>@d.ToName</strong> up to @(d.MaxAmount?.ToString("N0") ?? "any amount") until @d.EndDate.ToString("dd/MM")</div> }
-        <a asp-controller="ApprovalLimits" asp-action="Index" class="small">Approval limits</a>
+        <a asp-controller="ApprovalLimits" asp-action="Index" class="small">@T["Approval limits"]</a>
     </div></div></div>
 </div>
 
 @if (Model.Drafts.Count > 0 || large.Count > 0)
 {
     <div class="card shadow-sm mb-3 border-danger">
-        <div class="card-header bg-light"><h5 class="mb-0">Needs your attention</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Needs your attention"]</h5></div>
         <ul class="list-group list-group-flush">
             @if (large.Count > 0) { <li class="list-group-item">@large.Count posting(s) over @Model.LargeAmount.ToString("N0"), highlighted below.</li> }
             @if (Model.Drafts.Count > 0) { <li class="list-group-item">@Model.Drafts.Count journal(s) left as drafts for more than a week (oldest @Model.Drafts[0].EntryDate.ToString("dd/MM/yyyy")).</li> }
@@ -53,11 +53,11 @@
 }
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-light"><h5 class="mb-0">Payments released and waiting</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["Payments released and waiting"]</h5></div>
     <div class="table-responsive">
         <table class="table table-sm mb-0">
-            <tr><th>Entered</th><th>By</th><th>Payment</th><th class="text-end">Amount</th><th>Status</th><th>Released / decided by</th></tr>
-            @if (Model.Payments.Count == 0) { <tr><td colspan="6" class="text-muted">None in the period.</td></tr> }
+            <tr><th>@T["Entered"]</th><th>@T["By"]</th><th>@T["Payment"]</th><th class="text-end">@T["Amount"]</th><th>@T["Status"]</th><th>@T["Released / decided by"]</th></tr>
+            @if (Model.Payments.Count == 0) { <tr><td colspan="6" class="text-muted">@T["None in the period."]</td></tr> }
             @foreach (var p in Model.Payments)
             {
                 <tr>
@@ -72,11 +72,11 @@
 </div>
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-light"><h5 class="mb-0">Postings to the accounts</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["Postings to the accounts"]</h5></div>
     <div class="table-responsive">
         <table class="table table-sm mb-0">
-            <tr><th>Date</th><th>Entry</th><th>Type</th><th>Description</th><th class="text-end">Amount</th></tr>
-            @if (Model.Postings.Count == 0) { <tr><td colspan="5" class="text-muted">Nothing posted in the period.</td></tr> }
+            <tr><th>@T["Date"]</th><th>@T["Entry"]</th><th>@T["Type"]</th><th>@T["Description"]</th><th class="text-end">@T["Amount"]</th></tr>
+            @if (Model.Postings.Count == 0) { <tr><td colspan="5" class="text-muted">@T["Nothing posted in the period."]</td></tr> }
             @foreach (var j in Model.Postings)
             {
                 <tr class="@(j.Amount >= Model.LargeAmount ? "table-warning" : "")">

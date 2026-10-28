@@ -3,45 +3,45 @@
 @using RealEstateManager.Services
 @{
     Layout = "_SelfServiceLayout";
-    ViewData["Title"] = "Leave";
+    ViewData["Title"] = T["Leave"];
     var balance = (HrService.LeaveBalance)ViewBag.Balance;
     string Badge(string s) => s switch { LeaveStatuses.Approved => "bg-success", LeaveStatuses.Rejected => "bg-danger", LeaveStatuses.Cancelled => "bg-secondary", _ => "bg-warning text-dark" };
 }
 
 <div class="card shadow-sm mb-3">
     <div class="card-body d-flex justify-content-between">
-        <div class="stat"><div class="label">Available</div><div class="value">@balance.Available.ToString("0.#")</div></div>
-        <div class="stat"><div class="label">Pending</div><div class="value">@balance.Pending.ToString("0.#")</div></div>
-        <div class="stat"><div class="label">Taken</div><div class="value">@balance.Taken.ToString("0.#")</div></div>
+        <div class="stat"><div class="label">@T["Available"]</div><div class="value">@balance.Available.ToString("0.#")</div></div>
+        <div class="stat"><div class="label">@T["Pending"]</div><div class="value">@balance.Pending.ToString("0.#")</div></div>
+        <div class="stat"><div class="label">@T["Taken"]</div><div class="value">@balance.Taken.ToString("0.#")</div></div>
     </div>
 </div>
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <div class="fw-bold mb-2">Request leave</div>
+        <div class="fw-bold mb-2">@T["Request leave"]</div>
         <form asp-action="Leave" method="post">
             @Html.AntiForgeryToken()
             <div class="mb-2">
-                <label class="form-label small" for="leaveType">Type</label>
+                <label class="form-label small" for="leaveType">@T["Type"]</label>
                 <select id="leaveType" name="leaveType" class="form-select">
                     @foreach (var t in LeaveTypes.All) { <option value="@t">@t</option> }
                 </select>
             </div>
             <div class="row g-2 mb-2">
-                <div class="col-6"><label class="form-label small" for="startDate">From</label><input id="startDate" name="startDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required /></div>
-                <div class="col-6"><label class="form-label small" for="endDate">To</label><input id="endDate" name="endDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required /></div>
+                <div class="col-6"><label class="form-label small" for="startDate">@T["From"]</label><input id="startDate" name="startDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required /></div>
+                <div class="col-6"><label class="form-label small" for="endDate">@T["To"]</label><input id="endDate" name="endDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required /></div>
             </div>
             <div class="mb-3">
-                <label class="form-label small" for="reason">Reason (optional)</label>
+                <label class="form-label small" for="reason">@T["Reason (optional)"]</label>
                 <input id="reason" name="reason" class="form-control" maxlength="500" />
             </div>
-            <button class="btn btn-primary w-100">Send to HR</button>
+            <button class="btn btn-primary w-100">@T["Send to HR"]</button>
         </form>
     </div>
 </div>
 
-<h2 class="h6">My leave</h2>
-@if (Model.Count == 0) { <div class="text-muted small">No leave yet.</div> }
+<h2 class="h6">@T["My leave"]</h2>
+@if (Model.Count == 0) { <div class="text-muted small">@T["No leave yet."]</div> }
 <div class="list-group shadow-sm">
     @foreach (var l in Model)
     {

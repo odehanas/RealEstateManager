@@ -8,12 +8,19 @@
         string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), action, StringComparison.OrdinalIgnoreCase) ? "active" : "";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@RealEstateManager.Services.Localization.UiLanguages.Current" dir="@(RealEstateManager.Services.Localization.UiLanguages.IsArabic ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - My HR</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @if (RealEstateManager.Services.Localization.UiLanguages.IsArabic)
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    }
     <style>
         :root { --navy:#0f2740; --accent:#1e6fd9; --line:#d8dee6; }
         body { background:#f2f4f7; padding-bottom:78px; }
@@ -38,8 +45,9 @@
         @if (isSignedIn)
         {
             <div class="d-flex gap-2">
-                <a asp-controller="SelfServiceAccount" asp-action="ChangePassword" class="btn btn-sm btn-outline-light">Password</a>
-                <form asp-controller="SelfServiceAccount" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button class="btn btn-sm btn-light">Sign out</button></form>
+                <a asp-controller="SelfServiceAccount" asp-action="ChangePassword" class="btn btn-sm btn-outline-light">@T["Password"]</a>
+                <partial name="_LanguageSwitch" model="@("btn-sm btn-light")" />
+                <form asp-controller="SelfServiceAccount" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button class="btn btn-sm btn-light">@T["Sign out"]</button></form>
             </div>
         }
     </div>

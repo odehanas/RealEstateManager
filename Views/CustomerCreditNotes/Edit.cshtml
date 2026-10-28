@@ -15,13 +15,13 @@
             &mdash; @Model.TenantName, @Model.PropertyUnit, contract @Model.ContractNumber.
         </p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
 </div>
 
 @if (EInvoiceStatuses.IsLocked(Model.InvoiceEInvoiceStatus))
 {
     <div class="alert alert-info py-2">
-        This invoice has been reported through e-invoicing. The credit note will be e-invoiced too once posted.
+        @T["This invoice has been reported through e-invoicing. The credit note will be e-invoiced too once posted."]
     </div>
 }
 
@@ -38,13 +38,13 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label asp-for="CreditNoteDate" class="form-label">Credit note date</label>
+                            <label asp-for="CreditNoteDate" class="form-label">@T["Credit note date"]</label>
                             <input asp-for="CreditNoteDate" type="date" class="form-control" />
-                            <div class="form-text">Decides the VAT return the reduction falls in.</div>
+                            <div class="form-text">@T["Decides the VAT return the reduction falls in."]</div>
                         </div>
 
                         <div class="col-md-8">
-                            <label asp-for="ReasonCode" class="form-label">Reason</label>
+                            <label asp-for="ReasonCode" class="form-label">@T["Reason"]</label>
                             <select asp-for="ReasonCode" class="form-select">
                                 @foreach (var reason in CreditNoteReasons.ForLeases)
                                 {
@@ -54,9 +54,9 @@
                         </div>
 
                         <div class="col-md-12">
-                            <label asp-for="Reason" class="form-label">Explanation (printed on the credit note)</label>
+                            <label asp-for="Reason" class="form-label">@T["Explanation (printed on the credit note)"]</label>
                             <input asp-for="Reason" class="form-control" maxlength="500"
-                                   placeholder="e.g. Lease terminated on 31 March 2027 by mutual agreement - April rent cancelled" />
+                                   placeholder="@T["e.g. Lease terminated on 31 March 2027 by mutual agreement - April rent cancelled"]" />
                         </div>
 
                         <div class="col-md-12">
@@ -69,12 +69,12 @@
                         </div>
 
                         <div class="col-md-4" id="netBox">
-                            <label asp-for="NetAmount" class="form-label">Net amount to credit</label>
+                            <label asp-for="NetAmount" class="form-label">@T["Net amount to credit"]</label>
                             <input asp-for="NetAmount" type="number" step="0.01" min="0" class="form-control text-end" id="netAmount" />
                         </div>
 
                         <div class="col-md-8">
-                            <label asp-for="DebitAccountId" class="form-label">Reverse into account</label>
+                            <label asp-for="DebitAccountId" class="form-label">@T["Reverse into account"]</label>
                             <select asp-for="DebitAccountId" class="form-select">
                                 <option value="">Same account as the invoice (@Model.DefaultAccountName)</option>
                                 @foreach (var account in Model.Accounts)
@@ -83,8 +83,7 @@
                                 }
                             </select>
                             <div class="form-text">
-                                Leave as it is to reverse the invoice exactly. Choose a revenue account for a discount on
-                                rent already recognised.
+                                @T["Leave as it is to reverse the invoice exactly. Choose a revenue account for a discount on rent already recognised."]
                             </div>
                         </div>
                     </div>
@@ -92,28 +91,28 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-outline-dark">Save as Draft</button>
-                <button type="submit" name="PostNow" value="true" class="btn btn-dark">Save &amp; Post</button>
+                <button type="submit" class="btn btn-outline-dark">@T["Save as Draft"]</button>
+                <button type="submit" name="PostNow" value="true" class="btn btn-dark">@T["Save & Post"]</button>
             </div>
         </form>
     </div>
 
     <div class="col-lg-4">
         <div class="card shadow-sm">
-            <div class="card-header bg-light"><strong>The invoice</strong></div>
+            <div class="card-header bg-light">@T.Html("<strong>The invoice</strong>")</div>
             <div class="card-body small">
-                <div class="d-flex justify-content-between"><span>Net</span><span>@Model.InvoiceSubtotal.ToString("N2")</span></div>
+                <div class="d-flex justify-content-between"><span>@T["Net"]</span><span>@Model.InvoiceSubtotal.ToString("N2")</span></div>
                 <div class="d-flex justify-content-between"><span>VAT &mdash; @VatCategories.Describe(Model.VatCategory)</span><span>@Model.InvoiceVat.ToString("N2")</span></div>
-                <div class="d-flex justify-content-between fw-semibold border-top pt-1"><span>Total</span><span>@Model.InvoiceTotal.ToString("N2")</span></div>
-                <div class="d-flex justify-content-between text-muted"><span>Paid or credited</span><span>@Model.AlreadySettled.ToString("N2")</span></div>
-                <div class="d-flex justify-content-between fw-semibold"><span>Outstanding</span><span>@Model.Outstanding.ToString("N2")</span></div>
+                <div class="d-flex justify-content-between fw-semibold border-top pt-1"><span>@T["Total"]</span><span>@Model.InvoiceTotal.ToString("N2")</span></div>
+                <div class="d-flex justify-content-between text-muted"><span>@T["Paid or credited"]</span><span>@Model.AlreadySettled.ToString("N2")</span></div>
+                <div class="d-flex justify-content-between fw-semibold"><span>@T["Outstanding"]</span><span>@Model.Outstanding.ToString("N2")</span></div>
             </div>
-            <div class="card-header bg-light border-top"><strong>This credit note</strong></div>
+            <div class="card-header bg-light border-top">@T.Html("<strong>This credit note</strong>")</div>
             <div class="card-body small">
-                <div class="d-flex justify-content-between"><span>Net</span><span id="pNet">-</span></div>
-                <div class="d-flex justify-content-between"><span>VAT reversed</span><span id="pVat">-</span></div>
-                <div class="d-flex justify-content-between fw-semibold border-top pt-1"><span>Total credited</span><span id="pTotal">-</span></div>
-                <div class="text-muted mt-2">Amounts already paid cannot be credited &mdash; they are refunded.</div>
+                <div class="d-flex justify-content-between"><span>@T["Net"]</span><span id="pNet">-</span></div>
+                <div class="d-flex justify-content-between"><span>@T["VAT reversed"]</span><span id="pVat">-</span></div>
+                <div class="d-flex justify-content-between fw-semibold border-top pt-1"><span>@T["Total credited"]</span><span id="pTotal">-</span></div>
+                <div class="text-muted mt-2">@T["Amounts already paid cannot be credited — they are refunded."]</div>
             </div>
         </div>
     </div>

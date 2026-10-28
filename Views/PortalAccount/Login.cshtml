@@ -1,14 +1,14 @@
 @model RealEstateManager.Models.PortalLoginViewModel
 @{
     Layout = "_PortalLayout";
-    ViewData["Title"] = "Sign In";
+    ViewData["Title"] = T["Sign In"];
 }
 
 <div class="card shadow-sm mx-auto mt-4" style="max-width:420px">
     <div class="card-body p-4">
-        <h1 class="h5 mb-1">Sign in</h1>
+        <h1 class="h5 mb-1">@T["Sign in"]</h1>
         <p class="text-muted small mb-4">
-            Use the username and password given to you by your property manager.
+            @T["Use the username and password given to you by your property manager."]
         </p>
 
         <form asp-action="Login" method="post">
@@ -27,12 +27,11 @@
                 <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
 
-            <button type="submit" class="btn btn-dark w-100">Sign in</button>
+            <button type="submit" class="btn btn-dark w-100">@T["Sign in"]</button>
         </form>
 
         <p class="text-muted small mt-4 mb-0">
-            Forgotten your password, or no account yet? Contact your property manager &mdash;
-            they can issue new access for you.
+            @T["Forgotten your password, or no account yet? Contact your property manager — they can issue new access for you."]
         </p>
     </div>
 </div>

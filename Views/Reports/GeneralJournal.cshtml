@@ -1,7 +1,7 @@
 ﻿@model RealEstateManager.Services.GeneralJournalReport
 @using RealEstateManager.Services
 @{
-    ViewData["Title"] = "General Journal";
+    ViewData["Title"] = T["General Journal"];
     var sources = ViewBag.Sources as List<(string Key, string Label)> ?? new();
     string Money(decimal value) => value == 0 ? "" : value.ToString("N2");
     var balanced = Model.TotalDebit == Model.TotalCredit;
@@ -19,31 +19,31 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
     <div>
-        <h2 class="mb-0">General Journal</h2>
+        <h2 class="mb-0">@T["General Journal"]</h2>
         <div class="text-muted">Every journal entry from @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"), with its lines and the source it came from.</div>
     </div>
     <div class="d-flex gap-2 no-print">
         <a class="btn btn-outline-secondary" asp-action="GeneralJournal"
            asp-route-fromDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.To.ToString("yyyy-MM-dd")"
-           asp-route-source="@Model.Source" asp-route-status="@Model.Status" asp-route-search="@Model.Search" asp-route-format="csv">Export CSV</a>
-        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+           asp-route-source="@Model.Source" asp-route-status="@Model.Status" asp-route-search="@Model.Search" asp-route-format="csv">@T["Export CSV"]</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
 <form method="get" class="card card-body shadow-sm mb-3 no-print">
     <div class="row g-2 align-items-end">
         <div class="col-6 col-md-2">
-            <label class="form-label small" for="fromDate">From</label>
+            <label class="form-label small" for="fromDate">@T["From"]</label>
             <input type="date" class="form-control" id="fromDate" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" />
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small" for="toDate">To</label>
+            <label class="form-label small" for="toDate">@T["To"]</label>
             <input type="date" class="form-control" id="toDate" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" />
         </div>
         <div class="col-md-3">
-            <label class="form-label small" for="source">Source</label>
+            <label class="form-label small" for="source">@T["Source"]</label>
             <select class="form-select" id="source" name="source">
-                <option value="">All sources</option>
+                <option value="">@T["All sources"]</option>
                 @foreach (var s in sources)
                 {
                     <option value="@s.Key" selected="@(s.Key == Model.Source ? "selected" : null)">@s.Label</option>
@@ -51,19 +51,19 @@
             </select>
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small" for="status">Status</label>
+            <label class="form-label small" for="status">@T["Status"]</label>
             <select class="form-select" id="status" name="status">
-                <option value="@GeneralJournalReportService.StatusPosted" selected="@(Model.Status == GeneralJournalReportService.StatusPosted ? "selected" : null)">Posted</option>
-                <option value="@GeneralJournalReportService.StatusDraft" selected="@(Model.Status == GeneralJournalReportService.StatusDraft ? "selected" : null)">Drafts only</option>
-                <option value="@GeneralJournalReportService.StatusAll" selected="@(Model.Status == GeneralJournalReportService.StatusAll ? "selected" : null)">All</option>
+                <option value="@GeneralJournalReportService.StatusPosted" selected="@(Model.Status == GeneralJournalReportService.StatusPosted ? "selected" : null)">@T["Posted"]</option>
+                <option value="@GeneralJournalReportService.StatusDraft" selected="@(Model.Status == GeneralJournalReportService.StatusDraft ? "selected" : null)">@T["Drafts only"]</option>
+                <option value="@GeneralJournalReportService.StatusAll" selected="@(Model.Status == GeneralJournalReportService.StatusAll ? "selected" : null)">@T["All"]</option>
             </select>
         </div>
         <div class="col-6 col-md-2">
-            <label class="form-label small" for="search">Entry / document no.</label>
-            <input class="form-control" id="search" name="search" value="@Model.Search" placeholder="e.g. BILL-2026" />
+            <label class="form-label small" for="search">@T["Entry / document no."]</label>
+            <input class="form-control" id="search" name="search" value="@Model.Search" placeholder="@T["e.g. BILL-2026"]" />
         </div>
         <div class="col-md-1 d-grid">
-            <button type="submit" class="btn btn-dark">Show</button>
+            <button type="submit" class="btn btn-dark">@T["Show"]</button>
         </div>
     </div>
 </form>
@@ -71,7 +71,7 @@
 <div class="row g-3 mb-3">
     <div class="col-md-4">
         <div class="card shadow-sm h-100"><div class="card-body">
-            <div class="text-muted small">Entries</div>
+            <div class="text-muted small">@T["Entries"]</div>
             <div class="fs-4 fw-semibold">@Model.Entries.Count</div>
             <div class="small @(balanced ? "text-success" : "text-danger")">
                 Debits @Model.TotalDebit.ToString("N2") · Credits @Model.TotalCredit.ToString("N2") @(balanced ? "· balanced" : "· NOT balanced")
@@ -80,10 +80,10 @@
     </div>
     <div class="col-md-8">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white small fw-semibold">By source</div>
+            <div class="card-header bg-white small fw-semibold">@T["By source"]</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>Source</th><th class="text-end">Entries</th><th class="text-end">Amount</th></tr></thead>
+                    <thead class="table-light"><tr><th>@T["Source"]</th><th class="text-end">@T["Entries"]</th><th class="text-end">@T["Amount"]</th></tr></thead>
                     <tbody>
                         @foreach (var s in Model.BySource)
                         {
@@ -91,7 +91,7 @@
                         }
                         @if (Model.BySource.Count == 0)
                         {
-                            <tr><td colspan="3" class="text-muted">No entries.</td></tr>
+                            <tr><td colspan="3" class="text-muted">@T["No entries."]</td></tr>
                         }
                     </tbody>
                 </table>
@@ -104,12 +104,12 @@
     <table class="table table-sm align-middle">
         <thead class="table-dark">
             <tr>
-                <th style="width:110px">Date</th>
-                <th>Account</th>
-                <th>Description</th>
-                <th>Property</th>
-                <th class="text-end" style="width:130px">Debit</th>
-                <th class="text-end" style="width:130px">Credit</th>
+                <th style="width:110px">@T["Date"]</th>
+                <th>@T["Account"]</th>
+                <th>@T["Description"]</th>
+                <th>@T["Property"]</th>
+                <th class="text-end" style="width:130px">@T["Debit"]</th>
+                <th class="text-end" style="width:130px">@T["Credit"]</th>
             </tr>
         </thead>
         <tbody>
@@ -118,11 +118,11 @@
             <tr class="gj-entry">
                 <td>@e.EntryDate.ToString("dd/MM/yyyy")</td>
                 <td colspan="5">
-                    <a asp-controller="Documents" asp-action="Entry" asp-route-id="@e.Id" class="fw-bold" title="Open the journal entry">@e.EntryNumber</a>
+                    <a asp-controller="Documents" asp-action="Entry" asp-route-id="@e.Id" class="fw-bold" title="@T["Open the journal entry"]">@e.EntryNumber</a>
                     <span class="ms-2">Source: <strong>@e.SourceLabel</strong></span>
                     @if (!string.IsNullOrEmpty(e.DocumentNumber) || e.SourceType != null)
                     {
-                        <span class="ms-1">· <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@e.Id" title="Open the original document">@(e.DocumentNumber ?? "open document")</a></span>
+                        <span class="ms-1">· <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@e.Id" title="@T["Open the original document"]">@(e.DocumentNumber ?? "open document")</a></span>
                     }
                     @if (!string.IsNullOrEmpty(e.ReferenceNumber))
                     {
@@ -158,12 +158,12 @@
         }
         @if (Model.Entries.Count == 0)
         {
-            <tr><td colspan="6" class="text-muted">No journal entries match these filters.</td></tr>
+            <tr><td colspan="6" class="text-muted">@T["No journal entries match these filters."]</td></tr>
         }
         </tbody>
         <tfoot>
             <tr class="table-light">
-                <th colspan="4">Total for the period</th>
+                <th colspan="4">@T["Total for the period"]</th>
                 <th class="text-end">@Model.TotalDebit.ToString("N2")</th>
                 <th class="text-end">@Model.TotalCredit.ToString("N2")</th>
             </tr>

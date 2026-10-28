@@ -1,15 +1,15 @@
 @model RealEstateManager.Models.PrepaymentScheduleListViewModel
 
 @{
-    ViewData["Title"] = "Recurring Prepayments";
+    ViewData["Title"] = T["Recurring Prepayments"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Recurring Prepayments</h2>
-        <div class="text-muted">Automate monthly release of prepaid rent, insurance, and similar items.</div>
+        <h2 class="mb-1">@T["Recurring Prepayments"]</h2>
+        <div class="text-muted">@T["Automate monthly release of prepaid rent, insurance, and similar items."]</div>
     </div>
-    <a asp-action="Create" class="btn btn-dark">New Prepayment Setup</a>
+    <a asp-action="Create" class="btn btn-dark">@T["New Prepayment Setup"]</a>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -26,7 +26,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Open Prepaid Balance</div>
+                <div class="text-muted small">@T["Open Prepaid Balance"]</div>
                 <div class="fs-4 fw-bold">@Model.OpenPrepaidBalance.ToString("N2")</div>
             </div>
         </div>
@@ -34,7 +34,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Due Recognition Amount</div>
+                <div class="text-muted small">@T["Due Recognition Amount"]</div>
                 <div class="fs-4 fw-bold">@Model.DueRecognitionAmount.ToString("N2")</div>
             </div>
         </div>
@@ -42,7 +42,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Due Lines</div>
+                <div class="text-muted small">@T["Due Lines"]</div>
                 <div class="fs-4 fw-bold">@Model.DueLineCount</div>
             </div>
         </div>
@@ -51,28 +51,28 @@
 
 <form method="get" class="row g-3 mb-3">
     <div class="col-md-3">
-        <label class="form-label">As Of Date</label>
+        <label class="form-label">@T["As Of Date"]</label>
         <input type="date" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">Show Completed</label>
+        <label class="form-label">@T["Show Completed"]</label>
         <select name="showPosted" class="form-select">
             @if (Model.ShowPosted)
             {
-                <option value="true" selected>Yes</option>
-                <option value="false">No</option>
+                <option value="true" selected>@T["Yes"]</option>
+                <option value="false">@T["No"]</option>
             }
             else
             {
-                <option value="true">Yes</option>
-                <option value="false" selected>No</option>
+                <option value="true">@T["Yes"]</option>
+                <option value="false" selected>@T["No"]</option>
             }
         </select>
     </div>
 
     <div class="col-md-6 d-flex align-items-end gap-2">
-        <button type="submit" class="btn btn-outline-secondary">Refresh</button>
+        <button type="submit" class="btn btn-outline-secondary">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -80,30 +80,30 @@
     @Html.AntiForgeryToken()
     <input type="hidden" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
     <input type="hidden" name="showPosted" value="@Model.ShowPosted.ToString().ToLower()" />
-    <button type="submit" class="btn btn-success">Post All Due Up To Selected Date</button>
+    <button type="submit" class="btn btn-success">@T["Post All Due Up To Selected Date"]</button>
 </form>
 
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Schedule</th>
-            <th>Type</th>
-            <th>Payment</th>
-            <th>First Recognition</th>
-            <th>Accounts</th>
-            <th>GL</th>
-            <th>Status</th>
-            <th class="text-end">Total</th>
-            <th class="text-end">Recognized</th>
-            <th class="text-end">Remaining</th>
-            <th class="text-end">Due</th>
+            <th>@T["Schedule"]</th>
+            <th>@T["Type"]</th>
+            <th>@T["Payment"]</th>
+            <th>@T["First Recognition"]</th>
+            <th>@T["Accounts"]</th>
+            <th>@T["GL"]</th>
+            <th>@T["Status"]</th>
+            <th class="text-end">@T["Total"]</th>
+            <th class="text-end">@T["Recognized"]</th>
+            <th class="text-end">@T["Remaining"]</th>
+            <th class="text-end">@T["Due"]</th>
         </tr>
     </thead>
     <tbody>
         @if (Model.Schedules.Count == 0)
         {
             <tr>
-                <td colspan="11" class="text-center text-muted py-4">No prepayment schedules found.</td>
+                <td colspan="11" class="text-center text-muted py-4">@T["No prepayment schedules found."]</td>
             </tr>
         }
         else

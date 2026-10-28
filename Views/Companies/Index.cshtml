@@ -1,16 +1,16 @@
 @model RealEstateManager.Models.CompanyListPageViewModel
 
 @{
-    ViewData["Title"] = "Companies / Branch Setup";
+    ViewData["Title"] = T["Companies / Branch Setup"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Companies / Branch Setup</h2>
-    <a asp-action="Create" class="btn btn-primary">Add Internal Company</a>
+    <h2 class="mb-0">@T["Companies / Branch Setup"]</h2>
+    <a asp-action="Create" class="btn btn-primary">@T["Add Internal Company"]</a>
 </div>
 
 <div class="alert alert-info">
-    New customer onboarding now starts from the login page. Use this internal screen only for additional company records under administration and future branch-style expansion.
+    @T["New customer onboarding now starts from the login page. Use this internal screen only for additional company records under administration and future branch-style expansion."]
 </div>
 
 <div class="row g-3 mb-4">
@@ -18,12 +18,12 @@
         <div class="card border-danger shadow-sm h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0 text-danger">Expired Subscriptions</h5>
+                    <h5 class="mb-0 text-danger">@T["Expired Subscriptions"]</h5>
                     <span class="badge bg-danger">@Model.ExpiredCompanies.Count</span>
                 </div>
                 @if (Model.ExpiredCompanies.Count == 0)
                 {
-                    <div class="text-muted small">No expired company subscriptions.</div>
+                    <div class="text-muted small">@T["No expired company subscriptions."]</div>
                 }
                 else
                 {
@@ -48,12 +48,12 @@
         <div class="card border-warning shadow-sm h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0 text-warning-emphasis">Expiring In 15 Days</h5>
+                    <h5 class="mb-0 text-warning-emphasis">@T["Expiring In 15 Days"]</h5>
                     <span class="badge bg-warning text-dark">@Model.ExpiringSoonCompanies.Count</span>
                 </div>
                 @if (Model.ExpiringSoonCompanies.Count == 0)
                 {
-                    <div class="text-muted small">No company subscriptions are close to expiry.</div>
+                    <div class="text-muted small">@T["No company subscriptions are close to expiry."]</div>
                 }
                 else
                 {
@@ -89,15 +89,15 @@
 <table class="table table-striped table-bordered align-middle">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Currency</th>
-            <th>Fiscal Start</th>
-            <th>Subscription</th>
-            <th>Access Until</th>
-            <th>Codes</th>
-            <th>Users</th>
-            <th>Created</th>
-            <th class="text-center">Actions</th>
+            <th>@T["Name"]</th>
+            <th>@T["Currency"]</th>
+            <th>@T["Fiscal Start"]</th>
+            <th>@T["Subscription"]</th>
+            <th>@T["Access Until"]</th>
+            <th>@T["Codes"]</th>
+            <th>@T["Users"]</th>
+            <th>@T["Created"]</th>
+            <th class="text-center">@T["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -113,7 +113,7 @@
                 <td>@item.UsersCount</td>
                 <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
                 <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">@T["Edit"]</a>
                 </td>
             </tr>
         }

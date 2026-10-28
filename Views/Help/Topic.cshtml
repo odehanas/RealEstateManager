@@ -3,9 +3,9 @@
     ViewData["Title"] = $"Help: {Model.Topic.Title}";
 }
 
-<nav aria-label="breadcrumb" class="mb-2">
+<nav aria-label="@T["breadcrumb"]" class="mb-2">
     <ol class="breadcrumb small mb-0">
-        <li class="breadcrumb-item"><a asp-action="Index">Help Center</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@T["Help Center"]</a></li>
         <li class="breadcrumb-item">@Model.Group.Title</li>
         <li class="breadcrumb-item active" aria-current="page">@Model.Topic.Title</li>
     </ol>
@@ -62,7 +62,7 @@
             <div class="card-footer bg-white small">
                 <a asp-action="Index">All topics</a> &middot;
                 <a asp-action="Manual" target="_blank">Full manual</a> &middot;
-                <a href="#" onclick="window.print(); return false;">Print this topic</a>
+                <a href="#" onclick="window.print(); return false;">@T["Print this topic"]</a>
             </div>
         </div>
     </div>

@@ -2,13 +2,13 @@
 @inject RealEstateManager.Services.PlatformOwnerService PlatformOwnerService
 
 @{
-    ViewData["Title"] = "Add User";
+    ViewData["Title"] = T["Add User"];
     var canGrantSystemAdmin = PlatformOwnerService.IsOwner(User);
     var scope = ViewBag.Scope as RealEstateManager.Models.UserAdminScope;
     var companyAdminOnly = scope?.IsCompanyAdminOnly == true;
 }
 
-<h2>Add User</h2>
+<h2>@T["Add User"]</h2>
 
 <form asp-action="Create" method="post" class="row g-3">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -40,7 +40,7 @@
     <div class="col-md-4">
         <label asp-for="DefaultCompanyId" class="form-label"></label>
         <select asp-for="DefaultCompanyId" class="form-select">
-            <option value="">Select default company</option>
+            <option value="">@T["Select default company"]</option>
             @foreach (var company in Model.Companies)
             {
                 <option value="@company.CompanyId">@company.CompanyName</option>
@@ -63,10 +63,9 @@
     }
 
     <div class="col-12">
-        <label class="form-label">Company Access</label>
+        <label class="form-label">@T["Company Access"]</label>
         <div class="form-text mb-2">
-            A company's <strong>administrator</strong> manages its users and their permissions. Tick it only together with
-            access to that company.
+            @T.Html("A company's <strong>administrator</strong> manages its users and their permissions. Tick it only together with access to that company.")
         </div>
         <div class="row">
             @for (var i = 0; i < Model.Companies.Count; i++)
@@ -81,7 +80,7 @@
                         </div>
                         <div class="form-check small ms-3">
                             <input asp-for="Companies[i].IsCompanyAdmin" class="form-check-input" />
-                            <label class="form-check-label" asp-for="Companies[i].IsCompanyAdmin">Administrator of this company</label>
+                            <label class="form-check-label" asp-for="Companies[i].IsCompanyAdmin">@T["Administrator of this company"]</label>
                         </div>
                     </div>
                 </div>
@@ -90,11 +89,11 @@
     </div>
 
     <div class="col-12">
-        <label class="form-label">Permission Assignment</label>
+        <label class="form-label">@T["Permission Assignment"]</label>
         @if (!companyAdminOnly)
         {
             <div class="alert alert-info py-2">
-                System Admin ignores the permission matrix and always has full access.
+                @T["System Admin ignores the permission matrix and always has full access."]
             </div>
         }
         <partial name="_RolePresets" />
@@ -125,8 +124,8 @@
     </div>
 
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">@T["Save"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@T["Back"]</a>
     </div>
 </form>
 

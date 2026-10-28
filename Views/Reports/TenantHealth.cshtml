@@ -1,6 +1,6 @@
 @model RealEstateManager.Services.TenantHealthReportDto
 @{
-    ViewData["Title"] = "Tenant Health & Ranking";
+    ViewData["Title"] = T["Tenant Health & Ranking"];
 
     string GradeClass(string grade) => grade switch
     {
@@ -33,22 +33,22 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">Tenant Health &amp; Ranking</h2>
+        <h2 class="mb-1">@T["Tenant Health & Ranking"]</h2>
         <p class="text-muted mb-0">
-            Every tenant scored on collections, overdue exposure, cheque reliability and tenure &mdash; ranked best first.
+            @T["Every tenant scored on collections, overdue exposure, cheque reliability and tenure — ranked best first."]
         </p>
     </div>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="asOfDate">As Of Date</label>
+        <label class="form-label mb-1" for="asOfDate">@T["As Of Date"]</label>
         <input type="date" class="form-control form-control-sm" id="asOfDate" name="asOfDate"
                value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -74,7 +74,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-danger text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Overdue</div>
+                <div class="small text-uppercase opacity-75">@T["Overdue"]</div>
                 <div class="h3 fw-bold mb-1">@Model.TotalOverdue.ToString("N2")</div>
                 <div class="small">Total outstanding @Model.TotalOutstanding.ToString("N2")</div>
             </div>
@@ -98,7 +98,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-dark text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Grade Mix</div>
+                <div class="small text-uppercase opacity-75">@T["Grade Mix"]</div>
                 <div class="h5 fw-bold mb-1">
                     A @Model.GradeCount("A") &middot; B @Model.GradeCount("B") &middot; C @Model.GradeCount("C")
                 </div>
@@ -110,7 +110,7 @@
 
 @if (Model.Rows.Count == 0)
 {
-    <div class="alert alert-info">No tenants have been registered yet.</div>
+    <div class="alert alert-info">@T["No tenants have been registered yet."]</div>
 }
 else
 {
@@ -120,26 +120,26 @@ else
                 <thead>
                     <tr>
                         <th class="text-center">#</th>
-                        <th>Code</th>
-                        <th class="name">Tenant</th>
-                        <th class="text-center">Grade</th>
-                        <th class="text-end" style="min-width:94px">Score</th>
-                        <th class="text-end">Invoiced</th>
-                        <th class="text-end">Collected</th>
-                        <th class="text-end">Collection %</th>
-                        <th class="text-end">Outstanding</th>
-                        <th class="text-end">Overdue</th>
-                        <th class="text-end">Oldest (days)</th>
-                        <th class="text-end">Avg Days To Pay</th>
-                        <th class="text-end">PDC Cleared</th>
-                        <th class="text-end">PDC Bounced</th>
-                        <th class="text-end">PDC On Hand</th>
-                        <th class="text-end">Deposit Held</th>
-                        <th class="text-end">Tenure (yrs)</th>
-                        <th class="text-end">Leases</th>
-                        <th>Current Contract</th>
-                        <th class="text-end">Term (mo)</th>
-                        <th class="text-end">Annual Rent</th>
+                        <th>@T["Code"]</th>
+                        <th class="name">@T["Tenant"]</th>
+                        <th class="text-center">@T["Grade"]</th>
+                        <th class="text-end" style="min-width:94px">@T["Score"]</th>
+                        <th class="text-end">@T["Invoiced"]</th>
+                        <th class="text-end">@T["Collected"]</th>
+                        <th class="text-end">@T["Collection %"]</th>
+                        <th class="text-end">@T["Outstanding"]</th>
+                        <th class="text-end">@T["Overdue"]</th>
+                        <th class="text-end">@T["Oldest (days)"]</th>
+                        <th class="text-end">@T["Avg Days To Pay"]</th>
+                        <th class="text-end">@T["PDC Cleared"]</th>
+                        <th class="text-end">@T["PDC Bounced"]</th>
+                        <th class="text-end">@T["PDC On Hand"]</th>
+                        <th class="text-end">@T["Deposit Held"]</th>
+                        <th class="text-end">@T["Tenure (yrs)"]</th>
+                        <th class="text-end">@T["Leases"]</th>
+                        <th>@T["Current Contract"]</th>
+                        <th class="text-end">@T["Term (mo)"]</th>
+                        <th class="text-end">@T["Annual Rent"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -154,7 +154,7 @@ else
                                 @row.TenantName
                                 @if (!row.IsActive)
                                 {
-                                    <span class="badge bg-secondary ms-1">Inactive</span>
+                                    <span class="badge bg-secondary ms-1">@T["Inactive"]</span>
                                 }
                                 @if (row.CurrentUnitDisplay != null)
                                 {
@@ -174,7 +174,7 @@ else
                                 }
                                 else
                                 {
-                                    <span class="text-muted">No activity</span>
+                                    <span class="text-muted">@T["No activity"]</span>
                                 }
                             </td>
                             <td class="text-end">@row.TotalInvoiced.ToString("N2")</td>
@@ -213,7 +213,7 @@ else
                                 }
                                 else
                                 {
-                                    <span class="text-muted">No active contract</span>
+                                    <span class="text-muted">@T["No active contract"]</span>
                                 }
                             </td>
                             <td class="text-end">@(row.CurrentContractTermMonths > 0 ? row.CurrentContractTermMonths.ToString() : "-")</td>
@@ -223,7 +223,7 @@ else
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="5">Portfolio Total</td>
+                        <td colspan="5">@T["Portfolio Total"]</td>
                         <td class="text-end">@Model.TotalInvoiced.ToString("N2")</td>
                         <td class="text-end">@Model.TotalCollected.ToString("N2")</td>
                         <td class="text-end">@Model.PortfolioCollectionRatio.ToString("N1")%</td>
@@ -240,18 +240,15 @@ else
 
     <div class="card shadow-sm mt-3">
         <div class="card-body py-3 small text-muted">
-            <strong class="text-dark">How the health score is calculated</strong>
+            <strong class="text-dark">@T["How the health score is calculated"]</strong>
             <p class="mb-2 mt-2">
-                Four components, each scored 0&ndash;100 and combined by weight. A component that cannot be
-                measured for a tenant &mdash; for example a tenant who has never issued a post-dated cheque &mdash;
-                is dropped and its weight is shared across the remaining components, so nobody is penalised for
-                the absence of a behaviour rather than for the behaviour itself.
+                @T["Four components, each scored 0–100 and combined by weight. A component that cannot be measured for a tenant — for example a tenant who has never issued a post-dated cheque — is dropped and its weight is shared across the remaining components, so nobody is penalised for the absence of a behaviour rather than for the behaviour itself."]
             </p>
             <ul class="mb-2">
-                <li><strong>Collection ratio &mdash; 40%.</strong> Total collected divided by total invoiced. The single strongest signal of a paying tenant.</li>
-                <li><strong>Overdue exposure &mdash; 30%.</strong> Overdue balance against total invoiced, inverted, then reduced by an ageing penalty of up to 30 points as the oldest overdue invoice passes 120 days.</li>
-                <li><strong>PDC reliability &mdash; 15%.</strong> Cleared cheque value divided by cleared plus bounced value. Measured only where cheques have actually been presented.</li>
-                <li><strong>Tenure &amp; commitment &mdash; 15%.</strong> Years occupied, capped at five years (70% of the component), plus current contract length, capped at 36 months (30%).</li>
+                <li>@T.Html("<strong>Collection ratio &mdash; 40%.</strong> Total collected divided by total invoiced. The single strongest signal of a paying tenant.")</li>
+                <li>@T.Html("<strong>Overdue exposure &mdash; 30%.</strong> Overdue balance against total invoiced, inverted, then reduced by an ageing penalty of up to 30 points as the oldest overdue invoice passes 120 days.")</li>
+                <li>@T.Html("<strong>PDC reliability &mdash; 15%.</strong> Cleared cheque value divided by cleared plus bounced value. Measured only where cheques have actually been presented.")</li>
+                <li>@T.Html("<strong>Tenure &amp; commitment &mdash; 15%.</strong> Years occupied, capped at five years (70% of the component), plus current contract length, capped at 36 months (30%).")</li>
             </ul>
             <p class="mb-0">
                 Grades: <span class="badge bg-success">A</span> 85+ &middot;

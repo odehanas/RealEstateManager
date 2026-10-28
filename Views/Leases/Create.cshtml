@@ -1,12 +1,12 @@
 @model RealEstateManager.Models.LeaseCreateViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Create Lease";
+    ViewData["Title"] = T["Create Lease"];
     var units = ViewBag.Units as List<Unit> ?? new();
     var tenants = ViewBag.Tenants as List<Tenant> ?? new();
 }
 
-<h2>Create Lease</h2>
+<h2>@T["Create Lease"]</h2>
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
@@ -15,19 +15,17 @@
 
     <div class="row g-3">
         <div class="col-md-4">
-            <label class="form-label">Contract Code</label>
+            <label class="form-label">@T["Contract Code"]</label>
             <input type="text" class="form-control bg-light" value="Generated on save" readonly />
             <div class="form-text">
-                Unit code + contract number + year, e.g. <code>OWN-R-0001-U01-C001-2026</code>.
-                Renewing with the <strong>same tenant on the same unit</strong> keeps the contract number and
-                moves the year on; a <strong>different tenant</strong> starts a new contract number.
+                @T.Html("Unit code + contract number + year, e.g. <code>OWN-R-0001-U01-C001-2026</code>. Renewing with the <strong>same tenant on the same unit</strong> keeps the contract number and moves the year on; a <strong>different tenant</strong> starts a new contract number.")
             </div>
         </div>
 
         <div class="col-md-4">
             <label asp-for="UnitId" class="form-label"></label>
             <select asp-for="UnitId" class="form-select">
-                <option value="">Select Unit</option>
+                <option value="">@T["Select Unit"]</option>
                 @foreach (var unit in units)
                 {
                     <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
@@ -38,7 +36,7 @@
         <div class="col-md-4">
             <label asp-for="TenantId" class="form-label"></label>
             <select asp-for="TenantId" class="form-select">
-                <option value="">Select Tenant</option>
+                <option value="">@T["Select Tenant"]</option>
                 @foreach (var tenant in tenants)
                 {
                     <option value="@tenant.Id">@tenant.Code - @tenant.FullName</option>
@@ -64,35 +62,32 @@
         <div class="col-md-3">
             <label asp-for="BillingFrequencyMonths" class="form-label"></label>
             <select asp-for="BillingFrequencyMonths" class="form-select">
-                <option value="1">Monthly</option>
-                <option value="2">Every 2 Months</option>
-                <option value="3">Quarterly</option>
-                <option value="4">Every 4 Months</option>
-                <option value="6">Semi-Annual</option>
-                <option value="12">Annual</option>
+                <option value="1">@T["Monthly"]</option>
+                <option value="2">@T["Every 2 Months"]</option>
+                <option value="3">@T["Quarterly"]</option>
+                <option value="4">@T["Every 4 Months"]</option>
+                <option value="6">@T["Semi-Annual"]</option>
+                <option value="12">@T["Annual"]</option>
             </select>
         </div>
 
         <div class="col-md-6">
-            <label asp-for="VatCategoryOverride" class="form-label">VAT Treatment</label>
+            <label asp-for="VatCategoryOverride" class="form-label">@T["VAT Treatment"]</label>
             <select asp-for="VatCategoryOverride" class="form-select" id="vatCategoryOverride">
-                <option value="">Use the unit's treatment (recommended)</option>
-                <option value="Standard">Override &mdash; Standard rated (5%)</option>
-                <option value="Exempt">Override &mdash; Exempt</option>
-                <option value="ZeroRated">Override &mdash; Zero rated (0%)</option>
+                <option value="">@T["Use the unit's treatment (recommended)"]</option>
+                <option value="Standard">@T["Override — Standard rated (5%)"]</option>
+                <option value="Exempt">@T["Override — Exempt"]</option>
+                <option value="ZeroRated">@T["Override — Zero rated (0%)"]</option>
             </select>
             <div class="form-text">
-                VAT is derived from the unit, falling back to the property. Commercial leases are standard rated;
-                residential leases are exempt, except the <strong>first</strong> lease of a unit in a new building
-                (within three years of its completion date), which is zero rated automatically. Override only for a
-                genuine exception, and say why.
+                @T.Html("VAT is derived from the unit, falling back to the property. Commercial leases are standard rated; residential leases are exempt, except the <strong>first</strong> lease of a unit in a new building (within three years of its completion date), which is zero rated automatically. Override only for a genuine exception, and say why.")
             </div>
         </div>
 
         <div class="col-md-6">
-            <label asp-for="VatOverrideReason" class="form-label">Reason For Override</label>
+            <label asp-for="VatOverrideReason" class="form-label">@T["Reason For Override"]</label>
             <input asp-for="VatOverrideReason" class="form-control" id="vatOverrideReason"
-                   placeholder="Required only when overriding" />
+                   placeholder="@T["Required only when overriding"]" />
             <span asp-validation-for="VatOverrideReason" class="text-danger"></span>
         </div>
 
@@ -110,14 +105,14 @@
     <div class="mt-4 d-flex flex-wrap gap-2">
         @if (ViewBag.ApprovalRequired is true)
         {
-            <button type="submit" name="nextStep" value="submit" class="btn btn-warning">Save and Submit for Approval</button>
+            <button type="submit" name="nextStep" value="submit" class="btn btn-warning">@T["Save and Submit for Approval"]</button>
         }
         else
         {
-            <button type="submit" name="nextStep" value="activate" class="btn btn-dark">Save and Activate</button>
+            <button type="submit" name="nextStep" value="activate" class="btn btn-dark">@T["Save and Activate"]</button>
         }
-        <button type="submit" name="nextStep" value="draft" class="btn btn-outline-dark">Save as Draft</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" name="nextStep" value="draft" class="btn btn-outline-dark">@T["Save as Draft"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
     <div class="form-text mt-2">
         @if (ViewBag.ApprovalRequired is true)

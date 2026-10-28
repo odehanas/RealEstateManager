@@ -1,10 +1,10 @@
 ﻿@model RealEstateManager.Models.PdcClearViewModel
 
 @{
-    ViewData["Title"] = "Clear PDC";
+    ViewData["Title"] = T["Clear PDC"];
 }
 
-<h2>Clear PDC</h2>
+<h2>@T["Clear PDC"]</h2>
 
 @if (Model.DepositedDate.HasValue)
 {
@@ -29,27 +29,27 @@ else
 
     <div class="row g-3">
         <div class="col-md-4">
-            <label asp-for="ChequeNumber" class="form-label">Cheque Number</label>
+            <label asp-for="ChequeNumber" class="form-label">@T["Cheque Number"]</label>
             <input asp-for="ChequeNumber" class="form-control" readonly />
         </div>
 
         <div class="col-md-4">
-            <label asp-for="BankName" class="form-label">Bank</label>
+            <label asp-for="BankName" class="form-label">@T["Bank"]</label>
             <input asp-for="BankName" class="form-control" readonly />
         </div>
 
         <div class="col-md-4">
-            <label asp-for="SettlementMode" class="form-label">Settlement Mode</label>
+            <label asp-for="SettlementMode" class="form-label">@T["Settlement Mode"]</label>
             <input asp-for="SettlementMode" class="form-control" readonly />
         </div>
 
         <div class="col-md-4">
-            <label asp-for="LeaseDisplay" class="form-label">Lease</label>
+            <label asp-for="LeaseDisplay" class="form-label">@T["Lease"]</label>
             <input asp-for="LeaseDisplay" class="form-control" readonly />
         </div>
 
         <div class="col-md-4">
-            <label asp-for="InvoiceDisplay" class="form-label">Invoice</label>
+            <label asp-for="InvoiceDisplay" class="form-label">@T["Invoice"]</label>
             <input asp-for="InvoiceDisplay" class="form-control" readonly />
         </div>
 
@@ -69,9 +69,9 @@ else
         </div>
 
         <div class="col-md-4">
-            <label asp-for="ClearedDate" class="form-label">Cleared Date &mdash; accounting date</label>
+            <label asp-for="ClearedDate" class="form-label">@T["Cleared Date — accounting date"]</label>
             <input asp-for="ClearedDate" type="date" class="form-control" />
-            <div class="form-text">The day the bank honoured the cheque. The cash entry posts on this date.</div>
+            <div class="form-text">@T["The day the bank honoured the cheque. The cash entry posts on this date."]</div>
         </div>
     </div>
 
@@ -92,7 +92,7 @@ else
             <div class="form-check">
                 <input asp-for="ConfirmEarlyClearance" class="form-check-input" id="confirmEarly" />
                 <label class="form-check-label fw-semibold" for="confirmEarly">
-                    I confirm this cheque was honoured on the cleared date shown above.
+                    @T["I confirm this cheque was honoured on the cleared date shown above."]
                 </label>
             </div>
         </div>
@@ -102,7 +102,7 @@ else
         <button type="submit" class="btn @(Model.RequiresEarlyClearanceConfirmation ? "btn-warning" : "btn-dark")">
             @(Model.RequiresEarlyClearanceConfirmation ? "Confirm and Post" : "Clear and Post")
         </button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

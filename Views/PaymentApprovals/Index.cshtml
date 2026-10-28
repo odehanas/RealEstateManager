@@ -2,15 +2,15 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Payment Approvals";
+    ViewData["Title"] = T["Payment Approvals"];
     var blocks = (Dictionary<int, string?>)ViewBag.Blocks;
     bool all = ViewBag.All;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">Payment Approvals</h2>
-        <div class="text-muted">Payments held until someone whose authority covers the amount releases them. Nobody releases a payment they entered.</div>
+        <h2 class="mb-0">@T["Payment Approvals"]</h2>
+        <div class="text-muted">@T["Payments held until someone whose authority covers the amount releases them. Nobody releases a payment they entered."]</div>
     </div>
     <a asp-action="Index" asp-route-all="@(!all)" class="btn btn-outline-dark">@(all ? "Waiting only" : "Show decided too")</a>
 </div>
@@ -20,7 +20,7 @@
 
 @if (Model.Count == 0)
 {
-    <div class="alert alert-light border">Nothing is waiting.</div>
+    <div class="alert alert-light border">@T["Nothing is waiting."]</div>
 }
 
 @foreach (var a in Model)
@@ -43,7 +43,7 @@
             @if (a.JournalEntry != null)
             {
                 <table class="table table-sm mb-2">
-                    <tr><th>Account</th><th>Details</th><th class="text-end">Debit</th><th class="text-end">Credit</th></tr>
+                    <tr><th>@T["Account"]</th><th>@T["Details"]</th><th class="text-end">@T["Debit"]</th><th class="text-end">@T["Credit"]</th></tr>
                     @foreach (var l in a.JournalEntry.Lines)
                     {
                         <tr><td>@l.Account?.Code @l.Account?.Name</td><td class="small">@l.Description</td><td class="text-end">@(l.Debit == 0 ? "" : l.Debit.ToString("N2"))</td><td class="text-end">@(l.Credit == 0 ? "" : l.Credit.ToString("N2"))</td></tr>
@@ -64,9 +64,9 @@
                 <form method="post" class="d-flex flex-wrap gap-2">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@a.Id" />
-                    <input name="comment" class="form-control" style="max-width:420px" placeholder="Comment (required to turn down)" />
-                    <button class="btn btn-success" asp-action="Approve" onclick="return confirm('Release and post this payment of @a.Amount.ToString("N2")?');">Approve &amp; release</button>
-                    <button class="btn btn-outline-danger" asp-action="Reject">Turn down</button>
+                    <input name="comment" class="form-control" style="max-width:420px" placeholder="@T["Comment (required to turn down)"]" />
+                    <button class="btn btn-success" asp-action="Approve" onclick="return confirm('Release and post this payment of @a.Amount.ToString("N2")?');">@T["Approve & release"]</button>
+                    <button class="btn btn-outline-danger" asp-action="Reject">@T["Turn down"]</button>
                 </form>
             }
         </div>

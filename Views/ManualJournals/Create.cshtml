@@ -2,7 +2,7 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Create Manual Journal";
+    ViewData["Title"] = T["Create Manual Journal"];
 
     var accounts = ViewBag.Accounts as List<Account> ?? new();
     var units = ViewBag.Units as List<Unit> ?? new();
@@ -25,7 +25,7 @@
     tr.owner-line td { border-color: #e8d9a8; }
 </style>
 
-<h2>Create Manual Journal</h2>
+<h2>@T["Create Manual Journal"]</h2>
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
@@ -60,14 +60,14 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <h4 class="mb-0">Journal Lines</h4>
+        <h4 class="mb-0">@T["Journal Lines"]</h4>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleOwnerCategory"
-                    title="Show or hide the owner withdrawal category column" aria-expanded="@(showOwnerCategory ? "true" : "false")">
+                    title="@T["Show or hide the owner withdrawal category column"]" aria-expanded="@(showOwnerCategory ? "true" : "false")">
                 <span id="ownerCategorySign">@(showOwnerCategory ? "−" : "+")</span> Owner withdrawal category
             </button>
             <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleAdvancedRefs">
-                Show / Hide Advanced References
+                @T["Show / Hide Advanced References"]
             </button>
         </div>
     </div>
@@ -76,19 +76,19 @@
         <table class="table table-bordered table-striped align-middle">
             <thead>
                 <tr>
-                    <th style="min-width: 240px;">Account</th>
-                    <th style="min-width: 180px;">Line Memo</th>
-                    <th style="min-width: 140px;">Unit Cost Center</th>
-                    <th style="min-width: 190px;" class="@ownerColumnClass">Owner Withdrawal Category</th>
+                    <th style="min-width: 240px;">@T["Account"]</th>
+                    <th style="min-width: 180px;">@T["Line Memo"]</th>
+                    <th style="min-width: 140px;">@T["Unit Cost Center"]</th>
+                    <th style="min-width: 190px;" class="@ownerColumnClass">@T["Owner Withdrawal Category"]</th>
                     @if (projects.Count > 0)
                     {
-                        <th style="min-width: 220px;">Development Cost</th>
+                        <th style="min-width: 220px;">@T["Development Cost"]</th>
                     }
-                    <th class="text-end" style="min-width: 120px;">Debit</th>
-                    <th class="text-end" style="min-width: 120px;">Credit</th>
-                    <th class="advanced-ref d-none" style="min-width: 160px;">Tenant (AR)</th>
-                    <th class="advanced-ref d-none" style="min-width: 160px;">Vendor (AP)</th>
-                    <th class="advanced-ref d-none" style="min-width: 180px;">Lease</th>
+                    <th class="text-end" style="min-width: 120px;">@T["Debit"]</th>
+                    <th class="text-end" style="min-width: 120px;">@T["Credit"]</th>
+                    <th class="advanced-ref d-none" style="min-width: 160px;">@T["Tenant (AR)"]</th>
+                    <th class="advanced-ref d-none" style="min-width: 160px;">@T["Vendor (AP)"]</th>
+                    <th class="advanced-ref d-none" style="min-width: 180px;">@T["Lease"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,7 +97,7 @@
                     <tr>
                         <td>
                             <select asp-for="Lines[@i].AccountId" class="form-select">
-                                <option value="">Select Account</option>
+                                <option value="">@T["Select Account"]</option>
                                 @foreach (var account in accounts)
                                 {
                                     <option value="@account.Id">@account.Code - @account.Name</option>
@@ -111,7 +111,7 @@
 
                         <td>
                             <select asp-for="Lines[@i].UnitId" class="form-select">
-                                <option value="">No Cost Center</option>
+                                <option value="">@T["No Cost Center"]</option>
                                 @foreach (var unit in units)
                                 {
                                     <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
@@ -121,7 +121,7 @@
 
                         <td class="owner-cat-cell @ownerColumnClass">
                             <select asp-for="Lines[@i].OwnerWithdrawalCategoryId" class="form-select owner-category">
-                                <option value="">Not applicable</option>
+                                <option value="">@T["Not applicable"]</option>
                                 @foreach (var category in ownerCategories)
                                 {
                                     <option value="@category.Id">@category.Code - @category.Name</option>
@@ -133,7 +133,7 @@
                         {
                             <td>
                                 <select name="Lines[@i].DevelopmentCost" class="form-select line-project">
-                                    <option value="">Not applicable</option>
+                                    <option value="">@T["Not applicable"]</option>
                                     @foreach (var project in projects)
                                     {
                                         <optgroup label="@project.ProjectLabel">
@@ -161,7 +161,7 @@
 
                         <td class="advanced-ref d-none">
                             <select asp-for="Lines[@i].TenantId" class="form-select">
-                                <option value="">None</option>
+                                <option value="">@T["None"]</option>
                                 @foreach (var tenant in tenants)
                                 {
                                     <option value="@tenant.Id">@tenant.Code - @tenant.FullName</option>
@@ -171,7 +171,7 @@
 
                         <td class="advanced-ref d-none">
                             <select asp-for="Lines[@i].VendorId" class="form-select">
-                                <option value="">None</option>
+                                <option value="">@T["None"]</option>
                                 @foreach (var vendor in vendors)
                                 {
                                     <option value="@vendor.Id">@vendor.Code - @vendor.Name</option>
@@ -181,7 +181,7 @@
 
                         <td class="advanced-ref d-none">
                             <select asp-for="Lines[@i].LeaseId" class="form-select">
-                                <option value="">None</option>
+                                <option value="">@T["None"]</option>
                                 @foreach (var lease in leases)
                                 {
                                     <option value="@lease.Id">@lease.ContractNumber - @lease.Tenant?.FullName</option>
@@ -195,7 +195,7 @@
     </div>
 
     <div class="alert alert-light border small @ownerColumnClass">
-        <strong>Owner Withdrawal Category.</strong>
+        <strong>@T["Owner Withdrawal Category."]</strong>
         This column becomes available only on a line posted to an account flagged as an
         <em>owner's current account</em> (equity). It is the analysis dimension for the owner's own
         expenditure and is deliberately separate from both the chart of accounts &mdash; which belongs to the
@@ -208,11 +208,10 @@
         @* Saved as a DRAFT - it reaches the accounts only when posted from Journal Inquiry.
            The button used to say "Save and Post", which is why posted-looking journals were
            missing from the Trial Balance. *@
-        <button type="submit" class="btn btn-dark">Save as Draft</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" class="btn btn-dark">@T["Save as Draft"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
         <div class="form-text mt-2">
-            The journal is saved as a draft. Post it from <strong>Operations &rsaquo; Journal Inquiry</strong>
-            to put it into the accounts.
+            @T.Html("The journal is saved as a draft. Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> to put it into the accounts.")
         </div>
     </div>
 </form>

@@ -1,12 +1,12 @@
 @model List<RealEstateManager.Domain.EmployeeRequest>
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Employee Requests";
+    ViewData["Title"] = T["Employee Requests"];
     var status = (string)ViewBag.Status;
 }
 
-<h2>Employee Requests</h2>
-<p class="text-muted">Certificates and letters employees asked for in the employee portal (/me). Issuing gives the letter a reference number; the employee then prints it from their phone.</p>
+<h2>@T["Employee Requests"]</h2>
+<p class="text-muted">@T["Certificates and letters employees asked for in the employee portal (/me). Issuing gives the letter a reference number; the employee then prints it from their phone."]</p>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
 @if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
@@ -21,9 +21,9 @@
 <div class="card shadow-sm">
     <div class="table-responsive">
         <table class="table table-sm align-middle mb-0">
-            <thead class="table-light"><tr><th>Asked</th><th>Employee</th><th>Document</th><th>Addressed to</th><th>Purpose</th><th>Status</th><th></th></tr></thead>
+            <thead class="table-light"><tr><th>@T["Asked"]</th><th>@T["Employee"]</th><th>@T["Document"]</th><th>@T["Addressed to"]</th><th>@T["Purpose"]</th><th>@T["Status"]</th><th></th></tr></thead>
             <tbody>
-            @if (Model.Count == 0) { <tr><td colspan="7" class="text-muted text-center py-3">Nothing here.</td></tr> }
+            @if (Model.Count == 0) { <tr><td colspan="7" class="text-muted text-center py-3">@T["Nothing here."]</td></tr> }
             @foreach (var r in Model)
             {
                 <tr>
@@ -36,16 +36,16 @@
                     <td class="text-end text-nowrap">
                         @if (r.Status == EmployeeRequestStatuses.Pending)
                         {
-                            <form asp-action="Issue" asp-route-id="@r.Id" method="post" class="d-inline">@Html.AntiForgeryToken()<button class="btn btn-sm btn-success">Issue</button></form>
+                            <form asp-action="Issue" asp-route-id="@r.Id" method="post" class="d-inline">@Html.AntiForgeryToken()<button class="btn btn-sm btn-success">@T["Issue"]</button></form>
                             <form asp-action="Decline" asp-route-id="@r.Id" method="post" class="d-inline-flex gap-1">
                                 @Html.AntiForgeryToken()
-                                <input name="comment" class="form-control form-control-sm" placeholder="Reason" style="width:140px" />
-                                <button class="btn btn-sm btn-outline-danger">Decline</button>
+                                <input name="comment" class="form-control form-control-sm" placeholder="@T["Reason"]" style="width:140px" />
+                                <button class="btn btn-sm btn-outline-danger">@T["Decline"]</button>
                             </form>
                         }
                         else if (r.Status == EmployeeRequestStatuses.Issued)
                         {
-                            <a asp-action="Certificate" asp-route-id="@r.Id" target="_blank" class="btn btn-sm btn-outline-primary">Print</a>
+                            <a asp-action="Certificate" asp-route-id="@r.Id" target="_blank" class="btn btn-sm btn-outline-primary">@T["Print"]</a>
                         }
                     </td>
                 </tr>

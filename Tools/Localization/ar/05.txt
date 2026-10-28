@@ -1,0 +1,331 @@
+# Sheet 5: Marital status ... Our output VAT on recharges
+Marital status ||| الحالة الاجتماعية
+Mark as done ||| تحديد كمنجز
+Mark complete ||| تحديد كمكتمل
+Mark the day for everyone ||| سجّل اليوم للجميع، أو استورد الملف من جهاز الحضور والانصراف.
+Mark the request <strong>Resolved</strong> ||| حدد الطلب <strong>تم حله</strong> بعد الاتفاق على الشروط مع المستأجر. يظهر زر تغيير تاريخ استحقاق الفاتورة بعد ذلك.
+Mark the units of two floors ||| حدد وحدات طابقين أحدهما فوق الآخر. تُقاس المسافة بينهما، وتُكرر مخططات الطابق العلوي في كل طابق حتى الأخير - مطابقةً لوحداته من اليسار إلى اليمين. راجع النتيجة وصحح أي مخطط غير دقيق.
+Mark ticked as sent ||| تحديد المحدد كمُرسل
+Mark units ||| تحديد الوحدات
+Marks a postable <strong>Asset</strong> account ||| يحدد حساب <strong>أصول</strong> قابلاً للترحيل كعهدة نثرية، فيظهر في دفتر النثرية برصيده الخاص. يُتجاهل في أنواع الحسابات الأخرى.
+Marks a postable <strong>Equity</strong> account ||| يحدد حساب <strong>حقوق ملكية</strong> قابلاً للترحيل كحساب جارٍ للمالك. يمكن عندها أن تحمل بنود القيود المرحّلة إليه فئة مسحوبات المالك. يُتجاهل في أنواع الحسابات الأخرى.
+Married ||| متزوج
+Master Data ||| البيانات الرئيسية
+Matches this supplier's e-invoices ||| يربط الفواتير الإلكترونية لهذا المورد بهذا السجل. اتركه فارغاً إذا كان له رقم تسجيل ضريبي — رقم التعريف الضريبي هو أول 10 أرقام منه.
+Materials ||| المواد
+Materials used ||| المواد المستخدمة
+May approve ||| يمكنه الاعتماد
+May approve up to ||| يمكنه الاعتماد حتى
+Measure your cheque leaf with a ruler ||| قِس ورقة الشيك بالمسطرة: كل موضع بالمليمتر من <strong>الزاوية العلوية اليسرى</strong> للشيك حتى بداية الحقل. اطبع الاختبار على ورق عادي، وضعه فوق شيك حقيقي مقابل الضوء، وصحح الإزاحات حتى يقع كل حقل على سطره. احفظ بعد كل تغيير.
+Memorandum entry ||| القيد النظامي
+Message ||| الرسالة
+Method ||| الطريقة
+Method / ref. ||| الطريقة / المرجع
+Method / reference ||| الطريقة / المرجع
+Mix ||| التوزيع
+MixedUse ||| متعدد الاستخدام
+Mnt. ||| صيانة
+Mobile ||| الجوال
+Mobile · Email ||| الجوال · البريد الإلكتروني
+Mode ||| الطريقة
+Money advanced to staff is an asset ||| المبالغ المقدمة للموظفين أصل (11600 سلف الموظفين) حتى يستردها كشف الرواتب، بقسط شهري.
+Money in / out in the period ||| المبالغ الواردة / الصادرة في الفترة
+Money the owner takes out of the business ||| المبالغ التي يسحبها المالك من الشركة لاستخدامه الشخصي. ليست مصروفاً للشركة، فلا تصل إلى الأرباح والخسائر: تُحمّل مباشرة على <strong>الحساب الجاري للمالك</strong> (حقوق الملكية)، مع فئة توضح الغرض، وتُدفع من الحساب الذي تختاره. تمنح الفئات المالك تقريراً عن أوجه صرف مسحوباته.
+Month ||| الشهر
+Month ending ||| نهاية الشهر
+Month summary & payroll ||| ملخص الشهر والرواتب
+Monthly ||| شهري
+Monthly Depreciation ||| الإهلاك الشهري
+Monthly gross ||| الإجمالي الشهري
+Monthly recovery ||| الاسترداد الشهري
+Months ||| الأشهر
+Mortgage ||| الرهن
+Most dot matrix printers print ||| تطبع معظم الطابعات النقطية 10 أحرف و6 أسطر في البوصة في الوضع النصي. اطبع الملف المنزّل باستخدام برنامج تشغيل الطابعة <strong>Generic / Text Only</strong> (مثلاً <code>copy cheques.txt LPT1</code>، أو المفكرة مع اختيار تلك الطابعة)، مع ضبط طول الورقة على ارتفاع الشيك.
+Movements ||| الحركات
+Movements on the owner's equity account ||| الحركات على حساب حقوق ملكية المالك، محللة حسب أوجه صرف المال — دون المساس بحسابات مصروفات الشركة.
+Moves the project from planning ||| ينقل المشروع من التخطيط إلى قيد الإنشاء. تسجيل أول تكلفة يفعل ذلك أيضاً.
+Mute ||| كتم الصوت
+My Account ||| حسابي
+My Contracts ||| عقودي
+My Invoices ||| فواتيري
+My Payments ||| مدفوعاتي
+My Profile ||| ملفي الشخصي
+My Requests ||| طلباتي
+My Statement ||| كشف حسابي
+My leave ||| إجازاتي
+My monthly package ||| مستحقاتي الشهرية
+My payslips ||| قسائم رواتبي
+My requests ||| طلباتي
+NBV ||| صافي القيمة الدفترية
+Name ||| الاسم
+Name in Arabic ||| الاسم بالعربية
+Nationality ||| الجنسية
+Natural balance (debit-positive for Asset / Expense, credit-positive for Liability / Equity / Revenue). Leave 0 ||| الرصيد الطبيعي (موجب مدين للأصول / المصروفات، وموجب دائن للالتزامات / حقوق الملكية / الإيرادات). اتركه 0 إذا لم يوجد رصيد افتتاحي.
+Natural balance (debit-positive for Asset / Expense, credit-positive for Liability / Equity / Revenue). Leave at 0 ||| الرصيد الطبيعي (موجب مدين للأصول / المصروفات، وموجب دائن للالتزامات / حقوق الملكية / الإيرادات). اتركه 0 إذا لم يوجد رصيد افتتاحي. حسابات مراقبة الدفاتر الفرعية (الذمم المدينة والذمم الدائنة والأصول الثابتة) تستمد رصيدها الافتتاحي تلقائياً من تفاصيل الدفاتر الفرعية.
+Need help? ||| تحتاج إلى مساعدة؟
+Needs your attention ||| يحتاج إلى انتباهك
+Net ||| الصافي
+Net Amount ||| المبلغ الصافي
+Net Book Value ||| صافي القيمة الدفترية
+Net Imbalance (Dr - Cr) ||| صافي عدم التوازن (مدين - دائن)
+Net Margin % ||| هامش الربح الصافي %
+Net Movement ||| صافي الحركة
+Net Posted ||| الصافي المرحّل
+Net Profit / (Loss) ||| صافي الربح / (الخسارة)
+Net amount to credit ||| صافي المبلغ للإشعار الدائن
+Net cash from financing activities ||| صافي النقد من الأنشطة التمويلية
+Net cash from investing activities ||| صافي النقد من الأنشطة الاستثمارية
+Net cash from operating activities ||| صافي النقد من الأنشطة التشغيلية
+Net income ||| صافي الدخل
+Net increase / (decrease) in cash ||| صافي الزيادة / (النقص) في النقد
+Net profit / (loss) ||| صافي الربح / (الخسارة)
+Net profit this year ||| صافي ربح هذه السنة
+New ||| جديد
+New Account ||| حساب جديد
+New Bill ||| فاتورة مورد جديدة
+New Category ||| فئة جديدة
+New Customer Onboarding ||| تسجيل عميل جديد
+New Customer? ||| عميل جديد؟
+New Expense Voucher ||| سند مصروف جديد
+New Manual Journal ||| قيد يدوي جديد
+New Owner Withdrawal Category ||| فئة مسحوبات مالك جديدة
+New Prepayment Setup ||| إعداد مدفوعات مقدمة جديد
+New Project ||| مشروع جديد
+New Receipt ||| سند قبض جديد
+New Request ||| طلب جديد
+New Sale Contract ||| عقد بيع جديد
+New Vendor Payment ||| دفعة مورد جديدة
+New cheque ||| شيك جديد
+New customer onboarding now starts ||| يبدأ تسجيل العملاء الجدد الآن من صفحة تسجيل الدخول. استخدم هذه الشاشة الداخلية فقط لسجلات الشركات الإضافية تحت الإدارة وللتوسع المستقبلي بنمط الفروع.
+New department, e.g. Building Maintenance ||| قسم جديد، مثل: صيانة المباني
+New password ||| كلمة المرور الجديدة
+New request ||| طلب جديد
+New transaction ||| حركة جديدة
+Next free <code>TNT-00001</code> in sequence. ||| الرقم المتاح التالي <code>TNT-00001</code> في التسلسل.
+Next free <code>VEN-0001</code> in sequence. ||| الرقم المتاح التالي <code>VEN-0001</code> في التسلسل.
+Next payment due ||| الدفعة المستحقة التالية
+No ||| لا
+No Cost Center ||| بدون مركز تكلفة
+No PDC activity found. ||| لا توجد حركات شيكات مؤجلة.
+No Parent ||| بدون حساب رئيسي
+No account ||| لا يوجد حساب
+No account is currently flagged ||| لا يوجد حساب محدد حالياً كحساب جارٍ للمالك. افتح <strong>الإعداد &rsaquo; دليل الحسابات</strong>، وعدّل حساب حقوق الملكية المستخدم (مثل <code>34100</code>)، وحدد <strong>حساب مالك</strong>. حتى ذلك الحين يبقى عمود الفئة في دفتر اليومية العام معطلاً في كل البنود.
+No accounts found. ||| لا توجد حسابات.
+No acquisition costs have been recorded. ||| لم تُسجل تكاليف اقتناء.
+No activation codes generated yet. ||| لم تُنشأ رموز تفعيل بعد.
+No active contract ||| لا يوجد عقد نافذ
+No active lease ||| لا يوجد عقد نافذ
+No activity ||| لا يوجد نشاط
+No activity in this period. ||| لا يوجد نشاط في هذه الفترة.
+No advances. ||| لا توجد سلف.
+No attested contract is on file ||| لا توجد نسخة موثقة من هذا العقد في الملف بعد.
+No audit records found. ||| لا توجد سجلات تدقيق.
+No authority ||| بدون صلاحية
+No capital assets registered. ||| لا توجد أصول رأسمالية مسجلة.
+No categories have been created yet. ||| لم تُنشأ أي فئات بعد.
+No changes yet. ||| لا توجد تغييرات بعد.
+No cheques on record. ||| لا توجد شيكات مسجلة.
+No commission invoiced to this owner yet. ||| لم تُفوتر عمولة لهذا المالك بعد. تُصدر الفواتير في نهاية الشهر من صفحة تسويات الملاك.
+No commission invoices yet. ||| لا توجد فواتير عمولة بعد.
+No company subscriptions are close to expiry. ||| لا توجد اشتراكات شركات قاربت على الانتهاء.
+No contracts on record. ||| لا توجد عقود مسجلة.
+No contracts on this owner's properties ||| لا توجد عقود على عقارات هذا المالك حتى هذا التاريخ.
+No cost center ||| بدون مركز تكلفة
+No credit notes yet. ||| لا توجد إشعارات دائنة بعد.
+No depreciation schedules found. ||| لا توجد جداول إهلاك.
+No development projects yet. ||| لا توجد مشاريع تطوير بعد.
+No documents attached yet. ||| لا توجد مستندات مرفقة بعد.
+No documents uploaded. ||| لم تُرفع مستندات.
+No employees found. ||| لا يوجد موظفون.
+No entries. ||| لا توجد قيود.
+No expired company subscriptions. ||| لا توجد اشتراكات شركات منتهية.
+No feedback has been submitted for this company yet. ||| لم تُقدم ملاحظات لهذه الشركة بعد.
+No feedback items found. ||| لا توجد ملاحظات.
+No financing cash movements in this period. ||| لا توجد حركات نقدية تمويلية في هذه الفترة.
+No fixed asset opening balances captured. ||| لم تُسجل أرصدة افتتاحية للأصول الثابتة.
+No fixed assets found. ||| لا توجد أصول ثابتة.
+No investing cash movements in this period. ||| لا توجد حركات نقدية استثمارية في هذه الفترة.
+No investment property recorded. ||| لا توجد عقارات استثمارية مسجلة.
+No invoices found. ||| لا توجد فواتير.
+No jobs to show. ||| لا توجد أعمال لعرضها.
+No journal entries match these filters. ||| لا توجد قيود تطابق عوامل التصفية هذه.
+No journal entry has been created yet ||| لم يُنشأ قيد يومية بعد
+No leave yet. ||| لا توجد إجازات بعد.
+No linked invoice ||| لا توجد فاتورة مرتبطة
+No maintenance user is set up ||| لا يوجد مستخدم للصيانة، لذا تنتظر الأعمال الجديدة دون إسناد. أنشئ مستخدماً من إعداد النظام &gt; المستخدمون بصلاحية <strong>تنفيذ أعمال الصيانة</strong>.
+No managed properties for this selection. ||| لا توجد عقارات مُدارة لهذا الاختيار.
+No managed property drilldown data found. ||| لا توجد بيانات تفصيلية للعقارات المُدارة.
+No managed property has an owner recorded. ||| لا يوجد عقار مُدار مسجل له مالك. اجعل نوع الملكية مُدار وأدخل اسم المالك في البيانات الرئيسية › العقارات.
+No materials recorded. ||| لم تُسجل مواد.
+No messages yet. ||| لا توجد رسائل بعد.
+No movement was posted to the owner accounts ||| لم تُرحّل أي حركة إلى حسابات المالك في هذه الفترة.
+No movements in the selected period. ||| لا توجد حركات في الفترة المحددة.
+No noted PDC items outstanding ||| لا توجد شيكات مؤجلة قائمة كما في تاريخ الكشف المحدد.
+No operating cash movements in this period. ||| لا توجد حركات نقدية تشغيلية في هذه الفترة.
+No owner of a managed property has a TRN recorded. ||| لا يوجد مالك لعقار مُدار مسجل له رقم تسجيل ضريبي. الملاك غير المسجلين في الضريبة لا يقدمون إقرارات.
+No payments recorded yet. ||| لم تُسجل مدفوعات بعد.
+No payroll yet. ||| لا توجد رواتب بعد.
+No petty cash activity in this period. ||| لا توجد حركات نثرية في هذه الفترة.
+No photos yet. ||| لا توجد صور بعد.
+No portal login yet. ||| لا يوجد حساب دخول للبوابة بعد.
+No posted bills for this project. ||| لا توجد فواتير مرحّلة لهذا المشروع.
+No posted cost yet. ||| لا توجد تكلفة مرحّلة بعد.
+No posted costs yet. ||| لا توجد تكاليف مرحّلة بعد.
+No prepayment schedules found. ||| لا توجد جداول مدفوعات مقدمة.
+No properties have been registered yet. ||| لم تُسجل عقارات بعد.
+No properties match this filter. ||| لا توجد عقارات تطابق هذا التصفية.
+No properties yet. ||| لا توجد عقارات بعد.
+No purchases posted in this period. ||| لا توجد مشتريات مرحّلة في هذه الفترة.
+No receipts found. ||| لا توجد سندات قبض.
+No recharges in this period. ||| لا توجد تكاليف معاد تحميلها في هذه الفترة. حدد <strong>تحميل على المالك</strong> في بند فاتورة مورد أو سند نثرية لعقار مُدار، أو اصرف مادة من مخزن الصيانة لوحدة مالك.
+No request is waiting. ||| لا توجد طلبات بالانتظار.
+No requests yet. ||| لا توجد طلبات بعد.
+No revenue or expense activity was posted ||| لم تُرحّل أي إيرادات أو مصروفات في هذه الفترة.
+No sale contracts yet. ||| لا توجد عقود بيع بعد.
+No scripts have been recorded on this database yet. ||| لم تُسجل أي نصوص على قاعدة البيانات هذه بعد.
+No settlements yet. ||| لا توجد تسويات بعد.
+No statement movements found ||| لا توجد حركات كشف حساب للفترة المحددة.
+No supplies posted in this period. ||| لا توجد توريدات مرحّلة في هذه الفترة.
+No tenant opening balances captured. ||| لم تُسجل أرصدة افتتاحية للمستأجرين.
+No tenants have been registered yet. ||| لم يُسجل مستأجرون بعد.
+No units found for this property. ||| لا توجد وحدات لهذا العقار.
+No units yet. ||| لا توجد وحدات بعد.
+No unpaid bills. ||| لا توجد فواتير غير مسددة.
+No user carries out maintenance jobs yet. ||| لا يوجد مستخدم ينفذ أعمال الصيانة بعد. أنشئ مستخدماً لمهندس الصيانة من <strong>إعداد النظام &gt; المستخدمون</strong> وامنحه <strong>تنفيذ أعمال الصيانة</strong>؛ عندها تُسند طلبات الصيانة الجديدة إليه تلقائياً.
+No vendor matched their TRN ||| لا يوجد مورد يطابق رقم تسجيلهم الضريبي — اختر المورد أدناه.
+No vendor opening balances captured. ||| لم تُسجل أرصدة افتتاحية للموردين.
+No vendor with this TRN ||| لا يوجد مورد بهذا الرقم الضريبي
+No. Their portals read the person ||| لا. تتعرف بواباتهم على الشخص من تسجيل دخوله، لا من عنوان الصفحة، فتغيير رقم في العنوان لا يُظهر شيئاً. ولا يمكنهم فتح أي شاشة خاصة بالموظفين.
+Nobody employed this month. ||| لا يوجد موظفون هذا الشهر.
+Nobody was employed on this date. ||| لا يوجد موظفون في هذا التاريخ.
+Non-capitalizable ||| غير قابل للرسملة
+None ||| لا شيء
+None in the period. ||| لا شيء في الفترة.
+None in this period. ||| لا شيء في هذه الفترة.
+None of these amounts appear ||| لا تظهر أي من هذه المبالغ في أرباح وخسائر الشركة. وهذا هو المقصود — إنفاق المالك توزيع وليس تكلفة أعمال.
+None yet. ||| لا شيء بعد.
+None. ||| لا شيء.
+Not Posted ||| غير مرحّل
+Not Property-Specific ||| غير مخصص لعقار
+Not applicable ||| لا ينطبق
+Not applied to any bill yet. ||| لم يُطبق على أي فاتورة بعد.
+Not every property has a fair value recorded. ||| ليست كل العقارات مسجلاً لها قيمة عادلة. يتطلب المعيار المحاسبي الدولي 40 الإفصاح عن القيمة العادلة للعقارات الاستثمارية المسجلة بالتكلفة؛ سجّل أحدث تقييم لكل عقار.
+Not in any project: ||| ليست في أي مشروع:
+Not journalised ||| غير مقيد
+Not journalised yet ||| لم يُقيد بعد
+Not property specific ||| غير مخصص لعقار
+Not realistically. After five wrong attempts ||| ليس واقعياً. بعد خمس محاولات خاطئة يُقفل الحساب لمدة 15 دقيقة، ويجب أن تكون كلمات المرور قوية، ويجب تغيير كلمات المرور الافتراضية عند أول تسجيل دخول. استخدم لهذا النظام كلمة مرور مختلفة عن البريد الإلكتروني.
+Not recorded ||| غير مسجل
+Not set ||| غير محدد
+Not started ||| لم يبدأ
+Not yet payable: less than one year. ||| غير مستحقة بعد: أقل من سنة.
+Noted Items PDC ||| الشيكات المؤجلة المسجلة نظامياً
+Notes ||| الملاحظات
+Notes (optional) - e.g. how the taxable use ||| ملاحظات (اختياري) - مثل طريقة احتساب الاستخدام الخاضع للضريبة
+Nothing awaiting an answer. ||| لا يوجد ما ينتظر رداً.
+Nothing here. ||| لا يوجد شيء هنا.
+Nothing in this period. ||| لا شيء في هذه الفترة.
+Nothing is due to this owner at this date. ||| لا يوجد مستحق لهذا المالك في هذا التاريخ.
+Nothing is waiting for you. ||| لا يوجد ما ينتظرك.
+Nothing is waiting. ||| لا يوجد ما ينتظر.
+Nothing matches every word you typed. ||| لا يوجد ما يطابق جميع الكلمات التي كتبتها. جرّب كلمات أقل أو مختلفة، أو تصفح الموضوعات أدناه.
+Nothing matches this filter. ||| لا يوجد ما يطابق هذا التصفية.
+Nothing open. ||| لا يوجد شيء مفتوح.
+Nothing paid to this owner yet. ||| لم يُدفع شيء لهذا المالك بعد.
+Nothing posted in the period. ||| لم يُرحّل شيء في الفترة.
+Nothing received yet. ||| لم يُستلم شيء بعد.
+Nothing waiting. Every in-scope document ||| لا يوجد ما ينتظر. أُرسل كل مستند ضمن النطاق.
+Number ||| الرقم
+OT hours ||| ساعات العمل الإضافي
+OW-10 ||| OW-10
+Occ. ||| الإشغال
+Occupancy ||| الإشغال
+Occupancy, leased area and rent realisation ||| الإشغال والمساحة المؤجرة وتحقق الإيجار لكل عقار كما في التاريخ المحدد.
+Occupied ||| مشغولة
+Off = every payment needs a second person. ||| معطل = كل دفعة تحتاج إلى شخص ثانٍ. النثرية تحتاج دائماً إلى شخص ثانٍ.
+Office ||| المكتب
+Offset Account ||| الحساب المقابل
+Oldest (days) ||| الأقدم (أيام)
+On A4 ||| على ورق A4
+On approval it posts to the accounts ||| عند الاعتماد يُرحّل إلى الحسابات (أو يسري العقد). تُسجل كل خطوة مع من قام بها ومتى.
+On leave ||| في إجازة
+Once a month is closed, nothing can be posted ||| بعد إقفال الشهر لا يمكن الترحيل إليه. تتطلب إعادة فتحه طلباً ومعتمِداً مختلفاً.
+One year's share ||| حصة سنة واحدة
+Only costs directly needed to complete ||| تُدرج هنا فقط التكاليف اللازمة مباشرة لإنجاز المبنى. التسويق وعمولات البيع وتكاليف تشغيل الوحدة النموذجية والمصروفات العامة مصروفات وليست تكلفة مشروع.
+Only draft assets accept new acquisition cost allocations. ||| الأصول المسودة فقط تقبل توزيعات تكاليف اقتناء جديدة.
+Only issued invoices are shown. ||| تُعرض الفواتير الصادرة فقط. المبالغ المحددة كمدفوعة تشمل الشيكات المحصّلة بالفعل.
+Only the lines of each bill that belong to this project ||| تُحتسب فقط بنود كل فاتورة التي تخص هذا المشروع. تُوزّع المدفوعات على بنود الفاتورة بنسبة مبالغها.
+Only the platform owner can change this. ||| لا يمكن تغيير هذا إلا من قبل مالك المنصة.
+Only when a passport identifies the tenant. ||| فقط عندما يُعرّف المستأجر بجواز السفر.
+Only when the unit has its own deed (strata title). ||| فقط عندما يكون للوحدة سند ملكية خاص (ملكية طبقية).
+Only while nothing has been paid. ||| فقط طالما لم يُدفع شيء. يُسجل الرد أو المصادرة بقيد أولاً.
+Only while nothing has been spent on the project. ||| فقط طالما لم يُنفق شيء على المشروع.
+Open ||| فتح
+Open A/R ||| الذمم المدينة المفتوحة
+Open Account Mappings ||| فتح ربط الحسابات
+Open Balance Sheet ||| فتح الميزانية العمومية
+Open Closing Cockpit ||| فتح لوحة الإقفال
+Open Items ||| البنود المفتوحة
+Open Leases ||| فتح العقود
+Open Manual Journals ||| فتح القيود اليدوية
+Open PDC Receipts ||| فتح الشيكات المؤجلة
+Open Prepaid Balance ||| رصيد المدفوعات المقدمة المفتوح
+Open Profit & Loss ||| فتح الأرباح والخسائر
+Open Properties ||| فتح العقارات
+Open Subscription ||| فتح الاشتراك
+Open Tenant Statement ||| فتح كشف حساب المستأجر
+Open Trial Balance ||| فتح ميزان المراجعة
+Open a report ||| فتح تقرير
+Open advance ||| دفعة مقدمة مفتوحة
+Open bills ||| الفواتير المفتوحة
+Open building ||| فتح المبنى
+Open for ||| مفتوح لـ
+Open full page ||| فتح الصفحة كاملة
+Open items only ||| البنود المفتوحة فقط
+Open original document ||| فتح المستند الأصلي
+Open the account ||| فتح الحساب
+Open the asset ||| فتح الأصل
+Open the draft contract ||| فتح مسودة العقد
+Open the journal entry ||| فتح قيد اليومية
+Open the original document ||| فتح المستند الأصلي
+Open the profit and loss ||| فتح الأرباح والخسائر
+Open the queue ||| فتح قائمة الانتظار
+Open this account's ledger for the month ||| فتح دفتر أستاذ هذا الحساب للشهر
+Open to Capitalize ||| مفتوح للرسملة
+Opening ||| الافتتاحي
+Opening Acc. Dep. ||| مجمع الإهلاك الافتتاحي
+Opening Accumulated Depreciation ||| مجمع الإهلاك الافتتاحي
+Opening Balance ||| الرصيد الافتتاحي
+Opening Balance Position ||| مركز الأرصدة الافتتاحية
+Opening Balances ||| الأرصدة الافتتاحية
+Opening Balances Detail ||| تفاصيل الأرصدة الافتتاحية
+Opening Cash ||| النقد الافتتاحي
+Opening Cost ||| التكلفة الافتتاحية
+Opening NBV ||| صافي القيمة الدفترية الافتتاحية
+Opening balance ||| الرصيد الافتتاحي
+Opening balance is computed from sub-ledger detail ||| يُحتسب الرصيد الافتتاحي من تفاصيل الدفتر الفرعي
+Opening balances are complete and balanced. ||| الأرصدة الافتتاحية مكتملة ومتوازنة.
+Opening balances are incomplete. ||| الأرصدة الافتتاحية غير مكتملة.
+Opening balances exist on revenue or expense accounts ||| توجد أرصدة افتتاحية على حسابات إيرادات أو مصروفات
+Opening gratuity provision ||| مخصص مكافأة نهاية الخدمة الافتتاحي
+Opening leave balance (days) ||| رصيد الإجازات الافتتاحي (أيام)
+Operating ||| التشغيلي
+Operating profit ||| الربح التشغيلي
+Operations ||| العمليات
+Optional analysis ||| تحليل اختياري
+Optional. If entered, you must also select ||| اختياري. إذا أُدخل فيجب أيضاً اختيار حساب الدفع أو الذمم.
+Optional. Left to right in the building view ||| اختياري. من اليسار إلى اليمين في عرض المبنى؛ وحسب رقم الوحدة إذا كان فارغاً.
+Optional. Read from Floor when empty ||| اختياري. يُقرأ من الطابق إذا كان فارغاً (G = 0، B1 = -1).
+Optional. Where the unit sits ||| اختياري. موقع الوحدة في عرض المبنى ثلاثي الأبعاد.
+Order ||| الترتيب
+Ordered by deadline ||| مرتبة حسب الموعد النهائي
+Original document ||| المستند الأصلي
+Other ||| أخرى
+Other Income ||| إيرادات أخرى
+Other Income (default) ||| إيرادات أخرى (افتراضي)
+Other Prepayment ||| مدفوعات مقدمة أخرى
+Other allowances ||| بدلات أخرى
+Other costs ||| تكاليف أخرى
+Other movements (disposals, adjustments) ||| حركات أخرى (استبعادات، تسويات)
+Our commission income ||| إيرادات عمولتنا
+Our output VAT on recharges ||| ضريبة مخرجاتنا على إعادة التحميل

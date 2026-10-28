@@ -1,7 +1,7 @@
 ﻿@model RealEstateManager.Services.MaintenanceService.Dashboard
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Maintenance Dashboard";
+    ViewData["Title"] = T["Maintenance Dashboard"];
     var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
     var technicianId = ViewBag.TechnicianId as int?;
 
@@ -16,61 +16,61 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-1">Maintenance Dashboard</h2>
+        <h2 class="mb-1">@T["Maintenance Dashboard"]</h2>
         <div class="text-muted">Jobs raised from @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"), and every job still open.</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Maintenance Jobs</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Maintenance Jobs"]</a>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3">
-    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">From</label><input id="fromDate" type="date" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
-    <div class="col-auto"><label class="form-label small mb-0" for="toDate">To</label><input id="toDate" type="date" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">@T["From"]</label><input id="fromDate" type="date" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="toDate">@T["To"]</label><input id="toDate" type="date" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
     @if (technicians.Count > 0)
     {
         <div class="col-auto">
-            <label class="form-label small mb-0" for="tech">Technician</label>
+            <label class="form-label small mb-0" for="tech">@T["Technician"]</label>
             <select id="tech" name="technicianId" class="form-select form-select-sm">
-                <option value="">All</option>
+                <option value="">@T["All"]</option>
                 @foreach (var t in technicians) { <option value="@t.Id" selected="@(t.Id == technicianId ? "selected" : null)">@t.Name</option> }
             </select>
         </div>
     }
-    <div class="col-auto"><button class="btn btn-sm btn-dark">Show</button></div>
+    <div class="col-auto"><button class="btn btn-sm btn-dark">@T["Show"]</button></div>
 </form>
 
 @if (!Model.HasTechnicians)
 {
-    <div class="alert alert-warning">No maintenance user is set up, so new jobs wait unassigned. Create one in System Setup &gt; Users with <strong>Carry Out Maintenance Jobs</strong>.</div>
+    <div class="alert alert-warning">@T.Html("No maintenance user is set up, so new jobs wait unassigned. Create one in System Setup &gt; Users with <strong>Carry Out Maintenance Jobs</strong>.")</div>
 }
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Jobs received</div><div class="value">@Model.Received</div><div class="note">@Model.Done done &middot; @Model.Rejected declined</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Still open</div><div class="value @(Model.OverdueOpen > 0 ? "text-danger" : "")">@Model.OpenCount</div><div class="note">@Model.OverdueOpen past target &middot; @Model.Unassigned unassigned</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Average first response</div><div class="value">@Hours(Model.AvgResponseHours)</div><div class="note">from request to the engineer's response</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Average time to complete</div><div class="value">@Hours(Model.AvgResolveHours)</div><div class="note">@(Model.OnTimePercent.HasValue ? $"{Model.OnTimePercent:0}% done within target" : "no completed jobs")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Jobs received"]</div><div class="value">@Model.Received</div><div class="note">@Model.Done done &middot; @Model.Rejected declined</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Still open"]</div><div class="value @(Model.OverdueOpen > 0 ? "text-danger" : "")">@Model.OpenCount</div><div class="note">@Model.OverdueOpen past target &middot; @Model.Unassigned unassigned</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average first response"]</div><div class="value">@Hours(Model.AvgResponseHours)</div><div class="note">@T["from request to the engineer's response"]</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average time to complete"]</div><div class="value">@Hours(Model.AvgResolveHours)</div><div class="note">@(Model.OnTimePercent.HasValue ? $"{Model.OnTimePercent:0}% done within target" : "no completed jobs")</div></div></div></div>
 </div>
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Materials used</div><div class="value">@Model.MaterialsCost.ToString("N0")</div><div class="note">on these jobs</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">Maintenance store</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">balance of account @MaintenanceStandards.StockAccountCode</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Materials used"]</div><div class="value">@Model.MaterialsCost.ToString("N0")</div><div class="note">@T["on these jobs"]</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Maintenance store"]</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">balance of account @MaintenanceStandards.StockAccountCode</div></div></div></div>
     <div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-body small text-muted">
-        <strong class="text-dark">Targets by priority</strong><br />
+        <strong class="text-dark">@T["Targets by priority"]</strong><br />
         Urgent: respond in 2 h, done in 24 h &middot; High: 8 h / 3 days &middot; Normal: 24 h / 5 days &middot; Low: 2 days / 10 days.
         A job past its target shows in red.
     </div></div></div>
 </div>
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-white"><strong>Jobs still open</strong> <span class="text-muted small">worst first</span></div>
+    <div class="card-header bg-white"><strong>@T["Jobs still open"]</strong> <span class="text-muted small">@T["worst first"]</span></div>
     @if (!Model.Open.Any())
     {
-        <div class="card-body text-muted small">Nothing open.</div>
+        <div class="card-body text-muted small">@T["Nothing open."]</div>
     }
     else
     {
         <div class="table-responsive">
             <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light"><tr><th>Job</th><th>Priority</th><th>What</th><th>Unit</th><th>Technician</th><th>Status</th><th class="text-end">First response</th><th class="text-end">Open for</th></tr></thead>
+                <thead class="table-light"><tr><th>@T["Job"]</th><th>@T["Priority"]</th><th>@T["What"]</th><th>@T["Unit"]</th><th>@T["Technician"]</th><th>@T["Status"]</th><th class="text-end">@T["First response"]</th><th class="text-end">@T["Open for"]</th></tr></thead>
                 <tbody>
                     @foreach (var job in Model.Open)
                     {
@@ -94,10 +94,10 @@
 <div class="row g-3">
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white"><strong>By technician</strong></div>
+            <div class="card-header bg-white">@T.Html("<strong>By technician</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>Technician</th><th class="text-end">Jobs</th><th class="text-end">Open</th><th class="text-end">Done</th><th class="text-end">Avg to complete</th><th class="text-end">Past target</th></tr></thead>
+                    <thead class="table-light"><tr><th>@T["Technician"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Done"]</th><th class="text-end">@T["Avg to complete"]</th><th class="text-end">@T["Past target"]</th></tr></thead>
                     <tbody>
                         @foreach (var t in Model.ByTechnician)
                         {
@@ -110,10 +110,10 @@
     </div>
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white"><strong>By property</strong></div>
+            <div class="card-header bg-white">@T.Html("<strong>By property</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>Property</th><th class="text-end">Jobs</th><th class="text-end">Open</th><th class="text-end">Materials</th></tr></thead>
+                    <thead class="table-light"><tr><th>@T["Property"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Materials"]</th></tr></thead>
                     <tbody>
                         @foreach (var p in Model.ByProperty)
                         {
@@ -126,10 +126,10 @@
     </div>
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white"><strong>By kind of job</strong></div>
+            <div class="card-header bg-white">@T.Html("<strong>By kind of job</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>Category</th><th class="text-end">Jobs</th><th class="text-end">Avg to complete</th></tr></thead>
+                    <thead class="table-light"><tr><th>@T["Category"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Avg to complete"]</th></tr></thead>
                     <tbody>
                         @foreach (var c in Model.ByCategory)
                         {

@@ -21,12 +21,12 @@
         </div>
     </div>
     <div class="no-print d-flex gap-2">
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back"]</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
         @if (p.Status != DevelopmentProjectStatuses.Cancelled)
         {
-            <a asp-controller="ProjectCosts" asp-action="Index" asp-route-projectId="@p.Id" class="btn btn-outline-dark btn-sm">Costs &amp; WIP report</a>
-            <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-primary btn-sm">Edit</a>
+            <a asp-controller="ProjectCosts" asp-action="Index" asp-route-projectId="@p.Id" class="btn btn-outline-dark btn-sm">@T["Costs & WIP report"]</a>
+            <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-primary btn-sm">@T["Edit"]</a>
         }
     </div>
 </div>
@@ -67,13 +67,13 @@
 }
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Budget</div><div class="fs-5">@Model.Budget.ToString("N2")</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Cost to date</div><div class="fs-5 fw-bold">@Model.CostToDate.ToString("N2")</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Remaining budget</div><div class="fs-5 @(Model.Remaining < 0 ? "text-danger" : "")">@Model.Remaining.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Budget"]</div><div class="fs-5">@Model.Budget.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Cost to date"]</div><div class="fs-5 fw-bold">@Model.CostToDate.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Remaining budget"]</div><div class="fs-5 @(Model.Remaining < 0 ? "text-danger" : "")">@Model.Remaining.ToString("N2")</div></div></div></div>
     @if (Model.Transferred != 0)
     {
-        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Transferred on completion</div><div class="fs-5">@Model.Transferred.ToString("N2")</div></div></div></div>
-        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Still in work in progress</div><div class="fs-5">@Model.InWorkInProgress.ToString("N2")</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Transferred on completion"]</div><div class="fs-5">@Model.Transferred.ToString("N2")</div></div></div></div>
+        <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Still in work in progress"]</div><div class="fs-5">@Model.InWorkInProgress.ToString("N2")</div></div></div></div>
     }
     <div class="col-12 col-md-3"><div class="card shadow-sm"><div class="card-body py-1">
         <partial name="_Gauge" model="@(new RealEstateManager.Models.GaugeModel
@@ -95,10 +95,10 @@
 <div class="row g-3">
     <div class="col-lg-5">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-light"><strong>Project</strong></div>
+            <div class="card-header bg-light">@T.Html("<strong>Project</strong>")</div>
             <div class="card-body">
                 <dl class="row mb-0">
-                    <dt class="col-5 fw-normal text-muted">Property</dt>
+                    <dt class="col-5 fw-normal text-muted">@T["Property"]</dt>
                     <dd class="col-7">
                         @if (p.Property != null)
                         {
@@ -109,22 +109,22 @@
                             <text>-</text>
                         }
                     </dd>
-                    <dt class="col-5 fw-normal text-muted">Title deed</dt><dd class="col-7">@(p.Property?.TitleDeedNumber ?? "-")</dd>
-                    <dt class="col-5 fw-normal text-muted">Building permit</dt><dd class="col-7">@(p.Property?.BuildingPermitNumber ?? "-")</dd>
-                    <dt class="col-5 fw-normal text-muted">Cost collected in</dt><dd class="col-7">@p.WipAccount?.Code @p.WipAccount?.Name</dd>
-                    <dt class="col-5 fw-normal text-muted">Main contractor</dt><dd class="col-7">@(p.MainContractorVendor?.Name ?? "-")</dd>
-                    <dt class="col-5 fw-normal text-muted">Started</dt><dd class="col-7">@(p.StartDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
-                    <dt class="col-5 fw-normal text-muted">Expected completion</dt><dd class="col-7">@(p.ExpectedCompletionDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
-                    <dt class="col-5 fw-normal text-muted">Notes</dt><dd class="col-7">@(p.Notes ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Title deed"]</dt><dd class="col-7">@(p.Property?.TitleDeedNumber ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Building permit"]</dt><dd class="col-7">@(p.Property?.BuildingPermitNumber ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Cost collected in"]</dt><dd class="col-7">@p.WipAccount?.Code @p.WipAccount?.Name</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Main contractor"]</dt><dd class="col-7">@(p.MainContractorVendor?.Name ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Started"]</dt><dd class="col-7">@(p.StartDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Expected completion"]</dt><dd class="col-7">@(p.ExpectedCompletionDate?.ToString("dd/MM/yyyy") ?? "-")</dd>
+                    <dt class="col-5 fw-normal text-muted">@T["Notes"]</dt><dd class="col-7">@(p.Notes ?? "-")</dd>
                 </dl>
             </div>
         </div>
     </div>
     <div class="col-lg-7">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-light"><strong>Budget against Actual</strong></div>
+            <div class="card-header bg-light">@T.Html("<strong>Budget against Actual</strong>")</div>
             <table class="table table-sm mb-0">
-                <thead><tr><th>Category</th><th class="text-end">Budget</th><th class="text-end">Actual</th><th class="text-end">Remaining</th></tr></thead>
+                <thead><tr><th>@T["Category"]</th><th class="text-end">@T["Budget"]</th><th class="text-end">@T["Actual"]</th><th class="text-end">@T["Remaining"]</th></tr></thead>
                 <tbody>
                     @foreach (var c in Model.Categories.Where(x => x.Budget != 0 || x.Actual != 0))
                     {
@@ -138,7 +138,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="fw-bold">
-                        <td>Total</td>
+                        <td>@T["Total"]</td>
                         <td class="text-end">@Model.Budget.ToString("N2")</td>
                         <td class="text-end">@Model.CostToDate.ToString("N2")</td>
                         <td class="text-end @(Model.Remaining < 0 ? "text-danger" : "")">@Model.Remaining.ToString("N2")</td>
@@ -149,16 +149,16 @@
     </div>
 </div>
 
-<h4 class="mt-4">Cost Ledger</h4>
+<h4 class="mt-4">@T["Cost Ledger"]</h4>
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-sm">
         <thead>
-            <tr><th>Date</th><th>Entry</th><th>Source</th><th>Document</th><th>Supplier</th><th>Category</th><th>Description</th><th class="text-end">Amount</th></tr>
+            <tr><th>@T["Date"]</th><th>@T["Entry"]</th><th>@T["Source"]</th><th>@T["Document"]</th><th>@T["Supplier"]</th><th>@T["Category"]</th><th>@T["Description"]</th><th class="text-end">@T["Amount"]</th></tr>
         </thead>
         <tbody>
             @if (Model.Ledger.Count == 0)
             {
-                <tr><td colspan="8" class="text-center text-muted">No posted costs yet.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted">@T["No posted costs yet."]</td></tr>
             }
             @foreach (var line in Model.Ledger)
             {
@@ -175,14 +175,14 @@
             }
         </tbody>
         <tfoot>
-            <tr class="fw-bold"><td colspan="7">Cost to date</td><td class="text-end">@Model.CostToDate.ToString("N2")</td></tr>
+            <tr class="fw-bold"><td colspan="7">@T["Cost to date"]</td><td class="text-end">@Model.CostToDate.ToString("N2")</td></tr>
         </tfoot>
     </table>
 </div>
 
 @if (Model.Transfers.Count > 0)
 {
-    <h4 class="mt-4">Completion Transfers</h4>
+    <h4 class="mt-4">@T["Completion Transfers"]</h4>
     @foreach (var t in Model.Transfers)
     {
         <div class="card shadow-sm mb-3">
@@ -195,7 +195,7 @@
                 }
             </div>
             <table class="table table-sm mb-0">
-                <thead><tr><th>Unit</th><th>Goes to</th><th class="text-end">Area (sq ft)</th><th class="text-end">Land</th><th class="text-end">Building</th><th class="text-end">Total cost</th></tr></thead>
+                <thead><tr><th>@T["Unit"]</th><th>@T["Goes to"]</th><th class="text-end">@T["Area (sq ft)"]</th><th class="text-end">@T["Land"]</th><th class="text-end">@T["Building"]</th><th class="text-end">@T["Total cost"]</th></tr></thead>
                 <tbody>
                     @foreach (var l in t.Lines.OrderBy(x => x.Unit?.UnitNumber))
                     {
@@ -229,7 +229,7 @@
     var transferUnits = Model.Units.Where(x => x.AreaSqFt > 0).ToList();
     var totalArea = transferUnits.Sum(x => x.AreaSqFt);
     <div class="card shadow-sm mb-3 no-print border-primary">
-        <div class="card-header bg-light"><strong>Transfer on Completion</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Transfer on Completion</strong>")</div>
         <div class="card-body">
             <p class="small text-muted">
                 Moves the @Model.InWorkInProgress.ToString("N2") still in work in progress to where each unit now belongs, shared by
@@ -251,16 +251,16 @@
                       onsubmit="return confirm('Transfer the cost and post it now? This cannot be reset.');">
                     <div class="row g-3 mb-3">
                         <div class="col-md-3">
-                            <label class="form-label">Transfer date</label>
+                            <label class="form-label">@T["Transfer date"]</label>
                             <input type="date" name="transferDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" required />
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Building useful life (years)</label>
+                            <label class="form-label">@T["Building useful life (years)"]</label>
                             <input type="number" name="usefulLifeYears" value="30" min="1" max="100" class="form-control" />
-                            <div class="form-text">Rental and own-use units only.</div>
+                            <div class="form-text">@T["Rental and own-use units only."]</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Set every unit to</label>
+                            <label class="form-label">@T["Set every unit to"]</label>
                             <select class="form-select" id="allUses">
                                 <option value="">--</option>
                                 @foreach (var use in DevelopmentIntendedUses.All)
@@ -271,7 +271,7 @@
                         </div>
                     </div>
                     <table class="table table-sm table-bordered">
-                        <thead><tr><th>Unit</th><th>Usage</th><th class="text-end">Area (sq ft)</th><th class="text-end">Share</th><th class="text-end">Cost (approx.)</th><th style="width: 260px;">Goes to</th></tr></thead>
+                        <thead><tr><th>@T["Unit"]</th><th>@T["Usage"]</th><th class="text-end">@T["Area (sq ft)"]</th><th class="text-end">@T["Share"]</th><th class="text-end">@T["Cost (approx.)"]</th><th style="width: 260px;">@T["Goes to"]</th></tr></thead>
                         <tbody>
                             @foreach (var u in transferUnits)
                             {
@@ -293,7 +293,7 @@
                             }
                         </tbody>
                     </table>
-                    <button type="submit" class="btn btn-primary">Transfer and Post</button>
+                    <button type="submit" class="btn btn-primary">@T["Transfer and Post"]</button>
                 </form>
             }
         </div>
@@ -303,7 +303,7 @@
 @if (p.TakesCosts)
 {
     <div class="card shadow-sm mb-3 no-print">
-        <div class="card-header bg-light"><strong>Record a Cost without a Supplier Bill</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Record a Cost without a Supplier Bill</strong>")</div>
         <div class="card-body">
             <p class="small text-muted">
                 Supplier invoices are entered as <a asp-controller="VendorBills" asp-action="Create">vendor bills</a> with the project
@@ -312,11 +312,11 @@
             </p>
             <form asp-action="RecordCost" asp-route-id="@p.Id" method="post" class="row g-3">
                 <div class="col-md-2">
-                    <label class="form-label">Date</label>
+                    <label class="form-label">@T["Date"]</label>
                     <input type="date" name="costDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" required />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Category</label>
+                    <label class="form-label">@T["Category"]</label>
                     <select name="category" class="form-select" required>
                         @foreach (var c in DevelopmentCostCategories.All)
                         {
@@ -325,23 +325,23 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Description</label>
+                    <label class="form-label">@T["Description"]</label>
                     <input type="text" name="description" class="form-control" maxlength="250" required />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Amount</label>
+                    <label class="form-label">@T["Amount"]</label>
                     <input type="number" step="0.01" min="0.01" name="amount" class="form-control" required />
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Paid from / moved from</label>
+                    <label class="form-label">@T["Paid from / moved from"]</label>
                     <select name="creditAccountId" asp-items="creditAccounts" class="form-select" required></select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Reference</label>
-                    <input type="text" name="reference" class="form-control" maxlength="50" placeholder="Receipt, cheque or transfer number" />
+                    <label class="form-label">@T["Reference"]</label>
+                    <input type="text" name="reference" class="form-control" maxlength="50" placeholder="@T["Receipt, cheque or transfer number"]" />
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-dark w-100">Record and Post</button>
+                    <button type="submit" class="btn btn-dark w-100">@T["Record and Post"]</button>
                 </div>
             </form>
         </div>
@@ -355,33 +355,32 @@
         {
             <div class="col-md-4">
                 <div class="card shadow-sm h-100"><div class="card-body">
-                    <h6>Start Construction</h6>
-                    <p class="small text-muted">Moves the project from planning to under construction. Recording the first cost does this too.</p>
+                    <h6>@T["Start Construction"]</h6>
+                    <p class="small text-muted">@T["Moves the project from planning to under construction. Recording the first cost does this too."]</p>
                     <form asp-action="StartConstruction" asp-route-id="@p.Id" method="post">
-                        <button type="submit" class="btn btn-outline-dark btn-sm">Start construction</button>
+                        <button type="submit" class="btn btn-outline-dark btn-sm">@T["Start construction"]</button>
                     </form>
                 </div></div>
             </div>
         }
         <div class="col-md-5">
             <div class="card shadow-sm h-100"><div class="card-body">
-                <h6>Completion</h6>
-                <p class="small text-muted">Enter the completion certificate. Its date is copied to the property, where it starts the VAT
-                zero-rating window for new residential units.</p>
+                <h6>@T["Completion"]</h6>
+                <p class="small text-muted">@T["Enter the completion certificate. Its date is copied to the property, where it starts the VAT zero-rating window for new residential units."]</p>
                 <form asp-action="Complete" asp-route-id="@p.Id" method="post" class="row g-2"
                       onsubmit="return confirm('Mark the project complete?');">
                     <div class="col-6"><input type="date" name="completionDate" class="form-control form-control-sm" required /></div>
-                    <div class="col-6"><input type="text" name="certificateNumber" class="form-control form-control-sm" placeholder="Certificate number" maxlength="50" /></div>
-                    <div class="col-12"><button type="submit" class="btn btn-success btn-sm">Mark complete</button></div>
+                    <div class="col-6"><input type="text" name="certificateNumber" class="form-control form-control-sm" placeholder="@T["Certificate number"]" maxlength="50" /></div>
+                    <div class="col-12"><button type="submit" class="btn btn-success btn-sm">@T["Mark complete"]</button></div>
                 </form>
             </div></div>
         </div>
         <div class="col-md-3">
             <div class="card shadow-sm h-100"><div class="card-body">
-                <h6>Cancel</h6>
-                <p class="small text-muted">Only while nothing has been spent on the project.</p>
+                <h6>@T["Cancel"]</h6>
+                <p class="small text-muted">@T["Only while nothing has been spent on the project."]</p>
                 <form asp-action="Cancel" asp-route-id="@p.Id" method="post" onsubmit="return confirm('Cancel this project?');">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Cancel project</button>
+                    <button type="submit" class="btn btn-outline-danger btn-sm">@T["Cancel project"]</button>
                 </form>
             </div></div>
         </div>

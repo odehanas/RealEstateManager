@@ -2,7 +2,7 @@
 @inject PermissionService PermissionService
 
 @{
-    ViewData["Title"] = "Workflow";
+    ViewData["Title"] = T["Workflow"];
 
     var canMasterData = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
     var canLeases = await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
@@ -198,85 +198,85 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 wf-page-head">
     <div>
-        <h1 class="fw-bold mb-1">Workflow</h1>
+        <h1 class="fw-bold mb-1">@T["Workflow"]</h1>
         <p class="text-muted mb-0">
-            The operating cycle from left to right. Select any icon to open that screen.
+            @T["The operating cycle from left to right. Select any icon to open that screen."]
         </p>
     </div>
     <div class="d-flex align-items-center gap-2 wf-no-print">
-        <a href="~/manual/RealEstateManager-User-Manual.html" target="_blank" class="btn btn-outline-primary btn-sm">User Manual</a>
-        <a asp-controller="Help" asp-action="Index" class="btn btn-outline-secondary btn-sm">Help</a>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a href="~/manual/RealEstateManager-User-Manual.html" target="_blank" class="btn btn-outline-primary btn-sm">@T["User Manual"]</a>
+        <a asp-controller="Help" asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Help"]</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
 @* ================= MAIN OPERATING FLOW ================= *@
 <div class="wf-canvas">
-    <div class="wf-band-title">Main operating flow &mdash; start here</div>
+    <div class="wf-band-title">@T["Main operating flow — start here"]</div>
 
     <div class="wf-row">
         <a class="wf-node @(canMasterData ? "" : "disabled")" asp-controller="Properties" asp-action="Index">
-            <span class="step-no">STEP 1</span>
+            <span class="step-no">@T["STEP 1"]</span>
             <div class="tile"><svg><use href="#i-property" /></svg></div>
-            <div class="lbl">Properties</div>
-            <div class="hint">Register the building. Owned or Managed.</div>
+            <div class="lbl">@T["Properties"]</div>
+            <div class="hint">@T["Register the building. Owned or Managed."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node @(canMasterData ? "" : "disabled")" asp-controller="Units" asp-action="Index">
-            <span class="step-no">STEP 2</span>
+            <span class="step-no">@T["STEP 2"]</span>
             <div class="tile"><svg><use href="#i-unit" /></svg></div>
-            <div class="lbl">Units</div>
-            <div class="hint">Add the rentable units inside the property.</div>
+            <div class="lbl">@T["Units"]</div>
+            <div class="hint">@T["Add the rentable units inside the property."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node @(canMasterData ? "" : "disabled")" asp-controller="Tenants" asp-action="Index">
-            <span class="step-no">STEP 3</span>
+            <span class="step-no">@T["STEP 3"]</span>
             <div class="tile"><svg><use href="#i-tenant" /></svg></div>
-            <div class="lbl">Tenants</div>
-            <div class="hint">Register the occupier and their details.</div>
+            <div class="lbl">@T["Tenants"]</div>
+            <div class="hint">@T["Register the occupier and their details."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node @(canLeases ? "" : "disabled")" asp-controller="Leases" asp-action="Index">
-            <span class="step-no">STEP 4</span>
+            <span class="step-no">@T["STEP 4"]</span>
             <div class="tile"><svg><use href="#i-contract" /></svg></div>
-            <div class="lbl">Contracts</div>
-            <div class="hint">Lease the unit. Invoices auto-generate.</div>
+            <div class="lbl">@T["Contracts"]</div>
+            <div class="hint">@T["Lease the unit. Invoices auto-generate."]</div>
         </a>
     </div>
 
     <div class="wf-elbow">
         <span class="line"></span>
         <svg><use href="#i-down" /></svg>
-        <span>continues below</span>
+        <span>@T["continues below"]</span>
         <svg><use href="#i-down" /></svg>
         <span class="line"></span>
     </div>
 
     <div class="wf-row">
         <a class="wf-node @(canAccounting ? "" : "disabled")" asp-controller="PdcReceipts" asp-action="Index">
-            <span class="step-no">STEP 5</span>
+            <span class="step-no">@T["STEP 5"]</span>
             <div class="tile"><svg><use href="#i-pdc" /></svg></div>
-            <div class="lbl">PDCs</div>
-            <div class="hint">Log the post-dated cheques taken at signing.</div>
+            <div class="lbl">@T["PDCs"]</div>
+            <div class="hint">@T["Log the post-dated cheques taken at signing."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node @(canAccounting ? "" : "disabled")" asp-controller="CustomerInvoices" asp-action="Index">
-            <span class="step-no">STEP 6</span>
+            <span class="step-no">@T["STEP 6"]</span>
             <div class="tile"><svg><use href="#i-invoice" /></svg></div>
-            <div class="lbl">Invoicing</div>
-            <div class="hint">Post the rent invoices when they fall due.</div>
+            <div class="lbl">@T["Invoicing"]</div>
+            <div class="hint">@T["Post the rent invoices when they fall due."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node @(canAccounting ? "" : "disabled")" asp-controller="CustomerReceipts" asp-action="Index">
-            <span class="step-no">STEP 7</span>
+            <span class="step-no">@T["STEP 7"]</span>
             <div class="tile"><svg><use href="#i-payment" /></svg></div>
-            <div class="lbl">Payments Received</div>
-            <div class="hint">Record collections and settle the invoice.</div>
+            <div class="lbl">@T["Payments Received"]</div>
+            <div class="hint">@T["Record collections and settle the invoice."]</div>
         </a>
     </div>
 
@@ -290,26 +290,26 @@
 @if (canAccounting)
 {
     <div class="wf-canvas">
-        <div class="wf-band-title">Before you start &mdash; one-time company setup</div>
+        <div class="wf-band-title">@T["Before you start — one-time company setup"]</div>
         <div class="wf-row">
             <a class="wf-node support" asp-controller="ChartOfAccounts" asp-action="Index">
                 <div class="tile"><svg><use href="#i-coa" /></svg></div>
-                <div class="lbl">Chart of Accounts</div>
-                <div class="hint">Seeded automatically. Review and extend.</div>
+                <div class="lbl">@T["Chart of Accounts"]</div>
+                <div class="hint">@T["Seeded automatically. Review and extend."]</div>
             </a>
             <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
             <a class="wf-node support" asp-controller="AccountMappings" asp-action="Index">
                 <div class="tile"><svg><use href="#i-map" /></svg></div>
-                <div class="lbl">Account Mapping</div>
-                <div class="hint">Which account each posting uses.</div>
+                <div class="lbl">@T["Account Mapping"]</div>
+                <div class="hint">@T["Which account each posting uses."]</div>
             </a>
             <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
             <a class="wf-node support" asp-controller="OpeningBalances" asp-action="Index">
                 <div class="tile"><svg><use href="#i-opening" /></svg></div>
-                <div class="lbl">Opening Balances</div>
-                <div class="hint">Legacy balances. Must net to zero.</div>
+                <div class="lbl">@T["Opening Balances"]</div>
+                <div class="hint">@T["Legacy balances. Must net to zero."]</div>
             </a>
         </div>
     </div>
@@ -317,87 +317,84 @@
 
 @* ================= ALONGSIDE THE LEASE ================= *@
 <div class="wf-canvas">
-    <div class="wf-band-title">Alongside the lease &mdash; deposits, revenue &amp; payables</div>
+    <div class="wf-band-title">@T["Alongside the lease — deposits, revenue & payables"]</div>
     <div class="wf-row">
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="SecurityDeposits" asp-action="Index">
             <div class="tile"><svg><use href="#i-deposit" /></svg></div>
-            <div class="lbl">Security Deposits</div>
-            <div class="hint">Refundable deposit held as a liability.</div>
+            <div class="lbl">@T["Security Deposits"]</div>
+            <div class="hint">@T["Refundable deposit held as a liability."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="RevenueRecognition" asp-action="Index">
             <div class="tile"><svg><use href="#i-revenue" /></svg></div>
-            <div class="lbl">Revenue Recognition</div>
-            <div class="hint">Releases one month of rent at month end.</div>
+            <div class="lbl">@T["Revenue Recognition"]</div>
+            <div class="hint">@T["Releases one month of rent at month end."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canVendors ? "" : "disabled")" asp-controller="Vendors" asp-action="Index">
             <div class="tile"><svg><use href="#i-vendor" /></svg></div>
-            <div class="lbl">Vendors</div>
-            <div class="hint">Suppliers and service providers.</div>
+            <div class="lbl">@T["Vendors"]</div>
+            <div class="hint">@T["Suppliers and service providers."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="VendorBills" asp-action="Index">
             <div class="tile"><svg><use href="#i-bill" /></svg></div>
-            <div class="lbl">Vendor Bills</div>
-            <div class="hint">Expenses and recoverable VAT.</div>
+            <div class="lbl">@T["Vendor Bills"]</div>
+            <div class="hint">@T["Expenses and recoverable VAT."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="VendorPayments" asp-action="Index">
             <div class="tile"><svg><use href="#i-payout" /></svg></div>
-            <div class="lbl">Vendor Payments</div>
-            <div class="hint">Settle the payable.</div>
+            <div class="lbl">@T["Vendor Payments"]</div>
+            <div class="hint">@T["Settle the payable."]</div>
         </a>
     </div>
 </div>
 
 @* ================= PERIOD END ================= *@
 <div class="wf-canvas">
-    <div class="wf-band-title">Period end &mdash; every month, then every year</div>
+    <div class="wf-band-title">@T["Period end — every month, then every year"]</div>
     <div class="wf-row">
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="FixedAssets" asp-action="Index">
             <div class="tile"><svg><use href="#i-asset" /></svg></div>
-            <div class="lbl">Depreciation</div>
-            <div class="hint">Run the monthly depreciation batch.</div>
+            <div class="lbl">@T["Depreciation"]</div>
+            <div class="hint">@T["Run the monthly depreciation batch."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="Prepayments" asp-action="Index">
             <div class="tile"><svg><use href="#i-prepaid" /></svg></div>
-            <div class="lbl">Prepayments</div>
-            <div class="hint">Amortise prepaid expenses.</div>
+            <div class="lbl">@T["Prepayments"]</div>
+            <div class="hint">@T["Amortise prepaid expenses."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="ManualJournals" asp-action="Index">
             <div class="tile"><svg><use href="#i-journal" /></svg></div>
-            <div class="lbl">Manual Journals</div>
-            <div class="hint">Adjustments and accruals.</div>
+            <div class="lbl">@T["Manual Journals"]</div>
+            <div class="hint">@T["Adjustments and accruals."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canReports ? "" : "disabled")" asp-controller="Reports" asp-action="TrialBalance">
             <div class="tile"><svg><use href="#i-report" /></svg></div>
-            <div class="lbl">Reports</div>
-            <div class="hint">Trial Balance, P&amp;L, Balance Sheet.</div>
+            <div class="lbl">@T["Reports"]</div>
+            <div class="hint">@T["Trial Balance, P&L, Balance Sheet."]</div>
         </a>
         <div class="wf-arrow"><svg><use href="#i-arrow" /></svg></div>
 
         <a class="wf-node support @(canAccounting ? "" : "disabled")" asp-controller="Closing" asp-action="Index">
             <div class="tile"><svg><use href="#i-closing" /></svg></div>
-            <div class="lbl">Closing</div>
-            <div class="hint">Close the period, then the fiscal year.</div>
+            <div class="lbl">@T["Closing"]</div>
+            <div class="hint">@T["Close the period, then the fiscal year."]</div>
         </a>
     </div>
 </div>
 
 <div class="alert alert-light border small mb-0 wf-no-print">
-    <strong>You cannot skip a step.</strong>
-    Each screen selects a record created by the one before it &mdash; there is no unit without a property,
-    no lease without a unit and a tenant, no invoice without a lease, and no receipt without an invoice.
-    If a dropdown is empty, the previous step has not been completed.
+    @T.Html("<strong>You cannot skip a step.</strong> Each screen selects a record created by the one before it &mdash; there is no unit without a property, no lease without a unit and a tenant, no invoice without a lease, and no receipt without an invoice. If a dropdown is empty, the previous step has not been completed.")
 </div>

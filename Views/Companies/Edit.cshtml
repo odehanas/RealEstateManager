@@ -1,10 +1,10 @@
 @model RealEstateManager.Models.CompanyFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Company";
+    ViewData["Title"] = T["Edit Company"];
 }
 
-<h2>Edit Company</h2>
+<h2>@T["Edit Company"]</h2>
 
 @if (TempData["SuccessMessage"] is string successMessage)
 {
@@ -24,25 +24,25 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                 <div>
-                    <h4 class="mb-1 text-success">Activation Code Ready</h4>
-                    <div class="text-muted small">Copy the code or send the prepared message to the customer.</div>
+                    <h4 class="mb-1 text-success">@T["Activation Code Ready"]</h4>
+                    <div class="text-muted small">@T["Copy the code or send the prepared message to the customer."]</div>
                 </div>
-                <button type="button" class="btn btn-outline-success btn-sm js-copy-text" data-copy="@generatedCode">Copy Code</button>
+                <button type="button" class="btn btn-outline-success btn-sm js-copy-text" data-copy="@generatedCode">@T["Copy Code"]</button>
             </div>
 
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label">Generated Code</label>
+                    <label class="form-label">@T["Generated Code"]</label>
                     <div class="input-group">
                         <input type="text" class="form-control" value="@generatedCode" readonly />
-                        <button type="button" class="btn btn-outline-secondary js-copy-text" data-copy="@generatedCode">Copy</button>
+                        <button type="button" class="btn btn-outline-secondary js-copy-text" data-copy="@generatedCode">@T["Copy"]</button>
                     </div>
                 </div>
                 <div class="col-md-8">
-                    <label class="form-label">Ready-To-Send Message</label>
+                    <label class="form-label">@T["Ready-To-Send Message"]</label>
                     <div class="input-group">
                         <textarea class="form-control" rows="7" readonly>@generatedMessage</textarea>
-                        <button type="button" class="btn btn-outline-secondary js-copy-text" data-copy="@generatedMessage">Copy Message</button>
+                        <button type="button" class="btn btn-outline-secondary js-copy-text" data-copy="@generatedMessage">@T["Copy Message"]</button>
                     </div>
                 </div>
             </div>
@@ -78,58 +78,53 @@
     </div>
 
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">@T["Save Changes"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@T["Back"]</a>
     </div>
 </form>
 
 <div class="card mt-4 shadow-sm">
     <div class="card-body">
-        <h4 class="mb-2">Sample Data for Training</h4>
+        <h4 class="mb-2">@T["Sample Data for Training"]</h4>
         <p class="text-muted mb-3">
-            Fills this company with a fictional year of business, from the start of the fiscal year to today:
-            owned and managed properties, tenants, leases, receipts, cheques, deposits, supplier bills, petty cash,
-            journals, VAT, prepayments, fixed assets and tenant requests, property documents, development projects,
-            unit sales and a handover, a contract awaiting approval, the Capital Assets Scheme and e-invoices sent and
-            received, so every screen and report has something to show.
-            It only works on a company with no properties, tenants, vendors, leases or journals yet, and takes up to a minute.
+            @T["Fills this company with a fictional year of business, from the start of the fiscal year to today: owned and managed properties, tenants, leases, receipts, cheques, deposits, supplier bills, petty cash, journals, VAT, prepayments, fixed assets and tenant requests, property documents, development projects, unit sales and a handover, a contract awaiting approval, the Capital Assets Scheme and e-invoices sent and received, so every screen and report has something to show. It only works on a company with no properties, tenants, vendors, leases or journals yet, and takes up to a minute."]
         </p>
         <form asp-action="LoadSampleData" method="post"
               onsubmit="return confirm('Fill this company with sample data? This cannot be undone.');">
             @Html.AntiForgeryToken()
             <input type="hidden" name="id" value="@Model.Id" />
-            <button type="submit" class="btn btn-outline-secondary">Load Sample Data</button>
+            <button type="submit" class="btn btn-outline-secondary">@T["Load Sample Data"]</button>
         </form>
     </div>
 </div>
 
 <div class="card mt-4 shadow-sm">
     <div class="card-body">
-        <h4 class="mb-3">Subscription</h4>
+        <h4 class="mb-3">@T["Subscription"]</h4>
 
         <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <label class="form-label">Status</label>
+                <label class="form-label">@T["Status"]</label>
                 <input class="form-control" value="@Model.SubscriptionStatus" readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Trial Start</label>
+                <label class="form-label">@T["Trial Start"]</label>
                 <input class="form-control" value="@(Model.TrialStartDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Trial End</label>
+                <label class="form-label">@T["Trial End"]</label>
                 <input class="form-control" value="@(Model.TrialEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Paid Until</label>
+                <label class="form-label">@T["Paid Until"]</label>
                 <input class="form-control" value="@(Model.SubscriptionEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Access Until</label>
+                <label class="form-label">@T["Access Until"]</label>
                 <input class="form-control" value="@(Model.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")" readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Days Remaining</label>
+                <label class="form-label">@T["Days Remaining"]</label>
                 <input class="form-control" value="@Model.DaysRemaining" readonly />
             </div>
         </div>
@@ -143,13 +138,13 @@
                     {
                         <div class="small mt-1">@Model.SubscriptionNotes</div>
                     }
-                    <div class="small mt-1">Applying a new activation code also lifts the suspension.</div>
+                    <div class="small mt-1">@T["Applying a new activation code also lifts the suspension."]</div>
                 </div>
                 <form asp-action="Reactivate" method="post"
                       onsubmit="return confirm('Reactivate this company now, without a new code?');">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.Id" />
-                    <button type="submit" class="btn btn-sm btn-success">Reactivate</button>
+                    <button type="submit" class="btn btn-sm btn-success">@T["Reactivate"]</button>
                 </form>
             </div>
         }
@@ -160,12 +155,12 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.Id" />
                 <div class="col-md-9">
-                    <label class="form-label" for="suspendReason">Suspend access - reason (kept on record, not shown to the customer)</label>
+                    <label class="form-label" for="suspendReason">@T["Suspend access - reason (kept on record, not shown to the customer)"]</label>
                     <input id="suspendReason" name="reason" class="form-control" maxlength="300"
-                           placeholder="e.g. Payment for the annual renewal was returned by the bank" required />
+                           placeholder="@T["e.g. Payment for the annual renewal was returned by the bank"]" required />
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn btn-outline-danger w-100">Suspend Company</button>
+                    <button type="submit" class="btn btn-outline-danger w-100">@T["Suspend Company"]</button>
                 </div>
             </form>
             @if (!string.IsNullOrWhiteSpace(Model.SubscriptionNotes))
@@ -191,33 +186,33 @@
             </div>
 
             <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-outline-primary w-100">Generate Code</button>
+                <button type="submit" class="btn btn-outline-primary w-100">@T["Generate Code"]</button>
             </div>
         </form>
 
         <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
-            <h5 class="mb-0">Activation History</h5>
-            <span class="text-muted small">Latest 50 generated codes</span>
+            <h5 class="mb-0">@T["Activation History"]</h5>
+            <span class="text-muted small">@T["Latest 50 generated codes"]</span>
         </div>
 
         <div class="table-responsive">
             <table class="table table-sm table-bordered align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Code</th>
-                        <th>Days</th>
-                        <th>Status</th>
-                        <th>Issued</th>
-                        <th>Activated</th>
-                        <th>Notes</th>
-                        <th>Action</th>
+                        <th>@T["Code"]</th>
+                        <th>@T["Days"]</th>
+                        <th>@T["Status"]</th>
+                        <th>@T["Issued"]</th>
+                        <th>@T["Activated"]</th>
+                        <th>@T["Notes"]</th>
+                        <th>@T["Action"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.ActivationCodes.Count == 0)
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-muted">No activation codes generated yet.</td>
+                            <td colspan="7" class="text-center text-muted">@T["No activation codes generated yet."]</td>
                         </tr>
                     }
                     else
@@ -230,22 +225,22 @@
                                 <td>
                                     @if (code.IsCancelled)
                                     {
-                                        <span class="badge bg-secondary">Cancelled</span>
+                                        <span class="badge bg-secondary">@T["Cancelled"]</span>
                                     }
                                     else if (code.ActivatedAt.HasValue)
                                     {
-                                        <span class="badge bg-success">Used</span>
+                                        <span class="badge bg-success">@T["Used"]</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-warning text-dark">Available</span>
+                                        <span class="badge bg-warning text-dark">@T["Available"]</span>
                                     }
                                 </td>
                                 <td>@code.IssuedAt.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>@(code.ActivatedAt.HasValue ? code.ActivatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Not used")</td>
                                 <td>@(string.IsNullOrWhiteSpace(code.Notes) ? "-" : code.Notes)</td>
                                 <td class="text-nowrap">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary js-copy-text" data-copy="@code.Code">Copy</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary js-copy-text" data-copy="@code.Code">@T["Copy"]</button>
                                     @if (!code.IsCancelled && !code.ActivatedAt.HasValue)
                                     {
                                         <form asp-action="CancelCode" method="post" class="d-inline"
@@ -253,7 +248,7 @@
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@Model.Id" />
                                             <input type="hidden" name="code" value="@code.Code" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">@T["Cancel"]</button>
                                         </form>
                                     }
                                 </td>

@@ -1,7 +1,7 @@
 @model RealEstateManager.Services.VatReturnReportDto
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "VAT Return";
+    ViewData["Title"] = T["VAT Return"];
     var washUp = ViewBag.WashUp as RealEstateManager.Services.VatWashUpDto;
 }
 
@@ -17,37 +17,36 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">VAT Return</h2>
+        <h2 class="mb-1">@T["VAT Return"]</h2>
         <p class="text-muted mb-0">
             @Model.CompanyName
             @if (!string.IsNullOrWhiteSpace(Model.CompanyTrn)) { <text>&middot; TRN @Model.CompanyTrn</text> }
         </p>
     </div>
     <div class="d-flex gap-2 no-print">
-        <a asp-controller="VatSettings" asp-action="Index" class="btn btn-outline-secondary btn-sm">VAT Settings</a>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a asp-controller="VatSettings" asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["VAT Settings"]</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
 @if (string.IsNullOrWhiteSpace(Model.CompanyTrn))
 {
     <div class="alert alert-warning">
-        <strong>No TRN is configured.</strong> Set it under <strong>Setup &rsaquo; VAT Settings</strong>.
-        This report is still accurate, but it is not a filing document without it.
+        @T.Html("<strong>No TRN is configured.</strong> Set it under <strong>Setup &rsaquo; VAT Settings</strong>. This report is still accurate, but it is not a filing document without it.")
     </div>
 }
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="startDate">Period From</label>
+        <label class="form-label mb-1" for="startDate">@T["Period From"]</label>
         <input type="date" class="form-control form-control-sm" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="endDate">Period To</label>
+        <label class="form-label mb-1" for="endDate">@T["Period To"]</label>
         <input type="date" class="form-control form-control-sm" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -59,7 +58,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-primary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Output Tax Due</div>
+                <div class="small text-uppercase opacity-75">@T["Output Tax Due"]</div>
                 <div class="h4 fw-bold mb-0">@Model.StandardRatedVat.ToString("N2")</div>
                 <div class="small opacity-75">On @Model.StandardRatedNet.ToString("N0") of standard rated supplies</div>
             </div>
@@ -68,7 +67,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-success text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Input Tax Recoverable</div>
+                <div class="small text-uppercase opacity-75">@T["Input Tax Recoverable"]</div>
                 <div class="h4 fw-bold mb-0">@Model.InputVatRecoverable.ToString("N2")</div>
                 <div class="small opacity-75">@Model.InputVatNonRecoverable.ToString("N2") irrecoverable</div>
             </div>
@@ -85,7 +84,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Recovery Rate</div>
+                <div class="small text-uppercase opacity-75">@T["Recovery Rate"]</div>
                 <div class="h4 fw-bold mb-0">@Model.ActualRecoveryRate.ToString("N2")%</div>
                 <div class="small opacity-75">Provisional @Model.ProvisionalRecoveryRate.ToString("N2")%</div>
             </div>
@@ -94,21 +93,21 @@
 </div>
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><strong>Output Tax &mdash; Supplies Made</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Output Tax &mdash; Supplies Made</strong>")</div>
     <div class="scroll-x">
         <table class="table table-bordered table-sm mb-0 vat-table">
             <thead>
                 <tr>
-                    <th class="lbl">VAT Treatment</th>
-                    <th class="text-end">Documents</th>
-                    <th class="text-end">Net Amount</th>
-                    <th class="text-end">VAT</th>
+                    <th class="lbl">@T["VAT Treatment"]</th>
+                    <th class="text-end">@T["Documents"]</th>
+                    <th class="text-end">@T["Net Amount"]</th>
+                    <th class="text-end">@T["VAT"]</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.OutputLines.Count == 0)
                 {
-                    <tr><td colspan="4" class="text-muted">No supplies posted in this period.</td></tr>
+                    <tr><td colspan="4" class="text-muted">@T["No supplies posted in this period."]</td></tr>
                 }
                 @foreach (var line in Model.OutputLines)
                 {
@@ -131,7 +130,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td>Total supplies</td>
+                    <td>@T["Total supplies"]</td>
                     <td class="text-end">@Model.OutputLines.Sum(x => x.SupplyCount)</td>
                     <td class="text-end">@Model.TotalSuppliesNet.ToString("N2")</td>
                     <td class="text-end">@Model.StandardRatedVat.ToString("N2")</td>
@@ -142,23 +141,23 @@
 </div>
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><strong>Input Tax &mdash; Purchases</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Input Tax &mdash; Purchases</strong>")</div>
     <div class="scroll-x">
         <table class="table table-bordered table-sm mb-0 vat-table">
             <thead>
                 <tr>
-                    <th class="lbl">Attribution</th>
-                    <th class="text-end">Bills</th>
-                    <th class="text-end">Net Amount</th>
-                    <th class="text-end">VAT Charged</th>
-                    <th class="text-end">Recoverable</th>
-                    <th class="text-end">Irrecoverable</th>
+                    <th class="lbl">@T["Attribution"]</th>
+                    <th class="text-end">@T["Bills"]</th>
+                    <th class="text-end">@T["Net Amount"]</th>
+                    <th class="text-end">@T["VAT Charged"]</th>
+                    <th class="text-end">@T["Recoverable"]</th>
+                    <th class="text-end">@T["Irrecoverable"]</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.InputLines.Count == 0)
                 {
-                    <tr><td colspan="6" class="text-muted">No purchases posted in this period.</td></tr>
+                    <tr><td colspan="6" class="text-muted">@T["No purchases posted in this period."]</td></tr>
                 }
                 @foreach (var line in Model.InputLines)
                 {
@@ -174,7 +173,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td>Total</td>
+                    <td>@T["Total"]</td>
                     <td class="text-end">@Model.InputLines.Sum(x => x.BillCount)</td>
                     <td class="text-end">@Model.InputLines.Sum(x => x.NetAmount).ToString("N2")</td>
                     <td class="text-end">@Model.InputVatTotal.ToString("N2")</td>
@@ -185,8 +184,7 @@
         </table>
     </div>
     <div class="card-body py-3 small text-muted">
-        Irrecoverable VAT is not lost from the accounts &mdash; it was added to the expense account when each
-        bill was posted, so it already sits in the Profit &amp; Loss as part of the cost.
+        @T["Irrecoverable VAT is not lost from the accounts — it was added to the expense account when each bill was posted, so it already sits in the Profit & Loss as part of the cost."]
     </div>
 </div>
 
@@ -194,42 +192,42 @@
 {
     <div class="card shadow-sm mb-4 border-warning">
         <div class="card-header bg-warning bg-opacity-25">
-            <strong>Annual Apportionment Wash-Up</strong>
+            <strong>@T["Annual Apportionment Wash-Up"]</strong>
             <span class="text-muted small ms-2">@washUp.YearStart.ToString("dd/MM/yyyy") to @washUp.YearEnd.ToString("dd/MM/yyyy")</span>
         </div>
         <div class="scroll-x">
             <table class="table table-bordered table-sm mb-0 vat-table">
                 <tbody>
                     <tr>
-                        <td class="lbl">Standard rated supplies for the year</td>
+                        <td class="lbl">@T["Standard rated supplies for the year"]</td>
                         <td class="text-end">@washUp.StandardRatedNet.ToString("N2")</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Zero rated supplies for the year</td>
+                        <td class="lbl">@T["Zero rated supplies for the year"]</td>
                         <td class="text-end">@washUp.ZeroRatedNet.ToString("N2")</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Exempt supplies for the year</td>
+                        <td class="lbl">@T["Exempt supplies for the year"]</td>
                         <td class="text-end">@washUp.ExemptNet.ToString("N2")</td>
                     </tr>
                     <tr>
-                        <td class="lbl"><strong>Actual recovery rate</strong> &mdash; (standard + zero rated) ÷ total supplies</td>
+                        <td class="lbl">@T.Html("<strong>Actual recovery rate</strong> &mdash; (standard + zero rated) ÷ total supplies")</td>
                         <td class="text-end fw-bold">@washUp.ActualRecoveryRate.ToString("N2")%</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Provisional rate applied during the year</td>
+                        <td class="lbl">@T["Provisional rate applied during the year"]</td>
                         <td class="text-end">@washUp.ProvisionalRecoveryRate.ToString("N2")%</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Residual input tax for the year</td>
+                        <td class="lbl">@T["Residual input tax for the year"]</td>
                         <td class="text-end">@washUp.ResidualInputVat.ToString("N2")</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Recoverable at the actual rate</td>
+                        <td class="lbl">@T["Recoverable at the actual rate"]</td>
                         <td class="text-end">@washUp.RecoverableAtActualRate.ToString("N2")</td>
                     </tr>
                     <tr>
-                        <td class="lbl">Already recovered at the provisional rate</td>
+                        <td class="lbl">@T["Already recovered at the provisional rate"]</td>
                         <td class="text-end">@washUp.AlreadyRecovered.ToString("N2")</td>
                     </tr>
                 </tbody>
@@ -246,7 +244,7 @@
             </table>
         </div>
         <div class="card-body py-3 small">
-            <strong>This figure is not posted automatically.</strong>
+            <strong>@T["This figure is not posted automatically."]</strong>
             Post it yourself as a manual journal in the final period of the year:
             @if (washUp.Adjustment >= 0)
             {
@@ -264,12 +262,12 @@
 
 <div class="card shadow-sm">
     <div class="card-body py-3 small text-muted">
-        <strong class="text-dark">How this is built</strong>
+        <strong class="text-dark">@T["How this is built"]</strong>
         <ul class="mb-0 mt-2">
-            <li><strong>Output tax</strong> comes from posted customer invoices, grouped by the VAT treatment snapshotted on each one. Draft and cancelled invoices are excluded because they have no ledger effect.</li>
-            <li><strong>Input tax</strong> comes from posted vendor bills, using the recoverable / irrecoverable split fixed when each bill was posted &mdash; so this report always agrees with the ledger rather than re-deriving it.</li>
-            <li><strong>Recovery rate</strong> is the standard apportionment method: supplies carrying the right of recovery divided by total supplies. If your business needs a special method, it must be approved by the FTA.</li>
-            <li>The default period is the calendar quarter containing the end date. Change the dates for a different tax period.</li>
+            <li>@T.Html("<strong>Output tax</strong> comes from posted customer invoices, grouped by the VAT treatment snapshotted on each one. Draft and cancelled invoices are excluded because they have no ledger effect.")</li>
+            <li>@T.Html("<strong>Input tax</strong> comes from posted vendor bills, using the recoverable / irrecoverable split fixed when each bill was posted &mdash; so this report always agrees with the ledger rather than re-deriving it.")</li>
+            <li>@T.Html("<strong>Recovery rate</strong> is the standard apportionment method: supplies carrying the right of recovery divided by total supplies. If your business needs a special method, it must be approved by the FTA.")</li>
+            <li>@T["The default period is the calendar quarter containing the end date. Change the dates for a different tax period."]</li>
         </ul>
     </div>
 </div>

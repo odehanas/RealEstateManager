@@ -1,33 +1,33 @@
 @model RealEstateManager.Models.AuditLogListViewModel
 
 @{
-    ViewData["Title"] = "Audit Logs";
+    ViewData["Title"] = T["Audit Logs"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Audit Logs</h2>
-    <span class="text-muted">Latest 500 records</span>
+    <h2 class="mb-0">@T["Audit Logs"]</h2>
+    <span class="text-muted">@T["Latest 500 records"]</span>
 </div>
 
 <form method="get" class="card shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-2">
-                <label asp-for="Filter.FromDate" class="form-label">From</label>
+                <label asp-for="Filter.FromDate" class="form-label">@T["From"]</label>
                 <input asp-for="Filter.FromDate" type="date" class="form-control" />
             </div>
             <div class="col-md-2">
-                <label asp-for="Filter.ToDate" class="form-label">To</label>
+                <label asp-for="Filter.ToDate" class="form-label">@T["To"]</label>
                 <input asp-for="Filter.ToDate" type="date" class="form-control" />
             </div>
             <div class="col-md-2">
-                <label asp-for="Filter.Username" class="form-label">Username</label>
+                <label asp-for="Filter.Username" class="form-label">@T["Username"]</label>
                 <input asp-for="Filter.Username" class="form-control" />
             </div>
             <div class="col-md-2">
-                <label asp-for="Filter.ControllerName" class="form-label">Controller</label>
+                <label asp-for="Filter.ControllerName" class="form-label">@T["Controller"]</label>
                 <select asp-for="Filter.ControllerName" class="form-select">
-                    <option value="">All</option>
+                    <option value="">@T["All"]</option>
                     @foreach (var controller in Model.AvailableControllers)
                     {
                         <option value="@controller">@controller</option>
@@ -35,24 +35,24 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label asp-for="Filter.HttpMethod" class="form-label">Method</label>
+                <label asp-for="Filter.HttpMethod" class="form-label">@T["Method"]</label>
                 <select asp-for="Filter.HttpMethod" class="form-select">
-                    <option value="">All</option>
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
+                    <option value="">@T["All"]</option>
+                    <option value="GET">@T["GET"]</option>
+                    <option value="POST">@T["POST"]</option>
+                    <option value="PUT">@T["PUT"]</option>
+                    <option value="DELETE">@T["DELETE"]</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
                 <div class="form-check mb-2">
                     <input asp-for="Filter.OnlyFailures" class="form-check-input" />
-                    <label asp-for="Filter.OnlyFailures" class="form-check-label">Failures only</label>
+                    <label asp-for="Filter.OnlyFailures" class="form-check-label">@T["Failures only"]</label>
                 </div>
             </div>
             <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+                <button type="submit" class="btn btn-primary">@T["Filter"]</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">@T["Reset"]</a>
             </div>
         </div>
     </div>
@@ -62,22 +62,22 @@
     <table class="table table-striped table-bordered align-middle">
         <thead>
             <tr>
-                <th>When</th>
-                <th>User</th>
-                <th>Company</th>
-                <th>Activity</th>
-                <th>Method</th>
-                <th>Path</th>
-                <th>Status</th>
-                <th>IP</th>
-                <th>Error</th>
+                <th>@T["When"]</th>
+                <th>@T["User"]</th>
+                <th>@T["Company"]</th>
+                <th>@T["Activity"]</th>
+                <th>@T["Method"]</th>
+                <th>@T["Path"]</th>
+                <th>@T["Status"]</th>
+                <th>@T["IP"]</th>
+                <th>@T["Error"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Items.Count == 0)
             {
                 <tr>
-                    <td colspan="9" class="text-center text-muted">No audit records found.</td>
+                    <td colspan="9" class="text-center text-muted">@T["No audit records found."]</td>
                 </tr>
             }
             else

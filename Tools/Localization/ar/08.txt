@@ -1,0 +1,351 @@
+# Sheet 8: The routing code ... end
+The routing code (agent ID) is the bank's 9-digit WPS code. ||| رمز التوجيه (رقم الوكيل) هو رمز البنك المكوّن من 9 أرقام في نظام حماية الأجور. يقدمه البنك مع حساب الموظف.
+The site is running, but scripts from this one onwards ||| الموقع يعمل، لكن النصوص من هذا النص فصاعداً لم تُطبق، لذا قد تظهر أخطاء في الشاشات التي تعتمد عليها. أرسل هذه الصفحة إلى المطوّر. بعد تصحيح النص ونشر إصدار جديد، تُعاد المحاولة عند التشغيل التالي.
+The statement ||| كشف الحساب
+The system posts on the month-end of the selected month. ||| يرحّل النظام في نهاية الشهر المحدد.
+The tenant's email address is the usual choice. ||| البريد الإلكتروني للمستأجر هو الاختيار المعتاد. يجب أن يكون فريداً بين جميع المستأجرين.
+Their balance, overdue amount, cheques held and deposit held ||| رصيدهم والمبلغ المتأخر والشيكات المحتفظ بها والتأمين المحتفظ به
+Their own invoices, payments, cheques, contracts ||| فواتيرهم ومدفوعاتهم وشيكاتهم وعقودهم وكشف حسابهم الخاص
+Their salary is then charged to that building in P&L by Property. ||| يُحمّل راتبهم عندها على ذلك المبنى في الأرباح والخسائر حسب العقار.
+There are no development projects yet. ||| لا توجد مشاريع تطوير بعد.
+These amounts were posted to a development account ||| رُحّلت هذه المبالغ إلى حساب تطوير دون اختيار مشروع، فهي في الميزانية العمومية لكن خارج تكلفة أي مشروع. صححها بقيد ينقلها إلى المشروع الصحيح.
+These determined what was posted ||| هذه حددت ما رُحّل ولا يمكن تغييرها هنا
+This contract is awaiting approval ||| هذا العقد بانتظار الاعتماد، لذا لا يمكن تغييره. اسحبه من قائمة العقود لتصحيحه.
+This entry is the record; there is no separate document page. ||| هذا القيد هو السجل؛ لا توجد صفحة مستند منفصلة.
+This figure is not posted automatically. ||| لا يُرحّل هذا الرقم تلقائياً.
+This figure is the total of the detail below ||| هذا الرقم هو إجمالي التفاصيل أدناه
+This invoice has been reported through e-invoicing. ||| أُبلغ عن هذه الفاتورة عبر الفوترة الإلكترونية. سيُرسل الإشعار الدائن إلكترونياً أيضاً بعد ترحيله.
+This page can be updated later ||| يمكن تحديث هذه الصفحة لاحقاً بسياسة الخصوصية والبيانات الخاصة بشركتك.
+This page could not be shown ||| تعذر عرض هذه الصفحة
+This period has never been asked to reopen. ||| لم يُطلب إعادة فتح هذه الفترة قط.
+This property has no units yet. ||| لا توجد وحدات لهذا العقار بعد. أضفها من البيانات الرئيسية › الوحدات، مع الطابق والمساحة.
+This statement does not reconcile. ||| كشف الحساب هذا غير متطابق.
+This tenant has no portal access yet. ||| لا يملك هذا المستأجر دخولاً إلى البوابة بعد. أصدره أدناه وسلّمه البيانات.
+Tick cheques due by that date ||| تحديد الشيكات المستحقة حتى ذلك التاريخ
+Tick only while the registration is <strong>live</strong>. ||| حدده فقط طالما التسجيل <strong>ساري</strong>. فواتير المورد غير المسجل لا تتضمن ضريبة إطلاقاً وتُعامل كفواتير تجارية، ويُحمّل المبلغ كاملاً على التكلفة مباشرة.
+Timeline ||| الخط الزمني
+Times reopened ||| مرات إعادة الفتح
+Title Deed ||| سند الملكية
+Title Deed & Land ||| سند الملكية والأرض
+Title deed ||| سند الملكية
+Title deed date ||| تاريخ سند الملكية
+Title deed number ||| رقم سند الملكية
+Title is mortgaged ||| العقار مرهون
+To ||| إلى
+To Date ||| إلى تاريخ
+To change the amount, lease, invoice or settlement mode ||| لتغيير المبلغ أو العقد أو الفاتورة أو طريقة التسوية يجب عكس القيد المرحّل وإعادة إدخاله. سجّل شيكاً مؤجلاً جديداً بدلاً من ذلك.
+To correct a withdrawal, reset its journal ||| لتصحيح المسحوبات، أعد قيدها إلى مسودة من العمليات › الاستعلام عن القيود (فتخرج من الأرقام) ثم سجّلها مجدداً.
+To send ||| للإرسال
+Topping up a float is a <strong>transfer between two asset accounts</strong> ||| تعبئة العهدة <strong>تحويل بين حسابي أصول</strong> وليست مصروفاً. لا يصل شيء إلى الأرباح والخسائر هنا &mdash; فقد سُجلت التكلفة عند ترحيل كل سند مصروف.
+Total ||| الإجمالي
+Total Amount ||| المبلغ الإجمالي
+Total Area ||| إجمالي المساحة
+Total Assets ||| إجمالي الأصول
+Total Credit Opening Balance ||| إجمالي الأرصدة الافتتاحية الدائنة
+Total Debit Opening Balance ||| إجمالي الأرصدة الافتتاحية المدينة
+Total Equity ||| إجمالي حقوق الملكية
+Total Expenses ||| إجمالي المصروفات
+Total Feedback ||| إجمالي الملاحظات
+Total Liabilities ||| إجمالي الالتزامات
+Total Liabilities and Equity ||| إجمالي الالتزامات وحقوق الملكية
+Total Movement ||| إجمالي الحركة
+Total Revenue ||| إجمالي الإيرادات
+Total billed ||| إجمالي المفوتر
+Total budget ||| إجمالي الموازنة
+Total cost ||| إجمالي التكلفة
+Total cost of revenue ||| إجمالي تكلفة الإيرادات
+Total credited ||| إجمالي الإشعارات الدائنة
+Total excluding VAT ||| الإجمالي غير شامل الضريبة
+Total finance costs ||| إجمالي تكاليف التمويل
+Total for the period ||| إجمالي الفترة
+Total invoiced ||| إجمالي المفوتر
+Total of ||| إجمالي
+Total paid ||| إجمالي المدفوع
+Total received ||| إجمالي المستلم
+Total rent of the agreements (full contract terms) ||| إجمالي إيجار الاتفاقيات (كامل مدة العقود)
+Total revenue ||| إجمالي الإيرادات
+Total supplies ||| إجمالي التوريدات
+Total to pay ||| الإجمالي المستحق الدفع
+Totals ||| الإجماليات
+Totals and the balancing line are recalculated when you save. ||| يُعاد احتساب الإجماليات وسطر الموازنة عند الحفظ.
+Totals by group ||| الإجماليات حسب المجموعة
+Track the status of this suggestion ||| تابع حالة هذا الاقتراح وسجّل ملاحظات داخلية للإصدارات القادمة.
+Trade Licence Number ||| رقم الرخصة التجارية
+Trade licence issued by ||| جهة إصدار الرخصة التجارية
+Trade licence, Emirates ID, passport and TRN each identify the tenant and must be unique. If one is already held by another record the save is refused and the existing tenant is named — ||| الرخصة التجارية والهوية الإماراتية وجواز السفر والرقم الضريبي كل منها يعرّف المستأجر ويجب أن يكون فريداً. إذا كان أحدها مسجلاً لسجل آخر يُرفض الحفظ ويُذكر اسم المستأجر الحالي — عدّل ذلك السجل بدلاً من فتح سجل ثانٍ.
+Trade licence, Emirates ID, passport and TRN each identify the tenant and must be unique. If one is already held by another record the save is refused and the existing tenant is named. ||| الرخصة التجارية والهوية الإماراتية وجواز السفر والرقم الضريبي كل منها يعرّف المستأجر ويجب أن يكون فريداً. إذا كان أحدها مسجلاً لسجل آخر يُرفض الحفظ ويُذكر اسم المستأجر الحالي.
+Training Workbook ||| كراسة التدريب
+Training workbook ||| كراسة التدريب
+Transfer ||| تحويل
+Transfer and Post ||| تحويل وترحيل
+Transfer date ||| تاريخ التحويل
+Transfer list (CSV) ||| قائمة التحويل (CSV)
+Transferred from properties under construction ||| محوّل من العقارات قيد الإنشاء
+Transferred on completion ||| محوّل عند الإنجاز
+Transferred out ||| المحوّل للخارج
+Transport ||| المواصلات
+Transport allowance ||| بدل المواصلات
+Trial Balance ||| ميزان المراجعة
+Trial Balance, P&L, Balance Sheet. ||| ميزان المراجعة، الأرباح والخسائر، الميزانية العمومية.
+Trial End ||| نهاية الفترة التجريبية
+Trial Period ||| الفترة التجريبية
+Trial Start ||| بداية الفترة التجريبية
+Try: <em>"Which tenants are overdue?"</em> ||| جرّب: <em>"من المستأجرون المتأخرون؟"</em>، <em>"الوحدات الشاغرة في البرج A"</em>، <em>"ميزان المراجعة في 30 سبتمبر"</em>، <em>"كيف أحصّل شيكاً مؤجلاً؟"</em>، <em>"عبّئ هذا النموذج عني"</em>، أو أرفق فاتورة ممسوحة ضوئياً بمشبك الورق. أي شيء يغيّر سجلاتك يُعرض كبطاقة لتأكيده.
+Turn down ||| رفض
+Two-letter code. ||| رمز من حرفين.
+Type ||| النوع
+Type a question… ||| اكتب سؤالاً…
+UAE documents ||| مستندات الإمارات
+Unavailable ||| غير متاح
+Uncategorised ||| غير مصنف
+Uncleared PDC total ||| إجمالي الشيكات المؤجلة غير المحصّلة
+Unclosed Periods ||| الفترات غير المقفلة
+UnderMaintenance ||| تحت الصيانة
+Undo corner ||| تراجع عن الزاوية
+Unearned Revenue ||| الإيرادات غير المكتسبة
+Unique per company. Stops the same supplier ||| فريد في كل شركة. يمنع فتح المورد نفسه مرتين برمزين.
+Unique within the company. Used to sort ||| فريد داخل الشركة. يُستخدم لترتيب الفئة وتعريفها.
+Unit ||| الوحدة
+Unit Code ||| رمز الوحدة
+Unit Cost Center ||| مركز تكلفة الوحدة
+Unit Occupancy ||| إشغال الوحدات
+Unit Price ||| سعر الوحدة
+Unit Sales ||| مبيعات الوحدات
+Unit Title Deed ||| سند ملكية الوحدة
+Unit code + contract number + year ||| رمز الوحدة + رقم العقد + السنة، مثل <code>OWN-R-0001-U01-C001-2026</code>. التجديد مع <strong>المستأجر نفسه على الوحدة نفسها</strong> يحتفظ برقم العقد وينقل السنة؛ و<strong>مستأجر مختلف</strong> يبدأ رقم عقد جديداً.
+Unit cost ||| تكلفة الوحدة
+Unit's cost held for sale (13200) ||| تكلفة الوحدة المحتفظ بها للبيع (13200)
+Units ||| الوحدات
+Units Hierarchy ||| تسلسل الوحدات
+Units are drawn in proportion to their area. ||| تُرسم الوحدات بنسبة مساحتها. اختر وحدة لعرض تفاصيلها، أو لوناً أعلاه لعرض تلك الوحدات فقط. تأتي الطوابق من طابق كل وحدة (G = الأرضي)؛ حدد رقم الطابق والموضع على الوحدة لترتيبها بدقة.
+Unpaid ||| غير مدفوع
+Unpaid / absent days ||| أيام بدون راتب / غياب
+Unpaid to suppliers ||| غير مدفوع للموردين
+Until ||| حتى
+Up to ||| حتى
+Up to date ||| محدّث
+Up to floor ||| حتى الطابق
+Update ||| تحديث
+Update Password ||| تحديث كلمة المرور
+Updated ||| تم التحديث
+Upload ||| رفع
+Upload a photo of each side of the building ||| ارفع صورة لكل جهة تريد عرضها من المبنى - الصورة المباشرة هي الأفضل. ثم حدد نوافذ أو شرفة كل وحدة عليها مرة واحدة. يلوّن وضع <strong>الصورة</strong> في عرض المبنى كل وحدة محددة بلون سلامة الإيجار. للأبراج، حدد طابقين ودع النظام يكررهما في المبنى.
+Upload the supplier's invoice ||| ارفع فاتورة المورد (PDF أو JPG أو PNG، حتى 10 ميغابايت). تُعبأ بيانات المورد ورقمه والتواريخ ووصف كل بند وكميته وسعره لتراجعها.
+Uploaded ||| تم الرفع
+Upper floor ||| الطابق الأعلى
+Urgent ||| عاجل
+Usability ||| سهولة الاستخدام
+Usage ||| الاستخدام
+Use <strong>Advance</strong> when the cheque ||| استخدم <strong>دفعة مقدمة</strong> عندما يكون الشيك مجرد بند مسجل نظامياً للتحصيل المستقبلي. واستخدم <strong>ذمم مدينة</strong> فقط عندما يرتبط الشيك بفاتورة مستحقة ويجب أن يسدد الذمم المدينة عند تحصيله.
+Use Approval Limits → Delegation ||| استخدم حدود الاعتماد ← التفويض لمنح مدير حداً أعلى للتواريخ التي تكون فيها غائباً بالضبط، مع ذكر السبب. ينتهي تلقائياً؛ ويمكنك مواصلة متابعة كل شيء من هاتفك.
+Use Default ||| استخدام الافتراضي
+Use the credentials assigned to your company account ||| استخدم بيانات الدخول المخصصة لحساب شركتك للوصول إلى العقود والمحاسبة والتقارير وأدوات الإدارة.
+Use the unit's treatment ||| استخدام معاملة الوحدة
+Use the unit's treatment (recommended) ||| استخدام معاملة الوحدة (موصى به)
+Use the username and password given to you ||| استخدم اسم المستخدم وكلمة المرور الممنوحة لك من مدير العقار.
+Use the username and temporary password HR gave you. ||| استخدم اسم المستخدم وكلمة المرور المؤقتة التي منحتك إياها الموارد البشرية. ستختار كلمة مرورك الخاصة في المرة الأولى.
+Use these fields only when migrating ||| استخدم هذه الحقول فقط عند الانتقال من نظام سابق. تُغذي حسابي مراقبة تكلفة الأصول الثابتة ومجمع الإهلاك كأرصدة افتتاحية <strong>ولا</strong> تُنشئ أي قيد. اتركهما صفراً للأصول المقتناة حديثاً عبر هذا النظام.
+Use this internal page only after sign-in ||| استخدم هذه الصفحة الداخلية فقط بعد تسجيل الدخول للشركات المُدارة الإضافية. يبدأ تسجيل الشركات الجديدة الآن من صفحة تسجيل الدخول وينشئ أول مستخدم مسؤول تلقائياً.
+Use this to report something that needs fixing ||| استخدم هذا للإبلاغ عن شيء يحتاج إلى إصلاح، أو لطلب مهلة لسداد فاتورة، أو للاستفسار عن تجديد عقدك، أو لإثارة أي أمر آخر معنا.
+Used ||| مستخدم
+Used only when `Capitalizable = No`. ||| يُستخدم فقط عندما `قابل للرسملة = لا`.
+Useful Life ||| العمر الإنتاجي
+Useful Life (Months) ||| العمر الإنتاجي (أشهر)
+User ||| المستخدم
+User Manual ||| دليل المستخدم
+Username ||| اسم المستخدم
+Username (mobile or email) ||| اسم المستخدم (الجوال أو البريد الإلكتروني)
+Users ||| المستخدمون
+Users & Permissions ||| المستخدمون والصلاحيات
+Utilities & Insurance ||| المرافق والتأمين
+VAT ||| ضريبة القيمة المضافة
+VAT 5% ||| الضريبة 5%
+VAT Charged ||| الضريبة المفروضة
+VAT Payable ||| ضريبة القيمة المضافة المستحقة
+VAT Rate ||| نسبة الضريبة
+VAT Recoverable ||| ضريبة القيمة المضافة القابلة للاسترداد
+VAT Return ||| الإقرار الضريبي
+VAT Settings ||| إعدادات ضريبة القيمة المضافة
+VAT Treatment ||| المعاملة الضريبية
+VAT collected for owner ||| الضريبة المحصّلة للمالك
+VAT in cost ||| الضريبة ضمن التكلفة
+VAT is derived from the unit ||| تُستمد الضريبة من الوحدة، ثم من العقار إن لم تُحدد. العقود التجارية خاضعة للنسبة الأساسية؛ والسكنية معفاة، باستثناء العقد <strong>الأول</strong> لوحدة في مبنى جديد (خلال ثلاث سنوات من تاريخ إنجازه)، فيخضع لنسبة الصفر تلقائياً. تجاوز فقط لاستثناء حقيقي، واذكر السبب.
+VAT on Commission ||| الضريبة على العمولة
+VAT on commission ||| الضريبة على العمولة
+VAT on costs ||| الضريبة على التكاليف
+VAT on rent billed in your name ||| الضريبة على الإيجار المفوتر باسمك، ناقصاً الصيانة والمصروفات المحمّلة عليك
+VAT recovered ||| الضريبة المستردة
+VAT registered (active) ||| مسجل في الضريبة (ساري)
+VAT reversed ||| الضريبة المعكوسة
+VAT treatment ||| المعاملة الضريبية
+Vac. ||| شاغرة
+Vacant ||| شاغرة
+Valuation ||| التقييم
+Valuation Date ||| تاريخ التقييم
+Value ||| القيمة
+Value before VAT ||| القيمة قبل الضريبة
+Valuer ||| المُقيّم
+Vendor ||| المورد
+Vendor (AP) ||| المورد (ذمم دائنة)
+Vendor / Bill ||| المورد / الفاتورة
+Vendor Bills ||| فواتير الموردين
+Vendor Code ||| رمز المورد
+Vendor Opening Balances (Accounts Payable) ||| الأرصدة الافتتاحية للموردين (الذمم الدائنة)
+Vendor Payment ||| دفعة مورد
+Vendor Payments ||| دفعات الموردين
+Vendor Statement ||| كشف حساب المورد
+Vendor payments, owner settlements and withdrawals ||| تُسجل دفعات الموردين وتسويات الملاك والمسحوبات وتكاليف التطوير والنثرية لكنها لا تُرحّل حتى يصرفها شخص بصلاحية كافية. المستويات الافتراضية: المحاسب حتى 1,000 درهم، والمدير حتى 5,000 درهم، والمالك بلا حد — قابلة للتغيير في أي وقت من حدود الاعتماد. فعّل الضابط لكل شركة هناك.
+Vendors ||| الموردون
+View ||| عرض
+View Statement ||| عرض كشف الحساب
+Visa expiry ||| انتهاء التأشيرة
+Voucher ||| السند
+Vouchers ||| السندات
+WIP account ||| حساب الأعمال قيد التنفيذ
+WIP balance ||| رصيد الأعمال قيد التنفيذ
+WPS (Wage Protection System) ||| نظام حماية الأجور (WPS)
+Waiting ||| بالانتظار
+Waiting for an approver. ||| بانتظار المعتمِد.
+Waiting for your decision ||| بانتظار قرارك
+Warehouse ||| مستودع
+Watch ||| متابعة
+We will do our best, but cannot promise this exact day. ||| سنبذل قصارى جهدنا، لكن لا نستطيع الالتزام بهذا اليوم تحديداً.
+Weekly rest day ||| يوم الراحة الأسبوعي
+Weekly rest days ||| أيام الراحة الأسبوعية
+What ||| ماذا
+What Happens Next ||| ماذا يحدث بعد ذلك
+What date could you pay by? ||| في أي تاريخ يمكنك السداد؟
+What do you need? ||| ماذا تحتاج؟
+What happens when we are travelling? ||| ماذا يحدث عندما نسافر؟
+What if a staff member deletes or changes records ||| ماذا لو حذف موظف سجلات أو غيّرها لإخفاء شيء؟
+What is wrong in this period ||| ما الخطأ في هذه الفترة، وما الذي سيُرحّل لتصحيحه.
+What kind of problem? ||| ما نوع المشكلة؟
+What should we do if we suspect a breach? ||| ماذا نفعل إذا اشتبهنا في اختراق؟
+What the system enforces to protect ||| ما يفرضه النظام لحماية أموال الشركة وبياناتها، وما يجب أن يعتمده الملاك كسياسة، وإجابات الأسئلة التي يطرحها الملاك عادة.
+What the tenant can see ||| ما يمكن للمستأجر رؤيته
+What they cannot do ||| ما لا يمكنهم فعله
+What was bought and why ||| ما الذي اشتُري ولماذا
+What was done (the tenant reads this) ||| ما الذي نُفذ (يقرأه المستأجر)
+What was supplied ||| ما الذي ورّد
+What we owe a supplier and how it arose ||| ما ندين به للمورد وكيف نشأ: كل فاتورة ودفعة مرحّلة على الذمم الدائنة لذلك المورد. الفواتير المسودة ليست في الحسابات ولا تُعرض. يطابق الرصيد الختامي حصة المورد من الذمم الدائنة في ميزان المراجعة.
+When ||| متى
+When an owner is away ||| عندما يغيب المالك <strong>يفوّض</strong> حداً أعلى لمدير لتواريخ محددة؛ وينتهي تلقائياً.
+Where withdrawal and returned cheque charges ||| الحساب الذي تُقيد فيه رسوم سحب الشيكات والشيكات المرتجعة على المستأجرين.
+Which account each posting uses. ||| الحساب الذي يستخدمه كل قيد.
+Which invoice? ||| أي فاتورة؟
+Which jobs ||| أي أعمال
+Which property? ||| أي عقار؟
+Which side ||| أي جهة
+Who may release how much ||| من يحق له الصرف وبأي مبلغ، والصلاحيات المؤقتة أثناء سفرك.
+Who may release payments, and up to how much. ||| من يحق له صرف المدفوعات وحتى أي مبلغ. يمكن للملاك تغييرها في أي وقت.
+Who occupies each unit, on what terms ||| من يشغل كل وحدة، وبأي شروط، وما المستحق عليه — مجمّعة حسب مالك العقار.
+Whole property ||| العقار بالكامل
+Widowed ||| أرمل
+Width (mm) ||| العرض (مم)
+With a TRN the tenant receives ||| مع الرقم الضريبي يستلم المستأجر <strong>فاتورة ضريبية كاملة</strong>؛ وبدونه <strong>فاتورة ضريبية مبسطة</strong>. الفواتير الصادرة تحتفظ بالرقم الضريبي المسجل وقتها.
+With payment approval on ||| مع تفعيل اعتماد المدفوعات، أي دفعة تتجاوز حدهم — وكل سند نثرية — تنتظر شخصاً آخر يرى البنود المحاسبية قبل صرفها. تُقفل المبالغ المعتمدة؛ والتعديلات تحتاج إلى إعادة اعتماد. كل شيء يظهر في شاشة رقابة المالك.
+Withdraw ||| سحب
+Withdraw my request ||| سحب طلبي
+Withdraw this request ||| سحب هذا الطلب
+Withdrawal ||| المسحوبات
+Withdrawals ||| المسحوبات
+Withdrawn ||| مسحوب
+Withdrawn, not yet replaced ||| مسحوبة، لم تُستبدل بعد
+Within ||| خلال
+Work it out from the numbers above ||| احسبه من الأرقام أعلاه
+Work started ||| بدأ العمل
+Worked ||| أيام العمل
+Workflow ||| سير العمل
+Workflow Guide ||| دليل سير العمل
+Working day starts ||| بداية يوم العمل
+Working hours a day ||| ساعات العمل اليومية
+Works for building ||| يعمل لمبنى
+Write a reply... ||| اكتب رداً...
+XML ||| XML
+Year ||| السنة
+Years adjusted ||| السنوات المعدلة
+Yes ||| نعم
+You are signed in with a temporary password. ||| أنت مسجل الدخول بكلمة مرور مؤقتة. يرجى اختيار كلمة مرورك الخاصة قبل المتابعة.
+You are signed in, but your account does not have permission ||| أنت مسجل الدخول، لكن حسابك لا يملك صلاحية فتح هذه الصفحة.
+You asked to pay by ||| طلبت السداد بحلول
+You can see the requests, but deciding them ||| يمكنك رؤية الطلبات، لكن البت فيها يحتاج إلى صلاحية اعتماد إعادة فتح الفترات.
+You do not have access to any data that can be reported on. ||| لا تملك وصولاً إلى أي بيانات يمكن إعداد تقرير عنها.
+You do not have access to open it. ||| لا تملك صلاحية فتحه.
+You have no active contract at the moment. ||| لا يوجد لديك عقد نافذ حالياً.
+You have no invoices yet. ||| لا توجد لديك فواتير بعد.
+You have no unpaid invoices at the moment ||| لا توجد لديك فواتير غير مدفوعة حالياً، فلا يوجد ما يمكن تأجيله.
+You have read-only access to master data. Contact the master data owner to add or amend a property. ||| لديك صلاحية اطلاع فقط على البيانات الرئيسية. تواصل مع المسؤول عن البيانات الرئيسية لإضافة عقار أو تعديله.
+You have read-only access to master data. Contact the master data owner to add or amend a tenant. ||| لديك صلاحية اطلاع فقط على البيانات الرئيسية. تواصل مع المسؤول عن البيانات الرئيسية لإضافة مستأجر أو تعديله.
+You have read-only access to master data. Contact the master data owner to add or amend a unit. ||| لديك صلاحية اطلاع فقط على البيانات الرئيسية. تواصل مع المسؤول عن البيانات الرئيسية لإضافة وحدة أو تعديلها.
+You have read-only access to master data. Contact the master data owner to add or amend a vendor. ||| لديك صلاحية اطلاع فقط على البيانات الرئيسية. تواصل مع المسؤول عن البيانات الرئيسية لإضافة مورد أو تعديله.
+Your Share ||| حصتك
+Your account information cannot be shown at the moment. ||| لا يمكن عرض معلومات حسابك حالياً. هذه ليست مشكلة في حسابك ولم يتغير فيه شيء.
+Your company record is created automatically. ||| يُنشأ سجل شركتك تلقائياً.
+Your company subscription has expired. ||| انتهى اشتراك شركتك. أدخل رمز تفعيل صالحاً لمواصلة استخدام شاشات المعالجة.
+Your decision ||| قرارك
+Your first admin user gets full access for that company. ||| يحصل أول مستخدم مسؤول على وصول كامل لتلك الشركة.
+Your own request - another approver decides it. ||| طلبك الخاص - يقرره معتمِد آخر.
+Your payslips appear here once a payroll is approved. ||| تظهر قسائم رواتبك هنا بعد اعتماد كشف الرواتب.
+Your report ||| تقريرك
+Your share ||| حصتك
+Yours - someone else approves it ||| خاصتك - يعتمده شخص آخر
+Z → A / high → low ||| ي ← أ / من الأعلى إلى الأقل
+Zero rated (0%) ||| خاضع لنسبة الصفر (0%)
+Zero rated supplies ||| توريدات خاضعة لنسبة الصفر
+Zero rated supplies for the year ||| التوريدات الخاضعة لنسبة الصفر للسنة
+automatic ||| تلقائي
+blank = your limit ||| فارغ = حدك
+breadcrumb ||| مسار التنقل
+continues below ||| يتبع أدناه
+dd MM yyyy (boxes) ||| dd MM yyyy (خانات)
+dd-MM-yyyy ||| dd-MM-yyyy
+dd/MM/yyyy ||| dd/MM/yyyy
+ddMMyyyy (boxes) ||| ddMMyyyy (خانات)
+debit side ||| الجانب المدين
+draft ||| مسودة
+e.g. 000451 ||| مثال: 000451
+e.g. AC filter 24x24 ||| مثال: فلتر مكيف 24x24
+e.g. BILL-2026 ||| مثال: BILL-2026
+e.g. Building maintenance ||| مثال: صيانة المباني
+e.g. Department of Economic Development - Ras Al Khaimah ||| مثال: دائرة التنمية الاقتصادية - رأس الخيمة
+e.g. Department of Economy and Tourism - Dubai ||| مثال: دائرة الاقتصاد والسياحة - دبي
+e.g. Emirates NBD, or leave blank ||| مثال: الإمارات دبي الوطني، أو اتركه فارغاً
+e.g. IN ||| مثال: IN
+e.g. Kitchen tap is leaking ||| مثال: صنبور المطبخ يسرّب
+e.g. Lease terminated on 31 March 2027 ||| مثال: أُنهي العقد في 31 مارس 2027 بالاتفاق المتبادل - أُلغي إيجار أبريل
+e.g. Makani number ||| مثال: رقم مكاني
+e.g. Opening a bank account ||| مثال: فتح حساب بنكي
+e.g. Payment for the annual renewal was returned by the bank ||| مثال: أعاد البنك دفعة التجديد السنوي
+e.g. Penalty for damaged equipment, memo HR-12 ||| مثال: غرامة على معدات تالفة، مذكرة HR-12
+e.g. Rent by property this year ||| مثال: الإيجار حسب العقار هذه السنة
+e.g. Sunday, or Saturday,Sunday ||| مثال: Sunday، أو Saturday,Sunday
+e.g. Visited, compressor needs replacing ||| مثال: تمت الزيارة، الضاغط يحتاج إلى استبدال، طُلبت القطع
+entry ||| قيد
+expired ||| منتهٍ
+expires soon ||| ينتهي قريباً
+from request to the engineer's response ||| من الطلب حتى استجابة المهندس
+if bought ||| إن اشتُري
+internal ||| داخلي
+let ||| مؤجرة
+limit ||| الحد
+main contractor ||| المقاول الرئيسي
+memo posts here ||| يُرحّل القيد النظامي هنا
+moves every field; negative = left / up ||| يحرك كل الحقول؛ السالب = يسار / أعلى
+no TRN ||| بدون رقم ضريبي
+no data yet ||| لا توجد بيانات بعد
+no limit ||| بلا حد
+not accounting ||| ليس محاسبياً
+of which collected from tenants and available to pay ||| منها المحصّل من المستأجرين والمتاح للدفع
+on these jobs ||| على هذه الأعمال
+owner billed ||| مفوتر باسم المالك
+payroll transactions ||| حركات الرواتب
+per year ||| في السنة
+rows ||| صفوف
+tenant credited ||| قُيد للمستأجر
+worked out ||| المحتسب
+worst first ||| الأسوأ أولاً
+— choose — ||| — اختر —
+✓ Complete ||| ✓ مكتمل
+✓ Every business and government tenant is complete ||| ✓ جميع المستأجرين من جهات الأعمال والجهات الحكومية مكتملون
+🔒 Closed ||| 🔒 مقفل
+🔒 Year closed ||| 🔒 السنة مقفلة

@@ -1,7 +1,7 @@
 ﻿@model List<RealEstateManager.Domain.OwnerRecharge>
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Recharges to Owners";
+    ViewData["Title"] = T["Recharges to Owners"];
     var from = (DateTime)ViewBag.From;
     var to = (DateTime)ViewBag.To;
     var owner = ViewBag.Owner as string;
@@ -11,33 +11,33 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-1">Recharges to Owners</h2>
-        <div class="text-muted">Costs of managed properties passed on to their owners: recharges with 5% VAT and our tax invoice, or disbursements paid on the owner's behalf with no VAT.</div>
+        <h2 class="mb-1">@T["Recharges to Owners"]</h2>
+        <div class="text-muted">@T["Costs of managed properties passed on to their owners: recharges with 5% VAT and our tax invoice, or disbursements paid on the owner's behalf with no VAT."]</div>
     </div>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3">
-    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">From</label><input id="fromDate" type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
-    <div class="col-auto"><label class="form-label small mb-0" for="toDate">To</label><input id="toDate" type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">@T["From"]</label><input id="fromDate" type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="toDate">@T["To"]</label><input id="toDate" type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
     <div class="col-auto">
-        <label class="form-label small mb-0" for="owner">Owner</label>
+        <label class="form-label small mb-0" for="owner">@T["Owner"]</label>
         <select id="owner" name="owner" class="form-select form-select-sm">
-            <option value="">All owners</option>
+            <option value="">@T["All owners"]</option>
             @foreach (var o in owners) { <option value="@o" selected="@(o == owner ? "selected" : null)">@o</option> }
         </select>
     </div>
-    <div class="col-auto"><button class="btn btn-sm btn-dark">Show</button></div>
+    <div class="col-auto"><button class="btn btn-sm btn-dark">@T["Show"]</button></div>
 </form>
 
 <div class="row g-3 mb-3">
-    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Costs recharged (posted)</div><div class="h4 mb-0">@posted.Sum(x => x.NetAmount).ToString("N2")</div></div></div></div>
-    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Our output VAT on recharges</div><div class="h4 mb-0">@posted.Sum(x => x.VatAmount).ToString("N2")</div></div></div></div>
-    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Charged to owners</div><div class="h4 mb-0">@posted.Sum(x => x.TotalAmount).ToString("N2")</div></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Costs recharged (posted)"]</div><div class="h4 mb-0">@posted.Sum(x => x.NetAmount).ToString("N2")</div></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Our output VAT on recharges"]</div><div class="h4 mb-0">@posted.Sum(x => x.VatAmount).ToString("N2")</div></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Charged to owners"]</div><div class="h4 mb-0">@posted.Sum(x => x.TotalAmount).ToString("N2")</div></div></div></div>
 </div>
 
 @if (Model.Count == 0)
 {
-    <div class="card shadow-sm"><div class="card-body text-muted">No recharges in this period. Tick <strong>Charge to owner</strong> on a vendor bill line or petty cash voucher for a managed property, or take a maintenance store item for an owner's unit.</div></div>
+    <div class="card shadow-sm"><div class="card-body text-muted">@T.Html("No recharges in this period. Tick <strong>Charge to owner</strong> on a vendor bill line or petty cash voucher for a managed property, or take a maintenance store item for an owner's unit.")</div></div>
 }
 else
 {
@@ -45,7 +45,7 @@ else
         <div class="table-responsive">
             <table class="table table-sm table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>Document</th><th>Date</th><th>Owner</th><th>Property</th><th>How</th><th>Kind</th><th>Description</th><th class="text-end">Cost</th><th class="text-end">VAT</th><th class="text-end">Total</th><th></th></tr>
+                    <tr><th>@T["Document"]</th><th>@T["Date"]</th><th>@T["Owner"]</th><th>@T["Property"]</th><th>@T["How"]</th><th>@T["Kind"]</th><th>@T["Description"]</th><th class="text-end">@T["Cost"]</th><th class="text-end">@T["VAT"]</th><th class="text-end">@T["Total"]</th><th></th></tr>
                 </thead>
                 <tbody>
                     @foreach (var r in Model)
@@ -62,7 +62,7 @@ else
                             <td class="text-end">@r.NetAmount.ToString("N2")</td>
                             <td class="text-end" title="@(r.Treatment == OwnerCostTreatments.Disbursement ? "The supplier's VAT, the owner's to reclaim" : "Our 5% VAT")">@r.OwnerReclaimableVat.ToString("N2")</td>
                             <td class="text-end fw-semibold">@r.TotalAmount.ToString("N2")</td>
-                            <td>@if (!isPosted) { <span class="badge bg-secondary" title="Counts once its entry is posted">draft</span> }</td>
+                            <td>@if (!isPosted) { <span class="badge bg-secondary" title="@T["Counts once its entry is posted"]">@T["draft"]</span> }</td>
                         </tr>
                     }
                 </tbody>

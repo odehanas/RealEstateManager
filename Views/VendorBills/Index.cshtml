@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<RealEstateManager.Domain.VendorBill>
 
 @{
-    ViewData["Title"] = "Vendor Bills";
+    ViewData["Title"] = T["Vendor Bills"];
 
     string Money(decimal value) => value.ToString("N2");
 }
@@ -17,12 +17,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Vendor Bills</h2>
+        <h2 class="mb-1">@T["Vendor Bills"]</h2>
         <p class="text-muted mb-0 small">
-            Bills are entered as drafts and have no effect on the accounts until posted.
+            @T["Bills are entered as drafts and have no effect on the accounts until posted."]
         </p>
     </div>
-    <a asp-action="Create" class="btn btn-dark">New Bill</a>
+    <a asp-action="Create" class="btn btn-dark">@T["New Bill"]</a>
 </div>
 
 <div class="card shadow-sm">
@@ -30,18 +30,18 @@
         <table class="table table-bordered table-striped table-sm mb-0">
             <thead>
                 <tr>
-                    <th>Bill No.</th>
-                    <th>Supplier Ref.</th>
-                    <th>Supplier</th>
-                    <th>Bill Date</th>
-                    <th>Due Date</th>
-                    <th>Document</th>
-                    <th class="text-end">Net</th>
-                    <th class="text-end">VAT</th>
-                    <th class="text-end">Total</th>
-                    <th class="text-end">Balance</th>
-                    <th>Status</th>
-                    <th style="width:1%">Actions</th>
+                    <th>@T["Bill No."]</th>
+                    <th>@T["Supplier Ref."]</th>
+                    <th>@T["Supplier"]</th>
+                    <th>@T["Bill Date"]</th>
+                    <th>@T["Due Date"]</th>
+                    <th>@T["Document"]</th>
+                    <th class="text-end">@T["Net"]</th>
+                    <th class="text-end">@T["VAT"]</th>
+                    <th class="text-end">@T["Total"]</th>
+                    <th class="text-end">@T["Balance"]</th>
+                    <th>@T["Status"]</th>
+                    <th style="width:1%">@T["Actions"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,11 +61,11 @@
                         <td>
                             @if (bill.VendorIsVatRegistered && bill.VatAmount > 0m)
                             {
-                                <span class="badge bg-info text-dark">Tax Invoice</span>
+                                <span class="badge bg-info text-dark">@T["Tax Invoice"]</span>
                             }
                             else
                             {
-                                <span class="badge bg-light text-dark border">Commercial</span>
+                                <span class="badge bg-light text-dark border">@T["Commercial"]</span>
                             }
                         </td>
                         <td class="text-end">@Money(bill.Subtotal)</td>
@@ -75,7 +75,7 @@
                         <td>
                             @if (periodClosed)
                             {
-                                <span class="badge bg-dark">Locked</span>
+                                <span class="badge bg-dark">@T["Locked"]</span>
                             }
                             else if (posted)
                             {
@@ -83,12 +83,12 @@
                             }
                             else
                             {
-                                <span class="badge bg-warning text-dark">Draft</span>
+                                <span class="badge bg-warning text-dark">@T["Draft"]</span>
                             }
                         </td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a asp-action="Details" asp-route-id="@bill.Id" class="btn btn-sm btn-outline-secondary">Open</a>
+                                <a asp-action="Details" asp-route-id="@bill.Id" class="btn btn-sm btn-outline-secondary">@T["Open"]</a>
 
                                 @if (bill.IsEditable)
                                 {
@@ -96,7 +96,7 @@
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@bill.Id" />
                                         <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                        <button type="submit" class="btn btn-sm btn-dark">Post</button>
+                                        <button type="submit" class="btn btn-sm btn-dark">@T["Post"]</button>
                                     </form>
                                 }
                                 else if (!periodClosed)
@@ -105,14 +105,14 @@
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@bill.Id" />
                                         <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                        <button type="submit" class="btn btn-sm btn-outline-warning">Reset</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-warning">@T["Reset"]</button>
                                     </form>
                                 }
 
                                 @if (bill.BalanceDue > 0 && posted)
                                 {
                                     <a asp-controller="VendorPayments" asp-action="Create" asp-route-billId="@bill.Id"
-                                       class="btn btn-sm btn-outline-success">Pay</a>
+                                       class="btn btn-sm btn-outline-success">@T["Pay"]</a>
                                 }
                             </div>
                         </td>

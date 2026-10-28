@@ -1,7 +1,7 @@
 @model RealEstateManager.Services.InvestmentPropertyNoteDto
 
 @{
-    ViewData["Title"] = "Investment Property Note";
+    ViewData["Title"] = T["Investment Property Note"];
     string N(decimal v) => v < 0 ? "(" + (-v).ToString("N2") + ")" : v.ToString("N2");
 }
 
@@ -11,27 +11,25 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Investment Property</h2>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <h2 class="mb-0">@T["Investment Property"]</h2>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <div class="alert alert-info no-print">
-    Investment property is carried at <strong>cost less accumulated depreciation</strong> (the cost model in IAS 40). Land is
-    not depreciated; buildings are depreciated over their useful lives. Fair value is not booked - it is disclosed below, from
-    the latest valuation recorded on each property (Master Data ▸ Properties ▸ Edit ▸ Valuation).
+    @T.Html("Investment property is carried at <strong>cost less accumulated depreciation</strong> (the cost model in IAS 40). Land is not depreciated; buildings are depreciated over their useful lives. Fair value is not booked - it is disclosed below, from the latest valuation recorded on each property (Master Data ▸ Properties ▸ Edit ▸ Valuation).")
 </div>
 
 <form method="get" class="row g-3 mb-4 no-print">
     <div class="col-md-3">
-        <label class="form-label">From</label>
+        <label class="form-label">@T["From"]</label>
         <input type="date" name="fromDate" value="@Model.FromDate.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
     <div class="col-md-3">
-        <label class="form-label">To</label>
+        <label class="form-label">@T["To"]</label>
         <input type="date" name="toDate" value="@Model.ToDate.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
     <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-dark w-100">Refresh</button>
+        <button type="submit" class="btn btn-dark w-100">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -47,25 +45,25 @@
 
 <h5>Movement in the carrying amount, @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</h5>
 <table class="table table-sm table-bordered note" style="max-width: 720px;">
-    <thead><tr><th></th><th class="num">AED</th></tr></thead>
+    <thead><tr><th></th><th class="num">@T["AED"]</th></tr></thead>
     <tbody>
-        <tr class="table-light"><td colspan="2"><strong>Cost</strong></td></tr>
+        <tr class="table-light"><td colspan="2">@T.Html("<strong>Cost</strong>")</td></tr>
         <tr><td>At @Model.FromDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.OpeningCost)</td></tr>
-        <tr><td>Additions</td><td class="num">@N(Model.Additions)</td></tr>
-        <tr><td>Transferred from properties under construction</td><td class="num">@N(Model.TransfersFromDevelopment)</td></tr>
-        <tr><td>Disposals and other reductions</td><td class="num">@N(-Model.Disposals)</td></tr>
+        <tr><td>@T["Additions"]</td><td class="num">@N(Model.Additions)</td></tr>
+        <tr><td>@T["Transferred from properties under construction"]</td><td class="num">@N(Model.TransfersFromDevelopment)</td></tr>
+        <tr><td>@T["Disposals and other reductions"]</td><td class="num">@N(-Model.Disposals)</td></tr>
         <tr class="fw-bold"><td>At @Model.ToDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.ClosingCost)</td></tr>
 
-        <tr class="table-light"><td colspan="2"><strong>Accumulated depreciation</strong></td></tr>
+        <tr class="table-light"><td colspan="2">@T.Html("<strong>Accumulated depreciation</strong>")</td></tr>
         <tr><td>At @Model.FromDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.OpeningDepreciation)</td></tr>
-        <tr><td>Charge for the period</td><td class="num">@N(Model.DepreciationCharge)</td></tr>
+        <tr><td>@T["Charge for the period"]</td><td class="num">@N(Model.DepreciationCharge)</td></tr>
         @if (Model.DepreciationOther != 0)
         {
-            <tr><td>Other movements (disposals, adjustments)</td><td class="num">@N(Model.DepreciationOther)</td></tr>
+            <tr><td>@T["Other movements (disposals, adjustments)"]</td><td class="num">@N(Model.DepreciationOther)</td></tr>
         }
         <tr class="fw-bold"><td>At @Model.ToDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.ClosingDepreciation)</td></tr>
 
-        <tr class="table-light"><td colspan="2"><strong>Carrying amount</strong></td></tr>
+        <tr class="table-light"><td colspan="2">@T.Html("<strong>Carrying amount</strong>")</td></tr>
         <tr><td>At @Model.FromDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.OpeningCarryingAmount)</td></tr>
         <tr class="fw-bold table-primary"><td>At @Model.ToDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.ClosingCarryingAmount)</td></tr>
     </tbody>
@@ -76,19 +74,19 @@
     <table class="table table-sm table-bordered note">
         <thead>
             <tr>
-                <th>Property</th>
-                <th class="num">Cost</th>
-                <th class="num">Accumulated Depreciation</th>
-                <th class="num">Carrying Amount</th>
-                <th class="num">Fair Value</th>
-                <th>Valuation Date</th>
-                <th>Valuer</th>
+                <th>@T["Property"]</th>
+                <th class="num">@T["Cost"]</th>
+                <th class="num">@T["Accumulated Depreciation"]</th>
+                <th class="num">@T["Carrying Amount"]</th>
+                <th class="num">@T["Fair Value"]</th>
+                <th>@T["Valuation Date"]</th>
+                <th>@T["Valuer"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Properties.Count == 0)
             {
-                <tr><td colspan="7" class="text-center text-muted">No investment property recorded.</td></tr>
+                <tr><td colspan="7" class="text-center text-muted">@T["No investment property recorded."]</td></tr>
             }
             @foreach (var row in Model.Properties)
             {
@@ -114,7 +112,7 @@
         </tbody>
         <tfoot>
             <tr class="fw-bold">
-                <td>Total</td>
+                <td>@T["Total"]</td>
                 <td class="num">@N(Model.Properties.Sum(x => x.Cost))</td>
                 <td class="num">@N(Model.Properties.Sum(x => x.AccumulatedDepreciation))</td>
                 <td class="num">@N(Model.Properties.Sum(x => x.CarryingAmount))</td>
@@ -128,8 +126,7 @@
 @if (!Model.AllValued)
 {
     <div class="alert alert-warning">
-        Not every property has a fair value recorded. IAS 40 requires the fair value of investment property carried at cost to be
-        disclosed; record the latest valuation on each property.
+        @T["Not every property has a fair value recorded. IAS 40 requires the fair value of investment property carried at cost to be disclosed; record the latest valuation on each property."]
     </div>
 }
 
@@ -147,7 +144,7 @@
 @if (candidates != null && candidates.Count > 0)
 {
     <div class="card shadow-sm mb-4 no-print">
-        <div class="card-header bg-light"><strong>Depreciate an Existing Building</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Depreciate an Existing Building</strong>")</div>
         <div class="card-body">
             <p class="small text-muted">
                 A building brought in as an opening balance is not depreciated until it is set up here. Split its carrying amount
@@ -159,7 +156,7 @@
             <form asp-action="SetUpBuilding" method="post" class="row g-3"
                   onsubmit="return confirm('Set up depreciation for this building? Its monthly depreciation will be posted by the depreciation run.');">
                 <div class="col-md-4">
-                    <label class="form-label">Property</label>
+                    <label class="form-label">@T["Property"]</label>
                     <select name="propertyId" class="form-select" required>
                         @foreach (var c in candidates)
                         {
@@ -168,30 +165,30 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Depreciate from</label>
+                    <label class="form-label">@T["Depreciate from"]</label>
                     <input type="date" name="startDate" value="@(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1).ToString("yyyy-MM-dd"))" class="form-control" required />
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Land</label>
+                    <label class="form-label">@T["Land"]</label>
                     <input type="number" step="0.01" min="0" name="landCost" class="form-control" required />
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Building</label>
+                    <label class="form-label">@T["Building"]</label>
                     <input type="number" step="0.01" min="0.01" name="buildingCost" class="form-control" required />
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Remaining life (years)</label>
+                    <label class="form-label">@T["Remaining life (years)"]</label>
                     <input type="number" min="1" max="100" name="remainingLifeYears" value="30" class="form-control" required />
                 </div>
                 <div class="col-md-8">
                     <div class="form-check">
                         <input type="checkbox" name="allocate" value="true" class="form-check-input" id="allocate" checked />
                         <input type="hidden" name="allocate" value="false" />
-                        <label class="form-check-label" for="allocate">Allocate land and building from the unallocated opening balance to this property</label>
+                        <label class="form-check-label" for="allocate">@T["Allocate land and building from the unallocated opening balance to this property"]</label>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <button type="submit" class="btn btn-dark w-100">Set Up Depreciation</button>
+                    <button type="submit" class="btn btn-dark w-100">@T["Set Up Depreciation"]</button>
                 </div>
             </form>
         </div>

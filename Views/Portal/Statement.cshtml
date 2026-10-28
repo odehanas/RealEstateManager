@@ -1,25 +1,25 @@
 @model RealEstateManager.Models.PortalStatementViewModel
 @{
     Layout = "_PortalLayout";
-    ViewData["Title"] = "My Statement";
+    ViewData["Title"] = T["My Statement"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h5 mb-0">My Statement</h1>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <h1 class="h5 mb-0">@T["My Statement"]</h1>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-6 col-md-auto">
-        <label class="form-label mb-1 small" for="fromDate">From</label>
+        <label class="form-label mb-1 small" for="fromDate">@T["From"]</label>
         <input type="date" class="form-control form-control-sm" id="fromDate" name="fromDate" value="@Model.FromDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-6 col-md-auto">
-        <label class="form-label mb-1 small" for="toDate">To</label>
+        <label class="form-label mb-1 small" for="toDate">@T["To"]</label>
         <input type="date" class="form-control form-control-sm" id="toDate" name="toDate" value="@Model.ToDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Show</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Show"]</button>
     </div>
 </form>
 
@@ -33,23 +33,23 @@
         <table class="table table-bordered table-sm mb-0">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Reference</th>
-                    <th>Description</th>
-                    <th class="text-end">Charge</th>
-                    <th class="text-end">Payment</th>
-                    <th class="text-end">Balance</th>
+                    <th>@T["Date"]</th>
+                    <th>@T["Reference"]</th>
+                    <th>@T["Description"]</th>
+                    <th class="text-end">@T["Charge"]</th>
+                    <th class="text-end">@T["Payment"]</th>
+                    <th class="text-end">@T["Balance"]</th>
                 </tr>
             </thead>
             <tbody>
                 <tr class="table-light">
-                    <td colspan="5"><strong>Balance brought forward</strong></td>
+                    <td colspan="5">@T.Html("<strong>Balance brought forward</strong>")</td>
                     <td class="text-end fw-bold">@Model.OpeningBalance.ToString("N2")</td>
                 </tr>
 
                 @if (Model.Lines.Count == 0)
                 {
-                    <tr><td colspan="6" class="text-muted">No activity in this period.</td></tr>
+                    <tr><td colspan="6" class="text-muted">@T["No activity in this period."]</td></tr>
                 }
 
                 @foreach (var line in Model.Lines)
@@ -66,7 +66,7 @@
             </tbody>
             <tfoot class="table-light">
                 <tr>
-                    <th colspan="3">Period totals</th>
+                    <th colspan="3">@T["Period totals"]</th>
                     <th class="text-end">@Model.TotalCharges.ToString("N2")</th>
                     <th class="text-end">@Model.TotalPayments.ToString("N2")</th>
                     <th class="text-end">@Model.ClosingBalance.ToString("N2")</th>
@@ -78,8 +78,6 @@
 
 <div class="card shadow-sm mt-3">
     <div class="card-body small text-muted">
-        A positive balance is an amount you owe; a negative balance means you are in credit.
-        Cheques appear as a payment on the date they cleared, not the date you handed them over.
-        If anything here looks wrong, contact your property manager.
+        @T["A positive balance is an amount you owe; a negative balance means you are in credit. Cheques appear as a payment on the date they cleared, not the date you handed them over. If anything here looks wrong, contact your property manager."]
     </div>
 </div>

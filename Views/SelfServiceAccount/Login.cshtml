@@ -1,28 +1,28 @@
 @{
     Layout = "_SelfServiceLayout";
-    ViewData["Title"] = "Sign In";
+    ViewData["Title"] = T["Sign In"];
 }
 
 <div class="card shadow-sm mx-auto mt-4" style="max-width:420px">
     <div class="card-body p-4">
-        <h1 class="h5 mb-1">Employee sign in</h1>
-        <p class="text-muted small mb-4">Use the username and temporary password HR gave you. You will choose your own password the first time.</p>
+        <h1 class="h5 mb-1">@T["Employee sign in"]</h1>
+        <p class="text-muted small mb-4">@T["Use the username and temporary password HR gave you. You will choose your own password the first time."]</p>
 
         @if (ViewBag.Error is string error) { <div class="alert alert-danger py-2 small">@error</div> }
 
         <form asp-action="Login" method="post">
             @Html.AntiForgeryToken()
             <div class="mb-3">
-                <label class="form-label" for="username">Username</label>
+                <label class="form-label" for="username">@T["Username"]</label>
                 <input id="username" name="username" value="@ViewBag.Username" class="form-control" autocomplete="username" autocapitalize="none" autofocus required />
             </div>
             <div class="mb-4">
-                <label class="form-label" for="password">Password</label>
+                <label class="form-label" for="password">@T["Password"]</label>
                 <input id="password" name="password" type="password" class="form-control" autocomplete="current-password" required />
             </div>
-            <button type="submit" class="btn btn-dark w-100">Sign in</button>
+            <button type="submit" class="btn btn-dark w-100">@T["Sign in"]</button>
         </form>
 
-        <p class="text-muted small mt-4 mb-0">Forgotten your password? Ask HR to reset your portal access. After 5 wrong attempts the account locks for 15 minutes.</p>
+        <p class="text-muted small mt-4 mb-0">@T["Forgotten your password? Ask HR to reset your portal access. After 5 wrong attempts the account locks for 15 minutes."]</p>
     </div>
 </div>

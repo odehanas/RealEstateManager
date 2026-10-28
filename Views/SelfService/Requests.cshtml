@@ -2,36 +2,36 @@
 @using RealEstateManager.Domain
 @{
     Layout = "_SelfServiceLayout";
-    ViewData["Title"] = "Certificates";
+    ViewData["Title"] = T["Certificates"];
     string Badge(string s) => s switch { EmployeeRequestStatuses.Issued => "bg-success", EmployeeRequestStatuses.Declined => "bg-danger", _ => "bg-warning text-dark" };
 }
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <div class="fw-bold mb-2">Ask HR for a document</div>
+        <div class="fw-bold mb-2">@T["Ask HR for a document"]</div>
         <form asp-action="Requests" method="post">
             @Html.AntiForgeryToken()
             <div class="mb-2">
-                <label class="form-label small" for="requestType">Document</label>
+                <label class="form-label small" for="requestType">@T["Document"]</label>
                 <select id="requestType" name="requestType" class="form-select">
                     @foreach (var t in EmployeeRequestTypes.All) { <option value="@t">@EmployeeRequestTypes.Describe(t)</option> }
                 </select>
             </div>
             <div class="mb-2">
-                <label class="form-label small" for="addressedTo">Addressed to</label>
-                <input id="addressedTo" name="addressedTo" class="form-control" maxlength="200" placeholder="e.g. Emirates NBD, or leave blank" />
+                <label class="form-label small" for="addressedTo">@T["Addressed to"]</label>
+                <input id="addressedTo" name="addressedTo" class="form-control" maxlength="200" placeholder="@T["e.g. Emirates NBD, or leave blank"]" />
             </div>
             <div class="mb-3">
-                <label class="form-label small" for="purpose">Purpose (optional)</label>
-                <input id="purpose" name="purpose" class="form-control" maxlength="500" placeholder="e.g. Opening a bank account" />
+                <label class="form-label small" for="purpose">@T["Purpose (optional)"]</label>
+                <input id="purpose" name="purpose" class="form-control" maxlength="500" placeholder="@T["e.g. Opening a bank account"]" />
             </div>
-            <button class="btn btn-primary w-100">Send to HR</button>
+            <button class="btn btn-primary w-100">@T["Send to HR"]</button>
         </form>
     </div>
 </div>
 
-<h2 class="h6">My requests</h2>
-@if (Model.Count == 0) { <div class="text-muted small">No requests yet.</div> }
+<h2 class="h6">@T["My requests"]</h2>
+@if (Model.Count == 0) { <div class="text-muted small">@T["No requests yet."]</div> }
 <div class="list-group shadow-sm">
     @foreach (var r in Model)
     {

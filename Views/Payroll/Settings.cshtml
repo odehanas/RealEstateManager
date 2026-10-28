@@ -1,13 +1,13 @@
 @model RealEstateManager.Models.PayrollSettingsViewModel
 
 @{
-    ViewData["Title"] = "Payroll Settings";
+    ViewData["Title"] = T["Payroll Settings"];
     var s = Model.Settings;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Payroll Settings</h2>
-    <a asp-action="Index" class="btn btn-outline-secondary">Payroll</a>
+    <h2 class="mb-0">@T["Payroll Settings"]</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Payroll"]</a>
 </div>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
@@ -17,24 +17,24 @@
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">WPS (Wage Protection System)</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["WPS (Wage Protection System)"]</h5></div>
         <div class="card-body row g-3">
             <div class="col-md-4">
-                <label class="form-label">MOHRE establishment number</label>
+                <label class="form-label">@T["MOHRE establishment number"]</label>
                 <input asp-for="Settings.EmployerEstablishmentId" class="form-control" maxlength="13" />
-                <div class="form-text">13 digits, on the establishment card.</div>
+                <div class="form-text">@T["13 digits, on the establishment card."]</div>
             </div>
             <div class="col-md-4">
-                <label class="form-label">Salary bank routing code</label>
+                <label class="form-label">@T["Salary bank routing code"]</label>
                 <input asp-for="Settings.EmployerBankRoutingCode" class="form-control" maxlength="9" />
-                <div class="form-text">9-digit routing code (agent ID) of the bank that sends the WPS file.</div>
+                <div class="form-text">@T["9-digit routing code (agent ID) of the bank that sends the WPS file."]</div>
             </div>
-            <div class="col-md-4"><label class="form-label">Salary bank name</label><input asp-for="Settings.SalaryBankName" class="form-control" /></div>
+            <div class="col-md-4"><label class="form-label">@T["Salary bank name"]</label><input asp-for="Settings.SalaryBankName" class="form-control" /></div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">Accounts</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Accounts"]</h5></div>
         <div class="card-body row g-3">
             @foreach (var (field, label) in new[] {
                 ("BasicSalaryExpenseAccountId", "Basic salaries (expense)"), ("AllowancesExpenseAccountId", "Allowances (expense)"),
@@ -55,104 +55,100 @@
                 </div>
             }
             <div class="col-md-4">
-                <label class="form-label">Default bank for salaries</label>
+                <label class="form-label">@T["Default bank for salaries"]</label>
                 <select asp-for="Settings.DefaultBankAccountId" asp-items="Model.BankAccounts" class="form-select"><option value="">-</option></select>
             </div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">Calculation</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Calculation"]</h5></div>
         <div class="card-body row g-3">
             <div class="col-md-3">
-                <label class="form-label">Overtime rate</label>
+                <label class="form-label">@T["Overtime rate"]</label>
                 <input asp-for="Settings.OvertimeMultiplier" class="form-control" />
-                <div class="form-text">1.25 = 125% of the basic hourly wage (UAE normal overtime); 1.5 for nights and rest days.</div>
+                <div class="form-text">@T["1.25 = 125% of the basic hourly wage (UAE normal overtime); 1.5 for nights and rest days."]</div>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Rest-day / holiday overtime rate</label>
+                <label class="form-label">@T["Rest-day / holiday overtime rate"]</label>
                 <input asp-for="Settings.RestDayOvertimeMultiplier" class="form-control" />
-                <div class="form-text">1.5 = 150% under UAE law.</div>
+                <div class="form-text">@T["1.5 = 150% under UAE law."]</div>
             </div>
-            <div class="col-md-3"><label class="form-label">Working hours a day</label><input asp-for="Settings.WorkingHoursPerDay" class="form-control" /></div>
-            <div class="col-md-3"><label class="form-label">Working day starts</label><input asp-for="Settings.WorkStartTime" type="time" class="form-control" /></div>
+            <div class="col-md-3"><label class="form-label">@T["Working hours a day"]</label><input asp-for="Settings.WorkingHoursPerDay" class="form-control" /></div>
+            <div class="col-md-3"><label class="form-label">@T["Working day starts"]</label><input asp-for="Settings.WorkStartTime" type="time" class="form-control" /></div>
             <div class="col-md-3">
-                <label class="form-label">Weekly rest days</label>
+                <label class="form-label">@T["Weekly rest days"]</label>
                 <input asp-for="Settings.WeeklyOffDays" class="form-control" />
-                <div class="form-text">e.g. Sunday, or Saturday,Sunday</div>
+                <div class="form-text">@T["e.g. Sunday, or Saturday,Sunday"]</div>
             </div>
-            <div class="col-md-3"><label class="form-label">Late after (minutes' grace)</label><input asp-for="Settings.LateGraceMinutes" class="form-control" /></div>
+            <div class="col-md-3"><label class="form-label">@T["Late after (minutes' grace)"]</label><input asp-for="Settings.LateGraceMinutes" class="form-control" /></div>
             <div class="col-md-6">
                 <div class="form-check mt-4">
                     <input asp-for="Settings.DeductLateTime" class="form-check-input" type="checkbox" />
-                    <label asp-for="Settings.DeductLateTime" class="form-check-label">Deduct late time from pay (at the basic hourly wage)</label>
+                    <label asp-for="Settings.DeductLateTime" class="form-check-label">@T["Deduct late time from pay (at the basic hourly wage)"]</label>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-check mt-4">
                     <input asp-for="Settings.AccrueGratuity" class="form-check-input" type="checkbox" />
-                    <label asp-for="Settings.AccrueGratuity" class="form-check-label">Provide for end-of-service gratuity every month</label>
+                    <label asp-for="Settings.AccrueGratuity" class="form-check-label">@T["Provide for end-of-service gratuity every month"]</label>
                 </div>
-                <div class="form-text">Each payroll tops the provision up to what UAE law would pay each employee at the month end.</div>
+                <div class="form-text">@T["Each payroll tops the provision up to what UAE law would pay each employee at the month end."]</div>
             </div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h5 class="mb-0">Cheque layout</h5>
+            <h5 class="mb-0">@T["Cheque layout"]</h5>
             <div class="d-flex flex-wrap gap-2">
-                <a asp-action="TestCheque" target="_blank" class="btn btn-sm btn-outline-dark">Test print — laser / inkjet</a>
-                <a asp-action="TestCheque" asp-route-a4="true" target="_blank" class="btn btn-sm btn-outline-dark">Test on A4</a>
-                <a asp-action="TestCheque" asp-route-dotMatrix="true" class="btn btn-sm btn-outline-dark">Test file — dot matrix</a>
+                <a asp-action="TestCheque" target="_blank" class="btn btn-sm btn-outline-dark">@T["Test print — laser / inkjet"]</a>
+                <a asp-action="TestCheque" asp-route-a4="true" target="_blank" class="btn btn-sm btn-outline-dark">@T["Test on A4"]</a>
+                <a asp-action="TestCheque" asp-route-dotMatrix="true" class="btn btn-sm btn-outline-dark">@T["Test file — dot matrix"]</a>
             </div>
         </div>
         <div class="card-body">
             <p class="small text-muted">
-                Measure your cheque leaf with a ruler: every position is in millimetres from the cheque's <strong>top-left corner</strong>
-                to the start of the field. Print the test on plain paper, hold it over a real cheque against the light, and correct the
-                offsets until every field sits on its line. Save after each change.
+                @T.Html("Measure your cheque leaf with a ruler: every position is in millimetres from the cheque's <strong>top-left corner</strong> to the start of the field. Print the test on plain paper, hold it over a real cheque against the light, and correct the offsets until every field sits on its line. Save after each change.")
             </p>
             <div class="row g-3">
-                <div class="col-md-2"><label class="form-label">Cheque width</label><input asp-for="Settings.ChequeWidthMm" class="form-control" /></div>
-                <div class="col-md-2"><label class="form-label">Cheque height</label><input asp-for="Settings.ChequeHeightMm" class="form-control" /></div>
-                <div class="col-md-2"><label class="form-label">Font size (pt)</label><input asp-for="Settings.ChequeFontSizePt" class="form-control" /></div>
+                <div class="col-md-2"><label class="form-label">@T["Cheque width"]</label><input asp-for="Settings.ChequeWidthMm" class="form-control" /></div>
+                <div class="col-md-2"><label class="form-label">@T["Cheque height"]</label><input asp-for="Settings.ChequeHeightMm" class="form-control" /></div>
+                <div class="col-md-2"><label class="form-label">@T["Font size (pt)"]</label><input asp-for="Settings.ChequeFontSizePt" class="form-control" /></div>
                 <div class="col-md-3">
-                    <label class="form-label">Date format</label>
+                    <label class="form-label">@T["Date format"]</label>
                     <select asp-for="Settings.DateFormat" class="form-select">
-                        <option value="dd/MM/yyyy">dd/MM/yyyy</option>
-                        <option value="dd-MM-yyyy">dd-MM-yyyy</option>
-                        <option value="dd MM yyyy">dd MM yyyy (boxes)</option>
-                        <option value="ddMMyyyy">ddMMyyyy (boxes)</option>
+                        <option value="dd/MM/yyyy">@T["dd/MM/yyyy"]</option>
+                        <option value="dd-MM-yyyy">@T["dd-MM-yyyy"]</option>
+                        <option value="dd MM yyyy">@T["dd MM yyyy (boxes)"]</option>
+                        <option value="ddMMyyyy">@T["ddMMyyyy (boxes)"]</option>
                     </select>
                 </div>
                 <div class="col-md-3">
                     <div class="form-check mt-4">
                         <input asp-for="Settings.PrintAccountPayeeOnly" class="form-check-input" type="checkbox" />
-                        <label asp-for="Settings.PrintAccountPayeeOnly" class="form-check-label">Print "A/C Payee Only"</label>
+                        <label asp-for="Settings.PrintAccountPayeeOnly" class="form-check-label">@T["Print \"A/C Payee Only\""]</label>
                     </div>
                 </div>
             </div>
             <table class="table table-sm mt-3" style="max-width:640px">
-                <tr><th>Field</th><th>From left (mm)</th><th>From top (mm)</th><th>Width (mm)</th></tr>
-                <tr><td>Date</td><td><input asp-for="Settings.DateXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.DateYMm" class="form-control form-control-sm" /></td><td></td></tr>
-                <tr><td>Payee</td><td><input asp-for="Settings.PayeeXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.PayeeYMm" class="form-control form-control-sm" /></td><td></td></tr>
-                <tr><td>Amount in words</td><td><input asp-for="Settings.AmountWordsXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.AmountWordsYMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.AmountWordsWidthMm" class="form-control form-control-sm" /></td></tr>
-                <tr><td>Amount in figures</td><td><input asp-for="Settings.AmountXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.AmountYMm" class="form-control form-control-sm" /></td><td></td></tr>
-                <tr><td><strong>Printer offset</strong></td><td><input asp-for="Settings.OffsetXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.OffsetYMm" class="form-control form-control-sm" /></td><td class="small text-muted">moves every field; negative = left / up</td></tr>
+                <tr><th>@T["Field"]</th><th>@T["From left (mm)"]</th><th>@T["From top (mm)"]</th><th>@T["Width (mm)"]</th></tr>
+                <tr><td>@T["Date"]</td><td><input asp-for="Settings.DateXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.DateYMm" class="form-control form-control-sm" /></td><td></td></tr>
+                <tr><td>@T["Payee"]</td><td><input asp-for="Settings.PayeeXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.PayeeYMm" class="form-control form-control-sm" /></td><td></td></tr>
+                <tr><td>@T["Amount in words"]</td><td><input asp-for="Settings.AmountWordsXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.AmountWordsYMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.AmountWordsWidthMm" class="form-control form-control-sm" /></td></tr>
+                <tr><td>@T["Amount in figures"]</td><td><input asp-for="Settings.AmountXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.AmountYMm" class="form-control form-control-sm" /></td><td></td></tr>
+                <tr><td>@T.Html("<strong>Printer offset</strong>")</td><td><input asp-for="Settings.OffsetXMm" class="form-control form-control-sm" /></td><td><input asp-for="Settings.OffsetYMm" class="form-control form-control-sm" /></td><td class="small text-muted">@T["moves every field; negative = left / up"]</td></tr>
             </table>
-            <h6 class="mt-3">Dot matrix printer</h6>
+            <h6 class="mt-3">@T["Dot matrix printer"]</h6>
             <div class="row g-3">
-                <div class="col-md-3"><label class="form-label">Characters per inch</label><input asp-for="Settings.DotMatrixCpi" class="form-control" /></div>
-                <div class="col-md-3"><label class="form-label">Lines per inch</label><input asp-for="Settings.DotMatrixLpi" class="form-control" /></div>
+                <div class="col-md-3"><label class="form-label">@T["Characters per inch"]</label><input asp-for="Settings.DotMatrixCpi" class="form-control" /></div>
+                <div class="col-md-3"><label class="form-label">@T["Lines per inch"]</label><input asp-for="Settings.DotMatrixLpi" class="form-control" /></div>
                 <div class="col-md-6 small text-muted pt-4">
-                    Most dot matrix printers print 10 characters and 6 lines to the inch in their text mode. Print the downloaded file with the
-                    printer's <strong>Generic / Text Only</strong> driver (for example <code>copy cheques.txt LPT1</code>, or Notepad set to that printer),
-                    with the paper length set to the cheque height.
+                    @T.Html("Most dot matrix printers print 10 characters and 6 lines to the inch in their text mode. Print the downloaded file with the printer's <strong>Generic / Text Only</strong> driver (for example <code>copy cheques.txt LPT1</code>, or Notepad set to that printer), with the paper length set to the cheque height.")
                 </div>
             </div>
         </div>
     </div>
 
-    <button class="btn btn-dark">Save settings</button>
+    <button class="btn btn-dark">@T["Save settings"]</button>
 </form>

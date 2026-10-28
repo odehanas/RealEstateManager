@@ -2,14 +2,14 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Leases";
+    ViewData["Title"] = T["Leases"];
     var approvals = ViewBag.Approvals as Dictionary<int, ApprovalRequest> ?? new();
     var approvalRequired = ViewBag.ApprovalRequired is true;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Leases</h2>
-    <a asp-controller="Leases" asp-action="Create" class="btn btn-dark">Create Lease</a>
+    <h2>@T["Leases"]</h2>
+    <a asp-controller="Leases" asp-action="Create" class="btn btn-dark">@T["Create Lease"]</a>
 </div>
 
 @if (TempData["LeaseSuccess"] is string ok)
@@ -30,16 +30,16 @@
 <table class="table table-bordered table-striped align-middle">
     <thead>
         <tr>
-            <th>Contract</th>
-            <th>Property</th>
-            <th>Unit</th>
-            <th>Tenant</th>
-            <th>Start</th>
-            <th>End</th>
-            <th class="text-end">Annual Rent</th>
-            <th>Billing Frequency</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>@T["Contract"]</th>
+            <th>@T["Property"]</th>
+            <th>@T["Unit"]</th>
+            <th>@T["Tenant"]</th>
+            <th>@T["Start"]</th>
+            <th>@T["End"]</th>
+            <th class="text-end">@T["Annual Rent"]</th>
+            <th>@T["Billing Frequency"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -63,10 +63,10 @@
                             <span class="badge @(returned ? "bg-danger" : "bg-secondary")">@(returned ? "Returned" : "Draft")</span>
                             break;
                         case LeaseStatuses.PendingApproval:
-                            <span class="badge bg-warning text-dark">Awaiting approval</span>
+                            <span class="badge bg-warning text-dark">@T["Awaiting approval"]</span>
                             break;
                         case LeaseStatuses.Active:
-                            <span class="badge bg-success">Active</span>
+                            <span class="badge bg-success">@T["Active"]</span>
                             break;
                         default:
                             <span class="badge bg-light text-dark border">@lease.Status</span>
@@ -89,12 +89,12 @@
                     <div class="d-flex flex-wrap gap-2">
                         @if (lease.Status == LeaseStatuses.Draft)
                         {
-                            <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-primary">Edit</a>
+                            <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-primary">@T["Edit"]</a>
                             @if (approvalRequired)
                             {
                                 <form asp-action="Submit" asp-route-id="@lease.Id" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-warning">Submit for approval</button>
+                                    <button type="submit" class="btn btn-sm btn-warning">@T["Submit for approval"]</button>
                                 </form>
                             }
                             else
@@ -102,13 +102,13 @@
                                 <form asp-action="Activate" asp-route-id="@lease.Id" method="post" class="d-inline"
                                       onsubmit="return confirm('Activate contract @lease.ContractNumber? Its invoices will be created and its terms locked.');">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-success">Activate</button>
+                                    <button type="submit" class="btn btn-sm btn-success">@T["Activate"]</button>
                                 </form>
                             }
                             <form asp-action="DeleteDraft" asp-route-id="@lease.Id" method="post" class="d-inline"
                                   onsubmit="return confirm('Delete draft contract @lease.ContractNumber?');">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete"]</button>
                             </form>
                         }
                         else if (lease.Status == LeaseStatuses.PendingApproval)
@@ -116,15 +116,15 @@
                             <form asp-action="Withdraw" asp-route-id="@lease.Id" method="post" class="d-inline"
                                   onsubmit="return confirm('Take contract @lease.ContractNumber back to draft?');">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Withdraw</button>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Withdraw"]</button>
                             </form>
                         }
                         else
                         {
-                            <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-outline-primary">Notes</a>
+                            <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-outline-primary">@T["Notes"]</a>
                         }
-                        <a asp-action="ContractLabel" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-dark">QR Label</a>
-                        <a asp-action="ContractDraft" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-secondary">Draft Contract</a>
+                        <a asp-action="ContractLabel" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-dark">@T["QR Label"]</a>
+                        <a asp-action="ContractDraft" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-secondary">@T["Draft Contract"]</a>
                     </div>
                 </td>
             </tr>

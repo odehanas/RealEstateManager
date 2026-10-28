@@ -2,7 +2,7 @@
 @using RealEstateManager.Domain
 @{
     Layout = "_PortalLayout";
-    ViewData["Title"] = "My Requests";
+    ViewData["Title"] = T["My Requests"];
 
     var open = Model.Where(x => x.Status != ServiceRequestStatuses.Closed
                                 && x.Status != ServiceRequestStatuses.Cancelled
@@ -20,20 +20,19 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h5 mb-0">My Requests</h1>
-    <a asp-action="NewRequest" class="btn btn-dark btn-sm">New request</a>
+    <h1 class="h5 mb-0">@T["My Requests"]</h1>
+    <a asp-action="NewRequest" class="btn btn-dark btn-sm">@T["New request"]</a>
 </div>
 
 @if (Model.Count == 0)
 {
     <div class="card shadow-sm">
         <div class="card-body text-center py-5">
-            <p class="mb-2"><strong>You have not made any requests yet.</strong></p>
+            <p class="mb-2">@T.Html("<strong>You have not made any requests yet.</strong>")</p>
             <p class="text-muted small mb-3">
-                Use this to report something that needs fixing, ask for more time to pay an invoice,
-                ask about renewing your contract, or raise anything else with us.
+                @T["Use this to report something that needs fixing, ask for more time to pay an invoice, ask about renewing your contract, or raise anything else with us."]
             </p>
-            <a asp-action="NewRequest" class="btn btn-dark">Make a request</a>
+            <a asp-action="NewRequest" class="btn btn-dark">@T["Make a request"]</a>
         </div>
     </div>
 }
@@ -42,7 +41,7 @@ else
     @if (open.Count > 0)
     {
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white"><strong>Open</strong></div>
+            <div class="card-header bg-white">@T.Html("<strong>Open</strong>")</div>
             <div class="list-group list-group-flush">
                 @foreach (var request in open)
                 {
@@ -80,7 +79,7 @@ else
     @if (closed.Count > 0)
     {
         <div class="card shadow-sm">
-            <div class="card-header bg-white"><strong>Finished</strong></div>
+            <div class="card-header bg-white">@T.Html("<strong>Finished</strong>")</div>
             <div class="list-group list-group-flush">
                 @foreach (var request in closed)
                 {

@@ -1,17 +1,17 @@
 @model List<RealEstateManager.Models.PortalInvoiceViewModel>
 @{
     Layout = "_PortalLayout";
-    ViewData["Title"] = "My Invoices";
+    ViewData["Title"] = T["My Invoices"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h5 mb-0">My Invoices</h1>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <h1 class="h5 mb-0">@T["My Invoices"]</h1>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 @if (Model.Count == 0)
 {
-    <div class="alert alert-info">You have no invoices yet.</div>
+    <div class="alert alert-info">@T["You have no invoices yet."]</div>
 }
 else
 {
@@ -20,16 +20,16 @@ else
             <table class="table table-bordered table-sm mb-0 align-middle">
                 <thead>
                     <tr>
-                        <th>Invoice</th>
-                        <th>Unit</th>
-                        <th>Date</th>
-                        <th>Due</th>
-                        <th class="text-end">Rent</th>
-                        <th class="text-end">VAT</th>
-                        <th class="text-end">Total</th>
-                        <th class="text-end">Paid</th>
-                        <th class="text-end">Outstanding</th>
-                        <th>Status</th>
+                        <th>@T["Invoice"]</th>
+                        <th>@T["Unit"]</th>
+                        <th>@T["Date"]</th>
+                        <th>@T["Due"]</th>
+                        <th class="text-end">@T["Rent"]</th>
+                        <th class="text-end">@T["VAT"]</th>
+                        <th class="text-end">@T["Total"]</th>
+                        <th class="text-end">@T["Paid"]</th>
+                        <th class="text-end">@T["Outstanding"]</th>
+                        <th>@T["Status"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@ else
                                 @(invoice.TaxInvoiceNumber ?? invoice.InvoiceNumber)
                                 @if (invoice.TaxInvoiceNumber != null)
                                 {
-                                    <div class="small text-muted">Tax invoice</div>
+                                    <div class="small text-muted">@T["Tax invoice"]</div>
                                 }
                             </td>
                             <td>@invoice.UnitCode</td>
@@ -81,7 +81,7 @@ else
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <th colspan="6">Total</th>
+                        <th colspan="6">@T["Total"]</th>
                         <th class="text-end">@Model.Sum(x => x.TotalAmount).ToString("N2")</th>
                         <th class="text-end">@Model.Sum(x => x.CashPaid).ToString("N2")</th>
                         <th class="text-end">@Model.Sum(x => x.Outstanding).ToString("N2")</th>
@@ -93,6 +93,6 @@ else
     </div>
 
     <p class="text-muted small mt-2">
-        Only issued invoices are shown. Amounts marked as paid include cheques that have already cleared.
+        @T["Only issued invoices are shown. Amounts marked as paid include cheques that have already cleared."]
     </p>
 }

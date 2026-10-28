@@ -1,7 +1,7 @@
 @model List<RealEstateManager.Services.BuildingSummaryDto>
 
 @{
-    ViewData["Title"] = "Building View";
+    ViewData["Title"] = T["Building View"];
 }
 
 <style>
@@ -13,7 +13,7 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Building View</h2>
+    <h2 class="mb-0">@T["Building View"]</h2>
 </div>
 
 <p class="text-muted">
@@ -25,7 +25,7 @@
 <div class="row g-3">
     @if (Model.Count == 0)
     {
-        <div class="col-12"><div class="alert alert-secondary">No properties yet.</div></div>
+        <div class="col-12"><div class="alert alert-secondary">@T["No properties yet."]</div></div>
     }
     @foreach (var b in Model)
     {
@@ -40,7 +40,7 @@
                         </div>
                         <div class="text-end">
                             <div class="fs-5">@b.OccupancyPercent.ToString("0")%</div>
-                            <div class="small text-muted">let</div>
+                            <div class="small text-muted">@T["let"]</div>
                         </div>
                     </div>
                     <div class="bar my-3" title="@b.Good healthy, @b.Watch watch, @b.Risk at risk, @b.Vacant vacant, @b.SoldOrReserved sold or reserved">
@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-white border-0 pt-0">
-                    <a asp-action="Property" asp-route-id="@b.PropertyId" class="btn btn-sm btn-dark">Open building</a>
+                    <a asp-action="Property" asp-route-id="@b.PropertyId" class="btn btn-sm btn-dark">@T["Open building"]</a>
                 </div>
             </div>
         </div>

@@ -1,22 +1,22 @@
 @model RealEstateManager.Models.FixedAssetDepreciationViewModel
 
 @{
-    ViewData["Title"] = "Asset Depreciation";
+    ViewData["Title"] = T["Asset Depreciation"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Asset Depreciation</h2>
+        <h2 class="mb-1">@T["Asset Depreciation"]</h2>
         <div class="text-muted">@Model.AssetCode - @Model.AssetName</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back to Register</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to Register"]</a>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-md-3">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Cost</div>
+                <div class="text-muted small">@T["Cost"]</div>
                 <div class="fs-4 fw-bold">@Model.Cost.ToString("N2")</div>
             </div>
         </div>
@@ -24,7 +24,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Residual Value</div>
+                <div class="text-muted small">@T["Residual Value"]</div>
                 <div class="fs-4 fw-bold">@Model.ResidualValue.ToString("N2")</div>
             </div>
         </div>
@@ -32,7 +32,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Monthly Depreciation</div>
+                <div class="text-muted small">@T["Monthly Depreciation"]</div>
                 <div class="fs-4 fw-bold">@Model.MonthlyDepreciation.ToString("N2")</div>
             </div>
         </div>
@@ -40,7 +40,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Net Book Value</div>
+                <div class="text-muted small">@T["Net Book Value"]</div>
                 <div class="fs-4 fw-bold">@Model.NetBookValue.ToString("N2")</div>
             </div>
         </div>
@@ -50,19 +50,19 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Period</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Journal Entry</th>
-            <th>Posted At</th>
-            <th class="text-end">Amount</th>
+            <th>@T["Period"]</th>
+            <th>@T["Date"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Journal Entry"]</th>
+            <th>@T["Posted At"]</th>
+            <th class="text-end">@T["Amount"]</th>
         </tr>
     </thead>
     <tbody>
         @if (Model.Schedules.Count == 0)
         {
             <tr>
-                <td colspan="6" class="text-center text-muted py-4">No depreciation schedules found.</td>
+                <td colspan="6" class="text-center text-muted py-4">@T["No depreciation schedules found."]</td>
             </tr>
         }
         else

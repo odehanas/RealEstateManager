@@ -2,34 +2,34 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Leave";
+    ViewData["Title"] = T["Leave"];
 }
 
-<h2>Leave</h2>
-<p class="text-muted">Book leave, then approve it. Approved annual leave comes off the balance; approved unpaid leave is deducted by that month's payroll.</p>
+<h2>@T["Leave"]</h2>
+<p class="text-muted">@T["Book leave, then approve it. Approved annual leave comes off the balance; approved unpaid leave is deducted by that month's payroll."]</p>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
 @if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><h5 class="mb-0">Book leave</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["Book leave"]</h5></div>
     <div class="card-body">
         <form asp-action="Create" method="post" class="row g-2 align-items-end">
             @Html.AntiForgeryToken()
             <div class="col-md-3">
-                <label class="form-label">Employee</label>
-                <select asp-for="NewRequest.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">Choose</option></select>
+                <label class="form-label">@T["Employee"]</label>
+                <select asp-for="NewRequest.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">@T["Choose"]</option></select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Type</label>
+                <label class="form-label">@T["Type"]</label>
                 <select asp-for="NewRequest.LeaveType" class="form-select">
                     @foreach (var t in LeaveTypes.All) { <option value="@t">@t</option> }
                 </select>
             </div>
-            <div class="col-md-2"><label class="form-label">From</label><input asp-for="NewRequest.StartDate" type="date" class="form-control" /></div>
-            <div class="col-md-2"><label class="form-label">To</label><input asp-for="NewRequest.EndDate" type="date" class="form-control" /></div>
-            <div class="col-md-2"><label class="form-label">Reason</label><input asp-for="NewRequest.Reason" class="form-control" /></div>
-            <div class="col-md-1"><button class="btn btn-dark w-100">Book</button></div>
+            <div class="col-md-2"><label class="form-label">@T["From"]</label><input asp-for="NewRequest.StartDate" type="date" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">@T["To"]</label><input asp-for="NewRequest.EndDate" type="date" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">@T["Reason"]</label><input asp-for="NewRequest.Reason" class="form-control" /></div>
+            <div class="col-md-1"><button class="btn btn-dark w-100">@T["Book"]</button></div>
         </form>
     </div>
 </div>
@@ -44,10 +44,10 @@
 <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-light">
-            <tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th class="text-end">Days</th><th>Reason</th><th>Status</th><th style="width:300px">Decision</th></tr>
+            <tr><th>@T["Employee"]</th><th>@T["Type"]</th><th>@T["From"]</th><th>@T["To"]</th><th class="text-end">@T["Days"]</th><th>@T["Reason"]</th><th>@T["Status"]</th><th style="width:300px">@T["Decision"]</th></tr>
         </thead>
         <tbody>
-            @if (Model.Requests.Count == 0) { <tr><td colspan="8" class="text-muted">Nothing here.</td></tr> }
+            @if (Model.Requests.Count == 0) { <tr><td colspan="8" class="text-muted">@T["Nothing here."]</td></tr> }
             @foreach (var r in Model.Requests)
             {
                 <tr>
@@ -67,9 +67,9 @@
                             <form method="post" class="d-flex gap-1">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@r.Id" />
-                                <input name="comment" class="form-control form-control-sm" placeholder="Comment" />
-                                <button class="btn btn-sm btn-success" asp-action="Approve">Approve</button>
-                                <button class="btn btn-sm btn-outline-danger" asp-action="Reject">Reject</button>
+                                <input name="comment" class="form-control form-control-sm" placeholder="@T["Comment"]" />
+                                <button class="btn btn-sm btn-success" asp-action="Approve">@T["Approve"]</button>
+                                <button class="btn btn-sm btn-outline-danger" asp-action="Reject">@T["Reject"]</button>
                             </form>
                         }
                         else if (r.Status == LeaveStatuses.Approved)
@@ -77,7 +77,7 @@
                             <form method="post" asp-action="Cancel">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@r.Id" />
-                                <button class="btn btn-sm btn-outline-secondary">Cancel leave</button>
+                                <button class="btn btn-sm btn-outline-secondary">@T["Cancel leave"]</button>
                             </form>
                         }
                     </td>

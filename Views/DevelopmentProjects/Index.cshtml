@@ -2,14 +2,14 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Development Projects";
+    ViewData["Title"] = T["Development Projects"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Development Projects</h2>
+    <h2 class="mb-0">@T["Development Projects"]</h2>
     <div class="d-flex gap-2">
-        <a asp-controller="ProjectCosts" asp-action="Index" class="btn btn-outline-dark">Project Costs &amp; WIP report</a>
-        <a asp-action="Create" class="btn btn-dark">New Project</a>
+        <a asp-controller="ProjectCosts" asp-action="Index" class="btn btn-outline-dark">@T["Project Costs & WIP report"]</a>
+        <a asp-action="Create" class="btn btn-dark">@T["New Project"]</a>
     </div>
 </div>
 
@@ -19,22 +19,18 @@
 }
 
 <div class="alert alert-info">
-    A building under construction collects its costs - land, design, permits, contractors, supervision and
-    borrowing costs - in a work-in-progress account chosen by what it is for: <strong>for sale</strong> (inventory),
-    <strong>for rental</strong> (investment property) or <strong>own use</strong> (fixed asset). Tag supplier bills and
-    journals to the project and the cost to date below is read straight from the ledger.
+    @T.Html("A building under construction collects its costs - land, design, permits, contractors, supervision and borrowing costs - in a work-in-progress account chosen by what it is for: <strong>for sale</strong> (inventory), <strong>for rental</strong> (investment property) or <strong>own use</strong> (fixed asset). Tag supplier bills and journals to the project and the cost to date below is read straight from the ledger.")
 </div>
 
 @if (Model.Untagged.Count > 0)
 {
     <div class="alert alert-warning">
-        <strong>Not in any project:</strong>
+        <strong>@T["Not in any project:"]</strong>
         @foreach (var u in Model.Untagged)
         {
             <span class="me-3">@u.AccountCode @u.AccountName: @u.Amount.ToString("N2")</span>
         }
-        <div class="small mt-1">These amounts were posted to a development account without choosing a project, so they are on
-        the balance sheet but in no project's cost. Correct them with a journal that moves them into the right project.</div>
+        <div class="small mt-1">@T["These amounts were posted to a development account without choosing a project, so they are on the balance sheet but in no project's cost. Correct them with a journal that moves them into the right project."]</div>
     </div>
 }
 
@@ -42,24 +38,24 @@
     <table class="table table-bordered table-striped table-sm">
         <thead>
             <tr>
-                <th>Code</th>
-                <th>Project</th>
-                <th>Property</th>
-                <th>For</th>
-                <th>Status</th>
-                <th>Cost Account</th>
-                <th class="text-end">Budget</th>
-                <th class="text-end">Cost to Date</th>
-                <th class="text-end">% of Budget</th>
-                <th class="text-end">Still in WIP</th>
-                <th>Completion</th>
+                <th>@T["Code"]</th>
+                <th>@T["Project"]</th>
+                <th>@T["Property"]</th>
+                <th>@T["For"]</th>
+                <th>@T["Status"]</th>
+                <th>@T["Cost Account"]</th>
+                <th class="text-end">@T["Budget"]</th>
+                <th class="text-end">@T["Cost to Date"]</th>
+                <th class="text-end">@T["% of Budget"]</th>
+                <th class="text-end">@T["Still in WIP"]</th>
+                <th>@T["Completion"]</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Projects.Count == 0)
             {
-                <tr><td colspan="12" class="text-center text-muted">No development projects yet.</td></tr>
+                <tr><td colspan="12" class="text-center text-muted">@T["No development projects yet."]</td></tr>
             }
             @foreach (var p in Model.Projects)
             {
@@ -75,7 +71,7 @@
                     <td class="text-end @(p.PercentOfBudget > 100 ? "text-danger fw-bold" : "")">@(p.Budget == 0 ? "-" : p.PercentOfBudget.ToString("0.0") + "%")</td>
                     <td class="text-end">@p.InWorkInProgress.ToString("N2")</td>
                     <td>@(p.CompletionDate?.ToString("dd/MM/yyyy") ?? (p.ExpectedCompletionDate.HasValue ? "exp. " + p.ExpectedCompletionDate.Value.ToString("dd/MM/yyyy") : "-"))</td>
-                    <td><a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-dark">Open</a></td>
+                    <td><a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-dark">@T["Open"]</a></td>
                 </tr>
             }
         </tbody>
@@ -83,7 +79,7 @@
         {
             <tfoot>
                 <tr class="fw-bold">
-                    <td colspan="6">Total</td>
+                    <td colspan="6">@T["Total"]</td>
                     <td class="text-end">@Model.Projects.Sum(x => x.Budget).ToString("N2")</td>
                     <td class="text-end">@Model.Projects.Sum(x => x.CostToDate).ToString("N2")</td>
                     <td></td>

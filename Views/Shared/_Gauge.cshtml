@@ -60,7 +60,7 @@
     }
     else if (!Model.HasValue)
     {
-        <div class="gauge-band">no data yet</div>
+        <div class="gauge-band">@T["no data yet"]</div>
     }
     @foreach (var note in Model.Notes)
     {

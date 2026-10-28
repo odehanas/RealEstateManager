@@ -2,11 +2,11 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Create Account";
+    ViewData["Title"] = T["Create Account"];
     var parentAccounts = ViewBag.ParentAccounts as List<Account> ?? new();
 }
 
-<h2>Create Account</h2>
+<h2>@T["Create Account"]</h2>
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
@@ -15,42 +15,42 @@
 
     <div class="row g-3">
         <div class="col-md-3">
-            <label asp-for="Code" class="form-label">Account Number</label>
+            <label asp-for="Code" class="form-label">@T["Account Number"]</label>
             <input asp-for="Code" class="form-control" />
         </div>
 
         <div class="col-md-5">
-            <label asp-for="Name" class="form-label">Account Name</label>
+            <label asp-for="Name" class="form-label">@T["Account Name"]</label>
             <input asp-for="Name" class="form-control" />
         </div>
 
         <div class="col-md-4">
-            <label asp-for="AccountType" class="form-label">Account Type</label>
+            <label asp-for="AccountType" class="form-label">@T["Account Type"]</label>
             <select asp-for="AccountType" class="form-select">
-                <option value="">Select Type</option>
-                <option>Asset</option>
-                <option>Liability</option>
-                <option>Equity</option>
-                <option>Revenue</option>
-                <option>Expense</option>
+                <option value="">@T["Select Type"]</option>
+                <option>@T["Asset"]</option>
+                <option>@T["Liability"]</option>
+                <option>@T["Equity"]</option>
+                <option>@T["Revenue"]</option>
+                <option>@T["Expense"]</option>
             </select>
         </div>
 
         <div class="col-md-4">
-            <label asp-for="ReportingGroup" class="form-label">Reporting Group</label>
+            <label asp-for="ReportingGroup" class="form-label">@T["Reporting Group"]</label>
             <select asp-for="ReportingGroup" class="form-select">
-                <option value="">Select Group</option>
-                <option>Assets</option>
-                <option>Liabilities</option>
-                <option>Equity</option>
-                <option>Revenue</option>
-                <option>DirectExpense</option>
-                <option>GeneralExpense</option>
+                <option value="">@T["Select Group"]</option>
+                <option>@T["Assets"]</option>
+                <option>@T["Liabilities"]</option>
+                <option>@T["Equity"]</option>
+                <option>@T["Revenue"]</option>
+                <option>@T["DirectExpense"]</option>
+                <option>@T["GeneralExpense"]</option>
             </select>
         </div>
 
         <div class="col-md-4" id="statementLineBox">
-            <label asp-for="StatementLine" class="form-label">Income statement line</label>
+            <label asp-for="StatementLine" class="form-label">@T["Income statement line"]</label>
             <select asp-for="StatementLine" class="form-select" id="statementLine">
                 <option value="">@(Model.InheritedStatementLine != null ? $"As its group / default: {RealEstateManager.Domain.StatementLines.Describe(Model.InheritedStatementLine)}" : "As its group / standard default")</option>
                 <optgroup label="Revenue" data-type="Revenue">
@@ -66,14 +66,14 @@
                     }
                 </optgroup>
             </select>
-            <div class="form-text">Revenue and expense accounts only: where the account appears on the Profit &amp; Loss. Fixed costs: the same every month (salaries, office rent, depreciation). Recurring costs: running costs that move with activity (utilities, supplies).</div>
+            <div class="form-text">@T["Revenue and expense accounts only: where the account appears on the Profit & Loss. Fixed costs: the same every month (salaries, office rent, depreciation). Recurring costs: running costs that move with activity (utilities, supplies)."]</div>
         </div>
 
 
         <div class="col-md-4">
-            <label asp-for="ParentAccountId" class="form-label">Parent Account</label>
+            <label asp-for="ParentAccountId" class="form-label">@T["Parent Account"]</label>
             <select asp-for="ParentAccountId" class="form-select">
-                <option value="">No Parent</option>
+                <option value="">@T["No Parent"]</option>
                 @foreach (var account in parentAccounts)
                 {
                     <option value="@account.Id">@account.ReportingGroup - @account.Code - @account.Name</option>
@@ -82,49 +82,46 @@
         </div>
 
         <div class="col-md-2">
-            <label asp-for="SortOrder" class="form-label">Sort Order</label>
+            <label asp-for="SortOrder" class="form-label">@T["Sort Order"]</label>
             <input asp-for="SortOrder" class="form-control" />
         </div>
 
         <div class="col-md-2">
-            <label asp-for="IsGroup" class="form-label">Group</label>
+            <label asp-for="IsGroup" class="form-label">@T["Group"]</label>
             <select asp-for="IsGroup" class="form-select">
-                <option value="false">No</option>
-                <option value="true">Yes</option>
+                <option value="false">@T["No"]</option>
+                <option value="true">@T["Yes"]</option>
             </select>
         </div>
 
         <div class="col-md-2">
-            <label asp-for="IsPostable" class="form-label">Postable</label>
+            <label asp-for="IsPostable" class="form-label">@T["Postable"]</label>
             <select asp-for="IsPostable" class="form-select">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="true">@T["Yes"]</option>
+                <option value="false">@T["No"]</option>
             </select>
         </div>
 
         <div class="col-md-2">
-            <label asp-for="IsActive" class="form-label">Active</label>
+            <label asp-for="IsActive" class="form-label">@T["Active"]</label>
             <select asp-for="IsActive" class="form-select">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="true">@T["Yes"]</option>
+                <option value="false">@T["No"]</option>
             </select>
         </div>
 
         <div class="col-md-4">
-            <label asp-for="OpeningBalance" class="form-label">Opening Balance</label>
+            <label asp-for="OpeningBalance" class="form-label">@T["Opening Balance"]</label>
             <input asp-for="OpeningBalance" type="number" step="0.01" class="form-control" />
             <div class="form-text">
-                Natural balance (debit-positive for Asset / Expense, credit-positive for
-                Liability / Equity / Revenue). Leave at 0 if no opening balance applies.
-                Sub-ledger control accounts (Accounts Receivable, Accounts Payable, Fixed
-                Assets) automatically derive their opening balance from sub-ledger detail.
+                @T["Natural balance (debit-positive for Asset / Expense, credit-positive for Liability / Equity / Revenue). Leave at 0 if no opening balance applies. Sub-ledger control accounts (Accounts Receivable, Accounts Payable, Fixed Assets) automatically derive their opening balance from sub-ledger detail."]
             </div>
         </div>
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" class="btn btn-dark">@T["Save"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

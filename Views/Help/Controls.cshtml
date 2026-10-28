@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Controls & Security Guide";
+    ViewData["Title"] = T["Controls & Security Guide"];
 }
 <style>
     .ctl h3 { font-size: 1.05rem; margin-top: 1.4rem; }
@@ -8,74 +8,74 @@
 </style>
 
 <div class="ctl" style="max-width:980px">
-    <h2>Controls &amp; Security Guide</h2>
-    <p class="text-muted">What the system enforces to protect the company's money and data, what the owners should adopt as policy, and answers to the questions owners usually ask.</p>
+    <h2>@T["Controls & Security Guide"]</h2>
+    <p class="text-muted">@T["What the system enforces to protect the company's money and data, what the owners should adopt as policy, and answers to the questions owners usually ask."]</p>
 
     <div class="row g-3 mb-3">
-        <div class="col-md-4"><a asp-controller="Performance" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Business Performance</strong><div class="small text-muted">Results, collections, occupancy, and what waits for your decision.</div></div></a></div>
-        <div class="col-md-4"><a asp-controller="ApprovalLimits" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Approval Limits &amp; Delegation</strong><div class="small text-muted">Who may release how much, and temporary authority while you travel.</div></div></a></div>
-        <div class="col-md-4"><a asp-controller="PaymentApprovals" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>Payment Approvals</strong><div class="small text-muted">Payments waiting for a second person, with their accounting lines.</div></div></a></div>
+        <div class="col-md-4"><a asp-controller="Performance" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>@T["Business Performance"]</strong><div class="small text-muted">@T["Results, collections, occupancy, and what waits for your decision."]</div></div></a></div>
+        <div class="col-md-4"><a asp-controller="ApprovalLimits" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>@T["Approval Limits & Delegation"]</strong><div class="small text-muted">@T["Who may release how much, and temporary authority while you travel."]</div></div></a></div>
+        <div class="col-md-4"><a asp-controller="PaymentApprovals" asp-action="Index" class="card shadow-sm text-decoration-none h-100"><div class="card-body"><strong>@T["Payment Approvals"]</strong><div class="small text-muted">@T["Payments waiting for a second person, with their accounting lines."]</div></div></a></div>
     </div>
 
-    <h3>1. Controls the system enforces</h3>
+    <h3>@T["1. Controls the system enforces"]</h3>
     <div class="table-responsive">
         <table class="table table-sm align-top">
-            <thead class="table-light"><tr><th style="width:28%">Control</th><th>How it works</th></tr></thead>
+            <thead class="table-light"><tr><th style="width:28%">@T["Control"]</th><th>@T["How it works"]</th></tr></thead>
             <tbody>
-                <tr><td><strong>Approval limits on payments</strong></td><td>Vendor payments, owner settlements and withdrawals, development costs and petty cash are recorded but not posted until someone with enough authority releases them. Default levels: Accountant up to AED 1,000, Manager up to AED 5,000, Owner unlimited &mdash; changeable at any time in Approval Limits. Switch the control on per company there.</td></tr>
-                <tr><td><strong>Four eyes (maker &ne; checker)</strong></td><td>The person who recorded a payment cannot approve it. Petty cash always needs a second person, whatever the amount. Optionally, staff may release their own payments within their limit &mdash; switch that off for strict segregation.</td></tr>
-                <tr><td><strong>Amount lock</strong></td><td>An approval is bound to the exact amount approved. If anyone edits the entry afterwards, it needs approving again.</td></tr>
-                <tr><td><strong>Delegation while away</strong></td><td>An owner can grant a manager a higher limit for a fixed period (up to 180 days) with a reason. It ends automatically and can be revoked early; it can never exceed the owner's own limit. Every delegation shows on the Owner Monitor.</td></tr>
-                <tr><td><strong>Payroll and salary advances</strong></td><td>Approving a payroll posts it to the ledger, so the approver's limit must cover the total net pay. Salary advances are checked the same way. Payslips reach employees only after approval.</td></tr>
-                <tr><td><strong>Closed periods</strong></td><td>Once a month is closed, nothing can be posted into it. Reopening needs a request and a separate approver.</td></tr>
-                <tr><td><strong>Roles and permissions</strong></td><td>Each user sees and does only what their permissions allow, company by company. Owners can be given read-only oversight of all reports without being able to change anything.</td></tr>
-                <tr><td><strong>Audit trail</strong></td><td>Every change made by staff is logged with user, time and address, as are refused attempts (access denied) and errors. Administrators review them in System Setup &rsaquo; Audit Logs; owners see the business, not the log.</td></tr>
-                <tr><td><strong>Separate portals</strong></td><td>Tenants (/portal) and employees (/me) sign in with their own accounts and cookies and can only ever see their own records &mdash; never a company screen. Employees see approved payslips, their leave balance and advances, request leave and certificates.</td></tr>
-                <tr><td><strong>Sign-in protection</strong></td><td>Five wrong passwords lock an account for 15 minutes, stopping password guessing from the internet. The default ADMIN password and any password set by an administrator must be changed at first sign-in. New passwords need at least 10 characters with upper and lower case letters and a digit.</td></tr>
-                <tr><td><strong>Password storage</strong></td><td>Passwords are never stored &mdash; only a salted PBKDF2-SHA256 hash with 100,000 iterations. Nobody, including the developer, can read a user's password.</td></tr>
-                <tr><td><strong>Browser protection</strong></td><td>HTTPS only (with HSTS), HttpOnly session cookies, anti-forgery tokens on every form, and headers that stop other sites framing the system (clickjacking) or sniffing content.</td></tr>
+                <tr><td>@T.Html("<strong>Approval limits on payments</strong>")</td><td>@T["Vendor payments, owner settlements and withdrawals, development costs and petty cash are recorded but not posted until someone with enough authority releases them. Default levels: Accountant up to AED 1,000, Manager up to AED 5,000, Owner unlimited — changeable at any time in Approval Limits. Switch the control on per company there."]</td></tr>
+                <tr><td>@T.Html("<strong>Four eyes (maker &ne; checker)</strong>")</td><td>@T["The person who recorded a payment cannot approve it. Petty cash always needs a second person, whatever the amount. Optionally, staff may release their own payments within their limit — switch that off for strict segregation."]</td></tr>
+                <tr><td>@T.Html("<strong>Amount lock</strong>")</td><td>@T["An approval is bound to the exact amount approved. If anyone edits the entry afterwards, it needs approving again."]</td></tr>
+                <tr><td>@T.Html("<strong>Delegation while away</strong>")</td><td>@T["An owner can grant a manager a higher limit for a fixed period (up to 180 days) with a reason. It ends automatically and can be revoked early; it can never exceed the owner's own limit. Every delegation shows on the Owner Monitor."]</td></tr>
+                <tr><td>@T.Html("<strong>Payroll and salary advances</strong>")</td><td>@T["Approving a payroll posts it to the ledger, so the approver's limit must cover the total net pay. Salary advances are checked the same way. Payslips reach employees only after approval."]</td></tr>
+                <tr><td>@T.Html("<strong>Closed periods</strong>")</td><td>@T["Once a month is closed, nothing can be posted into it. Reopening needs a request and a separate approver."]</td></tr>
+                <tr><td>@T.Html("<strong>Roles and permissions</strong>")</td><td>@T["Each user sees and does only what their permissions allow, company by company. Owners can be given read-only oversight of all reports without being able to change anything."]</td></tr>
+                <tr><td>@T.Html("<strong>Audit trail</strong>")</td><td>@T["Every change made by staff is logged with user, time and address, as are refused attempts (access denied) and errors. Administrators review them in System Setup › Audit Logs; owners see the business, not the log."]</td></tr>
+                <tr><td>@T.Html("<strong>Separate portals</strong>")</td><td>@T["Tenants (/portal) and employees (/me) sign in with their own accounts and cookies and can only ever see their own records — never a company screen. Employees see approved payslips, their leave balance and advances, request leave and certificates."]</td></tr>
+                <tr><td>@T.Html("<strong>Sign-in protection</strong>")</td><td>@T["Five wrong passwords lock an account for 15 minutes, stopping password guessing from the internet. The default ADMIN password and any password set by an administrator must be changed at first sign-in. New passwords need at least 10 characters with upper and lower case letters and a digit."]</td></tr>
+                <tr><td>@T.Html("<strong>Password storage</strong>")</td><td>@T["Passwords are never stored — only a salted PBKDF2-SHA256 hash with 100,000 iterations. Nobody, including the developer, can read a user's password."]</td></tr>
+                <tr><td>@T.Html("<strong>Browser protection</strong>")</td><td>@T["HTTPS only (with HSTS), HttpOnly session cookies, anti-forgery tokens on every form, and headers that stop other sites framing the system (clickjacking) or sniffing content."]</td></tr>
             </tbody>
         </table>
     </div>
 
-    <h3>2. Controls to adopt as company policy</h3>
+    <h3>@T["2. Controls to adopt as company policy"]</h3>
     <ol>
-        <li><strong>Switch payment approval on</strong> for every live company, and set limits that suit the business.</li>
-        <li><strong>One person, one login.</strong> Never share accounts &mdash; the audit trail is only as good as the logins behind it.</li>
-        <li><strong>Remove access the day someone leaves</strong>: disable their staff user and their employee portal login.</li>
-        <li><strong>Review Business Performance and the Owner Monitor weekly</strong>: results, collections, large postings, payments released, old drafts. Administrators check the Audit Logs.</li>
-        <li><strong>Bank reconciliation every month</strong>, prepared by one person and reviewed by another, before the month is closed.</li>
-        <li><strong>Petty cash counts</strong> by surprise at least monthly, matched to the vouchers in the system.</li>
-        <li><strong>Vendor bank details</strong>: confirm any change by phone on a known number before paying &mdash; the most common fraud is a fake "new bank account" email.</li>
-        <li><strong>Separate who adds vendors from who pays them</strong>, and who adds employees from who approves payroll.</li>
-        <li><strong>Close each month</strong> after review so past figures cannot change.</li>
-        <li><strong>Keep administrator rights to as few people as possible</strong> and give owners Owner Oversight rather than full rights where they only need to watch.</li>
+        <li>@T.Html("<strong>Switch payment approval on</strong> for every live company, and set limits that suit the business.")</li>
+        <li>@T.Html("<strong>One person, one login.</strong> Never share accounts &mdash; the audit trail is only as good as the logins behind it.")</li>
+        <li>@T.Html("<strong>Remove access the day someone leaves</strong>: disable their staff user and their employee portal login.")</li>
+        <li>@T.Html("<strong>Review Business Performance and the Owner Monitor weekly</strong>: results, collections, large postings, payments released, old drafts. Administrators check the Audit Logs.")</li>
+        <li>@T.Html("<strong>Bank reconciliation every month</strong>, prepared by one person and reviewed by another, before the month is closed.")</li>
+        <li>@T.Html("<strong>Petty cash counts</strong> by surprise at least monthly, matched to the vouchers in the system.")</li>
+        <li>@T.Html("<strong>Vendor bank details</strong>: confirm any change by phone on a known number before paying &mdash; the most common fraud is a fake \"new bank account\" email.")</li>
+        <li>@T.Html("<strong>Separate who adds vendors from who pays them</strong>, and who adds employees from who approves payroll.")</li>
+        <li>@T.Html("<strong>Close each month</strong> after review so past figures cannot change.")</li>
+        <li>@T.Html("<strong>Keep administrator rights to as few people as possible</strong> and give owners Owner Oversight rather than full rights where they only need to watch.")</li>
     </ol>
 
-    <h3>3. Owners' security questions</h3>
+    <h3>@T["3. Owners' security questions"]</h3>
     <dl>
-        <dt>Can someone on the internet guess a password and get in?</dt>
-        <dd>Not realistically. After five wrong attempts the account locks for 15 minutes, passwords must be strong, and default passwords have to be changed at first sign-in. Use a different password for this system than for email.</dd>
+        <dt>@T["Can someone on the internet guess a password and get in?"]</dt>
+        <dd>@T["Not realistically. After five wrong attempts the account locks for 15 minutes, passwords must be strong, and default passwords have to be changed at first sign-in. Use a different password for this system than for email."]</dd>
 
-        <dt>Is the data encrypted?</dt>
-        <dd>Everything between the browser and the server travels over HTTPS. Passwords are stored only as one-way hashes. The database sits with the hosting provider behind its own login, which the application holds as a server-side secret.</dd>
+        <dt>@T["Is the data encrypted?"]</dt>
+        <dd>@T["Everything between the browser and the server travels over HTTPS. Passwords are stored only as one-way hashes. The database sits with the hosting provider behind its own login, which the application holds as a server-side secret."]</dd>
 
-        <dt>Can a tenant or an employee see other people's data?</dt>
-        <dd>No. Their portals read the person from their own sign-in, never from the web address, so changing a number in the address shows nothing. They cannot open any staff screen.</dd>
+        <dt>@T["Can a tenant or an employee see other people's data?"]</dt>
+        <dd>@T["No. Their portals read the person from their own sign-in, never from the web address, so changing a number in the address shows nothing. They cannot open any staff screen."]</dd>
 
-        <dt>Can an accountant pay themselves or a fake vendor?</dt>
-        <dd>With payment approval on, any payment above their limit &mdash; and every petty cash voucher &mdash; waits for someone else, who sees the accounting lines before releasing it. Approved amounts are locked; edits need re-approval. Everything is on the Owner Monitor.</dd>
+        <dt>@T["Can an accountant pay themselves or a fake vendor?"]</dt>
+        <dd>@T["With payment approval on, any payment above their limit — and every petty cash voucher — waits for someone else, who sees the accounting lines before releasing it. Approved amounts are locked; edits need re-approval. Everything is on the Owner Monitor."]</dd>
 
-        <dt>What if a staff member deletes or changes records to hide something?</dt>
-        <dd>Every change is logged with the user, time and address, and the log cannot be edited from the application. Closed months cannot be changed at all, which is why each month should be closed after review.</dd>
+        <dt>@T["What if a staff member deletes or changes records to hide something?"]</dt>
+        <dd>@T["Every change is logged with the user, time and address, and the log cannot be edited from the application. Closed months cannot be changed at all, which is why each month should be closed after review."]</dd>
 
-        <dt>What happens when we are travelling?</dt>
-        <dd>Use Approval Limits &rarr; Delegation to give a manager a higher limit for exactly the dates you are away, with a reason. It ends on its own; you can still watch everything from your phone.</dd>
+        <dt>@T["What happens when we are travelling?"]</dt>
+        <dd>@T["Use Approval Limits → Delegation to give a manager a higher limit for exactly the dates you are away, with a reason. It ends on its own; you can still watch everything from your phone."]</dd>
 
-        <dt>Are backups taken?</dt>
-        <dd>The hosting provider backs up the database. Ask your administrator to confirm the schedule and to test a restore at least twice a year.</dd>
+        <dt>@T["Are backups taken?"]</dt>
+        <dd>@T["The hosting provider backs up the database. Ask your administrator to confirm the schedule and to test a restore at least twice a year."]</dd>
 
-        <dt>What should we do if we suspect a breach?</dt>
-        <dd>Disable the affected users, change administrator passwords, ask the administrator to rotate the database password, and review the audit log for the period (System Setup &rsaquo; Audit Logs).</dd>
+        <dt>@T["What should we do if we suspect a breach?"]</dt>
+        <dd>@T["Disable the affected users, change administrator passwords, ask the administrator to rotate the database password, and review the audit log for the period (System Setup › Audit Logs)."]</dd>
     </dl>
 </div>

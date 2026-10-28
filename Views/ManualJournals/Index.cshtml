@@ -2,12 +2,12 @@
 @using RealEstateManager.Models
 
 @{
-    ViewData["Title"] = "Manual Journals";
+    ViewData["Title"] = T["Manual Journals"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Manual Journals</h2>
-    <a asp-action="Create" class="btn btn-dark">New Manual Journal</a>
+    <h2>@T["Manual Journals"]</h2>
+    <a asp-action="Create" class="btn btn-dark">@T["New Manual Journal"]</a>
 </div>
 
 @if (TempData["JournalSuccess"] is string journalSuccess)
@@ -20,24 +20,22 @@
 }
 
 <div class="alert alert-light border small">
-    A journal is saved as a <strong>Draft</strong> and has no effect on the accounts until you press
-    <strong>Post</strong>. Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet
-    and General Ledger.
+    @T.Html("A journal is saved as a <strong>Draft</strong> and has no effect on the accounts until you press <strong>Post</strong>. Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet and General Ledger.")
 </div>
 
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Entry No.</th>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Document</th>
-            <th>Reference</th>
-            <th class="text-end">Debit</th>
-            <th class="text-end">Credit</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>@T["Entry No."]</th>
+            <th>@T["Date"]</th>
+            <th>@T["Type"]</th>
+            <th>@T["Description"]</th>
+            <th>@T["Document"]</th>
+            <th>@T["Reference"]</th>
+            <th class="text-end">@T["Debit"]</th>
+            <th class="text-end">@T["Credit"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Action"]</th>
         </tr>
     </thead>
     <tbody>
@@ -58,11 +56,11 @@
                 <td>
                     @if (item.IsPosted)
                     {
-                        <span class="badge bg-success">Posted</span>
+                        <span class="badge bg-success">@T["Posted"]</span>
                     }
                     else
                     {
-                        <span class="badge bg-warning text-dark">Draft</span>
+                        <span class="badge bg-warning text-dark">@T["Draft"]</span>
                     }
                 </td>
                 <td>

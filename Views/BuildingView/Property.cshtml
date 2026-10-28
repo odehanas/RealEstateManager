@@ -59,19 +59,19 @@
         <div class="text-muted">@Model.Code &middot; @Model.PropertyType &middot; @Model.OwnershipType @(string.IsNullOrWhiteSpace(Model.Address) ? "" : "· " + Model.Address)</div>
     </div>
     <div class="no-print d-flex gap-2">
-        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">All buildings</a>
-        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-outline-secondary btn-sm">Property record</a>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["All buildings"]</a>
+        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-outline-secondary btn-sm">@T["Property record"]</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Units</div><div class="fs-5">@Model.Units.Count</div></div></div></div>
-    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Let</div><div class="fs-5">@Model.OccupancyPercent.ToString("0")%</div></div></div></div>
-    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Healthy</div><div class="fs-5 text-success">@Model.Count("good")</div></div></div></div>
-    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Watch</div><div class="fs-5" style="color:#997404">@Model.Count("watch")</div></div></div></div>
-    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">At risk</div><div class="fs-5 text-danger">@Model.Count("risk")</div></div></div></div>
-    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">Overdue</div><div class="fs-5">@Model.Overdue.ToString("N0")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">@T["Units"]</div><div class="fs-5">@Model.Units.Count</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">@T["Let"]</div><div class="fs-5">@Model.OccupancyPercent.ToString("0")%</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">@T["Healthy"]</div><div class="fs-5 text-success">@Model.Count("good")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">@T["Watch"]</div><div class="fs-5" style="color:#997404">@Model.Count("watch")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">@T["At risk"]</div><div class="fs-5 text-danger">@Model.Count("risk")</div></div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body py-2"><div class="small text-muted">@T["Overdue"]</div><div class="fs-5">@Model.Overdue.ToString("N0")</div></div></div></div>
 </div>
 
 @{
@@ -122,16 +122,16 @@
 
 @if (Model.Units.Count == 0)
 {
-    <div class="alert alert-secondary">This property has no units yet. Add them in Master Data &rsaquo; Units, with their floor and area.</div>
+    <div class="alert alert-secondary">@T["This property has no units yet. Add them in Master Data › Units, with their floor and area."]</div>
 }
 else
 {
     <div class="d-flex justify-content-between align-items-start flex-wrap no-print">
         <div class="bv-legend" id="legend"></div>
-        <div class="btn-group btn-group-sm bv-mode mb-2" role="group" aria-label="Drawing style">
+        <div class="btn-group btn-group-sm bv-mode mb-2" role="group" aria-label="@T["Drawing style"]">
             <button type="button" class="btn btn-outline-dark active" id="mode2d">2.5D</button>
             <button type="button" class="btn btn-outline-dark" id="mode3d">3D</button>
-            <button type="button" class="btn btn-outline-dark" id="modePhoto">Photo</button>
+            <button type="button" class="btn btn-outline-dark" id="modePhoto">@T["Photo"]</button>
         </div>
     </div>
     <div class="row g-3">
@@ -156,20 +156,18 @@ else
                 <div class="small text-muted mt-2" id="photoUnmarked"></div>
             </div>
             <p class="small text-muted mt-2" id="hint2d">
-                Units are drawn in proportion to their area. Select a unit for its details, or a colour above to show only those units.
-                Floors come from each unit's floor (G = ground); set the floor number and position on the unit to arrange them exactly.
+                @T["Units are drawn in proportion to their area. Select a unit for its details, or a colour above to show only those units. Floors come from each unit's floor (G = ground); set the floor number and position on the unit to arrange them exactly."]
             </p>
             <p class="small text-muted mt-2 d-none" id="hintPhoto">
                 Each unit marked on the photo is tinted with its colour; select it for its details.
-                <a asp-controller="BuildingPhotos" asp-action="Index" asp-route-id="@Model.PropertyId">Manage photos and mark units</a>
+                <a asp-controller="BuildingPhotos" asp-action="Index" asp-route-id="@Model.PropertyId">@T["Manage photos and mark units"]</a>
             </p>
             <p class="small text-muted mt-2 d-none" id="hint3d">
-                Drag to turn the building, scroll or pinch to zoom, right-drag to move it. Units sit on the side recorded on the unit
-                (front, back, left, right); without one, a floor's units are shared between front and back.
+                @T["Drag to turn the building, scroll or pinch to zoom, right-drag to move it. Units sit on the side recorded on the unit (front, back, left, right); without one, a floor's units are shared between front and back."]
             </p>
         </div>
         <div class="col-lg-5">
-            <div id="panel" class="card shadow-sm"><div class="card-body"><p class="text-muted mb-0">Select a unit to see its details.</p></div></div>
+            <div id="panel" class="card shadow-sm"><div class="card-body"><p class="text-muted mb-0">@T["Select a unit to see its details."]</p></div></div>
         </div>
     </div>
 }

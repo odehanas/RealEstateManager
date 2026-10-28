@@ -2,7 +2,7 @@
 @inject PermissionService PermissionService
 
 @{
-    ViewData["Title"] = "Opening Balances";
+    ViewData["Title"] = T["Opening Balances"];
 
     // Typing balances needs the same right as the chart of accounts; anyone else sees the figures only.
     var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
@@ -18,7 +18,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Opening Balances</h2>
+        <h2 class="mb-1">@T["Opening Balances"]</h2>
         <div class="text-muted">
             Per-account opening balances combined with sub-ledger detail for
             Accounts Receivable, Accounts Payable and Fixed Assets.
@@ -29,10 +29,10 @@
         </div>
     </div>
     <div>
-        <a asp-controller="ChartOfAccounts" asp-action="Index" class="btn btn-sm btn-outline-secondary">Chart of Accounts</a>
-        <a asp-controller="Tenants" asp-action="Index" class="btn btn-sm btn-outline-secondary">Tenants</a>
-        <a asp-controller="Vendors" asp-action="Index" class="btn btn-sm btn-outline-secondary">Vendors</a>
-        <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-secondary">Fixed Assets</a>
+        <a asp-controller="ChartOfAccounts" asp-action="Index" class="btn btn-sm btn-outline-secondary">@T["Chart of Accounts"]</a>
+        <a asp-controller="Tenants" asp-action="Index" class="btn btn-sm btn-outline-secondary">@T["Tenants"]</a>
+        <a asp-controller="Vendors" asp-action="Index" class="btn btn-sm btn-outline-secondary">@T["Vendors"]</a>
+        <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-secondary">@T["Fixed Assets"]</a>
     </div>
 </div>
 
@@ -45,7 +45,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Total Debit Opening Balance</div>
+                <div class="text-muted small">@T["Total Debit Opening Balance"]</div>
                 <div class="h4 mb-0 text-success">@Model.TotalDebitOpeningBalance.ToString("N2")</div>
             </div>
         </div>
@@ -53,7 +53,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Total Credit Opening Balance</div>
+                <div class="text-muted small">@T["Total Credit Opening Balance"]</div>
                 <div class="h4 mb-0 text-danger">@Model.TotalCreditOpeningBalance.ToString("N2")</div>
             </div>
         </div>
@@ -61,7 +61,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small">Net Imbalance (Dr - Cr)</div>
+                <div class="text-muted small">@T["Net Imbalance (Dr - Cr)"]</div>
                 @if (Model.NetImbalance == 0m)
                 {
                     <div class="h4 mb-0 text-success">0.00 &nbsp;<span class="badge bg-success">Balanced</span></div>
@@ -78,19 +78,14 @@
 @if (Model.NetImbalance != 0m)
 {
     <div class="alert alert-warning">
-        <strong>Opening balances are not balanced.</strong>
-        Total debit opening balances must equal total credit opening balances for the
-        Trial Balance and Balance Sheet to remain in balance from day one.
-        Review the manual opening balance on the equity / retained earnings account
-        (or the contra account you use for the opening journal) so that the difference
-        is zero.
+        @T.Html("<strong>Opening balances are not balanced.</strong> Total debit opening balances must equal total credit opening balances for the Trial Balance and Balance Sheet to remain in balance from day one. Review the manual opening balance on the equity / retained earnings account (or the contra account you use for the opening journal) so that the difference is zero.")
     </div>
 }
 
 <form asp-action="Save" method="post" id="openingForm">
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <strong>GL Account Opening Balances</strong>
+        <strong>@T["GL Account Opening Balances"]</strong>
         <span class="text-muted small">
             Postable accounts only.
             @if (canEdit)
@@ -103,15 +98,15 @@
         <table class="table table-sm table-hover mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>Code</th>
-                    <th>Account</th>
-                    <th>Type</th>
-                    <th>Source</th>
-                    <th class="text-end">Manual OB</th>
-                    <th class="text-end">Sub-ledger Total</th>
-                    <th class="text-end">Effective OB</th>
-                    <th class="text-end">Debit</th>
-                    <th class="text-end">Credit</th>
+                    <th>@T["Code"]</th>
+                    <th>@T["Account"]</th>
+                    <th>@T["Type"]</th>
+                    <th>@T["Source"]</th>
+                    <th class="text-end">@T["Manual OB"]</th>
+                    <th class="text-end">@T["Sub-ledger Total"]</th>
+                    <th class="text-end">@T["Effective OB"]</th>
+                    <th class="text-end">@T["Debit"]</th>
+                    <th class="text-end">@T["Credit"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,7 +116,7 @@
                         <td>
                             @if (canEdit)
                             {
-                                <a asp-controller="ChartOfAccounts" asp-action="Edit" asp-route-id="@row.AccountId" title="Open the account"><code>@row.AccountCode</code></a>
+                                <a asp-controller="ChartOfAccounts" asp-action="Edit" asp-route-id="@row.AccountId" title="@T["Open the account"]"><code>@row.AccountCode</code></a>
                             }
                             else
                             {
@@ -134,29 +129,29 @@
                             @switch (row.Source)
                             {
                                 case "AccountsReceivable":
-                                    <span class="badge bg-primary">AR Sub-ledger</span>
+                                    <span class="badge bg-primary">@T["AR Sub-ledger"]</span>
                                     break;
                                 case "AccountsPayable":
-                                    <span class="badge bg-primary">AP Sub-ledger</span>
+                                    <span class="badge bg-primary">@T["AP Sub-ledger"]</span>
                                     break;
                                 case "FixedAssetCost":
-                                    <span class="badge bg-primary">Fixed Asset Cost</span>
+                                    <span class="badge bg-primary">@T["Fixed Asset Cost"]</span>
                                     break;
                                 case "FixedAssetAccumDepreciation":
-                                    <span class="badge bg-primary">Fixed Asset Acc. Dep.</span>
+                                    <span class="badge bg-primary">@T["Fixed Asset Acc. Dep."]</span>
                                     break;
                                 case "OpeningBalanceControl":
-                                    <span class="badge bg-warning text-dark">Balancing line</span>
+                                    <span class="badge bg-warning text-dark">@T["Balancing line"]</span>
                                     break;
                                 default:
-                                    <span class="badge bg-secondary">Manual</span>
+                                    <span class="badge bg-secondary">@T["Manual"]</span>
                                     break;
                             }
                         </td>
                         <td class="text-end">
                             @if (row.Source == RealEstateManager.Services.OpeningBalanceService.SourceOpeningBalanceControl)
                             {
-                                <span class="text-muted small" title="The difference left by every other account's opening balance">worked out</span>
+                                <span class="text-muted small" title="@T["The difference left by every other account's opening balance"]">@T["worked out"]</span>
                             }
                             else if (row.IsControlAccount)
                             {
@@ -166,7 +161,7 @@
                                     "AccountsPayable" => ("Vendors", "Edit per vendor"),
                                     _ => ("FixedAssets", "Edit per asset")
                                 };
-                                <a asp-controller="@controller" asp-action="Index" class="small" title="This figure is the total of the detail below">@label</a>
+                                <a asp-controller="@controller" asp-action="Index" class="small" title="@T["This figure is the total of the detail below"]">@label</a>
                             }
                             else if (canEdit && row.IsEditable)
                             {
@@ -200,7 +195,7 @@
             </tbody>
             <tfoot>
                 <tr class="table-light fw-semibold">
-                    <td colspan="7" class="text-end">Totals</td>
+                    <td colspan="7" class="text-end">@T["Totals"]</td>
                     <td class="text-end">@Model.TotalDebitOpeningBalance.ToString("N2")</td>
                     <td class="text-end">@Model.TotalCreditOpeningBalance.ToString("N2")</td>
                 </tr>
@@ -210,9 +205,9 @@
     @if (canEdit)
     {
         <div class="card-footer bg-white d-flex align-items-center gap-2 ob-savebar">
-            <button type="submit" class="btn btn-dark btn-sm" id="obSave">Save opening balances</button>
-            <span class="text-muted small" id="obChanged">No changes yet.</span>
-            <span class="ms-auto text-muted small">Totals and the balancing line are recalculated when you save.</span>
+            <button type="submit" class="btn btn-dark btn-sm" id="obSave">@T["Save opening balances"]</button>
+            <span class="text-muted small" id="obChanged">@T["No changes yet."]</span>
+            <span class="ms-auto text-muted small">@T["Totals and the balancing line are recalculated when you save."]</span>
         </div>
     }
 </div>
@@ -220,8 +215,8 @@
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <strong>Tenant Opening Balances (Accounts Receivable)</strong>
-        <a asp-controller="Tenants" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Tenants</a>
+        <strong>@T["Tenant Opening Balances (Accounts Receivable)"]</strong>
+        <a asp-controller="Tenants" asp-action="Index" class="btn btn-sm btn-outline-primary">@T["Manage Tenants"]</a>
     </div>
     @if (Model.TenantOpeningBalances.Any(x => x.OpeningBalance != 0m))
     {
@@ -229,16 +224,16 @@
             <table class="table table-sm mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Code</th>
-                        <th>Tenant</th>
-                        <th class="text-end">Opening Balance</th>
+                        <th>@T["Code"]</th>
+                        <th>@T["Tenant"]</th>
+                        <th class="text-end">@T["Opening Balance"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var t in Model.TenantOpeningBalances.Where(x => x.OpeningBalance != 0m))
                     {
                         <tr>
-                            <td>@if (canEditMasterData) { <a asp-controller="Tenants" asp-action="Edit" asp-route-id="@t.EntityId" title="Edit the tenant's opening balance"><code>@t.EntityCode</code></a> } else { <code>@t.EntityCode</code> }</td>
+                            <td>@if (canEditMasterData) { <a asp-controller="Tenants" asp-action="Edit" asp-route-id="@t.EntityId" title="@T["Edit the tenant's opening balance"]"><code>@t.EntityCode</code></a> } else { <code>@t.EntityCode</code> }</td>
                             <td>@t.EntityName</td>
                             <td class="text-end">@t.OpeningBalance.ToString("N2")</td>
                         </tr>
@@ -246,7 +241,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="table-light fw-semibold">
-                        <td colspan="2" class="text-end">Total</td>
+                        <td colspan="2" class="text-end">@T["Total"]</td>
                         <td class="text-end">@Model.TenantOpeningTotal.ToString("N2")</td>
                     </tr>
                 </tfoot>
@@ -255,14 +250,14 @@
     }
     else
     {
-        <div class="card-body text-muted">No tenant opening balances captured.</div>
+        <div class="card-body text-muted">@T["No tenant opening balances captured."]</div>
     }
 </div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <strong>Vendor Opening Balances (Accounts Payable)</strong>
-        <a asp-controller="Vendors" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Vendors</a>
+        <strong>@T["Vendor Opening Balances (Accounts Payable)"]</strong>
+        <a asp-controller="Vendors" asp-action="Index" class="btn btn-sm btn-outline-primary">@T["Manage Vendors"]</a>
     </div>
     @if (Model.VendorOpeningBalances.Any(x => x.OpeningBalance != 0m))
     {
@@ -270,16 +265,16 @@
             <table class="table table-sm mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Code</th>
-                        <th>Vendor</th>
-                        <th class="text-end">Opening Balance</th>
+                        <th>@T["Code"]</th>
+                        <th>@T["Vendor"]</th>
+                        <th class="text-end">@T["Opening Balance"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var v in Model.VendorOpeningBalances.Where(x => x.OpeningBalance != 0m))
                     {
                         <tr>
-                            <td>@if (canEditMasterData) { <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@v.EntityId" title="Edit the vendor's opening balance"><code>@v.EntityCode</code></a> } else { <code>@v.EntityCode</code> }</td>
+                            <td>@if (canEditMasterData) { <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@v.EntityId" title="@T["Edit the vendor's opening balance"]"><code>@v.EntityCode</code></a> } else { <code>@v.EntityCode</code> }</td>
                             <td>@v.EntityName</td>
                             <td class="text-end">@v.OpeningBalance.ToString("N2")</td>
                         </tr>
@@ -287,7 +282,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="table-light fw-semibold">
-                        <td colspan="2" class="text-end">Total</td>
+                        <td colspan="2" class="text-end">@T["Total"]</td>
                         <td class="text-end">@Model.VendorOpeningTotal.ToString("N2")</td>
                     </tr>
                 </tfoot>
@@ -296,14 +291,14 @@
     }
     else
     {
-        <div class="card-body text-muted">No vendor opening balances captured.</div>
+        <div class="card-body text-muted">@T["No vendor opening balances captured."]</div>
     }
 </div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <strong>Fixed Asset Opening Balances</strong>
-        <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Fixed Assets</a>
+        <strong>@T["Fixed Asset Opening Balances"]</strong>
+        <a asp-controller="FixedAssets" asp-action="Index" class="btn btn-sm btn-outline-primary">@T["Manage Fixed Assets"]</a>
     </div>
     @if (Model.FixedAssetOpeningBalances.Any(x => x.OpeningCost != 0m || x.OpeningAccumulatedDepreciation != 0m))
     {
@@ -311,20 +306,20 @@
             <table class="table table-sm mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Code</th>
-                        <th>Asset</th>
-                        <th>Asset Account</th>
-                        <th>Acc. Dep. Account</th>
-                        <th class="text-end">Opening Cost</th>
-                        <th class="text-end">Opening Acc. Dep.</th>
-                        <th class="text-end">Opening NBV</th>
+                        <th>@T["Code"]</th>
+                        <th>@T["Asset"]</th>
+                        <th>@T["Asset Account"]</th>
+                        <th>@T["Acc. Dep. Account"]</th>
+                        <th class="text-end">@T["Opening Cost"]</th>
+                        <th class="text-end">@T["Opening Acc. Dep."]</th>
+                        <th class="text-end">@T["Opening NBV"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var fa in Model.FixedAssetOpeningBalances.Where(x => x.OpeningCost != 0m || x.OpeningAccumulatedDepreciation != 0m))
                     {
                         <tr>
-                            <td><a asp-controller="FixedAssets" asp-action="Acquisition" asp-route-id="@fa.AssetId" title="Open the asset"><code>@fa.AssetCode</code></a></td>
+                            <td><a asp-controller="FixedAssets" asp-action="Acquisition" asp-route-id="@fa.AssetId" title="@T["Open the asset"]"><code>@fa.AssetCode</code></a></td>
                             <td>@fa.AssetName</td>
                             <td>@fa.AssetAccountDisplay</td>
                             <td>@fa.AccumulatedDepreciationAccountDisplay</td>
@@ -336,7 +331,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="table-light fw-semibold">
-                        <td colspan="4" class="text-end">Totals</td>
+                        <td colspan="4" class="text-end">@T["Totals"]</td>
                         <td class="text-end">@Model.FixedAssetOpeningCostTotal.ToString("N2")</td>
                         <td class="text-end">@Model.FixedAssetOpeningAccumDepTotal.ToString("N2")</td>
                         <td class="text-end">@Model.FixedAssetOpeningNetBookValueTotal.ToString("N2")</td>
@@ -347,7 +342,7 @@
     }
     else
     {
-        <div class="card-body text-muted">No fixed asset opening balances captured.</div>
+        <div class="card-body text-muted">@T["No fixed asset opening balances captured."]</div>
     }
 </div>
 

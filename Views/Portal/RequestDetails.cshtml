@@ -19,7 +19,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h5 mb-0">@Model.RequestNumber</h1>
-    <a asp-action="Requests" class="btn btn-outline-secondary btn-sm">Back</a>
+    <a asp-action="Requests" class="btn btn-outline-secondary btn-sm">@T["Back"]</a>
 </div>
 
 <div class="card shadow-sm mb-3">
@@ -59,18 +59,18 @@
 {
     <div class="card shadow-sm mb-3">
         <div class="card-body">
-            <div class="small text-uppercase text-muted mb-2">Payment request</div>
-            <div class="d-flex justify-content-between"><span>Invoice</span><strong>@Model.RelatedInvoiceNumber</strong></div>
+            <div class="small text-uppercase text-muted mb-2">@T["Payment request"]</div>
+            <div class="d-flex justify-content-between"><span>@T["Invoice"]</span><strong>@Model.RelatedInvoiceNumber</strong></div>
             <div class="d-flex justify-content-between">
-                <span>Outstanding</span>
+                <span>@T["Outstanding"]</span>
                 <strong>@Model.RelatedInvoiceOutstanding?.ToString("N2")</strong>
             </div>
             <div class="d-flex justify-content-between">
-                <span>Current due date</span>
+                <span>@T["Current due date"]</span>
                 <strong>@Model.RelatedInvoiceDueDate?.ToString("dd/MM/yyyy")</strong>
             </div>
             <div class="d-flex justify-content-between">
-                <span>You asked to pay by</span>
+                <span>@T["You asked to pay by"]</span>
                 <strong>@Model.RequestedNewDueDate?.ToString("dd/MM/yyyy")</strong>
             </div>
 
@@ -84,7 +84,7 @@
             else
             {
                 <div class="alert alert-warning mt-3 mb-0 small">
-                    The current due date still applies until we confirm a change.
+                    @T["The current due date still applies until we confirm a change."]
                 </div>
             }
         </div>
@@ -95,18 +95,18 @@
 {
     <div class="card shadow-sm mb-3 border-success">
         <div class="card-body">
-            <div class="small text-uppercase text-muted mb-1">Our response</div>
+            <div class="small text-uppercase text-muted mb-1">@T["Our response"]</div>
             <div style="white-space: pre-wrap">@Model.ResolutionNotes</div>
         </div>
     </div>
 }
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-white"><strong>Messages</strong></div>
+    <div class="card-header bg-white">@T.Html("<strong>Messages</strong>")</div>
     <div class="card-body">
         @if (Model.Comments.Count == 0)
         {
-            <p class="text-muted small mb-0">No messages yet.</p>
+            <p class="text-muted small mb-0">@T["No messages yet."]</p>
         }
         else
         {
@@ -130,9 +130,9 @@
                 @Html.AntiForgeryToken()
                 <div class="mb-2">
                     <textarea name="body" class="form-control" rows="3" maxlength="4000" required
-                              placeholder="Add a message..."></textarea>
+                              placeholder="@T["Add a message..."]"></textarea>
                 </div>
-                <button type="submit" class="btn btn-dark btn-sm">Send message</button>
+                <button type="submit" class="btn btn-dark btn-sm">@T["Send message"]</button>
             </form>
         </div>
     }
@@ -143,6 +143,6 @@
     <form asp-action="CancelRequest" asp-route-id="@Model.Id" method="post"
           onsubmit="return confirm('Withdraw this request?');">
         @Html.AntiForgeryToken()
-        <button type="submit" class="btn btn-outline-danger btn-sm">Withdraw this request</button>
+        <button type="submit" class="btn btn-outline-danger btn-sm">@T["Withdraw this request"]</button>
     </form>
 }

@@ -1,9 +1,9 @@
 @model RealEstateManager.Models.OwnerWithdrawalCategoryViewModel
 @{
-    ViewData["Title"] = "New Owner Withdrawal Category";
+    ViewData["Title"] = T["New Owner Withdrawal Category"];
 }
 
-<h2 class="mb-3">New Owner Withdrawal Category</h2>
+<h2 class="mb-3">@T["New Owner Withdrawal Category"]</h2>
 
 <form asp-action="Create" method="post" class="col-lg-7">
     @Html.AntiForgeryToken()
@@ -11,14 +11,14 @@
 
     <div class="mb-3">
         <label asp-for="Code" class="form-label"></label>
-        <input asp-for="Code" class="form-control" placeholder="OW-10" />
-        <div class="form-text">Unique within the company. Used to sort and identify the category.</div>
+        <input asp-for="Code" class="form-control" placeholder="@T["OW-10"]" />
+        <div class="form-text">@T["Unique within the company. Used to sort and identify the category."]</div>
         <span asp-validation-for="Code" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" placeholder="Education" />
+        <input asp-for="Name" class="form-control" placeholder="@T["Education"]" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
@@ -31,7 +31,7 @@
         <div class="col-md-6">
             <label asp-for="SortOrder" class="form-label"></label>
             <input asp-for="SortOrder" class="form-control" />
-            <div class="form-text">Controls the order in the General Journal selector and reports.</div>
+            <div class="form-text">@T["Controls the order in the General Journal selector and reports."]</div>
         </div>
         <div class="col-md-6 d-flex align-items-center">
             <div class="form-check mt-4">
@@ -41,8 +41,8 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Save</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-dark">@T["Save"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Cancel"]</a>
 </form>
 
 @section Scripts {

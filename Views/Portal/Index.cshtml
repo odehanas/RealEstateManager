@@ -2,7 +2,7 @@
 @using RealEstateManager.Domain
 @{
     Layout = "_PortalLayout";
-    ViewData["Title"] = "My Account";
+    ViewData["Title"] = T["My Account"];
 }
 
 <div class="row g-3 mb-3">
@@ -17,7 +17,7 @@
     <div class="col-6 col-lg-3">
         <div class="card stat shadow-sm h-100 @(Model.OverdueAmount > 0 ? "bg-warning text-dark" : "bg-secondary text-white")">
             <div class="card-body">
-                <div class="label">Overdue</div>
+                <div class="label">@T["Overdue"]</div>
                 <div class="value">@Model.OverdueAmount.ToString("N2")</div>
                 <div class="small">@Model.OverdueCount invoice(s)</div>
             </div>
@@ -26,7 +26,7 @@
     <div class="col-6 col-lg-3">
         <div class="card stat shadow-sm h-100 bg-dark text-white">
             <div class="card-body">
-                <div class="label">Cheques Held</div>
+                <div class="label">@T["Cheques Held"]</div>
                 <div class="value">@Model.PdcsOnHandTotal.ToString("N2")</div>
                 <div class="small">@Model.PdcsOnHand.Count not yet presented</div>
             </div>
@@ -35,7 +35,7 @@
     <div class="col-6 col-lg-3">
         <div class="card stat shadow-sm h-100 bg-primary text-white">
             <div class="card-body">
-                <div class="label">Deposit Held</div>
+                <div class="label">@T["Deposit Held"]</div>
                 <div class="value">@Model.SecurityDepositHeld.ToString("N2")</div>
             </div>
         </div>
@@ -49,7 +49,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                 <div>
-                    <div class="text-muted small text-uppercase">Next payment due</div>
+                    <div class="text-muted small text-uppercase">@T["Next payment due"]</div>
                     <div class="h4 mb-1">@next.Outstanding.ToString("N2")</div>
                     <div class="small">
                         Invoice <strong>@next.InvoiceNumber</strong> &middot; unit @next.UnitCode
@@ -61,7 +61,7 @@
                         }
                     </div>
                 </div>
-                <a asp-action="Invoices" class="btn btn-outline-dark btn-sm">All invoices</a>
+                <a asp-action="Invoices" class="btn btn-outline-dark btn-sm">@T["All invoices"]</a>
             </div>
         </div>
     </div>
@@ -69,15 +69,15 @@
 else if (Model.IsSettled)
 {
     <div class="alert alert-success">
-        <strong>Your account is fully settled.</strong> There is nothing outstanding.
+        @T.Html("<strong>Your account is fully settled.</strong> There is nothing outstanding.")
     </div>
 }
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-light"><strong>My Tenancy</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>My Tenancy</strong>")</div>
     @if (Model.ActiveContracts.Count == 0)
     {
-        <div class="card-body text-muted">You have no active contract at the moment.</div>
+        <div class="card-body text-muted">@T["You have no active contract at the moment."]</div>
     }
     else
     {
@@ -95,7 +95,7 @@ else if (Model.IsSettled)
                         </div>
                         <div class="text-end">
                             <div class="fw-semibold">@contract.AnnualRent.ToString("N2")</div>
-                            <div class="small text-muted">per year</div>
+                            <div class="small text-muted">@T["per year"]</div>
                             @if (contract.IsExpiringSoon)
                             {
                                 <span class="badge bg-warning text-dark mt-1">Expires in @contract.DaysToExpiry days</span>
@@ -112,15 +112,15 @@ else if (Model.IsSettled)
     <div class="card-body small">
         <div class="row g-2">
             <div class="col-6 col-md-3">
-                <div class="text-muted">Opening balance</div>
+                <div class="text-muted">@T["Opening balance"]</div>
                 <div class="fw-semibold">@Model.OpeningBalance.ToString("N2")</div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="text-muted">Total invoiced</div>
+                <div class="text-muted">@T["Total invoiced"]</div>
                 <div class="fw-semibold">@Model.TotalInvoiced.ToString("N2")</div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="text-muted">Total paid</div>
+                <div class="text-muted">@T["Total paid"]</div>
                 <div class="fw-semibold">@Model.TotalPaid.ToString("N2")</div>
                 @if (Model.TotalCredited > 0m)
                 {
@@ -128,7 +128,7 @@ else if (Model.IsSettled)
                 }
             </div>
             <div class="col-6 col-md-3">
-                <div class="text-muted">Balance</div>
+                <div class="text-muted">@T["Balance"]</div>
                 <div class="fw-semibold">@Model.OutstandingBalance.ToString("N2")</div>
             </div>
         </div>
@@ -137,7 +137,7 @@ else if (Model.IsSettled)
 
 <div class="card shadow-sm">
     <div class="card-body small text-muted">
-        <strong class="text-dark">Need help?</strong>
+        <strong class="text-dark">@T["Need help?"]</strong>
         Contact @Model.CompanyName
         @if (!string.IsNullOrWhiteSpace(Model.CompanyPhone)) { <text>on @Model.CompanyPhone</text> }
         @if (!string.IsNullOrWhiteSpace(Model.CompanyEmail)) { <text>or at @Model.CompanyEmail</text> }.

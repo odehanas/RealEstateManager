@@ -2,13 +2,13 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Employees";
+    ViewData["Title"] = T["Employees"];
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">Employees</h2>
-        <div class="text-muted">Staff records, UAE documents, salary and payment details.</div>
+        <h2 class="mb-0">@T["Employees"]</h2>
+        <div class="text-muted">@T["Staff records, UAE documents, salary and payment details."]</div>
     </div>
     <div class="d-flex gap-2">
         <a asp-action="Documents" class="btn btn-outline-danger">
@@ -18,7 +18,7 @@
                 <span class="badge bg-danger">@Model.ExpiringDocuments</span>
             }
         </a>
-        <a asp-action="Create" class="btn btn-dark">Add Employee</a>
+        <a asp-action="Create" class="btn btn-dark">@T["Add Employee"]</a>
     </div>
 </div>
 
@@ -37,30 +37,30 @@
         </select>
     </div>
     <div class="col-md-5">
-        <input name="q" value="@Model.Search" class="form-control" placeholder="Search by code, name, job title or Emirates ID" />
+        <input name="q" value="@Model.Search" class="form-control" placeholder="@T["Search by code, name, job title or Emirates ID"]" />
     </div>
-    <div class="col-md-2"><button class="btn btn-outline-dark w-100">Search</button></div>
+    <div class="col-md-2"><button class="btn btn-outline-dark w-100">@T["Search"]</button></div>
 </form>
 
 <div class="table-responsive">
     <table class="table table-striped table-bordered align-middle">
         <thead class="table-light">
             <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Job title</th>
-                <th>Department</th>
-                <th>Building</th>
-                <th>Joined</th>
-                <th class="text-end">Monthly gross</th>
-                <th>Paid by</th>
-                <th>Status</th>
+                <th>@T["Code"]</th>
+                <th>@T["Name"]</th>
+                <th>@T["Job title"]</th>
+                <th>@T["Department"]</th>
+                <th>@T["Building"]</th>
+                <th>@T["Joined"]</th>
+                <th class="text-end">@T["Monthly gross"]</th>
+                <th>@T["Paid by"]</th>
+                <th>@T["Status"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Employees.Count == 0)
             {
-                <tr><td colspan="9" class="text-muted">No employees found.</td></tr>
+                <tr><td colspan="9" class="text-muted">@T["No employees found."]</td></tr>
             }
             @foreach (var e in Model.Employees)
             {

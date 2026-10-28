@@ -1,14 +1,14 @@
 @model RealEstateManager.Models.TenantPortalAccessViewModel
 @{
-    ViewData["Title"] = "Portal Access";
+    ViewData["Title"] = T["Portal Access"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Portal Access</h2>
+        <h2 class="mb-1">@T["Portal Access"]</h2>
         <p class="text-muted mb-0">@Model.TenantName <span class="text-muted">(@Model.TenantCode)</span></p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Tenants</a>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to Tenants"]</a>
 </div>
 
 @if (TempData["SuccessMessage"] is string success)
@@ -21,22 +21,20 @@
 @if (!string.IsNullOrEmpty(Model.IssuedPassword))
 {
     <div class="card border-success shadow-sm mb-4">
-        <div class="card-header bg-success text-white"><strong>Access issued &mdash; copy these details now</strong></div>
+        <div class="card-header bg-success text-white">@T.Html("<strong>Access issued &mdash; copy these details now</strong>")</div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <div class="text-muted small">Username</div>
+                    <div class="text-muted small">@T["Username"]</div>
                     <div class="fs-5 fw-bold font-monospace">@Model.Username</div>
                 </div>
                 <div class="col-md-6">
-                    <div class="text-muted small">Temporary password</div>
+                    <div class="text-muted small">@T["Temporary password"]</div>
                     <div class="fs-5 fw-bold font-monospace">@Model.IssuedPassword</div>
                 </div>
             </div>
             <div class="alert alert-warning mt-3 mb-0 small">
-                <strong>This password is shown once and cannot be retrieved.</strong>
-                It is stored only as a hash. If it is lost, issue a reset from this page, which produces a
-                new one. The tenant must change it the first time they sign in.
+                @T.Html("<strong>This password is shown once and cannot be retrieved.</strong> It is stored only as a hash. If it is lost, issue a reset from this page, which produces a new one. The tenant must change it the first time they sign in.")
             </div>
         </div>
     </div>
@@ -45,55 +43,55 @@
 <div class="row g-3">
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-light"><strong>Current Status</strong></div>
+            <div class="card-header bg-light">@T.Html("<strong>Current Status</strong>")</div>
             <div class="card-body">
                 @if (!Model.HasAccess)
                 {
                     <p class="text-muted mb-0">
-                        This tenant has no portal access yet. Issue it below and hand the details over.
+                        @T["This tenant has no portal access yet. Issue it below and hand the details over."]
                     </p>
                 }
                 else
                 {
                     <table class="table table-sm mb-0">
                         <tr>
-                            <th style="width:45%">Username</th>
+                            <th style="width:45%">@T["Username"]</th>
                             <td class="font-monospace">@Model.Username</td>
                         </tr>
                         <tr>
-                            <th>Status</th>
+                            <th>@T["Status"]</th>
                             <td>
                                 @if (Model.IsActive)
                                 {
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="badge bg-success">@T["Active"]</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">Suspended</span>
+                                    <span class="badge bg-secondary">@T["Suspended"]</span>
                                 }
                             </td>
                         </tr>
                         <tr>
-                            <th>Password</th>
+                            <th>@T["Password"]</th>
                             <td>
                                 @if (Model.MustChangePassword)
                                 {
-                                    <span class="badge bg-warning text-dark">Temporary &mdash; not yet changed</span>
+                                    <span class="badge bg-warning text-dark">@T["Temporary — not yet changed"]</span>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">Set by the tenant</span>
+                                    <span class="text-muted">@T["Set by the tenant"]</span>
                                 }
                             </td>
                         </tr>
                         <tr>
-                            <th>Last sign in</th>
+                            <th>@T["Last sign in"]</th>
                             <td>@(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm") : "Never")</td>
                         </tr>
                         @if (Model.LockedOutUntil.HasValue && Model.LockedOutUntil > DateTime.UtcNow)
                         {
                             <tr>
-                                <th>Locked until</th>
+                                <th>@T["Locked until"]</th>
                                 <td class="text-danger">@Model.LockedOutUntil.Value.ToString("dd/MM/yyyy HH:mm") (too many failed attempts)</td>
                             </tr>
                         }
@@ -111,7 +109,7 @@
                         </button>
                     </form>
                     <span class="text-muted small ms-2">
-                        Suspending blocks sign-in immediately but keeps the account.
+                        @T["Suspending blocks sign-in immediately but keeps the account."]
                     </span>
                 </div>
             }
@@ -131,7 +129,7 @@
                         <label asp-for="NewUsername" class="form-label"></label>
                         <input asp-for="NewUsername" name="newUsername" class="form-control" />
                         <div class="form-text">
-                            The tenant's email address is the usual choice. It must be unique across all tenants.
+                            @T["The tenant's email address is the usual choice. It must be unique across all tenants."]
                         </div>
                     </div>
 
@@ -143,8 +141,7 @@
                 @if (Model.HasAccess)
                 {
                     <div class="alert alert-warning small mt-3 mb-0">
-                        Resetting generates a <strong>new</strong> temporary password and invalidates the old
-                        one. Use it when a tenant is locked out or has forgotten their password.
+                        @T.Html("Resetting generates a <strong>new</strong> temporary password and invalidates the old one. Use it when a tenant is locked out or has forgotten their password.")
                     </div>
                 }
             </div>
@@ -154,16 +151,16 @@
 
 <div class="card shadow-sm mt-3">
     <div class="card-body small text-muted">
-        <strong class="text-dark">What the tenant can see</strong>
+        <strong class="text-dark">@T["What the tenant can see"]</strong>
         <ul class="mb-2 mt-2">
-            <li>Their balance, overdue amount, cheques held and deposit held</li>
-            <li>Their own invoices, payments, cheques, contracts and account statement</li>
+            <li>@T["Their balance, overdue amount, cheques held and deposit held"]</li>
+            <li>@T["Their own invoices, payments, cheques, contracts and account statement"]</li>
         </ul>
-        <strong class="text-dark">What they cannot do</strong>
+        <strong class="text-dark">@T["What they cannot do"]</strong>
         <ul class="mb-0">
-            <li>See any other tenant, any property owner, or any company financial report</li>
-            <li>Change anything &mdash; the portal is read-only</li>
+            <li>@T["See any other tenant, any property owner, or any company financial report"]</li>
+            <li>@T["Change anything — the portal is read-only"]</li>
         </ul>
-        <div class="mt-2">The portal is at <code>/portal</code>.</div>
+        <div class="mt-2">@T.Html("The portal is at <code>/portal</code>.")</div>
     </div>
 </div>

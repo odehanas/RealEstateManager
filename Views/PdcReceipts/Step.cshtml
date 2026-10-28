@@ -50,13 +50,13 @@
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="row g-3">
-        <div class="col-md-3"><label class="form-label">Cheque number</label><input class="form-control" value="@Model.ChequeNumber" readonly /></div>
-        <div class="col-md-3"><label class="form-label">Bank</label><input class="form-control" value="@Model.BankName" readonly /></div>
-        <div class="col-md-3"><label class="form-label">Amount</label><input class="form-control" value="@Model.Amount.ToString("N2")" readonly /></div>
-        <div class="col-md-3"><label class="form-label">Status</label><input class="form-control" value="@PdcStatuses.Describe(Model.Status)" readonly /></div>
-        <div class="col-md-6"><label class="form-label">Lease</label><input class="form-control" value="@Model.LeaseDisplay" readonly /></div>
-        <div class="col-md-2"><label class="form-label">Invoice</label><input class="form-control" value="@Model.InvoiceDisplay" readonly /></div>
-        <div class="col-md-2"><label class="form-label">Cheque date</label><input class="form-control" value="@Model.ChequeDate.ToString("dd/MM/yyyy")" readonly /></div>
+        <div class="col-md-3"><label class="form-label">@T["Cheque number"]</label><input class="form-control" value="@Model.ChequeNumber" readonly /></div>
+        <div class="col-md-3"><label class="form-label">@T["Bank"]</label><input class="form-control" value="@Model.BankName" readonly /></div>
+        <div class="col-md-3"><label class="form-label">@T["Amount"]</label><input class="form-control" value="@Model.Amount.ToString("N2")" readonly /></div>
+        <div class="col-md-3"><label class="form-label">@T["Status"]</label><input class="form-control" value="@PdcStatuses.Describe(Model.Status)" readonly /></div>
+        <div class="col-md-6"><label class="form-label">@T["Lease"]</label><input class="form-control" value="@Model.LeaseDisplay" readonly /></div>
+        <div class="col-md-2"><label class="form-label">@T["Invoice"]</label><input class="form-control" value="@Model.InvoiceDisplay" readonly /></div>
+        <div class="col-md-2"><label class="form-label">@T["Cheque date"]</label><input class="form-control" value="@Model.ChequeDate.ToString("dd/MM/yyyy")" readonly /></div>
         <div class="col-md-2"><label class="form-label">@(Model.DepositedDate.HasValue ? "Deposited" : "Received")</label><input class="form-control" value="@((Model.DepositedDate ?? Model.ReceivedDate).ToString("dd/MM/yyyy"))" readonly /></div>
 
         <div class="col-md-3">
@@ -69,7 +69,7 @@
         @if (Model.TakesCharge)
         {
             <div class="col-md-3">
-                <label asp-for="Charge" class="form-label">Charge to tenant (before VAT)</label>
+                <label asp-for="Charge" class="form-label">@T["Charge to tenant (before VAT)"]</label>
                 <input asp-for="Charge" type="number" step="0.01" min="0" class="form-control" id="charge" />
                 <div class="form-text" id="chargeTotal"></div>
             </div>
@@ -85,7 +85,7 @@
         <button type="submit" class="btn @(Model.Kind == PdcStepViewModel.Bounce ? "btn-danger" : "btn-dark")">
             @(Model.Kind switch { PdcStepViewModel.Bounce => "Record Bounce and Post", PdcStepViewModel.Withdraw => "Withdraw and Post", _ => "Deposit and Post" })
         </button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

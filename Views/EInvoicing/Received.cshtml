@@ -1,17 +1,16 @@
 @model List<RealEstateManager.Models.ReceivedEInvoiceListItemViewModel>
 @{
-    ViewData["Title"] = "Received E-Invoices";
+    ViewData["Title"] = T["Received E-Invoices"];
 }
 
 <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
     <div>
-        <h2 class="mb-1">Received E-Invoices</h2>
+        <h2 class="mb-1">@T["Received E-Invoices"]</h2>
         <p class="text-muted mb-0">
-            E-invoices your suppliers sent through the network. Upload the XML files your provider delivered,
-            then book each one as a vendor bill &mdash; the supplier, number, dates and lines are filled in for you.
+            @T["E-invoices your suppliers sent through the network. Upload the XML files your provider delivered, then book each one as a vendor bill — the supplier, number, dates and lines are filled in for you."]
         </p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">E-Invoice Monitor</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["E-Invoice Monitor"]</a>
 </div>
 
 <partial name="_Messages" />
@@ -21,12 +20,12 @@
         <form asp-action="Upload" method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
             @Html.AntiForgeryToken()
             <div class="col-md-8">
-                <label class="form-label">E-invoice files (XML)</label>
+                <label class="form-label">@T["E-invoice files (XML)"]</label>
                 <input type="file" name="files" class="form-control" accept=".xml,application/xml,text/xml" multiple />
-                <div class="form-text">Several at once is fine. The same document is never accepted twice.</div>
+                <div class="form-text">@T["Several at once is fine. The same document is never accepted twice."]</div>
             </div>
             <div class="col-md-4">
-                <button type="submit" class="btn btn-dark w-100">Upload</button>
+                <button type="submit" class="btn btn-dark w-100">@T["Upload"]</button>
             </div>
         </form>
     </div>
@@ -37,19 +36,19 @@
         <table class="table table-sm table-hover align-middle mb-0">
             <thead>
                 <tr>
-                    <th>Supplier</th>
-                    <th>Document</th>
-                    <th>Date</th>
-                    <th class="text-end">Total</th>
-                    <th>Vendor</th>
-                    <th>Status</th>
+                    <th>@T["Supplier"]</th>
+                    <th>@T["Document"]</th>
+                    <th>@T["Date"]</th>
+                    <th class="text-end">@T["Total"]</th>
+                    <th>@T["Vendor"]</th>
+                    <th>@T["Status"]</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model.Count == 0)
                 {
-                    <tr><td colspan="7" class="text-muted p-3">Nothing received yet.</td></tr>
+                    <tr><td colspan="7" class="text-muted p-3">@T["Nothing received yet."]</td></tr>
                 }
                 @foreach (var item in Model)
                 {
@@ -74,7 +73,7 @@
                             }
                             else
                             {
-                                <span class="text-danger small">No vendor with this TRN</span>
+                                <span class="text-danger small">@T["No vendor with this TRN"]</span>
                             }
                         </td>
                         <td>
@@ -90,18 +89,18 @@
                             }
                         </td>
                         <td class="text-nowrap">
-                            <a asp-action="ReceivedFile" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark">XML</a>
+                            <a asp-action="ReceivedFile" asp-route-id="@item.Id" class="btn btn-sm btn-outline-dark">@T["XML"]</a>
                             @if (item.VendorBillId == null && item.Status != "Ignored")
                             {
                                 if (item.IsCreditNote)
                                 {
-                                    <span class="small text-muted" title="Supplier credit notes are recorded by reducing or reversing the bill they relate to.">
-                                        Record manually
+                                    <span class="small text-muted" title="@T["Supplier credit notes are recorded by reducing or reversing the bill they relate to."]">
+                                        @T["Record manually"]
                                     </span>
                                 }
                                 else
                                 {
-                                    <a asp-controller="VendorBills" asp-action="Create" asp-route-receivedId="@item.Id" class="btn btn-sm btn-primary">Book as bill</a>
+                                    <a asp-controller="VendorBills" asp-action="Create" asp-route-receivedId="@item.Id" class="btn btn-sm btn-primary">@T["Book as bill"]</a>
                                 }
                             }
                             @if (item.VendorBillId == null)

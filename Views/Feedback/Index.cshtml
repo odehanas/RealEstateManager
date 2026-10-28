@@ -1,13 +1,13 @@
 @model RealEstateManager.Models.FeedbackPageViewModel
 
 @{
-    ViewData["Title"] = "Feedback";
+    ViewData["Title"] = T["Feedback"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Feedback</h2>
-        <p class="text-muted mb-0">Share your ideas, improvement requests, or pain points so they can be considered in future releases.</p>
+        <h2 class="mb-1">@T["Feedback"]</h2>
+        <p class="text-muted mb-0">@T["Share your ideas, improvement requests, or pain points so they can be considered in future releases."]</p>
     </div>
 </div>
 
@@ -20,18 +20,18 @@
     <div class="col-lg-5">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h5 class="card-title mb-3">Submit New Feedback</h5>
+                <h5 class="card-title mb-3">@T["Submit New Feedback"]</h5>
                 <form asp-action="Submit" method="post" class="row g-3">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="col-12">
                         <label asp-for="Form.Category" class="form-label"></label>
                         <select asp-for="Form.Category" class="form-select">
-                            <option value="General">General</option>
-                            <option value="Feature Request">Feature Request</option>
-                            <option value="Usability">Usability</option>
-                            <option value="Bug Report">Bug Report</option>
-                            <option value="Reporting">Reporting</option>
+                            <option value="General">@T["General"]</option>
+                            <option value="Feature Request">@T["Feature Request"]</option>
+                            <option value="Usability">@T["Usability"]</option>
+                            <option value="Bug Report">@T["Bug Report"]</option>
+                            <option value="Reporting">@T["Reporting"]</option>
                         </select>
                         <span asp-validation-for="Form.Category" class="text-danger"></span>
                     </div>
@@ -49,7 +49,7 @@
                     </div>
 
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Send Feedback</button>
+                        <button type="submit" class="btn btn-primary">@T["Send Feedback"]</button>
                     </div>
                 </form>
             </div>
@@ -60,13 +60,13 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Recent Company Feedback</h5>
-                    <span class="text-muted small">Latest 10 items</span>
+                    <h5 class="card-title mb-0">@T["Recent Company Feedback"]</h5>
+                    <span class="text-muted small">@T["Latest 10 items"]</span>
                 </div>
 
                 @if (Model.RecentItems.Count == 0)
                 {
-                    <div class="text-muted">No feedback has been submitted for this company yet.</div>
+                    <div class="text-muted">@T["No feedback has been submitted for this company yet."]</div>
                 }
                 else
                 {
@@ -91,7 +91,7 @@
                                 @if (!string.IsNullOrWhiteSpace(item.AdminNotes))
                                 {
                                     <div class="alert alert-light border mt-3 mb-0">
-                                        <div class="fw-semibold small">Admin Notes</div>
+                                        <div class="fw-semibold small">@T["Admin Notes"]</div>
                                         <div class="small">@item.AdminNotes</div>
                                     </div>
                                 }

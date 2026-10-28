@@ -1,0 +1,13 @@
+@using RealEstateManager.Services.Localization
+@model string
+@*
+    The English / Arabic switch: one link to the other language. The model is the button style
+    ("btn-outline-light btn-sm" on the dark top bar).
+*@
+@{
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    var other = UiLanguages.IsArabic ? UiLanguages.English : UiLanguages.Arabic;
+}
+<a class="btn @(Model ?? "btn-outline-light btn-sm")" lang="@other"
+   href="@Url.Action("Set", "Language", new { lang = other, returnUrl })"
+   title="@(other == UiLanguages.Arabic ? "عرض الشاشات باللغة العربية" : "Show the screens in English")">@(other == UiLanguages.Arabic ? "العربية" : "English")</a>

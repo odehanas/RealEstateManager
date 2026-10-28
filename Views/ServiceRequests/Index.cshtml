@@ -1,7 +1,7 @@
 @model RealEstateManager.Models.ServiceRequestQueueViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Tenant Requests";
+    ViewData["Title"] = T["Tenant Requests"];
 
     string ChipClass(string? value) =>
         (Model.StatusFilter ?? "Open") == value ? "btn-dark" : "btn-outline-secondary";
@@ -18,9 +18,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Tenant Requests</h2>
+        <h2 class="mb-1">@T["Tenant Requests"]</h2>
         <p class="text-muted mb-0 small">
-            Everything tenants have raised through the self-service portal.
+            @T["Everything tenants have raised through the self-service portal."]
         </p>
     </div>
 </div>
@@ -39,9 +39,9 @@
         In progress <span class="badge bg-light text-dark">@Model.InProgressCount</span>
     </a>
     <a asp-action="Index" asp-route-status="Closed" asp-route-type="@Model.TypeFilter"
-       class="btn btn-sm @ChipClass("Closed")">Closed</a>
+       class="btn btn-sm @ChipClass("Closed")">@T["Closed"]</a>
     <a asp-action="Index" asp-route-status="" asp-route-type="@Model.TypeFilter"
-       class="btn btn-sm @ChipClass("")">All</a>
+       class="btn btn-sm @ChipClass("")">@T["All"]</a>
 
     @if (Model.AwaitingPostponementCount > 0)
     {
@@ -55,9 +55,9 @@
 <form method="get" class="row g-2 align-items-end mb-3">
     <input type="hidden" name="status" value="@Model.StatusFilter" />
     <div class="col-auto">
-        <label class="form-label mb-1 small" for="type">Type</label>
+        <label class="form-label mb-1 small" for="type">@T["Type"]</label>
         <select class="form-select form-select-sm" id="type" name="type" onchange="this.form.submit()">
-            <option value="">All types</option>
+            <option value="">@T["All types"]</option>
             @foreach (var type in ServiceRequestTypes.All)
             {
                 <option value="@type" selected="@(type == Model.TypeFilter ? "selected" : null)">
@@ -70,7 +70,7 @@
 
 @if (Model.Requests.Count == 0)
 {
-    <div class="alert alert-info">Nothing matches this filter.</div>
+    <div class="alert alert-info">@T["Nothing matches this filter."]</div>
 }
 else
 {
@@ -79,14 +79,14 @@ else
             <table class="table table-bordered table-striped table-sm mb-0 align-middle">
                 <thead>
                     <tr>
-                        <th>Request</th>
-                        <th>Tenant</th>
-                        <th>Unit</th>
-                        <th>Type</th>
-                        <th>Subject</th>
-                        <th>Priority</th>
-                        <th class="text-end">Age</th>
-                        <th>Status</th>
+                        <th>@T["Request"]</th>
+                        <th>@T["Tenant"]</th>
+                        <th>@T["Unit"]</th>
+                        <th>@T["Type"]</th>
+                        <th>@T["Subject"]</th>
+                        <th>@T["Priority"]</th>
+                        <th class="text-end">@T["Age"]</th>
+                        <th>@T["Status"]</th>
                         <th style="width:1%"></th>
                     </tr>
                 </thead>
@@ -111,17 +111,17 @@ else
                                 @request.Subject
                                 @if (request.AwaitingPostponementAction)
                                 {
-                                    <span class="badge bg-warning text-dark">Due date not yet applied</span>
+                                    <span class="badge bg-warning text-dark">@T["Due date not yet applied"]</span>
                                 }
                             </td>
                             <td>
                                 @if (request.Priority == ServiceRequestPriorities.Urgent)
                                 {
-                                    <span class="badge bg-danger">Urgent</span>
+                                    <span class="badge bg-danger">@T["Urgent"]</span>
                                 }
                                 else if (request.Priority == ServiceRequestPriorities.High)
                                 {
-                                    <span class="badge bg-warning text-dark">High</span>
+                                    <span class="badge bg-warning text-dark">@T["High"]</span>
                                 }
                                 else
                                 {
@@ -138,7 +138,7 @@ else
                             </td>
                             <td>
                                 <a asp-action="Details" asp-route-id="@request.Id"
-                                   class="btn btn-sm btn-outline-secondary">Open</a>
+                                   class="btn btn-sm btn-outline-secondary">@T["Open"]</a>
                             </td>
                         </tr>
                     }

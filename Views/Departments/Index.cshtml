@@ -1,23 +1,23 @@
 @model List<RealEstateManager.Domain.Department>
 
 @{
-    ViewData["Title"] = "Departments";
+    ViewData["Title"] = T["Departments"];
     var counts = (Dictionary<int, int>)ViewBag.Counts;
 }
 
-<h2>Departments</h2>
+<h2>@T["Departments"]</h2>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
 @if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
 
 <form asp-action="Create" method="post" class="row g-2 mb-3">
     @Html.AntiForgeryToken()
-    <div class="col-md-5"><input name="name" class="form-control" placeholder="New department, e.g. Building Maintenance" /></div>
-    <div class="col-md-2"><button class="btn btn-dark w-100">Add</button></div>
+    <div class="col-md-5"><input name="name" class="form-control" placeholder="@T["New department, e.g. Building Maintenance"]" /></div>
+    <div class="col-md-2"><button class="btn btn-dark w-100">@T["Add"]</button></div>
 </form>
 
 <table class="table table-bordered table-striped" style="max-width:720px">
-    <thead class="table-light"><tr><th>Department</th><th class="text-end">Active staff</th><th>Status</th><th></th></tr></thead>
+    <thead class="table-light"><tr><th>@T["Department"]</th><th class="text-end">@T["Active staff"]</th><th>@T["Status"]</th><th></th></tr></thead>
     <tbody>
         @foreach (var d in Model)
         {

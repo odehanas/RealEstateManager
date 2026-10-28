@@ -2,7 +2,7 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Vendor Statement";
+    ViewData["Title"] = T["Vendor Statement"];
     var vendors = ViewBag.Vendors as List<Vendor> ?? new();
 }
 
@@ -13,24 +13,22 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Vendor Statement</h2>
+    <h2 class="mb-0">@T["Vendor Statement"]</h2>
     @if (Model.VendorId.HasValue)
     {
-        <button type="button" class="btn btn-outline-secondary btn-sm statement-no-print" onclick="window.print()">Print</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm statement-no-print" onclick="window.print()">@T["Print"]</button>
     }
 </div>
 
 <div class="alert alert-info statement-no-print">
-    What we owe a supplier and how it arose: every posted bill and payment on Accounts Payable for that vendor.
-    Draft bills are not in the accounts and are not shown. The closing balance agrees with the vendor's share of
-    Accounts Payable in the Trial Balance.
+    @T["What we owe a supplier and how it arose: every posted bill and payment on Accounts Payable for that vendor. Draft bills are not in the accounts and are not shown. The closing balance agrees with the vendor's share of Accounts Payable in the Trial Balance."]
 </div>
 
 <form method="get" class="row g-3 mb-4 statement-no-print">
     <div class="col-md-6">
-        <label class="form-label">Vendor</label>
+        <label class="form-label">@T["Vendor"]</label>
         <select name="vendorId" class="form-select">
-            <option value="">Select Vendor</option>
+            <option value="">@T["Select Vendor"]</option>
             @foreach (var vendor in vendors)
             {
                 <option value="@vendor.Id" selected="@(Model.VendorId == vendor.Id)">@vendor.Code - @vendor.Name</option>
@@ -38,15 +36,15 @@
         </select>
     </div>
     <div class="col-md-2">
-        <label class="form-label">From Date</label>
+        <label class="form-label">@T["From Date"]</label>
         <input type="date" name="fromDate" value="@Model.FromDate.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
     <div class="col-md-2">
-        <label class="form-label">To Date</label>
+        <label class="form-label">@T["To Date"]</label>
         <input type="date" name="toDate" value="@Model.ToDate.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
     <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-dark w-100">View Statement</button>
+        <button type="submit" class="btn btn-dark w-100">@T["View Statement"]</button>
     </div>
 </form>
 
@@ -54,7 +52,7 @@
 
 @if (!Model.VendorId.HasValue)
 {
-    <div class="alert alert-secondary">Select a vendor to view the statement.</div>
+    <div class="alert alert-secondary">@T["Select a vendor to view the statement."]</div>
 }
 else
 {
@@ -68,42 +66,42 @@ else
         </div>
         <div class="card-body row g-3">
             <div class="col-md-12"><strong>Statement Period:</strong> @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</div>
-            <div class="col-6 col-md-3"><div class="text-muted small">Opening balance</div><div class="fs-5">@Model.OpeningBalance.ToString("N2")</div></div>
-            <div class="col-6 col-md-3"><div class="text-muted small">Billed in the period</div><div class="fs-5">@Model.TotalBilled.ToString("N2")</div></div>
-            <div class="col-6 col-md-3"><div class="text-muted small">Paid in the period</div><div class="fs-5">@Model.TotalPaid.ToString("N2")</div></div>
-            <div class="col-6 col-md-3"><div class="text-muted small">Closing balance - we owe</div><div class="fs-5 fw-bold">@Model.ClosingBalance.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">@T["Opening balance"]</div><div class="fs-5">@Model.OpeningBalance.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">@T["Billed in the period"]</div><div class="fs-5">@Model.TotalBilled.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">@T["Paid in the period"]</div><div class="fs-5">@Model.TotalPaid.ToString("N2")</div></div>
+            <div class="col-6 col-md-3"><div class="text-muted small">@T["Closing balance - we owe"]</div><div class="fs-5 fw-bold">@Model.ClosingBalance.ToString("N2")</div></div>
         </div>
     </div>
 
-    <h4>Statement Movements</h4>
+    <h4>@T["Statement Movements"]</h4>
     <table class="table table-bordered table-striped table-sm mb-4">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Reference</th>
-                <th>Description</th>
-                <th class="text-end">Paid (Debit)</th>
-                <th class="text-end">Billed (Credit)</th>
-                <th class="text-end">Balance</th>
+                <th>@T["Date"]</th>
+                <th>@T["Type"]</th>
+                <th>@T["Reference"]</th>
+                <th>@T["Description"]</th>
+                <th class="text-end">@T["Paid (Debit)"]</th>
+                <th class="text-end">@T["Billed (Credit)"]</th>
+                <th class="text-end">@T["Balance"]</th>
             </tr>
         </thead>
         <tbody>
             <tr class="table-light">
                 <td>@Model.FromDate.ToString("dd/MM/yyyy")</td>
-                <td colspan="5"><em>Opening balance</em></td>
+                <td colspan="5">@T.Html("<em>Opening balance</em>")</td>
                 <td class="text-end">@Model.OpeningBalance.ToString("N2")</td>
             </tr>
             @if (Model.Rows.Count == 0)
             {
-                <tr><td colspan="7" class="text-center text-muted">No movements in the selected period.</td></tr>
+                <tr><td colspan="7" class="text-center text-muted">@T["No movements in the selected period."]</td></tr>
             }
             @foreach (var row in Model.Rows)
             {
                 <tr>
                     <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td>
                     <td>@row.TransactionType</td>
-                    <td>@if (row.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="Open the original document">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td>
+                    <td>@if (row.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="@T["Open the original document"]">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td>
                     <td>@row.Description</td>
                     <td class="text-end">@(row.Debit == 0 ? "" : row.Debit.ToString("N2"))</td>
                     <td class="text-end">@(row.Credit == 0 ? "" : row.Credit.ToString("N2"))</td>
@@ -113,7 +111,7 @@ else
         </tbody>
         <tfoot>
             <tr class="fw-bold">
-                <td colspan="4">Closing balance</td>
+                <td colspan="4">@T["Closing balance"]</td>
                 <td class="text-end">@Model.TotalPaid.ToString("N2")</td>
                 <td class="text-end">@Model.TotalBilled.ToString("N2")</td>
                 <td class="text-end">@Model.ClosingBalance.ToString("N2")</td>
@@ -125,20 +123,20 @@ else
     <table class="table table-bordered table-sm">
         <thead>
             <tr>
-                <th>Bill</th>
-                <th>Supplier's No.</th>
-                <th>Bill Date</th>
-                <th>Due Date</th>
-                <th class="text-end">Total</th>
-                <th class="text-end">Paid</th>
-                <th class="text-end">Balance</th>
-                <th class="text-end">Days Overdue</th>
+                <th>@T["Bill"]</th>
+                <th>@T["Supplier's No."]</th>
+                <th>@T["Bill Date"]</th>
+                <th>@T["Due Date"]</th>
+                <th class="text-end">@T["Total"]</th>
+                <th class="text-end">@T["Paid"]</th>
+                <th class="text-end">@T["Balance"]</th>
+                <th class="text-end">@T["Days Overdue"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.OpenBills.Count == 0)
             {
-                <tr><td colspan="8" class="text-center text-muted">No unpaid bills.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted">@T["No unpaid bills."]</td></tr>
             }
             @foreach (var bill in Model.OpenBills)
             {
@@ -158,15 +156,15 @@ else
 
     @if (Model.AdvanceRows.Count > 0)
     {
-        <h5 class="mt-4">Advances (down payments) - kept apart from payables</h5>
+        <h5 class="mt-4">@T["Advances (down payments) - kept apart from payables"]</h5>
         <p class="small text-muted mb-1">Paid ahead of bills and held on 11550 Advances to Suppliers until applied (SAP special G/L "A"). Open advances: <strong>@Model.AdvancesOpen.ToString("N2")</strong> - the vendor owes this in goods or services.</p>
         <table class="table table-sm table-bordered">
-            <thead class="table-light"><tr><th>Date</th><th>Type</th><th>Reference</th><th>Description</th><th class="text-end">Paid</th><th class="text-end">Applied</th><th class="text-end">Open advance</th></tr></thead>
+            <thead class="table-light"><tr><th>@T["Date"]</th><th>@T["Type"]</th><th>@T["Reference"]</th><th>@T["Description"]</th><th class="text-end">@T["Paid"]</th><th class="text-end">@T["Applied"]</th><th class="text-end">@T["Open advance"]</th></tr></thead>
             <tbody>
                 @foreach (var row in Model.AdvanceRows)
                 {
                     <tr>
-                        <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td><td>@row.TransactionType</td><td>@if (row.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="Open the original document">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td><td>@row.Description</td>
+                        <td>@row.TransactionDate.ToString("dd/MM/yyyy")</td><td>@row.TransactionType</td><td>@if (row.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="@T["Open the original document"]">@row.ReferenceNumber</a> } else { @row.ReferenceNumber }</td><td>@row.Description</td>
                         <td class="text-end">@(row.Debit == 0 ? "" : row.Debit.ToString("N2"))</td>
                         <td class="text-end">@(row.Credit == 0 ? "" : row.Credit.ToString("N2"))</td>
                         <td class="text-end">@row.RunningBalance.ToString("N2")</td>

@@ -1,44 +1,44 @@
 @model RealEstateManager.Models.AdvanceListViewModel
 
 @{
-    ViewData["Title"] = "Salary Advances";
+    ViewData["Title"] = T["Salary Advances"];
 }
 
-<h2>Salary Advances</h2>
-<p class="text-muted">Money advanced to staff is an asset (11600 Employee Advances) until the payroll recovers it, one instalment a month.</p>
+<h2>@T["Salary Advances"]</h2>
+<p class="text-muted">@T["Money advanced to staff is an asset (11600 Employee Advances) until the payroll recovers it, one instalment a month."]</p>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
 @if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><h5 class="mb-0">Pay an advance</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["Pay an advance"]</h5></div>
     <div class="card-body">
         <form asp-action="Create" method="post" class="row g-2 align-items-end">
             @Html.AntiForgeryToken()
             <div class="col-md-3">
-                <label class="form-label">Employee</label>
-                <select asp-for="NewAdvance.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">Choose</option></select>
+                <label class="form-label">@T["Employee"]</label>
+                <select asp-for="NewAdvance.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">@T["Choose"]</option></select>
             </div>
-            <div class="col-md-2"><label class="form-label">Date</label><input asp-for="NewAdvance.AdvanceDate" type="date" class="form-control" /></div>
-            <div class="col-md-2"><label class="form-label">Amount</label><input asp-for="NewAdvance.Amount" class="form-control" /></div>
-            <div class="col-md-2"><label class="form-label">Monthly recovery</label><input asp-for="NewAdvance.MonthlyInstalment" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">@T["Date"]</label><input asp-for="NewAdvance.AdvanceDate" type="date" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">@T["Amount"]</label><input asp-for="NewAdvance.Amount" class="form-control" /></div>
+            <div class="col-md-2"><label class="form-label">@T["Monthly recovery"]</label><input asp-for="NewAdvance.MonthlyInstalment" class="form-control" /></div>
             <div class="col-md-3">
-                <label class="form-label">Paid from</label>
+                <label class="form-label">@T["Paid from"]</label>
                 <select asp-for="NewAdvance.PaidFromAccountId" asp-items="Model.BankAccounts" class="form-select"></select>
             </div>
-            <div class="col-md-4"><label class="form-label">Reference</label><input asp-for="NewAdvance.Reference" class="form-control" placeholder="Cheque or transfer reference" /></div>
-            <div class="col-md-6"><label class="form-label">Notes</label><input asp-for="NewAdvance.Notes" class="form-control" /></div>
-            <div class="col-md-2"><button class="btn btn-dark w-100">Save and Post</button></div>
+            <div class="col-md-4"><label class="form-label">@T["Reference"]</label><input asp-for="NewAdvance.Reference" class="form-control" placeholder="@T["Cheque or transfer reference"]" /></div>
+            <div class="col-md-6"><label class="form-label">@T["Notes"]</label><input asp-for="NewAdvance.Notes" class="form-control" /></div>
+            <div class="col-md-2"><button class="btn btn-dark w-100">@T["Save and Post"]</button></div>
         </form>
     </div>
 </div>
 
 <table class="table table-bordered table-striped">
     <thead class="table-light">
-        <tr><th>Date</th><th>Employee</th><th class="text-end">Amount</th><th class="text-end">Monthly</th><th class="text-end">Recovered</th><th class="text-end">Outstanding</th><th>Reference</th></tr>
+        <tr><th>@T["Date"]</th><th>@T["Employee"]</th><th class="text-end">@T["Amount"]</th><th class="text-end">@T["Monthly"]</th><th class="text-end">@T["Recovered"]</th><th class="text-end">@T["Outstanding"]</th><th>@T["Reference"]</th></tr>
     </thead>
     <tbody>
-        @if (Model.Advances.Count == 0) { <tr><td colspan="7" class="text-muted">No advances.</td></tr> }
+        @if (Model.Advances.Count == 0) { <tr><td colspan="7" class="text-muted">@T["No advances."]</td></tr> }
         @foreach (var a in Model.Advances)
         {
             <tr>

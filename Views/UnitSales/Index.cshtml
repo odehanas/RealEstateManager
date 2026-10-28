@@ -2,34 +2,31 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Unit Sales";
+    ViewData["Title"] = T["Unit Sales"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Unit Sales</h2>
-    <a asp-action="Create" class="btn btn-dark">New Sale Contract</a>
+    <h2 class="mb-0">@T["Unit Sales"]</h2>
+    <a asp-action="Create" class="btn btn-dark">@T["New Sale Contract"]</a>
 </div>
 
 <div class="alert alert-info">
-    Sale and purchase agreements for units. Payments before handover are held as <strong>advances from buyers</strong>;
-    at <strong>handover</strong> the price becomes revenue and the unit's cost moves from completed properties held for sale
-    to cost of sales. The VAT treatment is set when the contract is signed: the first sale of a new residential unit within
-    three years of completion is zero rated, later residential sales are exempt, commercial units are standard rated.
+    @T.Html("Sale and purchase agreements for units. Payments before handover are held as <strong>advances from buyers</strong>; at <strong>handover</strong> the price becomes revenue and the unit's cost moves from completed properties held for sale to cost of sales. The VAT treatment is set when the contract is signed: the first sale of a new residential unit within three years of completion is zero rated, later residential sales are exempt, commercial units are standard rated.")
 </div>
 
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-sm">
         <thead>
             <tr>
-                <th>Contract</th><th>Date</th><th>Unit</th><th>Buyer</th><th>VAT</th>
-                <th class="text-end">Price incl. VAT</th><th class="text-end">Received</th><th class="text-end">Outstanding</th>
-                <th>Status</th><th></th>
+                <th>@T["Contract"]</th><th>@T["Date"]</th><th>@T["Unit"]</th><th>@T["Buyer"]</th><th>@T["VAT"]</th>
+                <th class="text-end">@T["Price incl. VAT"]</th><th class="text-end">@T["Received"]</th><th class="text-end">@T["Outstanding"]</th>
+                <th>@T["Status"]</th><th></th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Count == 0)
             {
-                <tr><td colspan="10" class="text-center text-muted">No sale contracts yet.</td></tr>
+                <tr><td colspan="10" class="text-center text-muted">@T["No sale contracts yet."]</td></tr>
             }
             @foreach (var row in Model)
             {
@@ -44,7 +41,7 @@
                     <td class="text-end">@row.Received.ToString("N2")</td>
                     <td class="text-end">@row.Outstanding.ToString("N2")</td>
                     <td>@UnitSaleStatuses.Describe(s.Status)</td>
-                    <td><a asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-dark">Open</a></td>
+                    <td><a asp-action="Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-dark">@T["Open"]</a></td>
                 </tr>
             }
         </tbody>

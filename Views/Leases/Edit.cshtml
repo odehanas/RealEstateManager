@@ -1,7 +1,7 @@
 @model RealEstateManager.Models.LeaseCreateViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Edit Lease";
+    ViewData["Title"] = T["Edit Lease"];
     var units = ViewBag.Units as List<Unit> ?? new();
     var tenants = ViewBag.Tenants as List<Tenant> ?? new();
     var id = ViewBag.Id;
@@ -23,7 +23,7 @@
 }
 else if (status == LeaseStatuses.PendingApproval)
 {
-    <div class="alert alert-warning">This contract is awaiting approval, so it cannot be changed. Withdraw it from the Leases list to correct it.</div>
+    <div class="alert alert-warning">@T["This contract is awaiting approval, so it cannot be changed. Withdraw it from the Leases list to correct it."]</div>
 }
 else if (termsLocked)
 {
@@ -41,15 +41,15 @@ else if (termsLocked)
     <fieldset @(termsLocked ? "disabled" : "")>
     <div class="row g-3">
         <div class="col-md-4">
-            <label asp-for="ContractNumber" class="form-label">Contract Code</label>
+            <label asp-for="ContractNumber" class="form-label">@T["Contract Code"]</label>
             <input asp-for="ContractNumber" class="form-control bg-light" readonly />
-            <div class="form-text">Fixed once issued &mdash; it appears on the signed contract and in its QR code.</div>
+            <div class="form-text">@T["Fixed once issued — it appears on the signed contract and in its QR code."]</div>
         </div>
 
         <div class="col-md-4">
             <label asp-for="UnitId" class="form-label"></label>
             <select asp-for="UnitId" class="form-select">
-                <option value="">Select Unit</option>
+                <option value="">@T["Select Unit"]</option>
                 @foreach (var unit in units)
                 {
                     <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
@@ -60,7 +60,7 @@ else if (termsLocked)
         <div class="col-md-4">
             <label asp-for="TenantId" class="form-label"></label>
             <select asp-for="TenantId" class="form-select">
-                <option value="">Select Tenant</option>
+                <option value="">@T["Select Tenant"]</option>
                 @foreach (var tenant in tenants)
                 {
                     <option value="@tenant.Id">@tenant.Code - @tenant.FullName</option>
@@ -86,31 +86,30 @@ else if (termsLocked)
         <div class="col-md-3">
             <label asp-for="BillingFrequencyMonths" class="form-label"></label>
             <select asp-for="BillingFrequencyMonths" class="form-select">
-                <option value="1">Monthly</option>
-                <option value="2">Every 2 Months</option>
-                <option value="3">Quarterly</option>
-                <option value="4">Every 4 Months</option>
-                <option value="6">Semi-Annual</option>
-                <option value="12">Annual</option>
+                <option value="1">@T["Monthly"]</option>
+                <option value="2">@T["Every 2 Months"]</option>
+                <option value="3">@T["Quarterly"]</option>
+                <option value="4">@T["Every 4 Months"]</option>
+                <option value="6">@T["Semi-Annual"]</option>
+                <option value="12">@T["Annual"]</option>
             </select>
         </div>
 
         <div class="col-md-6">
-            <label asp-for="VatCategoryOverride" class="form-label">VAT Treatment</label>
+            <label asp-for="VatCategoryOverride" class="form-label">@T["VAT Treatment"]</label>
             <select asp-for="VatCategoryOverride" class="form-select">
-                <option value="">Use the unit's treatment</option>
-                <option value="Standard">Override &mdash; Standard rated (5%)</option>
-                <option value="Exempt">Override &mdash; Exempt</option>
-                <option value="ZeroRated">Override &mdash; Zero rated (0%)</option>
+                <option value="">@T["Use the unit's treatment"]</option>
+                <option value="Standard">@T["Override — Standard rated (5%)"]</option>
+                <option value="Exempt">@T["Override — Exempt"]</option>
+                <option value="ZeroRated">@T["Override — Zero rated (0%)"]</option>
             </select>
             <div class="form-text">
-                Changing this affects invoices generated <strong>from now on</strong>. Invoices already
-                raised keep the treatment they were issued under.
+                @T.Html("Changing this affects invoices generated <strong>from now on</strong>. Invoices already raised keep the treatment they were issued under.")
             </div>
         </div>
 
         <div class="col-md-6">
-            <label asp-for="VatOverrideReason" class="form-label">Reason For Override</label>
+            <label asp-for="VatOverrideReason" class="form-label">@T["Reason For Override"]</label>
             <input asp-for="VatOverrideReason" class="form-control" />
         </div>
 
@@ -132,22 +131,22 @@ else if (termsLocked)
     <div class="mt-4 d-flex flex-wrap gap-2">
         @if (status == LeaseStatuses.Draft)
         {
-            <button type="submit" name="nextStep" value="draft" class="btn btn-outline-dark">Save Draft</button>
+            <button type="submit" name="nextStep" value="draft" class="btn btn-outline-dark">@T["Save Draft"]</button>
             @if (approvalRequired)
             {
-                <button type="submit" name="nextStep" value="submit" class="btn btn-warning">Save and Submit for Approval</button>
+                <button type="submit" name="nextStep" value="submit" class="btn btn-warning">@T["Save and Submit for Approval"]</button>
             }
             else
             {
                 <button type="submit" name="nextStep" value="activate" class="btn btn-success"
-                        onclick="return confirm('Activate this contract? Its invoices will be created and its terms locked.');">Save and Activate</button>
+                        onclick="return confirm('Activate this contract? Its invoices will be created and its terms locked.');">@T["Save and Activate"]</button>
             }
         }
         else if (status != LeaseStatuses.PendingApproval)
         {
-            <button type="submit" class="btn btn-dark">Save Notes</button>
+            <button type="submit" class="btn btn-dark">@T["Save Notes"]</button>
         }
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 
@@ -158,9 +157,9 @@ else if (termsLocked)
 
 @if (history.Count > 0)
 {
-    <h5 class="mt-5">Approval history</h5>
+    <h5 class="mt-5">@T["Approval history"]</h5>
     <table class="table table-sm table-bordered">
-        <thead><tr><th>Submitted</th><th>By</th><th>Outcome</th><th>Decided by</th><th>Remark</th></tr></thead>
+        <thead><tr><th>@T["Submitted"]</th><th>@T["By"]</th><th>@T["Outcome"]</th><th>@T["Decided by"]</th><th>@T["Remark"]</th></tr></thead>
         <tbody>
             @foreach (var step in history)
             {

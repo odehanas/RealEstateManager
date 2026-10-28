@@ -1,22 +1,21 @@
 @model RealEstateManager.Models.PettyCashReplenishmentViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Replenish Petty Cash";
+    ViewData["Title"] = T["Replenish Petty Cash"];
     var floats = ViewBag.FloatAccounts as List<Account> ?? new();
     var fundingAccounts = ViewBag.FundingAccounts as List<Account> ?? new();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Replenish Petty Cash</h2>
-        <p class="text-muted mb-0">Posts <strong>Dr petty cash</strong> / <strong>Cr bank or cash</strong>.</p>
+        <h2 class="mb-1">@T["Replenish Petty Cash"]</h2>
+        <p class="text-muted mb-0">@T.Html("Posts <strong>Dr petty cash</strong> / <strong>Cr bank or cash</strong>.")</p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Petty Cash</a>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to Petty Cash"]</a>
 </div>
 
 <div class="alert alert-info">
-    Topping up a float is a <strong>transfer between two asset accounts</strong>, not an expense. Nothing
-    reaches the Profit &amp; Loss here &mdash; the cost was already recorded when each expense voucher was posted.
+    @T.Html("Topping up a float is a <strong>transfer between two asset accounts</strong>, not an expense. Nothing reaches the Profit &amp; Loss here &mdash; the cost was already recorded when each expense voucher was posted.")
 </div>
 
 <form asp-action="Replenish" method="post" class="col-lg-8">
@@ -34,7 +33,7 @@
                             <option value="@account.Id">@account.Code - @account.Name</option>
                         }
                     </select>
-                    <div class="form-text">The float receiving the cash.</div>
+                    <div class="form-text">@T["The float receiving the cash."]</div>
                 </div>
 
                 <div class="col-md-6">
@@ -45,7 +44,7 @@
                             <option value="@account.Id">@account.Code - @account.Name</option>
                         }
                     </select>
-                    <div class="form-text">The bank or cash account the money came from.</div>
+                    <div class="form-text">@T["The bank or cash account the money came from."]</div>
                 </div>
 
                 <div class="col-md-4">
@@ -61,7 +60,7 @@
 
                 <div class="col-md-4">
                     <label asp-for="ReferenceNumber" class="form-label"></label>
-                    <input asp-for="ReferenceNumber" class="form-control" placeholder="Cheque / transfer ref." />
+                    <input asp-for="ReferenceNumber" class="form-control" placeholder="@T["Cheque / transfer ref."]" />
                 </div>
 
                 <div class="col-md-12">
@@ -73,8 +72,8 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Post Replenishment</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-dark">@T["Post Replenishment"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Cancel"]</a>
 </form>
 
 @section Scripts {

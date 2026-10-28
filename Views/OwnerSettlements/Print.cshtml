@@ -18,8 +18,8 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3 statement-no-print">
-    <a asp-action="Statement" asp-route-owner="@Model.OwnerName" class="btn btn-outline-secondary btn-sm">Back to statement</a>
-    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Print</button>
+    <a asp-action="Statement" asp-route-owner="@Model.OwnerName" class="btn btn-outline-secondary btn-sm">@T["Back to statement"]</a>
+    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <div class="card shadow-sm">
@@ -27,14 +27,14 @@
         <div class="d-flex justify-content-between mb-4">
             <div>
                 <h3 class="mb-0">@Model.Company?.Name</h3>
-                <div class="text-muted">Owner Settlement Advice</div>
+                <div class="text-muted">@T["Owner Settlement Advice"]</div>
             </div>
             <div class="text-end">
                 <div><strong>@Model.SettlementNumber</strong></div>
                 <div>Date: @Model.SettlementDate.ToString("dd/MM/yyyy")</div>
                 @if (!Model.IsPosted)
                 {
-                    <span class="badge bg-warning text-dark">Draft - not posted</span>
+                    <span class="badge bg-warning text-dark">@T["Draft - not posted"]</span>
                 }
             </div>
         </div>
@@ -47,13 +47,13 @@
             <table class="table table-bordered table-sm mb-4">
                 <thead>
                     <tr>
-                        <th>Property / Unit</th>
-                        <th>Contract</th>
-                        <th>Tenant</th>
-                        <th class="text-end">Rent Billed</th>
-                        <th class="text-end">Commission</th>
-                        <th class="text-end">VAT</th>
-                        <th class="text-end">Your Share</th>
+                        <th>@T["Property / Unit"]</th>
+                        <th>@T["Contract"]</th>
+                        <th>@T["Tenant"]</th>
+                        <th class="text-end">@T["Rent Billed"]</th>
+                        <th class="text-end">@T["Commission"]</th>
+                        <th class="text-end">@T["VAT"]</th>
+                        <th class="text-end">@T["Your Share"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,22 +75,22 @@
 
         <table class="table table-sm ms-auto" style="max-width: 460px;">
             <tbody>
-                <tr><td>Rent billed (before VAT)</td><td class="text-end">@Model.GrossRent.ToString("N2")</td></tr>
-                <tr><td>Less: management commission</td><td class="text-end">(@Model.Commission.ToString("N2"))</td></tr>
+                <tr><td>@T["Rent billed (before VAT)"]</td><td class="text-end">@Model.GrossRent.ToString("N2")</td></tr>
+                <tr><td>@T["Less: management commission"]</td><td class="text-end">(@Model.Commission.ToString("N2"))</td></tr>
                 @if (Model.CommissionVat > 0)
                 {
-                    <tr><td>Less: VAT on commission</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
+                    <tr><td>@T["Less: VAT on commission"]</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
                 }
                 @{ var adjustments = Model.OwnerShare - (Model.GrossRent - Model.Commission - Model.CommissionVat); }
                 @if (adjustments != 0m)
                 {
-                    <tr><td>VAT on rent billed in your name, less maintenance and expenses charged to you</td><td class="text-end">@adjustments.ToString("N2")</td></tr>
+                    <tr><td>@T["VAT on rent billed in your name, less maintenance and expenses charged to you"]</td><td class="text-end">@adjustments.ToString("N2")</td></tr>
                 }
-                <tr class="fw-bold"><td>Your share</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
-                <tr><td>Less: paid to you before</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
-                <tr><td>Balance due before this payment</td><td class="text-end">@((Model.OwnerShare - Model.PreviouslySettled).ToString("N2"))</td></tr>
-                <tr class="fw-bold table-primary"><td>Paid now</td><td class="text-end">@Model.AmountPaid.ToString("N2")</td></tr>
-                <tr class="fw-bold"><td>Balance still due to you</td><td class="text-end">@Model.BalanceAfter.ToString("N2")</td></tr>
+                <tr class="fw-bold"><td>@T["Your share"]</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
+                <tr><td>@T["Less: paid to you before"]</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
+                <tr><td>@T["Balance due before this payment"]</td><td class="text-end">@((Model.OwnerShare - Model.PreviouslySettled).ToString("N2"))</td></tr>
+                <tr class="fw-bold table-primary"><td>@T["Paid now"]</td><td class="text-end">@Model.AmountPaid.ToString("N2")</td></tr>
+                <tr class="fw-bold"><td>@T["Balance still due to you"]</td><td class="text-end">@Model.BalanceAfter.ToString("N2")</td></tr>
             </tbody>
         </table>
 

@@ -11,10 +11,10 @@
 
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <div>
-        <div class="text-muted small">Approval of a contract</div>
+        <div class="text-muted small">@T["Approval of a contract"]</div>
         <h2 class="mb-0">@request.DocumentNumber</h2>
     </div>
-    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Back to Approvals</a>
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">@T["Back to Approvals"]</a>
 </div>
 
 @if (TempData["ApprovalError"] is string error)
@@ -36,7 +36,7 @@
 
 @if (lease == null)
 {
-    <div class="alert alert-danger">The contract no longer exists.</div>
+    <div class="alert alert-danger">@T["The contract no longer exists."]</div>
 }
 else
 {
@@ -44,16 +44,16 @@ else
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="mb-3">The contract</h5>
+                    <h5 class="mb-3">@T["The contract"]</h5>
                     <table class="table table-sm mb-0">
-                        <tr><th class="w-50">Tenant</th><td>@lease.Tenant?.Code - @lease.Tenant?.FullName</td></tr>
-                        <tr><th>Property</th><td>@lease.Unit?.Property?.Name (@lease.Unit?.Property?.OwnershipType)</td></tr>
-                        <tr><th>Unit</th><td>@lease.Unit?.UnitNumber</td></tr>
-                        <tr><th>Period</th><td>@lease.StartDate.ToString("dd/MM/yyyy") to @lease.EndDate.ToString("dd/MM/yyyy")</td></tr>
-                        <tr><th>Annual rent</th><td>@lease.AnnualRent.ToString("N2")</td></tr>
-                        <tr><th>Billing</th><td>Every @lease.BillingFrequencyMonths month(s)</td></tr>
+                        <tr><th class="w-50">@T["Tenant"]</th><td>@lease.Tenant?.Code - @lease.Tenant?.FullName</td></tr>
+                        <tr><th>@T["Property"]</th><td>@lease.Unit?.Property?.Name (@lease.Unit?.Property?.OwnershipType)</td></tr>
+                        <tr><th>@T["Unit"]</th><td>@lease.Unit?.UnitNumber</td></tr>
+                        <tr><th>@T["Period"]</th><td>@lease.StartDate.ToString("dd/MM/yyyy") to @lease.EndDate.ToString("dd/MM/yyyy")</td></tr>
+                        <tr><th>@T["Annual rent"]</th><td>@lease.AnnualRent.ToString("N2")</td></tr>
+                        <tr><th>@T["Billing"]</th><td>Every @lease.BillingFrequencyMonths month(s)</td></tr>
                         <tr>
-                            <th>VAT</th>
+                            <th>@T["VAT"]</th>
                             <td>
                                 @lease.VatCategory @(lease.VatRate > 0 ? $"({lease.VatRate:0.##}%)" : "")
                                 @if (!string.IsNullOrWhiteSpace(lease.VatOverrideReason))
@@ -62,14 +62,14 @@ else
                                 }
                             </td>
                         </tr>
-                        <tr><th>Security deposit</th><td>@lease.SecurityDepositAmount.ToString("N2")</td></tr>
+                        <tr><th>@T["Security deposit"]</th><td>@lease.SecurityDepositAmount.ToString("N2")</td></tr>
                         @if (!string.IsNullOrWhiteSpace(lease.Notes))
                         {
-                            <tr><th>Notes</th><td>@lease.Notes</td></tr>
+                            <tr><th>@T["Notes"]</th><td>@lease.Notes</td></tr>
                         }
                     </table>
                     <a asp-controller="Leases" asp-action="ContractDraft" asp-route-id="@lease.Id" target="_blank"
-                       class="btn btn-sm btn-outline-secondary mt-3">Open the draft contract</a>
+                       class="btn btn-sm btn-outline-secondary mt-3">@T["Open the draft contract"]</a>
                 </div>
             </div>
         </div>
@@ -77,10 +77,10 @@ else
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="mb-1">Invoices it will create</h5>
-                    <p class="small text-muted">Created the moment it is approved, as drafts to post when each falls due.</p>
+                    <h5 class="mb-1">@T["Invoices it will create"]</h5>
+                    <p class="small text-muted">@T["Created the moment it is approved, as drafts to post when each falls due."]</p>
                     <table class="table table-sm table-striped mb-0">
-                        <thead><tr><th>Date</th><th class="text-end">Net</th><th class="text-end">VAT</th><th class="text-end">Total</th></tr></thead>
+                        <thead><tr><th>@T["Date"]</th><th class="text-end">@T["Net"]</th><th class="text-end">@T["VAT"]</th><th class="text-end">@T["Total"]</th></tr></thead>
                         <tbody>
                             @foreach (var invoice in Model.Instalments)
                             {
@@ -111,7 +111,7 @@ else
 {
     <div class="card shadow-sm mt-4">
         <div class="card-body">
-            <h5 class="mb-3">Your decision</h5>
+            <h5 class="mb-3">@T["Your decision"]</h5>
             @if (Model.FourEyesBlock != null)
             {
                 <div class="alert alert-info mb-0">@Model.FourEyesBlock</div>
@@ -122,15 +122,15 @@ else
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@request.Id" />
                     <div class="col-12">
-                        <label class="form-label" for="comment">Remark - required when returning it, so the creator knows what to correct</label>
+                        <label class="form-label" for="comment">@T["Remark - required when returning it, so the creator knows what to correct"]</label>
                         <textarea id="comment" name="comment" class="form-control" rows="2" maxlength="1000"></textarea>
                     </div>
                     <div class="col-12 d-flex gap-2">
                         <button type="submit" asp-action="Approve" class="btn btn-success"
                                 onclick="return confirm('Approve this contract? Its invoices and income schedule will be created and its terms locked.');">
-                            Approve
+                            @T["Approve"]
                         </button>
-                        <button type="submit" asp-action="Reject" class="btn btn-outline-danger">Return to creator</button>
+                        <button type="submit" asp-action="Reject" class="btn btn-outline-danger">@T["Return to creator"]</button>
                     </div>
                 </form>
             }
@@ -140,9 +140,9 @@ else
 
 @if (Model.History.Count > 1)
 {
-    <h5 class="mt-4">History of this contract</h5>
+    <h5 class="mt-4">@T["History of this contract"]</h5>
     <table class="table table-sm table-bordered">
-        <thead><tr><th>Submitted</th><th>By</th><th>Outcome</th><th>Decided by</th><th>Remark</th></tr></thead>
+        <thead><tr><th>@T["Submitted"]</th><th>@T["By"]</th><th>@T["Outcome"]</th><th>@T["Decided by"]</th><th>@T["Remark"]</th></tr></thead>
         <tbody>
             @foreach (var step in Model.History)
             {

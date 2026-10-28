@@ -1,7 +1,7 @@
 @model RealEstateManager.Models.PettyCashExpenseViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Petty Cash Expense Voucher";
+    ViewData["Title"] = T["Petty Cash Expense Voucher"];
     var floats = ViewBag.FloatAccounts as List<Account> ?? new();
     var expenseAccounts = ViewBag.ExpenseAccounts as List<Account> ?? new();
     var properties = ViewBag.Properties as List<Property> ?? new();
@@ -10,10 +10,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Petty Cash Expense Voucher</h2>
-        <p class="text-muted mb-0">Posts <strong>Dr expense account</strong> / <strong>Cr petty cash</strong>.</p>
+        <h2 class="mb-1">@T["Petty Cash Expense Voucher"]</h2>
+        <p class="text-muted mb-0">@T.Html("Posts <strong>Dr expense account</strong> / <strong>Cr petty cash</strong>.")</p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Petty Cash</a>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to Petty Cash"]</a>
 </div>
 
 <form asp-action="Create" method="post" class="col-lg-9">
@@ -51,29 +51,29 @@
                 <div class="col-md-6">
                     <label asp-for="ExpenseAccountId" class="form-label"></label>
                     <select asp-for="ExpenseAccountId" class="form-select">
-                        <option value="0">Select expense account</option>
+                        <option value="0">@T["Select expense account"]</option>
                         @foreach (var account in expenseAccounts)
                         {
                             <option value="@account.Id">@account.Code - @account.Name</option>
                         }
                     </select>
-                    <div class="form-text">The cost lands here and appears in the Profit &amp; Loss.</div>
+                    <div class="form-text">@T["The cost lands here and appears in the Profit & Loss."]</div>
                 </div>
 
                 <div class="col-md-6">
                     <label asp-for="PaidTo" class="form-label"></label>
-                    <input asp-for="PaidTo" class="form-control" placeholder="Shop, driver, supplier..." />
+                    <input asp-for="PaidTo" class="form-control" placeholder="@T["Shop, driver, supplier..."]" />
                 </div>
 
                 <div class="col-md-8">
                     <label asp-for="Description" class="form-label"></label>
-                    <input asp-for="Description" class="form-control" placeholder="What was bought and why" />
+                    <input asp-for="Description" class="form-control" placeholder="@T["What was bought and why"]" />
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-4">
                     <label asp-for="ReferenceNumber" class="form-label"></label>
-                    <input asp-for="ReferenceNumber" class="form-control" placeholder="Receipt no." />
+                    <input asp-for="ReferenceNumber" class="form-control" placeholder="@T["Receipt no."]" />
                 </div>
             </div>
         </div>
@@ -81,15 +81,15 @@
 
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-light">
-            <strong>Optional analysis</strong>
-            <span class="text-muted small ms-2">Attributes the cost to a property or unit in the management reports</span>
+            <strong>@T["Optional analysis"]</strong>
+            <span class="text-muted small ms-2">@T["Attributes the cost to a property or unit in the management reports"]</span>
         </div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="PropertyId" class="form-label"></label>
                     <select asp-for="PropertyId" class="form-select">
-                        <option value="">Not property specific</option>
+                        <option value="">@T["Not property specific"]</option>
                         @foreach (var property in properties)
                         {
                             <option value="@property.Id">@property.Code - @property.Name</option>
@@ -101,7 +101,7 @@
                         <input asp-for="RechargeToOwner" class="form-check-input" type="checkbox" />
                         <label asp-for="RechargeToOwner" class="form-check-label"></label>
                     </div>
-                    <div class="form-text">For a managed property only: the owner is charged the amount (plus 5% VAT when the company recharges; as paid when it disburses &mdash; see VAT Settings), instead of it being our expense.</div>
+                    <div class="form-text">@T["For a managed property only: the owner is charged the amount (plus 5% VAT when the company recharges; as paid when it disburses — see VAT Settings), instead of it being our expense."]</div>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="OwnerCostCategory" class="form-label"></label>
@@ -115,7 +115,7 @@
                 <div class="col-md-6">
                     <label asp-for="UnitId" class="form-label"></label>
                     <select asp-for="UnitId" class="form-select">
-                        <option value="">No cost center</option>
+                        <option value="">@T["No cost center"]</option>
                         @foreach (var unit in units)
                         {
                             <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
@@ -126,8 +126,8 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Post Voucher</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-dark">@T["Post Voucher"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Cancel"]</a>
 </form>
 
 @section Scripts {

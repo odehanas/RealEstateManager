@@ -6,7 +6,7 @@
 @inject RealEstateManager.Services.PermissionService PermissionService
 
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = T["Home"];
     var dateValue = Model.Today.ToString("yyyy-MM-dd");
 
     // The subscription is always in view on the dashboard, not only when it is about to end.
@@ -73,11 +73,11 @@
                 <span> - <strong>@daysText</strong>, until @subscription.AccessEndDate?.ToString("dd/MM/yyyy").</span>
                 @if (endingSoon)
                 {
-                    <span> Renew in time to keep working without interruption.</span>
+                    <span> @T["Renew in time to keep working without interruption."]</span>
                 }
             }
         </div>
-        <a asp-controller="Subscription" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">Manage subscription</a>
+        <a asp-controller="Subscription" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">@T["Manage subscription"]</a>
     </div>
 }
 
@@ -89,7 +89,7 @@
             <strong>@approvalsWaiting contract@(approvalsWaiting == 1 ? " is" : "s are") waiting for your approval.</strong>
             They take effect only once approved.
         </div>
-        <a asp-controller="Approvals" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">Review</a>
+        <a asp-controller="Approvals" asp-action="Index" class="btn btn-sm btn-outline-dark text-nowrap">@T["Review"]</a>
     </div>
 }
 
@@ -100,19 +100,19 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3 dashboard-no-print">
     <div>
-        <h1 class="fw-bold mb-1">Dashboard</h1>
-        <p class="text-muted mb-0">Portfolio, collections, liabilities, and tenant activity in one operational view.</p>
+        <h1 class="fw-bold mb-1">@T["Dashboard"]</h1>
+        <p class="text-muted mb-0">@T["Portfolio, collections, liabilities, and tenant activity in one operational view."]</p>
     </div>
     <div class="d-flex align-items-center gap-2">
         <div class="text-muted">
             <strong>Today:</strong> @Model.Today.ToString("dd/MM/yyyy")
         </div>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print Dashboard</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print Dashboard"]</button>
     </div>
 </div>
 
 <div class="d-none d-print-block mb-4">
-    <h1 class="fw-bold mb-1">Management Dashboard Snapshot</h1>
+    <h1 class="fw-bold mb-1">@T["Management Dashboard Snapshot"]</h1>
     <div>Printed on @Model.Today.ToString("dd/MM/yyyy")</div>
     <div>Current Period: @Model.CurrentPeriodName</div>
 </div>
@@ -121,7 +121,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-primary text-white">
             <div class="card-body">
-                <div class="small text-uppercase opacity-75">Properties</div>
+                <div class="small text-uppercase opacity-75">@T["Properties"]</div>
                 <div class="display-6 fw-bold">@Model.PropertiesCount</div>
                 <div>Owned: @Model.OwnedPropertiesCount</div>
                 <div>Managed: @Model.ManagedPropertiesCount</div>
@@ -131,7 +131,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-success text-white">
             <div class="card-body">
-                <div class="small text-uppercase opacity-75">Occupancy</div>
+                <div class="small text-uppercase opacity-75">@T["Occupancy"]</div>
                 <div class="display-6 fw-bold">@Model.OccupancyRate.ToString("N2")%</div>
                 <div>Occupied: @Model.OccupiedUnitsCount</div>
                 <div>Vacant: @Model.VacantUnitsCount</div>
@@ -141,7 +141,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-dark text-white">
             <div class="card-body">
-                <div class="small text-uppercase opacity-75">Receivables</div>
+                <div class="small text-uppercase opacity-75">@T["Receivables"]</div>
                 <div class="display-6 fw-bold">@Model.OutstandingReceivables.ToString("N2")</div>
                 <div>Open invoices: @Model.OutstandingInvoicesCount</div>
                 <div>Overdue: @Model.OverdueReceivables.ToString("N2")</div>
@@ -151,7 +151,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-warning">
             <div class="card-body">
-                <div class="small text-uppercase text-muted">Accounting Period</div>
+                <div class="small text-uppercase text-muted">@T["Accounting Period"]</div>
                 <div class="fw-bold fs-4">@Model.CurrentPeriodName</div>
                 <div>Open periods: @Model.OpenPeriodsCount</div>
                 <div>Active leases: @Model.ActiveLeasesCount</div>
@@ -164,7 +164,7 @@
 {
     <div class="card shadow-sm border-0 mb-4 dashboard-print-card">
         <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h5 class="mb-0">HR &amp; Payroll</h5>
+            <h5 class="mb-0">@T["HR & Payroll"]</h5>
             <span class="small text-muted">@hr.ActiveEmployees active employee(s)</span>
         </div>
         <div class="card-body d-flex flex-wrap gap-3">
@@ -193,7 +193,7 @@
     var needsAttention = unclosed.OverdueCount > 0 || unclosed.UnclosedFiscalYears.Count > 0 || unclosed.PendingReopenRequests > 0;
     <div class="card shadow-sm border-0 mb-4 dashboard-print-card @(needsAttention ? "border-start border-4 border-danger" : "")">
         <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <h5 class="mb-0">Unclosed Periods</h5>
+            <h5 class="mb-0">@T["Unclosed Periods"]</h5>
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 @if (unclosed.OverdueCount > 0)
                 {
@@ -205,7 +205,7 @@
                         @unclosed.PendingReopenRequests reopen request(s) waiting
                     </a>
                 }
-                <a asp-controller="Closing" asp-action="Index" class="btn btn-sm btn-dark dashboard-no-print">Open Closing Cockpit</a>
+                <a asp-controller="Closing" asp-action="Index" class="btn btn-sm btn-dark dashboard-no-print">@T["Open Closing Cockpit"]</a>
             </div>
         </div>
         <div class="card-body p-0">
@@ -218,7 +218,7 @@
             }
             @if (unclosed.Periods.Count == 0)
             {
-                <div class="p-3 text-muted">Every period up to today is closed.</div>
+                <div class="p-3 text-muted">@T["Every period up to today is closed."]</div>
             }
             else
             {
@@ -226,10 +226,10 @@
                     <table class="table table-sm mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Period</th>
-                                <th>Dates</th>
-                                <th>Status</th>
-                                <th class="text-end">Draft journals</th>
+                                <th>@T["Period"]</th>
+                                <th>@T["Dates"]</th>
+                                <th>@T["Status"]</th>
+                                <th class="text-end">@T["Draft journals"]</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -246,17 +246,17 @@
                                         }
                                         else
                                         {
-                                            <span class="badge bg-success">Current period</span>
+                                            <span class="badge bg-success">@T["Current period"]</span>
                                         }
                                         @if (p.IsReopened)
                                         {
-                                            <span class="badge bg-primary">Reopened - to close again</span>
+                                            <span class="badge bg-primary">@T["Reopened - to close again"]</span>
                                         }
                                     </td>
                                     <td class="text-end">@(p.DraftJournals > 0 ? p.DraftJournals.ToString() : "-")</td>
                                     <td class="text-end dashboard-no-print">
                                         <a asp-controller="Closing" asp-action="Index" asp-route-fiscalYear="@p.FiscalYear" asp-route-period="@p.PeriodNumber"
-                                           class="btn btn-sm btn-outline-dark">Checklist</a>
+                                           class="btn btn-sm btn-outline-dark">@T["Checklist"]</a>
                                     </td>
                                 </tr>
                             }
@@ -329,19 +329,19 @@
     <div class="col-lg-4">
         <div class="card shadow-sm h-100 border-0 dashboard-print-card">
             <div class="card-header bg-light">
-                <strong>Cash KPI</strong>
+                @T.Html("<strong>Cash KPI</strong>")
             </div>
             <div class="card-body">
                 @if (Model.CashKpiAvailable)
                 {
-                    <div class="text-muted small">Mapped cash account</div>
+                    <div class="text-muted small">@T["Mapped cash account"]</div>
                     <div class="fw-semibold mb-2">@Model.CashAccountName</div>
                     <div class="fs-3 fw-bold">@Model.CashBalance.ToString("N2")</div>
-                    <div class="text-muted small mt-2">Based on posted journal lines and account opening balance.</div>
+                    <div class="text-muted small mt-2">@T["Based on posted journal lines and account opening balance."]</div>
                 }
                 else
                 {
-                    <div class="text-muted">Cash KPI is not available until the default cash account mapping is configured.</div>
+                    <div class="text-muted">@T["Cash KPI is not available until the default cash account mapping is configured."]</div>
                 }
             </div>
         </div>
@@ -349,19 +349,19 @@
     <div class="col-lg-4">
         <div class="card shadow-sm h-100 border-0 dashboard-print-card">
             <div class="card-header bg-light">
-                <strong>Landlord KPI</strong>
+                @T.Html("<strong>Landlord KPI</strong>")
             </div>
             <div class="card-body">
                 @if (Model.LandlordKpiAvailable)
                 {
-                    <div class="text-muted small">Mapped landlord liability account</div>
+                    <div class="text-muted small">@T["Mapped landlord liability account"]</div>
                     <div class="fw-semibold mb-2">@Model.DueToLandlordsAccountName</div>
                     <div class="fs-3 fw-bold">@Model.DueToLandlordsBalance.ToString("N2")</div>
-                    <div class="text-muted small mt-2">Shows current posted balance due to landlords.</div>
+                    <div class="text-muted small mt-2">@T["Shows current posted balance due to landlords."]</div>
                 }
                 else
                 {
-                    <div class="text-muted">Landlord KPI is not available until the due-to-landlords account mapping is configured.</div>
+                    <div class="text-muted">@T["Landlord KPI is not available until the due-to-landlords account mapping is configured."]</div>
                 }
             </div>
         </div>
@@ -369,21 +369,21 @@
     <div class="col-lg-4">
         <div class="card shadow-sm h-100 border-0 dashboard-print-card">
             <div class="card-header bg-light">
-                <strong>PDC Summary</strong>
+                @T.Html("<strong>PDC Summary</strong>")
             </div>
             <div class="card-body">
                 @if (Model.PdcDataAvailable)
                 {
-                    <div class="text-muted small">Uncleared PDC total</div>
+                    <div class="text-muted small">@T["Uncleared PDC total"]</div>
                     <div class="fs-3 fw-bold">@Model.UnclearedPdcAmount.ToString("N2")</div>
                     <div>Uncleared cheques: @Model.UnclearedPdcCount</div>
                     <div class="mt-3">
-                        <a class="btn btn-outline-dark btn-sm" href="/PdcReceipts">Open PDC Receipts</a>
+                        <a class="btn btn-outline-dark btn-sm" href="/PdcReceipts">@T["Open PDC Receipts"]</a>
                     </div>
                 }
                 else
                 {
-                    <div class="text-muted">PDC data is not available yet. Apply the `PdcReceipts` migration to enable this section.</div>
+                    <div class="text-muted">@T["PDC data is not available yet. Apply the `PdcReceipts` migration to enable this section."]</div>
                 }
             </div>
         </div>
@@ -392,10 +392,10 @@
 
 <div class="card shadow-sm border-0 mb-4 dashboard-print-card">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <strong>Landlord Drilldown</strong>
+        <strong>@T["Landlord Drilldown"]</strong>
         <div class="dashboard-no-print">
-            <a class="btn btn-outline-dark btn-sm" href="/Properties">Open Properties</a>
-            <a class="btn btn-outline-dark btn-sm" href="/Leases">Open Leases</a>
+            <a class="btn btn-outline-dark btn-sm" href="/Properties">@T["Open Properties"]</a>
+            <a class="btn btn-outline-dark btn-sm" href="/Leases">@T["Open Leases"]</a>
         </div>
     </div>
     <div class="card-body p-0">
@@ -403,20 +403,20 @@
             <table class="table table-sm table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Property</th>
-                        <th>Owner</th>
-                        <th class="text-end">Units</th>
-                        <th class="text-end">Occupied</th>
-                        <th class="text-end">Active Leases</th>
-                        <th class="text-end">Occupancy</th>
-                        <th class="text-end">Open A/R</th>
+                        <th>@T["Property"]</th>
+                        <th>@T["Owner"]</th>
+                        <th class="text-end">@T["Units"]</th>
+                        <th class="text-end">@T["Occupied"]</th>
+                        <th class="text-end">@T["Active Leases"]</th>
+                        <th class="text-end">@T["Occupancy"]</th>
+                        <th class="text-end">@T["Open A/R"]</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.ManagedPropertyDrilldown.Count == 0)
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-3">No managed property drilldown data found.</td>
+                            <td colspan="7" class="text-center text-muted py-3">@T["No managed property drilldown data found."]</td>
                         </tr>
                     }
                     else
@@ -427,9 +427,9 @@
                                 <td>
                                     <div>@property.PropertyCode - @property.PropertyName</div>
                                     <small class="text-muted dashboard-no-print">
-                                        <a href="/Properties">Properties</a> |
-                                        <a href="/Leases">Leases</a> |
-                                        <a href="/TenantStatements">Tenant Statements</a>
+                                        <a href="/Properties">@T["Properties"]</a> |
+                                        <a href="/Leases">@T["Leases"]</a> |
+                                        <a href="/TenantStatements">@T["Tenant Statements"]</a>
                                     </small>
                                 </td>
                                 <td>@property.OwnerName</td>
@@ -451,36 +451,36 @@
     <div class="col-lg-8">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-light">
-                <strong>Quick Reports</strong>
+                @T.Html("<strong>Quick Reports</strong>")
             </div>
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="border rounded p-3 h-100">
-                            <h5>Trial Balance</h5>
-                            <p class="text-muted mb-3">Review debit and credit balances from posted journal entries.</p>
-                            <a class="btn btn-dark btn-sm" href="/Reports/TrialBalance?asOfDate=@dateValue">Open Trial Balance</a>
+                            <h5>@T["Trial Balance"]</h5>
+                            <p class="text-muted mb-3">@T["Review debit and credit balances from posted journal entries."]</p>
+                            <a class="btn btn-dark btn-sm" href="/Reports/TrialBalance?asOfDate=@dateValue">@T["Open Trial Balance"]</a>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3 h-100">
-                            <h5>Profit &amp; Loss</h5>
-                            <p class="text-muted mb-3">Review revenue, expenses, and current year result.</p>
-                            <a class="btn btn-dark btn-sm" href="/Reports/ProfitAndLoss?asOfDate=@dateValue">Open Profit &amp; Loss</a>
+                            <h5>@T["Profit & Loss"]</h5>
+                            <p class="text-muted mb-3">@T["Review revenue, expenses, and current year result."]</p>
+                            <a class="btn btn-dark btn-sm" href="/Reports/ProfitAndLoss?asOfDate=@dateValue">@T["Open Profit & Loss"]</a>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3 h-100">
-                            <h5>Balance Sheet</h5>
-                            <p class="text-muted mb-3">Review assets, liabilities, equity, and current year result.</p>
-                            <a class="btn btn-dark btn-sm" href="/Reports/BalanceSheet?asOfDate=@dateValue">Open Balance Sheet</a>
+                            <h5>@T["Balance Sheet"]</h5>
+                            <p class="text-muted mb-3">@T["Review assets, liabilities, equity, and current year result."]</p>
+                            <a class="btn btn-dark btn-sm" href="/Reports/BalanceSheet?asOfDate=@dateValue">@T["Open Balance Sheet"]</a>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="border rounded p-3 h-100">
-                            <h5>Tenant Statement</h5>
-                            <p class="text-muted mb-3">Review tenant balance movements and noted PDC items.</p>
-                            <a class="btn btn-dark btn-sm" href="/TenantStatements">Open Tenant Statement</a>
+                            <h5>@T["Tenant Statement"]</h5>
+                            <p class="text-muted mb-3">@T["Review tenant balance movements and noted PDC items."]</p>
+                            <a class="btn btn-dark btn-sm" href="/TenantStatements">@T["Open Tenant Statement"]</a>
                         </div>
                     </div>
                 </div>
@@ -491,17 +491,17 @@
     <div class="col-lg-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-light">
-                <strong>Quick Actions</strong>
+                @T.Html("<strong>Quick Actions</strong>")
             </div>
             <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action" href="/Properties">Manage Properties</a>
-                <a class="list-group-item list-group-item-action" href="/Units">Manage Units</a>
-                <a class="list-group-item list-group-item-action" href="/Leases">Manage Leases</a>
-                <a class="list-group-item list-group-item-action" href="/CustomerInvoices">Manage Customer Invoices</a>
-                <a class="list-group-item list-group-item-action" href="/CustomerReceipts">Manage Customer Receipts</a>
-                <a class="list-group-item list-group-item-action" href="/PdcReceipts">Manage PDC Receipts</a>
-                <a class="list-group-item list-group-item-action" href="/ManualJournals">Open Manual Journals</a>
-                <a class="list-group-item list-group-item-action" href="/AccountMappings">Open Account Mappings</a>
+                <a class="list-group-item list-group-item-action" href="/Properties">@T["Manage Properties"]</a>
+                <a class="list-group-item list-group-item-action" href="/Units">@T["Manage Units"]</a>
+                <a class="list-group-item list-group-item-action" href="/Leases">@T["Manage Leases"]</a>
+                <a class="list-group-item list-group-item-action" href="/CustomerInvoices">@T["Manage Customer Invoices"]</a>
+                <a class="list-group-item list-group-item-action" href="/CustomerReceipts">@T["Manage Customer Receipts"]</a>
+                <a class="list-group-item list-group-item-action" href="/PdcReceipts">@T["Manage PDC Receipts"]</a>
+                <a class="list-group-item list-group-item-action" href="/ManualJournals">@T["Open Manual Journals"]</a>
+                <a class="list-group-item list-group-item-action" href="/AccountMappings">@T["Open Account Mappings"]</a>
             </div>
         </div>
     </div>
@@ -511,25 +511,25 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-light">
-                <strong>Recent Invoices</strong>
+                @T.Html("<strong>Recent Invoices</strong>")
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-sm table-striped mb-0">
                         <thead>
                             <tr>
-                                <th>Invoice</th>
-                                <th>Date</th>
-                                <th>Tenant</th>
-                                <th>Status</th>
-                                <th class="text-end">Outstanding</th>
+                                <th>@T["Invoice"]</th>
+                                <th>@T["Date"]</th>
+                                <th>@T["Tenant"]</th>
+                                <th>@T["Status"]</th>
+                                <th class="text-end">@T["Outstanding"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (Model.RecentInvoices.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-3">No invoices found.</td>
+                                    <td colspan="5" class="text-center text-muted py-3">@T["No invoices found."]</td>
                                 </tr>
                             }
                             else
@@ -568,25 +568,25 @@
     <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-light">
-                <strong>Recent Receipts</strong>
+                @T.Html("<strong>Recent Receipts</strong>")
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-sm table-striped mb-0">
                         <thead>
                             <tr>
-                                <th>Receipt</th>
-                                <th>Date</th>
-                                <th>Tenant</th>
-                                <th>Method</th>
-                                <th class="text-end">Amount</th>
+                                <th>@T["Receipt"]</th>
+                                <th>@T["Date"]</th>
+                                <th>@T["Tenant"]</th>
+                                <th>@T["Method"]</th>
+                                <th class="text-end">@T["Amount"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (Model.RecentReceipts.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-3">No receipts found.</td>
+                                    <td colspan="5" class="text-center text-muted py-3">@T["No receipts found."]</td>
                                 </tr>
                             }
                             else
@@ -620,12 +620,12 @@
 
 <div class="card shadow-sm border-0">
     <div class="card-header bg-light">
-        <strong>Recent PDC Activity</strong>
+        @T.Html("<strong>Recent PDC Activity</strong>")
     </div>
     <div class="card-body p-0">
         @if (!Model.PdcDataAvailable)
         {
-            <div class="p-3 text-muted">PDC activity will appear here after the `PdcReceipts` database migration is applied.</div>
+            <div class="p-3 text-muted">@T["PDC activity will appear here after the `PdcReceipts` database migration is applied."]</div>
         }
         else
         {
@@ -633,19 +633,19 @@
                 <table class="table table-sm table-striped mb-0">
                     <thead>
                         <tr>
-                            <th>Cheque</th>
-                            <th>Received</th>
-                            <th>Tenant</th>
-                            <th>Mode</th>
-                            <th>Status</th>
-                            <th class="text-end">Amount</th>
+                            <th>@T["Cheque"]</th>
+                            <th>@T["Received"]</th>
+                            <th>@T["Tenant"]</th>
+                            <th>@T["Mode"]</th>
+                            <th>@T["Status"]</th>
+                            <th class="text-end">@T["Amount"]</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (Model.RecentPdcReceipts.Count == 0)
                         {
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-3">No PDC activity found.</td>
+                                <td colspan="6" class="text-center text-muted py-3">@T["No PDC activity found."]</td>
                             </tr>
                         }
                         else

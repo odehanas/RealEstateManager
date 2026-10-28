@@ -1,6 +1,6 @@
 ﻿@model List<RealEstateManager.Controllers.RecordDocumentsController.ExpiryRow>
 @{
-    ViewData["Title"] = "Document Expiry";
+    ViewData["Title"] = T["Document Expiry"];
     var days = ViewBag.Days as int? ?? 60;
     var missingAttestation = ViewBag.MissingAttestation as List<RealEstateManager.Controllers.RecordDocumentsController.ExpiryRow> ?? new();
     var missingIds = ViewBag.MissingIds as List<RealEstateManager.Controllers.RecordDocumentsController.ExpiryRow> ?? new();
@@ -9,11 +9,11 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-1">Document Expiry</h2>
+        <h2 class="mb-1">@T["Document Expiry"]</h2>
         <div class="text-muted">Emirates IDs, passports, contract and property documents that have expired or expire within @days days.</div>
     </div>
     <form method="get" class="d-flex gap-2 align-items-center">
-        <label for="days" class="small text-muted">Within</label>
+        <label for="days" class="small text-muted">@T["Within"]</label>
         <select id="days" name="days" class="form-select form-select-sm" onchange="this.form.submit()">
             @foreach (var d in new[] { 30, 60, 90, 180 }) { <option value="@d" selected="@(d == days ? "selected" : null)">@d days</option> }
         </select>
@@ -21,14 +21,14 @@
 </div>
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Expired</div><div class="h3 mb-0 @(expired > 0 ? "text-danger" : "")">@expired</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Expired"]</div><div class="h3 mb-0 @(expired > 0 ? "text-danger" : "")">@expired</div></div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Expiring within @days days</div><div class="h3 mb-0">@(Model.Count - expired)</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Running contracts without attested copy</div><div class="h3 mb-0 @(missingAttestation.Count > 0 ? "text-warning" : "")">@missingAttestation.Count</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Tenants with no Emirates ID expiry</div><div class="h3 mb-0">@missingIds.Count</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Running contracts without attested copy"]</div><div class="h3 mb-0 @(missingAttestation.Count > 0 ? "text-warning" : "")">@missingAttestation.Count</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Tenants with no Emirates ID expiry"]</div><div class="h3 mb-0">@missingIds.Count</div></div></div></div>
 </div>
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-white"><strong>Expired and expiring</strong></div>
+    <div class="card-header bg-white">@T.Html("<strong>Expired and expiring</strong>")</div>
     @if (Model.Count == 0)
     {
         <div class="card-body text-muted small">Nothing expires within @days days.</div>
@@ -37,7 +37,7 @@
     {
         <div class="table-responsive">
             <table class="table table-sm table-hover align-middle mb-0">
-                <thead class="table-light"><tr><th>For</th><th>Name</th><th>Document</th><th>Number</th><th>Expires</th><th class="text-end">Days</th></tr></thead>
+                <thead class="table-light"><tr><th>@T["For"]</th><th>@T["Name"]</th><th>@T["Document"]</th><th>@T["Number"]</th><th>@T["Expires"]</th><th class="text-end">@T["Days"]</th></tr></thead>
                 <tbody>
                     @foreach (var r in Model)
                     {
@@ -62,8 +62,8 @@
 <div class="row g-3">
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white"><strong>Running contracts without an attested copy</strong></div>
-            @if (missingAttestation.Count == 0) { <div class="card-body text-muted small">Every running contract has its attested copy.</div> }
+            <div class="card-header bg-white">@T.Html("<strong>Running contracts without an attested copy</strong>")</div>
+            @if (missingAttestation.Count == 0) { <div class="card-body text-muted small">@T["Every running contract has its attested copy."]</div> }
             else
             {
                 <ul class="list-group list-group-flush small">
@@ -74,8 +74,8 @@
     </div>
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white"><strong>Tenants with a running contract and no Emirates ID expiry</strong></div>
-            @if (missingIds.Count == 0) { <div class="card-body text-muted small">None.</div> }
+            <div class="card-header bg-white">@T.Html("<strong>Tenants with a running contract and no Emirates ID expiry</strong>")</div>
+            @if (missingIds.Count == 0) { <div class="card-body text-muted small">@T["None."]</div> }
             else
             {
                 <ul class="list-group list-group-flush small">

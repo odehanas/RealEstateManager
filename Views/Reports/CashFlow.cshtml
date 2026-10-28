@@ -1,6 +1,6 @@
 @model RealEstateManager.Services.CashFlowReportDto
 @{
-    ViewData["Title"] = "Statement of Cash Flows";
+    ViewData["Title"] = T["Statement of Cash Flows"];
 
     string Money(decimal v) => v.ToString("N2");
     string SignClass(decimal v) => v < 0 ? "text-danger" : "";
@@ -22,23 +22,23 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">Statement of Cash Flows</h2>
+        <h2 class="mb-1">@T["Statement of Cash Flows"]</h2>
         <p class="text-muted mb-0">@Model.CompanyName &middot; direct method (IAS 7)</p>
     </div>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="startDate">From</label>
+        <label class="form-label mb-1" for="startDate">@T["From"]</label>
         <input type="date" class="form-control form-control-sm" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="endDate">To</label>
+        <label class="form-label mb-1" for="endDate">@T["To"]</label>
         <input type="date" class="form-control form-control-sm" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -51,9 +51,7 @@
 @if (!Model.HasCashAccounts)
 {
     <div class="alert alert-warning">
-        <strong>No cash accounts are configured.</strong>
-        Set the <em>Default Cash</em> mapping under <strong>Setup ▸ Account Mapping</strong>, and flag any
-        petty cash floats in the Chart of Accounts. Without those, there is nothing to report on.
+        @T.Html("<strong>No cash accounts are configured.</strong> Set the <em>Default Cash</em> mapping under <strong>Setup ▸ Account Mapping</strong>, and flag any petty cash floats in the Chart of Accounts. Without those, there is nothing to report on.")
     </div>
     return;
 }
@@ -61,7 +59,7 @@
 @if (!Model.IsReconciled)
 {
     <div class="alert alert-danger">
-        <strong>This statement does not reconcile.</strong>
+        <strong>@T["This statement does not reconcile."]</strong>
         The classified sections total @Money(Model.NetMovement) but the cash accounts actually moved
         @Money(Model.ActualNetMovement) &mdash; a difference of @Money(Model.ReconcilingDifference).
         Please report this; it indicates a journal shape the classifier did not expect.
@@ -72,7 +70,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Opening Cash</div>
+                <div class="small text-uppercase opacity-75">@T["Opening Cash"]</div>
                 <div class="h4 fw-bold mb-0">@Money(Model.OpeningCash)</div>
             </div>
         </div>
@@ -80,7 +78,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100 border-0 @(Model.OperatingTotal >= 0 ? "bg-success" : "bg-danger") text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Operating</div>
+                <div class="small text-uppercase opacity-75">@T["Operating"]</div>
                 <div class="h4 fw-bold mb-0">@Money(Model.OperatingTotal)</div>
             </div>
         </div>
@@ -88,7 +86,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100 border-0 @(Model.NetMovement >= 0 ? "bg-primary" : "bg-dark") text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Net Movement</div>
+                <div class="small text-uppercase opacity-75">@T["Net Movement"]</div>
                 <div class="h4 fw-bold mb-0">@Money(Model.NetMovement)</div>
             </div>
         </div>
@@ -96,7 +94,7 @@
     <div class="col-md-3">
         <div class="card shadow-sm h-100 border-0 bg-info text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Closing Cash</div>
+                <div class="small text-uppercase opacity-75">@T["Closing Cash"]</div>
                 <div class="h4 fw-bold mb-0">@Money(Model.ClosingCash)</div>
             </div>
         </div>
@@ -108,17 +106,17 @@
         <table class="table table-bordered table-sm mb-0 cf-table">
             <thead>
                 <tr>
-                    <th class="lbl">Cash flows</th>
-                    <th class="num" style="width:120px">Movements</th>
+                    <th class="lbl">@T["Cash flows"]</th>
+                    <th class="num" style="width:120px">@T["Movements"]</th>
                     <th class="num" style="width:170px">Amount (@Model.Currency)</th>
                 </tr>
             </thead>
             <tbody>
                 @* ---------------- OPERATING ---------------- *@
-                <tr class="section"><td colspan="3">Cash flows from operating activities</td></tr>
+                <tr class="section"><td colspan="3">@T["Cash flows from operating activities"]</td></tr>
                 @if (Model.Operating.Count == 0)
                 {
-                    <tr><td class="lbl text-muted" colspan="3">No operating cash movements in this period.</td></tr>
+                    <tr><td class="lbl text-muted" colspan="3">@T["No operating cash movements in this period."]</td></tr>
                 }
                 @foreach (var line in Model.Operating)
                 {
@@ -129,16 +127,16 @@
                     </tr>
                 }
                 <tr class="subtotal">
-                    <td>Net cash from operating activities</td>
+                    <td>@T["Net cash from operating activities"]</td>
                     <td></td>
                     <td class="num @SignClass(Model.OperatingTotal)">@Money(Model.OperatingTotal)</td>
                 </tr>
 
                 @* ---------------- INVESTING ---------------- *@
-                <tr class="section"><td colspan="3">Cash flows from investing activities</td></tr>
+                <tr class="section"><td colspan="3">@T["Cash flows from investing activities"]</td></tr>
                 @if (Model.Investing.Count == 0)
                 {
-                    <tr><td class="lbl text-muted" colspan="3">No investing cash movements in this period.</td></tr>
+                    <tr><td class="lbl text-muted" colspan="3">@T["No investing cash movements in this period."]</td></tr>
                 }
                 @foreach (var line in Model.Investing)
                 {
@@ -149,16 +147,16 @@
                     </tr>
                 }
                 <tr class="subtotal">
-                    <td>Net cash from investing activities</td>
+                    <td>@T["Net cash from investing activities"]</td>
                     <td></td>
                     <td class="num @SignClass(Model.InvestingTotal)">@Money(Model.InvestingTotal)</td>
                 </tr>
 
                 @* ---------------- FINANCING ---------------- *@
-                <tr class="section"><td colspan="3">Cash flows from financing activities</td></tr>
+                <tr class="section"><td colspan="3">@T["Cash flows from financing activities"]</td></tr>
                 @if (Model.Financing.Count == 0)
                 {
-                    <tr><td class="lbl text-muted" colspan="3">No financing cash movements in this period.</td></tr>
+                    <tr><td class="lbl text-muted" colspan="3">@T["No financing cash movements in this period."]</td></tr>
                 }
                 @foreach (var line in Model.Financing)
                 {
@@ -169,24 +167,24 @@
                     </tr>
                 }
                 <tr class="subtotal">
-                    <td>Net cash from financing activities</td>
+                    <td>@T["Net cash from financing activities"]</td>
                     <td></td>
                     <td class="num @SignClass(Model.FinancingTotal)">@Money(Model.FinancingTotal)</td>
                 </tr>
             </tbody>
             <tfoot>
                 <tr class="subtotal">
-                    <td>Net increase / (decrease) in cash</td>
+                    <td>@T["Net increase / (decrease) in cash"]</td>
                     <td></td>
                     <td class="num @SignClass(Model.NetMovement)">@Money(Model.NetMovement)</td>
                 </tr>
                 <tr class="subtotal">
-                    <td>Cash at the beginning of the period</td>
+                    <td>@T["Cash at the beginning of the period"]</td>
                     <td></td>
                     <td class="num">@Money(Model.OpeningCash)</td>
                 </tr>
                 <tr class="grand">
-                    <td>Cash at the end of the period</td>
+                    <td>@T["Cash at the end of the period"]</td>
                     <td></td>
                     <td class="num">@Money(Model.ClosingCash)</td>
                 </tr>
@@ -197,19 +195,18 @@
 
 <div class="card shadow-sm mt-3">
     <div class="card-body py-3 small text-muted">
-        <strong class="text-dark">Basis of preparation</strong>
+        <strong class="text-dark">@T["Basis of preparation"]</strong>
         <ul class="mb-2 mt-2">
-            <li>Prepared on the <strong>direct method</strong>, which IAS 7 encourages. Every movement is taken from the ledger and classified by the account on the other side of the journal, so the statement reconciles to the cash accounts by construction.</li>
+            <li>@T.Html("Prepared on the <strong>direct method</strong>, which IAS 7 encourages. Every movement is taken from the ledger and classified by the account on the other side of the journal, so the statement reconciles to the cash accounts by construction.")</li>
             <li><strong>Cash and cash equivalents</strong> comprise
                 @string.Join(", ", Model.CashAccounts.Select(x => $"{x.AccountCode} {x.AccountName}")).
             </li>
-            <li><strong>PDC On Hand is excluded.</strong> A post-dated cheque in the drawer has not been banked and is not readily convertible, so it is not a cash equivalent under IAS 7.</li>
-            <li><strong>Transfers between cash accounts are excluded</strong> &mdash; topping up petty cash from the bank moves cash between pockets, it is not a cash flow.</li>
-            <li>Classification: equity counterparts are <em>financing</em>; long-term assets (codes 15000 and above) are <em>investing</em>; everything else is <em>operating</em>.</li>
+            <li>@T.Html("<strong>PDC On Hand is excluded.</strong> A post-dated cheque in the drawer has not been banked and is not readily convertible, so it is not a cash equivalent under IAS 7.")</li>
+            <li>@T.Html("<strong>Transfers between cash accounts are excluded</strong> &mdash; topping up petty cash from the bank moves cash between pockets, it is not a cash flow.")</li>
+            <li>@T.Html("Classification: equity counterparts are <em>financing</em>; long-term assets (codes 15000 and above) are <em>investing</em>; everything else is <em>operating</em>.")</li>
         </ul>
         <p class="mb-0">
-            The <strong>Movements</strong> column counts the journals behind each figure, so a surprising number
-            can be traced through Journal Inquiry.
+            @T.Html("The <strong>Movements</strong> column counts the journals behind each figure, so a surprising number can be traced through Journal Inquiry.")
         </p>
     </div>
 </div>

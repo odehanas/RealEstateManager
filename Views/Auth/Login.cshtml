@@ -1,7 +1,7 @@
 @model RealEstateManager.Models.LoginViewModel
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = T["Login"];
     Layout = "_Layout";
 }
 
@@ -11,27 +11,27 @@
             <div class="col-lg-5">
                 <div class="card shadow-sm h-100 border-0 bg-light">
                     <div class="card-body p-4">
-                        <span class="badge bg-primary-subtle text-primary mb-3">Secure Access</span>
-                        <h1 class="h3 mb-3">Sign In To Your Company</h1>
+                        <span class="badge bg-primary-subtle text-primary mb-3">@T["Secure Access"]</span>
+                        <h1 class="h3 mb-3">@T["Sign In To Your Company"]</h1>
                         <p class="text-muted mb-4">
-                            Use the credentials assigned to your company account to access leases, accounting, reports, and administration tools.
+                            @T["Use the credentials assigned to your company account to access leases, accounting, reports, and administration tools."]
                         </p>
 
                         <div class="card border-primary-subtle mb-4">
                             <div class="card-body">
-                                <h2 class="h6 text-primary mb-3">Access Notes</h2>
+                                <h2 class="h6 text-primary mb-3">@T["Access Notes"]</h2>
                                 <ul class="mb-0 ps-3">
-                                    <li>Each user only sees the functions assigned by the administrator.</li>
-                                    <li>Company access and permissions are controlled centrally.</li>
-                                    <li>Subscriptions and trial periods are enforced automatically.</li>
+                                    <li>@T["Each user only sees the functions assigned by the administrator."]</li>
+                                    <li>@T["Company access and permissions are controlled centrally."]</li>
+                                    <li>@T["Subscriptions and trial periods are enforced automatically."]</li>
                                 </ul>
                             </div>
                         </div>
 
                         <div class="border rounded p-3 bg-white">
-                            <div class="fw-semibold mb-1">New Customer?</div>
-                            <div class="text-muted small mb-3">Create a new company, create the first admin user, and start the 15-day trial.</div>
-                            <a asp-action="RegisterCompany" class="btn btn-outline-secondary w-100">Create New Company</a>
+                            <div class="fw-semibold mb-1">@T["New Customer?"]</div>
+                            <div class="text-muted small mb-3">@T["Create a new company, create the first admin user, and start the 15-day trial."]</div>
+                            <a asp-action="RegisterCompany" class="btn btn-outline-secondary w-100">@T["Create New Company"]</a>
                         </div>
                     </div>
                 </div>
@@ -40,8 +40,8 @@
             <div class="col-lg-5">
                 <div class="card shadow-sm">
                     <div class="card-body p-4 p-lg-5">
-                        <h2 class="h4 mb-2">Sign In</h2>
-                        <p class="text-muted small mb-4">Enter your username and password to continue.</p>
+                        <h2 class="h4 mb-2">@T["Sign In"]</h2>
+                        <p class="text-muted small mb-4">@T["Enter your username and password to continue."]</p>
 
                         @if (TempData["SuccessMessage"] is string successMessage)
                         {
@@ -65,12 +65,11 @@
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                            <button type="submit" class="btn btn-primary w-100">@T["Login"]</button>
                         </form>
 
                         <div class="alert alert-light border mt-4 mb-0 small text-muted">
-                            Sign in with the credentials assigned to your company account. If you are a new customer, use <strong>Create New Company</strong> to begin your setup.
-                            Tenants and employees can sign in here too with the username and password they were given; they are taken to their own portal.
+                            @T.Html("Sign in with the credentials assigned to your company account. If you are a new customer, use <strong>Create New Company</strong> to begin your setup. Tenants and employees can sign in here too with the username and password they were given; they are taken to their own portal.")
                         </div>
                     </div>
                 </div>

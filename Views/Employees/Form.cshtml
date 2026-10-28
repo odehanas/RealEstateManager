@@ -9,7 +9,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">@(isNew ? "Add Employee" : $"Edit {e.EmployeeCode} {e.FullName}")</h2>
-    <a asp-action="@(isNew ? "Index" : "Details")" asp-route-id="@(isNew ? null : e.Id)" class="btn btn-outline-secondary">Back</a>
+    <a asp-action="@(isNew ? "Index" : "Details")" asp-route-id="@(isNew ? null : e.Id)" class="btn btn-outline-secondary">@T["Back"]</a>
 </div>
 
 <form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : e.Id)" method="post">
@@ -17,126 +17,126 @@
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">Personal</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Personal"]</h5></div>
         <div class="card-body row g-3">
             <div class="col-md-3">
-                <label class="form-label">Employee code</label>
+                <label class="form-label">@T["Employee code"]</label>
                 <input class="form-control bg-light" value="@(isNew ? "Generated on save" : e.EmployeeCode)" readonly />
             </div>
-            <div class="col-md-3"><label asp-for="Employee.FirstName" class="form-label">First name</label><input asp-for="Employee.FirstName" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.LastName" class="form-label">Last name</label><input asp-for="Employee.LastName" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.NameArabic" class="form-label">Name in Arabic</label><input asp-for="Employee.NameArabic" class="form-control" dir="rtl" /></div>
+            <div class="col-md-3"><label asp-for="Employee.FirstName" class="form-label">@T["First name"]</label><input asp-for="Employee.FirstName" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.LastName" class="form-label">@T["Last name"]</label><input asp-for="Employee.LastName" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.NameArabic" class="form-label">@T["Name in Arabic"]</label><input asp-for="Employee.NameArabic" class="form-control" dir="rtl" /></div>
             <div class="col-md-2">
-                <label asp-for="Employee.Gender" class="form-label">Gender</label>
-                <select asp-for="Employee.Gender" class="form-select"><option>Male</option><option>Female</option></select>
+                <label asp-for="Employee.Gender" class="form-label">@T["Gender"]</label>
+                <select asp-for="Employee.Gender" class="form-select"><option>@T["Male"]</option><option>@T["Female"]</option></select>
             </div>
-            <div class="col-md-2"><label asp-for="Employee.DateOfBirth" class="form-label">Date of birth</label><input asp-for="Employee.DateOfBirth" type="date" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.Nationality" class="form-label">Nationality</label><input asp-for="Employee.Nationality" class="form-control" /></div>
+            <div class="col-md-2"><label asp-for="Employee.DateOfBirth" class="form-label">@T["Date of birth"]</label><input asp-for="Employee.DateOfBirth" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.Nationality" class="form-label">@T["Nationality"]</label><input asp-for="Employee.Nationality" class="form-control" /></div>
             <div class="col-md-2">
-                <label asp-for="Employee.MaritalStatus" class="form-label">Marital status</label>
-                <select asp-for="Employee.MaritalStatus" class="form-select"><option></option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select>
+                <label asp-for="Employee.MaritalStatus" class="form-label">@T["Marital status"]</label>
+                <select asp-for="Employee.MaritalStatus" class="form-select"><option></option><option>@T["Single"]</option><option>@T["Married"]</option><option>@T["Divorced"]</option><option>@T["Widowed"]</option></select>
             </div>
-            <div class="col-md-3"><label asp-for="Employee.Mobile" class="form-label">Mobile</label><input asp-for="Employee.Mobile" class="form-control" /></div>
-            <div class="col-md-4"><label asp-for="Employee.Email" class="form-label">Email</label><input asp-for="Employee.Email" class="form-control" /></div>
-            <div class="col-md-8"><label asp-for="Employee.Address" class="form-label">Address</label><input asp-for="Employee.Address" class="form-control" /></div>
-            <div class="col-md-6"><label asp-for="Employee.EmergencyContactName" class="form-label">Emergency contact</label><input asp-for="Employee.EmergencyContactName" class="form-control" /></div>
-            <div class="col-md-6"><label asp-for="Employee.EmergencyContactPhone" class="form-label">Emergency contact phone</label><input asp-for="Employee.EmergencyContactPhone" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.Mobile" class="form-label">@T["Mobile"]</label><input asp-for="Employee.Mobile" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Employee.Email" class="form-label">@T["Email"]</label><input asp-for="Employee.Email" class="form-control" /></div>
+            <div class="col-md-8"><label asp-for="Employee.Address" class="form-label">@T["Address"]</label><input asp-for="Employee.Address" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="Employee.EmergencyContactName" class="form-label">@T["Emergency contact"]</label><input asp-for="Employee.EmergencyContactName" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="Employee.EmergencyContactPhone" class="form-label">@T["Emergency contact phone"]</label><input asp-for="Employee.EmergencyContactPhone" class="form-control" /></div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">Job and contract</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Job and contract"]</h5></div>
         <div class="card-body row g-3">
-            <div class="col-md-4"><label asp-for="Employee.JobTitle" class="form-label">Job title</label><input asp-for="Employee.JobTitle" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Employee.JobTitle" class="form-label">@T["Job title"]</label><input asp-for="Employee.JobTitle" class="form-control" /></div>
             <div class="col-md-4">
-                <label asp-for="Employee.DepartmentId" class="form-label">Department</label>
+                <label asp-for="Employee.DepartmentId" class="form-label">@T["Department"]</label>
                 <select asp-for="Employee.DepartmentId" asp-items="Model.Departments" class="form-select"><option value="">-</option></select>
             </div>
             <div class="col-md-4">
-                <label asp-for="Employee.PropertyId" class="form-label">Works for building</label>
-                <select asp-for="Employee.PropertyId" asp-items="Model.Properties" class="form-select"><option value="">Head office / none</option></select>
-                <div class="form-text">Their salary is then charged to that building in P&amp;L by Property.</div>
+                <label asp-for="Employee.PropertyId" class="form-label">@T["Works for building"]</label>
+                <select asp-for="Employee.PropertyId" asp-items="Model.Properties" class="form-select"><option value="">@T["Head office / none"]</option></select>
+                <div class="form-text">@T["Their salary is then charged to that building in P&L by Property."]</div>
             </div>
-            <div class="col-md-3"><label asp-for="Employee.JoiningDate" class="form-label">Joining date</label><input asp-for="Employee.JoiningDate" type="date" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.ProbationEndDate" class="form-label">Probation ends</label><input asp-for="Employee.ProbationEndDate" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.JoiningDate" class="form-label">@T["Joining date"]</label><input asp-for="Employee.JoiningDate" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.ProbationEndDate" class="form-label">@T["Probation ends"]</label><input asp-for="Employee.ProbationEndDate" type="date" class="form-control" /></div>
             <div class="col-md-3">
-                <label asp-for="Employee.ContractType" class="form-label">Contract</label>
+                <label asp-for="Employee.ContractType" class="form-label">@T["Contract"]</label>
                 <select asp-for="Employee.ContractType" class="form-select">
                     @foreach (var t in EmployeeContractTypes.All) { <option value="@t">@t</option> }
                 </select>
             </div>
-            <div class="col-md-3"><label asp-for="Employee.ContractEndDate" class="form-label">Contract ends</label><input asp-for="Employee.ContractEndDate" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.ContractEndDate" class="form-label">@T["Contract ends"]</label><input asp-for="Employee.ContractEndDate" type="date" class="form-control" /></div>
             <div class="col-md-3">
-                <label asp-for="Employee.Status" class="form-label">Status</label>
+                <label asp-for="Employee.Status" class="form-label">@T["Status"]</label>
                 <select asp-for="Employee.Status" class="form-select">
                     @foreach (var s in EmployeeStatuses.All) { <option value="@s">@s</option> }
                 </select>
-                <div class="form-text">Suspended staff are left out of the payroll.</div>
+                <div class="form-text">@T["Suspended staff are left out of the payroll."]</div>
             </div>
-            <div class="col-md-3"><label asp-for="Employee.LeavingDate" class="form-label">Last working day</label><input asp-for="Employee.LeavingDate" type="date" class="form-control" /></div>
-            <div class="col-md-6"><label asp-for="Employee.LeavingReason" class="form-label">Reason for leaving</label><input asp-for="Employee.LeavingReason" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.LeavingDate" class="form-label">@T["Last working day"]</label><input asp-for="Employee.LeavingDate" type="date" class="form-control" /></div>
+            <div class="col-md-6"><label asp-for="Employee.LeavingReason" class="form-label">@T["Reason for leaving"]</label><input asp-for="Employee.LeavingReason" class="form-control" /></div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">UAE documents</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["UAE documents"]</h5></div>
         <div class="card-body row g-3">
-            <div class="col-md-3"><label asp-for="Employee.PassportNumber" class="form-label">Passport no.</label><input asp-for="Employee.PassportNumber" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.PassportExpiry" class="form-label">Passport expiry</label><input asp-for="Employee.PassportExpiry" type="date" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.EmiratesIdNumber" class="form-label">Emirates ID</label><input asp-for="Employee.EmiratesIdNumber" class="form-control" placeholder="784-XXXX-XXXXXXX-X" /></div>
-            <div class="col-md-3"><label asp-for="Employee.EmiratesIdExpiry" class="form-label">Emirates ID expiry</label><input asp-for="Employee.EmiratesIdExpiry" type="date" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.ResidenceVisaNumber" class="form-label">Residence visa no.</label><input asp-for="Employee.ResidenceVisaNumber" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.ResidenceVisaExpiry" class="form-label">Visa expiry</label><input asp-for="Employee.ResidenceVisaExpiry" type="date" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.LabourCardNumber" class="form-label">Labour card / work permit</label><input asp-for="Employee.LabourCardNumber" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.LabourCardExpiry" class="form-label">Labour card expiry</label><input asp-for="Employee.LabourCardExpiry" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.PassportNumber" class="form-label">@T["Passport no."]</label><input asp-for="Employee.PassportNumber" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.PassportExpiry" class="form-label">@T["Passport expiry"]</label><input asp-for="Employee.PassportExpiry" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.EmiratesIdNumber" class="form-label">@T["Emirates ID"]</label><input asp-for="Employee.EmiratesIdNumber" class="form-control" placeholder="@T["784-XXXX-XXXXXXX-X"]" /></div>
+            <div class="col-md-3"><label asp-for="Employee.EmiratesIdExpiry" class="form-label">@T["Emirates ID expiry"]</label><input asp-for="Employee.EmiratesIdExpiry" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.ResidenceVisaNumber" class="form-label">@T["Residence visa no."]</label><input asp-for="Employee.ResidenceVisaNumber" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.ResidenceVisaExpiry" class="form-label">@T["Visa expiry"]</label><input asp-for="Employee.ResidenceVisaExpiry" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.LabourCardNumber" class="form-label">@T["Labour card / work permit"]</label><input asp-for="Employee.LabourCardNumber" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.LabourCardExpiry" class="form-label">@T["Labour card expiry"]</label><input asp-for="Employee.LabourCardExpiry" type="date" class="form-control" /></div>
             <div class="col-md-4">
-                <label asp-for="Employee.MohrePersonCode" class="form-label">MOHRE person code</label>
+                <label asp-for="Employee.MohrePersonCode" class="form-label">@T["MOHRE person code"]</label>
                 <input asp-for="Employee.MohrePersonCode" class="form-control" maxlength="14" />
-                <div class="form-text">14 digits, on the labour card. Needed for the WPS salary file.</div>
+                <div class="form-text">@T["14 digits, on the labour card. Needed for the WPS salary file."]</div>
             </div>
-            <div class="col-md-4"><label asp-for="Employee.HealthInsuranceNumber" class="form-label">Health insurance no.</label><input asp-for="Employee.HealthInsuranceNumber" class="form-control" /></div>
-            <div class="col-md-4"><label asp-for="Employee.HealthInsuranceExpiry" class="form-label">Insurance expiry</label><input asp-for="Employee.HealthInsuranceExpiry" type="date" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Employee.HealthInsuranceNumber" class="form-label">@T["Health insurance no."]</label><input asp-for="Employee.HealthInsuranceNumber" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Employee.HealthInsuranceExpiry" class="form-label">@T["Insurance expiry"]</label><input asp-for="Employee.HealthInsuranceExpiry" type="date" class="form-control" /></div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">Salary and payment</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Salary and payment"]</h5></div>
         <div class="card-body row g-3">
-            <div class="col-md-3"><label asp-for="Employee.BasicSalary" class="form-label">Basic salary</label><input asp-for="Employee.BasicSalary" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.HousingAllowance" class="form-label">Housing allowance</label><input asp-for="Employee.HousingAllowance" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.TransportAllowance" class="form-label">Transport allowance</label><input asp-for="Employee.TransportAllowance" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.OtherAllowance" class="form-label">Other allowances</label><input asp-for="Employee.OtherAllowance" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.BasicSalary" class="form-label">@T["Basic salary"]</label><input asp-for="Employee.BasicSalary" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.HousingAllowance" class="form-label">@T["Housing allowance"]</label><input asp-for="Employee.HousingAllowance" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.TransportAllowance" class="form-label">@T["Transport allowance"]</label><input asp-for="Employee.TransportAllowance" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.OtherAllowance" class="form-label">@T["Other allowances"]</label><input asp-for="Employee.OtherAllowance" class="form-control" /></div>
             <div class="col-md-3">
-                <label asp-for="Employee.PaymentMethod" class="form-label">Paid by</label>
+                <label asp-for="Employee.PaymentMethod" class="form-label">@T["Paid by"]</label>
                 <select asp-for="Employee.PaymentMethod" class="form-select">
                     @foreach (var m in SalaryPaymentMethods.All) { <option value="@m">@SalaryPaymentMethods.Describe(m)</option> }
                 </select>
             </div>
-            <div class="col-md-3"><label asp-for="Employee.BankName" class="form-label">Bank</label><input asp-for="Employee.BankName" class="form-control" /></div>
-            <div class="col-md-4"><label asp-for="Employee.Iban" class="form-label">IBAN</label><input asp-for="Employee.Iban" class="form-control" placeholder="AE07 0331 2345 6789 0123 456" /></div>
+            <div class="col-md-3"><label asp-for="Employee.BankName" class="form-label">@T["Bank"]</label><input asp-for="Employee.BankName" class="form-control" /></div>
+            <div class="col-md-4"><label asp-for="Employee.Iban" class="form-label">@T["IBAN"]</label><input asp-for="Employee.Iban" class="form-control" placeholder="@T["AE07 0331 2345 6789 0123 456"]" /></div>
             <div class="col-md-2">
-                <label asp-for="Employee.BankRoutingCode" class="form-label">Routing code</label>
+                <label asp-for="Employee.BankRoutingCode" class="form-label">@T["Routing code"]</label>
                 <input asp-for="Employee.BankRoutingCode" class="form-control" maxlength="9" />
             </div>
-            <div class="col-12 form-text mt-0">The routing code (agent ID) is the bank's 9-digit WPS code. Your bank gives it with the employee's account.</div>
+            <div class="col-12 form-text mt-0">@T["The routing code (agent ID) is the bank's 9-digit WPS code. Your bank gives it with the employee's account."]</div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">Leave and end of service</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Leave and end of service"]</h5></div>
         <div class="card-body row g-3">
             <div class="col-md-3">
-                <label asp-for="Employee.AnnualLeaveDaysPerYear" class="form-label">Annual leave days a year</label>
+                <label asp-for="Employee.AnnualLeaveDaysPerYear" class="form-label">@T["Annual leave days a year"]</label>
                 <input asp-for="Employee.AnnualLeaveDaysPerYear" class="form-control" />
-                <div class="form-text">30 under UAE law after the first year.</div>
+                <div class="form-text">@T["30 under UAE law after the first year."]</div>
             </div>
-            <div class="col-md-3"><label asp-for="Employee.OpeningBalanceDate" class="form-label">Balances as at</label><input asp-for="Employee.OpeningBalanceDate" type="date" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.OpeningLeaveBalance" class="form-label">Opening leave balance (days)</label><input asp-for="Employee.OpeningLeaveBalance" class="form-control" /></div>
-            <div class="col-md-3"><label asp-for="Employee.OpeningGratuityProvision" class="form-label">Opening gratuity provision</label><input asp-for="Employee.OpeningGratuityProvision" class="form-control" /></div>
-            <div class="col-12 form-text mt-0">The opening figures are only for staff moved from another system: what was already owed or provided at that date.</div>
-            <div class="col-12"><label asp-for="Employee.Notes" class="form-label">Notes</label><textarea asp-for="Employee.Notes" class="form-control" rows="2"></textarea></div>
+            <div class="col-md-3"><label asp-for="Employee.OpeningBalanceDate" class="form-label">@T["Balances as at"]</label><input asp-for="Employee.OpeningBalanceDate" type="date" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.OpeningLeaveBalance" class="form-label">@T["Opening leave balance (days)"]</label><input asp-for="Employee.OpeningLeaveBalance" class="form-control" /></div>
+            <div class="col-md-3"><label asp-for="Employee.OpeningGratuityProvision" class="form-label">@T["Opening gratuity provision"]</label><input asp-for="Employee.OpeningGratuityProvision" class="form-control" /></div>
+            <div class="col-12 form-text mt-0">@T["The opening figures are only for staff moved from another system: what was already owed or provided at that date."]</div>
+            <div class="col-12"><label asp-for="Employee.Notes" class="form-label">@T["Notes"]</label><textarea asp-for="Employee.Notes" class="form-control" rows="2"></textarea></div>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Save</button>
+    <button type="submit" class="btn btn-dark">@T["Save"]</button>
 </form>

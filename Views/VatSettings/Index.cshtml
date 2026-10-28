@@ -1,10 +1,10 @@
 @model RealEstateManager.Models.VatSettingsViewModel
 @{
-    ViewData["Title"] = "VAT Settings";
+    ViewData["Title"] = T["VAT Settings"];
 }
 
 <div class="mb-3">
-    <h2 class="mb-1">VAT Settings</h2>
+    <h2 class="mb-1">@T["VAT Settings"]</h2>
     <p class="text-muted mb-0">
         The company's tax identity for <strong>@Model.CompanyName</strong>, and the recovery rate applied to
         residual input tax.
@@ -19,8 +19,7 @@
 @if (!Model.IsReadyToIssueTaxInvoices)
 {
     <div class="alert alert-warning">
-        <strong>Tax invoices cannot be issued yet.</strong>
-        A tax invoice must show the supplier's TRN and address. Fill both in below and save.
+        @T.Html("<strong>Tax invoices cannot be issued yet.</strong> A tax invoice must show the supplier's TRN and address. Fill both in below and save.")
     </div>
 }
 
@@ -29,18 +28,18 @@
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light"><strong>Tax Identity</strong> <span class="text-muted small ms-2">Printed on every tax invoice</span></div>
+        <div class="card-header bg-light"><strong>@T["Tax Identity"]</strong> <span class="text-muted small ms-2">@T["Printed on every tax invoice"]</span></div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label asp-for="LegalName" class="form-label"></label>
-                    <input asp-for="LegalName" class="form-control" placeholder="If different from the trading name" />
+                    <input asp-for="LegalName" class="form-control" placeholder="@T["If different from the trading name"]" />
                 </div>
 
                 <div class="col-md-6">
                     <label asp-for="TrnNumber" class="form-label"></label>
-                    <input asp-for="TrnNumber" class="form-control" placeholder="15 digits" />
-                    <div class="form-text">Leave blank if the company is not VAT registered.</div>
+                    <input asp-for="TrnNumber" class="form-control" placeholder="@T["15 digits"]" />
+                    <div class="form-text">@T["Leave blank if the company is not VAT registered."]</div>
                 </div>
 
                 <div class="col-md-6">
@@ -77,7 +76,7 @@
     </div>
 
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light"><strong>Input Tax Recovery</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Input Tax Recovery</strong>")</div>
         <div class="card-body">
             <div class="row g-3 align-items-start">
                 <div class="col-md-4">
@@ -87,12 +86,7 @@
                 </div>
                 <div class="col-md-8">
                     <div class="alert alert-light border small mb-0">
-                        Applied to bills attributed as <strong>Residual</strong> during the year. Set it to last
-                        year's actual recovery percentage. Bills attributed as <em>Taxable</em> recover in full
-                        and <em>Exempt</em> recover nothing, so this rate does not affect them.
-                        <br /><br />
-                        Leave it at <strong>100</strong> only if you have no exempt supplies at all. With a mix of
-                        commercial and residential property you almost certainly do.
+                        @T.Html("Applied to bills attributed as <strong>Residual</strong> during the year. Set it to last year's actual recovery percentage. Bills attributed as <em>Taxable</em> recover in full and <em>Exempt</em> recover nothing, so this rate does not affect them. <br /><br /> Leave it at <strong>100</strong> only if you have no exempt supplies at all. With a mix of commercial and residential property you almost certainly do.")
                     </div>
                 </div>
             </div>
@@ -100,63 +94,58 @@
     </div>
 
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light"><strong>Costs Passed On to Owners of Managed Properties</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Costs Passed On to Owners of Managed Properties</strong>")</div>
         <div class="card-body">
-            <p class="small text-muted">How a cost ticked <em>Charge to owner</em> on a vendor bill or petty cash voucher is passed on.
-            The choice is kept on each bill and voucher when saved, so changing it later does not alter what is already recorded.</p>
+            <p class="small text-muted">@T.Html("How a cost ticked <em>Charge to owner</em> on a vendor bill or petty cash voucher is passed on. The choice is kept on each bill and voucher when saved, so changing it later does not alter what is already recorded.")</p>
             <div class="form-check mb-2">
                 <input class="form-check-input" type="radio" asp-for="OwnerCostTreatment" value="Recharge" id="treatRecharge" />
                 <label class="form-check-label" for="treatRecharge">
-                    <strong>Recharge with 5% VAT</strong> &mdash; the supplier invoices us; we reclaim their VAT and charge the owner the cost
-                    plus 5% VAT on our own tax invoice. Our output VAT is on our return; a registered owner reclaims it.
+                    @T.Html("<strong>Recharge with 5% VAT</strong> &mdash; the supplier invoices us; we reclaim their VAT and charge the owner the cost plus 5% VAT on our own tax invoice. Our output VAT is on our return; a registered owner reclaims it.")
                 </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="radio" asp-for="OwnerCostTreatment" value="Disbursement" id="treatDisbursement" />
                 <label class="form-check-label" for="treatDisbursement">
-                    <strong>Disbursement, no VAT</strong> &mdash; the supplier invoices the owner and we pay from our cash as the owner's agent.
-                    The cost including the supplier's VAT goes to the owner's account as it is; we charge no VAT and reclaim none. The
-                    supplier's VAT is on the owner's VAT return.
+                    @T.Html("<strong>Disbursement, no VAT</strong> &mdash; the supplier invoices the owner and we pay from our cash as the owner's agent. The cost including the supplier's VAT goes to the owner's account as it is; we charge no VAT and reclaim none. The supplier's VAT is on the owner's VAT return.")
                 </label>
             </div>
-            <div class="small text-muted mt-2">Items taken from the maintenance store are our own goods, so they are always recharged with VAT.</div>
+            <div class="small text-muted mt-2">@T["Items taken from the maintenance store are our own goods, so they are always recharged with VAT."]</div>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Save VAT Settings</button>
+    <button type="submit" class="btn btn-dark">@T["Save VAT Settings"]</button>
 </form>
 
 <div class="card shadow-sm mt-4">
-    <div class="card-header bg-light"><strong>Setup Readiness</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Setup Readiness</strong>")</div>
     <div class="table-responsive">
         <table class="table table-sm table-bordered mb-0">
             <tbody>
                 <tr>
-                    <td style="width:60%">Properties classified as standard rated (commercial)</td>
+                    <td style="width:60%">@T["Properties classified as standard rated (commercial)"]</td>
                     <td class="text-end fw-semibold">@Model.StandardRatedProperties</td>
                 </tr>
                 <tr>
-                    <td>Properties classified as exempt (residential)</td>
+                    <td>@T["Properties classified as exempt (residential)"]</td>
                     <td class="text-end fw-semibold">@Model.ExemptProperties</td>
                 </tr>
                 <tr>
-                    <td>Tenants with a TRN (these receive a full tax invoice)</td>
+                    <td>@T["Tenants with a TRN (these receive a full tax invoice)"]</td>
                     <td class="text-end fw-semibold">@Model.TenantsWithTrn of @Model.TotalTenants</td>
                 </tr>
                 <tr>
-                    <td>Tax invoices issued to date</td>
+                    <td>@T["Tax invoices issued to date"]</td>
                     <td class="text-end fw-semibold">@Model.TaxInvoicesIssued</td>
                 </tr>
                 <tr class="@(Model.BillsAwaitingAttribution > 0 ? "table-warning" : "")">
-                    <td>Draft vendor bills carrying VAT, not yet posted</td>
+                    <td>@T["Draft vendor bills carrying VAT, not yet posted"]</td>
                     <td class="text-end fw-semibold">@Model.BillsAwaitingAttribution</td>
                 </tr>
             </tbody>
         </table>
     </div>
     <div class="card-body py-3 small text-muted">
-        Check the input tax attribution on those draft bills before posting them &mdash; once posted, the
-        recoverable and irrecoverable split is fixed in the journal.
+        @T["Check the input tax attribution on those draft bills before posting them — once posted, the recoverable and irrecoverable split is fixed in the journal."]
     </div>
 </div>
 

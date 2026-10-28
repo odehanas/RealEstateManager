@@ -7,17 +7,17 @@
 *@
 
 <div class="col-md-6">
-    <label asp-for="Address" class="form-label">Street address</label>
-    <input asp-for="Address" class="form-control" placeholder="Building, street, area" />
+    <label asp-for="Address" class="form-label">@T["Street address"]</label>
+    <input asp-for="Address" class="form-control" placeholder="@T["Building, street, area"]" />
 </div>
 
 <div class="col-md-2">
-    <label asp-for="City" class="form-label">City</label>
+    <label asp-for="City" class="form-label">@T["City"]</label>
     <input asp-for="City" class="form-control" />
 </div>
 
 <div class="col-md-2">
-    <label asp-for="Emirate" class="form-label">Emirate</label>
+    <label asp-for="Emirate" class="form-label">@T["Emirate"]</label>
     <select asp-for="Emirate" class="form-select">
         <option value="">&mdash;</option>
         @foreach (var emirate in Emirates.All)
@@ -28,21 +28,21 @@
 </div>
 
 <div class="col-md-2">
-    <label asp-for="CountryCode" class="form-label">Country</label>
-    <input asp-for="CountryCode" class="form-control text-uppercase" maxlength="2" placeholder="AE" />
-    <div class="form-text">Two-letter code.</div>
+    <label asp-for="CountryCode" class="form-label">@T["Country"]</label>
+    <input asp-for="CountryCode" class="form-control text-uppercase" maxlength="2" placeholder="@T["AE"]" />
+    <div class="form-text">@T["Two-letter code."]</div>
 </div>
 
 <div class="col-md-12">
     <div class="card border-primary-subtle">
         <div class="card-header bg-light py-2">
-            <strong>E-invoicing</strong>
-            <span class="text-muted small ms-2">Decides whether this tenant's invoices go on the UAE e-invoicing network</span>
+            <strong>@T["E-invoicing"]</strong>
+            <span class="text-muted small ms-2">@T["Decides whether this tenant's invoices go on the UAE e-invoicing network"]</span>
         </div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label asp-for="PartyType" class="form-label">Customer type</label>
+                    <label asp-for="PartyType" class="form-label">@T["Customer type"]</label>
                     <select asp-for="PartyType" class="form-select" id="partyType">
                         @foreach (var type in PartyTypes.All)
                         {
@@ -50,20 +50,20 @@
                         }
                     </select>
                     <div class="form-text">
-                        A company or establishment is a <strong>Business</strong> even if it is not VAT registered.
+                        @T.Html("A company or establishment is a <strong>Business</strong> even if it is not VAT registered.")
                     </div>
                 </div>
 
                 <div class="col-md-4 einv-business">
-                    <label asp-for="TaxIdentificationNumber" class="form-label">TIN (Tax Identification Number)</label>
-                    <input asp-for="TaxIdentificationNumber" class="form-control" placeholder="10 digits" maxlength="10" />
-                    <div class="form-text">Leave blank when the tenant has a TRN &mdash; the TIN is its first 10 digits.</div>
+                    <label asp-for="TaxIdentificationNumber" class="form-label">@T["TIN (Tax Identification Number)"]</label>
+                    <input asp-for="TaxIdentificationNumber" class="form-control" placeholder="@T["10 digits"]" maxlength="10" />
+                    <div class="form-text">@T["Leave blank when the tenant has a TRN — the TIN is its first 10 digits."]</div>
                 </div>
 
                 <div class="col-md-4 einv-business">
-                    <label asp-for="LegalRegistrationType" class="form-label">Identified by</label>
+                    <label asp-for="LegalRegistrationType" class="form-label">@T["Identified by"]</label>
                     <select asp-for="LegalRegistrationType" class="form-select">
-                        <option value="">Work it out from the numbers above</option>
+                        <option value="">@T["Work it out from the numbers above"]</option>
                         @foreach (var type in LegalRegistrationTypes.All)
                         {
                             <option value="@type">@LegalRegistrationTypes.Describe(type)</option>
@@ -72,15 +72,15 @@
                 </div>
 
                 <div class="col-md-8 einv-business">
-                    <label asp-for="LicensingAuthority" class="form-label">Trade licence issued by</label>
+                    <label asp-for="LicensingAuthority" class="form-label">@T["Trade licence issued by"]</label>
                     <input asp-for="LicensingAuthority" class="form-control"
-                           placeholder="e.g. Department of Economy and Tourism - Dubai" />
+                           placeholder="@T["e.g. Department of Economy and Tourism - Dubai"]" />
                 </div>
 
                 <div class="col-md-4 einv-business">
-                    <label asp-for="PassportIssuingCountry" class="form-label">Passport issued by (country code)</label>
-                    <input asp-for="PassportIssuingCountry" class="form-control text-uppercase" maxlength="2" placeholder="e.g. IN" />
-                    <div class="form-text">Only when a passport identifies the tenant.</div>
+                    <label asp-for="PassportIssuingCountry" class="form-label">@T["Passport issued by (country code)"]</label>
+                    <input asp-for="PassportIssuingCountry" class="form-control text-uppercase" maxlength="2" placeholder="@T["e.g. IN"]" />
+                    <div class="form-text">@T["Only when a passport identifies the tenant."]</div>
                 </div>
             </div>
         </div>

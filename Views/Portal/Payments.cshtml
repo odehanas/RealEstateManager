@@ -2,20 +2,20 @@
 @using RealEstateManager.Models
 @{
     Layout = "_PortalLayout";
-    ViewData["Title"] = "My Payments";
+    ViewData["Title"] = T["My Payments"];
     var pdcs = ViewBag.Pdcs as List<PortalPdcViewModel> ?? new();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h5 mb-0">My Payments</h1>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <h1 class="h5 mb-0">@T["My Payments"]</h1>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><strong>Payments Received</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Payments Received</strong>")</div>
     @if (Model.Count == 0)
     {
-        <div class="card-body text-muted">No payments recorded yet.</div>
+        <div class="card-body text-muted">@T["No payments recorded yet."]</div>
     }
     else
     {
@@ -23,11 +23,11 @@
             <table class="table table-bordered table-sm mb-0">
                 <thead>
                     <tr>
-                        <th>Receipt</th>
-                        <th>Date</th>
-                        <th>Method</th>
-                        <th>Against invoice</th>
-                        <th class="text-end">Amount</th>
+                        <th>@T["Receipt"]</th>
+                        <th>@T["Date"]</th>
+                        <th>@T["Method"]</th>
+                        <th>@T["Against invoice"]</th>
+                        <th class="text-end">@T["Amount"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +44,7 @@
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <th colspan="4">Total received</th>
+                        <th colspan="4">@T["Total received"]</th>
                         <th class="text-end">@Model.Sum(x => x.Amount).ToString("N2")</th>
                     </tr>
                 </tfoot>
@@ -54,10 +54,10 @@
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header bg-light"><strong>My Cheques</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>My Cheques</strong>")</div>
     @if (pdcs.Count == 0)
     {
-        <div class="card-body text-muted">No cheques on record.</div>
+        <div class="card-body text-muted">@T["No cheques on record."]</div>
     }
     else
     {
@@ -65,12 +65,12 @@
             <table class="table table-bordered table-sm mb-0">
                 <thead>
                     <tr>
-                        <th>Cheque</th>
-                        <th>Bank</th>
-                        <th>Cheque date</th>
-                        <th>Cleared</th>
-                        <th class="text-end">Amount</th>
-                        <th>Status</th>
+                        <th>@T["Cheque"]</th>
+                        <th>@T["Bank"]</th>
+                        <th>@T["Cheque date"]</th>
+                        <th>@T["Cleared"]</th>
+                        <th class="text-end">@T["Amount"]</th>
+                        <th>@T["Status"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,9 +98,7 @@
             </table>
         </div>
         <div class="card-body small text-muted">
-            A cheque marked <strong>Received</strong> is being held and has not yet been presented to the
-            bank &mdash; it does not reduce your balance until it clears. Make sure funds are available on the
-            cheque date.
+            @T.Html("A cheque marked <strong>Received</strong> is being held and has not yet been presented to the bank &mdash; it does not reduce your balance until it clears. Make sure funds are available on the cheque date.")
         </div>
     }
 </div>

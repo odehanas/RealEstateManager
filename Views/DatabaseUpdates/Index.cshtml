@@ -1,19 +1,17 @@
 @model RealEstateManager.Models.DatabaseUpdatesViewModel
 
 @{
-    ViewData["Title"] = "Database Updates";
+    ViewData["Title"] = T["Database Updates"];
     var status = Model.Status;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Database Updates</h2>
-    <span class="text-muted">Read-only. Times are UTC.</span>
+    <h2 class="mb-0">@T["Database Updates"]</h2>
+    <span class="text-muted">@T["Read-only. Times are UTC."]</span>
 </div>
 
 <p class="text-muted">
-    Each new version of the application carries its database changes as numbered scripts and applies any it has not
-    applied before, every time the site starts. This page shows what happened at the last start and every script
-    recorded so far.
+    @T["Each new version of the application carries its database changes as numbered scripts and applies any it has not applied before, every time the site starts. This page shows what happened at the last start and every script recorded so far."]
 </p>
 
 <div class="card shadow-sm mb-4 @(status.HasFailed ? "border-danger" : "border-success")">
@@ -22,19 +20,19 @@
             Last start:
             @if (status.Outcome == "Failed")
             {
-                <span class="badge bg-danger">Stopped on an error</span>
+                <span class="badge bg-danger">@T["Stopped on an error"]</span>
             }
             else if (status.Outcome == "Skipped")
             {
-                <span class="badge bg-warning text-dark">Skipped</span>
+                <span class="badge bg-warning text-dark">@T["Skipped"]</span>
             }
             else if (status.Outcome == "Updated")
             {
-                <span class="badge bg-success">Updated</span>
+                <span class="badge bg-success">@T["Updated"]</span>
             }
             else if (status.Outcome == "Up to date")
             {
-                <span class="badge bg-success">Up to date</span>
+                <span class="badge bg-success">@T["Up to date"]</span>
             }
             else
             {
@@ -64,14 +62,12 @@
                 }
                 <div><strong>What happened:</strong> @status.FailureMessage</div>
                 <div class="mt-2">
-                    The site is running, but scripts from this one onwards were not applied, so screens that rely on them
-                    may show errors. Send this page to your developer. Once the script is corrected and a new version is
-                    deployed, the next start tries again.
+                    @T["The site is running, but scripts from this one onwards were not applied, so screens that rely on them may show errors. Send this page to your developer. Once the script is corrected and a new version is deployed, the next start tries again."]
                 </div>
                 @if (!string.IsNullOrWhiteSpace(status.FailedSql))
                 {
                     <details class="mt-2">
-                        <summary>The statement</summary>
+                        <summary>@T["The statement"]</summary>
                         <pre class="small mb-0 mt-2" style="white-space: pre-wrap;">@status.FailedSql</pre>
                     </details>
                 }
@@ -111,7 +107,7 @@
         </h5>
         @if (Model.History == null)
         {
-            <div class="text-muted">No scripts have been recorded on this database yet.</div>
+            <div class="text-muted">@T["No scripts have been recorded on this database yet."]</div>
         }
         else
         {
@@ -119,10 +115,10 @@
                 <table class="table table-sm table-striped align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Script</th>
-                            <th>Recorded</th>
-                            <th>How</th>
-                            <th class="text-end">Statements</th>
+                            <th>@T["Script"]</th>
+                            <th>@T["Recorded"]</th>
+                            <th>@T["How"]</th>
+                            <th class="text-end">@T["Statements"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -134,11 +130,11 @@
                                 <td>
                                     @if (row.Method == "Baseline")
                                     {
-                                        <span title="Already applied by hand before automatic updates existed">Already in place</span>
+                                        <span title="@T["Already applied by hand before automatic updates existed"]">@T["Already in place"]</span>
                                     }
                                     else
                                     {
-                                        <span>Applied automatically</span>
+                                        <span>@T["Applied automatically"]</span>
                                     }
                                 </td>
                                 <td class="text-end">@(row.Statements?.ToString() ?? "-")</td>

@@ -15,8 +15,8 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-3 statement-no-print">
-    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to Owner Settlements</a>
-    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Print</button>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to Owner Settlements"]</a>
+    <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <div class="card shadow-sm">
@@ -43,7 +43,7 @@
                 <div>Date of supply: @Model.InvoiceDate.ToString("dd/MM/yyyy")</div>
                 @if (!Model.IsPosted)
                 {
-                    <span class="badge bg-warning text-dark">Draft - not posted</span>
+                    <span class="badge bg-warning text-dark">@T["Draft - not posted"]</span>
                 }
             </div>
         </div>
@@ -60,9 +60,9 @@
         <table class="table table-bordered table-sm mb-4">
             <thead>
                 <tr>
-                    <th>Description</th>
+                    <th>@T["Description"]</th>
                     <th class="text-end">Amount (@currency)</th>
-                    <th class="text-end">VAT Rate</th>
+                    <th class="text-end">@T["VAT Rate"]</th>
                     <th class="text-end">VAT (@currency)</th>
                 </tr>
             </thead>
@@ -81,7 +81,7 @@
 
         <table class="table table-sm ms-auto" style="max-width: 420px;">
             <tbody>
-                <tr><td>Total excluding VAT</td><td class="text-end">@Model.Commission.ToString("N2")</td></tr>
+                <tr><td>@T["Total excluding VAT"]</td><td class="text-end">@Model.Commission.ToString("N2")</td></tr>
                 <tr><td>VAT at @Model.VatRate.ToString("0.##")%</td><td class="text-end">@Model.VatAmount.ToString("N2")</td></tr>
                 <tr class="fw-bold table-primary"><td>Total including VAT (@currency)</td><td class="text-end">@Model.TotalAmount.ToString("N2")</td></tr>
             </tbody>

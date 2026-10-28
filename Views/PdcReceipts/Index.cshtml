@@ -2,7 +2,7 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "PDC Receipts";
+    ViewData["Title"] = T["PDC Receipts"];
     var list = Model.ToList();
     var onHand = list.Where(x => x.Status == PdcStatuses.Received).ToList();
     var atBank = list.Where(x => x.Status == PdcStatuses.Deposited).ToList();
@@ -11,8 +11,8 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>PDC Receipts</h2>
-    <a asp-action="Create" class="btn btn-dark">Receive PDC</a>
+    <h2>@T["PDC Receipts"]</h2>
+    <a asp-action="Create" class="btn btn-dark">@T["Receive PDC"]</a>
 </div>
 
 @if (TempData["PdcMessage"] is string pdcMessage)
@@ -30,23 +30,23 @@
         <div class="h5 mb-0">@atBank.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@atBank.Count cheque(s)</div>
     </div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 @(bounced.Count > 0 ? "border-danger" : "")"><div class="card-body py-2">
-        <div class="text-muted small">Bounced, not yet replaced</div>
+        <div class="text-muted small">@T["Bounced, not yet replaced"]</div>
         <div class="h5 mb-0 @(bounced.Count > 0 ? "text-danger" : "")">@bounced.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@bounced.Count cheque(s)</div>
     </div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
-        <div class="text-muted small">Withdrawn, not yet replaced</div>
+        <div class="text-muted small">@T["Withdrawn, not yet replaced"]</div>
         <div class="h5 mb-0">@withdrawn.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@withdrawn.Count cheque(s)</div>
     </div></div></div>
 </div>
 
 <details class="alert alert-info">
-    <summary><strong>How a cheque moves through the accounts</strong></summary>
+    <summary>@T.Html("<strong>How a cheque moves through the accounts</strong>")</summary>
     <ul class="mb-0 mt-2">
-        <li><strong>Received</strong> (received date): <code>Dr 11400 PDC On Hand / Cr 21600 PDC Contra</code> &mdash; a memorandum pair; nothing touches cash, revenue or the tenant yet.</li>
-        <li><strong>Deposited</strong> to the bank for collection: the memorandum is reversed and <code>Dr 11450 Cheques Under Collection / Cr the tenant</code> (receivable, or advance).</li>
-        <li><strong>Cleared</strong> by the bank: <code>Dr Bank / Cr 11450</code>. A cheque cleared without being deposited first goes straight from on hand to the bank.</li>
-        <li><strong>Bounced</strong>: <code>Dr the tenant / Cr 11450</code> &mdash; charged back, the invoice is open again, plus any returned cheque charge.</li>
-        <li><strong>Withdrawn</strong> by the tenant before deposit: the memorandum is reversed, the cheque stays here as withdrawn, and the withdrawal charge is invoiced to the tenant.</li>
+        <li>@T.Html("<strong>Received</strong> (received date): <code>Dr 11400 PDC On Hand / Cr 21600 PDC Contra</code> &mdash; a memorandum pair; nothing touches cash, revenue or the tenant yet.")</li>
+        <li>@T.Html("<strong>Deposited</strong> to the bank for collection: the memorandum is reversed and <code>Dr 11450 Cheques Under Collection / Cr the tenant</code> (receivable, or advance).")</li>
+        <li>@T.Html("<strong>Cleared</strong> by the bank: <code>Dr Bank / Cr 11450</code>. A cheque cleared without being deposited first goes straight from on hand to the bank.")</li>
+        <li>@T.Html("<strong>Bounced</strong>: <code>Dr the tenant / Cr 11450</code> &mdash; charged back, the invoice is open again, plus any returned cheque charge.")</li>
+        <li>@T.Html("<strong>Withdrawn</strong> by the tenant before deposit: the memorandum is reversed, the cheque stays here as withdrawn, and the withdrawal charge is invoiced to the tenant.")</li>
     </ul>
 </details>
 
@@ -55,11 +55,11 @@
     <form asp-action="DepositSelected" method="post" id="depositForm" class="d-flex flex-wrap align-items-end gap-2 mb-2">
         @Html.AntiForgeryToken()
         <div>
-            <label class="form-label small mb-0" for="depositDate">Deposit ticked cheques on</label>
+            <label class="form-label small mb-0" for="depositDate">@T["Deposit ticked cheques on"]</label>
             <input type="date" name="depositDate" id="depositDate" class="form-control form-control-sm" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
         </div>
-        <button type="submit" class="btn btn-sm btn-primary">Deposit to Bank</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" id="tickDue">Tick cheques due by that date</button>
+        <button type="submit" class="btn btn-sm btn-primary">@T["Deposit to Bank"]</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="tickDue">@T["Tick cheques due by that date"]</button>
     </form>
 }
 
@@ -68,20 +68,20 @@
     <thead>
         <tr>
             <th></th>
-            <th>Cheque No.</th>
-            <th>Cheque Date <div class="fw-normal small opacity-75">not accounting</div></th>
-            <th>Received <div class="fw-normal small opacity-75">memo posts here</div></th>
-            <th>Deposited <div class="fw-normal small opacity-75">tenant credited</div></th>
-            <th>Cleared / Returned</th>
-            <th>Lease</th>
-            <th>Property / Unit</th>
-            <th>Tenant</th>
-            <th>Invoice</th>
-            <th>Bank</th>
-            <th>Mode</th>
-            <th>Status</th>
-            <th class="text-end">Amount</th>
-            <th>Action</th>
+            <th>@T["Cheque No."]</th>
+            <th>Cheque Date <div class="fw-normal small opacity-75">@T["not accounting"]</div></th>
+            <th>Received <div class="fw-normal small opacity-75">@T["memo posts here"]</div></th>
+            <th>Deposited <div class="fw-normal small opacity-75">@T["tenant credited"]</div></th>
+            <th>@T["Cleared / Returned"]</th>
+            <th>@T["Lease"]</th>
+            <th>@T["Property / Unit"]</th>
+            <th>@T["Tenant"]</th>
+            <th>@T["Invoice"]</th>
+            <th>@T["Bank"]</th>
+            <th>@T["Mode"]</th>
+            <th>@T["Status"]</th>
+            <th class="text-end">@T["Amount"]</th>
+            <th>@T["Action"]</th>
         </tr>
     </thead>
     <tbody>
@@ -133,26 +133,26 @@
                 <td class="text-end">@pdc.Amount.ToString("N2")</td>
                 <td>
                     <div class="d-flex flex-wrap gap-1">
-                        <a asp-action="Edit" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Edit" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-primary">@T["Edit"]</a>
                         @if (pdc.Status == PdcStatuses.Received)
                         {
-                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="deposit" class="btn btn-sm btn-outline-primary">Deposit</a>
-                            <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-dark">Clear</a>
-                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="withdraw" class="btn btn-sm btn-outline-warning">Withdraw</a>
+                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="deposit" class="btn btn-sm btn-outline-primary">@T["Deposit"]</a>
+                            <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-dark">@T["Clear"]</a>
+                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="withdraw" class="btn btn-sm btn-outline-warning">@T["Withdraw"]</a>
                         }
                         else if (pdc.Status == PdcStatuses.Deposited)
                         {
-                            <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-success">Cleared</a>
-                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="bounce" class="btn btn-sm btn-outline-danger">Bounced</a>
+                            <a asp-action="Clear" asp-route-id="@pdc.Id" class="btn btn-sm btn-outline-success">@T["Cleared"]</a>
+                            <a asp-action="Step" asp-route-id="@pdc.Id" asp-route-kind="bounce" class="btn btn-sm btn-outline-danger">@T["Bounced"]</a>
                         }
                         else if (pdc.Status is PdcStatuses.Bounced or PdcStatuses.Withdrawn)
                         {
-                            <a asp-action="Create" asp-route-replaces="@pdc.Id" class="btn btn-sm btn-outline-dark">New cheque</a>
+                            <a asp-action="Create" asp-route-replaces="@pdc.Id" class="btn btn-sm btn-outline-dark">@T["New cheque"]</a>
                             <form asp-action="MarkReplaced" asp-route-id="@pdc.Id" method="post" class="d-inline"
                                   onsubmit="return confirm('Mark cheque @pdc.ChequeNumber as replaced - the tenant has paid another way?');">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="note" value="Settled otherwise" />
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Paid otherwise</button>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Paid otherwise"]</button>
                             </form>
                         }
                     </div>

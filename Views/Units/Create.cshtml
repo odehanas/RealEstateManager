@@ -1,11 +1,11 @@
 @model RealEstateManager.Models.UnitCreateViewModel
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Create Unit";
+    ViewData["Title"] = T["Create Unit"];
     var properties = ViewBag.Properties as List<Property> ?? new();
 }
 
-<h2>Create Unit</h2>
+<h2>@T["Create Unit"]</h2>
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
@@ -16,7 +16,7 @@
         <div class="col-md-4">
             <label asp-for="PropertyId" class="form-label"></label>
             <select asp-for="PropertyId" class="form-select">
-                <option value="">Select Property</option>
+                <option value="">@T["Select Property"]</option>
                 @foreach (var property in properties)
                 {
                     <option value="@property.Id">@property.Code - @property.Name</option>
@@ -25,10 +25,10 @@
         </div>
 
         <div class="col-md-4">
-            <label class="form-label">Unit Code</label>
+            <label class="form-label">@T["Unit Code"]</label>
             <input type="text" class="form-control bg-light" value="Generated from the property code" readonly />
             <div class="form-text">
-                The property code plus a two-digit unit sequence, e.g. <code>OWN-R-0001-U01</code>.
+                @T.Html("The property code plus a two-digit unit sequence, e.g. <code>OWN-R-0001-U01</code>.")
             </div>
         </div>
 
@@ -40,11 +40,11 @@
         <div class="col-md-4">
             <label asp-for="UsageType" class="form-label"></label>
             <select asp-for="UsageType" class="form-select">
-                <option value="">Select</option>
-                <option>Residential</option>
-                <option>Commercial</option>
-                <option>Warehouse</option>
-                <option>Office</option>
+                <option value="">@T["Select"]</option>
+                <option>@T["Residential"]</option>
+                <option>@T["Commercial"]</option>
+                <option>@T["Warehouse"]</option>
+                <option>@T["Office"]</option>
             </select>
         </div>
 
@@ -60,32 +60,32 @@
 
         <div class="col-md-4">
             <label asp-for="FloorNumber" class="form-label"></label>
-            <input asp-for="FloorNumber" class="form-control" min="-10" max="200" placeholder="0 = ground" />
-            <div class="form-text">Optional. Read from Floor when empty (G = 0, B1 = -1).</div>
+            <input asp-for="FloorNumber" class="form-control" min="-10" max="200" placeholder="@T["0 = ground"]" />
+            <div class="form-text">@T["Optional. Read from Floor when empty (G = 0, B1 = -1)."]</div>
         </div>
 
         <div class="col-md-4">
             <label asp-for="FloorPosition" class="form-label"></label>
-            <input asp-for="FloorPosition" class="form-control" min="1" max="200" placeholder="1 = far left" />
-            <div class="form-text">Optional. Left to right in the building view; by unit number when empty.</div>
+            <input asp-for="FloorPosition" class="form-control" min="1" max="200" placeholder="@T["1 = far left"]" />
+            <div class="form-text">@T["Optional. Left to right in the building view; by unit number when empty."]</div>
         </div>
 
         <div class="col-md-4">
             <label asp-for="FloorSide" class="form-label"></label>
             <select asp-for="FloorSide" class="form-select">
-                <option value="">Not set</option>
-                <option>Front</option>
-                <option>Back</option>
-                <option>Left</option>
-                <option>Right</option>
+                <option value="">@T["Not set"]</option>
+                <option>@T["Front"]</option>
+                <option>@T["Back"]</option>
+                <option>@T["Left"]</option>
+                <option>@T["Right"]</option>
             </select>
-            <div class="form-text">Optional. Where the unit sits in the 3D building view.</div>
+            <div class="form-text">@T["Optional. Where the unit sits in the 3D building view."]</div>
         </div>
 
         <div class="col-md-4">
             <label asp-for="TitleDeedNumber" class="form-label"></label>
             <input asp-for="TitleDeedNumber" class="form-control" maxlength="50" />
-            <div class="form-text">Only when the unit has its own deed (strata title).</div>
+            <div class="form-text">@T["Only when the unit has its own deed (strata title)."]</div>
         </div>
 
         <div class="col-md-4">
@@ -101,31 +101,30 @@
         <div class="col-md-4">
             <label asp-for="Status" class="form-label"></label>
             <select asp-for="Status" class="form-select">
-                <option>Vacant</option>
-                <option>Reserved</option>
-                <option>Occupied</option>
-                <option>UnderMaintenance</option>
+                <option>@T["Vacant"]</option>
+                <option>@T["Reserved"]</option>
+                <option>@T["Occupied"]</option>
+                <option>@T["UnderMaintenance"]</option>
             </select>
         </div>
 
         <div class="col-md-4">
-            <label asp-for="VatCategory" class="form-label">VAT Treatment</label>
+            <label asp-for="VatCategory" class="form-label">@T["VAT Treatment"]</label>
             <select asp-for="VatCategory" class="form-select">
-                <option value="">Inherit from property</option>
-                <option value="Standard">Standard rated (5%)</option>
-                <option value="Exempt">Exempt</option>
-                <option value="ZeroRated">Zero rated (0%)</option>
+                <option value="">@T["Inherit from property"]</option>
+                <option value="Standard">@T["Standard rated (5%)"]</option>
+                <option value="Exempt">@T["Exempt"]</option>
+                <option value="ZeroRated">@T["Zero rated (0%)"]</option>
             </select>
             <div class="form-text">
-                Leave as <em>Inherit</em> unless this unit differs from the rest of the building &mdash;
-                for example a shop on the ground floor of a residential tower.
+                @T.Html("Leave as <em>Inherit</em> unless this unit differs from the rest of the building &mdash; for example a shop on the ground floor of a residential tower.")
             </div>
         </div>
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" class="btn btn-dark">@T["Save"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

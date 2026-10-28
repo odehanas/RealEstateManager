@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Apply Advance to Bills";
+    ViewData["Title"] = T["Apply Advance to Bills"];
     var vendors = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Vendors;
     int? vendorId = ViewBag.VendorId;
     int? advanceId = ViewBag.AdvanceId;
@@ -11,10 +11,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-0">Apply Advance to Bills</h2>
-        <div class="text-muted">Settle a vendor's open bills from an advance already paid (SAP F-54): Dr Accounts Payable, Cr 11550 Advances to Suppliers. No money moves; a clearing document number is given.</div>
+        <h2 class="mb-0">@T["Apply Advance to Bills"]</h2>
+        <div class="text-muted">@T["Settle a vendor's open bills from an advance already paid (SAP F-54): Dr Accounts Payable, Cr 11550 Advances to Suppliers. No money moves; a clearing document number is given."]</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
 </div>
 
 @if (TempData["PaymentError"] is string err) { <div class="alert alert-danger">@err</div> }
@@ -24,28 +24,28 @@
     <div class="card shadow-sm mb-3">
         <div class="card-body row g-3">
             <div class="col-md-5">
-                <label class="form-label fw-semibold" for="vendorId">Vendor</label>
+                <label class="form-label fw-semibold" for="vendorId">@T["Vendor"]</label>
                 <select name="vendorId" id="vendorId" class="form-select">
-                    <option value="0">Choose the vendor…</option>
+                    <option value="0">@T["Choose the vendor…"]</option>
                     @foreach (var v in vendors) { <option value="@v.Value" selected="@(v.Value == vendorId?.ToString() ? "selected" : null)">@v.Text</option> }
                 </select>
             </div>
             <div class="col-md-4">
-                <label class="form-label fw-semibold" for="advanceId">Advance to apply</label>
+                <label class="form-label fw-semibold" for="advanceId">@T["Advance to apply"]</label>
                 <select name="advanceId" id="advanceId" class="form-select"></select>
             </div>
             <div class="col-md-3">
-                <label class="form-label fw-semibold" for="clearingDate">Clearing date</label>
+                <label class="form-label fw-semibold" for="clearingDate">@T["Clearing date"]</label>
                 <input type="date" name="clearingDate" id="clearingDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
             </div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3 aa">
-        <div class="card-header bg-light d-flex justify-content-between"><h5 class="mb-0">Open bills</h5><span class="small text-muted" id="note"></span></div>
+        <div class="card-header bg-light d-flex justify-content-between"><h5 class="mb-0">@T["Open bills"]</h5><span class="small text-muted" id="note"></span></div>
         <div class="table-responsive">
             <table class="table table-sm mb-0">
-                <thead class="table-light"><tr><th style="width:36px"></th><th>Bill</th><th>Supplier ref</th><th>Due</th><th class="text-end">Open</th><th class="text-end" style="width:160px">Settle from advance</th></tr></thead>
+                <thead class="table-light"><tr><th style="width:36px"></th><th>@T["Bill"]</th><th>@T["Supplier ref"]</th><th>@T["Due"]</th><th class="text-end">@T["Open"]</th><th class="text-end" style="width:160px">@T["Settle from advance"]</th></tr></thead>
                 <tbody id="body"></tbody>
             </table>
         </div>
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Apply and Post</button>
+    <button type="submit" class="btn btn-dark">@T["Apply and Post"]</button>
 </form>
 
 @section Scripts {

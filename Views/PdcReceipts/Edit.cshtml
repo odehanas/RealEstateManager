@@ -1,21 +1,21 @@
 @model RealEstateManager.Models.PdcEditViewModel
 
 @{
-    ViewData["Title"] = "Edit PDC";
+    ViewData["Title"] = T["Edit PDC"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Edit PDC</h2>
-        <p class="text-muted mb-0">Correct a mis-keyed cheque. The memorandum entry is re-dated to match.</p>
+        <h2 class="mb-1">@T["Edit PDC"]</h2>
+        <p class="text-muted mb-0">@T["Correct a mis-keyed cheque. The memorandum entry is re-dated to match."]</p>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back to PDCs</a>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to PDCs"]</a>
 </div>
 
 @if (Model.IsOutOfStep)
 {
     <div class="alert alert-danger">
-        <strong>The register and the ledger disagree.</strong>
+        <strong>@T["The register and the ledger disagree."]</strong>
         This PDC says it was received on <strong>@Model.ReceivedDate.ToString("dd/MM/yyyy")</strong>, but its
         memorandum entry is posted on <strong>@Model.MemoPostedOn!.Value.ToString("dd/MM/yyyy")</strong>.
         Saving from this screen will bring them back into line.
@@ -39,7 +39,7 @@
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><strong>Editable</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Editable</strong>")</div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
@@ -54,17 +54,16 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="ChequeDate" class="form-label">Cheque Date</label>
+                    <label asp-for="ChequeDate" class="form-label">@T["Cheque Date"]</label>
                     <input asp-for="ChequeDate" type="date" class="form-control" />
-                    <div class="form-text">The date written on the cheque. <strong>Not</strong> an accounting date.</div>
+                    <div class="form-text">@T.Html("The date written on the cheque. <strong>Not</strong> an accounting date.")</div>
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="ReceivedDate" class="form-label">Received Date &mdash; accounting date</label>
+                    <label asp-for="ReceivedDate" class="form-label">@T["Received Date — accounting date"]</label>
                     <input asp-for="ReceivedDate" type="date" class="form-control" />
                     <div class="form-text">
-                        Changing this <strong>re-dates the memorandum entry</strong> and moves it to the matching
-                        accounting period.
+                        @T.Html("Changing this <strong>re-dates the memorandum entry</strong> and moves it to the matching accounting period.")
                     </div>
                     <span asp-validation-for="ReceivedDate" class="text-danger"></span>
                 </div>
@@ -79,37 +78,37 @@
 
     <div class="card shadow-sm mb-3">
         <div class="card-header bg-light">
-            <strong>Fixed</strong>
-            <span class="text-muted small ms-2">These determined what was posted and cannot be changed here</span>
+            <strong>@T["Fixed"]</strong>
+            <span class="text-muted small ms-2">@T["These determined what was posted and cannot be changed here"]</span>
         </div>
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <div class="text-muted small">Amount</div>
+                    <div class="text-muted small">@T["Amount"]</div>
                     <div class="fw-semibold">@Model.Amount.ToString("N2")</div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-muted small">Settlement mode</div>
+                    <div class="text-muted small">@T["Settlement mode"]</div>
                     <div class="fw-semibold">@Model.SettlementMode</div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-muted small">Status</div>
+                    <div class="text-muted small">@T["Status"]</div>
                     <div class="fw-semibold">@Model.Status</div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-muted small">Cleared on</div>
+                    <div class="text-muted small">@T["Cleared on"]</div>
                     <div class="fw-semibold">@(Model.ClearedDate.HasValue ? Model.ClearedDate.Value.ToString("dd/MM/yyyy") : "-")</div>
                 </div>
                 <div class="col-md-6">
-                    <div class="text-muted small">Lease</div>
+                    <div class="text-muted small">@T["Lease"]</div>
                     <div class="fw-semibold">@Model.LeaseDisplay</div>
                 </div>
                 <div class="col-md-6">
-                    <div class="text-muted small">Invoice</div>
+                    <div class="text-muted small">@T["Invoice"]</div>
                     <div class="fw-semibold">@Model.InvoiceDisplay</div>
                 </div>
                 <div class="col-md-6">
-                    <div class="text-muted small">Memorandum entry</div>
+                    <div class="text-muted small">@T["Memorandum entry"]</div>
                     <div class="fw-semibold">
                         @(Model.MemoEntryNumber ?? "Not posted")
                         @if (Model.MemoPostedOn.HasValue)
@@ -119,12 +118,12 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="text-muted small">Accounting period</div>
+                    <div class="text-muted small">@T["Accounting period"]</div>
                     <div class="fw-semibold">
                         @(Model.MemoPeriodName ?? "-")
                         @if (Model.MemoPeriodClosed)
                         {
-                            <span class="badge bg-danger ms-1">Closed</span>
+                            <span class="badge bg-danger ms-1">@T["Closed"]</span>
                         }
                     </div>
                 </div>
@@ -140,15 +139,14 @@
             else
             {
                 <div class="alert alert-light border small mt-3 mb-0">
-                    To change the amount, lease, invoice or settlement mode, the posted entry would have to be
-                    reversed and re-entered. Raise a new PDC instead.
+                    @T["To change the amount, lease, invoice or settlement mode, the posted entry would have to be reversed and re-entered. Raise a new PDC instead."]
                 </div>
             }
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark">Save Changes</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-dark">@T["Save Changes"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Cancel"]</a>
 </form>
 
 @section Scripts {

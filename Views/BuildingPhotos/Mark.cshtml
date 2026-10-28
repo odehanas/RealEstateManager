@@ -36,8 +36,8 @@
         <div class="text-muted">@Model.Property?.Code - @Model.Property?.Name</div>
     </div>
     <div class="d-flex gap-2">
-        <a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-outline-secondary btn-sm">All photos</a>
-        <a asp-controller="BuildingView" asp-action="Property" asp-route-id="@Model.PropertyId" class="btn btn-outline-dark btn-sm">See it in the building view</a>
+        <a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-outline-secondary btn-sm">@T["All photos"]</a>
+        <a asp-controller="BuildingView" asp-action="Property" asp-route-id="@Model.PropertyId" class="btn btn-outline-dark btn-sm">@T["See it in the building view"]</a>
     </div>
 </div>
 
@@ -57,23 +57,21 @@
             <svg id="overlay"></svg>
         </div>
         <div class="small text-muted mt-2">
-            Choose a unit on the right, then click the corners of its windows or balcony on the photo. <strong>Save outline</strong>
-            (or Enter) keeps it and moves on to the next unit; <strong>Undo corner</strong> (or Backspace) removes the last click.
-            Click a saved outline to select its unit again.
+            @T.Html("Choose a unit on the right, then click the corners of its windows or balcony on the photo. <strong>Save outline</strong> (or Enter) keeps it and moves on to the next unit; <strong>Undo corner</strong> (or Backspace) removes the last click. Click a saved outline to select its unit again.")
         </div>
     </div>
     <div class="col-lg-4">
         <div class="card shadow-sm mb-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <strong id="current">Choose a unit</strong>
+                    <strong id="current">@T["Choose a unit"]</strong>
                     <span class="small text-muted" id="progress"></span>
                 </div>
                 <div class="d-flex flex-wrap gap-2 mb-2">
-                    <button type="button" class="btn btn-sm btn-success" id="save">Save outline</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="undo">Undo corner</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="restart">Start again</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" id="remove">Remove outline</button>
+                    <button type="button" class="btn btn-sm btn-success" id="save">@T["Save outline"]</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="undo">@T["Undo corner"]</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="restart">@T["Start again"]</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="remove">@T["Remove outline"]</button>
                 </div>
                 <div class="small text-danger" id="message"></div>
                 <div id="unitList" class="border-top pt-2"></div>
@@ -83,28 +81,26 @@
         @if (floors.Count > 2)
         {
             <div class="card shadow-sm">
-                <div class="card-header bg-light"><strong>Repeat Floors Up the Building</strong></div>
+                <div class="card-header bg-light">@T.Html("<strong>Repeat Floors Up the Building</strong>")</div>
                 <div class="card-body">
                     <p class="small text-muted">
-                        Mark the units of two floors one above the other. The step between them is measured, and the upper floor's outlines are
-                        repeated on every floor up to the last one - matched to its units left to right. Check the result and correct any outline
-                        that does not sit right.
+                        @T["Mark the units of two floors one above the other. The step between them is measured, and the upper floor's outlines are repeated on every floor up to the last one - matched to its units left to right. Check the result and correct any outline that does not sit right."]
                     </p>
                     <form asp-action="Repeat" asp-route-id="@Model.Id" method="post" class="row g-2">
-                        <div class="col-4"><label class="form-label small">Lower floor</label>
+                        <div class="col-4"><label class="form-label small">@T["Lower floor"]</label>
                             <select name="lowerFloor" class="form-select form-select-sm">@foreach (var f in floors) { <option value="@f">@F(f)</option> }</select></div>
-                        <div class="col-4"><label class="form-label small">Upper floor</label>
+                        <div class="col-4"><label class="form-label small">@T["Upper floor"]</label>
                             <select name="upperFloor" class="form-select form-select-sm">@foreach (var f in floors) { <option value="@f" selected="@(f == floors[Math.Min(1, floors.Count - 1)] ? "selected" : null)">@F(f)</option> }</select></div>
-                        <div class="col-4"><label class="form-label small">Up to floor</label>
+                        <div class="col-4"><label class="form-label small">@T["Up to floor"]</label>
                             <select name="lastFloor" class="form-select form-select-sm">@foreach (var f in floors) { <option value="@f" selected="@(f == floors[^1] ? "selected" : null)">@F(f)</option> }</select></div>
                         <div class="col-12">
                             <div class="form-check">
                                 <input type="checkbox" name="overwrite" value="true" class="form-check-input" id="overwrite" />
                                 <input type="hidden" name="overwrite" value="false" />
-                                <label class="form-check-label small" for="overwrite">Replace outlines already marked on those floors</label>
+                                <label class="form-check-label small" for="overwrite">@T["Replace outlines already marked on those floors"]</label>
                             </div>
                         </div>
-                        <div class="col-12"><button type="submit" class="btn btn-sm btn-dark">Repeat floors</button></div>
+                        <div class="col-12"><button type="submit" class="btn btn-sm btn-dark">@T["Repeat floors"]</button></div>
                     </form>
                 </div>
             </div>

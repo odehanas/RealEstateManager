@@ -1,0 +1,311 @@
+# Sheet 2: All ... Choose a vendor
+All buildings ||| جميع المباني
+All decisions ||| جميع القرارات
+All employees ||| جميع الموظفين
+All floats ||| جميع العهد
+All help topics ||| جميع موضوعات المساعدة
+All invoices ||| جميع الفواتير
+All leave ||| جميع الإجازات
+All owners ||| جميع الملاك
+All payslips ||| جميع قسائم الرواتب
+All photos ||| جميع الصور
+All projects (summary) ||| جميع المشاريع (ملخص)
+All properties ||| جميع العقارات
+All sources ||| جميع المصادر
+All technicians ||| جميع الفنيين
+All types ||| جميع الأنواع
+Allocate land and building ||| توزيع الأرض والمبنى من الرصيد الافتتاحي غير الموزع على هذا العقار
+Allowances ||| البدلات
+Alongside the lease ||| مع العقد — التأمينات والإيرادات والذمم الدائنة
+Already applied by hand ||| طُبّق يدوياً قبل وجود التحديثات التلقائية
+Already in place ||| موجود مسبقاً
+Already recovered at the provisional rate ||| مسترد مسبقاً بالنسبة المؤقتة
+Always the owner's account ||| دائماً حساب المالك - لا يمكن تغييره هنا.
+Amortise prepaid expenses. ||| إطفاء المصروفات المدفوعة مقدماً.
+Amount ||| المبلغ
+Amount (incl. VAT) ||| المبلغ (شامل الضريبة)
+Amount in figures ||| المبلغ بالأرقام
+Amount in words ||| المبلغ بالحروف
+Amount owed to this vendor ||| المبلغ المستحق لهذا المورد في تاريخ الافتتاح (موجب = دائن، سالب = دفعة مقدمة مدفوعة). يُغذي حساب مراقبة الذمم الدائنة.
+Amount this tenant owed ||| المبلغ المستحق على هذا المستأجر في تاريخ الافتتاح (موجب = مدين، سالب = دفعة مقدمة محتفظ بها). يُغذي حساب مراقبة الذمم المدينة.
+Amount to pay ||| المبلغ المراد دفعه
+Amounts already paid cannot be credited ||| لا يمكن إصدار إشعار دائن بالمبالغ المدفوعة — بل تُرد.
+An <strong>Owned</strong> property ||| العقار <strong>المملوك</strong> يُجمّع تحت اسم الشركة نفسها، لأنها المالكة.
+An approval is bound to the exact amount ||| يرتبط الاعتماد بالمبلغ المعتمد تحديداً. إذا عدّل أي شخص القيد بعد ذلك فيحتاج إلى اعتماد جديد.
+An approver decides. ||| يقرر المعتمِد. بعد التصحيح تُقفل الفترة مجدداً من خلال قائمة التحقق.
+An approver reviews it ||| يراجعه المعتمِد ويعتمده أو يرفضه مع ذكر السبب. <strong>لا أحد يعتمد ما أدخله بنفسه.</strong> النثرية تحتاج دائماً إلى شخص ثانٍ.
+An expense voucher posts ||| يُرحّل سند المصروف <strong>من حـ/ المصروف إلى حـ/ النثرية</strong> &mdash; ينخفض رصيد العهدة وتظهر التكلفة في الأرباح والخسائر.
+An owner can grant a manager ||| يمكن للمالك منح مدير حداً أعلى لفترة محددة (حتى 180 يوماً) مع ذكر السبب. ينتهي تلقائياً ويمكن إلغاؤه مبكراً؛ ولا يتجاوز أبداً حد المالك نفسه. يظهر كل تفويض في شاشة رقابة المالك.
+Annual ||| سنوي
+Annual Apportionment Wash-Up ||| التسوية السنوية لتوزيع ضريبة المدخلات
+Annual Rent ||| الإيجار السنوي
+Annual Rent Gap ||| فجوة الإيجار السنوية
+Annual leave available ||| رصيد الإجازة السنوية المتاح
+Annual leave days a year ||| أيام الإجازة السنوية في العام
+Annual leave left ||| المتبقي من الإجازة السنوية
+Annual rent ||| الإيجار السنوي
+Anything worth recording against this bill ||| أي ملاحظة تستحق التسجيل على هذه الفاتورة
+Applied ||| مطبّق
+Applied automatically ||| طُبّق تلقائياً
+Applied to ||| مطبّق على
+Applied to bills ||| مطبّق على الفواتير
+Applied to bills attributed as <strong>Residual</strong> ||| يُطبّق على الفواتير المصنفة <strong>متبقية</strong> خلال السنة. اجعلها نسبة الاسترداد الفعلية للسنة الماضية. الفواتير المصنفة <em>خاضعة</em> تُسترد بالكامل و<em>المعفاة</em> لا يُسترد منها شيء، فلا تتأثر بهذه النسبة. <br /><br /> اتركها <strong>100</strong> فقط إذا لم تكن لديك توريدات معفاة إطلاقاً. مع وجود عقارات تجارية وسكنية معاً فالأرجح أن لديك.
+Applied to every bill line of this project. ||| تُطبّق على كل بنود فواتير هذا المشروع. البيع الأول التجاري أو الخاضع لنسبة الصفر: قابلة للاسترداد. السكني للتأجير: غير قابلة للاسترداد (تصبح الضريبة تكلفة). المختلط: موزّعة.
+Apply Advance to Bills ||| تطبيق الدفعة المقدمة على الفواتير
+Apply Code ||| تطبيق الرمز
+Apply advance to bills ||| تطبيق الدفعة المقدمة على الفواتير
+Apply and Post ||| تطبيق وترحيل
+Apply the limits to contracts too ||| تطبيق الحدود على العقود أيضاً
+Apply to bills ||| تطبيق على الفواتير
+Applying a new activation code also lifts the suspension. ||| تطبيق رمز تفعيل جديد يرفع الإيقاف أيضاً.
+Approval Limits ||| حدود الاعتماد
+Approval Limits & Delegation ||| حدود الاعتماد والتفويض
+Approval history ||| سجل الاعتمادات
+Approval level ||| مستوى الاعتماد
+Approval limits ||| حدود الاعتماد
+Approval of a contract ||| اعتماد عقد
+Approvals ||| الاعتمادات
+Approve ||| اعتماد
+Approve & release ||| اعتماد وصرف
+Approve & reopen ||| اعتماد وإعادة فتح
+Approve now ||| اعتماد الآن
+Approve payroll ||| اعتماد الرواتب
+Approve selected ||| اعتماد المحدد
+Approved ||| معتمد
+Approved by ||| اعتمده
+Approving a payroll posts it to the ledger ||| اعتماد كشف الرواتب يرحّله إلى الدفاتر، لذا يجب أن يغطي حد المعتمِد إجمالي صافي الرواتب. تُفحص السلف بالطريقة نفسها. لا تصل قسائم الرواتب إلى الموظفين إلا بعد الاعتماد.
+Arabic name ||| الاسم بالعربية
+Are backups taken? ||| هل تُؤخذ نسخ احتياطية؟
+Area ||| المساحة
+Area (sq ft) ||| المساحة (قدم مربع)
+Area / community ||| المنطقة / المجمع
+Area SqFt ||| المساحة بالقدم المربع
+Area Util. ||| استغلال المساحة
+Area Utilization ||| استغلال المساحة
+As Of Date ||| حتى تاريخ
+As at ||| كما في
+As of ||| حتى
+As on the trade licence ||| كما في الرخصة التجارية
+As printed on their invoice ||| كما هو مطبوع على فاتورتهم
+As the company's administrator ||| بصفتك مسؤول الشركة فأنت تدير مستخدميها وما يحق لكل منهم. المستخدمون الذين يعملون أيضاً لشركة أخرى، ومسؤولو النظام، يديرهم مزود الخدمة.
+Ask HR for a document ||| اطلب مستنداً من الموارد البشرية
+Ask about your properties ||| اسأل عن عقاراتك أو مستأجريك أو فواتيرك أو تقاريرك - صوتياً أو كتابياً.
+Ask for a salary certificate ||| اطلب شهادة راتب
+Ask for this period to be reopened ||| اطلب إعادة فتح هذه الفترة
+Asked ||| تاريخ الطلب
+Asked by ||| مقدم الطلب
+Asset ||| الأصل
+Asset Account ||| حساب الأصل
+Asset Acquisition and Capitalization ||| اقتناء الأصل ورسملته
+Asset Code ||| رمز الأصل
+Asset Cost ||| تكلفة الأصل
+Asset Depreciation ||| إهلاك الأصول
+Asset Name ||| اسم الأصل
+Asset Value ||| قيمة الأصل
+Asset value ||| قيمة الأصل
+Assets ||| الأصول
+Assets (debit side) ||| الأصول (الجانب المدين)
+Assets should equal liabilities plus equity ||| يجب أن تساوي الأصول الالتزامات زائد حقوق الملكية
+Assign ||| إسناد
+Assign to ||| إسناد إلى
+Assigned to ||| مسند إلى
+Assistant ||| المساعد
+At each month end, issue one tax invoice ||| في نهاية كل شهر، أصدر فاتورة ضريبية واحدة لكل مالك بالعمولة المكتسبة في ذلك الشهر، زائد ضريبة 5%. تُخصم الضريبة من أموال المالك (المستحق للملاك) وتذهب إلى ضريبة القيمة المضافة المستحقة، فتظهر في إقرار ذلك الشهر. شغّله بعد ترحيل الاعتراف بإيرادات الشهر. العمولة المفوترة لا تُفوتر مرة أخرى.
+At least 8 characters. ||| 8 أحرف على الأقل.
+At risk ||| معرّض للخطر
+Attach a scanned supplier invoice ||| أرفق فاتورة مورد ممسوحة ضوئياً (PDF أو JPG أو PNG)
+Attendance ||| الحضور
+Attendance Summary ||| ملخص الحضور
+Attention ||| تنبيه
+Attributes the cost to a property or unit ||| ينسب التكلفة إلى عقار أو وحدة في التقارير الإدارية
+Attribution ||| التصنيف
+Audit Logs ||| سجلات التدقيق
+Authority delegated now ||| الصلاحيات المفوضة حالياً
+Authority today ||| الصلاحيات اليوم
+Authorization Matrix ||| مصفوفة الصلاحيات
+Automate monthly release ||| أتمتة الإطفاء الشهري للإيجار المدفوع مقدماً والتأمين والبنود المشابهة.
+Available ||| متاح
+Available from Collections ||| المتاح من التحصيلات
+Average first response ||| متوسط أول استجابة
+Average of ||| متوسط
+Average time to complete ||| متوسط وقت الإنجاز
+Avg Days To Pay ||| متوسط أيام السداد
+Avg to complete ||| متوسط الإنجاز
+Awaiting approval ||| بانتظار الاعتماد
+Awaiting approval / draft ||| بانتظار الاعتماد / مسودة
+Back ||| رجوع
+Back To Login ||| العودة إلى تسجيل الدخول
+Back To Review List ||| العودة إلى قائمة المراجعة
+Back to Approvals ||| العودة إلى الاعتمادات
+Back to Home ||| العودة إلى الرئيسية
+Back to Owner Settlements ||| العودة إلى تسويات الملاك
+Back to PDCs ||| العودة إلى الشيكات المؤجلة
+Back to Petty Cash ||| العودة إلى النثرية
+Back to Register ||| العودة إلى السجل
+Back to Tenants ||| العودة إلى المستأجرين
+Back to jobs ||| العودة إلى الأعمال
+Back to list ||| العودة إلى القائمة
+Back to queue ||| العودة إلى قائمة الانتظار
+Back to statement ||| العودة إلى كشف الحساب
+Back to the building view ||| العودة إلى عرض المبنى
+Balance ||| الرصيد
+Balance Due ||| الرصيد المستحق
+Balance Payable ||| الرصيد المستحق الدفع
+Balance Sheet ||| الميزانية العمومية
+Balance due before this payment ||| الرصيد المستحق قبل هذه الدفعة
+Balance in the ledger ||| الرصيد في الدفاتر
+Balance payable to the owner ||| الرصيد المستحق للمالك
+Balance still due to you ||| الرصيد المتبقي المستحق لك
+Balance to count in the box ||| الرصيد المفترض عدّه في الصندوق
+Balances as at ||| الأرصدة كما في
+Balancing line ||| سطر الموازنة
+Bank ||| البنك
+Bank, cash, petty cash, or a card ||| البنك أو النقد أو النثرية أو حساب البطاقة أو الذمم الذي حُمّلت عليه.
+Bar ||| أعمدة
+Bar chart of withdrawals by category ||| رسم بياني بالأعمدة للمسحوبات حسب الفئة
+Based on posted journal lines ||| بناءً على بنود القيود المرحّلة والرصيد الافتتاحي للحساب.
+Basic ||| الأساسي
+Basic salary ||| الراتب الأساسي
+Basis of preparation ||| أساس الإعداد
+Before VAT; 0 for none. ||| قبل الضريبة؛ 0 لعدم وجود رسوم. يمكن تغييرها عند كل ارتجاع.
+Before VAT; can be changed on each withdrawal. ||| قبل الضريبة؛ يمكن تغييرها عند كل سحب.
+Before you start — one-time company setup ||| قبل أن تبدأ — إعداد الشركة لمرة واحدة
+Between them ||| فيما بينها
+Bill ||| فاتورة مورد
+Bill / receipt ||| فاتورة / إيصال
+Bill Date ||| تاريخ الفاتورة
+Bill Details ||| تفاصيل الفاتورة
+Bill Lines ||| بنود الفاتورة
+Bill No. ||| رقم الفاتورة
+Bill date ||| تاريخ الفاتورة
+Bill now ||| فوترة الآن
+Bill total ||| إجمالي الفاتورة
+Billed (Credit) ||| المفوتر (دائن)
+Billed in the period ||| المفوتر في الفترة
+Billing ||| الفوترة
+Billing Frequency ||| دورية الفوترة
+Bills ||| فواتير الموردين
+Bills are entered as drafts ||| تُدخل الفواتير مسودات ولا تؤثر على الحسابات حتى ترحيلها.
+Bills settled ||| الفواتير المسددة
+Bills: VAT in cost ||| الفواتير: الضريبة ضمن التكلفة
+Bills: net ||| الفواتير: الصافي
+Blank if not VAT registered. ||| فارغ إذا لم يكن مسجلاً في الضريبة.
+Book ||| حجز
+Book as bill ||| تسجيل كفاتورة مورد
+Book leave ||| حجز إجازة
+Book leave, then approve it. ||| احجز الإجازة ثم اعتمدها. الإجازة السنوية المعتمدة تُخصم من الرصيد؛ والإجازة بدون راتب المعتمدة تُخصم في رواتب ذلك الشهر.
+Bought for the job ||| مشتراة للعمل
+Bounced ||| مرتجع
+Bounced, not yet replaced ||| مرتجعة، لم تُستبدل بعد
+Box ||| صندوق
+Budget ||| الموازنة
+Budget by Cost Category ||| الموازنة حسب فئة التكلفة
+Budget left ||| المتبقي من الموازنة
+Bug Report ||| بلاغ عن خطأ
+Build Your Own Report ||| أنشئ تقريرك الخاص
+Building ||| المبنى
+Building & Completion ||| البناء والإنجاز
+Building Photos ||| صور المبنى
+Building View ||| عرض المبنى
+Building permit ||| تصريح البناء
+Building useful life (years) ||| العمر الإنتاجي للمبنى (بالسنوات)
+Building view ||| عرض المبنى
+Building, street, area ||| المبنى، الشارع، المنطقة
+Built from what passes through the company ||| مبني على ما يمر عبر الشركة لهذا المالك. يقدم المالك إقراره برقم تسجيله الضريبي الخاص، ويجب أن يضيف أي توريدات أو مصروفات أخرى له خارج هذا النظام. ضريبة المدخلات على فواتير الشركة الضريبية لا تُسترد إلا بعد أن يحوزها المالك.
+Built-up area (sq ft) ||| المساحة المبنية (قدم مربع)
+Business Performance ||| أداء الأعمال
+Buyer ||| المشتري
+Buyer's title deed number (optional) ||| رقم سند ملكية المشتري (اختياري)
+By ||| بواسطة
+By day ||| حسب اليوم
+By month ||| حسب الشهر
+By quarter ||| حسب الربع
+By source ||| حسب المصدر
+By year ||| حسب السنة
+Calculate ||| احتساب
+Calculation ||| الاحتساب
+Can a tenant or an employee see other people's data? ||| هل يمكن لمستأجر أو موظف رؤية بيانات الآخرين؟
+Can an accountant pay themselves or a fake vendor? ||| هل يمكن لمحاسب أن يدفع لنفسه أو لمورد وهمي؟
+Can someone on the internet guess a password and get in? ||| هل يمكن لشخص على الإنترنت تخمين كلمة مرور والدخول؟
+Cancel ||| إلغاء
+Cancel contract ||| إلغاء العقد
+Cancel leave ||| إلغاء الإجازة
+Cancel project ||| إلغاء المشروع
+Cancelled ||| ملغى
+Capital Assets Scheme ||| نظام الأصول الرأسمالية
+Capital Assets Scheme (VAT) ||| نظام الأصول الرأسمالية (ضريبة القيمة المضافة)
+Capitalizable ||| قابل للرسملة
+Capitalizable Cost ||| التكلفة القابلة للرسملة
+Capitalization Date ||| تاريخ الرسملة
+Capitalization posts the asset ||| الرسملة ترحّل الأصل إلى حساب الأصول الثابتة وتُصفّي تكلفة الاقتناء المتراكمة من حساب التسوية المحدد. يبدأ الإهلاك فقط بعد الرسملة.
+Capitalize Asset ||| رسملة الأصل
+Capitalized ||| مُرسمل
+Capped at two years' basic pay. ||| بحد أقصى راتب أساسي لسنتين.
+Carrying Amount ||| القيمة الدفترية
+Cash ||| النقد
+Cash In Hand ||| النقد بالصندوق
+Cash KPI is not available ||| مؤشر النقد غير متاح حتى يتم إعداد ربط حساب النقد الافتراضي.
+Cash and bank ||| النقد والبنوك
+Cash and bank now ||| النقد والبنوك حالياً
+Cash at the beginning of the period ||| النقد في بداية الفترة
+Cash at the end of the period ||| النقد في نهاية الفترة
+Cash flows ||| التدفقات النقدية
+Cash flows from financing activities ||| التدفقات النقدية من الأنشطة التمويلية
+Cash flows from investing activities ||| التدفقات النقدية من الأنشطة الاستثمارية
+Cash flows from operating activities ||| التدفقات النقدية من الأنشطة التشغيلية
+Category ||| الفئة
+Category / Subject ||| الفئة / الموضوع
+Category amounts are debits less credits ||| مبالغ الفئات هي المدين ناقص الدائن، لذا يظهر رد مصروف شخصي إلى الشركة بالسالب في تلك الفئة.
+Cause (shown to the system administrator only) ||| السبب (يظهر لمسؤول النظام فقط)
+Certificate number ||| رقم الشهادة
+Certificates ||| الشهادات
+Certificates and letters employees asked for ||| الشهادات والخطابات التي طلبها الموظفون عبر بوابة الموظفين (/me). يمنح الإصدار الخطاب رقماً مرجعياً؛ ثم يطبعه الموظف من هاتفه.
+Change Password ||| تغيير كلمة المرور
+Change anything — the portal is read-only ||| تغيير أي شيء — البوابة للاطلاع فقط
+Change your password ||| غيّر كلمة المرور
+Changes only the invoice's due date ||| يغيّر تاريخ استحقاق الفاتورة فقط، وهو ما يحدد المتابعة وتقرير أعمار الديون. لا يتغير المبلغ المستحق ولا الضريبة ولا القيد — منح مهلة للسداد ليس إشعاراً دائناً.
+Changing this <strong>re-dates the memorandum entry</strong> ||| تغيير هذا <strong>يعيد تأريخ القيد النظامي</strong> وينقله إلى الفترة المحاسبية المطابقة.
+Changing this affects <strong>new</strong> leases only. ||| تغيير هذا يؤثر على العقود <strong>الجديدة</strong> فقط. الفواتير الصادرة تحتفظ بالمعاملة التي صدرت بها.
+Changing this affects invoices generated ||| تغيير هذا يؤثر على الفواتير المنشأة <strong>من الآن فصاعداً</strong>. الفواتير الصادرة تحتفظ بالمعاملة التي صدرت بها.
+Characters per inch ||| عدد الأحرف في البوصة
+Charge ||| الرسوم
+Charge for the period ||| المحمّل للفترة
+Charge this line to the owner ||| تحميل هذا البند على مالك العقار المُدار، مع ضريبة 5%
+Charge to owner ||| تحميل على المالك
+Charge to tenant (before VAT) ||| الرسوم على المستأجر (قبل الضريبة)
+Charged To ||| محمّل على
+Charged by approved payrolls ||| محمّل من كشوف الرواتب المعتمدة، زائد أي مخصص افتتاحي.
+Charged to (debit) ||| محمّل على (مدين)
+Charged to owners ||| محمّل على الملاك
+Chart of Accounts ||| دليل الحسابات
+Charts and report ||| الرسوم البيانية والتقرير
+Charts use the groups and totals ||| تستخدم الرسوم البيانية المجموعات والإجماليات؛ وللقائمة أول عمود نصي وأول عمود رقمي.
+Check ||| تحقق
+Check the input tax attribution ||| تحقق من تصنيف ضريبة المدخلات في تلك الفواتير المسودة قبل ترحيلها — بعد الترحيل يُثبّت تقسيم القابل وغير القابل للاسترداد في القيد.
+Check the month, then turn it into payroll transactions. ||| راجع الشهر، ثم حوّله إلى حركات رواتب.
+Checked by ||| راجعه
+Checklist ||| قائمة التحقق
+Cheque ||| شيك
+Cheque / transfer ref. ||| مرجع الشيك / التحويل
+Cheque / transfer reference ||| مرجع الشيك / التحويل
+Cheque Date ||| تاريخ الشيك
+Cheque No. ||| رقم الشيك
+Cheque Number ||| رقم الشيك
+Cheque charges income ||| إيرادات رسوم الشيكات
+Cheque date ||| تاريخ الشيك
+Cheque height ||| ارتفاع الشيك
+Cheque layout ||| تخطيط الشيك
+Cheque number ||| رقم الشيك
+Cheque or transfer number ||| رقم الشيك أو التحويل
+Cheque or transfer reference ||| مرجع الشيك أو التحويل
+Cheque width ||| عرض الشيك
+Cheque withdrawal charge ||| رسوم سحب الشيك
+Cheques Held ||| الشيكات المحتفظ بها
+Cheques Under Collection ||| شيكات برسم التحصيل
+Cheques deposited with the bank and not yet cleared ||| شيكات مودعة في البنك ولم تُحصّل بعد (11450). يُقيد المبلغ لحساب المستأجر عند إيداع الشيك.
+Cheques in hand ||| الشيكات في الحوزة
+Choose ||| اختر
+Choose <strong>Urgent</strong> only ||| اختر <strong>عاجل</strong> فقط لما هو غير آمن أو يسبب ضرراً الآن، مثل انفجار أنبوب أو انقطاع الكهرباء.
+Choose a unit ||| اختر وحدة
+Choose a unit on the right ||| اختر وحدة من اليمين، ثم انقر على زوايا نوافذها أو شرفتها في الصورة. <strong>حفظ المخطط</strong> (أو Enter) يحفظه وينتقل إلى الوحدة التالية؛ <strong>تراجع عن الزاوية</strong> (أو Backspace) يحذف آخر نقرة. انقر على مخطط محفوظ لتحديد وحدته مجدداً.
+Choose a vendor to see their open bills. ||| اختر مورداً لعرض فواتيره المفتوحة.

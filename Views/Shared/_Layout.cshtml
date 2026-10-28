@@ -101,12 +101,19 @@
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@RealEstateManager.Services.Localization.UiLanguages.Current" dir="@(RealEstateManager.Services.Localization.UiLanguages.IsArabic ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RealEstateManager</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @if (RealEstateManager.Services.Localization.UiLanguages.IsArabic)
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    }
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @* Help topic typography. Every rule is scoped under .help-content, so it cannot touch the application's own tables. *@
     <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
@@ -121,7 +128,7 @@
     <header>
         <nav class="navbar navbar-expand-xl navbar-dark bg-dark shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">RealEstateManager</a>
+                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@T["RealEstateManager"]</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                     <span class="navbar-toggler-icon"></span>
@@ -144,38 +151,38 @@
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="setupDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                System Setup
+                                @T["System Setup"]
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="setupDropdown">
                                 @if (canManageAccounting)
                                 {
-                                    <li><h6 class="dropdown-header">Accounting Setup</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Accounting Setup"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="ChartOfAccounts" asp-action="Index">Chart of Accounts</a>
+                                        <a class="dropdown-item" asp-controller="ChartOfAccounts" asp-action="Index">@T["Chart of Accounts"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="AccountMappings" asp-action="Index">Account Mapping</a>
+                                        <a class="dropdown-item" asp-controller="AccountMappings" asp-action="Index">@T["Account Mapping"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="OpeningBalances" asp-action="Index">Opening Balances</a>
+                                        <a class="dropdown-item" asp-controller="OpeningBalances" asp-action="Index">@T["Opening Balances"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="OwnerWithdrawalCategories" asp-action="Index">Owner Withdrawal Categories</a>
+                                        <a class="dropdown-item" asp-controller="OwnerWithdrawalCategories" asp-action="Index">@T["Owner Withdrawal Categories"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="VatSettings" asp-action="Index">VAT Settings</a>
+                                        <a class="dropdown-item" asp-controller="VatSettings" asp-action="Index">@T["VAT Settings"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Settings">E-Invoicing Settings</a>
+                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Settings">@T["E-Invoicing Settings"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="RevenueRecognition" asp-action="Index">Revenue Recognition</a>
+                                        <a class="dropdown-item" asp-controller="RevenueRecognition" asp-action="Index">@T["Revenue Recognition"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Prepayments" asp-action="Index">Recurring Prepayments</a>
+                                        <a class="dropdown-item" asp-controller="Prepayments" asp-action="Index">@T["Recurring Prepayments"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Closing" asp-action="Index">Closing Cockpit</a>
+                                        <a class="dropdown-item" asp-controller="Closing" asp-action="Index">@T["Closing Cockpit"]</a>
                                     </li>
                                 }
                                 @if (canApproveReopen)
@@ -193,32 +200,32 @@
                                 @if (isSystemAdmin)
                                 {
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Administration</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Administration"]</h6></li>
                                     @if (isPlatformOwner)
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Companies" asp-action="Index">Companies &amp; Subscriptions</a>
+                                            <a class="dropdown-item" asp-controller="Companies" asp-action="Index">@T["Companies & Subscriptions"]</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-controller="DatabaseUpdates" asp-action="Index">Database Updates</a>
+                                            <a class="dropdown-item" asp-controller="DatabaseUpdates" asp-action="Index">@T["Database Updates"]</a>
                                         </li>
                                     }
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">Users &amp; Permissions</a>
+                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="AuditLogs" asp-action="Index">Audit Logs</a>
+                                        <a class="dropdown-item" asp-controller="AuditLogs" asp-action="Index">@T["Audit Logs"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Manage">Feedback Review</a>
+                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Manage">@T["Feedback Review"]</a>
                                     </li>
                                 }
                                 else if (isCompanyAdmin)
                                 {
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Company Administration</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Company Administration"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">Users &amp; Permissions</a>
+                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
                                     </li>
                                 }
                                 @if (currentCompanyId.HasValue)
@@ -228,22 +235,22 @@
                                     @if (!isMaintenanceOnly)
                                     {
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Subscription" asp-action="Index">Subscription</a>
+                                        <a class="dropdown-item" asp-controller="Subscription" asp-action="Index">@T["Subscription"]</a>
                                     </li>
                                     }
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Help" asp-action="Index">Help</a>
+                                        <a class="dropdown-item" asp-controller="Help" asp-action="Index">@T["Help"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Help" asp-action="Manual" target="_blank">User Manual</a>
+                                        <a class="dropdown-item" asp-controller="Help" asp-action="Manual" target="_blank">@T["User Manual"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Help" asp-action="Training" target="_blank">Training Workbook</a>
+                                        <a class="dropdown-item" asp-controller="Help" asp-action="Training" target="_blank">@T["Training Workbook"]</a>
                                     </li>
                                     @if (!isMaintenanceOnly)
                                     {
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Index">Send Feedback</a>
+                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Index">@T["Send Feedback"]</a>
                                     </li>
                                     }
                                 }
@@ -254,28 +261,28 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="masterDataDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Master Data
+                                    @T["Master Data"]
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="masterDataDropdown">
                                     @if (canViewMasterData)
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Properties" asp-action="Index">Properties</a>
+                                            <a class="dropdown-item" asp-controller="Properties" asp-action="Index">@T["Properties"]</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Units" asp-action="Index">Units</a>
+                                            <a class="dropdown-item" asp-controller="Units" asp-action="Index">@T["Units"]</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Tenants" asp-action="Index">Tenants</a>
+                                            <a class="dropdown-item" asp-controller="Tenants" asp-action="Index">@T["Tenants"]</a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">Document Expiry</a>
+                                            <a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a>
                                         </li>
                                     }
                                     @if (canManageLeases)
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Leases" asp-action="Index">Leases</a>
+                                            <a class="dropdown-item" asp-controller="Leases" asp-action="Index">@T["Leases"]</a>
                                         </li>
                                     }
                                     @if (canApproveContracts)
@@ -293,7 +300,7 @@
                                     @if (canViewVendors)
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Vendors" asp-action="Index">Vendors</a>
+                                            <a class="dropdown-item" asp-controller="Vendors" asp-action="Index">@T["Vendors"]</a>
                                         </li>
                                     }
                                 </ul>
@@ -304,25 +311,25 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="operationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Operations
+                                    @T["Operations"]
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="operationsDropdown">
                                     @if (showAccountsMenu)
                                     {
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Workflow" asp-action="Index">Workflow Guide</a>
+                                        <a class="dropdown-item" asp-controller="Workflow" asp-action="Index">@T["Workflow Guide"]</a>
                                     </li>
                                     }
 
                                     @if (canHandleServiceRequests || canDoMaintenance)
                                     {
                                         <li><hr class="dropdown-divider" /></li>
-                                        <li><h6 class="dropdown-header">Tenant Services</h6></li>
+                                        <li><h6 class="dropdown-header">@T["Tenant Services"]</h6></li>
                                         @if (canHandleServiceRequests)
                                         {
                                         <li>
                                             <a class="dropdown-item" asp-controller="ServiceRequests" asp-action="Index">
-                                                Tenant Requests
+                                                @T["Tenant Requests"]
                                             </a>
                                         </li>
                                         }
@@ -336,79 +343,79 @@
                                     @if (showAccountsMenu)
                                     {
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Receivables &mdash; Tenants</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Receivables — Tenants"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="CustomerInvoices" asp-action="Index">Customer Invoices</a>
+                                        <a class="dropdown-item" asp-controller="CustomerInvoices" asp-action="Index">@T["Customer Invoices"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="CustomerCreditNotes" asp-action="Index">Credit Notes</a>
+                                        <a class="dropdown-item" asp-controller="CustomerCreditNotes" asp-action="Index">@T["Credit Notes"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="CustomerReceipts" asp-action="Index">Customer Receipts</a>
+                                        <a class="dropdown-item" asp-controller="CustomerReceipts" asp-action="Index">@T["Customer Receipts"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="PdcReceipts" asp-action="Index">PDC Receipts</a>
+                                        <a class="dropdown-item" asp-controller="PdcReceipts" asp-action="Index">@T["PDC Receipts"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="SecurityDeposits" asp-action="Index">Security Deposits</a>
+                                        <a class="dropdown-item" asp-controller="SecurityDeposits" asp-action="Index">@T["Security Deposits"]</a>
                                     </li>
 
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">E-Invoicing</h6></li>
+                                    <li><h6 class="dropdown-header">@T["E-Invoicing"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Index">E-Invoice Monitor</a>
+                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Index">@T["E-Invoice Monitor"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Received">Received E-Invoices</a>
+                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Received">@T["Received E-Invoices"]</a>
                                     </li>
 
                                     @* Vendors is master data, not an operation - it lives under Master Data only. *@
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Payables &mdash; Vendors</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Payables — Vendors"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="VendorBills" asp-action="Index">Vendor Bills</a>
+                                        <a class="dropdown-item" asp-controller="VendorBills" asp-action="Index">@T["Vendor Bills"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="VendorPayments" asp-action="Index">Vendor Payments</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Development</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="DevelopmentProjects" asp-action="Index">Development Projects</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="UnitSales" asp-action="Index">Unit Sales</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="CapitalAssetVat" asp-action="Index">Capital Assets Scheme (VAT)</a>
+                                        <a class="dropdown-item" asp-controller="VendorPayments" asp-action="Index">@T["Vendor Payments"]</a>
                                     </li>
 
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Landlords &mdash; Managed Properties</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Development"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="OwnerSettlements" asp-action="Index">Owner Settlements</a>
+                                        <a class="dropdown-item" asp-controller="DevelopmentProjects" asp-action="Index">@T["Development Projects"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="OwnerRecharges" asp-action="Index">Recharges to Owners</a>
+                                        <a class="dropdown-item" asp-controller="UnitSales" asp-action="Index">@T["Unit Sales"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="CapitalAssetVat" asp-action="Index">@T["Capital Assets Scheme (VAT)"]</a>
                                     </li>
 
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">General Ledger</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Landlords — Managed Properties"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="PettyCash" asp-action="Index">Petty Cash</a>
+                                        <a class="dropdown-item" asp-controller="OwnerSettlements" asp-action="Index">@T["Owner Settlements"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="FixedAssets" asp-action="Index">Fixed Assets</a>
+                                        <a class="dropdown-item" asp-controller="OwnerRecharges" asp-action="Index">@T["Recharges to Owners"]</a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><h6 class="dropdown-header">@T["General Ledger"]</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="PettyCash" asp-action="Index">@T["Petty Cash"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="ManualJournals" asp-action="Index">Manual Journals</a>
+                                        <a class="dropdown-item" asp-controller="FixedAssets" asp-action="Index">@T["Fixed Assets"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="OwnerWithdrawals" asp-action="Index">Owner Withdrawals</a>
+                                        <a class="dropdown-item" asp-controller="ManualJournals" asp-action="Index">@T["Manual Journals"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Journal" asp-action="Index">Journal Inquiry</a>
+                                        <a class="dropdown-item" asp-controller="OwnerWithdrawals" asp-action="Index">@T["Owner Withdrawals"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Journal" asp-action="Index">@T["Journal Inquiry"]</a>
                                     </li>
                                     }
                                 </ul>
@@ -425,13 +432,13 @@
                                 <ul class="dropdown-menu" aria-labelledby="controlsDropdown">
                                     @if (canViewPerformance)
                                     {
-                                        <li><a class="dropdown-item fw-semibold" asp-controller="Performance" asp-action="Index">Business Performance</a></li>
+                                        <li><a class="dropdown-item fw-semibold" asp-controller="Performance" asp-action="Index">@T["Business Performance"]</a></li>
                                     }
                                     @if (isOwner)
                                     {
-                                        <li><a class="dropdown-item" asp-controller="Oversight" asp-action="Index">Owner Monitor</a></li>
-                                        <li><a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Dashboard">Maintenance Dashboard</a></li>
-                                        <li><a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">Document Expiry</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Oversight" asp-action="Index">@T["Owner Monitor"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Dashboard">@T["Maintenance Dashboard"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a></li>
                                     }
                                     @if (canReleasePayments)
                                     {
@@ -445,9 +452,9 @@
                                     @if (isOwner)
                                     {
                                         <li><hr class="dropdown-divider" /></li>
-                                        <li><a class="dropdown-item" asp-controller="AuthorizationMatrix" asp-action="Index">Authorization Matrix</a></li>
-                                        <li><a class="dropdown-item" asp-controller="ApprovalLimits" asp-action="Index">Approval Limits &amp; Delegation</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Help" asp-action="Controls">Controls &amp; Security Guide</a></li>
+                                        <li><a class="dropdown-item" asp-controller="AuthorizationMatrix" asp-action="Index">@T["Authorization Matrix"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="ApprovalLimits" asp-action="Index">@T["Approval Limits & Delegation"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Help" asp-action="Controls">@T["Controls & Security Guide"]</a></li>
                                     }
                                 </ul>
                             </li>
@@ -457,27 +464,27 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="hrDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    HR &amp; Payroll
+                                    @T["HR & Payroll"]
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="hrDropdown">
-                                    <li><h6 class="dropdown-header">People</h6></li>
-                                    <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Employees</a></li>
+                                    <li><h6 class="dropdown-header">@T["People"]</h6></li>
+                                    <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">@T["Employees"]</a></li>
                                     @if (canManageHr)
                                     {
-                                        <li><a class="dropdown-item" asp-controller="Attendance" asp-action="Index">Attendance</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Leave" asp-action="Index">Leave</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EmployeeRequests" asp-action="Index">Employee Requests</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Employees" asp-action="Documents">Expiring Documents</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Departments" asp-action="Index">Departments</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Attendance" asp-action="Index">@T["Attendance"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Leave" asp-action="Index">@T["Leave"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="EmployeeRequests" asp-action="Index">@T["Employee Requests"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Employees" asp-action="Documents">@T["Expiring Documents"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Departments" asp-action="Index">@T["Departments"]</a></li>
                                     }
                                     @if (canRunPayroll)
                                     {
                                         <li><hr class="dropdown-divider" /></li>
-                                        <li><h6 class="dropdown-header">Payroll</h6></li>
-                                        <li><a class="dropdown-item" asp-controller="PayrollAdjustments" asp-action="Index">Payroll Transactions</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Index">Payroll Runs</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EmployeeAdvances" asp-action="Index">Salary Advances</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Settings">Payroll Settings</a></li>
+                                        <li><h6 class="dropdown-header">@T["Payroll"]</h6></li>
+                                        <li><a class="dropdown-item" asp-controller="PayrollAdjustments" asp-action="Index">@T["Payroll Transactions"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Index">@T["Payroll Runs"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="EmployeeAdvances" asp-action="Index">@T["Salary Advances"]</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Settings">@T["Payroll Settings"]</a></li>
                                     }
                                 </ul>
                             </li>
@@ -487,75 +494,75 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="reportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Reporting
+                                    @T["Reporting"]
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="reportingDropdown">
-                                    <li><a class="dropdown-item fw-semibold" asp-controller="ReportBuilder" asp-action="Index">Build Your Own Report</a></li>
-                                    <li><a class="dropdown-item" asp-controller="ProjectCosts" asp-action="Index">Project Costs &amp; WIP</a></li>
+                                    <li><a class="dropdown-item fw-semibold" asp-controller="ReportBuilder" asp-action="Index">@T["Build Your Own Report"]</a></li>
+                                    <li><a class="dropdown-item" asp-controller="ProjectCosts" asp-action="Index">@T["Project Costs & WIP"]</a></li>
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Financial Reports</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Financial Reports"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TrialBalance">Trial Balance</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TrialBalance">@T["Trial Balance"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLoss">Profit &amp; Loss</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLoss">@T["Profit & Loss"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="BalanceSheet">Balance Sheet</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="BalanceSheet">@T["Balance Sheet"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="CashFlow">Statement of Cash Flows</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="CashFlow">@T["Statement of Cash Flows"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="InvestmentProperty" asp-action="Index">Investment Property Note</a>
+                                        <a class="dropdown-item" asp-controller="InvestmentProperty" asp-action="Index">@T["Investment Property Note"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="GeneralJournal">General Journal</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="GeneralJournal">@T["General Journal"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Journal" asp-action="GeneralLedger">General Ledger</a>
+                                        <a class="dropdown-item" asp-controller="Journal" asp-action="GeneralLedger">@T["General Ledger"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="VatReturn">VAT Return</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="VatReturn">@T["VAT Return"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerVatReturn">Owner VAT Return</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerVatReturn">@T["Owner VAT Return"]</a>
                                     </li>
 
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Management &mdash; Tenants &amp; Properties</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Management — Tenants & Properties"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="BuildingView" asp-action="Index">Building View</a>
+                                        <a class="dropdown-item" asp-controller="BuildingView" asp-action="Index">@T["Building View"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="TenantStatements" asp-action="Index">Tenant Statement</a>
+                                        <a class="dropdown-item" asp-controller="TenantStatements" asp-action="Index">@T["Tenant Statement"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="VendorStatements" asp-action="Index">Vendor Statement</a>
+                                        <a class="dropdown-item" asp-controller="VendorStatements" asp-action="Index">@T["Vendor Statement"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TenantHealth">Tenant Health &amp; Ranking</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TenantHealth">@T["Tenant Health & Ranking"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="PropertyUtilization">Property Utilization</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="PropertyUtilization">@T["Property Utilization"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLossByProperty">P&amp;L by Property</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLossByProperty">@T["P&L by Property"]</a>
                                     </li>
 
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">Management &mdash; Owners</h6></li>
+                                    <li><h6 class="dropdown-header">@T["Management — Owners"]</h6></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerTenancySchedule">Owner Tenancy Schedule</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerTenancySchedule">@T["Owner Tenancy Schedule"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerProfitability">Owner Property Profitability</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerProfitability">@T["Owner Property Profitability"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerCombined">Owner's Combined View</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerCombined">@T["Owner's Combined View"]</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerWithdrawals">Owner Withdrawals</a>
+                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerWithdrawals">@T["Owner Withdrawals"]</a>
                                     </li>
                                 </ul>
                             </li>
@@ -599,16 +606,19 @@
                                 <span aria-hidden="true">?</span> Help
                             </button>
 
-                            <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">Password</a>
+                            <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
+
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">@T["Password"]</a>
 
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+                                <button type="submit" class="btn btn-outline-light btn-sm">@T["Logout"]</button>
                             </form>
                         }
                         else
                         {
-                            <a class="btn btn-outline-light btn-sm" asp-controller="Auth" asp-action="Login">Login</a>
+                            <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Auth" asp-action="Login">@T["Login"]</a>
                         }
                     </div>
                 </div>
@@ -636,7 +646,7 @@
                 {
                     <text>Subscription for <strong>@subscriptionStatus.CompanyName</strong> has expired. Enter an activation code to continue processing.</text>
                 }
-                <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
+                <a asp-controller="Subscription" asp-action="Index" class="alert-link">@T["Open Subscription"]</a>
             </div>
         }
         else if (subscriptionEndingSoon && subscriptionStatus != null && !isMaintenanceOnly)
@@ -649,7 +659,7 @@
                     ? "ends today"
                     : $"ends in {subscriptionStatus.DaysRemaining} day{(subscriptionStatus.DaysRemaining == 1 ? "" : "s")}, on {subscriptionStatus.AccessEndDate:dd/MM/yyyy}").
                 Renew in time to keep working without interruption.
-                <a asp-controller="Subscription" asp-action="Index" class="alert-link">Open Subscription</a>
+                <a asp-controller="Subscription" asp-action="Index" class="alert-link">@T["Open Subscription"]</a>
             </div>
         }
         @if (TempData["PostingWarning"] is string awaiting && awaiting.Contains(JournalWorkflowService.AwaitingApprovalPrefix))
@@ -688,13 +698,13 @@
         <div class="offcanvas offcanvas-end help-panel" tabindex="-1" id="helpPanel" aria-labelledby="helpPanelTitle">
             <div class="offcanvas-header">
                 <div>
-                    <div class="help-panel-path" id="helpPanelPath">Help</div>
-                    <h5 class="offcanvas-title mb-0" id="helpPanelTitle">Help</h5>
+                    <div class="help-panel-path" id="helpPanelPath">@T["Help"]</div>
+                    <h5 class="offcanvas-title mb-0" id="helpPanelTitle">@T["Help"]</h5>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="@T["Close"]"></button>
             </div>
             <div class="offcanvas-body" id="helpPanelBody">
-                <div class="text-muted small">Loading…</div>
+                <div class="text-muted small">@T["Loading…"]</div>
             </div>
         </div>
     }
@@ -707,9 +717,9 @@
            ------------------------------------------------------------------ *@
         <button type="button" class="assistant-fab" id="assistantFab"
                 data-bs-toggle="offcanvas" data-bs-target="#assistantPanel" aria-controls="assistantPanel"
-                title="AI Assistant">
+                title="@T["AI Assistant"]">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-            <span>Assistant</span>
+            <span>@T["Assistant"]</span>
         </button>
 
         <div class="offcanvas offcanvas-end assistant-panel" tabindex="-1" id="assistantPanel" aria-labelledby="assistantPanelTitle"
@@ -717,33 +727,30 @@
             <div class="offcanvas-header">
                 <div>
                     <div class="assistant-panel-sub">@currentCompanyName</div>
-                    <h5 class="offcanvas-title mb-0" id="assistantPanelTitle">AI Assistant</h5>
+                    <h5 class="offcanvas-title mb-0" id="assistantPanelTitle">@T["AI Assistant"]</h5>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="@T["Close"]"></button>
             </div>
-            <div class="assistant-status" id="assistantStatus">Ask about your properties, tenants, invoices or reports - by voice or text.</div>
+            <div class="assistant-status" id="assistantStatus">@T["Ask about your properties, tenants, invoices or reports - by voice or text."]</div>
             <div class="offcanvas-body assistant-log" id="assistantLog" aria-live="polite">
                 <div class="assistant-hint">
-                    Try: <em>"Which tenants are overdue?"</em>, <em>"Vacant units in Tower A"</em>,
-                    <em>"Trial balance at 30 September"</em>, <em>"How do I clear a PDC?"</em>,
-                    <em>"Fill this form for me"</em>, or attach a scanned invoice with the paperclip.
-                    Anything that changes your records is shown as a card for you to confirm.
+                    @T.Html("Try: <em>\"Which tenants are overdue?\"</em>, <em>\"Vacant units in Tower A\"</em>, <em>\"Trial balance at 30 September\"</em>, <em>\"How do I clear a PDC?\"</em>, <em>\"Fill this form for me\"</em>, or attach a scanned invoice with the paperclip. Anything that changes your records is shown as a card for you to confirm.")
                 </div>
             </div>
             <form class="assistant-compose" id="assistantForm" autocomplete="off">
-                <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantMic" title="Talk to the assistant" aria-pressed="false">
+                <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantMic" title="@T["Talk to the assistant"]" aria-pressed="false">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
                 </button>
-                <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantAttach" title="Attach a scanned supplier invoice (PDF, JPG, PNG)">
+                <button type="button" class="btn btn-outline-secondary assistant-mic" id="assistantAttach" title="@T["Attach a scanned supplier invoice (PDF, JPG, PNG)"]">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"/></svg>
                 </button>
                 <input type="file" id="assistantFile" accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,application/pdf,image/*" hidden />
-                <input type="text" class="form-control" id="assistantInput" placeholder="Type a question…" maxlength="2000" />
-                <button type="submit" class="btn btn-primary" id="assistantSend">Send</button>
+                <input type="text" class="form-control" id="assistantInput" placeholder="@T["Type a question…"]" maxlength="2000" />
+                <button type="submit" class="btn btn-primary" id="assistantSend">@T["Send"]</button>
             </form>
             <div class="assistant-footer">
-                <button type="button" class="btn btn-link btn-sm p-0" id="assistantMute" hidden>Mute</button>
-                <button type="button" class="btn btn-link btn-sm p-0 ms-auto" id="assistantEnd" hidden>End session</button>
+                <button type="button" class="btn btn-link btn-sm p-0" id="assistantMute" hidden>@T["Mute"]</button>
+                <button type="button" class="btn btn-link btn-sm p-0 ms-auto" id="assistantEnd" hidden>@T["End session"]</button>
             </div>
         </div>
     }

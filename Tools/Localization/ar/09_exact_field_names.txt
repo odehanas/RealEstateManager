@@ -1,0 +1,86 @@
+# Field names: labels written by asp-for from the property name ("StartDate" -> "Start Date").
+Accrue Gratuity ||| تكوين مخصص المكافأة
+Advance Date ||| تاريخ السلفة
+Amount Words Width Mm ||| عرض المبلغ بالحروف (مم)
+Amount Words X Mm ||| المبلغ بالحروف - أفقي (مم)
+Amount Words Y Mm ||| المبلغ بالحروف - رأسي (مم)
+Amount X Mm ||| المبلغ - أفقي (مم)
+Amount Y Mm ||| المبلغ - رأسي (مم)
+Bank Name ||| اسم البنك
+Billing Frequency Months ||| دورية الفوترة (أشهر)
+Cheque Font Size Pt ||| حجم خط الشيك (نقطة)
+Cheque Height Mm ||| ارتفاع الشيك (مم)
+Cheque Width Mm ||| عرض الشيك (مم)
+Commission Percentage ||| نسبة العمولة
+Confirm New Password ||| تأكيد كلمة المرور الجديدة
+Controller Name ||| اسم الشاشة
+Country Code ||| رمز الدولة
+Current Password ||| كلمة المرور الحالية
+Customer Invoice Id ||| فاتورة العميل
+Date Format ||| صيغة التاريخ
+Date X Mm ||| التاريخ - أفقي (مم)
+Date Y Mm ||| التاريخ - رأسي (مم)
+Deduct Late Time ||| خصم وقت التأخير
+Development Cost Category ||| فئة تكلفة التطوير
+Development Project Id ||| مشروع التطوير
+Dot Matrix Cpi ||| أحرف الطابعة النقطية في البوصة
+Dot Matrix Lpi ||| أسطر الطابعة النقطية في البوصة
+Employee Id ||| الموظف
+End Date ||| تاريخ النهاية
+Expense Category ||| فئة المصروف
+Http Method ||| طريقة HTTP
+Id ||| المعرّف
+Id Expiry Date ||| تاريخ انتهاء الهوية
+Id Number ||| رقم الهوية
+Late Grace Minutes ||| دقائق السماح للتأخير
+Latitude ||| خط العرض
+Lease Id ||| العقد
+Leave Type ||| نوع الإجازة
+Legal Registration Type ||| نوع التسجيل القانوني
+Licensing Authority ||| جهة الترخيص
+Longitude ||| خط الطول
+Monthly Instalment ||| القسط الشهري
+New Password ||| كلمة المرور الجديدة
+Offset X Mm ||| الإزاحة الأفقية (مم)
+Offset Y Mm ||| الإزاحة الرأسية (مم)
+Only Failures ||| الإخفاقات فقط
+Only Open Items ||| البنود المفتوحة فقط
+Overtime Multiplier ||| معامل العمل الإضافي
+Owner Cost Treatment ||| معالجة تكاليف الملاك
+Owner Name ||| اسم المالك
+Owner Trn ||| الرقم الضريبي للمالك
+Ownership Type ||| نوع الملكية
+Paid From Account Id ||| مدفوع من حساب
+Party Type ||| نوع الطرف
+Passport Expiry Date ||| تاريخ انتهاء جواز السفر
+Passport Issuing Country ||| دولة إصدار جواز السفر
+Passport Number ||| رقم جواز السفر
+Payee X Mm ||| المستفيد - أفقي (مم)
+Payee Y Mm ||| المستفيد - رأسي (مم)
+Pdc Bounce Charge ||| رسوم الشيك المرتجع
+Pdc Receipt Id ||| الشيك المؤجل
+Pdc Withdrawal Charge ||| رسوم سحب الشيك
+Print Account Payee Only ||| طباعة "يُصرف للمستفيد الأول فقط"
+Property Id ||| العقار
+Property Type ||| نوع العقار
+Received Net ||| الصافي المستلم
+Received Total ||| الإجمالي المستلم
+Received Vat ||| الضريبة المستلمة
+Rent Billed In Owner Name ||| فوترة الإيجار باسم المالك
+Rest Day Overtime Multiplier ||| معامل العمل الإضافي في يوم الراحة
+Security Deposit Amount ||| مبلغ التأمين
+Start Date ||| تاريخ البداية
+Step Date ||| التاريخ
+Tax Identification Number ||| رقم التعريف الضريبي
+Tenant Id ||| المستأجر
+Trade License Number ||| رقم الرخصة التجارية
+Trn Number ||| رقم التسجيل الضريبي
+Unit Id ||| الوحدة
+Vat Category ||| المعاملة الضريبية
+Vat Category Override ||| تجاوز المعاملة الضريبية
+Vat Override Reason ||| سبب تجاوز المعاملة الضريبية
+Vendor Id ||| المورد
+Vendor Reference ||| مرجع المورد
+Weekly Off Days ||| أيام الراحة الأسبوعية
+Work Start Time ||| وقت بداية العمل
+Working Hours Per Day ||| ساعات العمل اليومية

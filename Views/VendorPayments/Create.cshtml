@@ -1,6 +1,6 @@
 ﻿@model RealEstateManager.Services.VendorClearingService.PaymentRequest
 @{
-    ViewData["Title"] = "Vendor Payment";
+    ViewData["Title"] = T["Vendor Payment"];
     var vendors = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Vendors;
     var cashAccounts = (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.CashAccounts;
     int? defaultCash = ViewBag.DefaultCashAccountId;
@@ -15,10 +15,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-0">Vendor Payment</h2>
-        <div class="text-muted">Choose the vendor, then the open bills to pay - in full or in part. The payment gets a clearing document number. To pay before a bill arrives, choose <strong>Advance</strong>.</div>
+        <h2 class="mb-0">@T["Vendor Payment"]</h2>
+        <div class="text-muted">@T.Html("Choose the vendor, then the open bills to pay - in full or in part. The payment gets a clearing document number. To pay before a bill arrives, choose <strong>Advance</strong>.")</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
 </div>
 
 <div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
@@ -28,19 +28,19 @@
     <div class="card shadow-sm mb-3">
         <div class="card-body row g-3">
             <div class="col-md-5">
-                <label class="form-label fw-semibold" for="VendorId">1. Vendor</label>
+                <label class="form-label fw-semibold" for="VendorId">@T["1. Vendor"]</label>
                 <select asp-for="VendorId" class="form-select" id="VendorId">
-                    <option value="0">Choose the vendor…</option>
+                    <option value="0">@T["Choose the vendor…"]</option>
                     @foreach (var v in vendors) { <option value="@v.Value" selected="@(v.Value == Model.VendorId.ToString() ? "selected" : null)">@v.Text</option> }
                 </select>
             </div>
             <div class="col-md-7">
-                <label class="form-label fw-semibold">2. Payment type</label>
+                <label class="form-label fw-semibold">@T["2. Payment type"]</label>
                 <div class="btn-group w-100" role="group">
                     <input type="radio" class="btn-check" name="IsAdvance" id="typeBills" value="false" @(Model.IsAdvance ? "" : "checked")>
-                    <label class="btn btn-outline-dark" for="typeBills">Pay open bills</label>
+                    <label class="btn btn-outline-dark" for="typeBills">@T["Pay open bills"]</label>
                     <input type="radio" class="btn-check" name="IsAdvance" id="typeAdvance" value="true" @(Model.IsAdvance ? "checked" : "")>
-                    <label class="btn btn-outline-dark" for="typeAdvance">Advance (down payment)</label>
+                    <label class="btn btn-outline-dark" for="typeAdvance">@T["Advance (down payment)"]</label>
                 </div>
             </div>
         </div>
@@ -48,13 +48,13 @@
 
     <div class="card shadow-sm mb-3" id="billsCard">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">3. Open items</h5>
-            <span class="small text-muted" id="itemsNote">Choose a vendor to see their open bills.</span>
+            <h5 class="mb-0">@T["3. Open items"]</h5>
+            <span class="small text-muted" id="itemsNote">@T["Choose a vendor to see their open bills."]</span>
         </div>
         <div class="table-responsive">
             <table class="table table-sm mb-0 vp-items">
                 <thead class="table-light">
-                    <tr><th style="width:36px"></th><th>Bill</th><th>Supplier ref</th><th>Bill date</th><th>Due</th><th>For</th><th class="text-end">Total</th><th class="text-end">Paid</th><th class="text-end">Open</th><th class="text-end" style="width:160px">Pay now</th></tr>
+                    <tr><th style="width:36px"></th><th>@T["Bill"]</th><th>@T["Supplier ref"]</th><th>@T["Bill date"]</th><th>@T["Due"]</th><th>@T["For"]</th><th class="text-end">@T["Total"]</th><th class="text-end">@T["Paid"]</th><th class="text-end">@T["Open"]</th><th class="text-end" style="width:160px">@T["Pay now"]</th></tr>
                 </thead>
                 <tbody id="itemsBody"></tbody>
             </table>
@@ -63,29 +63,27 @@
     </div>
 
     <div class="card shadow-sm mb-3" id="advanceCard" hidden>
-        <div class="card-header bg-light"><h5 class="mb-0">3. Advance (down payment)</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["3. Advance (down payment)"]</h5></div>
         <div class="card-body row g-3">
             <div class="col-md-4">
-                <label asp-for="AdvanceAmount" class="form-label">Amount</label>
+                <label asp-for="AdvanceAmount" class="form-label">@T["Amount"]</label>
                 <input asp-for="AdvanceAmount" class="form-control" type="number" step="0.01" min="0" />
             </div>
             <div class="col-md-8 small text-muted">
-                Paid before any bill (SAP special G/L "A" down payment). It is recorded on <strong>11550 Advances to Suppliers</strong>, not in Accounts Payable,
-                and stays open until you apply it to the vendor's bills from <em>Vendor Payments ▸ Apply advance</em>.
-                If the supplier issues a tax invoice for the advance, record it as a vendor bill instead so its VAT can be recovered.
+                @T.Html("Paid before any bill (SAP special G/L \"A\" down payment). It is recorded on <strong>11550 Advances to Suppliers</strong>, not in Accounts Payable, and stays open until you apply it to the vendor's bills from <em>Vendor Payments ▸ Apply advance</em>. If the supplier issues a tax invoice for the advance, record it as a vendor bill instead so its VAT can be recovered.")
             </div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-3">
-        <div class="card-header bg-light"><h5 class="mb-0">4. Payment details</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["4. Payment details"]</h5></div>
         <div class="card-body row g-3">
             <div class="col-md-3">
-                <label asp-for="PaymentDate" class="form-label">Payment date</label>
+                <label asp-for="PaymentDate" class="form-label">@T["Payment date"]</label>
                 <input asp-for="PaymentDate" type="date" class="form-control" />
             </div>
             <div class="col-md-3">
-                <label asp-for="PaidFromAccountId" class="form-label">Paid from</label>
+                <label asp-for="PaidFromAccountId" class="form-label">@T["Paid from"]</label>
                 <select asp-for="PaidFromAccountId" class="form-select">
                     @foreach (var a in cashAccounts)
                     {
@@ -94,32 +92,32 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label asp-for="PaymentMethod" class="form-label">Method</label>
+                <label asp-for="PaymentMethod" class="form-label">@T["Method"]</label>
                 <select asp-for="PaymentMethod" class="form-select">
-                    <option>Bank</option><option>Cheque</option><option>Cash</option><option>Transfer</option>
+                    <option>@T["Bank"]</option><option>@T["Cheque"]</option><option>@T["Cash"]</option><option>@T["Transfer"]</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label asp-for="Reference" class="form-label">Cheque / transfer ref.</label>
+                <label asp-for="Reference" class="form-label">@T["Cheque / transfer ref."]</label>
                 <input asp-for="Reference" class="form-control" maxlength="100" />
             </div>
             <div class="col-md-2">
-                <label asp-for="PaymentNumber" class="form-label">Payment number</label>
-                <input asp-for="PaymentNumber" class="form-control" placeholder="automatic" />
+                <label asp-for="PaymentNumber" class="form-label">@T["Payment number"]</label>
+                <input asp-for="PaymentNumber" class="form-control" placeholder="@T["automatic"]" />
             </div>
             <div class="col-md-8">
-                <label asp-for="Notes" class="form-label">Notes</label>
+                <label asp-for="Notes" class="form-label">@T["Notes"]</label>
                 <input asp-for="Notes" class="form-control" maxlength="500" />
             </div>
             <div class="col-md-4 text-end align-self-end">
-                <div class="small text-muted">Total to pay</div>
+                <div class="small text-muted">@T["Total to pay"]</div>
                 <div class="vp-total" id="total">0.00</div>
             </div>
         </div>
     </div>
 
-    <button type="submit" class="btn btn-dark" id="submitBtn">Save and Post</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-dark" id="submitBtn">@T["Save and Post"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Cancel"]</a>
 </form>
 
 @section Scripts {

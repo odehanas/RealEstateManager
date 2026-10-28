@@ -1,17 +1,17 @@
 @{
-    ViewData["Title"] = "Access Denied";
+    ViewData["Title"] = T["Access Denied"];
 }
 
 <div class="row justify-content-center">
     <div class="col-lg-7">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <h2 class="mb-3">Access Denied</h2>
-                <p class="mb-2">You are signed in, but your account does not have permission to open this page.</p>
-                <p class="text-muted mb-4">Please contact your system administrator if you need access to this function.</p>
+                <h2 class="mb-3">@T["Access Denied"]</h2>
+                <p class="mb-2">@T["You are signed in, but your account does not have permission to open this page."]</p>
+                <p class="text-muted mb-4">@T["Please contact your system administrator if you need access to this function."]</p>
                 <div class="d-flex gap-2">
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Back to Home</a>
-                    <a asp-controller="Profile" asp-action="ChangePassword" class="btn btn-outline-secondary">My Profile</a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@T["Back to Home"]</a>
+                    <a asp-controller="Profile" asp-action="ChangePassword" class="btn btn-outline-secondary">@T["My Profile"]</a>
                 </div>
             </div>
         </div>

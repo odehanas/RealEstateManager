@@ -1,13 +1,13 @@
 @model RealEstateManager.Models.CompanyFormViewModel
 
 @{
-    ViewData["Title"] = "Add Internal Company";
+    ViewData["Title"] = T["Add Internal Company"];
 }
 
-<h2>Add Internal Company</h2>
+<h2>@T["Add Internal Company"]</h2>
 
 <div class="alert alert-info">
-    Use this internal page only after sign-in for additional managed companies. Public new-company signup now starts from the login page and creates the first admin user automatically.
+    @T["Use this internal page only after sign-in for additional managed companies. Public new-company signup now starts from the login page and creates the first admin user automatically."]
 </div>
 
 <form asp-action="Create" method="post" class="row g-3">
@@ -37,8 +37,8 @@
     </div>
 
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">@T["Save"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@T["Back"]</a>
     </div>
 </form>
 

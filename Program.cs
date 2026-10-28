@@ -49,6 +49,11 @@ builder.Services.AddScoped<TenantPortalService>();
 builder.Services.AddScoped<ServiceRequestService>();
 // Singleton: the help files only change on deployment, which restarts the app.
 builder.Services.AddSingleton<HelpCatalogService>();
+// English / Arabic screens: the dictionary, and the labels written by asp-for.
+builder.Services.AddSingleton<RealEstateManager.Services.Localization.UiText>();
+builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
+    .Configure<RealEstateManager.Services.Localization.UiText>((options, text) =>
+        options.ModelMetadataDetailsProviders.Add(new RealEstateManager.Services.Localization.LocalizedDisplayMetadataProvider(text)));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, PlatformOwnerAuthorizationHandler>();
@@ -338,6 +343,8 @@ app.Use(async (context, next) =>
 });
 
 app.UseStaticFiles();
+
+app.UseMiddleware<RealEstateManager.Services.Localization.UiLanguageMiddleware>();
 
 app.UseRouting();
 

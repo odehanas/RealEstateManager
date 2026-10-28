@@ -1,20 +1,20 @@
 @model RealEstateManager.Models.AttendanceMonthViewModel
 
 @{
-    ViewData["Title"] = "Attendance Summary";
+    ViewData["Title"] = T["Attendance Summary"];
     var monthStart = new DateTime(Model.Year, Model.Month, 1);
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
     <div>
         <h2 class="mb-0">Attendance — @monthStart.ToString("MMMM yyyy")</h2>
-        <div class="text-muted">Check the month, then turn it into payroll transactions.</div>
+        <div class="text-muted">@T["Check the month, then turn it into payroll transactions."]</div>
     </div>
     <div class="d-flex gap-2">
         <a asp-action="Month" asp-route-year="@monthStart.AddMonths(-1).Year" asp-route-month="@monthStart.AddMonths(-1).Month" class="btn btn-outline-secondary">&larr; @monthStart.AddMonths(-1).ToString("MMM")</a>
         <a asp-action="Month" asp-route-year="@monthStart.AddMonths(1).Year" asp-route-month="@monthStart.AddMonths(1).Month" class="btn btn-outline-secondary">@monthStart.AddMonths(1).ToString("MMM") &rarr;</a>
-        <a asp-action="Index" class="btn btn-outline-dark">Day sheet</a>
-        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+        <a asp-action="Index" class="btn btn-outline-dark">@T["Day sheet"]</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
@@ -25,13 +25,13 @@
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-light">
             <tr>
-                <th>Employee</th><th class="text-end">Present</th><th class="text-end">Absent</th><th class="text-end">On leave</th>
-                <th class="text-end">Rest days</th><th class="text-end">Not recorded</th><th class="text-end">Late days</th><th class="text-end">Late minutes</th>
-                <th class="text-end">Overtime h</th><th class="text-end">Rest-day OT h</th>
+                <th>@T["Employee"]</th><th class="text-end">@T["Present"]</th><th class="text-end">@T["Absent"]</th><th class="text-end">@T["On leave"]</th>
+                <th class="text-end">@T["Rest days"]</th><th class="text-end">@T["Not recorded"]</th><th class="text-end">@T["Late days"]</th><th class="text-end">@T["Late minutes"]</th>
+                <th class="text-end">@T["Overtime h"]</th><th class="text-end">@T["Rest-day OT h"]</th>
             </tr>
         </thead>
         <tbody>
-            @if (Model.Rows.Count == 0) { <tr><td colspan="10" class="text-muted">Nobody employed this month.</td></tr> }
+            @if (Model.Rows.Count == 0) { <tr><td colspan="10" class="text-muted">@T["Nobody employed this month."]</td></tr> }
             @foreach (var r in Model.Rows)
             {
                 <tr>
@@ -53,13 +53,13 @@
 
 @if (Model.Rows.Any(x => x.NotRecorded > 0))
 {
-    <div class="alert alert-warning">Some working days have no attendance recorded. They are treated as worked; complete the day sheets first if that is not right.</div>
+    <div class="alert alert-warning">@T["Some working days have no attendance recorded. They are treated as worked; complete the day sheets first if that is not right."]</div>
 }
 
 <div class="card shadow-sm">
     <div class="card-body d-flex flex-wrap gap-3 align-items-center">
         <div class="me-auto">
-            <strong>Generate payroll transactions</strong> — overtime, rest-day overtime, unauthorised absence
+            <strong>@T["Generate payroll transactions"]</strong> — overtime, rest-day overtime, unauthorised absence
             @(Model.Settings.DeductLateTime ? "and late arrival" : "(late arrival is not deducted: see Payroll Settings)")
             for every employee, approved and ready for the payroll. Running it again replaces what it made before.
         </div>
@@ -69,6 +69,6 @@
             <input type="hidden" name="month" value="@Model.Month" />
             <button class="btn btn-dark">Generate for @monthStart.ToString("MMMM yyyy")</button>
         </form>
-        <a asp-controller="PayrollAdjustments" asp-action="Index" asp-route-month="@monthStart.ToString("yyyy-MM")" asp-route-status="All" class="btn btn-outline-dark">See the transactions</a>
+        <a asp-controller="PayrollAdjustments" asp-action="Index" asp-route-month="@monthStart.ToString("yyyy-MM")" asp-route-status="All" class="btn btn-outline-dark">@T["See the transactions"]</a>
     </div>
 </div>

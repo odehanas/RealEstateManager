@@ -56,15 +56,15 @@
             @Model.BillNumber
             @if (isPosted)
             {
-                <span class="badge bg-success align-middle">Posted</span>
+                <span class="badge bg-success align-middle">@T["Posted"]</span>
             }
             else
             {
-                <span class="badge bg-warning text-dark align-middle">Draft</span>
+                <span class="badge bg-warning text-dark align-middle">@T["Draft"]</span>
             }
             @if (periodClosed)
             {
-                <span class="badge bg-dark align-middle">Period locked</span>
+                <span class="badge bg-dark align-middle">@T["Period locked"]</span>
             }
         </h2>
         <p class="text-muted mb-0">@Model.DocumentType from @Model.Vendor?.Name</p>
@@ -76,26 +76,26 @@
     <div class="d-flex gap-2">
         @if (Model.IsEditable)
         {
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark">Edit</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark">@T["Edit"]</a>
 
             <form asp-action="Post" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-dark">Post</button>
+                <button type="submit" class="btn btn-dark">@T["Post"]</button>
             </form>
         }
         else if (periodClosed)
         {
             <button type="button" class="btn btn-outline-secondary" disabled
                     title="@Model.JournalEntry?.AccountingPeriod?.Name is closed. Post a correcting journal instead.">
-                Reset to Draft
+                @T["Reset to Draft"]
             </button>
         }
         else if (hasPayments)
         {
             <button type="button" class="btn btn-outline-secondary" disabled
-                    title="Payments have been made against this bill. Reset those first.">
-                Reset to Draft
+                    title="@T["Payments have been made against this bill. Reset those first."]">
+                @T["Reset to Draft"]
             </button>
         }
         else
@@ -103,18 +103,18 @@
             <form asp-action="ResetToDraft" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-outline-warning">Reset to Draft</button>
+                <button type="submit" class="btn btn-outline-warning">@T["Reset to Draft"]</button>
             </form>
         }
 
         @if (Model.BalanceDue > 0 && isPosted)
         {
             <a asp-controller="VendorPayments" asp-action="Create" asp-route-billId="@Model.Id"
-               class="btn btn-success">Register Payment</a>
+               class="btn btn-success">@T["Register Payment"]</a>
         }
 
-        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </div>
 
@@ -148,7 +148,7 @@
     @if (!Model.VendorIsVatRegistered)
     {
         <div class="alert alert-warning print-keep">
-            <strong>Commercial invoice &mdash; no input tax.</strong>
+            <strong>@T["Commercial invoice — no input tax."]</strong>
             @Model.Vendor?.Name is not VAT registered, so no tax was charged and none is recoverable.
             The full amount is a direct cost.
         </div>
@@ -159,7 +159,7 @@
        ================================================================== *@
     <div class="doc-meta d-none d-print-flex">
         <div class="doc-panel">
-            <div class="doc-panel-title">Supplier</div>
+            <div class="doc-panel-title">@T["Supplier"]</div>
             <div class="doc-party-name">@Model.Vendor?.Name</div>
             <div class="doc-party-line">@Model.Vendor?.Code</div>
             @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn))
@@ -171,33 +171,33 @@
                 <div class="doc-party-line">Licence @Model.Vendor.TradeLicenseNumber</div>
             }
             <div class="doc-field" style="margin-top:2mm">
-                <span class="label">Supplier's bill no.</span>
+                <span class="label">@T["Supplier's bill no."]</span>
                 <span class="value">@(string.IsNullOrWhiteSpace(Model.VendorReference) ? "—" : Model.VendorReference)</span>
             </div>
         </div>
 
         <div class="doc-panel">
-            <div class="doc-panel-title">Bill Details</div>
-            <div class="doc-field"><span class="label">Bill date</span><span class="value">@Model.BillDate.ToString("dd/MM/yyyy")</span></div>
-            <div class="doc-field"><span class="label">Accounting date</span><span class="value">@accountingDate.ToString("dd/MM/yyyy")</span></div>
-            <div class="doc-field"><span class="label">Due date</span><span class="value">@Model.DueDate.ToString("dd/MM/yyyy")</span></div>
+            <div class="doc-panel-title">@T["Bill Details"]</div>
+            <div class="doc-field"><span class="label">@T["Bill date"]</span><span class="value">@Model.BillDate.ToString("dd/MM/yyyy")</span></div>
+            <div class="doc-field"><span class="label">@T["Accounting date"]</span><span class="value">@accountingDate.ToString("dd/MM/yyyy")</span></div>
+            <div class="doc-field"><span class="label">@T["Due date"]</span><span class="value">@Model.DueDate.ToString("dd/MM/yyyy")</span></div>
             <div class="doc-field">
-                <span class="label">Period</span>
+                <span class="label">@T["Period"]</span>
                 <span class="value">@(Model.JournalEntry?.AccountingPeriod?.Name ?? "—")</span>
             </div>
             <div class="doc-field">
-                <span class="label">Category</span>
+                <span class="label">@T["Category"]</span>
                 <span class="value">@(string.IsNullOrWhiteSpace(Model.ExpenseCategory) ? "—" : Model.ExpenseCategory)</span>
             </div>
             @if (Model.DevelopmentProject != null)
             {
                 <div class="doc-field">
-                    <span class="label">Development project</span>
+                    <span class="label">@T["Development project"]</span>
                     <span class="value">@Model.DevelopmentProject.Code @Model.DevelopmentProject.Name</span>
                 </div>
             }
             <div class="doc-field">
-                <span class="label">Journal entry</span>
+                <span class="label">@T["Journal entry"]</span>
                 <span class="value">@(Model.JournalEntry?.EntryNumber ?? "Not journalised")</span>
             </div>
         </div>
@@ -209,7 +209,7 @@
             <div class="row doc-meta-screen">
                 <div class="col-md-4">
                     <dl class="mb-0">
-                        <dt>Supplier</dt>
+                        <dt>@T["Supplier"]</dt>
                         <dd>
                             @Model.Vendor?.Code &mdash; @Model.Vendor?.Name<br />
                             @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn))
@@ -217,15 +217,15 @@
                                 <span class="small text-muted">TRN @Model.SupplierTrn</span>
                             }
                         </dd>
-                        <dt>Supplier's Bill No.</dt>
+                        <dt>@T["Supplier's Bill No."]</dt>
                         <dd>@(string.IsNullOrWhiteSpace(Model.VendorReference) ? "—" : Model.VendorReference)</dd>
                     </dl>
                 </div>
                 <div class="col-md-4">
                     <dl class="mb-0">
-                        <dt>Bill Date</dt>
+                        <dt>@T["Bill Date"]</dt>
                         <dd>@Model.BillDate.ToString("dd/MM/yyyy")</dd>
-                        <dt>Accounting Date</dt>
+                        <dt>@T["Accounting Date"]</dt>
                         <dd>
                             @accountingDate.ToString("dd/MM/yyyy")
                             @if (Model.JournalEntry?.AccountingPeriod != null)
@@ -233,20 +233,20 @@
                                 <span class="small text-muted">(@Model.JournalEntry.AccountingPeriod.Name)</span>
                             }
                         </dd>
-                        <dt>Due Date</dt>
+                        <dt>@T["Due Date"]</dt>
                         <dd>@Model.DueDate.ToString("dd/MM/yyyy")</dd>
                     </dl>
                 </div>
                 <div class="col-md-4">
                     <dl class="mb-0">
-                        <dt>Category</dt>
+                        <dt>@T["Category"]</dt>
                         <dd>@(string.IsNullOrWhiteSpace(Model.ExpenseCategory) ? "—" : Model.ExpenseCategory)</dd>
                         @if (Model.DevelopmentProject != null)
                         {
-                            <dt>Development project</dt>
+                            <dt>@T["Development project"]</dt>
                             <dd><a asp-controller="DevelopmentProjects" asp-action="Details" asp-route-id="@Model.DevelopmentProjectId">@Model.DevelopmentProject.Code @Model.DevelopmentProject.Name</a></dd>
                         }
-                        <dt>Journal Entry</dt>
+                        <dt>@T["Journal Entry"]</dt>
                         <dd>
                             @if (Model.JournalEntry != null)
                             {
@@ -269,7 +269,7 @@
                             }
                             else
                             {
-                                <span class="text-muted">Not journalised yet</span>
+                                <span class="text-muted">@T["Not journalised yet"]</span>
                             }
                         </dd>
                     </dl>
@@ -288,14 +288,14 @@
                 <thead>
                     <tr>
                         <th class="seq" style="width:3%">#</th>
-                        <th style="width:24%">Description</th>
-                        <th style="width:21%">Account</th>
-                        <th style="width:13%">Property</th>
-                        <th style="width:7%" class="num">Qty</th>
-                        <th style="width:10%" class="num">Unit Price</th>
-                        <th style="width:10%" class="num">Net</th>
-                        <th style="width:6%" class="num">VAT</th>
-                        <th style="width:10%" class="num">Total</th>
+                        <th style="width:24%">@T["Description"]</th>
+                        <th style="width:21%">@T["Account"]</th>
+                        <th style="width:13%">@T["Property"]</th>
+                        <th style="width:7%" class="num">@T["Qty"]</th>
+                        <th style="width:10%" class="num">@T["Unit Price"]</th>
+                        <th style="width:10%" class="num">@T["Net"]</th>
+                        <th style="width:6%" class="num">@T["VAT"]</th>
+                        <th style="width:10%" class="num">@T["Total"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -329,7 +329,7 @@
                                 }
                                 else
                                 {
-                                    <span class="text-danger">No account</span>
+                                    <span class="text-danger">@T["No account"]</span>
                                 }
                             </td>
                             <td class="doc-line-sub code">@(line.Property?.Code ?? "—")</td>
@@ -354,7 +354,7 @@
             @if (!string.IsNullOrWhiteSpace(Model.Notes))
             {
                 <div class="doc-notes">
-                    <strong>Notes</strong><br />
+                    <strong>@T["Notes"]</strong><br />
                     @Model.Notes
                 </div>
             }
@@ -369,11 +369,11 @@
         </div>
 
         <div class="doc-totals">
-            <div class="doc-total-row"><span>Subtotal</span><span class="amount">@Money(Model.Subtotal)</span></div>
-            <div class="doc-total-row"><span>VAT</span><span class="amount">@Money(Model.VatAmount)</span></div>
+            <div class="doc-total-row"><span>@T["Subtotal"]</span><span class="amount">@Money(Model.Subtotal)</span></div>
+            <div class="doc-total-row"><span>@T["VAT"]</span><span class="amount">@Money(Model.VatAmount)</span></div>
             <div class="doc-total-row grand"><span>Total @currency</span><span class="amount">@Money(Model.TotalAmount)</span></div>
-            <div class="doc-total-row"><span>Paid</span><span class="amount">@Money(Model.AmountPaid)</span></div>
-            <div class="doc-total-row balance"><span>Balance Due</span><span class="amount">@Money(Model.BalanceDue)</span></div>
+            <div class="doc-total-row"><span>@T["Paid"]</span><span class="amount">@Money(Model.AmountPaid)</span></div>
+            <div class="doc-total-row balance"><span>@T["Balance Due"]</span><span class="amount">@Money(Model.BalanceDue)</span></div>
         </div>
     </div>
 
@@ -384,7 +384,7 @@
             {
                 <div class="card shadow-sm h-100">
                     <div class="card-body">
-                        <div class="small text-uppercase text-muted mb-1">Notes</div>
+                        <div class="small text-uppercase text-muted mb-1">@T["Notes"]</div>
                         <div>@Model.Notes</div>
                     </div>
                 </div>
@@ -393,21 +393,21 @@
         <div class="col-md-5">
             <div class="card shadow-sm">
                 <div class="card-body totals-box">
-                    <div class="row"><div class="col">Subtotal</div><div class="col text-end">@Money(Model.Subtotal)</div></div>
-                    <div class="row"><div class="col">VAT</div><div class="col text-end">@Money(Model.VatAmount)</div></div>
+                    <div class="row"><div class="col">@T["Subtotal"]</div><div class="col text-end">@Money(Model.Subtotal)</div></div>
+                    <div class="row"><div class="col">@T["VAT"]</div><div class="col text-end">@Money(Model.VatAmount)</div></div>
                     <div class="row grand"><div class="col">Total (@currency)</div><div class="col text-end">@Money(Model.TotalAmount)</div></div>
-                    <div class="row"><div class="col">Paid</div><div class="col text-end">@Money(Model.AmountPaid)</div></div>
-                    <div class="row fw-bold"><div class="col">Balance Due</div><div class="col text-end">@Money(Model.BalanceDue)</div></div>
+                    <div class="row"><div class="col">@T["Paid"]</div><div class="col text-end">@Money(Model.AmountPaid)</div></div>
+                    <div class="row fw-bold"><div class="col">@T["Balance Due"]</div><div class="col text-end">@Money(Model.BalanceDue)</div></div>
 
                     @if (Model.VatAmount > 0m)
                     {
                         <hr class="my-2" />
                         <div class="row small text-muted">
-                            <div class="col">Recoverable input tax</div>
+                            <div class="col">@T["Recoverable input tax"]</div>
                             <div class="col text-end">@Money(Model.RecoverableVatAmount)</div>
                         </div>
                         <div class="row small text-muted">
-                            <div class="col">Added to cost</div>
+                            <div class="col">@T["Added to cost"]</div>
                             <div class="col text-end">@Money(Model.NonRecoverableVatAmount)</div>
                         </div>
                     }
@@ -420,12 +420,12 @@
     {
         <div class="card shadow-sm mt-3">
             <div class="card-header bg-white d-print-none d-flex justify-content-between">
-                <strong>Settled by</strong>
+                <strong>@T["Settled by"]</strong>
                 <span>@(Model.ClearingNumber != null ? $"Cleared by {Model.ClearingNumber} on {Model.ClearedDate:dd/MM/yyyy}" : $"Open {Money(Model.TotalAmount - Model.AmountPaid)}")</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0 doc-lines">
-                    <thead><tr><th>Clearing document</th><th>Date</th><th>By</th><th class="num">Amount</th><th>Status</th></tr></thead>
+                    <thead><tr><th>@T["Clearing document"]</th><th>@T["Date"]</th><th>@T["By"]</th><th class="num">@T["Amount"]</th><th>@T["Status"]</th></tr></thead>
                     <tbody>
                         @foreach (var line in clearings)
                         {
@@ -448,12 +448,12 @@
     @if (Model.Payments.Any())
     {
         <div class="card shadow-sm mt-3">
-            <div class="card-header bg-white d-print-none"><strong>Payments</strong></div>
+            <div class="card-header bg-white d-print-none">@T.Html("<strong>Payments</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0 doc-lines">
                     <thead>
                         <tr>
-                            <th>Payment</th><th>Date</th><th class="num">Amount</th><th>Status</th>
+                            <th>@T["Payment"]</th><th>@T["Date"]</th><th class="num">@T["Amount"]</th><th>@T["Status"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -478,9 +478,9 @@
        carries somewhere to sign it off.
        ================================================================== *@
     <div class="doc-signatures d-none d-print-flex">
-        <div class="doc-signature">Prepared by</div>
-        <div class="doc-signature">Checked by</div>
-        <div class="doc-signature">Approved by</div>
+        <div class="doc-signature">@T["Prepared by"]</div>
+        <div class="doc-signature">@T["Checked by"]</div>
+        <div class="doc-signature">@T["Approved by"]</div>
     </div>
 
     <div class="doc-footer d-none d-print-flex">

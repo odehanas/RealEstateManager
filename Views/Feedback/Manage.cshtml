@@ -1,13 +1,13 @@
 @model RealEstateManager.Models.FeedbackAdminListViewModel
 
 @{
-    ViewData["Title"] = "Feedback Review";
+    ViewData["Title"] = T["Feedback Review"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Feedback Review</h2>
-        <p class="text-muted mb-0">Review user suggestions and track what should be considered in future published versions.</p>
+        <h2 class="mb-1">@T["Feedback Review"]</h2>
+        <p class="text-muted mb-0">@T["Review user suggestions and track what should be considered in future published versions."]</p>
     </div>
     <div class="d-flex align-items-center gap-2">
         <a asp-action="ExportCsv"
@@ -15,8 +15,8 @@
            asp-route-category="@Model.Filter.Category"
            asp-route-username="@Model.Filter.Username"
            asp-route-onlyOpenItems="@Model.Filter.OnlyOpenItems"
-           class="btn btn-outline-secondary btn-sm">Export CSV</a>
-        <span class="text-muted">Latest 500 items</span>
+           class="btn btn-outline-secondary btn-sm">@T["Export CSV"]</a>
+        <span class="text-muted">@T["Latest 500 items"]</span>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm border-0 bg-primary text-white h-100">
             <div class="card-body">
-                <div class="small text-uppercase opacity-75">Total Feedback</div>
+                <div class="small text-uppercase opacity-75">@T["Total Feedback"]</div>
                 <div class="display-6 fw-bold">@Model.TotalItems</div>
             </div>
         </div>
@@ -37,7 +37,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm border-0 bg-warning h-100">
             <div class="card-body">
-                <div class="small text-uppercase text-muted">Open Items</div>
+                <div class="small text-uppercase text-muted">@T["Open Items"]</div>
                 <div class="display-6 fw-bold">@Model.OpenItems</div>
                 <div class="small text-muted">New: @Model.NewItems</div>
             </div>
@@ -46,7 +46,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm border-0 bg-success text-white h-100">
             <div class="card-body">
-                <div class="small text-uppercase opacity-75">Planned</div>
+                <div class="small text-uppercase opacity-75">@T["Planned"]</div>
                 <div class="display-6 fw-bold">@Model.PlannedItems</div>
             </div>
         </div>
@@ -54,7 +54,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm border-0 bg-secondary text-white h-100">
             <div class="card-body">
-                <div class="small text-uppercase opacity-75">Closed</div>
+                <div class="small text-uppercase opacity-75">@T["Closed"]</div>
                 <div class="display-6 fw-bold">@Model.ClosedItems</div>
             </div>
         </div>
@@ -65,9 +65,9 @@
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-3">
-                <label asp-for="Filter.Status" class="form-label">Status</label>
+                <label asp-for="Filter.Status" class="form-label">@T["Status"]</label>
                 <select asp-for="Filter.Status" class="form-select">
-                    <option value="">All</option>
+                    <option value="">@T["All"]</option>
                     @foreach (var status in Model.AvailableStatuses)
                     {
                         <option value="@status">@status</option>
@@ -75,9 +75,9 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label asp-for="Filter.Category" class="form-label">Category</label>
+                <label asp-for="Filter.Category" class="form-label">@T["Category"]</label>
                 <select asp-for="Filter.Category" class="form-select">
-                    <option value="">All</option>
+                    <option value="">@T["All"]</option>
                     @foreach (var category in Model.AvailableCategories)
                     {
                         <option value="@category">@category</option>
@@ -85,18 +85,18 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label asp-for="Filter.Username" class="form-label">Username</label>
+                <label asp-for="Filter.Username" class="form-label">@T["Username"]</label>
                 <input asp-for="Filter.Username" class="form-control" />
             </div>
             <div class="col-md-3 d-flex align-items-end">
                 <div class="form-check mb-2">
                     <input asp-for="Filter.OnlyOpenItems" class="form-check-input" />
-                    <label asp-for="Filter.OnlyOpenItems" class="form-check-label">Open items only</label>
+                    <label asp-for="Filter.OnlyOpenItems" class="form-check-label">@T["Open items only"]</label>
                 </div>
             </div>
             <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <a asp-action="Manage" class="btn btn-outline-secondary">Reset</a>
+                <button type="submit" class="btn btn-primary">@T["Filter"]</button>
+                <a asp-action="Manage" class="btn btn-outline-secondary">@T["Reset"]</a>
             </div>
         </div>
     </div>
@@ -106,21 +106,21 @@
     <table class="table table-striped table-bordered align-middle">
         <thead>
             <tr>
-                <th>When</th>
-                <th>Company</th>
-                <th>User</th>
-                <th>Category</th>
-                <th>Subject</th>
-                <th>Status</th>
-                <th>Reviewed</th>
-                <th class="text-center">Action</th>
+                <th>@T["When"]</th>
+                <th>@T["Company"]</th>
+                <th>@T["User"]</th>
+                <th>@T["Category"]</th>
+                <th>@T["Subject"]</th>
+                <th>@T["Status"]</th>
+                <th>@T["Reviewed"]</th>
+                <th class="text-center">@T["Action"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Items.Count == 0)
             {
                 <tr>
-                    <td colspan="8" class="text-center text-muted">No feedback items found.</td>
+                    <td colspan="8" class="text-center text-muted">@T["No feedback items found."]</td>
                 </tr>
             }
             else
@@ -139,7 +139,7 @@
                         <td>@item.Status</td>
                         <td>@(item.ReviewedAt.HasValue ? $"{item.ReviewedAt.Value.ToLocalTime():dd/MM/yyyy HH:mm} by {item.ReviewedByName ?? "-"}" : "-")</td>
                         <td class="text-center">
-                            <a asp-action="Review" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Open</a>
+                            <a asp-action="Review" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">@T["Open"]</a>
                         </td>
                     </tr>
                 }

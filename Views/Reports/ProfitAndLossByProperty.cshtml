@@ -1,6 +1,6 @@
 @model RealEstateManager.Services.PropertyProfitAndLossReportDto
 @{
-    ViewData["Title"] = "Profit & Loss by Property";
+    ViewData["Title"] = T["Profit & Loss by Property"];
     var propertyOptions = ViewBag.PropertyOptions as List<RealEstateManager.Services.PropertyColumnDto>
         ?? new List<RealEstateManager.Services.PropertyColumnDto>();
     var cols = Model.Columns;
@@ -25,29 +25,29 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">Profit &amp; Loss by Property</h2>
+        <h2 class="mb-1">@T["Profit & Loss by Property"]</h2>
         <p class="text-muted mb-0">
-            General ledger revenue and expenses analysed over the property dimension carried on each journal line.
+            @T["General ledger revenue and expenses analysed over the property dimension carried on each journal line."]
         </p>
     </div>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="startDate">From Date</label>
+        <label class="form-label mb-1" for="startDate">@T["From Date"]</label>
         <input type="date" class="form-control form-control-sm" id="startDate" name="startDate"
                value="@Model.StartDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="endDate">To Date</label>
+        <label class="form-label mb-1" for="endDate">@T["To Date"]</label>
         <input type="date" class="form-control form-control-sm" id="endDate" name="endDate"
                value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="propertyId">Property</label>
+        <label class="form-label mb-1" for="propertyId">@T["Property"]</label>
         <select class="form-select form-select-sm" id="propertyId" name="propertyId">
-            <option value="">All properties</option>
+            <option value="">@T["All properties"]</option>
             @foreach (var option in propertyOptions)
             {
                 <option value="@option.PropertyId" selected="@(Model.FilteredPropertyId == option.PropertyId ? "selected" : null)">
@@ -57,7 +57,7 @@
         </select>
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -69,7 +69,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100 border-0 bg-success text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Total Revenue</div>
+                <div class="small text-uppercase opacity-75">@T["Total Revenue"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalRevenue.ToString("N2")</div>
             </div>
         </div>
@@ -77,7 +77,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Total Expenses</div>
+                <div class="small text-uppercase opacity-75">@T["Total Expenses"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalExpenses.ToString("N2")</div>
             </div>
         </div>
@@ -95,17 +95,13 @@
 @if (Model.HasUnallocatedActivity)
 {
     <div class="alert alert-warning py-2 small">
-        <strong>Unallocated column present.</strong>
-        Some revenue or expense lines carry no property dimension &mdash; most commonly manual journals
-        posted without a unit / cost centre. Reopen those journals and set the unit so the amount is
-        attributed to a property. The matrix total always reconciles to the general ledger Profit &amp; Loss
-        for the same dates, whether or not lines are allocated.
+        @T.Html("<strong>Unallocated column present.</strong> Some revenue or expense lines carry no property dimension &mdash; most commonly manual journals posted without a unit / cost centre. Reopen those journals and set the unit so the amount is attributed to a property. The matrix total always reconciles to the general ledger Profit &amp; Loss for the same dates, whether or not lines are allocated.")
     </div>
 }
 
 @if (cols.Count == 0)
 {
-    <div class="alert alert-info">No revenue or expense activity was posted in this period.</div>
+    <div class="alert alert-info">@T["No revenue or expense activity was posted in this period."]</div>
 }
 else
 {
@@ -114,7 +110,7 @@ else
             <table class="table table-bordered table-sm mb-0 pnl-matrix">
                 <thead>
                     <tr>
-                        <th class="acct">Account</th>
+                        <th class="acct">@T["Account"]</th>
                         @foreach (var col in cols)
                         {
                             <th class="text-end @(col.PropertyId.HasValue ? "" : "unalloc")">
@@ -122,11 +118,11 @@ else
                                 <div class="fw-normal opacity-75" style="font-size:.72rem">@col.PropertyName</div>
                             </th>
                         }
-                        <th class="text-end">Total</th>
+                        <th class="text-end">@T["Total"]</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="grp"><td colspan="@(cols.Count + 2)">Revenue</td></tr>
+                    <tr class="grp"><td colspan="@(cols.Count + 2)">@T["Revenue"]</td></tr>
                     @foreach (var row in Model.Revenue)
                     {
                         <tr>
@@ -142,7 +138,7 @@ else
                         </tr>
                     }
                     <tr class="subtotal">
-                        <td>Total Revenue</td>
+                        <td>@T["Total Revenue"]</td>
                         @foreach (var col in cols)
                         {
                             <td class="text-end">@Model.RevenueFor(col.Key).ToString("N2")</td>
@@ -150,7 +146,7 @@ else
                         <td class="text-end">@Model.TotalRevenue.ToString("N2")</td>
                     </tr>
 
-                    <tr class="grp"><td colspan="@(cols.Count + 2)">Expenses</td></tr>
+                    <tr class="grp"><td colspan="@(cols.Count + 2)">@T["Expenses"]</td></tr>
                     @foreach (var row in Model.Expenses)
                     {
                         <tr>
@@ -166,7 +162,7 @@ else
                         </tr>
                     }
                     <tr class="subtotal">
-                        <td>Total Expenses</td>
+                        <td>@T["Total Expenses"]</td>
                         @foreach (var col in cols)
                         {
                             <td class="text-end">@Model.ExpensesFor(col.Key).ToString("N2")</td>
@@ -176,7 +172,7 @@ else
                 </tbody>
                 <tfoot>
                     <tr class="net">
-                        <td>Net Profit / (Loss)</td>
+                        <td>@T["Net Profit / (Loss)"]</td>
                         @foreach (var col in cols)
                         {
                             <td class="text-end">@Model.NetFor(col.Key).ToString("N2")</td>
@@ -184,7 +180,7 @@ else
                         <td class="text-end">@Model.NetProfitOrLoss.ToString("N2")</td>
                     </tr>
                     <tr class="subtotal">
-                        <td>Net Margin %</td>
+                        <td>@T["Net Margin %"]</td>
                         @foreach (var col in cols)
                         {
                             <td class="text-end">@Model.MarginFor(col.Key).ToString("N1")%</td>
@@ -199,7 +195,6 @@ else
     </div>
 
     <p class="text-muted small mt-2 mb-0">
-        Revenue is shown as credits less debits; expenses as debits less credits. A negative figure therefore
-        indicates a reversal or reclassification in the period.
+        @T["Revenue is shown as credits less debits; expenses as debits less credits. A negative figure therefore indicates a reversal or reclassification in the period."]
     </p>
 }

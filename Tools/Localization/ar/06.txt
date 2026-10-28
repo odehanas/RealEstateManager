@@ -1,0 +1,341 @@
+# Sheet 6: Our response ... Repeat floors
+Our response ||| ردنا
+Out ||| خارج
+Outcome ||| النتيجة
+Output Tax Due ||| ضريبة المخرجات المستحقة
+Output tax (on rent) ||| ضريبة المخرجات (على الإيجار)
+Outstanding ||| المستحق
+Outstanding is from posted invoices only ||| المستحق من الفواتير المرحّلة فقط؛ المسودات لا رصيد لها في الدفاتر.
+Over 90 days ||| أكثر من 90 يوماً
+Overdue ||| متأخر
+Overdue rent by age ||| الإيجار المتأخر حسب العمر
+Override — Exempt ||| تجاوز — معفى
+Override — Standard rated (5%) ||| تجاوز — خاضع للنسبة الأساسية (5%)
+Override — Zero rated (0%) ||| تجاوز — خاضع لنسبة الصفر (0%)
+Overtime ||| العمل الإضافي
+Overtime h ||| ساعات إضافية
+Overtime is priced at the overtime rate ||| يُحتسب العمل الإضافي بمعدل العمل الإضافي على أجر الساعة الأساسي (الأساسي ÷ 30 ÷ ساعات اليوم)؛ ودقائق التأخير بذلك الأجر؛ والغياب غير المصرح به يخفض الأيام المدفوعة، فيُخصم من الراتب الثابت كاملاً.
+Overtime rate ||| معدل العمل الإضافي
+Owed across all contracts ||| المستحق على جميع العقود
+Owed by tenants ||| مستحق على المستأجرين
+Owed to suppliers ||| مستحق للموردين
+Owned ||| مملوك
+Owned and Managed ||| مملوكة ومُدارة
+Owned only ||| المملوكة فقط
+Owned units not already under a sale contract. ||| الوحدات المملوكة غير الخاضعة لعقد بيع. يمكن بيع الوحدات على الخارطة قبل الإنجاز؛ ويحتاج التسليم إلى تحويل تكلفة الوحدة إلى محتفظ بها للبيع.
+Owner ||| المالك
+Owner (VAT registered) ||| المالك (مسجل في الضريبة)
+Owner Account ||| حساب المالك
+Owner Monitor ||| رقابة المالك
+Owner Property Profitability ||| ربحية عقارات المالك
+Owner Settlement Advice ||| إشعار تسوية المالك
+Owner Settlement Statement ||| كشف تسوية المالك
+Owner Settlements ||| تسويات الملاك
+Owner TRN ||| الرقم الضريبي للمالك
+Owner Tenancy Schedule ||| جدول إيجارات المالك
+Owner VAT Return ||| الإقرار الضريبي للمالك
+Owner Withdrawal Categories ||| فئات مسحوبات المالك
+Owner Withdrawal Category ||| فئة مسحوبات المالك
+Owner Withdrawal Category. ||| فئة مسحوبات المالك.
+Owner Withdrawals ||| مسحوبات المالك
+Owner Withdrawals Report ||| تقرير مسحوبات المالك
+Owner Withdrawals by Category ||| مسحوبات المالك حسب الفئة
+Owner account ||| حساب المالك
+Owner equity accounts ||| حسابات حقوق ملكية المالك
+Owner margin ||| هامش المالك
+Owner of the properties ||| مالك العقارات
+Owner travelling ||| المالك مسافر
+Owner's Combined View ||| العرض المجمّع للمالك
+Owner's Share ||| حصة المالك
+Owner's Share Collected ||| حصة المالك المحصّلة
+Owner's net income ||| صافي دخل المالك
+Owner's share ||| حصة المالك
+Owners ||| الملاك
+Owners' net income ||| صافي دخل الملاك
+Ownership ||| الملكية
+Ownership share ||| حصة الملكية
+P&L by Property ||| الأرباح والخسائر حسب العقار
+PDC Bounced ||| الشيكات المرتجعة
+PDC Cleared ||| الشيكات المحصّلة
+PDC Contra ||| مقابل الشيكات المؤجلة
+PDC On Hand ||| الشيكات المؤجلة في الحوزة
+PDC Receipts ||| الشيكات المؤجلة
+PDC Setup ||| إعداد الشيكات المؤجلة
+PDC activity will appear here ||| ستظهر حركات الشيكات المؤجلة هنا بعد تطبيق ترحيل قاعدة البيانات `PdcReceipts`.
+PDC data is not available yet. ||| بيانات الشيكات المؤجلة غير متاحة بعد. طبّق ترحيل `PdcReceipts` لتفعيل هذا القسم.
+PDCs ||| الشيكات المؤجلة
+POST ||| POST
+PUT ||| PUT
+Paid ||| مدفوع
+Paid (Debit) ||| المدفوع (مدين)
+Paid / Payable From ||| مدفوع / مستحق من
+Paid From ||| مدفوع من
+Paid Until ||| مدفوع حتى
+Paid before any bill ||| مدفوعة قبل أي فاتورة (دفعة مقدمة خاصة "A" في SAP). تُسجل في <strong>11550 دفعات مقدمة للموردين</strong>، لا في الذمم الدائنة، وتبقى مفتوحة حتى تطبقها على فواتير المورد من <em>دفعات الموردين ▸ تطبيق الدفعة المقدمة</em>. إذا أصدر المورد فاتورة ضريبية للدفعة المقدمة فسجّلها كفاتورة مورد ليمكن استرداد ضريبتها.
+Paid by ||| دفعها
+Paid from ||| مدفوع من
+Paid from (credit) ||| مدفوع من (دائن)
+Paid from / moved from ||| مدفوع من / منقول من
+Paid from / to ||| مدفوع من / إلى
+Paid in the period ||| المدفوع في الفترة
+Paid now ||| المدفوع الآن
+Paid or credited ||| مدفوع أو مُشعر بإشعار دائن
+Paid otherwise ||| مدفوع بطريقة أخرى
+Paid to Owner ||| المدفوع للمالك
+Parent Account ||| الحساب الرئيسي
+Parking ||| موقف سيارات
+Passport ||| جواز السفر
+Passport expiry ||| انتهاء جواز السفر
+Passport issued by (country code) ||| جهة إصدار الجواز (رمز الدولة)
+Passport no. ||| رقم الجواز
+Passports, Emirates IDs, visas ||| جوازات السفر والهويات الإماراتية والتأشيرات وبطاقات العمل والتأمين وعقود العمل محددة المدة للموظفين الحاليين.
+Password ||| كلمة المرور
+Passwords are never stored ||| لا تُخزن كلمات المرور أبداً — فقط تجزئة PBKDF2-SHA256 مملحة بـ 100,000 تكرار. لا أحد، بمن فيهم المطوّر، يستطيع قراءة كلمة مرور المستخدم.
+Past target ||| تجاوز المستهدف
+Past the 14-day deadline ||| تجاوز مهلة 14 يوماً
+Path ||| المسار
+Pay ||| دفع
+Pay an advance ||| دفع دفعة مقدمة
+Pay now ||| ادفع الآن
+Pay open bills ||| دفع الفواتير المفتوحة
+Pay salaries ||| دفع الرواتب
+Payables — Vendors ||| الذمم الدائنة — الموردون
+Payee ||| المستفيد
+Payment ||| الدفعة
+Payment Approvals ||| اعتمادات المدفوعات
+Payment Date ||| تاريخ الدفع
+Payment Plan ||| خطة الدفع
+Payment date ||| تاريخ الدفع
+Payment method ||| طريقة الدفع
+Payment number ||| رقم الدفعة
+Payment request ||| طلب دفع
+Payments ||| المدفوعات
+Payments Received ||| المدفوعات المستلمة
+Payments have been made against this bill. ||| توجد مدفوعات على هذه الفاتورة. أعد ضبطها أولاً.
+Payments held until someone whose authority ||| المدفوعات معلقة حتى يصرفها شخص تغطي صلاحيته المبلغ. لا أحد يصرف دفعة أدخلها بنفسه.
+Payments need approval ||| المدفوعات تحتاج إلى اعتماد
+Payments of open bills ||| مدفوعات الفواتير المفتوحة (لكل منها مستند تسوية)، والدفعات المقدمة قبل الفاتورة، والدفعات المقدمة المطبقة على الفواتير.
+Payments released and waiting ||| المدفوعات المصروفة والمنتظرة
+Payments to the Owner ||| المدفوعات للمالك
+Payments waiting for a second person ||| مدفوعات بانتظار شخص ثانٍ، مع بنودها المحاسبية.
+Payments waiting for release ||| مدفوعات بانتظار الصرف
+Payroll ||| الرواتب
+Payroll Runs ||| كشوف الرواتب
+Payroll Settings ||| إعدادات الرواتب
+Payroll Transactions ||| حركات الرواتب
+Payroll settings ||| إعدادات الرواتب
+Payslip ||| قسيمة الراتب
+Payslips ||| قسائم الرواتب
+Pending ||| قيد الانتظار
+People ||| الأشخاص
+Period ||| الفترة
+Period From ||| الفترة من
+Period Reopen Requests ||| طلبات إعادة فتح الفترات
+Period To ||| الفترة إلى
+Period end — every month, then every year ||| نهاية الفترة — كل شهر، ثم كل سنة
+Period history ||| سجل الفترات
+Period locked ||| الفترة مقفلة
+Period totals ||| إجماليات الفترة
+Periods closed ||| الفترات المقفلة
+Permission Assignment ||| تعيين الصلاحيات
+Permissions ||| الصلاحيات
+Personal ||| شخصي
+Personal and contract ||| البيانات الشخصية والعقد
+Personal investments — net income ||| الاستثمارات الشخصية — صافي الدخل
+Petty Cash ||| النثرية
+Petty Cash Expense Voucher ||| سند مصروف نثرية
+Petty Cash Float ||| عهدة نثرية
+Petty Cash Journal ||| دفتر النثرية
+Phone ||| الهاتف
+Photo ||| الصورة
+Photo (JPG or PNG, up to 8 MB) ||| الصورة (JPG أو PNG، حتى 8 ميغابايت)
+Pie ||| دائري
+Planned ||| مخطط
+Please contact HR for your payslips ||| يرجى التواصل مع الموارد البشرية بخصوص قسائم رواتبك أو إجازاتك أو شهاداتك.
+Please contact your property manager directly ||| يرجى التواصل مباشرة مع مدير العقار بخصوص رصيدك أو فواتيرك أو مدفوعاتك.
+Please contact your system administrator ||| يرجى التواصل مع مسؤول النظام إذا كنت تحتاج إلى الوصول لهذه الوظيفة.
+Plot area (sq ft) ||| مساحة قطعة الأرض (قدم مربع)
+Plot number ||| رقم قطعة الأرض
+Policy number ||| رقم الوثيقة
+Portal ||| البوابة
+Portal Access ||| الوصول إلى البوابة
+Portfolio Total ||| إجمالي المحفظة
+Portfolio, collections, liabilities ||| المحفظة والتحصيلات والالتزامات ونشاط المستأجرين في عرض تشغيلي واحد.
+Post ||| ترحيل
+Post Adjustment ||| ترحيل التسوية
+Post All Due Up To Selected Date ||| ترحيل كل المستحق حتى التاريخ المحدد
+Post Due Depreciation ||| ترحيل الإهلاك المستحق
+Post Replenishment ||| ترحيل التعويض
+Post Voucher ||| ترحيل السند
+Post the rent invoices when they fall due. ||| رحّل فواتير الإيجار عند استحقاقها.
+Postable ||| قابل للترحيل
+Posted ||| مرحّل
+Posted At ||| تاريخ الترحيل
+Posted Only ||| المرحّل فقط
+Posting Date ||| تاريخ الترحيل
+Postings not tagged to a project ||| قيود غير مرتبطة بمشروع
+Postings to the accounts ||| القيود في الحسابات
+Posts <strong>Dr expense account</strong> ||| يُرحّل <strong>من حـ/ المصروف</strong> / <strong>إلى حـ/ النثرية</strong>.
+Posts <strong>Dr petty cash</strong> ||| يُرحّل <strong>من حـ/ النثرية</strong> / <strong>إلى حـ/ البنك أو النقد</strong>.
+Posts all planned schedules ||| يرحّل كل الجداول المخططة حتى نهاية شهر التاريخ المحدد.
+Posts every draft matching the filter above. ||| يرحّل كل مسودة تطابق التصفية أعلاه. تُتخطى القيود في الفترات المقفلة، وتُدرج الإخفاقات منفردة بدلاً من إيقاف التشغيل.
+Pre-fills new lines. Each line may differ. ||| يُعبئ البنود الجديدة مسبقاً. يمكن أن يختلف كل بند.
+Preferred visit ||| الزيارة المفضلة
+Preferred visit date ||| تاريخ الزيارة المفضل
+Prepaid Asset Account ||| حساب أصل المدفوعات المقدمة
+Prepaid Expense Default ||| المصروف المدفوع مقدماً الافتراضي
+Prepaid Insurance ||| تأمين مدفوع مقدماً
+Prepaid Rent ||| إيجار مدفوع مقدماً
+Prepare payroll ||| إعداد الرواتب
+Prepare the month, have it approved ||| أعدّ الشهر، واعتمده، ثم ادفع عبر نظام حماية الأجور أو التحويل البنكي أو الشيك.
+Prepared by ||| أعدّه
+Prepared on the <strong>direct method</strong> ||| مُعدّ <strong>بالطريقة المباشرة</strong> التي يشجعها المعيار المحاسبي الدولي 7. تؤخذ كل حركة من الدفاتر وتُصنف حسب الحساب المقابل في القيد، فتتطابق القائمة مع الحسابات النقدية بطبيعة بنائها.
+Prepared · Approved ||| الإعداد · الاعتماد
+Prepayments ||| المدفوعات المقدمة
+Present ||| حاضر
+Price incl. VAT ||| السعر شامل الضريبة
+Price including VAT ||| السعر شامل الضريبة
+Price part ||| جزء السعر
+Print ||| طباعة
+Print "A/C Payee Only" ||| طباعة "يُصرف للمستفيد الأول فقط"
+Print Dashboard ||| طباعة لوحة المعلومات
+Print register ||| طباعة السجل
+Print statement ||| طباعة كشف الحساب
+Print this topic ||| طباعة هذا الموضوع
+Print — laser / inkjet ||| طباعة — ليزر / حبر
+Printed on every tax invoice ||| يُطبع على كل فاتورة ضريبية
+Priority ||| الأولوية
+Privacy ||| الخصوصية
+Probation ends ||| نهاية فترة التجربة
+Profit & Loss ||| الأرباح والخسائر
+Profit & Loss by Property ||| الأرباح والخسائر حسب العقار
+Profit / Loss ||| الربح / الخسارة
+Profit and Loss ||| الأرباح والخسائر
+Project ||| المشروع
+Project Costs & WIP ||| تكاليف المشاريع والأعمال قيد التنفيذ
+Project Costs & WIP report ||| تقرير تكاليف المشاريع والأعمال قيد التنفيذ
+Project name ||| اسم المشروع
+Properties ||| العقارات
+Properties classified as exempt (residential) ||| عقارات مصنفة معفاة (سكنية)
+Properties classified as standard rated (commercial) ||| عقارات مصنفة خاضعة للنسبة الأساسية (تجارية)
+Property ||| العقار
+Property / Unit ||| العقار / الوحدة
+Property Code ||| رمز العقار
+Property Utilization ||| استغلال العقارات
+Property and Unit Hierarchy ||| تسلسل العقارات والوحدات
+Property record ||| سجل العقار
+Provide for end-of-service gratuity every month ||| تكوين مخصص مكافأة نهاية الخدمة شهرياً
+Provided in the accounts ||| المخصص في الحسابات
+Provider ref ||| مرجع المزود
+Provider's answer ||| رد المزود
+Provider's batch / upload reference (optional) ||| مرجع الدفعة / الرفع لدى المزود (اختياري)
+Provisional rate applied during the year ||| النسبة المؤقتة المطبقة خلال السنة
+Purchase ||| الشراء
+Purpose ||| الغرض
+Purpose (optional) ||| الغرض (اختياري)
+Put in ||| المُضاف
+Put in during the period ||| المُضاف خلال الفترة
+QR Label ||| ملصق QR
+Qty ||| الكمية
+Quantity ||| الكمية
+Quarterly ||| ربع سنوي
+Re-apply the scope rules ||| أعد تطبيق قواعد النطاق بعد تغيير الإعدادات أو نوع عميل المستأجر
+Re-assess ||| إعادة التقييم
+Reactivate ||| إعادة التفعيل
+Read a scanned invoice ||| قراءة فاتورة ممسوحة ضوئياً
+Read invoice ||| قراءة الفاتورة
+Read the Emirates ID / passport ||| قراءة الهوية الإماراتية / جواز السفر
+Read-only. Times are UTC. ||| للاطلاع فقط. الأوقات بالتوقيت العالمي المنسق.
+Readiness check ||| فحص الجاهزية
+Ready for use, capitalization approved... ||| جاهز للاستخدام، تم اعتماد الرسملة...
+Ready-To-Send Message ||| رسالة جاهزة للإرسال
+Real balance movements appear ||| تظهر حركات الرصيد الفعلية في قسم كشف الحساب أدناه. تبقى الشيكات المؤجلة غير المحصّلة في قسم الشيكات المسجلة نظامياً ولا تؤثر على الرصيد التراكمي حتى تحصيلها.
+RealEstateManager ||| RealEstateManager
+Realisation ||| التحقق
+Reason ||| السبب
+Reason (optional) ||| السبب (اختياري)
+Reason For Override ||| سبب التجاوز
+Reason for leaving ||| سبب المغادرة
+Recalculate from employee records ||| إعادة الاحتساب من سجلات الموظفين
+Receipt ||| سند القبض
+Receipt no. ||| رقم السند
+Receipt, cheque or transfer number ||| رقم السند أو الشيك أو التحويل
+Receivable ||| ذمم مدينة
+Receivables ||| الذمم المدينة
+Receivables — Tenants ||| الذمم المدينة — المستأجرون
+Receive ||| استلام
+Receive Deposit ||| استلام التأمين
+Receive PDC ||| استلام شيك مؤجل
+Receive Payment ||| استلام دفعة
+Receive Security Deposit ||| استلام مبلغ التأمين
+Received ||| مستلم
+Received Date ||| تاريخ الاستلام
+Received Date — accounting date ||| تاريخ الاستلام — التاريخ المحاسبي
+Received E-Invoices ||| الفواتير الإلكترونية المستلمة
+Received from suppliers ||| المستلمة من الموردين
+Received into ||| مُستلم في
+Recent Company Feedback ||| أحدث ملاحظات الشركة
+Recharges to Owners ||| التكاليف المحمّلة على الملاك
+Recognition Months ||| أشهر الاعتراف
+Recognized ||| معترف به
+Record a Withdrawal ||| تسجيل مسحوبات
+Record and Post ||| تسجيل وترحيل
+Record collections and settle the invoice. ||| سجّل التحصيلات وسدّد الفاتورة.
+Record manually ||| تسجيل يدوي
+Recorded ||| مسجل
+Recorded before clearing documents ||| مسجل قبل مستندات التسوية
+Recorded in ||| مسجل في
+Recoverable ||| قابل للاسترداد
+Recoverable at the actual rate ||| قابل للاسترداد بالنسبة الفعلية
+Recoverable input tax ||| ضريبة المدخلات القابلة للاسترداد
+Recovered ||| مسترد
+Recovered at the time ||| مسترد في حينه
+Recovery Rate ||| نسبة الاسترداد
+Recurring Prepayments ||| المدفوعات المقدمة المتكررة
+Reduce or cancel this invoice. ||| خفّض هذه الفاتورة أو ألغها. بعد إرسالها كفاتورة إلكترونية يكون الإشعار الدائن هو الطريق الوحيد.
+Reference ||| المرجع
+Reference (optional) ||| المرجع (اختياري)
+Reference Number ||| الرقم المرجعي
+Refresh ||| تحديث
+Refundable deposit held as a liability. ||| تأمين قابل للرد محتفظ به كالتزام.
+Refunded ||| مردود
+Register ||| تسجيل
+Register Payment ||| تسجيل دفعة
+Register the building. Owned or Managed. ||| سجّل المبنى. مملوك أو مُدار.
+Register the occupier and their details. ||| سجّل الشاغل وبياناته.
+Registered Assets ||| الأصول المسجلة
+Reject ||| رفض
+Reject selected ||| رفض المحدد
+Rejected ||| مرفوض
+Rejection reason ||| سبب الرفض
+Released / decided by ||| صرفها / قررها
+Releases one month of rent at month end. ||| يُطفئ إيجار شهر واحد في نهاية الشهر.
+Releases up to ||| يُطفئ حتى
+Remaining ||| المتبقي
+Remaining budget ||| الموازنة المتبقية
+Remaining life (years) ||| العمر المتبقي (سنوات)
+Remark ||| ملاحظة
+Remark - required when returning it ||| ملاحظة - مطلوبة عند إعادته، ليعرف المُنشئ ما يجب تصحيحه
+Remarks ||| الملاحظات
+Remove ||| إزالة
+Remove line ||| حذف البند
+Remove outline ||| حذف المخطط
+Renew in time to keep working ||| جدّد في الوقت المناسب لمواصلة العمل دون انقطاع.
+Rent ||| الإيجار
+Rent / sq ft ||| الإيجار / قدم مربع
+Rent Billed ||| الإيجار المفوتر
+Rent Collected ||| الإيجار المحصّل
+Rent Gap ||| فجوة الإيجار
+Rent Realisation ||| تحقق الإيجار
+Rent billed ||| الإيجار المفوتر
+Rent billed (before VAT) ||| الإيجار المفوتر (قبل الضريبة)
+Rent billed to tenants to date (before VAT) ||| الإيجار المفوتر على المستأجرين حتى تاريخه (قبل الضريبة)
+Rental Revenue - Owned ||| إيرادات الإيجار - المملوكة
+Rental and own-use buildings from Development Projects ||| مبانٍ للتأجير وللاستخدام الخاص من مشاريع التطوير، منجزة، تكلفتها 5 ملايين درهم أو أكثر. ضريبة المدخلات من فواتير الموردين المرحّلة للمشروع.
+Rental and own-use units only. ||| وحدات التأجير والاستخدام الخاص فقط.
+Reopen ||| إعادة فتح
+Reopen asked ||| طُلبت إعادة الفتح
+Reopen requests waiting for a decision ||| طلبات إعادة فتح بانتظار القرار
+Reopened - close again ||| أُعيد فتحها - أقفلها مجدداً
+Reopened - to close again ||| أُعيد فتحها - لإقفالها مجدداً
+Repeat floors ||| تكرار الطوابق

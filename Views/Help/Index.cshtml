@@ -1,28 +1,27 @@
 @model RealEstateManager.Models.HelpCenterViewModel
 @{
-    ViewData["Title"] = "Help Center";
+    ViewData["Title"] = T["Help Center"];
 }
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <h2 class="mb-1">Help Center</h2>
+        <h2 class="mb-1">@T["Help Center"]</h2>
         <p class="text-muted mb-0">
-            Every screen's instructions in one place. On any screen, the <strong>Help</strong> button at the top right
-            opens just that screen's topic.
+            @T.Html("Every screen's instructions in one place. On any screen, the <strong>Help</strong> button at the top right opens just that screen's topic.")
         </p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
-        <a asp-action="Manual" target="_blank" class="btn btn-dark">Full manual</a>
-        <a href="~/manual/RealEstateManager-User-Manual.pdf" target="_blank" class="btn btn-outline-dark">Download PDF</a>
-        <a asp-action="Training" target="_blank" class="btn btn-outline-dark">Training workbook</a>
+        <a asp-action="Manual" target="_blank" class="btn btn-dark">@T["Full manual"]</a>
+        <a href="~/manual/RealEstateManager-User-Manual.pdf" target="_blank" class="btn btn-outline-dark">@T["Download PDF"]</a>
+        <a asp-action="Training" target="_blank" class="btn btn-outline-dark">@T["Training workbook"]</a>
     </div>
 </div>
 
 <form method="get" class="mb-4" role="search">
     <div class="input-group input-group-lg">
         <input type="search" name="q" value="@Model.Query" class="form-control"
-               placeholder="Search the help — e.g. post draft, VAT, PDC, petty cash" aria-label="Search help" autofocus />
-        <button type="submit" class="btn btn-primary">Search</button>
+               placeholder="@T["Search the help — e.g. post draft, VAT, PDC, petty cash"]" aria-label="@T["Search help"]" autofocus />
+        <button type="submit" class="btn btn-primary">@T["Search"]</button>
     </div>
 </form>
 
@@ -32,13 +31,13 @@
         <h3 class="h6 mb-0 text-muted">
             @Model.Results.Count result@(Model.Results.Count == 1 ? "" : "s") for &ldquo;@Model.Query&rdquo;
         </h3>
-        <a asp-action="Index" class="small">Clear search</a>
+        <a asp-action="Index" class="small">@T["Clear search"]</a>
     </div>
 
     @if (Model.Results.Count == 0)
     {
         <div class="alert alert-light border">
-            Nothing matches every word you typed. Try fewer or different words, or browse the topics below.
+            @T["Nothing matches every word you typed. Try fewer or different words, or browse the topics below."]
         </div>
     }
     else

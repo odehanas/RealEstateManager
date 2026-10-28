@@ -2,7 +2,7 @@
 @using RealEstateManager.Controllers
 @using RealEstateManager.Services
 @{
-    ViewData["Title"] = "Authorization Matrix";
+    ViewData["Title"] = T["Authorization Matrix"];
     var company = Model.Company;
     var roles = RoleTemplates.Assignable.Where(r => r.Key != RoleTemplates.CompanyAdmin).ToList();
     var limitsOn = company.RequirePaymentApproval;
@@ -34,25 +34,25 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
     <div>
-        <h2 class="mb-0">Authorization Matrix</h2>
+        <h2 class="mb-0">@T["Authorization Matrix"]</h2>
         <div class="text-muted">Who may do what in @company.Name, and how approvals and limits work. Change roles in Users &amp; Permissions, limits in Approval Limits.</div>
     </div>
     <div class="d-flex gap-2">
-        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-dark btn-sm">Users &amp; Permissions</a>
-        <a asp-controller="ApprovalLimits" asp-action="Index" class="btn btn-outline-dark btn-sm">Approval Limits</a>
-        <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a asp-controller="Users" asp-action="Index" class="btn btn-outline-dark btn-sm">@T["Users & Permissions"]</a>
+        <a asp-controller="ApprovalLimits" asp-action="Index" class="btn btn-outline-dark btn-sm">@T["Approval Limits"]</a>
+        <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
 <div class="card shadow-sm mb-4 am">
-    <div class="card-header bg-light"><h5 class="mb-0">1. Roles and what they may do</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["1. Roles and what they may do"]</h5></div>
     <div class="table-responsive">
         <table class="table table-sm table-bordered mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Area</th><th>Activity</th>
-                    <th class="text-center">System Admin</th>
-                    <th class="text-center">Company Admin</th>
+                    <th>@T["Area"]</th><th>@T["Activity"]</th>
+                    <th class="text-center">@T["System Admin"]</th>
+                    <th class="text-center">@T["Company Admin"]</th>
                     @foreach (var r in roles) { <th class="text-center">@r.Name</th> }
                 </tr>
             </thead>
@@ -85,9 +85,9 @@
 <div class="row g-3 mb-4">
     <div class="col-lg-5">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-light"><h5 class="mb-0">2. Approval levels in this company</h5></div>
+            <div class="card-header bg-light"><h5 class="mb-0">@T["2. Approval levels in this company"]</h5></div>
             <table class="table table-sm mb-0">
-                <tr><th>Level</th><th class="text-end">May approve up to</th><th>People</th></tr>
+                <tr><th>@T["Level"]</th><th class="text-end">@T["May approve up to"]</th><th>@T["People"]</th></tr>
                 @foreach (var level in Model.Levels)
                 {
                     <tr>
@@ -103,7 +103,7 @@
                 <div class="mb-1">Limits apply to contracts: <strong>@(company.ApplyLimitsToContracts ? "Yes (annual rent)" : "No - any contract approver")</strong></div>
                 @if (Model.Delegations.Count > 0)
                 {
-                    <div class="mt-2"><strong>Delegated authority now:</strong>
+                    <div class="mt-2"><strong>@T["Delegated authority now:"]</strong>
                         @foreach (var d in Model.Delegations)
                         {
                             <div>@d.ToName up to @(d.MaxAmount?.ToString("N0") ?? "the owner's limit") until @d.EndDate.ToString("dd/MM/yyyy"), from @d.FromName (@d.Reason)</div>
@@ -115,10 +115,10 @@
     </div>
     <div class="col-lg-7">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-light"><h5 class="mb-0">How an approval travels</h5></div>
+            <div class="card-header bg-light"><h5 class="mb-0">@T["How an approval travels"]</h5></div>
             <div class="card-body">
                 <ol class="flow mb-3">
-                    <li><strong>Data Entry</strong> prepares the record: a payment, petty cash voucher, contract or payroll. It is saved, but nothing reaches the accounts yet.</li>
+                    <li>@T.Html("<strong>Data Entry</strong> prepares the record: a payment, petty cash voucher, contract or payroll. It is saved, but nothing reaches the accounts yet.")</li>
                     <li>The system works out the level needed from the amount, e.g. with the levels above
                         @{ var ordered = Model.Levels.ToList(); }
                         @if (ordered.Count >= 3 && ordered[0].MaxAmount.HasValue && ordered[1].MaxAmount.HasValue)
@@ -126,12 +126,12 @@
                             <span>a payment of up to @ordered[0].MaxAmount!.Value.ToString("N0") needs <strong>@ordered[0].Name</strong>, up to @ordered[1].MaxAmount!.Value.ToString("N0") needs <strong>@ordered[1].Name</strong>, and anything above goes to <strong>@ordered[2].Name</strong>.</span>
                         }
                     </li>
-                    <li>It appears in <strong>Payment Approvals</strong> / <strong>Contract Approvals</strong> and on the <strong>Business Performance</strong> page of everyone whose limit covers it.</li>
-                    <li>An approver reviews it and approves or turns it down with a reason. <strong>Nobody approves what they entered.</strong> Petty cash always needs a second person.</li>
-                    <li>On approval it posts to the accounts (or the contract takes effect). Every step is recorded with who and when.</li>
-                    <li>When an owner is away, they <strong>delegate</strong> a higher limit to a manager for set dates; it ends by itself.</li>
+                    <li>@T.Html("It appears in <strong>Payment Approvals</strong> / <strong>Contract Approvals</strong> and on the <strong>Business Performance</strong> page of everyone whose limit covers it.")</li>
+                    <li>@T.Html("An approver reviews it and approves or turns it down with a reason. <strong>Nobody approves what they entered.</strong> Petty cash always needs a second person.")</li>
+                    <li>@T["On approval it posts to the accounts (or the contract takes effect). Every step is recorded with who and when."]</li>
+                    <li>@T.Html("When an owner is away, they <strong>delegate</strong> a higher limit to a manager for set dates; it ends by itself.")</li>
                 </ol>
-                <div class="small text-muted">Example: an accountant on Data Entry records a 7,500 maintenance payment. It needs the Owner level, so a Manager (limit 5,000) cannot release it; the Owner sees it on Business Performance and approves it from their phone or laptop.</div>
+                <div class="small text-muted">@T["Example: an accountant on Data Entry records a 7,500 maintenance payment. It needs the Owner level, so a Manager (limit 5,000) cannot release it; the Owner sees it on Business Performance and approves it from their phone or laptop."]</div>
             </div>
         </div>
     </div>
@@ -143,7 +143,7 @@
         <table class="table table-sm table-bordered mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Name</th><th>Role</th><th>Approval level</th><th>May approve</th>
+                    <th>@T["Name"]</th><th>@T["Role"]</th><th>@T["Approval level"]</th><th>@T["May approve"]</th>
                     @foreach (var p in permissionColumns) { <th class="rot" title="@p.Description">@p.Name</th> }
                 </tr>
             </thead>
@@ -164,5 +164,5 @@
             </tbody>
         </table>
     </div>
-    <div class="card-body small text-muted">"Custom" means the person's ticks differ from the standard roles. Choose a role on the user's page to bring them back in line.</div>
+    <div class="card-body small text-muted">@T["\"Custom\" means the person's ticks differ from the standard roles. Choose a role on the user's page to bring them back in line."]</div>
 </div>

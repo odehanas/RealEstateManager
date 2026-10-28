@@ -125,6 +125,10 @@ namespace RealEstateManager.Services
 
             var principal = new ClaimsPrincipal(identity);
 
+            // The user's own language follows them to this browser.
+            if (user.PreferredLanguage != null)
+                RealEstateManager.Services.Localization.UiLanguageMiddleware.Remember(httpContext.Response, user.PreferredLanguage);
+
             await httpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal,

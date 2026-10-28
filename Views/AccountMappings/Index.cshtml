@@ -2,11 +2,11 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Account Mapping Setup";
+    ViewData["Title"] = T["Account Mapping Setup"];
     var accounts = ViewBag.Accounts as List<Account> ?? new();
 }
 
-<h2>Account Mapping Setup</h2>
+<h2>@T["Account Mapping Setup"]</h2>
 
 @if (ViewBag.SuccessMessage != null)
 {
@@ -18,13 +18,13 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">Core Accounts</h5>
+            <h5 class="mb-0">@T["Core Accounts"]</h5>
         </div>
         <div class="card-body row g-3">
             <div class="col-md-6">
-                <label class="form-label">Default Cash / Bank</label>
+                <label class="form-label">@T["Default Cash / Bank"]</label>
                 <select asp-for="DefaultCashAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -33,9 +33,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Accounts Receivable</label>
+                <label class="form-label">@T["Accounts Receivable"]</label>
                 <select asp-for="AccountsReceivableAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -44,9 +44,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Accounts Payable</label>
+                <label class="form-label">@T["Accounts Payable"]</label>
                 <select asp-for="AccountsPayableAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -55,9 +55,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Advances From Customers</label>
+                <label class="form-label">@T["Advances From Customers"]</label>
                 <select asp-for="AdvancesFromCustomersAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -66,9 +66,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Unearned Revenue</label>
+                <label class="form-label">@T["Unearned Revenue"]</label>
                 <select asp-for="UnearnedRevenueAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -77,9 +77,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Tenant Security Deposit Liability</label>
+                <label class="form-label">@T["Tenant Security Deposit Liability"]</label>
                 <select asp-for="TenantSecurityDepositLiabilityAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -91,13 +91,13 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">Tax and Landlord Accounts</h5>
+            <h5 class="mb-0">@T["Tax and Landlord Accounts"]</h5>
         </div>
         <div class="card-body row g-3">
             <div class="col-md-6">
-                <label class="form-label">VAT Recoverable</label>
+                <label class="form-label">@T["VAT Recoverable"]</label>
                 <select asp-for="VatRecoverableAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -106,9 +106,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">VAT Payable</label>
+                <label class="form-label">@T["VAT Payable"]</label>
                 <select asp-for="VatPayableAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -117,9 +117,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Due To Landlords</label>
+                <label class="form-label">@T["Due To Landlords"]</label>
                 <select asp-for="DueToLandlordsAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -131,13 +131,13 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">Revenue and Expense Accounts</h5>
+            <h5 class="mb-0">@T["Revenue and Expense Accounts"]</h5>
         </div>
         <div class="card-body row g-3">
             <div class="col-md-6">
-                <label class="form-label">Rental Revenue - Owned</label>
+                <label class="form-label">@T["Rental Revenue - Owned"]</label>
                 <select asp-for="RentalRevenueOwnedAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -146,9 +146,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Management Fee Revenue</label>
+                <label class="form-label">@T["Management Fee Revenue"]</label>
                 <select asp-for="ManagementFeeRevenueAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -157,9 +157,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Other Income</label>
+                <label class="form-label">@T["Other Income"]</label>
                 <select asp-for="OtherIncomeAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -168,9 +168,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Default Direct Expense</label>
+                <label class="form-label">@T["Default Direct Expense"]</label>
                 <select asp-for="DirectExpenseDefaultAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -179,9 +179,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Default General Expense</label>
+                <label class="form-label">@T["Default General Expense"]</label>
                 <select asp-for="GeneralExpenseDefaultAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -190,9 +190,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Depreciation Expense</label>
+                <label class="form-label">@T["Depreciation Expense"]</label>
                 <select asp-for="DepreciationExpenseAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -201,9 +201,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Finance Cost</label>
+                <label class="form-label">@T["Finance Cost"]</label>
                 <select asp-for="FinanceCostAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -215,13 +215,13 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">Equity and Asset Control</h5>
+            <h5 class="mb-0">@T["Equity and Asset Control"]</h5>
         </div>
         <div class="card-body row g-3">
             <div class="col-md-6">
-                <label class="form-label">Retained Earnings - Prior Years</label>
+                <label class="form-label">@T["Retained Earnings - Prior Years"]</label>
                 <select asp-for="RetainedEarningsPriorYearsAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -230,9 +230,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Current Year Profit or Loss</label>
+                <label class="form-label">@T["Current Year Profit or Loss"]</label>
                 <select asp-for="CurrentYearProfitOrLossAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -241,9 +241,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Investment Property</label>
+                <label class="form-label">@T["Investment Property"]</label>
                 <select asp-for="InvestmentPropertyAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -252,9 +252,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Prepaid Expense Default</label>
+                <label class="form-label">@T["Prepaid Expense Default"]</label>
                 <select asp-for="PrepaidExpenseDefaultAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -263,9 +263,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Fixed Asset Default</label>
+                <label class="form-label">@T["Fixed Asset Default"]</label>
                 <select asp-for="FixedAssetDefaultAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -274,9 +274,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Fixed Asset Clearing</label>
+                <label class="form-label">@T["Fixed Asset Clearing"]</label>
                 <select asp-for="FixedAssetClearingAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -285,9 +285,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Accumulated Depreciation Default</label>
+                <label class="form-label">@T["Accumulated Depreciation Default"]</label>
                 <select asp-for="AccumulatedDepreciationDefaultAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -299,13 +299,13 @@
 
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">PDC Setup</h5>
+            <h5 class="mb-0">@T["PDC Setup"]</h5>
         </div>
         <div class="card-body row g-3">
             <div class="col-md-6">
-                <label class="form-label">PDC On Hand</label>
+                <label class="form-label">@T["PDC On Hand"]</label>
                 <select asp-for="PdcOnHandAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -314,9 +314,9 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">PDC Contra</label>
+                <label class="form-label">@T["PDC Contra"]</label>
                 <select asp-for="PdcContraAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
@@ -325,43 +325,43 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Cheques Under Collection</label>
+                <label class="form-label">@T["Cheques Under Collection"]</label>
                 <select asp-for="ChequesUnderCollectionAccountId" class="form-select">
-                    <option value="">Select Account</option>
+                    <option value="">@T["Select Account"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
                     }
                 </select>
-                <div class="form-text">Cheques deposited with the bank and not yet cleared (11450). The tenant is credited when a cheque is deposited.</div>
+                <div class="form-text">@T["Cheques deposited with the bank and not yet cleared (11450). The tenant is credited when a cheque is deposited."]</div>
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Cheque charges income</label>
+                <label class="form-label">@T["Cheque charges income"]</label>
                 <select asp-for="PdcChargeIncomeAccountId" class="form-select">
-                    <option value="">Other Income (default)</option>
+                    <option value="">@T["Other Income (default)"]</option>
                     @foreach (var account in accounts)
                     {
                         <option value="@account.Id">@account.Code - @account.Name</option>
                     }
                 </select>
-                <div class="form-text">Where withdrawal and returned cheque charges to tenants are credited.</div>
+                <div class="form-text">@T["Where withdrawal and returned cheque charges to tenants are credited."]</div>
             </div>
 
             <div class="col-md-3">
-                <label asp-for="PdcWithdrawalCharge" class="form-label">Cheque withdrawal charge</label>
+                <label asp-for="PdcWithdrawalCharge" class="form-label">@T["Cheque withdrawal charge"]</label>
                 <input asp-for="PdcWithdrawalCharge" class="form-control" type="number" step="0.01" min="0" />
-                <div class="form-text">Before VAT; can be changed on each withdrawal.</div>
+                <div class="form-text">@T["Before VAT; can be changed on each withdrawal."]</div>
             </div>
             <div class="col-md-3">
-                <label asp-for="PdcBounceCharge" class="form-label">Returned cheque charge</label>
+                <label asp-for="PdcBounceCharge" class="form-label">@T["Returned cheque charge"]</label>
                 <input asp-for="PdcBounceCharge" class="form-control" type="number" step="0.01" min="0" />
-                <div class="form-text">Before VAT; 0 for none. Can be changed on each bounce.</div>
+                <div class="form-text">@T["Before VAT; 0 for none. Can be changed on each bounce."]</div>
             </div>
         </div>
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save Mapping</button>
+        <button type="submit" class="btn btn-dark">@T["Save Mapping"]</button>
     </div>
 </form>

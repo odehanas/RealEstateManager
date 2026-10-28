@@ -3,7 +3,7 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Closing Cockpit";
+    ViewData["Title"] = T["Closing Cockpit"];
     var selected = Model.Selected;
     var yearEnd = Model.YearEnd;
 }
@@ -63,12 +63,12 @@
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">Closing Cockpit</h2>
-        <div class="text-muted">Every process the month needs, checked against the general ledger before the period is locked.</div>
+        <h2 class="mb-0">@T["Closing Cockpit"]</h2>
+        <div class="text-muted">@T["Every process the month needs, checked against the general ledger before the period is locked."]</div>
     </div>
     <div class="d-flex gap-2 align-items-center">
         <form method="get" class="d-flex gap-2 align-items-center">
-            <label class="form-label mb-0 text-nowrap" for="fiscalYear">Fiscal year</label>
+            <label class="form-label mb-0 text-nowrap" for="fiscalYear">@T["Fiscal year"]</label>
             <select id="fiscalYear" name="fiscalYear" class="form-select form-select-sm" style="min-width:6rem" onchange="this.form.submit()">
                 @foreach (var year in Model.FiscalYears)
                 {
@@ -116,7 +116,7 @@
                     <span class="fw-semibold">@tile.Name</span>
                     @if (tile.IsClosed)
                     {
-                        <span title="Closed" aria-label="Closed">&#128274;</span>
+                        <span title="@T["Closed"]" aria-label="@T["Closed"]">&#128274;</span>
                     }
                     else if (!tile.IsFuture)
                     {
@@ -128,11 +128,11 @@
                     @TileStatus(tile)
                     @if (tile.HasPendingRequest)
                     {
-                        <span class="badge bg-warning text-dark ms-1">Reopen asked</span>
+                        <span class="badge bg-warning text-dark ms-1">@T["Reopen asked"]</span>
                     }
                     @if (tile.ReopenCount > 0)
                     {
-                        <span class="badge bg-light text-dark border ms-1" title="Times reopened">&#8635; @tile.ReopenCount</span>
+                        <span class="badge bg-light text-dark border ms-1" title="@T["Times reopened"]">&#8635; @tile.ReopenCount</span>
                     }
                 </div>
             </a>
@@ -151,11 +151,11 @@
             </div>
             @if (selected.IsClosed)
             {
-                <span class="badge bg-dark fs-6">&#128274; Closed</span>
+                <span class="badge bg-dark fs-6">@T["🔒 Closed"]</span>
             }
             else if (selected.IsFuture)
             {
-                <span class="badge bg-secondary fs-6">Not started</span>
+                <span class="badge bg-secondary fs-6">@T["Not started"]</span>
             }
             else
             {
@@ -185,11 +185,11 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width:40px"></th>
-                            <th>Check</th>
-                            <th>Result</th>
-                            <th class="text-end text-nowrap">Scheduled</th>
-                            <th class="text-end text-nowrap">In ledger</th>
-                            <th class="text-end" style="width:210px">Action</th>
+                            <th>@T["Check"]</th>
+                            <th>@T["Result"]</th>
+                            <th class="text-end text-nowrap">@T["Scheduled"]</th>
+                            <th class="text-end text-nowrap">@T["In ledger"]</th>
+                            <th class="text-end" style="width:210px">@T["Action"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -233,7 +233,7 @@
                     <input type="hidden" name="periodId" value="@selected.Id" />
                     @if (!Model.CanClose)
                     {
-                        <span class="text-danger">Resolve the red checks before the period can be closed.</span>
+                        <span class="text-danger">@T["Resolve the red checks before the period can be closed."]</span>
                     }
                     else if (Model.AmberCount > 0)
                     {
@@ -244,7 +244,7 @@
                     }
                     else
                     {
-                        <span class="text-success">Every check is green.</span>
+                        <span class="text-success">@T["Every check is green."]</span>
                     }
                     <button type="submit" class="btn btn-danger ms-auto" disabled="@(!Model.CanClose)">&#128274; Close @selected.Name</button>
                 </form>
@@ -267,14 +267,14 @@
                     <div class="alert alert-warning mb-0">
                         <strong>Reopening requested</strong> by @Model.PendingRequest.RequestedByName on
                         @Model.PendingRequest.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm"): "@Model.PendingRequest.Reason"
-                        <div class="mt-2">Waiting for an approver.</div>
+                        <div class="mt-2">@T["Waiting for an approver."]</div>
                         @if (Model.PendingRequest.RequestedByAppUserId == Model.CurrentUserId)
                         {
                             <form asp-action="WithdrawReopen" method="post" class="mt-2">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="requestId" value="@Model.PendingRequest.Id" />
                                 <input type="hidden" name="periodId" value="@selected.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-dark">Withdraw my request</button>
+                                <button type="submit" class="btn btn-sm btn-outline-dark">@T["Withdraw my request"]</button>
                             </form>
                         }
                     </div>
@@ -288,12 +288,12 @@
                     <form asp-action="RequestReopen" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="periodId" value="@selected.Id" />
-                        <label class="form-label fw-semibold" for="reason">Ask for this period to be reopened</label>
+                        <label class="form-label fw-semibold" for="reason">@T["Ask for this period to be reopened"]</label>
                         <textarea id="reason" name="reason" class="form-control mb-2" rows="3" maxlength="1000" minlength="15" required
-                                  placeholder="What is wrong in this period, and what will be posted to correct it."></textarea>
+                                  placeholder="@T["What is wrong in this period, and what will be posted to correct it."]"></textarea>
                         <div class="d-flex justify-content-between align-items-center">
-                            <span class="small text-muted">An approver decides. Once corrected, the period is closed again through the checklist.</span>
-                            <button type="submit" class="btn btn-outline-danger">Request reopening</button>
+                            <span class="small text-muted">@T["An approver decides. Once corrected, the period is closed again through the checklist."]</span>
+                            <button type="submit" class="btn btn-outline-danger">@T["Request reopening"]</button>
                         </div>
                     </form>
                 }
@@ -310,12 +310,12 @@
                     <div class="card-body p-0">
                         @if (Model.RequestHistory.Count == 0)
                         {
-                            <div class="p-3 text-muted">This period has never been asked to reopen.</div>
+                            <div class="p-3 text-muted">@T["This period has never been asked to reopen."]</div>
                         }
                         else
                         {
                             <table class="table table-sm mb-0">
-                                <thead class="table-light"><tr><th>Asked</th><th>Reason</th><th>Status</th><th>Decision</th></tr></thead>
+                                <thead class="table-light"><tr><th>@T["Asked"]</th><th>@T["Reason"]</th><th>@T["Status"]</th><th>@T["Decision"]</th></tr></thead>
                                 <tbody>
                                     @foreach (var r in Model.RequestHistory)
                                     {
@@ -343,7 +343,7 @@
             </div>
             <div class="col-lg-5">
                 <div class="card shadow-sm h-100">
-                    <div class="card-header bg-light"><h6 class="mb-0">Period history</h6></div>
+                    <div class="card-header bg-light"><h6 class="mb-0">@T["Period history"]</h6></div>
                     <ul class="list-group list-group-flush small">
                         @foreach (var e in Model.Events)
                         {
@@ -370,7 +370,7 @@
 @if (Model.CanApproveReopen && Model.PendingRequests.Count > 0)
 {
     <div class="card shadow-sm border-warning mb-4">
-        <div class="card-header bg-warning-subtle"><h5 class="mb-0">Reopen requests waiting for a decision</h5></div>
+        <div class="card-header bg-warning-subtle"><h5 class="mb-0">@T["Reopen requests waiting for a decision"]</h5></div>
         <div class="card-body p-0">
             @await Html.PartialAsync("_ReopenRequestRows", new ReopenRequestsViewModel
             {
@@ -388,15 +388,15 @@
         <h5 class="mb-0">Year-end close - fiscal year @yearEnd.FiscalYear</h5>
         @if (yearEnd.IsClosed)
         {
-            <span class="badge bg-dark fs-6">&#128274; Year closed</span>
+            <span class="badge bg-dark fs-6">@T["🔒 Year closed"]</span>
         }
         else if (yearEnd.WasReopened)
         {
-            <span class="badge bg-primary fs-6">Reopened - close again</span>
+            <span class="badge bg-primary fs-6">@T["Reopened - close again"]</span>
         }
         else
         {
-            <span class="badge bg-secondary fs-6">Open</span>
+            <span class="badge bg-secondary fs-6">@T["Open"]</span>
         }
     </div>
     <div class="card-body">
@@ -430,7 +430,7 @@
             </div>
             <div class="col-md-3">
                 <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">Periods closed</div>
+                    <div class="small text-muted">@T["Periods closed"]</div>
                     <div class="fs-5 fw-bold">@Model.Periods.Count(x => x.IsClosed) / @Model.Periods.Count</div>
                 </div>
             </div>
@@ -451,7 +451,7 @@
                     <summary class="fw-semibold mb-2">Opening balances carried into @(yearEnd.FiscalYear + 1) (@yearEnd.CarryForwards.Count accounts)</summary>
                     <div class="table-responsive">
                         <table class="table table-sm table-striped mb-0">
-                            <thead class="table-light"><tr><th>Account</th><th>Type</th><th class="text-end">Debit</th><th class="text-end">Credit</th></tr></thead>
+                            <thead class="table-light"><tr><th>@T["Account"]</th><th>@T["Type"]</th><th class="text-end">@T["Debit"]</th><th class="text-end">@T["Credit"]</th></tr></thead>
                             <tbody>
                                 @foreach (var cf in yearEnd.CarryForwards)
                                 {
@@ -465,7 +465,7 @@
                             </tbody>
                             <tfoot class="fw-bold">
                                 <tr>
-                                    <td colspan="2">Total</td>
+                                    <td colspan="2">@T["Total"]</td>
                                     <td class="text-end">@yearEnd.CarryForwards.Sum(x => x.DebitBalance).ToString("N2")</td>
                                     <td class="text-end">@yearEnd.CarryForwards.Sum(x => x.CreditBalance).ToString("N2")</td>
                                 </tr>
@@ -488,7 +488,7 @@
             }
             else
             {
-                <div class="d-flex gap-2 align-items-center mb-3"><span class="cc-light cc-green"></span><span>Every period is closed. The year is ready to close.</span></div>
+                <div class="d-flex gap-2 align-items-center mb-3"><span class="cc-light cc-green"></span><span>@T["Every period is closed. The year is ready to close."]</span></div>
             }
             <form asp-action="CloseYear" method="post"
                   onsubmit="return confirm('Close fiscal year @yearEnd.FiscalYear? Revenue and expenses are transferred to retained earnings.');">
@@ -503,18 +503,18 @@
 @if (Model.FiscalYearClosings.Count > 0)
 {
     <div class="card shadow-sm">
-        <div class="card-header bg-light"><h5 class="mb-0">Fiscal year closing history</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["Fiscal year closing history"]</h5></div>
         <div class="card-body p-0">
             <table class="table table-bordered table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Fiscal year</th>
-                        <th>Status</th>
-                        <th class="text-end">Revenue</th>
-                        <th class="text-end">Expenses</th>
-                        <th class="text-end">Profit / Loss</th>
-                        <th>Closed</th>
-                        <th>Closing entry</th>
+                        <th>@T["Fiscal year"]</th>
+                        <th>@T["Status"]</th>
+                        <th class="text-end">@T["Revenue"]</th>
+                        <th class="text-end">@T["Expenses"]</th>
+                        <th class="text-end">@T["Profit / Loss"]</th>
+                        <th>@T["Closed"]</th>
+                        <th>@T["Closing entry"]</th>
                     </tr>
                 </thead>
                 <tbody>

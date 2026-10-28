@@ -13,10 +13,10 @@
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-2">
-    <h2 class="mb-0">Owner Settlement Statement</h2>
+    <h2 class="mb-0">@T["Owner Settlement Statement"]</h2>
     <div class="statement-no-print">
-        <a asp-action="Index" asp-route-asOfDate="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary btn-sm">Back</a>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a asp-action="Index" asp-route-asOfDate="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary btn-sm">@T["Back"]</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
@@ -32,11 +32,11 @@
 <form method="get" class="row g-3 mb-4 statement-no-print">
     <input type="hidden" name="owner" value="@Model.OwnerName" />
     <div class="col-md-3">
-        <label class="form-label">Statement as at</label>
+        <label class="form-label">@T["Statement as at"]</label>
         <input type="date" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" class="form-control" />
     </div>
     <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-dark w-100">Refresh</button>
+        <button type="submit" class="btn btn-dark w-100">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -48,28 +48,28 @@
     <div class="card-body">
         <table class="table table-sm mb-0" style="max-width: 560px;">
             <tbody>
-                <tr><td>Total rent of the agreements (full contract terms)</td><td class="text-end text-muted">@Model.AgreementRent.ToString("N2")</td></tr>
-                <tr><td>Rent billed to tenants to date (before VAT)</td><td class="text-end">@Model.RentBilled.ToString("N2")</td></tr>
-                <tr><td>Less: our commission</td><td class="text-end">(@Model.Commission.ToString("N2"))</td></tr>
+                <tr><td>@T["Total rent of the agreements (full contract terms)"]</td><td class="text-end text-muted">@Model.AgreementRent.ToString("N2")</td></tr>
+                <tr><td>@T["Rent billed to tenants to date (before VAT)"]</td><td class="text-end">@Model.RentBilled.ToString("N2")</td></tr>
+                <tr><td>@T["Less: our commission"]</td><td class="text-end">(@Model.Commission.ToString("N2"))</td></tr>
                 @if (Model.CommissionVatRate > 0)
                 {
                     <tr><td>Less: VAT on our commission (@Model.CommissionVatRate.ToString("0.##")%)</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
                 }
                 @if (Model.RentVatForOwner != 0m)
                 {
-                    <tr><td>Add: VAT on rent invoiced in the owner's name (the owner's to pay to the FTA)</td><td class="text-end">@Model.RentVatForOwner.ToString("N2")</td></tr>
+                    <tr><td>@T["Add: VAT on rent invoiced in the owner's name (the owner's to pay to the FTA)"]</td><td class="text-end">@Model.RentVatForOwner.ToString("N2")</td></tr>
                 }
                 @if (Model.OwnerExpenses != 0m)
                 {
-                    <tr><td>Less: maintenance and expenses charged to the owner</td><td class="text-end">(@Model.OwnerExpenses.ToString("N2"))</td></tr>
+                    <tr><td>@T["Less: maintenance and expenses charged to the owner"]</td><td class="text-end">(@Model.OwnerExpenses.ToString("N2"))</td></tr>
                 }
-                <tr class="fw-bold"><td>Owner's share</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
-                <tr><td>Less: already paid to the owner</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
-                <tr class="fw-bold table-primary"><td>Balance payable to the owner</td><td class="text-end">@Model.BalancePayable.ToString("N2")</td></tr>
-                <tr><td class="text-muted">of which collected from tenants and available to pay</td><td class="text-end text-muted">@Model.AvailableFromCollections.ToString("N2")</td></tr>
+                <tr class="fw-bold"><td>@T["Owner's share"]</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
+                <tr><td>@T["Less: already paid to the owner"]</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
+                <tr class="fw-bold table-primary"><td>@T["Balance payable to the owner"]</td><td class="text-end">@Model.BalancePayable.ToString("N2")</td></tr>
+                <tr><td class="text-muted">@T["of which collected from tenants and available to pay"]</td><td class="text-end text-muted">@Model.AvailableFromCollections.ToString("N2")</td></tr>
                 @if (Model.PendingSettlements > 0)
                 {
-                    <tr><td class="text-warning">Settlements awaiting posting or dated after the cut-off</td><td class="text-end text-warning">@Model.PendingSettlements.ToString("N2")</td></tr>
+                    <tr><td class="text-warning">@T["Settlements awaiting posting or dated after the cut-off"]</td><td class="text-end text-warning">@Model.PendingSettlements.ToString("N2")</td></tr>
                 }
             </tbody>
         </table>
@@ -79,10 +79,10 @@
 @if (Model.Expenses.Count > 0)
 {
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light"><strong>Maintenance and expenses charged to the owner</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Maintenance and expenses charged to the owner</strong>")</div>
         <div class="table-responsive">
             <table class="table table-sm mb-0">
-                <thead class="table-light"><tr><th>Date</th><th>Property</th><th>What</th><th>Entry</th><th class="text-end">Amount</th></tr></thead>
+                <thead class="table-light"><tr><th>@T["Date"]</th><th>@T["Property"]</th><th>@T["What"]</th><th>@T["Entry"]</th><th class="text-end">@T["Amount"]</th></tr></thead>
                 <tbody>
                     @foreach (var e in Model.Expenses)
                     {
@@ -95,35 +95,35 @@
                         </tr>
                     }
                 </tbody>
-                <tfoot><tr class="fw-semibold"><td colspan="4" class="text-end">Total</td><td class="text-end">@Model.OwnerExpenses.ToString("N2")</td></tr></tfoot>
+                <tfoot><tr class="fw-semibold"><td colspan="4" class="text-end">@T["Total"]</td><td class="text-end">@Model.OwnerExpenses.ToString("N2")</td></tr></tfoot>
             </table>
         </div>
     </div>
 }
 
-<h4>Contracts</h4>
+<h4>@T["Contracts"]</h4>
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-sm mb-4">
         <thead>
             <tr>
-                <th>Property / Unit</th>
-                <th>Contract</th>
-                <th>Tenant</th>
-                <th>Term</th>
-                <th class="text-end">Agreement Rent</th>
-                <th class="text-end">Rent Billed</th>
-                <th class="text-end">Comm. %</th>
-                <th class="text-end">Commission</th>
-                <th class="text-end">VAT</th>
-                <th class="text-end">Owner's Share</th>
-                <th class="text-end">Rent Collected</th>
-                <th class="text-end">Owner's Share Collected</th>
+                <th>@T["Property / Unit"]</th>
+                <th>@T["Contract"]</th>
+                <th>@T["Tenant"]</th>
+                <th>@T["Term"]</th>
+                <th class="text-end">@T["Agreement Rent"]</th>
+                <th class="text-end">@T["Rent Billed"]</th>
+                <th class="text-end">@T["Comm. %"]</th>
+                <th class="text-end">@T["Commission"]</th>
+                <th class="text-end">@T["VAT"]</th>
+                <th class="text-end">@T["Owner's Share"]</th>
+                <th class="text-end">@T["Rent Collected"]</th>
+                <th class="text-end">@T["Owner's Share Collected"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Contracts.Count == 0)
             {
-                <tr><td colspan="12" class="text-center text-muted">No contracts on this owner's properties up to this date.</td></tr>
+                <tr><td colspan="12" class="text-center text-muted">@T["No contracts on this owner's properties up to this date."]</td></tr>
             }
             @foreach (var c in Model.Contracts)
             {
@@ -145,7 +145,7 @@
         </tbody>
         <tfoot>
             <tr class="fw-bold">
-                <td colspan="4">Total</td>
+                <td colspan="4">@T["Total"]</td>
                 <td class="text-end">@Model.AgreementRent.ToString("N2")</td>
                 <td class="text-end">@Model.RentBilled.ToString("N2")</td>
                 <td></td>
@@ -162,22 +162,22 @@
 @{
     var commissionInvoices = ViewBag.CommissionInvoices as List<RealEstateManager.Domain.OwnerCommissionInvoice> ?? new();
 }
-<h4>Commission Tax Invoices to the Owner</h4>
+<h4>@T["Commission Tax Invoices to the Owner"]</h4>
 <table class="table table-bordered table-sm mb-4">
     <thead>
         <tr>
-            <th>Tax Invoice No.</th>
-            <th>Date</th>
-            <th class="text-end">Commission</th>
-            <th class="text-end">VAT</th>
-            <th class="text-end">Total</th>
+            <th>@T["Tax Invoice No."]</th>
+            <th>@T["Date"]</th>
+            <th class="text-end">@T["Commission"]</th>
+            <th class="text-end">@T["VAT"]</th>
+            <th class="text-end">@T["Total"]</th>
             <th class="statement-no-print"></th>
         </tr>
     </thead>
     <tbody>
         @if (commissionInvoices.Count == 0)
         {
-            <tr><td colspan="6" class="text-center text-muted">No commission invoiced to this owner yet. Invoices are issued at month end from the Owner Settlements page.</td></tr>
+            <tr><td colspan="6" class="text-center text-muted">@T["No commission invoiced to this owner yet. Invoices are issued at month end from the Owner Settlements page."]</td></tr>
         }
         @foreach (var ci in commissionInvoices)
         {
@@ -187,29 +187,29 @@
                 <td class="text-end">@ci.Commission.ToString("N2")</td>
                 <td class="text-end">@ci.VatAmount.ToString("N2")</td>
                 <td class="text-end">@ci.TotalAmount.ToString("N2")</td>
-                <td class="statement-no-print"><a asp-action="CommissionInvoice" asp-route-id="@ci.Id">Invoice</a></td>
+                <td class="statement-no-print"><a asp-action="CommissionInvoice" asp-route-id="@ci.Id">@T["Invoice"]</a></td>
             </tr>
         }
     </tbody>
 </table>
 
-<h4>Payments to the Owner</h4>
+<h4>@T["Payments to the Owner"]</h4>
 <table class="table table-bordered table-sm mb-4">
     <thead>
         <tr>
-            <th>Number</th>
-            <th>Date</th>
-            <th>Method</th>
-            <th>Reference</th>
-            <th class="text-end">Amount</th>
-            <th>Status</th>
+            <th>@T["Number"]</th>
+            <th>@T["Date"]</th>
+            <th>@T["Method"]</th>
+            <th>@T["Reference"]</th>
+            <th class="text-end">@T["Amount"]</th>
+            <th>@T["Status"]</th>
             <th class="statement-no-print"></th>
         </tr>
     </thead>
     <tbody>
         @if (Model.Settlements.Count == 0)
         {
-            <tr><td colspan="7" class="text-center text-muted">Nothing paid to this owner yet.</td></tr>
+            <tr><td colspan="7" class="text-center text-muted">@T["Nothing paid to this owner yet."]</td></tr>
         }
         @foreach (var s in Model.Settlements)
         {
@@ -220,18 +220,18 @@
                 <td>@(s.ReferenceNumber ?? "-")</td>
                 <td class="text-end">@s.AmountPaid.ToString("N2")</td>
                 <td>@(s.IsPosted ? "Posted" : "Draft")</td>
-                <td class="statement-no-print"><a asp-action="Print" asp-route-id="@s.Id">Advice</a></td>
+                <td class="statement-no-print"><a asp-action="Print" asp-route-id="@s.Id">@T["Advice"]</a></td>
             </tr>
         }
     </tbody>
 </table>
 
 <div class="card shadow-sm mb-4 statement-no-print">
-    <div class="card-header bg-light"><strong>Pay the Owner</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Pay the Owner</strong>")</div>
     <div class="card-body">
         @if (Model.MaximumPayable <= 0)
         {
-            <p class="text-muted mb-0">Nothing is due to this owner at this date.</p>
+            <p class="text-muted mb-0">@T["Nothing is due to this owner at this date."]</p>
         }
         else
         {
@@ -245,34 +245,34 @@
                 <input type="hidden" name="OwnerName" value="@Model.OwnerName" />
                 <input type="hidden" name="AsOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
                 <div class="col-md-3">
-                    <label class="form-label">Amount to pay</label>
+                    <label class="form-label">@T["Amount to pay"]</label>
                     <input type="number" step="0.01" min="0.01" max="@Model.MaximumPayable.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
                            name="Amount" value="@payment.Amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" class="form-control" required />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Payment date</label>
+                    <label class="form-label">@T["Payment date"]</label>
                     <input type="date" name="SettlementDate" value="@payment.SettlementDate.ToString("yyyy-MM-dd")" class="form-control" required />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Payment method</label>
+                    <label class="form-label">@T["Payment method"]</label>
                     <select name="PaymentMethod" class="form-select" asp-items="ViewBag.PaymentMethods"></select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Paid from</label>
+                    <label class="form-label">@T["Paid from"]</label>
                     <select name="PaidFromAccountId" class="form-select" asp-items="ViewBag.PaymentAccounts"></select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Cheque / transfer reference</label>
+                    <label class="form-label">@T["Cheque / transfer reference"]</label>
                     <input type="text" name="ReferenceNumber" maxlength="100" class="form-control" />
                 </div>
                 <div class="col-md-8">
-                    <label class="form-label">Notes</label>
+                    <label class="form-label">@T["Notes"]</label>
                     <input type="text" name="Notes" maxlength="1000" class="form-control" />
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-success"
                             onclick="return confirm('Pay this amount to @Model.OwnerName.Replace("'", "") and post it now?');">
-                        Save and Post Payment
+                        @T["Save and Post Payment"]
                     </button>
                 </div>
             </form>

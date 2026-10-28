@@ -2,24 +2,24 @@
 @inject PermissionService PermissionService
 
 @{
-    ViewData["Title"] = "Units Hierarchy";
+    ViewData["Title"] = T["Units Hierarchy"];
 
     // Master data is centralised - most users may look it up but not change it.
     var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Property and Unit Hierarchy</h2>
+    <h2>@T["Property and Unit Hierarchy"]</h2>
     @if (canEdit)
     {
-        <a asp-controller="Units" asp-action="Create" class="btn btn-dark">Add Unit</a>
+        <a asp-controller="Units" asp-action="Create" class="btn btn-dark">@T["Add Unit"]</a>
     }
 </div>
 
 @if (!canEdit)
 {
     <div class="alert alert-secondary py-2 small">
-        You have read-only access to master data. Contact the master data owner to add or amend a unit.
+        @T["You have read-only access to master data. Contact the master data owner to add or amend a unit."]
     </div>
 }
 
@@ -46,15 +46,15 @@
             <table class="table table-bordered table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Unit</th>
-                        <th>Floor</th>
-                        <th>Usage</th>
-                        <th class="text-end">Area SqFt</th>
-                        <th class="text-end">Standard Rent</th>
-                        <th>Status</th>
-                        <th>Active Tenant</th>
-                        <th>Active Lease</th>
-                        <th>Actions</th>
+                        <th>@T["Unit"]</th>
+                        <th>@T["Floor"]</th>
+                        <th>@T["Usage"]</th>
+                        <th class="text-end">@T["Area SqFt"]</th>
+                        <th class="text-end">@T["Standard Rent"]</th>
+                        <th>@T["Status"]</th>
+                        <th>@T["Active Tenant"]</th>
+                        <th>@T["Active Lease"]</th>
+                        <th>@T["Actions"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,7 +76,7 @@
                                     }
                                     else
                                     {
-                                        <span class="text-muted">Vacant</span>
+                                        <span class="text-muted">@T["Vacant"]</span>
                                     }
                                 </td>
                                 <td>
@@ -91,13 +91,13 @@
                                     }
                                     else
                                     {
-                                        <span class="text-muted">No active lease</span>
+                                        <span class="text-muted">@T["No active lease"]</span>
                                     }
                                 </td>
                                 <td>
                                     @if (canEdit)
                                     {
-                                        <a asp-action="Edit" asp-route-id="@unit.UnitId" class="btn btn-sm btn-primary">Edit</a>
+                                        <a asp-action="Edit" asp-route-id="@unit.UnitId" class="btn btn-sm btn-primary">@T["Edit"]</a>
                                     }
                                 </td>
                             </tr>
@@ -106,7 +106,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="9" class="text-center text-muted">No units found for this property.</td>
+                            <td colspan="9" class="text-center text-muted">@T["No units found for this property."]</td>
                         </tr>
                     }
                 </tbody>

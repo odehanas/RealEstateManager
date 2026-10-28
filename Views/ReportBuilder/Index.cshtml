@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Build Your Own Report";
+    ViewData["Title"] = T["Build Your Own Report"];
     var sources = (List<RealEstateManager.Services.Reporting.ReportEngine.SourceInfo>)ViewBag.Sources;
 }
 <style>
@@ -24,14 +24,14 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
     <div>
-        <h2 class="mb-0">Build Your Own Report</h2>
-        <div class="text-muted">Choose what to report on, the columns, filters and totals, and show it as a table or a chart. Save it to use again or share it with the company.</div>
+        <h2 class="mb-0">@T["Build Your Own Report"]</h2>
+        <div class="text-muted">@T["Choose what to report on, the columns, filters and totals, and show it as a table or a chart. Save it to use again or share it with the company."]</div>
     </div>
 </div>
 
 @if (sources.Count == 0)
 {
-    <div class="alert alert-warning">You do not have access to any data that can be reported on.</div>
+    <div class="alert alert-warning">@T["You do not have access to any data that can be reported on."]</div>
 }
 else
 {
@@ -39,49 +39,49 @@ else
     <div class="col-lg-4">
         <div class="card shadow-sm rb-panel">
             <div class="card-body">
-                <label class="form-label" for="rbSource">1. What do you want to report on?</label>
+                <label class="form-label" for="rbSource">@T["1. What do you want to report on?"]</label>
                 <select id="rbSource" class="form-select">
-                    <option value="">Choose…</option>
+                    <option value="">@T["Choose…"]</option>
                     @foreach (var s in sources) { <option value="@s.Key">@s.Label</option> }
                 </select>
 
                 <div id="rbBuilder" hidden>
                     <div class="rb-section">
-                        <label class="form-label">2. Show</label>
+                        <label class="form-label">@T["2. Show"]</label>
                         <div class="btn-group w-100" role="group">
                             <input type="radio" class="btn-check" name="rbMode" id="rbModeList" value="list" checked>
-                            <label class="btn btn-outline-dark btn-sm" for="rbModeList">A list of records</label>
+                            <label class="btn btn-outline-dark btn-sm" for="rbModeList">@T["A list of records"]</label>
                             <input type="radio" class="btn-check" name="rbMode" id="rbModeSummary" value="summary">
-                            <label class="btn btn-outline-dark btn-sm" for="rbModeSummary">Totals by group</label>
+                            <label class="btn btn-outline-dark btn-sm" for="rbModeSummary">@T["Totals by group"]</label>
                         </div>
                     </div>
 
                     <div class="rb-section" id="rbListOptions">
-                        <label class="form-label">Columns</label>
-                        <input type="search" id="rbFieldSearch" class="form-control form-control-sm mb-1" placeholder="Search fields…" />
+                        <label class="form-label">@T["Columns"]</label>
+                        <input type="search" id="rbFieldSearch" class="form-control form-control-sm mb-1" placeholder="@T["Search fields…"]" />
                         <div class="rb-fields" id="rbFieldList"></div>
                         <div class="rb-chips" id="rbChips"></div>
                     </div>
 
                     <div class="rb-section" id="rbSummaryOptions" hidden>
-                        <label class="form-label" for="rbGroupBy">Group by</label>
+                        <label class="form-label" for="rbGroupBy">@T["Group by"]</label>
                         <select id="rbGroupBy" class="form-select form-select-sm mb-2"></select>
                         <div id="rbDateGroupBox" hidden>
                             <select id="rbDateGroup" class="form-select form-select-sm mb-2">
-                                <option value="day">By day</option>
-                                <option value="month" selected>By month</option>
-                                <option value="quarter">By quarter</option>
-                                <option value="year">By year</option>
+                                <option value="day">@T["By day"]</option>
+                                <option value="month" selected>@T["By month"]</option>
+                                <option value="quarter">@T["By quarter"]</option>
+                                <option value="year">@T["By year"]</option>
                             </select>
                         </div>
-                        <label class="form-label" for="rbMeasure">Calculate</label>
+                        <label class="form-label" for="rbMeasure">@T["Calculate"]</label>
                         <div class="d-flex gap-2">
                             <select id="rbMeasure" class="form-select form-select-sm" style="max-width:45%">
-                                <option value="count">Count</option>
-                                <option value="sum">Total of</option>
-                                <option value="avg">Average of</option>
-                                <option value="min">Lowest</option>
-                                <option value="max">Highest</option>
+                                <option value="count">@T["Count"]</option>
+                                <option value="sum">@T["Total of"]</option>
+                                <option value="avg">@T["Average of"]</option>
+                                <option value="min">@T["Lowest"]</option>
+                                <option value="max">@T["Highest"]</option>
                             </select>
                             <select id="rbMeasureField" class="form-select form-select-sm" disabled></select>
                         </div>
@@ -90,57 +90,57 @@ else
                     <div class="rb-section">
                         <label class="form-label">3. Filters <span class="text-muted text-lowercase fw-normal">(optional)</span></label>
                         <div id="rbFilters"></div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" id="rbAddFilter">+ Add a filter</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="rbAddFilter">@T["+ Add a filter"]</button>
                     </div>
 
                     <div class="rb-section">
-                        <label class="form-label" for="rbSort">4. Sort and size</label>
+                        <label class="form-label" for="rbSort">@T["4. Sort and size"]</label>
                         <div class="d-flex gap-2 mb-2">
                             <select id="rbSort" class="form-select form-select-sm"></select>
                             <select id="rbSortDir" class="form-select form-select-sm" style="max-width:40%">
-                                <option value="asc">A → Z / low → high</option>
-                                <option value="desc">Z → A / high → low</option>
+                                <option value="asc">@T["A → Z / low → high"]</option>
+                                <option value="desc">@T["Z → A / high → low"]</option>
                             </select>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="small text-muted">Show at most</span>
+                            <span class="small text-muted">@T["Show at most"]</span>
                             <input type="number" id="rbLimit" class="form-control form-control-sm" value="500" min="1" max="2000" style="max-width:100px" />
-                            <span class="small text-muted">rows</span>
+                            <span class="small text-muted">@T["rows"]</span>
                         </div>
                     </div>
 
                     <div class="rb-section">
-                        <label class="form-label">5. Show as</label>
+                        <label class="form-label">@T["5. Show as"]</label>
                         <div class="btn-group w-100 rb-chart-types" role="group" id="rbChartTypes">
-                            <button type="button" class="btn btn-outline-dark btn-sm active" data-chart="table">Table</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm" data-chart="bar">Bar</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm" data-chart="line">Line</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm" data-chart="pie">Pie</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm active" data-chart="table">@T["Table"]</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm" data-chart="bar">@T["Bar"]</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm" data-chart="line">@T["Line"]</button>
+                            <button type="button" class="btn btn-outline-dark btn-sm" data-chart="pie">@T["Pie"]</button>
                         </div>
-                        <div class="small text-muted mt-1">Charts use the groups and totals; for a list, the first text column and first number column.</div>
+                        <div class="small text-muted mt-1">@T["Charts use the groups and totals; for a list, the first text column and first number column."]</div>
                     </div>
 
-                    <button type="button" class="btn btn-primary w-100 mt-3" id="rbRun">Run report</button>
+                    <button type="button" class="btn btn-primary w-100 mt-3" id="rbRun">@T["Run report"]</button>
                 </div>
             </div>
         </div>
 
         <div class="card shadow-sm rb-panel mt-3">
             <div class="card-body">
-                <label class="form-label" for="rbName">Save this report</label>
-                <input type="text" id="rbName" class="form-control form-control-sm mb-2" maxlength="150" placeholder="e.g. Rent by property this year" />
+                <label class="form-label" for="rbName">@T["Save this report"]</label>
+                <input type="text" id="rbName" class="form-control form-control-sm mb-2" maxlength="150" placeholder="@T["e.g. Rent by property this year"]" />
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox" id="rbShared">
-                    <label class="form-check-label small" for="rbShared">Share with everyone in the company (each person still sees only data they may see)</label>
+                    <label class="form-check-label small" for="rbShared">@T["Share with everyone in the company (each person still sees only data they may see)"]</label>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-dark" id="rbSave">Save</button>
-                    <button type="button" class="btn btn-sm btn-outline-dark" id="rbSaveAs">Save as new</button>
+                    <button type="button" class="btn btn-sm btn-dark" id="rbSave">@T["Save"]</button>
+                    <button type="button" class="btn btn-sm btn-outline-dark" id="rbSaveAs">@T["Save as new"]</button>
                 </div>
                 <div class="small mt-2" id="rbSaveNote"></div>
 
                 <div class="rb-section">
-                    <label class="form-label">Saved reports</label>
+                    <label class="form-label">@T["Saved reports"]</label>
                     <div id="rbSavedList" class="list-group list-group-flush small"></div>
                 </div>
             </div>
@@ -150,14 +150,14 @@ else
     <div class="col-lg-8 rb-result-col">
         <div class="card shadow-sm rb-result">
             <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <h5 class="mb-0" id="rbTitle">Your report</h5>
+                <h5 class="mb-0" id="rbTitle">@T["Your report"]</h5>
                 <div class="rb-actions d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="rbCsv" disabled>Export to Excel (CSV)</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">Print</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="rbCsv" disabled>@T["Export to Excel (CSV)"]</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
                 </div>
             </div>
             <div class="card-body">
-                <div id="rbMessage" class="text-muted">Choose what to report on, then select <strong>Run report</strong>.</div>
+                <div id="rbMessage" class="text-muted">@T.Html("Choose what to report on, then select <strong>Run report</strong>.")</div>
                 <div class="rb-chart-box mb-3" id="rbChartBox" hidden><canvas id="rbChart"></canvas></div>
                 <div class="table-responsive" id="rbTableBox" hidden>
                     <table class="table table-sm table-striped table-bordered mb-0" id="rbTable"></table>

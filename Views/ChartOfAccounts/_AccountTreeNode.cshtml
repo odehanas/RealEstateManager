@@ -10,22 +10,22 @@
 
                 @if (Model.IsGroup)
                 {
-                    <span class="badge bg-dark ms-1">Group</span>
+                    <span class="badge bg-dark ms-1">@T["Group"]</span>
                 }
 
                 @if (Model.IsPostable)
                 {
-                    <span class="badge bg-success ms-1">Postable</span>
+                    <span class="badge bg-success ms-1">@T["Postable"]</span>
                 }
 
                 @if (!Model.IsActive)
                 {
-                    <span class="badge bg-warning text-dark ms-1">Inactive</span>
+                    <span class="badge bg-warning text-dark ms-1">@T["Inactive"]</span>
                 }
 
                 @if (Model.IsControlAccount)
                 {
-                    <span class="badge bg-primary ms-1" title="Opening balance is computed from sub-ledger detail">Sub-ledger Control</span>
+                    <span class="badge bg-primary ms-1" title="@T["Opening balance is computed from sub-ledger detail"]">@T["Sub-ledger Control"]</span>
                 }
             </div>
 
@@ -39,7 +39,7 @@
                         </strong>
                     </div>
                 }
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary mt-1">Edit</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary mt-1">@T["Edit"]</a>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 @model RealEstateManager.Services.OwnerWithdrawalReportDto
 @{
-    ViewData["Title"] = "Owner Withdrawals by Category";
+    ViewData["Title"] = T["Owner Withdrawals by Category"];
     var accounts = Model.Accounts;
 }
 
@@ -19,32 +19,31 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">Owner Withdrawals by Category</h2>
+        <h2 class="mb-1">@T["Owner Withdrawals by Category"]</h2>
         <p class="text-muted mb-0">
-            Movements on the owner's equity account, analysed by what the money was spent on &mdash;
-            without touching the company's expense accounts.
+            @T["Movements on the owner's equity account, analysed by what the money was spent on — without touching the company's expense accounts."]
         </p>
     </div>
     <div class="d-flex gap-2 no-print">
-        <a asp-controller="OwnerWithdrawals" asp-action="Index" class="btn btn-outline-dark btn-sm">Record a Withdrawal</a>
-        <a asp-controller="OwnerWithdrawalCategories" asp-action="Index" class="btn btn-outline-secondary btn-sm">Manage Categories</a>
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+        <a asp-controller="OwnerWithdrawals" asp-action="Index" class="btn btn-outline-dark btn-sm">@T["Record a Withdrawal"]</a>
+        <a asp-controller="OwnerWithdrawalCategories" asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Manage Categories"]</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
     </div>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="startDate">From Date</label>
+        <label class="form-label mb-1" for="startDate">@T["From Date"]</label>
         <input type="date" class="form-control form-control-sm" id="startDate" name="startDate"
                value="@Model.StartDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="endDate">To Date</label>
+        <label class="form-label mb-1" for="endDate">@T["To Date"]</label>
         <input type="date" class="form-control form-control-sm" id="endDate" name="endDate"
                value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -55,11 +54,7 @@
 @if (!Model.HasOwnerAccounts)
 {
     <div class="alert alert-warning">
-        <strong>No owner equity account is configured.</strong>
-        Open <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the equity account you want to use for
-        owner drawings (the standard chart seeds <code>34100 Owner's Current Account</code>), and set
-        <strong>Owner Account</strong> to <em>Yes</em>. Until then the owner withdrawal dimension is inactive
-        and this report has nothing to show.
+        @T.Html("<strong>No owner equity account is configured.</strong> Open <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the equity account you want to use for owner drawings (the standard chart seeds <code>34100 Owner's Current Account</code>), and set <strong>Owner Account</strong> to <em>Yes</em>. Until then the owner withdrawal dimension is inactive and this report has nothing to show.")
     </div>
     return;
 }
@@ -68,34 +63,34 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-secondary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Opening Balance</div>
+                <div class="small text-uppercase opacity-75">@T["Opening Balance"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalOpeningBalance.ToString("N2")</div>
-                <div class="small opacity-75">Credit balance owed to the owner</div>
+                <div class="small opacity-75">@T["Credit balance owed to the owner"]</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-danger text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Withdrawals</div>
+                <div class="small text-uppercase opacity-75">@T["Withdrawals"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalWithdrawals.ToString("N2")</div>
-                <div class="small opacity-75">Taken out in the period</div>
+                <div class="small opacity-75">@T["Taken out in the period"]</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-success text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Contributions</div>
+                <div class="small text-uppercase opacity-75">@T["Contributions"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalContributions.ToString("N2")</div>
-                <div class="small opacity-75">Put in during the period</div>
+                <div class="small opacity-75">@T["Put in during the period"]</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-primary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Closing Balance</div>
+                <div class="small text-uppercase opacity-75">@T["Closing Balance"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalClosingBalance.ToString("N2")</div>
                 <div class="small opacity-75">Net movement @Model.NetMovement.ToString("N2")</div>
             </div>
@@ -106,24 +101,21 @@
 @if (Model.HasUncategorisedActivity)
 {
     <div class="alert alert-warning py-2 small">
-        <strong>Uncategorised activity present.</strong>
-        Some movement on the owner account carries no category. That is expected for capital introduced or
-        for a transfer of the owner's balance, but if it represents spending, reopen the journal in the
-        General Journal and set the category so it appears in the breakdown below.
+        @T.Html("<strong>Uncategorised activity present.</strong> Some movement on the owner account carries no category. That is expected for capital introduced or for a transfer of the owner's balance, but if it represents spending, reopen the journal in the General Journal and set the category so it appears in the breakdown below.")
     </div>
 }
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><strong>Owner Account Movement</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Owner Account Movement</strong>")</div>
     <div class="scroll-x">
         <table class="table table-bordered table-sm mb-0 ow-table">
             <thead>
                 <tr>
-                    <th>Account</th>
-                    <th class="text-end">Opening</th>
-                    <th class="text-end">Withdrawals</th>
-                    <th class="text-end">Contributions</th>
-                    <th class="text-end">Closing</th>
+                    <th>@T["Account"]</th>
+                    <th class="text-end">@T["Opening"]</th>
+                    <th class="text-end">@T["Withdrawals"]</th>
+                    <th class="text-end">@T["Contributions"]</th>
+                    <th class="text-end">@T["Closing"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,7 +132,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td>Total</td>
+                    <td>@T["Total"]</td>
                     <td class="text-end">@Model.TotalOpeningBalance.ToString("N2")</td>
                     <td class="text-end">@Model.TotalWithdrawals.ToString("N2")</td>
                     <td class="text-end">@Model.TotalContributions.ToString("N2")</td>
@@ -153,7 +145,7 @@
 
 @if (Model.Categories.Count == 0)
 {
-    <div class="alert alert-info">No movement was posted to the owner accounts in this period.</div>
+    <div class="alert alert-info">@T["No movement was posted to the owner accounts in this period."]</div>
 }
 else
 {
@@ -176,14 +168,14 @@ else
     <div class="row g-3 mb-4 ow-charts">
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-light"><strong>Withdrawals by Category</strong></div>
-                <div class="card-body"><div style="position:relative;height:@(Math.Max(220, catRows.Count * 34 + 60))px"><canvas id="chartByCategory" aria-label="Bar chart of withdrawals by category"></canvas></div></div>
+                <div class="card-header bg-light">@T.Html("<strong>Withdrawals by Category</strong>")</div>
+                <div class="card-body"><div style="position:relative;height:@(Math.Max(220, catRows.Count * 34 + 60))px"><canvas id="chartByCategory" aria-label="@T["Bar chart of withdrawals by category"]"></canvas></div></div>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-light"><strong>Withdrawals over Time</strong></div>
-                <div class="card-body"><div style="position:relative;height:300px"><canvas id="chartOverTime" aria-label="Line chart of withdrawals by month and the running total"></canvas></div></div>
+                <div class="card-header bg-light">@T.Html("<strong>Withdrawals over Time</strong>")</div>
+                <div class="card-body"><div style="position:relative;height:300px"><canvas id="chartOverTime" aria-label="@T["Line chart of withdrawals by month and the running total"]"></canvas></div></div>
             </div>
         </div>
     </div>
@@ -228,12 +220,12 @@ else
     </script>
 
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-light"><strong>Breakdown by Category</strong></div>
+        <div class="card-header bg-light">@T.Html("<strong>Breakdown by Category</strong>")</div>
         <div class="scroll-x">
             <table class="table table-bordered table-sm mb-0 ow-table">
                 <thead>
                     <tr>
-                        <th class="cat">Category</th>
+                        <th class="cat">@T["Category"]</th>
                         @foreach (var account in accounts)
                         {
                             <th class="text-end">
@@ -241,8 +233,8 @@ else
                                 <div class="fw-normal opacity-75" style="font-size:.74rem">@account.AccountName</div>
                             </th>
                         }
-                        <th class="text-end">Total</th>
-                        <th class="text-end" style="min-width:110px">Mix</th>
+                        <th class="text-end">@T["Total"]</th>
+                        <th class="text-end" style="min-width:110px">@T["Mix"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -275,7 +267,7 @@ else
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>Total Movement</td>
+                        <td>@T["Total Movement"]</td>
                         @foreach (var account in accounts)
                         {
                             <td class="text-end">@Model.ColumnTotal(account.AccountId).ToString("N2")</td>
@@ -290,19 +282,19 @@ else
 
     <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <strong>Detail</strong>
-            <span class="text-muted small ms-2">Every line posted to an owner account in the period</span>
+            <strong>@T["Detail"]</strong>
+            <span class="text-muted small ms-2">@T["Every line posted to an owner account in the period"]</span>
         </div>
         <div class="scroll-x">
             <table class="table table-bordered table-sm table-hover mb-0 ow-table">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Entry</th>
-                        <th class="cat">Description</th>
-                        <th>Category</th>
-                        <th class="text-end">Withdrawal</th>
-                        <th class="text-end">Contribution</th>
+                        <th>@T["Date"]</th>
+                        <th>@T["Entry"]</th>
+                        <th class="cat">@T["Description"]</th>
+                        <th>@T["Category"]</th>
+                        <th class="text-end">@T["Withdrawal"]</th>
+                        <th class="text-end">@T["Contribution"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -319,7 +311,7 @@ else
                                 }
                                 else
                                 {
-                                    <span class="badge bg-warning text-dark fw-normal">Uncategorised</span>
+                                    <span class="badge bg-warning text-dark fw-normal">@T["Uncategorised"]</span>
                                 }
                             </td>
                             <td class="text-end">@(line.Debit == 0m ? "-" : line.Debit.ToString("N2"))</td>
@@ -329,7 +321,7 @@ else
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="4">Total</td>
+                        <td colspan="4">@T["Total"]</td>
                         <td class="text-end">@Model.TotalWithdrawals.ToString("N2")</td>
                         <td class="text-end">@Model.TotalContributions.ToString("N2")</td>
                     </tr>
@@ -340,12 +332,12 @@ else
 
     <div class="card shadow-sm mt-3">
         <div class="card-body py-3 small text-muted">
-            <strong class="text-dark">How to read this</strong>
+            <strong class="text-dark">@T["How to read this"]</strong>
             <ul class="mb-0 mt-2">
-                <li>The owner account is <strong>equity</strong>, so a credit balance means the business owes the owner. A withdrawal is a <strong>debit</strong> and reduces that balance.</li>
-                <li>None of these amounts appear in the company Profit &amp; Loss. That is the point &mdash; owner spending is a distribution, not a business cost.</li>
-                <li>Category amounts are debits less credits, so a refund of a personal expense back into the business shows as a negative in that category.</li>
-                <li>Add one owner account per owner if you need to separate them; the same category list serves all of them and each gets its own column here.</li>
+                <li>@T.Html("The owner account is <strong>equity</strong>, so a credit balance means the business owes the owner. A withdrawal is a <strong>debit</strong> and reduces that balance.")</li>
+                <li>@T["None of these amounts appear in the company Profit & Loss. That is the point — owner spending is a distribution, not a business cost."]</li>
+                <li>@T["Category amounts are debits less credits, so a refund of a personal expense back into the business shows as a negative in that category."]</li>
+                <li>@T["Add one owner account per owner if you need to separate them; the same category list serves all of them and each gets its own column here."]</li>
             </ul>
         </div>
     </div>

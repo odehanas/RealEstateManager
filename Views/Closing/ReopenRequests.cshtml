@@ -2,16 +2,16 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Period Reopen Requests";
+    ViewData["Title"] = T["Period Reopen Requests"];
     var canApprove = ViewBag.CanApprove == true;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-0">Period Reopen Requests</h2>
-        <div class="text-muted">A closed period opens again only when an approver agrees with the reason given.</div>
+        <h2 class="mb-0">@T["Period Reopen Requests"]</h2>
+        <div class="text-muted">@T["A closed period opens again only when an approver agrees with the reason given."]</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">Closing Cockpit</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Closing Cockpit"]</a>
 </div>
 
 @if (TempData["ClosingSuccess"] is string success)
@@ -28,11 +28,11 @@
     <div class="card-body p-0">
         @if (Model.Pending.Count == 0)
         {
-            <div class="p-3 text-muted">No request is waiting.</div>
+            <div class="p-3 text-muted">@T["No request is waiting."]</div>
         }
         else if (!canApprove)
         {
-            <div class="p-3 text-muted">You can see the requests, but deciding them needs the Approve Period Reopening permission.</div>
+            <div class="p-3 text-muted">@T["You can see the requests, but deciding them needs the Approve Period Reopening permission."]</div>
         }
         else
         {
@@ -42,11 +42,11 @@
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header bg-light"><h5 class="mb-0">Decided lately</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["Decided lately"]</h5></div>
     <div class="card-body p-0">
         <table class="table table-sm table-striped mb-0">
             <thead>
-                <tr><th>Period</th><th>Asked by</th><th>Reason</th><th>Status</th><th>Decided by</th><th>Comment</th><th>Closed again</th></tr>
+                <tr><th>@T["Period"]</th><th>@T["Asked by"]</th><th>@T["Reason"]</th><th>@T["Status"]</th><th>@T["Decided by"]</th><th>@T["Comment"]</th><th>@T["Closed again"]</th></tr>
             </thead>
             <tbody>
                 @foreach (var r in Model.Recent)

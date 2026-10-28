@@ -1,6 +1,6 @@
 @model RealEstateManager.Services.PropertyUtilizationReportDto
 @{
-    ViewData["Title"] = "Property Utilization";
+    ViewData["Title"] = T["Property Utilization"];
 
     string RateClass(decimal rate) => rate >= 85m ? "bg-success"
         : rate >= 60m ? "bg-warning text-dark"
@@ -20,22 +20,22 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">Property Utilization</h2>
+        <h2 class="mb-1">@T["Property Utilization"]</h2>
         <p class="text-muted mb-0">
-            Occupancy, leased area and rent realisation for every property as at the selected date.
+            @T["Occupancy, leased area and rent realisation for every property as at the selected date."]
         </p>
     </div>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="asOfDate">As Of Date</label>
+        <label class="form-label mb-1" for="asOfDate">@T["As Of Date"]</label>
         <input type="date" class="form-control form-control-sm" id="asOfDate" name="asOfDate"
                value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -47,7 +47,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-primary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Unit Occupancy</div>
+                <div class="small text-uppercase opacity-75">@T["Unit Occupancy"]</div>
                 <div class="h3 fw-bold mb-1">@Model.OccupancyRate.ToString("N1")%</div>
                 <div class="small">@Model.OccupiedUnits occupied of @Model.TotalUnits units</div>
             </div>
@@ -56,7 +56,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-info text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Area Utilization</div>
+                <div class="small text-uppercase opacity-75">@T["Area Utilization"]</div>
                 <div class="h3 fw-bold mb-1">@Model.AreaUtilizationRate.ToString("N1")%</div>
                 <div class="small">@Model.LeasedAreaSqFt.ToString("N0") of @Model.TotalAreaSqFt.ToString("N0") sq ft</div>
             </div>
@@ -65,7 +65,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-success text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Rent Realisation</div>
+                <div class="small text-uppercase opacity-75">@T["Rent Realisation"]</div>
                 <div class="h3 fw-bold mb-1">@Model.RentRealisationRate.ToString("N1")%</div>
                 <div class="small">Contracted @Model.ContractedAnnualRent.ToString("N0") of @Model.StandardAnnualRent.ToString("N0")</div>
             </div>
@@ -74,7 +74,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-dark text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Annual Rent Gap</div>
+                <div class="small text-uppercase opacity-75">@T["Annual Rent Gap"]</div>
                 <div class="h3 fw-bold mb-1">@Model.RentGap.ToString("N0")</div>
                 <div class="small">@Model.VacantUnits vacant &middot; @Model.LeasesExpiringIn90Days expiring in 90 days</div>
             </div>
@@ -84,7 +84,7 @@
 
 @if (Model.Rows.Count == 0)
 {
-    <div class="alert alert-info">No properties have been registered yet.</div>
+    <div class="alert alert-info">@T["No properties have been registered yet."]</div>
 }
 else
 {
@@ -93,24 +93,24 @@ else
             <table class="table table-bordered table-sm mb-0 util-table">
                 <thead>
                     <tr>
-                        <th>Code</th>
-                        <th>Property</th>
-                        <th>Ownership</th>
-                        <th class="text-end">Units</th>
-                        <th class="text-end">Occ.</th>
-                        <th class="text-end">Vac.</th>
-                        <th class="text-end">Mnt.</th>
-                        <th class="text-end">Rsv.</th>
-                        <th class="text-end" style="min-width:110px">Occupancy</th>
-                        <th class="text-end">Total Area</th>
-                        <th class="text-end">Leased Area</th>
-                        <th class="text-end" style="min-width:110px">Area Util.</th>
-                        <th class="text-end">Standard Rent</th>
-                        <th class="text-end">Contracted Rent</th>
-                        <th class="text-end">Rent Gap</th>
-                        <th class="text-end">Realisation</th>
-                        <th class="text-end">Rent / sq ft</th>
-                        <th class="text-end">Expiring 90d</th>
+                        <th>@T["Code"]</th>
+                        <th>@T["Property"]</th>
+                        <th>@T["Ownership"]</th>
+                        <th class="text-end">@T["Units"]</th>
+                        <th class="text-end">@T["Occ."]</th>
+                        <th class="text-end">@T["Vac."]</th>
+                        <th class="text-end">@T["Mnt."]</th>
+                        <th class="text-end">@T["Rsv."]</th>
+                        <th class="text-end" style="min-width:110px">@T["Occupancy"]</th>
+                        <th class="text-end">@T["Total Area"]</th>
+                        <th class="text-end">@T["Leased Area"]</th>
+                        <th class="text-end" style="min-width:110px">@T["Area Util."]</th>
+                        <th class="text-end">@T["Standard Rent"]</th>
+                        <th class="text-end">@T["Contracted Rent"]</th>
+                        <th class="text-end">@T["Rent Gap"]</th>
+                        <th class="text-end">@T["Realisation"]</th>
+                        <th class="text-end">@T["Rent / sq ft"]</th>
+                        <th class="text-end">@T["Expiring 90d"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,7 +122,7 @@ else
                                 @row.PropertyName
                                 @if (!row.IsActive)
                                 {
-                                    <span class="badge bg-secondary ms-1">Inactive</span>
+                                    <span class="badge bg-secondary ms-1">@T["Inactive"]</span>
                                 }
                                 <div class="small text-muted">@row.PropertyType</div>
                             </td>
@@ -170,7 +170,7 @@ else
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="3">Portfolio Total</td>
+                        <td colspan="3">@T["Portfolio Total"]</td>
                         <td class="text-end">@Model.TotalUnits</td>
                         <td class="text-end">@Model.OccupiedUnits</td>
                         <td class="text-end">@Model.VacantUnits</td>
@@ -194,14 +194,14 @@ else
 
     <div class="card shadow-sm mt-3">
         <div class="card-body py-3 small text-muted">
-            <strong class="text-dark">How these measures are built</strong>
+            <strong class="text-dark">@T["How these measures are built"]</strong>
             <ul class="mb-0 mt-2">
-                <li><strong>Occupancy</strong> &mdash; units with status <em>Occupied</em> divided by total units. Driven by unit status, which is set automatically when a lease becomes active.</li>
-                <li><strong>Area utilization</strong> &mdash; area of units under a lease that is active and current at the as-of date, divided by total area. This measures let space rather than unit count, so a large vacant unit shows a bigger impact.</li>
-                <li><strong>Standard rent</strong> &mdash; the sum of each unit's asking rent. <strong>Contracted rent</strong> &mdash; the annual rent on leases active at the as-of date.</li>
-                <li><strong>Rent realisation</strong> &mdash; contracted against standard. Below 100% means vacancy or leases signed below the asking rent; above 100% means units are let above asking.</li>
-                <li><strong>Rent gap</strong> &mdash; annualised revenue forgone. This is the number to attack first.</li>
-                <li><strong>Expiring 90d</strong> &mdash; active leases ending within 90 days of the as-of date; your renewal pipeline.</li>
+                <li>@T.Html("<strong>Occupancy</strong> &mdash; units with status <em>Occupied</em> divided by total units. Driven by unit status, which is set automatically when a lease becomes active.")</li>
+                <li>@T.Html("<strong>Area utilization</strong> &mdash; area of units under a lease that is active and current at the as-of date, divided by total area. This measures let space rather than unit count, so a large vacant unit shows a bigger impact.")</li>
+                <li>@T.Html("<strong>Standard rent</strong> &mdash; the sum of each unit's asking rent. <strong>Contracted rent</strong> &mdash; the annual rent on leases active at the as-of date.")</li>
+                <li>@T.Html("<strong>Rent realisation</strong> &mdash; contracted against standard. Below 100% means vacancy or leases signed below the asking rent; above 100% means units are let above asking.")</li>
+                <li>@T.Html("<strong>Rent gap</strong> &mdash; annualised revenue forgone. This is the number to attack first.")</li>
+                <li>@T.Html("<strong>Expiring 90d</strong> &mdash; active leases ending within 90 days of the as-of date; your renewal pipeline.")</li>
             </ul>
         </div>
     </div>

@@ -2,7 +2,7 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "General Ledger";
+    ViewData["Title"] = T["General Ledger"];
     var accounts = ViewBag.Accounts as List<Account> ?? new();
     string? returnUrl = ViewBag.ReturnUrl;
     string? returnTo = ViewBag.ReturnTo;
@@ -14,12 +14,12 @@
     {
         <a href="@returnUrl" class="btn btn-outline-dark btn-sm">&larr; Back to @returnTo</a>
     }
-    <h2 class="mb-0 me-auto">General Ledger</h2>
-    <div class="btn-group btn-group-sm d-print-none" role="group" aria-label="Open a report">
-        <a asp-controller="Reports" asp-action="TrialBalance" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">Trial Balance</a>
-        <a asp-controller="Reports" asp-action="BalanceSheet" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">Balance Sheet</a>
-        <a asp-controller="Reports" asp-action="ProfitAndLoss" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">Profit &amp; Loss</a>
-        <a asp-controller="Reports" asp-action="GeneralJournal" asp-route-toDate="@reportDate" class="btn btn-outline-secondary">General Journal</a>
+    <h2 class="mb-0 me-auto">@T["General Ledger"]</h2>
+    <div class="btn-group btn-group-sm d-print-none" role="group" aria-label="@T["Open a report"]">
+        <a asp-controller="Reports" asp-action="TrialBalance" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">@T["Trial Balance"]</a>
+        <a asp-controller="Reports" asp-action="BalanceSheet" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">@T["Balance Sheet"]</a>
+        <a asp-controller="Reports" asp-action="ProfitAndLoss" asp-route-asOfDate="@reportDate" class="btn btn-outline-secondary">@T["Profit & Loss"]</a>
+        <a asp-controller="Reports" asp-action="GeneralJournal" asp-route-toDate="@reportDate" class="btn btn-outline-secondary">@T["General Journal"]</a>
     </div>
 </div>
 
@@ -30,9 +30,9 @@
         <input type="hidden" name="returnTo" value="@returnTo" />
     }
     <div class="col-md-4">
-        <label class="form-label">Account</label>
+        <label class="form-label">@T["Account"]</label>
         <select name="accountId" class="form-select">
-            <option value="">Select Account</option>
+            <option value="">@T["Select Account"]</option>
             @foreach (var account in accounts)
             {
                 if (Model?.AccountId == account.Id)
@@ -48,17 +48,17 @@
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">From Date</label>
+        <label class="form-label">@T["From Date"]</label>
         <input type="date" name="fromDate" value="@(Model?.FromDate.ToString("yyyy-MM-dd"))" class="form-control" />
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">To Date</label>
+        <label class="form-label">@T["To Date"]</label>
         <input type="date" name="toDate" value="@(Model?.ToDate.ToString("yyyy-MM-dd"))" class="form-control" />
     </div>
 
     <div class="col-md-2 d-flex align-items-end">
-        <button type="submit" class="btn btn-dark">View</button>
+        <button type="submit" class="btn btn-dark">@T["View"]</button>
     </div>
 </form>
 
@@ -79,13 +79,13 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Entry No.</th>
-                <th>Source</th>
-                <th>Description</th>
-                <th class="text-end">Debit</th>
-                <th class="text-end">Credit</th>
-                <th class="text-end">Running Balance</th>
+                <th>@T["Date"]</th>
+                <th>@T["Entry No."]</th>
+                <th>@T["Source"]</th>
+                <th>@T["Description"]</th>
+                <th class="text-end">@T["Debit"]</th>
+                <th class="text-end">@T["Credit"]</th>
+                <th class="text-end">@T["Running Balance"]</th>
             </tr>
         </thead>
         <tbody>
@@ -93,8 +93,8 @@
             {
                 <tr>
                     <td>@row.EntryDate.ToString("dd/MM/yyyy")</td>
-                    <td><a asp-controller="Documents" asp-action="Entry" asp-route-id="@row.JournalEntryId" title="Open the journal entry">@row.EntryNumber</a></td>
-                    <td><a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="Open the original document">@RealEstateManager.Services.GeneralJournalReportService.SourceLabel(row.SourceType)</a></td>
+                    <td><a asp-controller="Documents" asp-action="Entry" asp-route-id="@row.JournalEntryId" title="@T["Open the journal entry"]">@row.EntryNumber</a></td>
+                    <td><a asp-controller="Documents" asp-action="Open" asp-route-entryId="@row.JournalEntryId" title="@T["Open the original document"]">@RealEstateManager.Services.GeneralJournalReportService.SourceLabel(row.SourceType)</a></td>
                     <td>@row.Description</td>
                     <td class="text-end">@row.Debit.ToString("N2")</td>
                     <td class="text-end">@row.Credit.ToString("N2")</td>

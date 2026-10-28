@@ -13,7 +13,7 @@
         <h2 class="mb-0">@Model.Name</h2>
         <div class="text-muted">Capital Assets Scheme &middot; @Model.Property?.Code - @Model.Property?.Name</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">Back</a>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back"]</a>
 </div>
 
 @if (TempData["SuccessMessage"] is string success)
@@ -26,17 +26,17 @@
 }
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Value before VAT</div><div class="fs-5">@Model.AssetValue.ToString("N2")</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Input VAT charged</div><div class="fs-5">@Model.InputVat.ToString("N2")</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">Recovered at the time</div><div class="fs-5">@Model.RecoveredVat.ToString("N2") (@Model.OriginalRecoveryPercent.ToString("0.##")%)</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">One year's share</div><div class="fs-5">@((Model.InputVat / 10m).ToString("N2"))</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Value before VAT"]</div><div class="fs-5">@Model.AssetValue.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Input VAT charged"]</div><div class="fs-5">@Model.InputVat.ToString("N2")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["Recovered at the time"]</div><div class="fs-5">@Model.RecoveredVat.ToString("N2") (@Model.OriginalRecoveryPercent.ToString("0.##")%)</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["One year's share"]</div><div class="fs-5">@((Model.InputVat / 10m).ToString("N2"))</div></div></div></div>
 </div>
 
 <p class="small text-muted">Each year: adjustment = input VAT &times; (taxable use that year &minus; @Model.OriginalRecoveryPercent.ToString("0.##")%) &divide; 10.
 A positive figure is more tax to recover; a negative one is tax to pay back.</p>
 
 <table class="table table-bordered table-sm">
-    <thead><tr><th>Year</th><th>Period</th><th class="text-end">Taxable use</th><th class="text-end">Adjustment</th><th>Accounted on</th><th>Journal</th><th>Notes</th></tr></thead>
+    <thead><tr><th>@T["Year"]</th><th>@T["Period"]</th><th class="text-end">@T["Taxable use"]</th><th class="text-end">@T["Adjustment"]</th><th>@T["Accounted on"]</th><th>@T["Journal"]</th><th>@T["Notes"]</th></tr></thead>
     <tbody>
         @for (var year = 1; year <= 10; year++)
         {
@@ -73,20 +73,20 @@ A positive figure is more tax to recover; a negative one is tax to pay back.</p>
                   onsubmit="return confirm('Post the Capital Assets Scheme adjustment for this year?');">
                 <input type="hidden" name="year" value="@nextYear" />
                 <div class="col-md-3">
-                    <label class="form-label">Taxable use %</label>
+                    <label class="form-label">@T["Taxable use %"]</label>
                     <input type="number" step="0.01" min="0" max="100" name="taxableUsePercent" id="taxableUse"
                            value="@((proposed ?? Model.OriginalRecoveryPercent).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" class="form-control" required />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Adjustment</label>
+                    <label class="form-label">@T["Adjustment"]</label>
                     <div class="form-control bg-light" id="adjPreview">-</div>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Account on</label>
+                    <label class="form-label">@T["Account on"]</label>
                     <input type="date" name="adjustmentDate" value="@(e.AddDays(1) > DateTime.Today ? DateTime.Today.ToString("yyyy-MM-dd") : e.AddDays(1).ToString("yyyy-MM-dd"))" class="form-control" required />
                 </div>
-                <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-primary w-100">Post Adjustment</button></div>
-                <div class="col-12"><input type="text" name="notes" class="form-control" maxlength="500" placeholder="Notes (optional) - e.g. how the taxable use was worked out" /></div>
+                <div class="col-md-3 d-flex align-items-end"><button type="submit" class="btn btn-primary w-100">@T["Post Adjustment"]</button></div>
+                <div class="col-12"><input type="text" name="notes" class="form-control" maxlength="500" placeholder="@T["Notes (optional) - e.g. how the taxable use was worked out"]" /></div>
             </form>
         </div>
     </div>

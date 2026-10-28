@@ -4,7 +4,7 @@
 @* Registration details: shared by Create and Edit. Everything here is optional - fill in what
    the title deed, affection plan and permits show. *@
 
-<h5 class="mt-4 mb-2">Location</h5>
+<h5 class="mt-4 mb-2">@T["Location"]</h5>
 <div class="row g-3">
     <div class="col-md-3">
         <label asp-for="Emirate" class="form-label"></label>
@@ -30,19 +30,19 @@
     </div>
     <div class="col-md-4">
         <label asp-for="LocationReference" class="form-label"></label>
-        <input asp-for="LocationReference" class="form-control" maxlength="50" placeholder="e.g. Makani number" />
+        <input asp-for="LocationReference" class="form-control" maxlength="50" placeholder="@T["e.g. Makani number"]" />
     </div>
     <div class="col-md-4">
-        <label asp-for="Latitude" class="form-label">Latitude (GPS)</label>
+        <label asp-for="Latitude" class="form-label">@T["Latitude (GPS)"]</label>
         <input asp-for="Latitude" class="form-control" step="0.000001" placeholder="25.789123" />
     </div>
     <div class="col-md-4">
-        <label asp-for="Longitude" class="form-label">Longitude (GPS)</label>
+        <label asp-for="Longitude" class="form-label">@T["Longitude (GPS)"]</label>
         <input asp-for="Longitude" class="form-control" step="0.000001" placeholder="55.943210" />
     </div>
 </div>
 
-<h5 class="mt-4 mb-2">Title Deed &amp; Land</h5>
+<h5 class="mt-4 mb-2">@T["Title Deed & Land"]</h5>
 <div class="row g-3">
     <div class="col-md-3">
         <label asp-for="TitleDeedNumber" class="form-label"></label>
@@ -54,7 +54,7 @@
     </div>
     <div class="col-md-6">
         <label asp-for="TitleDeedAuthority" class="form-label"></label>
-        <input asp-for="TitleDeedAuthority" class="form-control" maxlength="100" placeholder="Land department or municipality that issued the deed" />
+        <input asp-for="TitleDeedAuthority" class="form-control" maxlength="100" placeholder="@T["Land department or municipality that issued the deed"]" />
     </div>
     <div class="col-md-3">
         <label asp-for="TenureType" class="form-label"></label>
@@ -87,16 +87,16 @@
     <div class="col-md-3">
         <div class="form-check mt-4">
             <input asp-for="IsMortgaged" class="form-check-input" type="checkbox" />
-            <label asp-for="IsMortgaged" class="form-check-label">Title is mortgaged</label>
+            <label asp-for="IsMortgaged" class="form-check-label">@T["Title is mortgaged"]</label>
         </div>
     </div>
     <div class="col-md-9">
         <label asp-for="MortgageDetails" class="form-label"></label>
-        <input asp-for="MortgageDetails" class="form-control" maxlength="300" placeholder="Lender, mortgage reference, amount" />
+        <input asp-for="MortgageDetails" class="form-control" maxlength="300" placeholder="@T["Lender, mortgage reference, amount"]" />
     </div>
 </div>
 
-<h5 class="mt-4 mb-2">Building &amp; Completion</h5>
+<h5 class="mt-4 mb-2">@T["Building & Completion"]</h5>
 <div class="row g-3">
     <div class="col-md-3">
         <label asp-for="BuildingPermitNumber" class="form-label"></label>
@@ -113,7 +113,7 @@
     <div class="col-md-3">
         <label asp-for="CompletionDate" class="form-label"></label>
         <input asp-for="CompletionDate" type="date" class="form-control" />
-        <div class="form-text">From the completion certificate. Starts the 3-year VAT zero-rating window for new residential units.</div>
+        <div class="form-text">@T["From the completion certificate. Starts the 3-year VAT zero-rating window for new residential units."]</div>
     </div>
     <div class="col-md-3">
         <label asp-for="BuiltUpAreaSqFt" class="form-label"></label>
@@ -142,7 +142,7 @@
     </div>
 </div>
 
-<h5 class="mt-4 mb-2">Utilities &amp; Insurance</h5>
+<h5 class="mt-4 mb-2">@T["Utilities & Insurance"]</h5>
 <div class="row g-3">
     <div class="col-md-3">
         <label asp-for="UtilityAccountNumber" class="form-label"></label>
@@ -166,12 +166,12 @@
     </div>
 </div>
 
-<h5 class="mt-4 mb-2">Valuation</h5>
+<h5 class="mt-4 mb-2">@T["Valuation"]</h5>
 <div class="row g-3">
     <div class="col-md-4">
         <label asp-for="FairValue" class="form-label"></label>
         <input asp-for="FairValue" class="form-control" step="0.01" min="0" />
-        <div class="form-text">Latest independent valuation. Disclosed in the investment property note, not booked.</div>
+        <div class="form-text">@T["Latest independent valuation. Disclosed in the investment property note, not booked."]</div>
     </div>
     <div class="col-md-4">
         <label asp-for="FairValueDate" class="form-label"></label>

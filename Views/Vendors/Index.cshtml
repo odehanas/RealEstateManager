@@ -2,7 +2,7 @@
 @inject PermissionService PermissionService
 
 @{
-    ViewData["Title"] = "Vendors";
+    ViewData["Title"] = T["Vendors"];
 
     // Accounting users can look a supplier up to enter its bill, but only the master
     // data owner may create one - otherwise the same supplier ends up under two codes.
@@ -10,31 +10,31 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Vendors</h2>
+    <h2>@T["Vendors"]</h2>
     @if (canEdit)
     {
-        <a asp-action="Create" class="btn btn-dark">Add Vendor</a>
+        <a asp-action="Create" class="btn btn-dark">@T["Add Vendor"]</a>
     }
 </div>
 
 @if (!canEdit)
 {
     <div class="alert alert-secondary py-2 small">
-        You have read-only access to master data. Contact the master data owner to add or amend a vendor.
+        @T["You have read-only access to master data. Contact the master data owner to add or amend a vendor."]
     </div>
 }
 
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Service Type</th>
-            <th>Contact Person</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>@T["Code"]</th>
+            <th>@T["Name"]</th>
+            <th>@T["Service Type"]</th>
+            <th>@T["Contact Person"]</th>
+            <th>@T["Email"]</th>
+            <th>@T["Phone"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -51,7 +51,7 @@
                 <td>
                     @if (canEdit)
                     {
-                        <a asp-action="Edit" asp-route-id="@vendor.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="Edit" asp-route-id="@vendor.Id" class="btn btn-sm btn-primary">@T["Edit"]</a>
                     }
                 </td>
             </tr>

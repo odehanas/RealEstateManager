@@ -2,12 +2,12 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Receive Payment";
+    ViewData["Title"] = T["Receive Payment"];
     var invoices = ViewBag.Invoices as List<CustomerInvoice> ?? new();
     var selectedInvoiceId = ViewBag.SelectedInvoiceId as int?;
 }
 
-<h2>Receive Payment</h2>
+<h2>@T["Receive Payment"]</h2>
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
@@ -16,9 +16,9 @@
 
     <div class="row g-3">
         <div class="col-md-6">
-            <label asp-for="CustomerInvoiceId" class="form-label">Invoice</label>
+            <label asp-for="CustomerInvoiceId" class="form-label">@T["Invoice"]</label>
             <select asp-for="CustomerInvoiceId" class="form-select">
-                <option value="">Select Invoice</option>
+                <option value="">@T["Select Invoice"]</option>
                 @foreach (var invoice in invoices)
                 {
                     var outstanding = invoice.TotalAmount - invoice.AmountPaid;
@@ -34,7 +34,7 @@
         <div class="col-md-3">
             <label asp-for="ReceiptNumber" class="form-label"></label>
             <input asp-for="ReceiptNumber" class="form-control" />
-            <small class="text-muted">Leave blank to auto-generate.</small>
+            <small class="text-muted">@T["Leave blank to auto-generate."]</small>
         </div>
 
         <div class="col-md-3">
@@ -50,17 +50,17 @@
         <div class="col-md-4">
             <label asp-for="PaymentMethod" class="form-label"></label>
             <select asp-for="PaymentMethod" class="form-select">
-                <option>Bank</option>
-                <option>Cash</option>
-                <option>Cheque</option>
-                <option>Transfer</option>
+                <option>@T["Bank"]</option>
+                <option>@T["Cash"]</option>
+                <option>@T["Cheque"]</option>
+                <option>@T["Transfer"]</option>
             </select>
         </div>
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save and Post</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" class="btn btn-dark">@T["Save and Post"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

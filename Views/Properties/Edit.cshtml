@@ -1,10 +1,10 @@
 @model RealEstateManager.Domain.Property
 
 @{
-    ViewData["Title"] = "Edit Property";
+    ViewData["Title"] = T["Edit Property"];
 }
 
-<h2>Edit Property</h2>
+<h2>@T["Edit Property"]</h2>
 
 <form asp-action="Edit" method="post">
     @Html.AntiForgeryToken()
@@ -33,32 +33,31 @@
         <div class="col-md-3">
             <label asp-for="PropertyType" class="form-label"></label>
             <select asp-for="PropertyType" class="form-select">
-                <option value="">Select</option>
-                <option>Residential</option>
-                <option>Commercial</option>
-                <option>Warehouse</option>
-                <option>MixedUse</option>
+                <option value="">@T["Select"]</option>
+                <option>@T["Residential"]</option>
+                <option>@T["Commercial"]</option>
+                <option>@T["Warehouse"]</option>
+                <option>@T["MixedUse"]</option>
             </select>
         </div>
 
         <div class="col-md-3">
             <label asp-for="OwnershipType" class="form-label"></label>
             <select asp-for="OwnershipType" class="form-select">
-                <option>Owned</option>
-                <option>Managed</option>
+                <option>@T["Owned"]</option>
+                <option>@T["Managed"]</option>
             </select>
         </div>
 
         <div class="col-md-3">
-            <label asp-for="VatCategory" class="form-label">VAT Treatment</label>
+            <label asp-for="VatCategory" class="form-label">@T["VAT Treatment"]</label>
             <select asp-for="VatCategory" class="form-select">
-                <option value="Standard">Standard rated (5%)</option>
-                <option value="Exempt">Exempt</option>
-                <option value="ZeroRated">Zero rated (0%)</option>
+                <option value="Standard">@T["Standard rated (5%)"]</option>
+                <option value="Exempt">@T["Exempt"]</option>
+                <option value="ZeroRated">@T["Zero rated (0%)"]</option>
             </select>
             <div class="form-text">
-                Changing this affects <strong>new</strong> leases only. Invoices already issued keep the
-                treatment they were raised under.
+                @T.Html("Changing this affects <strong>new</strong> leases only. Invoices already issued keep the treatment they were raised under.")
             </div>
         </div>
 
@@ -68,20 +67,18 @@
         </div>
 
         <div class="col-md-4">
-            <label asp-for="OwnerTrn" class="form-label">Owner TRN</label>
+            <label asp-for="OwnerTrn" class="form-label">@T["Owner TRN"]</label>
             <input asp-for="OwnerTrn" class="form-control" maxlength="20" />
-            <div class="form-text">Managed properties only, if the owner is VAT registered. Printed on our commission tax invoice.</div>
+            <div class="form-text">@T["Managed properties only, if the owner is VAT registered. Printed on our commission tax invoice."]</div>
         </div>
 
         <div class="col-md-8">
             <div class="form-check mt-md-4">
                 <input asp-for="RentBilledInOwnerName" class="form-check-input" type="checkbox" />
-                <label asp-for="RentBilledInOwnerName" class="form-check-label">Invoice tenants in the owner's name (we act as the owner's agent)</label>
+                <label asp-for="RentBilledInOwnerName" class="form-check-label">@T["Invoice tenants in the owner's name (we act as the owner's agent)"]</label>
             </div>
             <div class="form-text">
-                Managed properties only. Rent invoices show the owner as supplier with the owner's TRN; when the owner has no TRN
-                no VAT is charged. The rent VAT is the owner's and stays off our VAT return; our commission is invoiced to the owner
-                under our TRN. Applies to contracts and invoices posted after it is switched on.
+                @T["Managed properties only. Rent invoices show the owner as supplier with the owner's TRN; when the owner has no TRN no VAT is charged. The rent VAT is the owner's and stays off our VAT return; our commission is invoiced to the owner under our TRN. Applies to contracts and invoices posted after it is switched on."]
             </div>
         </div>
 
@@ -106,8 +103,8 @@
     <partial name="_RegistrationFields" model="Model" />
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save</button>
-        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" class="btn btn-dark">@T["Save"]</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

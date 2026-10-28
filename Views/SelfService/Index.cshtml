@@ -3,7 +3,7 @@
 @using RealEstateManager.Services
 @{
     Layout = "_SelfServiceLayout";
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = T["Home"];
     var balance = (HrService.LeaveBalance)ViewBag.Balance;
     var last = ViewBag.LastPayslip as PayrollRunLine;
     var advances = (List<EmployeeAdvance>)ViewBag.Advances;
@@ -22,28 +22,28 @@
 <div class="row g-3 mb-3">
     <div class="col-6">
         <a asp-action="Leave" class="card shadow-sm stat text-decoration-none text-reset h-100"><div class="card-body">
-            <div class="label">Annual leave left</div>
+            <div class="label">@T["Annual leave left"]</div>
             <div class="value">@((balance.Available - balance.Pending).ToString("0.#"))</div>
             <div class="small text-muted">days@(balance.Pending > 0 ? $" · {balance.Pending:0.#} pending" : "")</div>
         </div></a>
     </div>
     <div class="col-6">
         <a asp-action="Payslips" class="card shadow-sm stat text-decoration-none text-reset h-100"><div class="card-body">
-            <div class="label">Last net salary</div>
+            <div class="label">@T["Last net salary"]</div>
             <div class="value">@(last?.Net.ToString("N0") ?? "—")</div>
             <div class="small text-muted">@(last?.PayrollRun?.PeriodStart.ToString("MMMM yyyy") ?? "No payslip yet")</div>
         </div></a>
     </div>
     <div class="col-6">
         <div class="card shadow-sm stat h-100"><div class="card-body">
-            <div class="label">Advance to repay</div>
+            <div class="label">@T["Advance to repay"]</div>
             <div class="value">@outstanding.ToString("N0")</div>
-            <div class="small text-muted">AED</div>
+            <div class="small text-muted">@T["AED"]</div>
         </div></div>
     </div>
     <div class="col-6">
         <div class="card shadow-sm stat h-100"><div class="card-body">
-            <div class="label">End of service to date</div>
+            <div class="label">@T["End of service to date"]</div>
             <div class="value">@gratuity.Amount.ToString("N0")</div>
             <div class="small text-muted">AED · @gratuity.ServiceYears.ToString("0.##") yrs@(gratuity.Eligible ? "" : " (due after 1 yr)")</div>
         </div></div>
@@ -52,12 +52,12 @@
 
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <div class="fw-bold mb-2">My monthly package</div>
-        <div class="d-flex justify-content-between small"><span>Basic</span><span>@Model.BasicSalary.ToString("N2")</span></div>
-        <div class="d-flex justify-content-between small"><span>Housing</span><span>@Model.HousingAllowance.ToString("N2")</span></div>
-        <div class="d-flex justify-content-between small"><span>Transport</span><span>@Model.TransportAllowance.ToString("N2")</span></div>
-        <div class="d-flex justify-content-between small"><span>Other</span><span>@Model.OtherAllowance.ToString("N2")</span></div>
-        <div class="d-flex justify-content-between fw-bold border-top mt-1 pt-1"><span>Gross</span><span>@Model.MonthlyGross.ToString("N2")</span></div>
+        <div class="fw-bold mb-2">@T["My monthly package"]</div>
+        <div class="d-flex justify-content-between small"><span>@T["Basic"]</span><span>@Model.BasicSalary.ToString("N2")</span></div>
+        <div class="d-flex justify-content-between small"><span>@T["Housing"]</span><span>@Model.HousingAllowance.ToString("N2")</span></div>
+        <div class="d-flex justify-content-between small"><span>@T["Transport"]</span><span>@Model.TransportAllowance.ToString("N2")</span></div>
+        <div class="d-flex justify-content-between small"><span>@T["Other"]</span><span>@Model.OtherAllowance.ToString("N2")</span></div>
+        <div class="d-flex justify-content-between fw-bold border-top mt-1 pt-1"><span>@T["Gross"]</span><span>@Model.MonthlyGross.ToString("N2")</span></div>
     </div>
 </div>
 
@@ -65,7 +65,7 @@
 {
     <div class="card shadow-sm mb-3">
         <div class="card-body">
-            <div class="fw-bold mb-2">Salary advances</div>
+            <div class="fw-bold mb-2">@T["Salary advances"]</div>
             @foreach (var a in advances.Where(x => x.Outstanding > 0))
             {
                 <div class="d-flex justify-content-between small border-bottom py-1">
@@ -78,6 +78,6 @@
 }
 
 <div class="d-grid gap-2">
-    <a asp-action="Leave" class="btn btn-primary">Request leave</a>
-    <a asp-action="Requests" class="btn btn-outline-primary">Ask for a salary certificate</a>
+    <a asp-action="Leave" class="btn btn-primary">@T["Request leave"]</a>
+    <a asp-action="Requests" class="btn btn-outline-primary">@T["Ask for a salary certificate"]</a>
 </div>

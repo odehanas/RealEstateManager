@@ -1,7 +1,7 @@
 @model RealEstateManager.Models.RegisterCompanyViewModel
 
 @{
-    ViewData["Title"] = "Create Company";
+    ViewData["Title"] = T["Create Company"];
     Layout = "_Layout";
 }
 
@@ -11,20 +11,20 @@
             <div class="col-lg-5">
                 <div class="card shadow-sm h-100 border-0 bg-light">
                     <div class="card-body p-4">
-                        <span class="badge bg-primary-subtle text-primary mb-3">New Customer Onboarding</span>
-                        <h1 class="h3 mb-3">Start Your Company Setup</h1>
+                        <span class="badge bg-primary-subtle text-primary mb-3">@T["New Customer Onboarding"]</span>
+                        <h1 class="h3 mb-3">@T["Start Your Company Setup"]</h1>
                         <p class="text-muted mb-4">
-                            Create your company, create the first admin account, and start using the system immediately with a 15-day trial.
+                            @T["Create your company, create the first admin account, and start using the system immediately with a 15-day trial."]
                         </p>
 
                         <div class="card border-primary-subtle mb-4">
                             <div class="card-body">
-                                <h2 class="h6 text-primary mb-3">What Happens Next</h2>
+                                <h2 class="h6 text-primary mb-3">@T["What Happens Next"]</h2>
                                 <ul class="mb-0 ps-3">
-                                    <li>Your company record is created automatically.</li>
-                                    <li>Your first admin user gets full access for that company.</li>
-                                    <li>The default chart of accounts and setup are prepared.</li>
-                                    <li>The 15-day trial starts immediately after registration.</li>
+                                    <li>@T["Your company record is created automatically."]</li>
+                                    <li>@T["Your first admin user gets full access for that company."]</li>
+                                    <li>@T["The default chart of accounts and setup are prepared."]</li>
+                                    <li>@T["The 15-day trial starts immediately after registration."]</li>
                                 </ul>
                             </div>
                         </div>
@@ -32,21 +32,21 @@
                         <div class="row g-3">
                             <div class="col-sm-6">
                                 <div class="border rounded p-3 h-100 bg-white">
-                                    <div class="fw-semibold">Trial Period</div>
-                                    <div class="text-muted small">15 days of full system access</div>
+                                    <div class="fw-semibold">@T["Trial Period"]</div>
+                                    <div class="text-muted small">@T["15 days of full system access"]</div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="border rounded p-3 h-100 bg-white">
-                                    <div class="fw-semibold">Activation</div>
-                                    <div class="text-muted small">Continue later using subscription codes</div>
+                                    <div class="fw-semibold">@T["Activation"]</div>
+                                    <div class="text-muted small">@T["Continue later using subscription codes"]</div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-4 small text-muted">
                             Already have an account?
-                            <a asp-action="Login" class="text-decoration-none">Return to login</a>
+                            <a asp-action="Login" class="text-decoration-none">@T["Return to login"]</a>
                         </div>
                     </div>
                 </div>
@@ -57,17 +57,17 @@
                     <div class="card-body p-4 p-lg-5">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
-                                <h2 class="h4 mb-1">Company Registration</h2>
-                                <p class="text-muted mb-0">Fill in the company details and the first admin account.</p>
+                                <h2 class="h4 mb-1">@T["Company Registration"]</h2>
+                                <p class="text-muted mb-0">@T["Fill in the company details and the first admin account."]</p>
                             </div>
-                            <a asp-action="Login" class="btn btn-outline-secondary btn-sm">Back To Login</a>
+                            <a asp-action="Login" class="btn btn-outline-secondary btn-sm">@T["Back To Login"]</a>
                         </div>
 
                         <form asp-action="RegisterCompany" method="post" class="row g-3">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                             <div class="col-12">
-                                <h3 class="h6 text-uppercase text-muted border-bottom pb-2 mb-1">Company Details</h3>
+                                <h3 class="h6 text-uppercase text-muted border-bottom pb-2 mb-1">@T["Company Details"]</h3>
                             </div>
 
                             <div class="col-md-6">
@@ -94,7 +94,7 @@
                             </div>
 
                             <div class="col-12 pt-2">
-                                <h3 class="h6 text-uppercase text-muted border-bottom pb-2 mb-1">First Admin User</h3>
+                                <h3 class="h6 text-uppercase text-muted border-bottom pb-2 mb-1">@T["First Admin User"]</h3>
                             </div>
 
                             <div class="col-md-6">
@@ -123,13 +123,13 @@
 
                             <div class="col-12">
                                 <div class="alert alert-info mb-0">
-                                    After registration, the system signs you in automatically and opens your new company with the active trial.
+                                    @T["After registration, the system signs you in automatically and opens your new company with the active trial."]
                                 </div>
                             </div>
 
                             <div class="col-12 d-flex gap-2 flex-wrap">
-                                <button type="submit" class="btn btn-primary">Create Company</button>
-                                <a asp-action="Login" class="btn btn-outline-secondary">Back To Login</a>
+                                <button type="submit" class="btn btn-primary">@T["Create Company"]</button>
+                                <a asp-action="Login" class="btn btn-outline-secondary">@T["Back To Login"]</a>
                             </div>
                         </form>
                     </div>

@@ -2,18 +2,17 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Receive PDC";
+    ViewData["Title"] = T["Receive PDC"];
     var leases = ViewBag.Leases as List<Lease> ?? new();
     var invoices = ViewBag.Invoices as List<CustomerInvoice> ?? new();
     var selectedLeaseId = ViewBag.SelectedLeaseId as int?;
     var selectedInvoiceId = ViewBag.SelectedInvoiceId as int?;
 }
 
-<h2>Receive PDC</h2>
+<h2>@T["Receive PDC"]</h2>
 
 <div class="alert alert-info">
-    Use <strong>Advance</strong> when the cheque is still only a noted item for future collection.
-    Use <strong>Receivable</strong> only when the cheque is linked to an outstanding invoice and should settle A/R once cleared.
+    @T.Html("Use <strong>Advance</strong> when the cheque is still only a noted item for future collection. Use <strong>Receivable</strong> only when the cheque is linked to an outstanding invoice and should settle A/R once cleared.")
 </div>
 
 @if (Model.ReplacesPdcId.HasValue)
@@ -32,9 +31,9 @@
 
     <div class="row g-3">
         <div class="col-md-6">
-            <label asp-for="LeaseId" class="form-label">Lease</label>
+            <label asp-for="LeaseId" class="form-label">@T["Lease"]</label>
             <select asp-for="LeaseId" class="form-select">
-                <option value="">Select Lease</option>
+                <option value="">@T["Select Lease"]</option>
                 @foreach (var lease in leases)
                 {
                     var isSelected = Model.LeaseId == lease.Id || selectedLeaseId == lease.Id;
@@ -46,9 +45,9 @@
         </div>
 
         <div class="col-md-6">
-            <label asp-for="CustomerInvoiceId" class="form-label">Invoice (Optional)</label>
+            <label asp-for="CustomerInvoiceId" class="form-label">@T["Invoice (Optional)"]</label>
             <select asp-for="CustomerInvoiceId" class="form-select">
-                <option value="">No linked invoice</option>
+                <option value="">@T["No linked invoice"]</option>
                 @foreach (var invoice in invoices)
                 {
                     var outstanding = invoice.TotalAmount - invoice.AmountPaid;
@@ -59,7 +58,7 @@
                     </option>
                 }
             </select>
-            <small class="text-muted">Required only when settlement mode is Receivable.</small>
+            <small class="text-muted">@T["Required only when settlement mode is Receivable."]</small>
         </div>
 
         <div class="col-md-4">
@@ -73,28 +72,27 @@
         </div>
 
         <div class="col-md-4">
-            <label asp-for="SettlementMode" class="form-label">Settlement Mode</label>
+            <label asp-for="SettlementMode" class="form-label">@T["Settlement Mode"]</label>
             <select asp-for="SettlementMode" class="form-select">
-                <option>Advance</option>
-                <option>Receivable</option>
+                <option>@T["Advance"]</option>
+                <option>@T["Receivable"]</option>
             </select>
         </div>
 
         <div class="col-md-3">
-            <label asp-for="ChequeDate" class="form-label">Cheque Date</label>
+            <label asp-for="ChequeDate" class="form-label">@T["Cheque Date"]</label>
             <input asp-for="ChequeDate" type="date" class="form-control" />
             <div class="form-text">
-                The future date written on the cheque. <strong>Does not affect the accounts.</strong>
+                @T.Html("The future date written on the cheque. <strong>Does not affect the accounts.</strong>")
             </div>
             <span asp-validation-for="ChequeDate" class="text-danger"></span>
         </div>
 
         <div class="col-md-3">
-            <label asp-for="ReceivedDate" class="form-label">Received Date &mdash; accounting date</label>
+            <label asp-for="ReceivedDate" class="form-label">@T["Received Date — accounting date"]</label>
             <input asp-for="ReceivedDate" type="date" class="form-control" />
             <div class="form-text">
-                The day the cheque was handed to you. <strong>This is the date the entry posts on</strong>
-                and when it appears in the Trial Balance.
+                @T.Html("The day the cheque was handed to you. <strong>This is the date the entry posts on</strong> and when it appears in the Trial Balance.")
             </div>
             <span asp-validation-for="ReceivedDate" class="text-danger"></span>
         </div>
@@ -111,8 +109,8 @@
     </div>
 
     <div class="mt-4">
-        <button type="submit" class="btn btn-dark">Save and Receive</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <button type="submit" class="btn btn-dark">@T["Save and Receive"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 

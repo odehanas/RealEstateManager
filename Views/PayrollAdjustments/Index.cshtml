@@ -2,35 +2,35 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Payroll Transactions";
+    ViewData["Title"] = T["Payroll Transactions"];
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
     <div>
-        <h2 class="mb-0">Payroll Transactions</h2>
-        <div class="text-muted">Additions and deductions per employee. Approved ones are paid by the next payroll; draft payrolls update by themselves.</div>
+        <h2 class="mb-0">@T["Payroll Transactions"]</h2>
+        <div class="text-muted">@T["Additions and deductions per employee. Approved ones are paid by the next payroll; draft payrolls update by themselves."]</div>
     </div>
-    <a asp-controller="Attendance" asp-action="Month" class="btn btn-outline-dark">Generate from attendance</a>
+    <a asp-controller="Attendance" asp-action="Month" class="btn btn-outline-dark">@T["Generate from attendance"]</a>
 </div>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
 @if (TempData["HrError"] is string err) { <div class="alert alert-danger">@err</div> }
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-light"><h5 class="mb-0">New transaction</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["New transaction"]</h5></div>
     <div class="card-body">
         <form asp-action="Create" method="post" class="row g-2 align-items-end" id="new-adjustment">
             @Html.AntiForgeryToken()
             <div class="col-md-3">
-                <label class="form-label">Employee</label>
-                <select asp-for="NewAdjustment.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">Choose</option></select>
+                <label class="form-label">@T["Employee"]</label>
+                <select asp-for="NewAdjustment.EmployeeId" asp-items="Model.Employees" class="form-select"><option value="">@T["Choose"]</option></select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Date</label>
+                <label class="form-label">@T["Date"]</label>
                 <input asp-for="NewAdjustment.Date" type="date" class="form-control" />
             </div>
             <div class="col-md-3">
-                <label class="form-label">Kind</label>
+                <label class="form-label">@T["Kind"]</label>
                 <select asp-for="NewAdjustment.Category" class="form-select" id="adj-category">
                     <optgroup label="Additions">
                         @foreach (var c in PayrollAdjustmentCategories.All.Where(x => x.IsAddition)) { <option value="@c.Key" data-unit="@c.Unit">@c.Name</option> }
@@ -41,24 +41,23 @@
                 </select>
             </div>
             <div class="col-md-2" id="adj-qty">
-                <label class="form-label" id="adj-qty-label">Hours</label>
+                <label class="form-label" id="adj-qty-label">@T["Hours"]</label>
                 <input asp-for="NewAdjustment.Quantity" class="form-control" />
             </div>
             <div class="col-md-2" id="adj-amount">
-                <label class="form-label">Amount</label>
+                <label class="form-label">@T["Amount"]</label>
                 <input asp-for="NewAdjustment.Amount" class="form-control" />
             </div>
-            <div class="col-md-6"><label class="form-label">Description</label><input asp-for="NewAdjustment.Description" class="form-control" placeholder="e.g. Penalty for damaged equipment, memo HR-12" /></div>
+            <div class="col-md-6"><label class="form-label">@T["Description"]</label><input asp-for="NewAdjustment.Description" class="form-control" placeholder="@T["e.g. Penalty for damaged equipment, memo HR-12"]" /></div>
             <div class="col-md-3">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="approveNow" value="true" id="approveNow" />
-                    <label class="form-check-label" for="approveNow">Approve now</label>
+                    <label class="form-check-label" for="approveNow">@T["Approve now"]</label>
                 </div>
             </div>
-            <div class="col-md-3"><button class="btn btn-dark w-100">Save</button></div>
+            <div class="col-md-3"><button class="btn btn-dark w-100">@T["Save"]</button></div>
             <div class="col-12 small text-muted">
-                Overtime is priced at the overtime rate on the basic hourly wage (basic ÷ 30 ÷ daily hours); late minutes at that wage;
-                unauthorised absence reduces the days paid, so it comes off the whole fixed salary.
+                @T["Overtime is priced at the overtime rate on the basic hourly wage (basic ÷ 30 ÷ daily hours); late minutes at that wage; unauthorised absence reduces the days paid, so it comes off the whole fixed salary."]
             </div>
         </form>
     </div>
@@ -75,7 +74,7 @@
     </div>
     <div class="col-md-3">
         <select name="employeeId" asp-items="Model.Employees" class="form-select" onchange="this.form.submit()">
-            <option value="">All employees</option>
+            <option value="">@T["All employees"]</option>
         </select>
     </div>
     <div class="col-md-2"><input type="month" name="month" value="@Model.Month" class="form-control" onchange="this.form.submit()" /></div>
@@ -88,12 +87,12 @@
             <thead class="table-light">
                 <tr>
                     <th style="width:32px"><input type="checkbox" onclick="document.querySelectorAll('.pick').forEach(c => c.checked = this.checked)" /></th>
-                    <th>Date</th><th>Employee</th><th>Kind</th><th class="text-end">Quantity</th><th class="text-end">Value</th>
-                    <th>Description</th><th>Source</th><th>Status</th><th>Payroll</th><th></th>
+                    <th>@T["Date"]</th><th>@T["Employee"]</th><th>@T["Kind"]</th><th class="text-end">@T["Quantity"]</th><th class="text-end">@T["Value"]</th>
+                    <th>@T["Description"]</th><th>@T["Source"]</th><th>@T["Status"]</th><th>@T["Payroll"]</th><th></th>
                 </tr>
             </thead>
             <tbody>
-                @if (Model.Adjustments.Count == 0) { <tr><td colspan="11" class="text-muted">Nothing here.</td></tr> }
+                @if (Model.Adjustments.Count == 0) { <tr><td colspan="11" class="text-muted">@T["Nothing here."]</td></tr> }
                 @foreach (var a in Model.Adjustments)
                 {
                     var def = PayrollAdjustmentCategories.Get(a.Category);
@@ -112,7 +111,7 @@
                         <td>
                             @if (!paid)
                             {
-                                <button class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@a.Id" onclick="return confirm('Remove this transaction?');">Remove</button>
+                                <button class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@a.Id" onclick="return confirm('Remove this transaction?');">@T["Remove"]</button>
                             }
                         </td>
                     </tr>
@@ -121,8 +120,8 @@
         </table>
     </div>
     <div class="d-flex gap-2">
-        <button class="btn btn-success" asp-action="Approve">Approve selected</button>
-        <button class="btn btn-outline-danger" asp-action="Reject">Reject selected</button>
+        <button class="btn btn-success" asp-action="Approve">@T["Approve selected"]</button>
+        <button class="btn btn-outline-danger" asp-action="Reject">@T["Reject selected"]</button>
     </div>
 </form>
 

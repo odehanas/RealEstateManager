@@ -11,10 +11,10 @@
     <table class="table mb-0 align-middle">
         <thead class="table-light">
             <tr>
-                <th>Period</th>
-                <th>Asked by</th>
-                <th>Reason</th>
-                <th style="width:360px">Decision</th>
+                <th>@T["Period"]</th>
+                <th>@T["Asked by"]</th>
+                <th>@T["Reason"]</th>
+                <th style="width:360px">@T["Decision"]</th>
             </tr>
         </thead>
         <tbody>
@@ -33,7 +33,7 @@
                     <td>
                         @if (own && !Model.OnlyApprover)
                         {
-                            <span class="small text-muted">Your own request - another approver decides it.</span>
+                            <span class="small text-muted">@T["Your own request - another approver decides it."]</span>
                         }
                         else
                         {
@@ -42,13 +42,13 @@
                                 <input type="hidden" name="requestId" value="@r.Id" />
                                 <input type="hidden" name="returnTo" value="@returnTo" />
                                 <input type="text" name="comment" class="form-control form-control-sm" maxlength="1000"
-                                       placeholder="Comment (required to turn down)" />
+                                       placeholder="@T["Comment (required to turn down)"]" />
                                 <div class="d-flex gap-1">
                                     <button type="submit" class="btn btn-sm btn-success" asp-action="ApproveReopen"
                                             onclick="return confirm('Reopen @r.AccountingPeriod?.Name? Postings into it will be allowed until it is closed again.');">
-                                        Approve &amp; reopen
+                                        @T["Approve & reopen"]
                                     </button>
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" asp-action="RejectReopen">Turn down</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" asp-action="RejectReopen">@T["Turn down"]</button>
                                 </div>
                             </form>
                         }

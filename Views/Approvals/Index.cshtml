@@ -3,7 +3,7 @@
 @using RealEstateManager.Services
 
 @{
-    ViewData["Title"] = "Approvals";
+    ViewData["Title"] = T["Approvals"];
     var showAll = ViewBag.ShowAll is true;
     var userId = ViewBag.UserId as int?;
     var approvalRequired = ViewBag.ApprovalRequired is true;
@@ -11,12 +11,12 @@
 
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
     <div>
-        <h2 class="mb-1">Approvals</h2>
-        <p class="text-muted mb-0">Contracts waiting for a second person to approve them before they take effect.</p>
+        <h2 class="mb-1">@T["Approvals"]</h2>
+        <p class="text-muted mb-0">@T["Contracts waiting for a second person to approve them before they take effect."]</p>
     </div>
     <div class="btn-group">
-        <a asp-action="Index" class="btn btn-sm @(showAll ? "btn-outline-dark" : "btn-dark")">Waiting</a>
-        <a asp-action="Index" asp-route-all="true" class="btn btn-sm @(showAll ? "btn-dark" : "btn-outline-dark")">All decisions</a>
+        <a asp-action="Index" class="btn btn-sm @(showAll ? "btn-outline-dark" : "btn-dark")">@T["Waiting"]</a>
+        <a asp-action="Index" asp-route-all="true" class="btn btn-sm @(showAll ? "btn-dark" : "btn-outline-dark")">@T["All decisions"]</a>
     </div>
 </div>
 
@@ -58,11 +58,11 @@
 <table class="table table-bordered table-striped align-middle">
     <thead>
         <tr>
-            <th>Document</th>
-            <th>What</th>
-            <th>Submitted</th>
-            <th>Status</th>
-            <th>Decision</th>
+            <th>@T["Document"]</th>
+            <th>@T["What"]</th>
+            <th>@T["Submitted"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Decision"]</th>
             <th></th>
         </tr>
     </thead>
@@ -88,13 +88,13 @@
                     @switch (request.Status)
                     {
                         case ApprovalStatuses.Pending:
-                            <span class="badge bg-warning text-dark">Waiting</span>
+                            <span class="badge bg-warning text-dark">@T["Waiting"]</span>
                             break;
                         case ApprovalStatuses.Approved:
-                            <span class="badge bg-success">Approved</span>
+                            <span class="badge bg-success">@T["Approved"]</span>
                             break;
                         case ApprovalStatuses.Rejected:
-                            <span class="badge bg-danger">Returned</span>
+                            <span class="badge bg-danger">@T["Returned"]</span>
                             break;
                         default:
                             <span class="badge bg-secondary">@request.Status</span>
@@ -122,7 +122,7 @@
                     </a>
                     @if (request.Status == ApprovalStatuses.Pending && mine)
                     {
-                        <div class="small text-muted mt-1">Yours - someone else approves it</div>
+                        <div class="small text-muted mt-1">@T["Yours - someone else approves it"]</div>
                     }
                 </td>
             </tr>

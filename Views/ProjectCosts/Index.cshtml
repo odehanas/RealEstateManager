@@ -1,6 +1,6 @@
 @model RealEstateManager.Services.ProjectCostReportService.ReportModel
 @{
-    ViewData["Title"] = "Project Costs & WIP";
+    ViewData["Title"] = T["Project Costs & WIP"];
     var c = Model.Currency;
     string M(decimal v) => v.ToString("N2");
     var options = (IEnumerable<dynamic>)ViewBag.ProjectOptions;
@@ -29,46 +29,46 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
     <div>
-        <h2 class="mb-0">Project Costs &amp; WIP</h2>
+        <h2 class="mb-0">@T["Project Costs & WIP"]</h2>
         <div class="text-muted">Spend per development project as at @Model.AsOf.ToString("dd MMMM yyyy"): the supplier's net price, VAT taken into cost, VAT recovered, what is committed and paid, and the WIP reconciliation. Amounts in @c.</div>
     </div>
     <form method="get" class="d-flex flex-wrap gap-2 align-items-end no-print">
-        <div><label class="form-label small mb-0">As at</label><input type="date" name="asOf" value="@Model.AsOf.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+        <div><label class="form-label small mb-0">@T["As at"]</label><input type="date" name="asOf" value="@Model.AsOf.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
         <div>
-            <label class="form-label small mb-0">Project</label>
+            <label class="form-label small mb-0">@T["Project"]</label>
             <select name="projectId" class="form-select form-select-sm">
-                <option value="">All projects (summary)</option>
+                <option value="">@T["All projects (summary)"]</option>
                 @foreach (var o in options)
                 {
                     <option value="@o.Id" selected="@(Model.Project?.Id == (int)o.Id ? "selected" : null)">@o.Label</option>
                 }
             </select>
         </div>
-        <button class="btn btn-sm btn-dark">Show</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">Print</button>
+        <button class="btn btn-sm btn-dark">@T["Show"]</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
     </form>
 </div>
 
 @if (Model.Projects.Count == 0)
 {
-    <div class="alert alert-info">There are no development projects yet.</div>
+    <div class="alert alert-info">@T["There are no development projects yet."]</div>
 }
 else
 {
 <div class="card shadow-sm mb-4 pc">
-    <div class="card-header bg-light"><h5 class="mb-0">1. Cost by project</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["1. Cost by project"]</h5></div>
     <div class="table-responsive">
         <table class="table table-sm table-bordered mb-0 align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Project</th><th>VAT on costs</th>
-                    <th class="num">Budget</th>
-                    <th class="num">Bills: net</th><th class="num">Bills: VAT in cost</th><th class="num">Other costs</th>
-                    <th class="num">Cost to date</th>
-                    <th class="num">VAT recovered</th>
-                    <th class="num">Transferred out</th><th class="num">WIP balance</th>
-                    <th class="num">Committed (drafts)</th><th class="num">Budget left</th>
-                    <th class="num">Unpaid to suppliers</th>
+                    <th>@T["Project"]</th><th>@T["VAT on costs"]</th>
+                    <th class="num">@T["Budget"]</th>
+                    <th class="num">@T["Bills: net"]</th><th class="num">@T["Bills: VAT in cost"]</th><th class="num">@T["Other costs"]</th>
+                    <th class="num">@T["Cost to date"]</th>
+                    <th class="num">@T["VAT recovered"]</th>
+                    <th class="num">@T["Transferred out"]</th><th class="num">@T["WIP balance"]</th>
+                    <th class="num">@T["Committed (drafts)"]</th><th class="num">@T["Budget left"]</th>
+                    <th class="num">@T["Unpaid to suppliers"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@ else
                 </tr>
             }
                 <tr class="total">
-                    <td colspan="2">Total</td>
+                    <td colspan="2">@T["Total"]</td>
                     <td class="num">@M(totals.Budget)</td><td class="num">@M(totals.Net)</td><td class="num">@M(totals.CapVat)</td><td class="num">@M(totals.Other)</td>
                     <td class="num">@M(totals.Posted)</td><td class="num">@M(totals.RecVat)</td><td class="num">@M(totals.Transferred)</td><td class="num">@M(totals.Wip)</td>
                     <td class="num">@M(totals.Committed)</td><td class="num"></td><td class="num">@M(totals.Unpaid)</td>
@@ -98,18 +98,16 @@ else
         </table>
     </div>
     <div class="card-body small text-muted">
-        <strong>Cost to date</strong> = bills' net + VAT taken into cost + other costs (journals, petty cash, finance costs) posted to the project's WIP account.
-        <strong>VAT recovered</strong> sits in VAT Recoverable and is claimed on the VAT return, so it is not part of the cost.
-        <strong>WIP balance</strong> = cost to date less what was transferred out on completion. <strong>Committed</strong> = draft bills and journals tagged to the project, not yet posted.
+        @T.Html("<strong>Cost to date</strong> = bills' net + VAT taken into cost + other costs (journals, petty cash, finance costs) posted to the project's WIP account. <strong>VAT recovered</strong> sits in VAT Recoverable and is claimed on the VAT return, so it is not part of the cost. <strong>WIP balance</strong> = cost to date less what was transferred out on completion. <strong>Committed</strong> = draft bills and journals tagged to the project, not yet posted.")
     </div>
 </div>
 
 <div class="card shadow-sm mb-4 pc">
-    <div class="card-header bg-light"><h5 class="mb-0">2. WIP reconciliation: ledger against projects</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T["2. WIP reconciliation: ledger against projects"]</h5></div>
     <div class="table-responsive">
         <table class="table table-sm table-bordered mb-0 align-middle">
             <thead class="table-light">
-                <tr><th>WIP account</th><th class="num">Balance in the ledger</th><th class="num">Sum of project WIP balances</th><th class="num">Difference</th><th class="num">Postings not tagged to a project</th><th class="num">Still unexplained</th></tr>
+                <tr><th>@T["WIP account"]</th><th class="num">@T["Balance in the ledger"]</th><th class="num">@T["Sum of project WIP balances"]</th><th class="num">@T["Difference"]</th><th class="num">@T["Postings not tagged to a project"]</th><th class="num">@T["Still unexplained"]</th></tr>
             </thead>
             <tbody>
             @foreach (var r in Model.Reconciliation)
@@ -130,14 +128,14 @@ else
         {
             <div class="fw-semibold mt-2">@r.Account: postings without a project (tag them so they belong to a project)</div>
             <table class="table table-sm mb-2">
-                <tr><th>Date</th><th>Entry</th><th>Source</th><th>Description</th><th class="num">Amount</th></tr>
+                <tr><th>@T["Date"]</th><th>@T["Entry"]</th><th>@T["Source"]</th><th>@T["Description"]</th><th class="num">@T["Amount"]</th></tr>
                 @foreach (var l in r.UntaggedLines)
                 {
                     <tr><td>@l.Date.ToString("dd/MM/yyyy")</td><td>@l.EntryNumber</td><td>@l.Source</td><td>@l.Description</td><td class="num">@M(l.Amount)</td></tr>
                 }
             </table>
         }
-        <div class="text-muted">A difference that untagged postings do not explain usually comes from an opening balance entered on the WIP account itself; give it to a project with a manual journal (credit the account untagged, debit it tagged to the project).</div>
+        <div class="text-muted">@T["A difference that untagged postings do not explain usually comes from an opening balance entered on the WIP account itself; give it to a project with a manual journal (credit the account untagged, debit it tagged to the project)."]</div>
     </div>
 </div>
 }
@@ -150,9 +148,9 @@ else
     <div class="row g-3 mb-4 pc">
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-light"><h5 class="mb-0">3. Budget against cost, by category</h5></div>
+                <div class="card-header bg-light"><h5 class="mb-0">@T["3. Budget against cost, by category"]</h5></div>
                 <table class="table table-sm mb-0">
-                    <tr class="table-light"><th>Category</th><th class="num">Budget</th><th class="num">Posted</th><th class="num">Committed</th><th class="num">Left</th></tr>
+                    <tr class="table-light"><th>@T["Category"]</th><th class="num">@T["Budget"]</th><th class="num">@T["Posted"]</th><th class="num">@T["Committed"]</th><th class="num">@T["Left"]</th></tr>
                     @foreach (var cat in Model.Categories)
                     {
                         <tr>
@@ -160,17 +158,17 @@ else
                             <td class="num @(cat.Budget > 0 && cat.Remaining < 0 ? "text-danger fw-semibold" : "")">@(cat.Budget > 0 ? M(cat.Remaining) : "—")</td>
                         </tr>
                     }
-                    <tr class="total"><td>Total</td><td class="num">@M(Model.Categories.Sum(x => x.Budget))</td><td class="num">@M(Model.Categories.Sum(x => x.Posted))</td><td class="num">@M(Model.Categories.Sum(x => x.Committed))</td><td></td></tr>
+                    <tr class="total"><td>@T["Total"]</td><td class="num">@M(Model.Categories.Sum(x => x.Budget))</td><td class="num">@M(Model.Categories.Sum(x => x.Posted))</td><td class="num">@M(Model.Categories.Sum(x => x.Committed))</td><td></td></tr>
                 </table>
             </div>
         </div>
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header bg-light"><h5 class="mb-0">4. Spend by month (posted)</h5></div>
+                <div class="card-header bg-light"><h5 class="mb-0">@T["4. Spend by month (posted)"]</h5></div>
                 <table class="table table-sm mb-0">
-                    <tr class="table-light"><th>Month</th><th class="num">Cost</th><th class="num">Cumulative</th></tr>
+                    <tr class="table-light"><th>@T["Month"]</th><th class="num">@T["Cost"]</th><th class="num">@T["Cumulative"]</th></tr>
                     @{ var running = 0m; }
-                    @if (Model.Months.Count == 0) { <tr><td colspan="3" class="text-muted">No posted cost yet.</td></tr> }
+                    @if (Model.Months.Count == 0) { <tr><td colspan="3" class="text-muted">@T["No posted cost yet."]</td></tr> }
                     @foreach (var m in Model.Months)
                     {
                         running += m.Amount;
@@ -182,15 +180,15 @@ else
     </div>
 
     <div class="card shadow-sm mb-4 pc">
-        <div class="card-header bg-light"><h5 class="mb-0">5. Contractors, subcontractors and suppliers (posted bills)</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["5. Contractors, subcontractors and suppliers (posted bills)"]</h5></div>
         <div class="table-responsive">
             <table class="table table-sm table-bordered mb-0">
-                <tr class="table-light"><th>Vendor</th><th class="num">Bills</th><th class="num">Net</th><th class="num">VAT in cost</th><th class="num">VAT recovered</th><th class="num">Total billed</th><th class="num">Paid</th><th class="num">Unpaid</th></tr>
-                @if (Model.Vendors.Count == 0) { <tr><td colspan="8" class="text-muted">No posted bills for this project.</td></tr> }
+                <tr class="table-light"><th>@T["Vendor"]</th><th class="num">@T["Bills"]</th><th class="num">@T["Net"]</th><th class="num">@T["VAT in cost"]</th><th class="num">@T["VAT recovered"]</th><th class="num">@T["Total billed"]</th><th class="num">@T["Paid"]</th><th class="num">@T["Unpaid"]</th></tr>
+                @if (Model.Vendors.Count == 0) { <tr><td colspan="8" class="text-muted">@T["No posted bills for this project."]</td></tr> }
                 @foreach (var v in Model.Vendors)
                 {
                     <tr>
-                        <td>@v.Vendor @if (v.IsMainContractor) { <span class="badge bg-secondary">main contractor</span> }</td>
+                        <td>@v.Vendor @if (v.IsMainContractor) { <span class="badge bg-secondary">@T["main contractor"]</span> }</td>
                         <td class="num">@v.Bills</td><td class="num">@M(v.Net)</td><td class="num">@M(v.CapitalisedVat)</td><td class="num">@M(v.RecoverableVat)</td>
                         <td class="num fw-semibold">@M(v.Total)</td><td class="num">@M(v.Paid)</td><td class="num">@M(v.Unpaid)</td>
                     </tr>
@@ -200,11 +198,11 @@ else
     </div>
 
     <div class="card shadow-sm mb-4 pc">
-        <div class="card-header bg-light"><h5 class="mb-0">6. Bills charged to the project</h5></div>
+        <div class="card-header bg-light"><h5 class="mb-0">@T["6. Bills charged to the project"]</h5></div>
         <div class="table-responsive">
             <table class="table table-sm table-bordered mb-0">
-                <tr class="table-light"><th>Date</th><th>Bill</th><th>Vendor</th><th>Status</th><th class="num">Net</th><th class="num">VAT in cost</th><th class="num">VAT recovered</th><th class="num">Total</th><th class="num">Paid</th></tr>
-                @if (Model.Bills.Count == 0) { <tr><td colspan="9" class="text-muted">None.</td></tr> }
+                <tr class="table-light"><th>@T["Date"]</th><th>@T["Bill"]</th><th>@T["Vendor"]</th><th>@T["Status"]</th><th class="num">@T["Net"]</th><th class="num">@T["VAT in cost"]</th><th class="num">@T["VAT recovered"]</th><th class="num">@T["Total"]</th><th class="num">@T["Paid"]</th></tr>
+                @if (Model.Bills.Count == 0) { <tr><td colspan="9" class="text-muted">@T["None."]</td></tr> }
                 @foreach (var b in Model.Bills)
                 {
                     <tr class="@(b.Posted ? "" : "table-warning")">
@@ -216,6 +214,6 @@ else
                 }
             </table>
         </div>
-        <div class="card-body small text-muted">Only the lines of each bill that belong to this project are counted. Payments on a bill are shared across its lines in proportion to their amounts.</div>
+        <div class="card-body small text-muted">@T["Only the lines of each bill that belong to this project are counted. Payments on a bill are shared across its lines in proportion to their amounts."]</div>
     </div>
 }

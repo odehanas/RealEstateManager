@@ -1,7 +1,7 @@
 @model RealEstateManager.Services.OwnerTenancyScheduleDto
 @using RealEstateManager.Domain
 @{
-    ViewData["Title"] = "Owner Tenancy Schedule";
+    ViewData["Title"] = T["Owner Tenancy Schedule"];
     var ownerNames = ViewBag.OwnerNames as List<string> ?? new();
 }
 
@@ -28,31 +28,31 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
-        <h2 class="mb-1">Owner Tenancy Schedule</h2>
+        <h2 class="mb-1">@T["Owner Tenancy Schedule"]</h2>
         <p class="text-muted mb-0">
-            Who occupies each unit, on what terms, and what they owe &mdash; grouped by the owner of the property.
+            @T["Who occupies each unit, on what terms, and what they owe — grouped by the owner of the property."]
         </p>
     </div>
-    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">Print</button>
+    <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
 
 <form method="get" class="row g-2 align-items-end mb-3 no-print">
     <div class="col-auto">
-        <label class="form-label mb-1" for="asOfDate">As Of Date</label>
+        <label class="form-label mb-1" for="asOfDate">@T["As Of Date"]</label>
         <input type="date" class="form-control form-control-sm" id="asOfDate" name="asOfDate" value="@Model.AsOfDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="ownershipType">Ownership</label>
+        <label class="form-label mb-1" for="ownershipType">@T["Ownership"]</label>
         <select class="form-select form-select-sm" id="ownershipType" name="ownershipType">
-            <option value="">Owned and Managed</option>
-            <option value="Owned" selected="@(Model.OwnershipTypeFilter == "Owned" ? "selected" : null)">Owned only</option>
-            <option value="Managed" selected="@(Model.OwnershipTypeFilter == "Managed" ? "selected" : null)">Managed only</option>
+            <option value="">@T["Owned and Managed"]</option>
+            <option value="Owned" selected="@(Model.OwnershipTypeFilter == "Owned" ? "selected" : null)">@T["Owned only"]</option>
+            <option value="Managed" selected="@(Model.OwnershipTypeFilter == "Managed" ? "selected" : null)">@T["Managed only"]</option>
         </select>
     </div>
     <div class="col-auto">
-        <label class="form-label mb-1" for="ownerName">Owner</label>
+        <label class="form-label mb-1" for="ownerName">@T["Owner"]</label>
         <select class="form-select form-select-sm" id="ownerName" name="ownerName">
-            <option value="">All owners</option>
+            <option value="">@T["All owners"]</option>
             @foreach (var owner in ownerNames)
             {
                 <option value="@owner" selected="@(Model.OwnerNameFilter == owner ? "selected" : null)">@owner</option>
@@ -63,11 +63,11 @@
         <div class="form-check mb-1">
             <input class="form-check-input" type="checkbox" id="includeVacant" name="includeVacant" value="true"
                    checked="@(Model.IncludeVacant ? "checked" : null)" />
-            <label class="form-check-label" for="includeVacant">Show vacant units</label>
+            <label class="form-check-label" for="includeVacant">@T["Show vacant units"]</label>
         </div>
     </div>
     <div class="col-auto">
-        <button type="submit" class="btn btn-primary btn-sm">Refresh</button>
+        <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
     </div>
 </form>
 
@@ -79,7 +79,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-primary text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Occupancy</div>
+                <div class="small text-uppercase opacity-75">@T["Occupancy"]</div>
                 <div class="h3 fw-bold mb-1">@Model.OccupancyRate.ToString("N1")%</div>
                 <div class="small">@Model.OccupiedUnits let of @Model.TotalUnits units</div>
             </div>
@@ -88,7 +88,7 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-success text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Contracted Annual Rent</div>
+                <div class="small text-uppercase opacity-75">@T["Contracted Annual Rent"]</div>
                 <div class="h3 fw-bold mb-1">@Model.TotalAnnualRent.ToString("N0")</div>
                 <div class="small">Deposits held @Model.TotalDepositHeld.ToString("N0")</div>
             </div>
@@ -97,16 +97,16 @@
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-danger text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Outstanding</div>
+                <div class="small text-uppercase opacity-75">@T["Outstanding"]</div>
                 <div class="h3 fw-bold mb-1">@Model.TotalOutstanding.ToString("N0")</div>
-                <div class="small">Owed across all contracts</div>
+                <div class="small">@T["Owed across all contracts"]</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 bg-dark text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Attention</div>
+                <div class="small text-uppercase opacity-75">@T["Attention"]</div>
                 <div class="h3 fw-bold mb-1">@Model.VacantUnits vacant</div>
                 <div class="small">@Model.ExpiringSoon expiring in 90 days &middot; @Model.TotalVacancyCost.ToString("N0") rent forgone</div>
             </div>
@@ -116,7 +116,7 @@
 
 @if (Model.Rows.Count == 0)
 {
-    <div class="alert alert-info">No properties match this filter.</div>
+    <div class="alert alert-info">@T["No properties match this filter."]</div>
 }
 else
 {
@@ -151,18 +151,18 @@ else
                     <table class="table table-bordered table-sm mb-0 own-table">
                         <thead>
                             <tr>
-                                <th>Property</th>
-                                <th>Unit</th>
-                                <th class="text-end">Area</th>
-                                <th>Tenant</th>
-                                <th>Contact</th>
-                                <th>Contract</th>
-                                <th>Term</th>
-                                <th class="text-end">Annual Rent</th>
-                                <th>VAT</th>
-                                <th class="text-end">Deposit</th>
-                                <th class="text-end">Outstanding</th>
-                                <th>Status</th>
+                                <th>@T["Property"]</th>
+                                <th>@T["Unit"]</th>
+                                <th class="text-end">@T["Area"]</th>
+                                <th>@T["Tenant"]</th>
+                                <th>@T["Contact"]</th>
+                                <th>@T["Contract"]</th>
+                                <th>@T["Term"]</th>
+                                <th class="text-end">@T["Annual Rent"]</th>
+                                <th>@T["VAT"]</th>
+                                <th class="text-end">@T["Deposit"]</th>
+                                <th class="text-end">@T["Outstanding"]</th>
+                                <th>@T["Status"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -182,7 +182,7 @@ else
                                         }
                                         else
                                         {
-                                            <span class="text-muted">Vacant</span>
+                                            <span class="text-muted">@T["Vacant"]</span>
                                         }
                                     </td>
                                     <td class="wrap small">
@@ -228,7 +228,7 @@ else
                                     <td>
                                         @if (row.IsOccupied)
                                         {
-                                            <span class="badge bg-success">Occupied</span>
+                                            <span class="badge bg-success">@T["Occupied"]</span>
                                         }
                                         else
                                         {
@@ -257,13 +257,13 @@ else
 
 <div class="card shadow-sm mt-3">
     <div class="card-body py-3 small text-muted">
-        <strong class="text-dark">How owners are decided</strong>
+        <strong class="text-dark">@T["How owners are decided"]</strong>
         <ul class="mb-0 mt-2">
-            <li>A <strong>Managed</strong> property is grouped under the landlord named on the property record, with the management commission shown.</li>
-            <li>An <strong>Owned</strong> property is grouped under the company itself, since the company is the owner.</li>
-            <li>A managed property with no landlord recorded is flagged rather than quietly grouped with the company's own portfolio &mdash; fix it on the property record.</li>
-            <li><strong>Vacant units are included</strong> with their asking rent, because the empty ones are usually the owner's first question. Untick the box to hide them.</li>
-            <li>Outstanding is from posted invoices only; drafts carry no ledger balance.</li>
+            <li>@T.Html("A <strong>Managed</strong> property is grouped under the landlord named on the property record, with the management commission shown.")</li>
+            <li>@T.Html("An <strong>Owned</strong> property is grouped under the company itself, since the company is the owner.")</li>
+            <li>@T["A managed property with no landlord recorded is flagged rather than quietly grouped with the company's own portfolio — fix it on the property record."]</li>
+            <li>@T.Html("<strong>Vacant units are included</strong> with their asking rent, because the empty ones are usually the owner's first question. Untick the box to hide them.")</li>
+            <li>@T["Outstanding is from posted invoices only; drafts carry no ledger balance."]</li>
         </ul>
     </div>
 </div>

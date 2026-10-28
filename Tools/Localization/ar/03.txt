@@ -1,0 +1,321 @@
+# Sheet 3: Choose the owner ... Example
+Choose the owner and the tax period. ||| اختر المالك والفترة الضريبية.
+Choose the owner whose properties ||| اختر المالك الذي تدير الشركة عقاراته. عمود الشركة هو قائمة الدخل الخاصة بالشركة.
+Choose the unit and price. ||| اختر الوحدة والسعر.
+Choose the vendor, then the open bills ||| اختر المورد، ثم الفواتير المفتوحة المراد دفعها - كلياً أو جزئياً. تحصل الدفعة على رقم مستند تسوية. للدفع قبل وصول الفاتورة اختر <strong>دفعة مقدمة</strong>.
+Choose the vendor… ||| اختر المورد…
+Choose what to report on, the columns ||| اختر موضوع التقرير والأعمدة وعوامل التصفية والإجماليات، واعرضه جدولاً أو رسماً بيانياً. احفظه لاستخدامه مجدداً أو لمشاركته مع الشركة.
+Choose what to report on, then select ||| اختر موضوع التقرير ثم اختر <strong>تشغيل التقرير</strong>.
+Choose your password ||| اختر كلمة المرور
+Choose… ||| اختر…
+City ||| المدينة
+Classification: equity counterparts ||| التصنيف: الحسابات المقابلة في حقوق الملكية <em>تمويلية</em>؛ والأصول طويلة الأجل (الرموز 15000 فما فوق) <em>استثمارية</em>؛ وكل ما عدا ذلك <em>تشغيلي</em>.
+Clear ||| تحصيل
+Clear PDC ||| تحصيل شيك مؤجل
+Clear search ||| مسح البحث
+Cleared ||| محصّل
+Cleared / Returned ||| محصّل / مرتجع
+Cleared Date — accounting date ||| تاريخ التحصيل — التاريخ المحاسبي
+Cleared on ||| حُصّل في
+Clearing date ||| تاريخ التسوية
+Clearing document ||| مستند التسوية
+Close ||| إغلاق
+Close the job ||| إغلاق العمل
+Close the period, then the fiscal year. ||| أقفل الفترة، ثم السنة المالية.
+Closed ||| مقفل
+Closed again ||| أُقفل مجدداً
+Closing ||| الإقفال
+Closing Balance ||| الرصيد الختامي
+Closing Cash ||| النقد الختامي
+Closing Cockpit ||| لوحة الإقفال
+Closing balance ||| الرصيد الختامي
+Closing balance - we owe ||| الرصيد الختامي - مستحق علينا
+Closing entry ||| قيد الإقفال
+Code ||| الرمز
+Codes ||| الرموز
+Collected ||| المحصّل
+Collection % ||| نسبة التحصيل %
+Columns ||| الأعمدة
+Combined ||| مجمّع
+Comm. % ||| العمولة %
+Comment ||| تعليق
+Comment (required to turn down) ||| تعليق (مطلوب عند الرفض)
+Commercial ||| تجاري
+Commercial invoice — no input tax. ||| فاتورة تجارية — بدون ضريبة مدخلات.
+Commercial is standard rated ||| التجاري خاضع للنسبة الأساسية؛ والتأجير السكني معفى. ترث الوحدات هذه المعاملة — حدد معاملة خاصة للوحدة فقط في المباني متعددة الاستخدام.
+Commission ||| العمولة
+Commission % ||| نسبة العمولة %
+Commission Tax Invoices ||| فواتير العمولة الضريبية
+Commission Tax Invoices to the Owner ||| فواتير العمولة الضريبية للمالك
+Commission to invoice ||| العمولة المراد فوترتها
+Committed ||| الملتزم به
+Committed (drafts) ||| الملتزم به (مسودات)
+Companies ||| الشركات
+Companies & Subscriptions ||| الشركات والاشتراكات
+Companies / Branch Setup ||| إعداد الشركات / الفروع
+Company ||| الشركة
+Company Access ||| الوصول إلى الشركة
+Company Admin ||| مسؤول الشركة
+Company Administration ||| إدارة الشركة
+Company Details ||| بيانات الشركة
+Company Registration ||| تسجيل الشركة
+Company VAT Return ||| الإقرار الضريبي للشركة
+Company access and permissions are controlled centrally. ||| يُتحكم في الوصول إلى الشركات والصلاحيات مركزياً.
+Completed Buildings to Register ||| مبانٍ منجزة بانتظار التسجيل
+Completion ||| الإنجاز
+Completion Transfers ||| تحويلات الإنجاز
+Completion certificate ||| شهادة الإنجاز
+Completion date ||| تاريخ الإنجاز
+Computed from sub-ledger. ||| محسوب من الدفتر الفرعي.
+Consultant ||| الاستشاري
+Contact ||| جهة الاتصال
+Contact Person ||| الشخص المسؤول
+Continue later using subscription codes ||| المتابعة لاحقاً باستخدام رموز الاشتراك
+Contract ||| العقد
+Contract Code ||| رمز العقد
+Contract date ||| تاريخ العقد
+Contract ends ||| ينتهي العقد
+Contracted Annual Rent ||| الإيجار السنوي المتعاقد عليه
+Contracted Rent ||| الإيجار المتعاقد عليه
+Contracts ||| العقود
+Contracts ending in 90 days ||| عقود تنتهي خلال 90 يوماً
+Contracts ending in the next 90 days ||| عقود تنتهي خلال الـ 90 يوماً القادمة
+Contracts waiting for a second person ||| عقود بانتظار اعتماد شخص ثانٍ قبل سريانها.
+Contribution ||| المساهمة
+Contributions ||| المساهمات
+Control ||| الرقابة
+Controller ||| الشاشة
+Controls & Security Guide ||| دليل الضوابط والأمان
+Controls the order in the General Journal selector ||| يحدد الترتيب في قائمة دفتر اليومية العام والتقارير.
+Copy ||| نسخ
+Copy Code ||| نسخ الرمز
+Copy Message ||| نسخ الرسالة
+Copy the code or send the prepared message ||| انسخ الرمز أو أرسل الرسالة المعدّة إلى العميل.
+Core Accounts ||| الحسابات الأساسية
+Corporate tenants ||| المستأجرون من الشركات
+Correct a mis-keyed cheque. ||| صحّح شيكاً أُدخل بشكل خاطئ. يُعاد تأريخ القيد النظامي ليتطابق.
+Cost ||| التكلفة
+Cost (approx.) ||| التكلفة (تقريبية)
+Cost Account ||| حساب التكلفة
+Cost Date ||| تاريخ التكلفة
+Cost Ledger ||| دفتر التكاليف
+Cost Type ||| نوع التكلفة
+Cost category ||| فئة التكلفة
+Cost collected in ||| تُجمع التكلفة في
+Cost of sales ||| تكلفة المبيعات
+Cost to Date ||| التكلفة حتى تاريخه
+Cost to date ||| التكلفة حتى تاريخه
+Costs ||| التكاليف
+Costs & WIP report ||| تقرير التكاليف والأعمال قيد التنفيذ
+Costs charged to owners ||| التكاليف المحمّلة على الملاك
+Costs of managed properties passed on ||| تكاليف العقارات المُدارة المحمّلة على ملاكها: إعادة تحميل مع ضريبة 5% بفاتورتنا الضريبية، أو مصروفات مدفوعة نيابة عن المالك بدون ضريبة.
+Costs recharged (posted) ||| التكاليف المعاد تحميلها (المرحّلة)
+Count ||| العدد
+Country ||| الدولة
+Counts once its entry is posted ||| يُحتسب بعد ترحيل قيده
+Create Account ||| إنشاء حساب
+Create Company ||| إنشاء شركة
+Create Lease ||| إنشاء عقد
+Create Manual Journal ||| إنشاء قيد يدوي
+Create New Company ||| إنشاء شركة جديدة
+Create Property ||| إنشاء عقار
+Create Tenant ||| إنشاء مستأجر
+Create Unit ||| إنشاء وحدة
+Create Vendor ||| إنشاء مورد
+Create a new company, create the first admin user ||| أنشئ شركة جديدة وأول مستخدم مسؤول، وابدأ الفترة التجريبية لمدة 15 يوماً.
+Create your company, create the first admin account ||| أنشئ شركتك وأول حساب مسؤول، وابدأ استخدام النظام فوراً مع فترة تجريبية لمدة 15 يوماً.
+Created ||| تاريخ الإنشاء
+Created the moment it is approved ||| تُنشأ لحظة اعتماده، كمسودات تُرحّل عند استحقاق كل منها.
+Credit ||| دائن
+Credit Account (Fixed Asset Clearing / CWIP) ||| الحساب الدائن (تسوية الأصول الثابتة / أعمال رأسمالية قيد التنفيذ)
+Credit Note ||| إشعار دائن
+Credit Notes ||| الإشعارات الدائنة
+Credit balance owed to the owner ||| رصيد دائن مستحق للمالك
+Credit note date ||| تاريخ الإشعار الدائن
+Cumulative ||| تراكمي
+Currency ||| العملة
+Current ||| الحالي
+Current (or temporary) password ||| كلمة المرور الحالية (أو المؤقتة)
+Current Contract ||| العقد الحالي
+Current Year Profit / Loss ||| ربح / خسارة السنة الحالية
+Current Year Profit or Loss ||| ربح أو خسارة السنة الحالية
+Current due date ||| تاريخ الاستحقاق الحالي
+Current period ||| الفترة الحالية
+Customer Invoices ||| فواتير العملاء
+Customer Receipts ||| سندات قبض العملاء
+Customer type ||| نوع العميل
+Customs ||| الجمارك
+DELETE ||| DELETE
+Dashboard ||| لوحة المعلومات
+Database Updates ||| تحديثات قاعدة البيانات
+Date ||| التاريخ
+Date format ||| صيغة التاريخ
+Date of birth ||| تاريخ الميلاد
+Dates ||| التواريخ
+Day sheet ||| كشف اليوم
+Days ||| الأيام
+Days Overdue ||| أيام التأخير
+Days Remaining ||| الأيام المتبقية
+Days paid ||| الأيام المدفوعة
+Deactivating a category removes it ||| تعطيل الفئة يزيلها من قائمة دفتر اليومية العام مع الإبقاء على كل القيود المرحّلة عليها، فلا تتأثر التقارير التاريخية.
+Deadline ||| الموعد النهائي
+Debit ||| مدين
+Decide on each bill line ||| حدد لكل بند في الفاتورة
+Decided by ||| قرره
+Decided lately ||| قُرر مؤخراً
+Decides the VAT return the reduction falls in. ||| يحدد الإقرار الضريبي الذي يقع فيه التخفيض.
+Decides the account the cost is collected in. ||| يحدد الحساب الذي تُجمع فيه التكلفة. اختر الاستخدام الرئيسي؛ ويُقسّم المبنى المختلط عند الإنجاز.
+Decides the period the journal lands in. ||| يحدد الفترة التي يقع فيها القيد.
+Decides whether this tenant's invoices go on the UAE e-invoicing network ||| يحدد ما إذا كانت فواتير هذا المستأجر تُرسل عبر شبكة الفوترة الإلكترونية في الإمارات
+Decision ||| القرار
+Decline ||| رفض
+Deduct late time from pay ||| خصم وقت التأخير من الراتب (بأجر الساعة الأساسي)
+Deductions ||| الخصومات
+Default Cash / Bank ||| النقد / البنك الافتراضي
+Default Direct Expense ||| المصروف المباشر الافتراضي
+Default General Expense ||| المصروف العام الافتراضي
+Default Property ||| العقار الافتراضي
+Default bank for salaries ||| البنك الافتراضي للرواتب
+Delegate ||| تفويض
+Delegate authority while you are away ||| فوّض الصلاحيات أثناء غيابك
+Delegated authority now: ||| الصلاحيات المفوضة حالياً:
+Delete ||| حذف
+Delete draft ||| حذف المسودة
+Department ||| القسم
+Departments ||| الأقسام
+Deposit ||| إيداع
+Deposit Held ||| التأمين المحتفظ به
+Deposit ticked cheques on ||| إيداع الشيكات المحددة بتاريخ
+Deposit to Bank ||| إيداع في البنك
+Depreciate from ||| الإهلاك اعتباراً من
+Depreciation ||| الإهلاك
+Depreciation Expense ||| مصروف الإهلاك
+Depreciation Expense Account ||| حساب مصروف الإهلاك
+Describe it as fully as you can ||| صِفه بأكبر قدر ممكن من التفصيل - متى بدأ، وأين بالضبط، وأي شيء جربته بالفعل.
+Description ||| الوصف
+Detail ||| التفصيل
+Details ||| التفاصيل
+Developer ||| المطوّر
+Development ||| التطوير
+Development Cost ||| تكلفة التطوير
+Development Projects ||| مشاريع التطوير
+Development cost ||| تكلفة التطوير
+Development project ||| مشروع تطوير
+Development project (contractor / subcontractor bill) ||| مشروع تطوير (فاتورة مقاول / مقاول من الباطن)
+Difference ||| الفرق
+DirectExpense ||| مصروف مباشر
+Disable the affected users ||| عطّل المستخدمين المتأثرين، وغيّر كلمات مرور المسؤولين، واطلب من المسؤول تغيير كلمة مرور قاعدة البيانات، وراجع سجل التدقيق للفترة (إعداد النظام › سجلات التدقيق).
+Disposals and other reductions ||| الاستبعادات والتخفيضات الأخرى
+Divorced ||| مطلّق
+Document ||| المستند
+Document Expiry ||| انتهاء المستندات
+Document expiry control ||| مراقبة انتهاء المستندات
+Document number ||| رقم المستند
+Document type ||| نوع المستند
+Documents ||| المستندات
+Done ||| تم
+Dot matrix file ||| ملف الطابعة النقطية
+Dot matrix printer ||| الطابعة النقطية
+Download PDF ||| تنزيل PDF
+Download SIF ||| تنزيل ملف SIF
+Download ready files (ZIP) ||| تنزيل الملفات الجاهزة (ZIP)
+Draft ||| مسودة
+Draft - not posted ||| مسودة - غير مرحّلة
+Draft Contract ||| مسودة العقد
+Draft journals ||| القيود المسودة
+Draft vendor bills carrying VAT ||| فواتير موردين مسودة تتضمن ضريبة، لم تُرحّل بعد
+Drafts only ||| المسودات فقط
+Drag to turn the building ||| اسحب لتدوير المبنى، ومرّر أو اقرص للتكبير، واسحب بالزر الأيمن لتحريكه. تقع الوحدات في الجهة المسجلة على الوحدة (أمام، خلف، يسار، يمين)؛ وبدونها تُوزّع وحدات الطابق بين الأمام والخلف.
+Drawing style ||| نمط الرسم
+Due ||| المستحق
+Due Date ||| تاريخ الاستحقاق
+Due Lines ||| البنود المستحقة
+Due Recognition Amount ||| مبلغ الاعتراف المستحق
+Due To Landlords ||| المستحق للملاك
+Due date ||| تاريخ الاستحقاق
+Due date not yet applied ||| لم يُطبق تاريخ الاستحقاق بعد
+Due to Post ||| مستحق الترحيل
+Due within 3 days ||| مستحق خلال 3 أيام
+E-Invoice ||| فاتورة إلكترونية
+E-Invoice Monitor ||| متابعة الفواتير الإلكترونية
+E-Invoicing ||| الفوترة الإلكترونية
+E-Invoicing Settings ||| إعدادات الفوترة الإلكترونية
+E-invoice files (XML) ||| ملفات الفواتير الإلكترونية (XML)
+E-invoices your suppliers sent ||| الفواتير الإلكترونية التي أرسلها موردوك عبر الشبكة. ارفع ملفات XML التي سلّمها مزود الخدمة، ثم سجّل كلاً منها كفاتورة مورد — تُعبأ بيانات المورد والرقم والتواريخ والبنود تلقائياً.
+E-invoicing ||| الفوترة الإلكترونية
+E-invoicing is switched off for this company. ||| الفوترة الإلكترونية معطلة لهذه الشركة.
+EID expiry ||| انتهاء الهوية
+Each employee gets the next number in the cheque book. ||| يحصل كل موظف على الرقم التالي في دفتر الشيكات.
+Each new version of the application ||| يحمل كل إصدار جديد من التطبيق تغييرات قاعدة البيانات كنصوص مرقمة ويطبق ما لم يُطبق منها سابقاً عند كل تشغيل للموقع. تعرض هذه الصفحة ما حدث عند آخر تشغيل وكل نص سُجّل حتى الآن.
+Each payroll tops the provision up ||| كل كشف رواتب يرفع المخصص إلى ما يستحقه كل موظف وفق قانون دولة الإمارات في نهاية الشهر.
+Each user only sees the functions ||| يرى كل مستخدم فقط الوظائف التي حددها المسؤول.
+Each user sees and does only ||| يرى كل مستخدم ويفعل فقط ما تسمح به صلاحياته، شركةً بشركة. يمكن منح الملاك رقابة للاطلاع فقط على جميع التقارير دون القدرة على تغيير أي شيء.
+Edit ||| تعديل
+Edit Account ||| تعديل الحساب
+Edit Company ||| تعديل الشركة
+Edit Lease ||| تعديل العقد
+Edit Owner Withdrawal Category ||| تعديل فئة مسحوبات المالك
+Edit PDC ||| تعديل الشيك المؤجل
+Edit Property ||| تعديل العقار
+Edit Tenant ||| تعديل المستأجر
+Edit Unit ||| تعديل الوحدة
+Edit User ||| تعديل المستخدم
+Edit Vendor ||| تعديل المورد
+Edit the tenant's opening balance ||| تعديل الرصيد الافتتاحي للمستأجر
+Edit the vendor's opening balance ||| تعديل الرصيد الافتتاحي للمورد
+Education ||| التعليم
+Effective OB ||| الرصيد الافتتاحي الفعلي
+Electricity / Water ||| الكهرباء / الماء
+Electricity / water ||| الكهرباء / الماء
+Email ||| البريد الإلكتروني
+Emergency contact ||| جهة الاتصال للطوارئ
+Emergency contact phone ||| هاتف الطوارئ
+Emirate ||| الإمارة
+Emirates ID ||| الهوية الإماراتية
+Emirates ID / ID Number ||| الهوية الإماراتية / رقم الهوية
+Emirates ID expiry ||| انتهاء الهوية الإماراتية
+Employee ||| الموظف
+Employee Requests ||| طلبات الموظفين
+Employee code ||| رمز الموظف
+Employee portal (payslips, leave and certificates ||| بوابة الموظفين (قسائم الرواتب والإجازات والشهادات على هواتفهم)
+Employee sign in ||| تسجيل دخول الموظف
+Employees ||| الموظفون
+End ||| النهاية
+End now ||| إنهاء الآن
+End of service to date ||| نهاية الخدمة حتى تاريخه
+End session ||| إنهاء الجلسة
+End-of-service gratuity today ||| مكافأة نهاية الخدمة اليوم
+End-of-service gratuity — how it is worked out ||| مكافأة نهاية الخدمة — طريقة احتسابها
+Ends ||| ينتهي
+Enter the completion certificate. ||| أدخل شهادة الإنجاز. يُنسخ تاريخها إلى العقار، حيث يبدأ فترة النسبة الصفرية للضريبة للوحدات السكنية الجديدة.
+Enter the missing balance ||| أدخل الرصيد الناقص وسيعود هذا الحساب إلى الصفر تلقائياً. لا يمكن تصفيته بقيد — فالرقم مشتق وليس مخزناً.
+Enter your username and password to continue. ||| أدخل اسم المستخدم وكلمة المرور للمتابعة.
+Entered ||| تاريخ الإدخال
+Entries ||| القيود
+Entry ||| القيد
+Entry / document no. ||| رقم القيد / المستند
+Entry No. ||| رقم القيد
+Entry Totals ||| إجماليات القيد
+Equity ||| حقوق الملكية
+Equity and Asset Control ||| رقابة حقوق الملكية والأصول
+Error ||| خطأ
+Every 2 Months ||| كل شهرين
+Every 4 Months ||| كل 4 أشهر
+Every acquisition cost posts immediately ||| تُرحّل كل تكلفة اقتناء فوراً إلى الحسابات. التكاليف القابلة للرسملة تُرحّل إلى حساب تسوية الأصول الثابتة، ويُقيد الحساب المختار للدفع أو الذمم دائناً.
+Every change is logged ||| يُسجّل كل تغيير مع المستخدم والوقت والعنوان، ولا يمكن تعديل السجل من التطبيق. لا يمكن تغيير الأشهر المقفلة إطلاقاً، ولهذا يجب إقفال كل شهر بعد مراجعته.
+Every change made by staff is logged ||| يُسجّل كل تغيير يجريه الموظفون مع المستخدم والوقت والعنوان، وكذلك المحاولات المرفوضة (رفض الوصول) والأخطاء. يراجعها المسؤولون من إعداد النظام › سجلات التدقيق؛ ويرى الملاك الأعمال لا السجل.
+Every check is green. ||| جميع الفحوصات خضراء.
+Every e-invoice must say how it is to be paid ||| يجب أن تحدد كل فاتورة إلكترونية طريقة سدادها
+Every invoice and credit note to a business ||| يجب أن تصل كل فاتورة وإشعار دائن لمستأجر من جهة أعمال أو جهة حكومية إلى مزود الخدمة المعتمد خلال <strong>14 يوماً</strong> من التوريد.
+Every line becomes a cost of this project ||| يصبح كل بند تكلفة لهذا المشروع، ويُرحّل إلى حساب أعماله قيد التنفيذ.
+Every line posted to an owner account ||| كل بند مرحّل إلى حساب مالك في الفترة
+Every period is closed. ||| جميع الفترات مقفلة. السنة جاهزة للإقفال.
+Every period up to today is closed. ||| جميع الفترات حتى اليوم مقفلة.
+Every process the month needs ||| كل العمليات التي يحتاجها الشهر، مدققة مقابل دفتر الأستاذ العام قبل قفل الفترة.
+Every running contract has its attested copy. ||| لكل عقد سارٍ نسخته الموثقة.
+Every salary in this payroll is paid. ||| جميع الرواتب في هذا الكشف مدفوعة.
+Every screen's instructions in one place. ||| تعليمات كل شاشة في مكان واحد. في أي شاشة، يفتح زر <strong>المساعدة</strong> أعلى الشاشة موضوع تلك الشاشة فقط.
+Every tenant scored on collections ||| تقييم كل مستأجر حسب التحصيل والتعرض للمتأخرات وموثوقية الشيكات ومدة الإقامة — مرتبين من الأفضل.
+Everything between the browser and the server ||| كل ما يتنقل بين المتصفح والخادم يمر عبر HTTPS. تُخزن كلمات المرور كتجزئة أحادية الاتجاه فقط. قاعدة البيانات لدى مزود الاستضافة خلف حساب دخول خاص بها، يحتفظ به التطبيق كسر على الخادم.
+Everything tenants have raised ||| كل ما رفعه المستأجرون عبر بوابة الخدمة الذاتية.
+Example: an accountant on Data Entry ||| مثال: محاسب بصلاحية إدخال البيانات يسجل دفعة صيانة بقيمة 7,500. تحتاج إلى مستوى المالك، فلا يستطيع المدير (حده 5,000) صرفها؛ يراها المالك في أداء الأعمال ويعتمدها من هاتفه أو حاسوبه.

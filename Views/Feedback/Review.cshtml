@@ -1,39 +1,39 @@
 @model RealEstateManager.Models.FeedbackReviewViewModel
 
 @{
-    ViewData["Title"] = "Review Feedback";
+    ViewData["Title"] = T["Review Feedback"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">Review Feedback</h2>
-        <p class="text-muted mb-0">Track the status of this suggestion and capture internal notes for future versions.</p>
+        <h2 class="mb-1">@T["Review Feedback"]</h2>
+        <p class="text-muted mb-0">@T["Track the status of this suggestion and capture internal notes for future versions."]</p>
     </div>
-    <a asp-action="Manage" class="btn btn-outline-secondary">Back To Review List</a>
+    <a asp-action="Manage" class="btn btn-outline-secondary">@T["Back To Review List"]</a>
 </div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-3">Company</dt>
+            <dt class="col-sm-3">@T["Company"]</dt>
             <dd class="col-sm-9">@Model.CompanyName</dd>
 
-            <dt class="col-sm-3">User</dt>
+            <dt class="col-sm-3">@T["User"]</dt>
             <dd class="col-sm-9">@Model.DisplayName (@Model.Username)</dd>
 
-            <dt class="col-sm-3">Category</dt>
+            <dt class="col-sm-3">@T["Category"]</dt>
             <dd class="col-sm-9">@Model.Category</dd>
 
-            <dt class="col-sm-3">Subject</dt>
+            <dt class="col-sm-3">@T["Subject"]</dt>
             <dd class="col-sm-9">@Model.Subject</dd>
 
-            <dt class="col-sm-3">Submitted</dt>
+            <dt class="col-sm-3">@T["Submitted"]</dt>
             <dd class="col-sm-9">@Model.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
 
-            <dt class="col-sm-3">Feedback</dt>
+            <dt class="col-sm-3">@T["Feedback"]</dt>
             <dd class="col-sm-9" style="white-space: pre-wrap;">@Model.Message</dd>
 
-            <dt class="col-sm-3">Last Reviewed</dt>
+            <dt class="col-sm-3">@T["Last Reviewed"]</dt>
             <dd class="col-sm-9">@(Model.ReviewedAt.HasValue ? $"{Model.ReviewedAt.Value.ToLocalTime():dd/MM/yyyy HH:mm} by {Model.ReviewedByName ?? "-"}" : "-")</dd>
         </dl>
     </div>
@@ -57,10 +57,10 @@
             <div class="col-md-4">
                 <label asp-for="Status" class="form-label"></label>
                 <select asp-for="Status" class="form-select">
-                    <option value="New">New</option>
-                    <option value="Reviewed">Reviewed</option>
-                    <option value="Planned">Planned</option>
-                    <option value="Closed">Closed</option>
+                    <option value="New">@T["New"]</option>
+                    <option value="Reviewed">@T["Reviewed"]</option>
+                    <option value="Planned">@T["Planned"]</option>
+                    <option value="Closed">@T["Closed"]</option>
                 </select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
@@ -72,8 +72,8 @@
             </div>
 
             <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Save Review</button>
-                <a asp-action="Manage" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">@T["Save Review"]</button>
+                <a asp-action="Manage" class="btn btn-outline-secondary">@T["Cancel"]</a>
             </div>
         </div>
     </div>

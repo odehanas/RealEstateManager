@@ -2,15 +2,15 @@
 @using RealEstateManager.Domain
 
 @{
-    ViewData["Title"] = "Payroll";
+    ViewData["Title"] = T["Payroll"];
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">Payroll</h2>
-        <div class="text-muted">Prepare the month, have it approved, then pay by WPS, bank transfer or cheque.</div>
+        <h2 class="mb-0">@T["Payroll"]</h2>
+        <div class="text-muted">@T["Prepare the month, have it approved, then pay by WPS, bank transfer or cheque."]</div>
     </div>
-    <a asp-action="Settings" class="btn btn-outline-secondary">Payroll settings</a>
+    <a asp-action="Settings" class="btn btn-outline-secondary">@T["Payroll settings"]</a>
 </div>
 
 @if (TempData["HrSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
@@ -21,7 +21,7 @@
         <form asp-action="Create" method="post" class="row g-2 align-items-end">
             @Html.AntiForgeryToken()
             <div class="col-md-3">
-                <label class="form-label">Month</label>
+                <label class="form-label">@T["Month"]</label>
                 <select name="month" class="form-select">
                     @for (var m = 1; m <= 12; m++)
                     {
@@ -29,8 +29,8 @@
                     }
                 </select>
             </div>
-            <div class="col-md-2"><label class="form-label">Year</label><input name="year" type="number" value="@Model.NewYear" class="form-control" /></div>
-            <div class="col-md-3"><button class="btn btn-dark w-100">Prepare payroll</button></div>
+            <div class="col-md-2"><label class="form-label">@T["Year"]</label><input name="year" type="number" value="@Model.NewYear" class="form-control" /></div>
+            <div class="col-md-3"><button class="btn btn-dark w-100">@T["Prepare payroll"]</button></div>
             <div class="col-md-4 text-muted small">@Model.ActiveEmployees active employee(s). Unpaid leave and salary advances are picked up automatically.</div>
         </form>
     </div>
@@ -38,10 +38,10 @@
 
 <table class="table table-bordered table-striped align-middle">
     <thead class="table-light">
-        <tr><th>Payroll</th><th>Month</th><th class="text-end">Employees</th><th class="text-end">Gross</th><th class="text-end">Deductions</th><th class="text-end">Net</th><th>Status</th><th>Prepared · Approved</th></tr>
+        <tr><th>@T["Payroll"]</th><th>@T["Month"]</th><th class="text-end">@T["Employees"]</th><th class="text-end">@T["Gross"]</th><th class="text-end">@T["Deductions"]</th><th class="text-end">@T["Net"]</th><th>@T["Status"]</th><th>@T["Prepared · Approved"]</th></tr>
     </thead>
     <tbody>
-        @if (Model.Runs.Count == 0) { <tr><td colspan="8" class="text-muted">No payroll yet.</td></tr> }
+        @if (Model.Runs.Count == 0) { <tr><td colspan="8" class="text-muted">@T["No payroll yet."]</td></tr> }
         @foreach (var r in Model.Runs)
         {
             var badge = r.Status switch

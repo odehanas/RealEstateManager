@@ -1,7 +1,7 @@
 ﻿@model RealEstateManager.Models.JournalInquiryViewModel
 
 @{
-    ViewData["Title"] = "Journal Inquiry";
+    ViewData["Title"] = T["Journal Inquiry"];
     var sourceTypes = ViewBag.SourceTypes as List<string> ?? new();
 }
 
@@ -20,7 +20,7 @@
     .entry-card.is-posted { border-left: 4px solid #2e9e5b; }
 </style>
 
-<h2>Journal Inquiry</h2>
+<h2>@T["Journal Inquiry"]</h2>
 
 @if (TempData["JournalSuccess"] is string journalSuccess)
 {
@@ -34,28 +34,24 @@
 }
 
 <div class="alert alert-light border small">
-    <strong>Draft entries do not affect the accounts.</strong>
-    Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet and General Ledger.
-    Use <strong>Reset to Draft</strong> to pull an entry back out of the accounts and correct it &mdash; this
-    also unwinds what the posting did to the underlying document, such as the amount paid on an invoice.
-    Entries in a <strong>closed period</strong> cannot be posted or reset.
+    @T.Html("<strong>Draft entries do not affect the accounts.</strong> Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet and General Ledger. Use <strong>Reset to Draft</strong> to pull an entry back out of the accounts and correct it &mdash; this also unwinds what the posting did to the underlying document, such as the amount paid on an invoice. Entries in a <strong>closed period</strong> cannot be posted or reset.")
 </div>
 
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
-        <label class="form-label">From Date</label>
+        <label class="form-label">@T["From Date"]</label>
         <input type="date" name="fromDate" value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" class="form-control" />
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">To Date</label>
+        <label class="form-label">@T["To Date"]</label>
         <input type="date" name="toDate" value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" class="form-control" />
     </div>
 
     <div class="col-md-3">
-        <label class="form-label">Source Type</label>
+        <label class="form-label">@T["Source Type"]</label>
         <select name="sourceType" class="form-select">
-            <option value="">All</option>
+            <option value="">@T["All"]</option>
             @foreach (var type in sourceTypes)
             {
                 if (Model.SourceType == type)
@@ -71,23 +67,23 @@
     </div>
 
     <div class="col-md-2">
-        <label class="form-label">Posted Only</label>
+        <label class="form-label">@T["Posted Only"]</label>
         <select name="postedOnly" class="form-select">
             @if (Model.PostedOnly)
             {
-                <option value="true" selected>Yes</option>
-                <option value="false">No</option>
+                <option value="true" selected>@T["Yes"]</option>
+                <option value="false">@T["No"]</option>
             }
             else
             {
-                <option value="true">Yes</option>
-                <option value="false" selected>No</option>
+                <option value="true">@T["Yes"]</option>
+                <option value="false" selected>@T["No"]</option>
             }
         </select>
     </div>
 
     <div class="col-md-1 d-flex align-items-end">
-        <button type="submit" class="btn btn-dark">Go</button>
+        <button type="submit" class="btn btn-dark">@T["Go"]</button>
     </div>
 </form>
 
@@ -105,8 +101,7 @@
             Post All Drafts (@draftCount)
         </button>
         <span class="text-muted small ms-2">
-            Posts every draft matching the filter above. Entries in a closed period are skipped, and any that
-            fail are listed individually rather than stopping the run.
+            @T["Posts every draft matching the filter above. Entries in a closed period are skipped, and any that fail are listed individually rather than stopping the run."]
         </span>
     </form>
 }
@@ -120,7 +115,7 @@
                     @* Action first, top-left, the way Odoo places it. *@
                     @if (entry.PeriodClosed)
                     {
-                        <span class="badge bg-secondary" title="@entry.PeriodName is closed">Period locked</span>
+                        <span class="badge bg-secondary" title="@entry.PeriodName is closed">@T["Period locked"]</span>
                     }
                     else if (entry.IsPosted)
                     {
@@ -128,7 +123,7 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@entry.JournalEntryId" />
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                            <button type="submit" class="btn btn-sm btn-outline-warning">Reset to Draft</button>
+                            <button type="submit" class="btn btn-sm btn-outline-warning">@T["Reset to Draft"]</button>
                         </form>
                     }
                     else
@@ -137,15 +132,15 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@entry.JournalEntryId" />
                             <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                            <button type="submit" class="btn btn-sm btn-dark">Post</button>
+                            <button type="submit" class="btn btn-sm btn-dark">@T["Post"]</button>
                         </form>
                     }
 
                     <span class="ms-1">
-                        <a asp-controller="Documents" asp-action="Entry" asp-route-id="@entry.JournalEntryId" class="fw-bold" title="Open the journal entry">@entry.EntryNumber</a> | @entry.EntryDate.ToString("dd/MM/yyyy")
+                        <a asp-controller="Documents" asp-action="Entry" asp-route-id="@entry.JournalEntryId" class="fw-bold" title="@T["Open the journal entry"]">@entry.EntryNumber</a> | @entry.EntryDate.ToString("dd/MM/yyyy")
                         @if (!string.IsNullOrWhiteSpace(entry.SourceType))
                         {
-                            <span>| <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@entry.JournalEntryId" title="Open the original document">@RealEstateManager.Services.GeneralJournalReportService.SourceLabel(entry.SourceType)</a></span>
+                            <span>| <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@entry.JournalEntryId" title="@T["Open the original document"]">@RealEstateManager.Services.GeneralJournalReportService.SourceLabel(entry.SourceType)</a></span>
                         }
                         @if (entry.SourceId.HasValue)
                         {
@@ -160,8 +155,8 @@
                         <span class="text-muted small">@entry.PeriodName</span>
                     }
                     <span class="stage-trail">
-                        <span class="stage @(entry.IsPosted ? "" : "on draft")">Draft</span>
-                        <span class="stage @(entry.IsPosted ? "on" : "")">Posted</span>
+                        <span class="stage @(entry.IsPosted ? "" : "on draft")">@T["Draft"]</span>
+                        <span class="stage @(entry.IsPosted ? "on" : "")">@T["Posted"]</span>
                     </span>
                 </div>
             </div>
@@ -172,10 +167,10 @@
             <table class="table table-bordered table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Account</th>
-                        <th>Description</th>
-                        <th class="text-end">Debit</th>
-                        <th class="text-end">Credit</th>
+                        <th>@T["Account"]</th>
+                        <th>@T["Description"]</th>
+                        <th class="text-end">@T["Debit"]</th>
+                        <th class="text-end">@T["Credit"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -191,7 +186,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="2">Entry Totals</th>
+                        <th colspan="2">@T["Entry Totals"]</th>
                         <th class="text-end">@entry.TotalDebit.ToString("N2")</th>
                         <th class="text-end">@entry.TotalCredit.ToString("N2")</th>
                     </tr>

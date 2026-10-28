@@ -8,10 +8,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-2">
     <div>
-        <h2 class="mb-0">Building Photos</h2>
+        <h2 class="mb-0">@T["Building Photos"]</h2>
         <div class="text-muted">@property.Code - @property.Name</div>
     </div>
-    <a asp-controller="BuildingView" asp-action="Property" asp-route-id="@property.Id" class="btn btn-outline-secondary btn-sm">Back to the building view</a>
+    <a asp-controller="BuildingView" asp-action="Property" asp-route-id="@property.Id" class="btn btn-outline-secondary btn-sm">@T["Back to the building view"]</a>
 </div>
 
 @if (TempData["SuccessMessage"] is string success)
@@ -24,15 +24,13 @@
 }
 
 <div class="alert alert-info">
-    Upload a photo of each side of the building you want to show - straight on works best. Then mark each unit's windows or
-    balcony on it, once. The building view's <strong>Photo</strong> mode tints every marked unit with its rent-health colour.
-    For a tower, mark two floors and let the system repeat them up the building.
+    @T.Html("Upload a photo of each side of the building you want to show - straight on works best. Then mark each unit's windows or balcony on it, once. The building view's <strong>Photo</strong> mode tints every marked unit with its rent-health colour. For a tower, mark two floors and let the system repeat them up the building.")
 </div>
 
 <div class="row g-3 mb-4">
     @if (Model.Count == 0)
     {
-        <div class="col-12"><p class="text-muted">No photos yet.</p></div>
+        <div class="col-12"><p class="text-muted">@T["No photos yet."]</p></div>
     }
     @foreach (var photo in Model)
     {
@@ -43,9 +41,9 @@
                     <h5 class="card-title mb-1">@photo.Title</h5>
                     <div class="small text-muted mb-2">@photo.Areas.Count of @unitCount unit(s) marked &middot; @(photo.SizeBytes / 1024) KB &middot; @photo.UploadedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
                     <div class="d-flex gap-2">
-                        <a asp-action="Mark" asp-route-id="@photo.Id" class="btn btn-sm btn-dark">Mark units</a>
+                        <a asp-action="Mark" asp-route-id="@photo.Id" class="btn btn-sm btn-dark">@T["Mark units"]</a>
                         <form asp-action="Delete" asp-route-id="@photo.Id" method="post" onsubmit="return confirm('Delete this photo and every unit outline marked on it?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete"]</button>
                         </form>
                     </div>
                 </div>
@@ -55,19 +53,19 @@
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header bg-light"><strong>Upload a Photo</strong></div>
+    <div class="card-header bg-light">@T.Html("<strong>Upload a Photo</strong>")</div>
     <div class="card-body">
         <form asp-action="Upload" asp-route-id="@property.Id" method="post" enctype="multipart/form-data" class="row g-3">
             <div class="col-md-4">
-                <label class="form-label">Which side</label>
-                <input type="text" name="title" class="form-control" maxlength="100" placeholder="Front, Back, Sea side..." value="@(Model.Count == 0 ? "Front" : "")" />
+                <label class="form-label">@T["Which side"]</label>
+                <input type="text" name="title" class="form-control" maxlength="100" placeholder="@T["Front, Back, Sea side..."]" value="@(Model.Count == 0 ? "Front" : "")" />
             </div>
             <div class="col-md-5">
-                <label class="form-label">Photo (JPG or PNG, up to 8 MB)</label>
+                <label class="form-label">@T["Photo (JPG or PNG, up to 8 MB)"]</label>
                 <input type="file" name="file" class="form-control" accept=".jpg,.jpeg,.png" required />
             </div>
             <div class="col-md-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-dark w-100">Upload</button>
+                <button type="submit" class="btn btn-dark w-100">@T["Upload"]</button>
             </div>
         </form>
     </div>

@@ -1,0 +1,331 @@
+# Sheet 1: phrases A (symbols, numbers, bold headings, A...)
+"Custom" means the person's ticks ||| "مخصص" تعني أن صلاحيات الشخص تختلف عن الأدوار القياسية. اختر دوراً من صفحة المستخدم لإعادتها إلى الوضع القياسي.
+% of Budget ||| % من الموازنة
+(reclaimable by a registered owner) ||| (قابلة للاسترداد من قبل مالك مسجل)
++ / − Transaction ||| + / − معاملة
++ Add a filter ||| + إضافة عامل تصفية
++ Add line ||| + إضافة سطر
+-- account -- ||| -- الحساب --
+-- category -- ||| -- الفئة --
+-- choose -- ||| -- اختر --
+-- choose later -- ||| -- اختر لاحقاً --
+-- choose the invoice -- ||| -- اختر الفاتورة --
+-- nobody -- ||| -- لا أحد --
+-- none -- ||| -- لا شيء --
+-- not a development cost -- ||| -- ليست تكلفة تطوير --
+-- not a project bill -- ||| -- ليست فاتورة مشروع --
+-- not about a specific property -- ||| -- لا تخص عقاراً محدداً --
+-- select supplier -- ||| -- اختر المورد --
+0 = ground ||| 0 = الطابق الأرضي
+1 = far left ||| 1 = أقصى اليسار
+1. Controls the system enforces ||| 1. ضوابط يفرضها النظام
+1. Cost by project ||| 1. التكلفة حسب المشروع
+1. Roles and what they may do ||| 1. الأدوار وما يحق لكل منها
+1. Vendor ||| 1. المورد
+1. What do you want to report on? ||| 1. ما الذي تريد إعداد تقرير عنه؟
+1.25 = 125% of the basic hourly wage ||| 1.25 = 125% من أجر الساعة الأساسي (العمل الإضافي العادي في الإمارات)؛ 1.5 للعمل الليلي وأيام الراحة.
+1.5 = 150% under UAE law. ||| 1.5 = 150% وفق قانون دولة الإمارات.
+10 digits ||| 10 أرقام
+13 digits, on the establishment card. ||| 13 رقماً، مدون على بطاقة المنشأة.
+14 digits, on the labour card. ||| 14 رقماً، مدون على بطاقة العمل. مطلوب لملف رواتب نظام حماية الأجور.
+15 days of full system access ||| 15 يوماً من الوصول الكامل إلى النظام
+15 digits ||| 15 رقماً
+15 digits, if VAT registered ||| 15 رقماً، إذا كان مسجلاً في ضريبة القيمة المضافة
+1–30 days ||| 1–30 يوماً
+2. Approval levels in this company ||| 2. مستويات الاعتماد في هذه الشركة
+2. Company identity ||| 2. بيانات الشركة
+2. Controls to adopt as company policy ||| 2. ضوابط تُعتمد كسياسة للشركة
+2. Payment type ||| 2. نوع الدفعة
+2. Show ||| 2. العرض
+2. WIP reconciliation: ledger against projects ||| 2. مطابقة الأعمال قيد التنفيذ: الدفاتر مقابل المشاريع
+3. Advance (down payment) ||| 3. دفعة مقدمة
+3. Budget against cost, by category ||| 3. الموازنة مقابل التكلفة، حسب الفئة
+3. Open items ||| 3. البنود المفتوحة
+3. Owners' security questions ||| 3. أسئلة الملاك حول الأمان
+3. Payment ||| 3. الدفع
+30 under UAE law after the first year. ||| 30 وفق قانون دولة الإمارات بعد السنة الأولى.
+31–60 days ||| 31–60 يوماً
+4. Payment details ||| 4. تفاصيل الدفع
+4. Sort and size ||| 4. الترتيب والحجم
+4. Spend by month (posted) ||| 4. الإنفاق حسب الشهر (المرحّل)
+5. Contractors, subcontractors and suppliers (posted bills) ||| 5. المقاولون والمقاولون من الباطن والموردون (الفواتير المرحّلة)
+5. Show as ||| 5. العرض بصيغة
+6. Bills charged to the project ||| 6. الفواتير المحمّلة على المشروع
+61–90 days ||| 61–90 يوماً
+784-XXXX-XXXXXXX-X ||| 784-XXXX-XXXXXXX-X
+9-digit routing code ||| رمز التوجيه المكوّن من 9 أرقام (رقم الوكيل) للبنك الذي يرسل ملف نظام حماية الأجور.
+<em>Opening balance</em> ||| <em>الرصيد الافتتاحي</em>
+<strong>1. Switch and provider</strong> ||| <strong>1. التفعيل ومزود الخدمة</strong>
+<strong>1.</strong> Download the ready files ||| <strong>1.</strong> نزّل الملفات الجاهزة (جميعها أو المحددة منها) وارفعها في بوابة مزود الخدمة.
+<strong>2.</strong> Once uploaded, tick them ||| <strong>2.</strong> بعد الرفع، حددها وسجّل أنها أُرسلت. يؤدي ذلك إلى قفلها &mdash; وأي تصحيح بعدها يتطلب إشعاراً دائناً.
+<strong>Access issued &mdash; copy these details now</strong> ||| <strong>تم إصدار بيانات الدخول &mdash; انسخ هذه البيانات الآن</strong>
+<strong>Account Mapping</strong> ||| <strong>ربط الحسابات</strong>
+<strong>Account</strong> ||| <strong>الحساب</strong>
+<strong>Accounting</strong> ||| <strong>المحاسبة</strong>
+<strong>Accumulated depreciation</strong> ||| <strong>مجمع الإهلاك</strong>
+<strong>Actual recovery rate</strong> ||| <strong>نسبة الاسترداد الفعلية</strong> &mdash; (التوريدات الخاضعة للنسبة الأساسية + الخاضعة لنسبة الصفر) ÷ إجمالي التوريدات
+<strong>Add Acquisition Cost</strong> ||| <strong>إضافة تكلفة اقتناء</strong>
+<strong>Amount lock</strong> ||| <strong>قفل المبلغ</strong>
+<strong>Approval limits on payments</strong> ||| <strong>حدود اعتماد المدفوعات</strong>
+<strong>Area utilization</strong> ||| <strong>استغلال المساحة</strong> &mdash; مساحة الوحدات المؤجرة بعقد نافذ وساري في تاريخ التقرير مقسومة على إجمالي المساحة. يقيس المساحة المؤجرة لا عدد الوحدات، لذا يظهر أثر الوحدة الشاغرة الكبيرة بشكل أكبر.
+<strong>Asset Details</strong> ||| <strong>تفاصيل الأصل</strong>
+<strong>Asset Profile</strong> ||| <strong>ملف الأصل</strong>
+<strong>Audit trail</strong> ||| <strong>سجل التدقيق</strong>
+<strong>Balance brought forward</strong> ||| <strong>الرصيد المرحّل</strong>
+<strong>Bank reconciliation every month</strong> ||| <strong>مطابقة بنكية كل شهر</strong>، يعدّها شخص ويراجعها شخص آخر، قبل إقفال الشهر.
+<strong>Bounced</strong>: <code>Dr the tenant ||| <strong>مرتجع</strong>: <code>من حـ/ المستأجر إلى حـ/ 11450</code> &mdash; يُعاد تحميل المبلغ على المستأجر وتُفتح الفاتورة مجدداً، إضافة إلى رسوم الشيك المرتجع إن وجدت.
+<strong>Breakdown by Category</strong> ||| <strong>التوزيع حسب الفئة</strong>
+<strong>Browser protection</strong> ||| <strong>حماية المتصفح</strong>
+<strong>Budget against Actual</strong> ||| <strong>الموازنة مقابل الفعلي</strong>
+<strong>Building &amp; Completion</strong> ||| <strong>البناء والإنجاز</strong>
+<strong>By kind of job</strong> ||| <strong>حسب نوع العمل</strong>
+<strong>By property</strong> ||| <strong>حسب العقار</strong>
+<strong>By technician</strong> ||| <strong>حسب الفني</strong>
+<strong>Capitalize Asset</strong> ||| <strong>رسملة الأصل</strong>
+<strong>Carrying amount</strong> ||| <strong>القيمة الدفترية</strong>
+<strong>Cash In Hand</strong> is what should ||| <strong>النقد بالصندوق</strong> هو ما يجب أن يكون موجوداً فعلياً في الصندوق. قم بعدّه وقارنه؛ أي فرق هو عجز يجب التحقق منه.
+<strong>Cash KPI</strong> ||| <strong>مؤشر النقد</strong>
+<strong>Cleared</strong> by the bank ||| <strong>محصّل</strong> من البنك: <code>من حـ/ البنك إلى حـ/ 11450</code>. الشيك المحصّل دون إيداعه أولاً ينتقل مباشرة من الحوزة إلى البنك.
+<strong>Close each month</strong> ||| <strong>أقفل كل شهر</strong> بعد المراجعة حتى لا تتغير أرقام الفترات السابقة.
+<strong>Closed periods</strong> ||| <strong>الفترات المقفلة</strong>
+<strong>Collection ratio &mdash; 40%.</strong> ||| <strong>نسبة التحصيل &mdash; 40%.</strong> إجمالي المحصّل مقسوماً على إجمالي المفوتر. أقوى مؤشر منفرد على انتظام المستأجر في السداد.
+<strong>Contract</strong> ||| <strong>العقد</strong>
+<strong>Conversation</strong> ||| <strong>المحادثة</strong>
+<strong>Cost Allocation Lines</strong> ||| <strong>بنود توزيع التكلفة</strong>
+<strong>Cost to date</strong> = ||| <strong>التكلفة حتى تاريخه</strong> = صافي الفواتير + ضريبة القيمة المضافة المحمّلة على التكلفة + التكاليف الأخرى (القيود والنثريات وتكاليف التمويل) المرحّلة إلى حساب الأعمال قيد التنفيذ للمشروع. <strong>الضريبة المستردة</strong> تبقى في حساب ضريبة القيمة المضافة القابلة للاسترداد وتُطالب بها في الإقرار الضريبي، فلا تدخل في التكلفة. <strong>رصيد الأعمال قيد التنفيذ</strong> = التكلفة حتى تاريخه ناقصاً ما حُوّل عند الإنجاز. <strong>الملتزم به</strong> = الفواتير والقيود المسودة المرتبطة بالمشروع ولم تُرحّل بعد.
+<strong>Cost</strong> ||| <strong>التكلفة</strong>
+<strong>Costs Passed On to Owners of Managed Properties</strong> ||| <strong>التكاليف المحمّلة على ملاك العقارات المُدارة</strong>
+<strong>Costs charged to owners, by kind</strong> ||| <strong>التكاليف المحمّلة على الملاك، حسب النوع</strong>
+<strong>Current Status</strong> ||| <strong>الحالة الحالية</strong>
+<strong>Data Entry</strong> prepares the record ||| <strong>إدخال البيانات</strong> يُعدّ السجل: دفعة أو سند نثرية أو عقد أو رواتب. يُحفظ السجل لكن لا يصل شيء إلى الحسابات بعد.
+<strong>Delegation while away</strong> ||| <strong>التفويض أثناء الغياب</strong>
+<strong>Deposited</strong> to the bank ||| <strong>مودَع</strong> في البنك للتحصيل: يُعكس القيد النظامي و<code>من حـ/ 11450 شيكات برسم التحصيل إلى حـ/ المستأجر</code> (ذمم مدينة أو دفعة مقدمة).
+<strong>Depreciate an Existing Building</strong> ||| <strong>إهلاك مبنى قائم</strong>
+<strong>Disbursement, no VAT</strong> ||| <strong>مصروف مدفوع نيابة عن المالك، بدون ضريبة</strong> &mdash; يصدر المورد فاتورته باسم المالك وندفعها من نقديتنا بصفتنا وكلاء عنه. تُحمّل التكلفة شاملة ضريبة المورد على حساب المالك كما هي؛ لا نفرض ضريبة ولا نسترد شيئاً. ضريبة المورد تظهر في الإقرار الضريبي للمالك.
+<strong>Draft entries do not affect the accounts.</strong> ||| <strong>القيود المسودة لا تؤثر على الحسابات.</strong> تظهر القيود المرحّلة فقط في ميزان المراجعة والأرباح والخسائر والميزانية العمومية ودفتر الأستاذ العام. استخدم <strong>إعادة إلى مسودة</strong> لسحب القيد من الحسابات وتصحيحه &mdash; ويُلغي ذلك أيضاً أثر الترحيل على المستند المرتبط، مثل المبلغ المدفوع على الفاتورة. القيود في <strong>فترة مقفلة</strong> لا يمكن ترحيلها أو إعادتها.
+<strong>Editable</strong> ||| <strong>قابل للتعديل</strong>
+<strong>Expenses by Account</strong> ||| <strong>المصروفات حسب الحساب</strong>
+<strong>Expired and expiring</strong> ||| <strong>منتهية وقاربت على الانتهاء</strong>
+<strong>Expiring 90d</strong> ||| <strong>تنتهي خلال 90 يوماً</strong> &mdash; عقود نافذة تنتهي خلال 90 يوماً من تاريخ التقرير؛ وهي قائمة التجديدات المرتقبة.
+<strong>Finished</strong> ||| <strong>منجز</strong>
+<strong>Float Balances</strong> ||| <strong>أرصدة العهد</strong>
+<strong>Four eyes (maker &ne; checker)</strong> ||| <strong>مبدأ العيون الأربع (المُعِدّ &ne; المُراجِع)</strong>
+<strong>History</strong> ||| <strong>السجل</strong>
+<strong>How a cheque moves through the accounts</strong> ||| <strong>كيف ينتقل الشيك عبر الحسابات</strong>
+<strong>How sending works.</strong> ||| <strong>آلية الإرسال.</strong> يُصدر هذا النظام كل فاتورة إلكترونية بالصيغة الرسمية لدولة الإمارات (PINT AE). يتحقق منها مزود الخدمة المعتمد لديك، ويسلّمها إلى مزود خدمة عميلك ويبلّغ الهيئة الاتحادية للضرائب. نزّل الملفات من شاشة متابعة الفواتير الإلكترونية وارفعها في بوابة مزود الخدمة، ثم سجّل رد المزود. يمكن إضافة ربط مباشر بمزود معين عند الطلب.
+<strong>How this works.</strong> Money the owner takes ||| <strong>آلية العمل.</strong> المبالغ التي يسحبها المالك من الشركة ليست مصروفاً للشركة &mdash; بل حركة في حقوق الملكية. يُرحّل القيد إلى حساب حقوق ملكية واحد (<em>الحساب الجاري للمالك</em>) ويحمل فئة من هذه القائمة توضّح أوجه الإنفاق. تبقى حسابات مصروفات الشركة نظيفة، ويحصل المالك على تفصيل كامل لإنفاقه.
+<strong>Input Tax &mdash; Purchases</strong> ||| <strong>ضريبة المدخلات &mdash; المشتريات</strong>
+<strong>Input Tax Recovery</strong> ||| <strong>استرداد ضريبة المدخلات</strong>
+<strong>Input tax</strong> comes from posted vendor bills ||| <strong>ضريبة المدخلات</strong> تُستمد من فواتير الموردين المرحّلة، باستخدام تقسيم القابل وغير القابل للاسترداد المحدد عند ترحيل كل فاتورة &mdash; لذا يتطابق هذا التقرير دائماً مع الدفاتر.
+<strong>Keep administrator rights to as few people ||| <strong>اقصر صلاحيات المسؤول على أقل عدد ممكن من الأشخاص</strong> وامنح الملاك صلاحية "رقابة المالك" بدلاً من الصلاحيات الكاملة إذا كانوا يحتاجون إلى المتابعة فقط.
+<strong>Landlord KPI</strong> ||| <strong>مؤشرات المالك</strong>
+<strong>Location</strong> ||| <strong>الموقع</strong>
+<strong>Maintenance and expenses charged to the owner</strong> ||| <strong>الصيانة والمصروفات المحمّلة على المالك</strong>
+<strong>Messages</strong> ||| <strong>الرسائل</strong>
+<strong>Monthly Depreciation Run</strong> ||| <strong>تشغيل الإهلاك الشهري</strong>
+<strong>My Cheques</strong> ||| <strong>شيكاتي</strong>
+<strong>My Tenancy</strong> ||| <strong>إيجاري</strong>
+<strong>Next step</strong> ||| <strong>الخطوة التالية</strong>
+<strong>No TRN is configured.</strong> ||| <strong>لم يتم إعداد رقم التسجيل الضريبي.</strong> أدخله من <strong>الإعداد &rsaquo; إعدادات ضريبة القيمة المضافة</strong>. يبقى هذا التقرير دقيقاً، لكنه لا يصلح مستنداً للتقديم بدونه.
+<strong>No cash accounts are configured.</strong> ||| <strong>لم يتم إعداد حسابات نقدية.</strong> حدّد ربط <em>النقد الافتراضي</em> من <strong>الإعداد ▸ ربط الحسابات</strong>، وحدّد حسابات عهد النثرية في دليل الحسابات. بدونها لا يوجد ما يُعرض.
+<strong>No opening balances have been entered.</strong> ||| <strong>لم تُدخل أرصدة افتتاحية.</strong> هذا صحيح إذا بدأت الشركة من الصفر. إذا كنت تنتقل من نظام آخر، أدخل رصيد كل حساب أدناه &mdash; وتذكّر أن كل مدين يحتاج إلى دائن مقابل، وإلا لن يتوازن ميزان المراجعة والميزانية العمومية.
+<strong>No owner equity account is configured.</strong> ||| <strong>لم يتم إعداد حساب حقوق ملكية للمالك.</strong> افتح <strong>الإعداد &rsaquo; دليل الحسابات</strong>، وعدّل حساب حقوق الملكية المخصص لمسحوبات المالك (الدليل القياسي يتضمن <code>34100 الحساب الجاري للمالك</code>)، واجعل <strong>حساب مالك</strong> = <em>نعم</em>. حتى ذلك الحين يبقى بُعد مسحوبات المالك غير مفعّل ولا يعرض هذا التقرير شيئاً.
+<strong>No petty cash float is configured.</strong> ||| <strong>لم يتم إعداد عهدة نثرية.</strong> افتح <strong>الإعداد &rsaquo; دليل الحسابات</strong>، وعدّل حساب الأصول المستخدم للنثرية (الدليل القياسي يتضمن <code>11150 النثرية</code>)، واجعل <strong>عهدة نثرية</strong> = <em>نعم</em>. أدخل النقد الذي بدأت به <strong>رصيداً افتتاحياً</strong> لذلك الحساب.
+<strong>Occupancy</strong> ||| <strong>الإشغال</strong> &mdash; الوحدات بحالة <em>مشغولة</em> مقسومة على إجمالي الوحدات. يعتمد على حالة الوحدة التي تُحدَّث تلقائياً عند تفعيل العقد.
+<strong>One person, one login.</strong> ||| <strong>شخص واحد، حساب دخول واحد.</strong> لا تشارك الحسابات أبداً &mdash; فسجل التدقيق لا يكون أفضل من حسابات الدخول التي تقف خلفه.
+<strong>Open</strong> ||| <strong>مفتوح</strong>
+<strong>Opening Balance (brought forward)</strong> ||| <strong>الرصيد الافتتاحي (المرحّل)</strong>
+<strong>Opening balance</strong> is the cash ||| <strong>الرصيد الافتتاحي</strong> هو النقد الذي بدأت به، ويُدخل على الحساب في دليل الحسابات.
+<strong>Opening balances are not balanced.</strong> ||| <strong>الأرصدة الافتتاحية غير متوازنة.</strong> يجب أن يساوي مجموع الأرصدة الافتتاحية المدينة مجموع الدائنة ليبقى ميزان المراجعة والميزانية العمومية متوازنين من اليوم الأول. راجع الرصيد الافتتاحي اليدوي لحساب حقوق الملكية / الأرباح المحتجزة (أو الحساب المقابل المستخدم لقيد الافتتاح) حتى يصبح الفرق صفراً.
+<strong>Output Tax &mdash; Supplies Made</strong> ||| <strong>ضريبة المخرجات &mdash; التوريدات المنفذة</strong>
+<strong>Output tax</strong> comes from ||| <strong>ضريبة المخرجات</strong> تُستمد من فواتير العملاء المرحّلة، مجمّعة حسب المعاملة الضريبية المسجلة على كل منها. تُستبعد الفواتير المسودة والملغاة لأنه لا أثر لها في الدفاتر.
+<strong>Overdue exposure &mdash; 30%.</strong> ||| <strong>التعرض للمتأخرات &mdash; 30%.</strong> الرصيد المتأخر مقابل إجمالي المفوتر، معكوساً، ثم يُخفض بعقوبة تقادم تصل إلى 30 نقطة عندما تتجاوز أقدم فاتورة متأخرة 120 يوماً.
+<strong>Owner Account Movement</strong> ||| <strong>حركة حساب المالك</strong>
+<strong>Ownership, Utilities &amp; Insurance</strong> ||| <strong>الملكية والمرافق والتأمين</strong>
+<strong>PDC On Hand is excluded.</strong> ||| <strong>الشيكات المؤجلة في الحوزة مستبعدة.</strong> الشيك المؤجل في الدرج لم يُودع في البنك ولا يمكن تحويله بسهولة إلى نقد، فلا يُعد من النقد وما يعادله وفق المعيار المحاسبي الدولي 7.
+<strong>PDC Summary</strong> ||| <strong>ملخص الشيكات المؤجلة</strong>
+<strong>PDC reliability &mdash; 15%.</strong> ||| <strong>موثوقية الشيكات المؤجلة &mdash; 15%.</strong> قيمة الشيكات المحصّلة مقسومة على المحصّلة زائد المرتجعة. تُقاس فقط حيث قُدّمت الشيكات فعلاً.
+<strong>Password storage</strong> ||| <strong>تخزين كلمات المرور</strong>
+<strong>Pay the Owner</strong> ||| <strong>الدفع للمالك</strong>
+<strong>Payment postponement</strong> ||| <strong>تأجيل الدفع</strong>
+<strong>Payments Received</strong> ||| <strong>المدفوعات المستلمة</strong>
+<strong>Payments</strong> ||| <strong>المدفوعات</strong>
+<strong>Payroll and salary advances</strong> ||| <strong>الرواتب والسلف</strong>
+<strong>Petty cash counts</strong> by surprise ||| <strong>جرد النثرية</strong> بشكل مفاجئ مرة شهرياً على الأقل، ومطابقته مع السندات في النظام.
+<strong>Please note.</strong> This is a request ||| <strong>يرجى الملاحظة.</strong> هذا طلب وليس اتفاقاً. لا يتغير المبلغ المستحق عليك، ويبقى تاريخ الاستحقاق الحالي سارياً ما لم نؤكد خلاف ذلك. سنرد هنا.
+<strong>Printer offset</strong> ||| <strong>إزاحة الطابعة</strong>
+<strong>Project</strong> ||| <strong>المشروع</strong>
+<strong>Quick Actions</strong> ||| <strong>إجراءات سريعة</strong>
+<strong>Quick Reports</strong> ||| <strong>تقارير سريعة</strong>
+<strong>Received</strong> (received date) ||| <strong>مستلم</strong> (تاريخ الاستلام): <code>من حـ/ 11400 شيكات مؤجلة في الحوزة إلى حـ/ 21600 مقابل الشيكات المؤجلة</code> &mdash; قيد نظامي متقابل؛ لا يمس النقد أو الإيرادات أو حساب المستأجر بعد.
+<strong>Recent Invoices</strong> ||| <strong>أحدث الفواتير</strong>
+<strong>Recent PDC Activity</strong> ||| <strong>أحدث حركات الشيكات المؤجلة</strong>
+<strong>Recent Receipts</strong> ||| <strong>أحدث سندات القبض</strong>
+<strong>Recently accepted</strong> ||| <strong>المقبولة مؤخراً</strong>
+<strong>Recharge with 5% VAT</strong> ||| <strong>إعادة تحميل مع ضريبة 5%</strong> &mdash; يصدر المورد فاتورته باسمنا؛ نسترد ضريبته ونحمّل المالك التكلفة زائد ضريبة 5% بفاتورتنا الضريبية. ضريبة مخرجاتنا تظهر في إقرارنا؛ ويستردها المالك المسجل.
+<strong>Record a Cost without a Supplier Bill</strong> ||| <strong>تسجيل تكلفة بدون فاتورة مورد</strong>
+<strong>Record a Payment</strong> ||| <strong>تسجيل دفعة</strong>
+<strong>Record a Withdrawal</strong> ||| <strong>تسجيل مسحوبات</strong>
+<strong>Recovery rate</strong> is the standard ||| <strong>نسبة الاسترداد</strong> هي طريقة التوزيع القياسية: التوريدات التي يحق عنها الاسترداد مقسومة على إجمالي التوريدات. إذا احتاج نشاطك إلى طريقة خاصة فيجب أن تعتمدها الهيئة الاتحادية للضرائب.
+<strong>Register a Building Bought or Built Outside ||| <strong>تسجيل مبنى تم شراؤه أو بناؤه خارج النظام</strong>
+<strong>Remove access the day someone leaves</strong> ||| <strong>ألغِ الصلاحيات يوم مغادرة أي شخص</strong>: عطّل حساب الموظف في النظام وحساب دخوله إلى بوابة الموظفين.
+<strong>Rent gap</strong> ||| <strong>فجوة الإيجار</strong> &mdash; الإيراد السنوي الضائع. هذا هو الرقم الذي يجب معالجته أولاً.
+<strong>Rent realisation</strong> ||| <strong>تحقق الإيجار</strong> &mdash; الإيجار المتعاقد عليه مقابل الإيجار القياسي. أقل من 100% يعني شواغر أو عقوداً بأقل من الإيجار المطلوب؛ وأعلى من 100% يعني تأجير الوحدات بأعلى من المطلوب.
+<strong>Repeat Floors Up the Building</strong> ||| <strong>تكرار الطوابق في المبنى</strong>
+<strong>Review Business Performance and the Owner Monitor weekly</strong> ||| <strong>راجع أداء الأعمال وشاشة رقابة المالك أسبوعياً</strong>: النتائج والتحصيل والقيود الكبيرة والمدفوعات المصروفة والمسودات القديمة. ويراجع المسؤولون سجلات التدقيق.
+<strong>Roles and permissions</strong> ||| <strong>الأدوار والصلاحيات</strong>
+<strong>Running contracts without an attested copy</strong> ||| <strong>عقود سارية بدون نسخة موثقة</strong>
+<strong>Sent &mdash; awaiting the provider's answer</strong> ||| <strong>مُرسلة &mdash; بانتظار رد مزود الخدمة</strong>
+<strong>Separate portals</strong> ||| <strong>بوابات منفصلة</strong>
+<strong>Separate who adds vendors from who pays them</strong> ||| <strong>افصل بين من يضيف الموردين ومن يدفع لهم</strong>، وبين من يضيف الموظفين ومن يعتمد الرواتب.
+<strong>Setup Details</strong> ||| <strong>تفاصيل الإعداد</strong>
+<strong>Setup Readiness</strong> ||| <strong>جاهزية الإعداد</strong>
+<strong>Sign-in protection</strong> ||| <strong>حماية تسجيل الدخول</strong>
+<strong>Standard rent</strong> ||| <strong>الإيجار القياسي</strong> &mdash; مجموع الإيجار المطلوب لكل وحدة. <strong>الإيجار المتعاقد عليه</strong> &mdash; الإيجار السنوي للعقود النافذة في تاريخ التقرير.
+<strong>Summary</strong> ||| <strong>الملخص</strong>
+<strong>Switch payment approval on</strong> ||| <strong>فعّل اعتماد المدفوعات</strong> لكل شركة عاملة، وحدد حدوداً تناسب النشاط.
+<strong>Tax invoices cannot be issued yet.</strong> ||| <strong>لا يمكن إصدار فواتير ضريبية بعد.</strong> يجب أن تُظهر الفاتورة الضريبية رقم التسجيل الضريبي للمورد وعنوانه. أدخلهما أدناه واحفظ.
+<strong>Tenant</strong> ||| <strong>المستأجر</strong>
+<strong>Tenants with a running contract and no Emirates ID expiry</strong> ||| <strong>مستأجرون بعقد ساري وبدون تاريخ انتهاء للهوية الإماراتية</strong>
+<strong>Tenure &amp; commitment &mdash; 15%.</strong> ||| <strong>مدة الإقامة والالتزام &mdash; 15%.</strong> سنوات الإشغال بحد أقصى خمس سنوات (70% من المكوّن)، زائد مدة العقد الحالي بحد أقصى 36 شهراً (30%).
+<strong>The invoice</strong> ||| <strong>الفاتورة</strong>
+<strong>The owner's properties</strong> ||| <strong>عقارات المالك</strong>
+<strong>The request</strong> ||| <strong>الطلب</strong>
+<strong>This credit note</strong> ||| <strong>هذا الإشعار الدائن</strong>
+<strong>This password is shown once ||| <strong>تظهر كلمة المرور هذه مرة واحدة ولا يمكن استرجاعها.</strong> تُخزّن مشفرة فقط. إذا فُقدت، أصدر إعادة تعيين من هذه الصفحة لإنشاء كلمة جديدة. يجب على المستأجر تغييرها عند أول تسجيل دخول.
+<strong>Title Deed &amp; Land</strong> ||| <strong>سند الملكية والأرض</strong>
+<strong>Transfer on Completion</strong> ||| <strong>التحويل عند الإنجاز</strong>
+<strong>Transfers between cash accounts are excluded</strong> ||| <strong>التحويلات بين الحسابات النقدية مستبعدة</strong> &mdash; تعبئة النثرية من البنك نقل للنقد بين الحسابات وليست تدفقاً نقدياً.
+<strong>Unallocated column present.</strong> ||| <strong>يوجد عمود غير موزّع.</strong> بعض بنود الإيرادات أو المصروفات لا تحمل بُعد العقار &mdash; غالباً قيود يدوية رُحّلت بدون وحدة / مركز تكلفة. أعد فتح تلك القيود وحدد الوحدة لينسب المبلغ إلى عقار. إجمالي المصفوفة يطابق دائماً الأرباح والخسائر في دفتر الأستاذ العام للتواريخ نفسها، سواء وُزّعت البنود أم لا.
+<strong>Uncategorised activity present.</strong> ||| <strong>توجد حركة غير مصنفة.</strong> بعض الحركات على حساب المالك بدون فئة. هذا متوقع لرأس المال المضاف أو لتحويل رصيد المالك، أما إن كانت إنفاقاً فأعد فتح القيد في دفتر اليومية العام وحدد الفئة لتظهر في التفصيل أدناه.
+<strong>Update</strong> ||| <strong>تحديث</strong>
+<strong>Upload a Document</strong> ||| <strong>رفع مستند</strong>
+<strong>Upload a Photo</strong> ||| <strong>رفع صورة</strong>
+<strong>Vacant units are included</strong> ||| <strong>الوحدات الشاغرة مشمولة</strong> بإيجارها المطلوب، لأن الوحدات الشاغرة غالباً أول ما يسأل عنه المالك. أزل التحديد لإخفائها.
+<strong>Vendor bank details</strong> ||| <strong>البيانات البنكية للموردين</strong>: أكّد أي تغيير هاتفياً على رقم معروف قبل الدفع &mdash; أشيع أنواع الاحتيال رسالة بريد إلكتروني مزيفة عن "حساب بنكي جديد".
+<strong>Withdrawals by Category</strong> ||| <strong>المسحوبات حسب الفئة</strong>
+<strong>Withdrawals over Time</strong> ||| <strong>المسحوبات عبر الزمن</strong>
+<strong>Withdrawn</strong> by the tenant ||| <strong>مسحوب</strong> من قبل المستأجر قبل الإيداع: يُعكس القيد النظامي، ويبقى الشيك هنا بحالة مسحوب، وتُصدر فاتورة رسوم السحب للمستأجر.
+<strong>You cannot skip a step.</strong> ||| <strong>لا يمكنك تخطي أي خطوة.</strong> كل شاشة تختار سجلاً أنشأته الشاشة التي قبلها &mdash; فلا وحدة بدون عقار، ولا عقد بدون وحدة ومستأجر، ولا فاتورة بدون عقد، ولا سند قبض بدون فاتورة. إذا كانت القائمة المنسدلة فارغة فالخطوة السابقة لم تكتمل.
+<strong>You have not made any requests yet.</strong> ||| <strong>لم تقدم أي طلبات بعد.</strong>
+<strong>Your account is fully settled.</strong> ||| <strong>حسابك مسدد بالكامل.</strong> لا توجد مبالغ مستحقة.
+A <strong>Managed</strong> property is grouped ||| العقار <strong>المُدار</strong> يُجمّع تحت اسم المالك المدون في سجل العقار، مع إظهار عمولة الإدارة.
+A building costing <strong>AED 5 million ||| المبنى الذي تبلغ تكلفته <strong>5 ملايين درهم أو أكثر</strong> قبل الضريبة يُعد أصلاً رأسمالياً لأغراض ضريبة القيمة المضافة. تُراجع ضريبة المدخلات المستردة عنه سنوياً لمدة <strong>عشر سنوات</strong>: إذا استُخدم المبنى في توريدات معفاة أكثر مما كان عند الاسترداد - عادة مبنى سكني تليه عقود معفاة بعد عقوده الأولى الخاضعة لنسبة الصفر - يُعاد جزء من الضريبة؛ وإذا استُخدم أكثر في توريدات خاضعة يمكن استرداد المزيد. تُدرج تسوية كل سنة في الإقرار الضريبي بعد انتهاء السنة.
+A building under construction collects ||| يجمع المبنى قيد الإنشاء تكاليفه - الأرض والتصميم والتصاريح والمقاولين والإشراف وتكاليف الاقتراض - في حساب أعمال قيد التنفيذ يُختار حسب الغرض: <strong>للبيع</strong> (مخزون)، أو <strong>للتأجير</strong> (عقار استثماري)، أو <strong>للاستخدام الخاص</strong> (أصل ثابت). اربط فواتير الموردين والقيود بالمشروع لتُقرأ التكلفة حتى تاريخه أدناه مباشرة من الدفاتر.
+A category that has already been used ||| لا يمكن حذف فئة سبق استخدامها لأن قيوداً مرحّلة تشير إليها. عطّلها بدلاً من ذلك — فتختفي من قائمة الاختيار في دفتر اليومية العام مع بقاء سجلها كما هو.
+A cheque marked <strong>Received</strong> ||| الشيك بحالة <strong>مستلم</strong> محفوظ لدينا ولم يُقدّم إلى البنك بعد &mdash; ولا يخفض رصيدك حتى يُحصّل. تأكد من توفر الرصيد في تاريخ الشيك.
+A closed period opens again only ||| لا تُعاد فتح الفترة المقفلة إلا إذا وافق المعتمِد على السبب المقدم.
+A company or establishment is a <strong>Business</strong> ||| الشركة أو المنشأة تُعد <strong>جهة أعمال</strong> حتى لو لم تكن مسجلة في ضريبة القيمة المضافة.
+A company's <strong>administrator</strong> ||| <strong>مسؤول</strong> الشركة يدير مستخدميها وصلاحياتهم. حدده فقط مع منح الوصول إلى تلك الشركة.
+A difference that untagged postings ||| الفرق الذي لا تفسره القيود غير المرتبطة بمشروع ينتج عادة من رصيد افتتاحي أُدخل على حساب الأعمال قيد التنفيذ نفسه؛ انسبه إلى مشروع بقيد يدوي (دائن للحساب بدون مشروع، ومدين له مرتبطاً بالمشروع).
+A draft asset needs open capitalizable costs ||| يحتاج الأصل المسودة إلى تكاليف مفتوحة قابلة للرسملة قبل رسملته.
+A float is an ordinary asset account ||| العهدة حساب أصول عادي محدد كـ<em>عهدة نثرية</em>. حدد أكثر من حساب لتشغيل عهدة منفصلة لكل مكتب أو أمين عهدة.
+A journal is saved as a <strong>Draft</strong> ||| يُحفظ القيد <strong>مسودة</strong> ولا يؤثر على الحسابات حتى تضغط <strong>ترحيل</strong>. تظهر القيود المرحّلة فقط في ميزان المراجعة والأرباح والخسائر والميزانية العمومية ودفتر الأستاذ العام.
+A list of records ||| قائمة بالسجلات
+A managed property with no landlord recorded ||| العقار المُدار بدون مالك مسجل يُنبَّه إليه بدلاً من ضمه بصمت إلى محفظة الشركة — صحح ذلك في سجل العقار.
+A payroll approver approves it. ||| يعتمدها معتمد الرواتب.
+A positive balance is an amount you owe ||| الرصيد الموجب مبلغ مستحق عليك؛ والرصيد السالب يعني أن لك رصيداً دائناً. تظهر الشيكات كدفعة في تاريخ تحصيلها لا تاريخ تسليمها. إذا بدا لك شيء غير صحيح، تواصل مع مدير العقار.
+A replenishment posts <strong>Dr petty cash ||| يُرحّل التعويض <strong>من حـ/ النثرية إلى حـ/ البنك أو النقد</strong> &mdash; يرتفع رصيد العهدة دون تسجيل مصروف، لأن التعبئة تحويل وليست تكلفة.
+A tenant with a TRN receives ||| المستأجر الذي لديه رقم تسجيل ضريبي يستلم <strong>فاتورة ضريبية كاملة</strong> تُظهره. اتركه فارغاً ليستلم <strong>فاتورة ضريبية مبسطة</strong>.
+A voucher that would take the float below zero ||| يُرفض السند الذي يجعل رصيد العهدة أقل من الصفر — وهذا يعني غالباً أن تعويضاً لم يُسجل.
+A → Z / low → high ||| أ ← ي / من الأقل إلى الأعلى
+AE ||| AE
+AE.. (23 characters) ||| AE.. (23 خانة)
+AE07 0331 2345 6789 0123 456 ||| AE07 0331 2345 6789 0123 456
+AED ||| درهم
+AI Assistant ||| المساعد الذكي
+AP Sub-ledger ||| دفتر الذمم الدائنة الفرعي
+AR Sub-ledger ||| دفتر الذمم المدينة الفرعي
+Absent ||| غائب
+Absent means absent without leave ||| الغياب يعني الغياب بدون إجازة: يتحول إلى خصم غياب غير مصرح به. الإجازة المعتمدة تظهر بحالة "في إجازة". الأوقات المسجلة في يوم الراحة الأسبوعي أو العطلة تُدفع كعمل إضافي في يوم راحة.
+Acc. Dep. Account ||| حساب مجمع الإهلاك
+Accepted ||| مقبول
+Access Denied ||| تم رفض الوصول
+Access Notes ||| ملاحظات الوصول
+Access Until ||| الوصول حتى
+Access for this company has been suspended ||| تم إيقاف الوصول إلى هذه الشركة من قبل مزود الخدمة. سجلاتك آمنة ولم تتغير. يرجى التواصل معهم؛ يعود الوصول فور إعادة تفعيل الشركة أو إدخال رمز تفعيل جديد أدناه.
+Account ||| الحساب
+Account <code>39999</code> Opening Balance ||| الحساب <code>39999</code> حساب مراقبة الأرصدة الافتتاحية لم يُنشأ بعد. أعد تشغيل التطبيق وسيُضاف تلقائياً، وبعدها تتوازن التقارير ويظهر هذا المبلغ هناك.
+Account Mapping ||| ربط الحسابات
+Account Mapping Setup ||| إعداد ربط الحسابات
+Account Name ||| اسم الحساب
+Account Number ||| رقم الحساب
+Account Type ||| نوع الحساب
+Account on ||| الحساب في
+Accounted on ||| تاريخ القيد
+Accounting Date ||| التاريخ المحاسبي
+Accounting Period ||| الفترة المحاسبية
+Accounting Setup ||| الإعداد المحاسبي
+Accounting date ||| التاريخ المحاسبي
+Accounting period ||| الفترة المحاسبية
+Accounts ||| الحسابات
+Accounts Payable ||| الذمم الدائنة
+Accounts Receivable ||| الذمم المدينة
+Accounts flagged as an owner's current account ||| الحسابات المحددة كحساب جاري للمالك
+Accum. Dep. ||| مجمع الإهلاك
+Accumulated Depreciation ||| مجمع الإهلاك
+Accumulated Depreciation Account ||| حساب مجمع الإهلاك
+Accumulated Depreciation Default ||| مجمع الإهلاك الافتراضي
+Acknowledge — I have seen it ||| تأكيد — لقد اطلعت عليه
+Acknowledged ||| تم التأكيد
+Acquisition ||| الاقتناء
+Acquisition Date ||| تاريخ الاقتناء
+Action ||| الإجراء
+Actions ||| الإجراءات
+Activate ||| تفعيل
+Activate Subscription ||| تفعيل الاشتراك
+Activated ||| مفعّل
+Activation ||| التفعيل
+Activation Code Ready ||| رمز التفعيل جاهز
+Activation History ||| سجل التفعيل
+Active ||| نشط
+Active Lease ||| عقد نافذ
+Active Leases ||| العقود النافذة
+Active Tenant ||| مستأجر نشط
+Active staff ||| الموظفون النشطون
+Activity ||| النشاط
+Actual ||| الفعلي
+Add ||| إضافة
+Add Cost ||| إضافة تكلفة
+Add Employee ||| إضافة موظف
+Add Fixed Asset ||| إضافة أصل ثابت
+Add Internal Company ||| إضافة شركة داخلية
+Add Property ||| إضافة عقار
+Add Tenant ||| إضافة مستأجر
+Add Unit ||| إضافة وحدة
+Add User ||| إضافة مستخدم
+Add Vendor ||| إضافة مورد
+Add a level, e.g. Finance Manager ||| أضف مستوى، مثل: المدير المالي
+Add a message... ||| أضف رسالة...
+Add material ||| إضافة مواد
+Add one account per owner ||| أضف حساباً لكل مالك (<code>34200</code>، <code>34300</code>&hellip;) إذا أردت متابعة عدة ملاك بشكل منفصل. تنطبق قائمة الفئات نفسها عليهم جميعاً.
+Add one owner account per owner ||| أضف حساب مالك لكل مالك إذا أردت فصلهم؛ تخدمهم قائمة الفئات نفسها ويحصل كل منهم على عمود هنا.
+Add the rentable units inside the property. ||| أضف الوحدات القابلة للتأجير داخل العقار.
+Add: VAT on rent invoiced in the owner's name ||| يُضاف: ضريبة القيمة المضافة على الإيجار المفوتر باسم المالك (يسددها المالك للهيئة الاتحادية للضرائب)
+Added to cost ||| مضاف إلى التكلفة
+Added to cost (irrecoverable) ||| مضاف إلى التكلفة (غير قابل للاسترداد)
+Additions ||| الإضافات
+Additions and deductions per employee. ||| الإضافات والخصومات لكل موظف. تُدفع المعتمدة منها في كشف الرواتب التالي؛ وتتحدث كشوف الرواتب المسودة تلقائياً.
+Address ||| العنوان
+Addressed to ||| موجّه إلى
+Adjustment ||| تسوية
+Adjustments and accruals. ||| التسويات والمستحقات.
+Admin Notes ||| ملاحظات المسؤول
+Administration ||| الإدارة
+Administrator of this company ||| مسؤول هذه الشركة
+Advance ||| دفعة مقدمة
+Advance (down payment) ||| دفعة مقدمة
+Advance open ||| دفعة مقدمة مفتوحة
+Advance to apply ||| الدفعة المقدمة المراد تطبيقها
+Advance to repay ||| السلفة المراد سدادها
+Advances (down payments) - kept apart from payables ||| الدفعات المقدمة - منفصلة عن الذمم الدائنة
+Advances From Customers ||| دفعات مقدمة من العملاء
+Advances applied to bills ||| الدفعات المقدمة المطبقة على الفواتير
+Advice ||| نصيحة
+Affects <strong>new</strong> leases only. ||| يؤثر على العقود <strong>الجديدة</strong> فقط. الفواتير الصادرة سابقاً تحتفظ بمعاملتها الأصلية.
+After registration, the system signs you in ||| بعد التسجيل، يسجّل النظام دخولك تلقائياً ويفتح شركتك الجديدة مع الفترة التجريبية النشطة.
+Against invoice ||| مقابل الفاتورة
+Age ||| العمر
+Agreement Rent ||| إيجار العقد
+All ||| الكل
+All Leases ||| جميع العقود

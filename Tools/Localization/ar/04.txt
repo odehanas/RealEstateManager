@@ -1,0 +1,331 @@
+# Sheet 4: Exempt ... Mapped landlord liability account
+Exempt ||| معفى
+Exempt supplies (residential rent) ||| التوريدات المعفاة (الإيجار السكني)
+Exempt supplies for the year ||| التوريدات المعفاة للسنة
+Expected completion ||| الإنجاز المتوقع
+Expense ||| المصروف
+Expense Account ||| حساب المصروف
+Expenses ||| المصروفات
+Expenses and recoverable VAT. ||| المصروفات والضريبة القابلة للاسترداد.
+Expired ||| منتهٍ
+Expired Subscriptions ||| الاشتراكات المنتهية
+Expired: ||| منتهية:
+Expires ||| ينتهي
+Expiring 90d ||| تنتهي خلال 90 يوماً
+Expiring Documents ||| مستندات قاربت على الانتهاء
+Expiring In 15 Days ||| تنتهي خلال 15 يوماً
+Expiring within 60 days: ||| تنتهي خلال 60 يوماً:
+Expiry ||| الانتهاء
+Expiry date ||| تاريخ الانتهاء
+Explanation (printed on the credit note) ||| الشرح (يُطبع على الإشعار الدائن)
+Export CSV ||| تصدير CSV
+Export to Excel (CSV) ||| تصدير إلى Excel (CSV)
+Failures only ||| الإخفاقات فقط
+Fair Value ||| القيمة العادلة
+Fair value ||| القيمة العادلة
+Feature Request ||| طلب ميزة
+Feedback ||| الملاحظات
+Feedback Review ||| مراجعة الملاحظات
+Female ||| أنثى
+Field ||| الحقل
+File ||| الملف
+File (PDF, JPG or PNG, up to 5 MB) ||| الملف (PDF أو JPG أو PNG، حتى 5 ميغابايت)
+File (PDF, JPG, PNG, 5 MB) ||| الملف (PDF، JPG، PNG، 5 ميغابايت)
+Fill in the company details and the first admin account. ||| أدخل بيانات الشركة وأول حساب مسؤول.
+Fills this company with a fictional year ||| يملأ هذه الشركة بسنة أعمال افتراضية، من بداية السنة المالية حتى اليوم: عقارات مملوكة ومُدارة، ومستأجرون، وعقود، وسندات قبض، وشيكات، وتأمينات، وفواتير موردين، ونثريات، وقيود، وضريبة، ومدفوعات مقدمة، وأصول ثابتة، وطلبات مستأجرين، ومستندات عقارات، ومشاريع تطوير، ومبيعات وحدات وتسليم، وعقد بانتظار الاعتماد، ونظام الأصول الرأسمالية، وفواتير إلكترونية مرسلة ومستلمة، ليكون لكل شاشة وتقرير ما يعرضه. يعمل فقط على شركة لا تحتوي على بيانات بعد.
+Filter ||| تصفية
+Finance Cost ||| تكلفة التمويل
+Financial Reports ||| التقارير المالية
+First Admin User ||| أول مستخدم مسؤول
+First Recognition ||| أول اعتراف
+First Recognition Month ||| شهر أول اعتراف
+First cheque number ||| رقم أول شيك
+First name ||| الاسم الأول
+First response ||| أول استجابة
+First used on (year 1 starts) ||| أول استخدام في (تبدأ السنة الأولى)
+Fiscal Start ||| بداية السنة المالية
+Fiscal year ||| السنة المالية
+Fiscal year closing history ||| سجل إقفال السنوات المالية
+Five wrong passwords lock an account ||| خمس كلمات مرور خاطئة تقفل الحساب لمدة 15 دقيقة، مما يمنع تخمين كلمات المرور من الإنترنت. يجب تغيير كلمة مرور ADMIN الافتراضية وأي كلمة مرور يضعها المسؤول عند أول تسجيل دخول. تحتاج كلمات المرور الجديدة إلى 10 أحرف على الأقل تتضمن أحرفاً كبيرة وصغيرة ورقماً.
+Fixed ||| ثابت
+Fixed Asset Acc. Dep. ||| مجمع إهلاك الأصول الثابتة
+Fixed Asset Clearing ||| تسوية الأصول الثابتة
+Fixed Asset Cost ||| تكلفة الأصول الثابتة
+Fixed Asset Default ||| الأصل الثابت الافتراضي
+Fixed Asset Opening Balances ||| الأرصدة الافتتاحية للأصول الثابتة
+Fixed Asset Register ||| سجل الأصول الثابتة
+Fixed Assets ||| الأصول الثابتة
+Fixed once issued — contracts are numbered from it. ||| ثابت بعد الإصدار — تُرقّم العقود بناءً عليه.
+Fixed once issued — it appears on the signed contract ||| ثابت بعد الإصدار — يظهر على العقد الموقّع وفي رمز QR الخاص به.
+Fixed once issued — it identifies the tenant ||| ثابت بعد الإصدار — يعرّف المستأجر في كشوف الحساب والعقود.
+Fixed once issued — it identifies the vendor ||| ثابت بعد الإصدار — يعرّف المورد في الفواتير والمدفوعات.
+Fixed: a withdrawal always goes to the owner's account ||| ثابت: المسحوبات تُقيد دائماً على حساب المالك
+Fixed: costs are already posted to it. ||| ثابت: رُحّلت إليه تكاليف بالفعل.
+Float ||| العهدة
+Float control and expense journal. ||| رقابة العهدة ودفتر المصروفات. يُرحّل كل سند مباشرة إلى دفتر الأستاذ العام.
+Floor ||| الطابق
+Floors / parking bays ||| الطوابق / مواقف السيارات
+Font size (pt) ||| حجم الخط (نقطة)
+For ||| لـ
+For a managed property only: the owner is charged ||| للعقار المُدار فقط: يُحمّل المالك المبلغ (زائد ضريبة 5% عند إعادة التحميل؛ وكما دُفع عند الدفع نيابة عنه — انظر إعدادات الضريبة)، بدلاً من أن يكون مصروفاً علينا.
+For lines without their own. ||| للبنود التي لا تحمل قيمة خاصة بها.
+For managed properties we collect rent ||| في العقارات المُدارة نحصّل الإيجار نيابة عن المالك. يستحق كل مالك <strong>الإيجار المفوتر ناقصاً عمولتنا وضريبة 5% عليها</strong>، ناقصاً ما دفعناه له سابقاً. افتح المالك لعرض كشف الحساب لكل عقد ودفع الرصيد كلياً أو جزئياً. <em>المتاح من التحصيلات</em> هو الجزء الذي استلمناه فعلاً من المستأجرين.
+For unit (optional) ||| للوحدة (اختياري)
+Forfeited ||| مصادَر
+Forgotten your password, or no account yet? ||| نسيت كلمة المرور أو ليس لديك حساب بعد؟ تواصل مع مدير العقار — يمكنه إصدار بيانات دخول جديدة لك.
+Forgotten your password? Ask HR ||| نسيت كلمة المرور؟ اطلب من الموارد البشرية إعادة تعيين دخولك إلى البوابة. بعد 5 محاولات خاطئة يُقفل الحساب لمدة 15 دقيقة.
+Four components, each scored 0–100 ||| أربعة مكونات، يُقيّم كل منها من 0 إلى 100 وتُجمع حسب الوزن. المكوّن الذي لا يمكن قياسه لمستأجر — مثل مستأجر لم يصدر شيكاً مؤجلاً قط — يُستبعد ويُوزّع وزنه على المكونات الباقية، فلا يُعاقب أحد على غياب سلوك بل على السلوك نفسه.
+Freight ||| الشحن
+Freight, installation, supplier invoice... ||| الشحن، التركيب، فاتورة المورد...
+From ||| من
+From Date ||| من تاريخ
+From left (mm) ||| من اليسار (مم)
+From the completion certificate. ||| من شهادة الإنجاز. يبدأ فترة السنوات الثلاث للنسبة الصفرية للضريبة للوحدات السكنية الجديدة.
+From the customer register ||| من سجل العملاء (البيانات الرئيسية › المستأجرون) - أضف المشتري هناك أولاً، مع هويته ورقم تسجيله الضريبي.
+From top (mm) ||| من الأعلى (مم)
+Front ||| الأمام
+Front, Back, Sea side... ||| أمام، خلف، جهة البحر...
+Full Name ||| الاسم الكامل
+Full manual ||| الدليل الكامل
+Furniture, Equipment, Vehicles... ||| أثاث، معدات، مركبات...
+GET ||| GET
+GL ||| الأستاذ العام
+GL Account Opening Balances ||| الأرصدة الافتتاحية لحسابات الأستاذ العام
+GPS ||| GPS
+Gender ||| الجنس
+Gender · Nationality ||| الجنس · الجنسية
+General ||| عام
+General Journal ||| دفتر اليومية العام
+General Ledger ||| دفتر الأستاذ العام
+General ledger revenue and expenses analysed ||| إيرادات ومصروفات دفتر الأستاذ العام محللة حسب بُعد العقار المسجل على كل بند قيد.
+GeneralExpense ||| مصروف عام
+Generate Code ||| إنشاء رمز
+Generate all ||| إنشاء الكل
+Generate from attendance ||| إنشاء من الحضور
+Generate payroll transactions ||| إنشاء حركات الرواتب
+Generated Code ||| الرمز المُنشأ
+Generated automatically on save ||| يُنشأ تلقائياً عند الحفظ &mdash; نوع الملكية ثم نوع العقار ثم رقم تسلسلي (<code>OWN-R-0001</code>). تُبنى عليه الوحدات والعقود، لذا لا يمكن كتابته أو تغييره.
+Generated, ready to send ||| مُنشأة، جاهزة للإرسال
+Go ||| انتقال
+Goes to ||| يذهب إلى
+Grade ||| التقدير
+Grade Mix ||| توزيع التقديرات
+Green rows are replenishments ||| الصفوف الخضراء تعويضات؛ والباقي مصروفات
+Gross ||| الإجمالي
+Gross profit ||| إجمالي الربح
+Group ||| المجموعة
+Group by ||| تجميع حسب
+HR & Payroll ||| الموارد البشرية والرواتب
+HTTPS only (with HSTS) ||| HTTPS فقط (مع HSTS)، وملفات تعريف ارتباط للجلسة من نوع HttpOnly، ورموز مكافحة التزوير في كل نموذج، وترويسات تمنع المواقع الأخرى من تضمين النظام (الاختطاف بالنقر) أو تخمين المحتوى.
+Hand over ||| تسليم
+Handed over ||| تم التسليم
+Handover ||| التسليم
+Head office / none ||| المكتب الرئيسي / لا شيء
+Health insurance ||| التأمين الصحي
+Health insurance no. ||| رقم التأمين الصحي
+Healthy ||| سليم
+Held ||| محتفظ به
+Held in <code>39999</code> ||| محتفظ به في <code>39999</code>
+Help ||| المساعدة
+Help Center ||| مركز المساعدة
+High ||| مرتفع
+Highest ||| الأعلى
+History of this contract ||| سجل هذا العقد
+Home ||| الرئيسية
+Hours ||| الساعات
+Housing ||| السكن
+Housing allowance ||| بدل السكن
+How ||| الطريقة
+How a cost ticked <em>Charge to owner</em> ||| كيف تُحمّل التكلفة المحدد عليها <em>تحميل على المالك</em> في فاتورة مورد أو سند نثرية. يُحفظ الاختيار على كل فاتورة وسند عند الحفظ، لذا لا يغيّر تعديله لاحقاً ما سُجّل بالفعل.
+How an approval travels ||| مسار الاعتماد
+How it works ||| آلية العمل
+How owners are decided ||| كيف يُحدد الملاك
+How petty cash works here ||| كيف تعمل النثرية هنا
+How the health score is calculated ||| كيف يُحتسب مؤشر السلامة
+How the network and your customers identify you ||| كيف تتعرف عليك الشبكة وعملاؤك
+How these measures are built ||| كيف بُنيت هذه المقاييس
+How this is built ||| كيف بُني هذا
+How to read this ||| كيف تقرأ هذا
+How to use your portal ||| كيف تستخدم بوابتك
+How urgent is it? ||| ما مدى الاستعجال؟
+I confirm this cheque was honoured ||| أؤكد أن هذا الشيك صُرف في تاريخ التحصيل المبين أعلاه.
+IBAN ||| رقم الآيبان
+ID Number ||| رقم الهوية
+IP ||| عنوان IP
+Identified by ||| معرّف بـ
+If different from the trading name ||| إذا كان مختلفاً عن الاسم التجاري
+Import ||| استيراد
+Import device file (CSV) ||| استيراد ملف الجهاز (CSV)
+In ||| داخل
+In Service ||| في الخدمة
+In Service Date ||| تاريخ بدء الخدمة
+In ledger ||| في الدفاتر
+Inactive ||| غير نشط
+Income statement line ||| بند قائمة الدخل
+Inherit from property ||| وراثة من العقار
+Initial Acquisition Cost ||| تكلفة الاقتناء الأولية
+Input Tax ||| ضريبة المدخلات
+Input Tax Recoverable ||| ضريبة المدخلات القابلة للاسترداد
+Input VAT ||| ضريبة المدخلات
+Input VAT charged ||| ضريبة المدخلات المفروضة
+Input VAT recovered ||| ضريبة المدخلات المستردة
+Input tax (on our invoices to the owner) ||| ضريبة المدخلات (على فواتيرنا للمالك)
+Installation ||| التركيب
+Insurance expiry ||| انتهاء التأمين
+Insurer ||| شركة التأمين
+Internal (the tenant does not see it) ||| داخلي (لا يراه المستأجر)
+Internal note &mdash; the tenant will <strong>not</strong> see this ||| ملاحظة داخلية &mdash; <strong>لن</strong> يراها المستأجر
+Internal — tenant cannot see this ||| داخلي — لا يستطيع المستأجر رؤيته
+Investment Property ||| العقارات الاستثمارية
+Investment Property Note ||| إيضاح العقارات الاستثمارية
+Investment property is carried at ||| تُدرج العقارات الاستثمارية <strong>بالتكلفة ناقصاً مجمع الإهلاك</strong> (نموذج التكلفة في المعيار المحاسبي الدولي 40). لا تُهلك الأرض؛ وتُهلك المباني على مدى أعمارها الإنتاجية. لا تُسجل القيمة العادلة - بل يُفصح عنها أدناه من أحدث تقييم مسجل لكل عقار (البيانات الرئيسية ▸ العقارات ▸ تعديل ▸ التقييم).
+Invoice ||| الفاتورة
+Invoice (Optional) ||| الفاتورة (اختياري)
+Invoice Date ||| تاريخ الفاتورة
+Invoice tenants in the owner's name ||| فوترة المستأجرين باسم المالك (نعمل كوكلاء عن المالك)
+Invoiced ||| المفوتر
+Invoices it will create ||| الفواتير التي سيُنشئها
+Invoicing ||| الفوترة
+Irrecoverable ||| غير قابل للاسترداد
+Irrecoverable VAT is not lost from the accounts ||| الضريبة غير القابلة للاسترداد لا تضيع من الحسابات — بل أُضيفت إلى حساب المصروف عند ترحيل كل فاتورة، فهي موجودة في الأرباح والخسائر كجزء من التكلفة.
+Is the data encrypted? ||| هل البيانات مشفرة؟
+Issue ||| إصدار
+Issue date ||| تاريخ الإصدار
+Issued ||| صادر
+Issued by ||| صادر عن
+It appears in <strong>Payment Approvals</strong> ||| يظهر في <strong>اعتمادات المدفوعات</strong> / <strong>اعتمادات العقود</strong> وفي صفحة <strong>أداء الأعمال</strong> لكل من يغطي حده هذا المبلغ.
+It ends by itself on the last day ||| ينتهي تلقائياً في اليوم الأخير؛ ويمكنك إنهاؤه مبكراً أدناه.
+Item ||| البند
+Items taken from the maintenance store ||| المواد المأخوذة من مخزن الصيانة هي بضاعتنا، لذا يُعاد تحميلها دائماً مع الضريبة.
+Job ||| العمل
+Job and contract ||| الوظيفة والعقد
+Job title ||| المسمى الوظيفي
+Jobs ||| الأعمال
+Jobs received ||| الأعمال المستلمة
+Jobs still open ||| الأعمال المفتوحة
+Joined ||| تاريخ الالتحاق
+Joined · Probation ends ||| الالتحاق · نهاية فترة التجربة
+Joining date ||| تاريخ الالتحاق
+Journal ||| القيد
+Journal Entry ||| قيد اليومية
+Journal Inquiry ||| الاستعلام عن القيود
+Journal Lines ||| بنود القيد
+Journal entry ||| قيد اليومية
+Journal type ||| نوع القيد
+Kind ||| النوع
+Kind of cost ||| نوع التكلفة
+Kind of cost, for the owner's reports ||| نوع التكلفة، لتقارير المالك
+Labour card ||| بطاقة العمل
+Labour card / work permit ||| بطاقة العمل / تصريح العمل
+Labour card expiry ||| انتهاء بطاقة العمل
+Land ||| الأرض
+Land / municipality no. ||| رقم الأرض / البلدية
+Land department or municipality that issued the deed ||| دائرة الأراضي أو البلدية التي أصدرت السند
+Land use ||| استخدام الأرض
+Landlord Drilldown ||| تفاصيل المالك
+Landlord KPI is not available ||| مؤشرات المالك غير متاحة حتى يتم إعداد ربط حساب المستحق للملاك.
+Landlords — Managed Properties ||| الملاك — العقارات المُدارة
+Large if over ||| كبير إذا تجاوز
+Last Login ||| آخر دخول
+Last Reviewed ||| آخر مراجعة
+Last name ||| اسم العائلة
+Last net salary ||| آخر صافي راتب
+Last sign in ||| آخر تسجيل دخول
+Last working day ||| آخر يوم عمل
+Late (min) ||| التأخير (دقيقة)
+Late after (minutes' grace) ||| يُعد متأخراً بعد (دقائق السماح)
+Late days ||| أيام التأخير
+Late minutes ||| دقائق التأخير
+Latest 10 items ||| أحدث 10 عناصر
+Latest 50 generated codes ||| أحدث 50 رمزاً مُنشأً
+Latest 500 items ||| أحدث 500 عنصر
+Latest 500 records ||| أحدث 500 سجل
+Latest independent valuation. ||| أحدث تقييم مستقل. يُفصح عنه في إيضاح العقارات الاستثمارية ولا يُسجل.
+Latitude (GPS) ||| خط العرض (GPS)
+Lease ||| العقد
+Lease the unit. Invoices auto-generate. ||| أجّر الوحدة. تُنشأ الفواتير تلقائياً.
+Leased Area ||| المساحة المؤجرة
+Leases ||| عقود الإيجار
+Leave ||| الإجازات
+Leave and end of service ||| الإجازات ونهاية الخدمة
+Leave as <em>Inherit</em> unless this unit differs ||| اتركها <em>وراثة</em> ما لم تختلف هذه الوحدة عن باقي المبنى &mdash; مثل محل في الطابق الأرضي لبرج سكني.
+Leave as it is to reverse the invoice exactly. ||| اتركه كما هو لعكس الفاتورة تماماً. اختر حساب إيراد لخصم على إيجار سبق الاعتراف به.
+Leave blank if the company is not VAT registered. ||| اتركه فارغاً إذا لم تكن الشركة مسجلة في الضريبة.
+Leave blank to auto-generate. ||| اتركه فارغاً للإنشاء التلقائي.
+Leave blank to keep the current password. ||| اتركه فارغاً للإبقاء على كلمة المرور الحالية.
+Leave blank to start on the mandatory date. ||| اتركه فارغاً للبدء في التاريخ الإلزامي. حدد تاريخاً أبكر للانضمام طوعياً.
+Leave blank when the tenant has a TRN ||| اتركه فارغاً إذا كان للمستأجر رقم تسجيل ضريبي — رقم التعريف الضريبي هو أول 10 أرقام منه.
+Leave the limit blank for no limit ||| اترك الحد فارغاً لعدم وجود حد (مستوى الملاك). تذهب الدفعة إلى أدنى مستوى يغطي حده مبلغها.
+Left ||| يسار
+Legacy balances. Must net to zero. ||| أرصدة سابقة. يجب أن يكون صافيها صفراً.
+Lender, mortgage reference, amount ||| المُقرض، مرجع الرهن، المبلغ
+Less: VAT on commission ||| يُخصم: ضريبة القيمة المضافة على العمولة
+Less: already paid to the owner ||| يُخصم: ما دُفع للمالك سابقاً
+Less: cost of revenue ||| يُخصم: تكلفة الإيرادات
+Less: finance costs ||| يُخصم: تكاليف التمويل
+Less: maintenance and expenses charged to the owner ||| يُخصم: الصيانة والمصروفات المحمّلة على المالك
+Less: management commission ||| يُخصم: عمولة الإدارة
+Less: our commission ||| يُخصم: عمولتنا
+Less: paid to you before ||| يُخصم: ما دُفع لك سابقاً
+Let ||| مؤجر
+Letter to bank ||| خطاب إلى البنك
+Level ||| المستوى
+Levels ||| المستويات
+Liabilities ||| الالتزامات
+Liabilities + Equity ||| الالتزامات + حقوق الملكية
+Liabilities and equity (credit side) ||| الالتزامات وحقوق الملكية (الجانب الدائن)
+Liability ||| التزام
+Line ||| البند
+Line Memo ||| ملاحظة البند
+Line Total ||| إجمالي البند
+Line chart of withdrawals by month ||| رسم بياني خطي للمسحوبات حسب الشهر والإجمالي التراكمي
+Lines Used ||| البنود المستخدمة
+Lines per inch ||| عدد الأسطر في البوصة
+Load Sample Data ||| تحميل بيانات تجريبية
+Loading… ||| جارٍ التحميل…
+Location ||| الموقع
+Location reference ||| مرجع الموقع
+Locked ||| مقفل
+Locked until ||| مقفل حتى
+Log the post-dated cheques taken at signing. ||| سجّل الشيكات المؤجلة المستلمة عند التوقيع.
+Login ||| تسجيل الدخول
+Logout ||| تسجيل الخروج
+Longitude (GPS) ||| خط الطول (GPS)
+Lower floor ||| الطابق الأدنى
+Lowest ||| الأدنى
+MOHRE establishment number ||| رقم المنشأة لدى وزارة الموارد البشرية والتوطين
+MOHRE person code ||| الرقم الشخصي لدى وزارة الموارد البشرية والتوطين
+Main contractor ||| المقاول الرئيسي
+Main operating flow — start here ||| مسار العمل الرئيسي — ابدأ من هنا
+Maintain depreciable assets ||| إدارة الأصول القابلة للإهلاك وتشغيل ترحيل الإهلاك الشهري.
+Maintenance & costs ||| الصيانة والتكاليف
+Maintenance Dashboard ||| لوحة الصيانة
+Maintenance Jobs ||| أعمال الصيانة
+Maintenance store ||| مخزن الصيانة
+Make a request ||| تقديم طلب
+Male ||| ذكر
+Manage Categories ||| إدارة الفئات
+Manage Customer Invoices ||| إدارة فواتير العملاء
+Manage Customer Receipts ||| إدارة سندات قبض العملاء
+Manage Fixed Assets ||| إدارة الأصول الثابتة
+Manage Leases ||| إدارة العقود
+Manage PDC Receipts ||| إدارة الشيكات المؤجلة
+Manage Properties ||| إدارة العقارات
+Manage Tenants ||| إدارة المستأجرين
+Manage Units ||| إدارة الوحدات
+Manage Vendors ||| إدارة الموردين
+Manage photos and mark units ||| إدارة الصور وتحديد الوحدات
+Manage subscription ||| إدارة الاشتراك
+Managed ||| مُدار
+Managed only ||| المُدارة فقط
+Managed properties only, if the owner is VAT registered. ||| للعقارات المُدارة فقط، إذا كان المالك مسجلاً في الضريبة. يُطبع على فاتورة العمولة الضريبية الخاصة بنا.
+Managed properties only. Rent invoices show the owner ||| للعقارات المُدارة فقط. تُظهر فواتير الإيجار المالك كمورد برقم تسجيله الضريبي؛ وإذا لم يكن للمالك رقم تسجيل فلا تُفرض ضريبة. ضريبة الإيجار تخص المالك ولا تدخل في إقرارنا؛ وتُفوتر عمولتنا للمالك برقم تسجيلنا. يسري على العقود والفواتير المرحّلة بعد تفعيله.
+Management Dashboard Snapshot ||| لمحة لوحة الإدارة
+Management Fee Revenue ||| إيرادات أتعاب الإدارة
+Management — Owners ||| الإدارة — الملاك
+Management — Tenants & Properties ||| الإدارة — المستأجرون والعقارات
+Manual ||| يدوي
+Manual Journals ||| القيود اليدوية
+Manual OB ||| الرصيد الافتتاحي اليدوي
+Mapped cash account ||| حساب النقد المربوط
+Mapped landlord liability account ||| حساب التزام الملاك المربوط

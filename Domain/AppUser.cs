@@ -21,6 +21,9 @@ namespace RealEstateManager.Domain
         public bool MustChangePassword { get; set; }
         public DateTime? PasswordChangedAt { get; set; }
 
+        /// <summary>Screen language, "en" or "ar"; null until the user chooses. Applied at sign-in.</summary>
+        public string? PreferredLanguage { get; set; }
+
         public ICollection<AppUserCompany> CompanyAccesses { get; set; } = new List<AppUserCompany>();
         public ICollection<AppUserPermission> Permissions { get; set; } = new List<AppUserPermission>();
         public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
