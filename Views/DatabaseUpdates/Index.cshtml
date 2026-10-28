@@ -40,7 +40,7 @@
             }
         </h5>
         <div class="small text-muted mb-2">
-            Checked @(status.StartedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "-")
+            @T.Format("Checked {0}", status.StartedAt?.ToString("dd/MM/yyyy HH:mm:ss") ?? "-")
         </div>
 
         @if (status.BaselineNote != null)
@@ -50,7 +50,7 @@
 
         @if (status.AppliedThisRun.Count > 0)
         {
-            <div class="mb-2">Applied at this start: <strong>@string.Join(", ", status.AppliedThisRun)</strong></div>
+            <div class="mb-2">@T.HtmlFormat("Applied at this start: <strong>{0}</strong>", string.Join(", ", status.AppliedThisRun))</div>
         }
 
         @if (status.HasFailed)
@@ -60,7 +60,7 @@
                 {
                     <div><strong>Script:</strong> @status.FailedScript@(status.FailedStatement.HasValue ? $", statement {status.FailedStatement}" : "")</div>
                 }
-                <div><strong>What happened:</strong> @status.FailureMessage</div>
+                <div>@T.HtmlFormat("<strong>What happened:</strong> {0}", status.FailureMessage)</div>
                 <div class="mt-2">
                     @T["The site is running, but scripts from this one onwards were not applied, so screens that rely on them may show errors. Send this page to your developer. Once the script is corrected and a new version is deployed, the next start tries again."]
                 </div>
@@ -78,14 +78,14 @@
 
 @if (Model.HistoryError != null)
 {
-    <div class="alert alert-warning">The list of applied scripts could not be read: @Model.HistoryError</div>
+    <div class="alert alert-warning">@T.Format("The list of applied scripts could not be read: {0}", Model.HistoryError)</div>
 }
 
 @if (Model.NotApplied.Count > 0)
 {
     <div class="card shadow-sm mb-4 border-warning">
         <div class="card-body">
-            <h5 class="card-title">Included in this version but not applied (@Model.NotApplied.Count)</h5>
+            <h5 class="card-title">@T.Format("Included in this version but not applied ({0})", Model.NotApplied.Count)</h5>
             <ul class="mb-0">
                 @foreach (var name in Model.NotApplied)
                 {

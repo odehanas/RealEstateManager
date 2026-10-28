@@ -26,7 +26,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
     <div>
         <h2 class="mb-0">@T["Business Performance"]</h2>
-        <div class="text-muted">How the business is doing, and what is waiting for your decision. Figures from posted entries, @Model.Today.ToString("dd MMMM yyyy").</div>
+        <div class="text-muted">@T.Format("How the business is doing, and what is waiting for your decision. Figures from posted entries, {0}.", Model.Today.ToString("dd MMMM yyyy"))</div>
     </div>
     <button class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print"]</button>
 </div>
@@ -68,31 +68,31 @@
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Net profit this year"]</div><div class="value @(Model.NetYtd < 0 ? "text-danger" : "text-success")">@Money(Model.NetYtd)</div>
-        <div class="sub">expenses @Money(Model.ExpensesYtd)@Change(Model.NetYtd, Model.NetLastYtd)</div>
+        <div class="sub">@T.Format("expenses {0}{1}", Money(Model.ExpensesYtd), Change(Model.NetYtd, Model.NetLastYtd))</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Cash and bank"]</div><div class="value">@Money(Model.CashBalance)</div>
-        <div class="sub">collected @Money(Model.CollectedThisMonth) this month, @Money(Model.CollectedYtd) this year</div>
+        <div class="sub">@T.Format("collected {0} this month, {1} this year", Money(Model.CollectedThisMonth), Money(Model.CollectedYtd))</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Occupancy"]</div><div class="value">@occupancy.ToString("0")%</div>
-        <div class="sub">@Model.UnitsOccupied of @Model.UnitsTotal units · @Model.UnitsVacant vacant · rent roll @Money(Model.RentRoll) a year</div>
+        <div class="sub">@T.Format("{0} of {1} units · {2} vacant · rent roll {3} a year", Model.UnitsOccupied, Model.UnitsTotal, Model.UnitsVacant, Money(Model.RentRoll))</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Owed by tenants"]</div><div class="value">@Money(Model.Receivables)</div>
-        <div class="sub @(Model.Overdue > 0 ? "text-danger" : "")">@Money(Model.Overdue) overdue</div>
+        <div class="sub @(Model.Overdue > 0 ? "text-danger" : "")">@T.Format("{0} overdue", Money(Model.Overdue))</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Cheques in hand"]</div><div class="value">@Money(Model.PdcOnHand)</div>
-        <div class="sub">@Model.PdcDue30Count due in 30 days · @Money(Model.PdcDue30)</div>
+        <div class="sub">@T.Format("{0} due in 30 days · {1}", Model.PdcDue30Count, Money(Model.PdcDue30))</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Owed to suppliers"]</div><div class="value">@Money(Model.Payables)</div>
-        <div class="sub">@Money(Model.PayablesDue30) due in 30 days</div>
+        <div class="sub">@T.Format("{0} due in 30 days", Money(Model.PayablesDue30))</div>
     </div></div></div>
     <div class="col-6 col-lg-3"><div class="card shadow-sm perf-card h-100"><div class="card-body">
         <div class="label">@T["Contracts ending in 90 days"]</div><div class="value">@Model.Expiring.Count</div>
-        <div class="sub">@Money(Model.Expiring.Sum(x => x.AnnualRent)) annual rent to renew</div>
+        <div class="sub">@T.Format("{0} annual rent to renew", Money(Model.Expiring.Sum(x => x.AnnualRent)))</div>
     </div></div></div>
 </div>
 
@@ -143,11 +143,11 @@
                 <tr>
                     <td class="small">@l.ContractNumber</td><td>@l.Tenant?.FullName</td>
                     <td class="small">@l.Unit?.Property?.Name / @l.Unit?.UnitNumber</td>
-                    <td>@l.EndDate.ToString("dd/MM/yyyy") <span class="text-muted small">(@((l.EndDate - Model.Today).Days) days)</span></td>
+                    <td>@l.EndDate.ToString("dd/MM/yyyy") <span class="text-muted small">@T.Format("({0} days)", (l.EndDate - Model.Today).Days)</span></td>
                     <td class="text-end">@l.AnnualRent.ToString("N2")</td>
                 </tr>
             }
         </table>
     </div>
 </div>
-<p class="small text-muted">All amounts in @c. Collections are receipts plus cleared cheques. Detailed reports are under Reports.</p>
+<p class="small text-muted">@T.Format("All amounts in {0}. Collections are receipts plus cleared cheques. Detailed reports are under Reports.", c)</p>

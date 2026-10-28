@@ -13,8 +13,7 @@
 @if (ViewBag.MaintenanceHold is string hold)
 {
     <div class="alert alert-warning" id="maintenanceHold">
-        <strong>Maintenance requests are on hold.</strong> @hold
-        You can still send other requests, such as asking for more time to pay.
+        @T.HtmlFormat("<strong>Maintenance requests are on hold.</strong> {0} You can still send other requests, such as asking for more time to pay.", hold)
     </div>
 }
 

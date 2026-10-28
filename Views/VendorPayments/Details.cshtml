@@ -8,7 +8,7 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
-        <h2 class="mb-0">@(Model.IsAdvance ? "Advance" : "Payment") @Model.PaymentNumber</h2>
+        <h2 class="mb-0">@(Model.IsAdvance ? T["Advance"] : T["Payment"]) @Model.PaymentNumber</h2>
         <div class="text-muted">@Model.Vendor?.Name · @Model.PaymentDate.ToString("dd MMMM yyyy") · @Model.Amount.ToString("N2")</div>
     </div>
     <div class="d-flex gap-2">
@@ -26,9 +26,9 @@
     <div class="col-md-6">
         <div class="card shadow-sm h-100"><div class="card-body">
             <dl class="row mb-0">
-                <dt class="col-5">@T["Type"]</dt><dd class="col-7">@(Model.IsAdvance ? "Advance (down payment, special G/L)" : "Payment of open bills")</dd>
+                <dt class="col-5">@T["Type"]</dt><dd class="col-7">@(Model.IsAdvance ? T["Advance (down payment, special G/L)"] : T["Payment of open bills"])</dd>
                 <dt class="col-5">@T["Clearing document"]</dt><dd class="col-7">@(Model.ClearingNumber ?? (Model.IsAdvance ? "- (an advance clears nothing until applied)" : "-"))</dd>
-                <dt class="col-5">@T["Paid from"]</dt><dd class="col-7">@(Model.PaidFromAccount != null ? Model.PaidFromAccount.Code + " " + Model.PaidFromAccount.Name : "Default cash account")</dd>
+                <dt class="col-5">@T["Paid from"]</dt><dd class="col-7">@(Model.PaidFromAccount != null ? Model.PaidFromAccount.Code + " " + Model.PaidFromAccount.Name : T["Default cash account"])</dd>
                 <dt class="col-5">@T["Method / reference"]</dt><dd class="col-7">@Model.PaymentMethod @Model.Reference</dd>
                 <dt class="col-5">@T["Journal entry"]</dt><dd class="col-7">@(Model.JournalEntry?.EntryNumber) @(posted ? "(posted)" : "(awaiting approval or draft)")</dd>
                 @if (!string.IsNullOrEmpty(Model.Notes)) { <dt class="col-5">@T["Notes"]</dt><dd class="col-7">@Model.Notes</dd> }
@@ -49,7 +49,7 @@
 </div>
 
 <div class="card shadow-sm">
-    <div class="card-header bg-light"><h5 class="mb-0">@(Model.IsAdvance ? "Applications of this advance to bills" : "Bills settled by this payment")</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@(Model.IsAdvance ? T["Applications of this advance to bills"] : T["Bills settled by this payment"])</h5></div>
     <div class="table-responsive">
         <table class="table table-sm mb-0 align-middle">
             <thead class="table-light"><tr><th>@T["Clearing document"]</th><th>@T["Date"]</th><th>@T["Bill"]</th><th>@T["Supplier ref"]</th><th class="text-end">@T["Bill total"]</th><th class="text-end">@T["Settled here"]</th><th>@T["Bill now"]</th><th>@T["Status"]</th></tr></thead>

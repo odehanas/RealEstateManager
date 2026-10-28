@@ -24,13 +24,13 @@
         else if (Model.IsInTrial)
         {
             <div class="alert alert-warning">
-                Trial mode is active for this company. Remaining days: <strong>@Model.DaysRemaining</strong>.
+                @T.HtmlFormat("Trial mode is active for this company. Remaining days: <strong>{0}</strong>.", Model.DaysRemaining)
             </div>
         }
         else
         {
             <div class="alert alert-success">
-                Subscription is active. Remaining days: <strong>@Model.DaysRemaining</strong>.
+                @T.HtmlFormat("Subscription is active. Remaining days: <strong>{0}</strong>.", Model.DaysRemaining)
             </div>
         }
 

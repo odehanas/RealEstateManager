@@ -35,7 +35,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
     <div>
         <h2 class="mb-0">@T["Authorization Matrix"]</h2>
-        <div class="text-muted">Who may do what in @company.Name, and how approvals and limits work. Change roles in Users &amp; Permissions, limits in Approval Limits.</div>
+        <div class="text-muted">@T.Format("Who may do what in {0}, and how approvals and limits work. Change roles in Users & Permissions, limits in Approval Limits.", company.Name)</div>
     </div>
     <div class="d-flex gap-2">
         <a asp-controller="Users" asp-action="Index" class="btn btn-outline-dark btn-sm">@T["Users & Permissions"]</a>
@@ -92,21 +92,21 @@
                 {
                     <tr>
                         <td><strong>@level.Name</strong></td>
-                        <td class="text-end">@(level.MaxAmount.HasValue ? level.MaxAmount.Value.ToString("N0") + " " + company.BaseCurrency : "No limit")</td>
+                        <td class="text-end">@(level.MaxAmount.HasValue ? level.MaxAmount.Value.ToString("N0") + " " + company.BaseCurrency : T["No limit"])</td>
                         <td class="small">@string.Join(", ", Model.People.Where(p => p.Level == level.Name).Select(p => p.Name))</td>
                     </tr>
                 }
             </table>
             <div class="card-body small">
                 <div class="mb-1">Payments need approval: <strong class="@(company.RequirePaymentApproval ? "text-success" : "text-danger")">@(company.RequirePaymentApproval ? "ON" : "OFF")</strong></div>
-                <div class="mb-1">Entering person may release within own limit: <strong>@(company.AllowSelfReleaseWithinLimit ? "Yes" : "No - always a second person")</strong></div>
-                <div class="mb-1">Limits apply to contracts: <strong>@(company.ApplyLimitsToContracts ? "Yes (annual rent)" : "No - any contract approver")</strong></div>
+                <div class="mb-1">@T.HtmlFormat("Entering person may release within own limit: <strong>{0}</strong>", company.AllowSelfReleaseWithinLimit ? T["Yes"] : "No - always a second person")</div>
+                <div class="mb-1">@T.HtmlFormat("Limits apply to contracts: <strong>{0}</strong>", company.ApplyLimitsToContracts ? T["Yes (annual rent)"] : "No - any contract approver")</div>
                 @if (Model.Delegations.Count > 0)
                 {
                     <div class="mt-2"><strong>@T["Delegated authority now:"]</strong>
                         @foreach (var d in Model.Delegations)
                         {
-                            <div>@d.ToName up to @(d.MaxAmount?.ToString("N0") ?? "the owner's limit") until @d.EndDate.ToString("dd/MM/yyyy"), from @d.FromName (@d.Reason)</div>
+                            <div>@T.Format("{0} up to {1} until {2}, from {3} ({4})", d.ToName, d.MaxAmount?.ToString("N0") ?? "the owner's limit", d.EndDate.ToString("dd/MM/yyyy"), d.FromName, d.Reason)</div>
                         }
                     </div>
                 }
@@ -123,7 +123,7 @@
                         @{ var ordered = Model.Levels.ToList(); }
                         @if (ordered.Count >= 3 && ordered[0].MaxAmount.HasValue && ordered[1].MaxAmount.HasValue)
                         {
-                            <span>a payment of up to @ordered[0].MaxAmount!.Value.ToString("N0") needs <strong>@ordered[0].Name</strong>, up to @ordered[1].MaxAmount!.Value.ToString("N0") needs <strong>@ordered[1].Name</strong>, and anything above goes to <strong>@ordered[2].Name</strong>.</span>
+                            <span>@T.HtmlFormat("a payment of up to {0} needs <strong>{1}</strong>, up to {2} needs <strong>{3}</strong>, and anything above goes to <strong>{4}</strong>.", ordered[0].MaxAmount!.Value.ToString("N0"), ordered[0].Name, ordered[1].MaxAmount!.Value.ToString("N0"), ordered[1].Name, ordered[2].Name)</span>
                         }
                     </li>
                     <li>@T.Html("It appears in <strong>Payment Approvals</strong> / <strong>Contract Approvals</strong> and on the <strong>Business Performance</strong> page of everyone whose limit covers it.")</li>
@@ -138,7 +138,7 @@
 </div>
 
 <div class="card shadow-sm mb-4 am">
-    <div class="card-header bg-light"><h5 class="mb-0">3. People in @company.Name</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T.Format("3. People in {0}", company.Name)</h5></div>
     <div class="table-responsive">
         <table class="table table-sm table-bordered mb-0 align-middle">
             <thead class="table-light">

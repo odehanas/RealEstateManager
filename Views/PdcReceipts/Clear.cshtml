@@ -9,8 +9,7 @@
 @if (Model.DepositedDate.HasValue)
 {
     <div class="alert alert-info">
-        This cheque was deposited on <strong>@Model.DepositedDate.Value.ToString("dd/MM/yyyy")</strong> and the tenant was credited then.
-        Clearing it moves the amount from Cheques Under Collection into the bank: <code>Dr Bank / Cr Cheques Under Collection</code>.
+        @T.HtmlFormat("This cheque was deposited on <strong>{0}</strong> and the tenant was credited then. Clearing it moves the amount from Cheques Under Collection into the bank: <code>Dr Bank / Cr Cheques Under Collection</code>.", Model.DepositedDate.Value.ToString("dd/MM/yyyy"))
     </div>
 }
 else
@@ -78,16 +77,12 @@ else
     @if (Model.RequiresEarlyClearanceConfirmation)
     {
         <div class="alert alert-warning border-warning mt-4">
-            <div class="fw-bold mb-2">Clearing @Model.DaysEarly day(s) before the cheque date</div>
+            <div class="fw-bold mb-2">@T.Format("Clearing {0} day(s) before the cheque date", Model.DaysEarly)</div>
             <p class="mb-2">
-                The cheque is dated <strong>@Model.ChequeDate.ToString("dd/MM/yyyy")</strong> but you are
-                clearing it on <strong>@Model.ClearedDate.ToString("dd/MM/yyyy")</strong>. A bank will not
-                normally honour a post-dated cheque before its date.
+                @T.HtmlFormat("The cheque is dated <strong>{0}</strong> but you are clearing it on <strong>{1}</strong>. A bank will not normally honour a post-dated cheque before its date.", Model.ChequeDate.ToString("dd/MM/yyyy"), Model.ClearedDate.ToString("dd/MM/yyyy"))
             </p>
             <p class="mb-3 small">
-                If the cleared date is simply wrong, correct it above. If the cheque genuinely was presented
-                and honoured early &mdash; by agreement with the tenant, for example &mdash; tick below and
-                post. The cash entry will be dated @Model.ClearedDate.ToString("dd/MM/yyyy").
+                @T.Format("If the cleared date is simply wrong, correct it above. If the cheque genuinely was presented and honoured early — by agreement with the tenant, for example — tick below and post. The cash entry will be dated {0}.", Model.ClearedDate.ToString("dd/MM/yyyy"))
             </p>
             <div class="form-check">
                 <input asp-for="ConfirmEarlyClearance" class="form-check-input" id="confirmEarly" />
@@ -100,7 +95,7 @@ else
 
     <div class="mt-4">
         <button type="submit" class="btn @(Model.RequiresEarlyClearanceConfirmation ? "btn-warning" : "btn-dark")">
-            @(Model.RequiresEarlyClearanceConfirmation ? "Confirm and Post" : "Clear and Post")
+            @(Model.RequiresEarlyClearanceConfirmation ? T["Confirm and Post"] : T["Clear and Post"])
         </button>
         <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>

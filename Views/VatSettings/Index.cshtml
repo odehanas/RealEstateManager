@@ -6,8 +6,7 @@
 <div class="mb-3">
     <h2 class="mb-1">@T["VAT Settings"]</h2>
     <p class="text-muted mb-0">
-        The company's tax identity for <strong>@Model.CompanyName</strong>, and the recovery rate applied to
-        residual input tax.
+        @T.HtmlFormat("The company's tax identity for <strong>{0}</strong>, and the recovery rate applied to residual input tax.", Model.CompanyName)
     </p>
 </div>
 

@@ -29,7 +29,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-1">@(isNew ? "New Vendor Bill" : $"Bill {Model.BillNumber}")</h2>
+        <h2 class="mb-1">@(isNew ? T["New Vendor Bill"] : $"Bill {Model.BillNumber}")</h2>
         <p class="text-muted mb-0">
             @if (isNew)
             {
@@ -79,12 +79,10 @@
     {
         <div class="alert alert-info">
             <strong>Read from the scanned invoice</strong> @Model.ScannedFileName
-            @if (Model.ReceivedSupplierName != null) { <text>from @Model.ReceivedSupplierName</text> } &mdash;
+            @if (Model.ReceivedSupplierName != null) { <text>@T.Format("from {0}", Model.ReceivedSupplierName)</text> } &mdash;
             check every field against the document, choose the account for each line, then save.
             <div class="small mt-1">
-                Figures on the invoice: net <strong>@(Model.ReceivedNet?.ToString("N2") ?? "not read")</strong>,
-                VAT <strong>@(Model.ReceivedVat?.ToString("N2") ?? "not read")</strong>,
-                total <strong>@(Model.ReceivedTotal?.ToString("N2") ?? "not read")</strong>.
+                @T.HtmlFormat("Figures on the invoice: net <strong>{0}</strong>, VAT <strong>{1}</strong>, total <strong>{2}</strong>.", Model.ReceivedNet?.ToString("N2") ?? "not read", Model.ReceivedVat?.ToString("N2") ?? "not read", Model.ReceivedTotal?.ToString("N2") ?? "not read")
             </div>
             @if (scanWarnings.Count > 0)
             {
@@ -140,7 +138,7 @@
                 <div class="col-md-3">
                     <label asp-for="VendorReference" class="form-label">@T["Supplier's Bill No."]</label>
                     <input asp-for="VendorReference" class="form-control" placeholder="@T["As printed on their invoice"]" />
-                    <div class="form-text">Their number. Ours is @(isNew ? "issued on save" : Model.BillNumber).</div>
+                    <div class="form-text">@T.Format("Their number. Ours is {0}.", isNew ? "issued on save" : Model.BillNumber)</div>
                 </div>
 
                 <div class="col-md-5">
@@ -213,14 +211,13 @@
        -------------------------------------------------------------------- *@
     <div class="alert @(Model.VendorCanChargeVat ? "alert-info" : "alert-warning")" id="vatBanner">
         <strong id="vatBannerTitle">
-            @(Model.VendorCanChargeVat ? "Tax Invoice - 5% VAT applies" : "Commercial Invoice - no VAT")
+            @(Model.VendorCanChargeVat ? "Tax Invoice - 5% VAT applies" : T["Commercial Invoice - no VAT"])
         </strong>
         <div class="small mt-1" id="vatBannerBody">
             @if (Model.VendorCanChargeVat)
             {
                 <text>
-                    This supplier holds an active VAT registration (TRN @Model.VendorTrn), so taxable lines
-                    carry 5% and the input tax is claimable to the extent the attribution allows.
+                    @T.Format("This supplier holds an active VAT registration (TRN {0}), so taxable lines carry 5% and the input tax is claimable to the extent the attribution allows.", Model.VendorTrn)
                 </text>
             }
             else

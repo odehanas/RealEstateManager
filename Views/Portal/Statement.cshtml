@@ -24,8 +24,7 @@
 </form>
 
 <div class="d-none d-print-block mb-3">
-    <strong>@Model.TenantName</strong> (@Model.TenantCode)<br />
-    Statement @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")
+    @T.HtmlFormat("<strong>{0}</strong> ({1})<br /> Statement {2} to {3}", Model.TenantName, Model.TenantCode, Model.FromDate.ToString("dd/MM/yyyy"), Model.ToDate.ToString("dd/MM/yyyy"))
 </div>
 
 <div class="card shadow-sm">

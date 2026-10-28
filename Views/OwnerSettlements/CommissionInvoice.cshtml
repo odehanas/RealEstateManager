@@ -29,18 +29,18 @@
                 </div>
                 @if (!string.IsNullOrWhiteSpace(company?.TrnNumber))
                 {
-                    <div class="small">TRN: <strong>@company.TrnNumber</strong></div>
+                    <div class="small">@T.HtmlFormat("TRN: <strong>{0}</strong>", company.TrnNumber)</div>
                 }
             </div>
             <div class="text-end">
                 <h4 class="mb-1">@title</h4>
                 @if (isTaxInvoice)
                 {
-                    <div>Tax invoice no.: <strong>@Model.TaxInvoiceNumber</strong></div>
+                    <div>@T.HtmlFormat("Tax invoice no.: <strong>{0}</strong>", Model.TaxInvoiceNumber)</div>
                 }
-                <div>Reference: @Model.InvoiceNumber</div>
-                <div>Date of issue: @Model.InvoiceDate.ToString("dd/MM/yyyy")</div>
-                <div>Date of supply: @Model.InvoiceDate.ToString("dd/MM/yyyy")</div>
+                <div>@T.Format("Reference: {0}", Model.InvoiceNumber)</div>
+                <div>@T.Format("Date of issue: {0}", Model.InvoiceDate.ToString("dd/MM/yyyy"))</div>
+                <div>@T.Format("Date of supply: {0}", Model.InvoiceDate.ToString("dd/MM/yyyy"))</div>
                 @if (!Model.IsPosted)
                 {
                     <span class="badge bg-warning text-dark">@T["Draft - not posted"]</span>
@@ -48,22 +48,22 @@
             </div>
         </div>
 
-        <p class="mb-1"><strong>Bill to:</strong> @Model.OwnerName</p>
+        <p class="mb-1">@T.HtmlFormat("<strong>Bill to:</strong> {0}", Model.OwnerName)</p>
         @if (!string.IsNullOrWhiteSpace(Model.RecipientTrn))
         {
-            <p class="mb-1">TRN: @Model.RecipientTrn</p>
+            <p class="mb-1">@T.Format("TRN: {0}", Model.RecipientTrn)</p>
         }
         <p class="text-muted">
-            Property management commission for @Model.PeriodStart.ToString("MMMM yyyy")@(Model.PeriodStart.Month != Model.PeriodEnd.Month || Model.PeriodStart.Year != Model.PeriodEnd.Year ? " to " + Model.PeriodEnd.ToString("MMMM yyyy") : "").
+            @T.Format("Property management commission for {0}{1}.", Model.PeriodStart.ToString("MMMM yyyy"), Model.PeriodStart.Month != Model.PeriodEnd.Month || Model.PeriodStart.Year != Model.PeriodEnd.Year ? " to " + Model.PeriodEnd.ToString("MMMM yyyy") : "")
         </p>
 
         <table class="table table-bordered table-sm mb-4">
             <thead>
                 <tr>
                     <th>@T["Description"]</th>
-                    <th class="text-end">Amount (@currency)</th>
+                    <th class="text-end">@T.Format("Amount ({0})", currency)</th>
                     <th class="text-end">@T["VAT Rate"]</th>
-                    <th class="text-end">VAT (@currency)</th>
+                    <th class="text-end">@T.Format("VAT ({0})", currency)</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,14 +82,13 @@
         <table class="table table-sm ms-auto" style="max-width: 420px;">
             <tbody>
                 <tr><td>@T["Total excluding VAT"]</td><td class="text-end">@Model.Commission.ToString("N2")</td></tr>
-                <tr><td>VAT at @Model.VatRate.ToString("0.##")%</td><td class="text-end">@Model.VatAmount.ToString("N2")</td></tr>
-                <tr class="fw-bold table-primary"><td>Total including VAT (@currency)</td><td class="text-end">@Model.TotalAmount.ToString("N2")</td></tr>
+                <tr><td>@T.Format("VAT at {0}%", Model.VatRate.ToString("0.##"))</td><td class="text-end">@Model.VatAmount.ToString("N2")</td></tr>
+                <tr class="fw-bold table-primary"><td>@T.Format("Total including VAT ({0})", currency)</td><td class="text-end">@Model.TotalAmount.ToString("N2")</td></tr>
             </tbody>
         </table>
 
         <p class="small text-muted mb-0">
-            This amount has been deducted from the rent we collected on your behalf, and is shown on your owner
-            settlement statement. @(isTaxInvoice ? "VAT is charged on our management service; it is not charged on the rent." : "")
+            @T.Format("This amount has been deducted from the rent we collected on your behalf, and is shown on your owner settlement statement. {0}", isTaxInvoice ? "VAT is charged on our management service; it is not charged on the rent." : "")
         </p>
     </div>
 </div>

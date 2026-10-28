@@ -17,7 +17,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
         <h2 class="mb-1">@T["Maintenance Dashboard"]</h2>
-        <div class="text-muted">Jobs raised from @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"), and every job still open.</div>
+        <div class="text-muted">@T.Format("Jobs raised from {0} to {1}, and every job still open.", Model.From.ToString("dd/MM/yyyy"), Model.To.ToString("dd/MM/yyyy"))</div>
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary">@T["Maintenance Jobs"]</a>
 </div>
@@ -44,15 +44,15 @@
 }
 
 <div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Jobs received"]</div><div class="value">@Model.Received</div><div class="note">@Model.Done done &middot; @Model.Rejected declined</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Still open"]</div><div class="value @(Model.OverdueOpen > 0 ? "text-danger" : "")">@Model.OpenCount</div><div class="note">@Model.OverdueOpen past target &middot; @Model.Unassigned unassigned</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Jobs received"]</div><div class="value">@Model.Received</div><div class="note">@T.Format("{0} done · {1} declined", Model.Done, Model.Rejected)</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Still open"]</div><div class="value @(Model.OverdueOpen > 0 ? "text-danger" : "")">@Model.OpenCount</div><div class="note">@T.Format("{0} past target · {1} unassigned", Model.OverdueOpen, Model.Unassigned)</div></div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average first response"]</div><div class="value">@Hours(Model.AvgResponseHours)</div><div class="note">@T["from request to the engineer's response"]</div></div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average time to complete"]</div><div class="value">@Hours(Model.AvgResolveHours)</div><div class="note">@(Model.OnTimePercent.HasValue ? $"{Model.OnTimePercent:0}% done within target" : "no completed jobs")</div></div></div></div>
 </div>
 
 <div class="row g-3 mb-3">
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Materials used"]</div><div class="value">@Model.MaterialsCost.ToString("N0")</div><div class="note">@T["on these jobs"]</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Maintenance store"]</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">balance of account @MaintenanceStandards.StockAccountCode</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Maintenance store"]</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">@T.Format("balance of account {0}", MaintenanceStandards.StockAccountCode)</div></div></div></div>
     <div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-body small text-muted">
         <strong class="text-dark">@T["Targets by priority"]</strong><br />
         Urgent: respond in 2 h, done in 24 h &middot; High: 8 h / 3 days &middot; Normal: 24 h / 5 days &middot; Low: 2 days / 10 days.

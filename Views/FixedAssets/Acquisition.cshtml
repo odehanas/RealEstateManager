@@ -84,7 +84,7 @@
         </div>
         <div class="col-md-2">
             <div class="text-muted small">@T["Useful Life"]</div>
-            <div>@Model.UsefulLifeMonths month(s)</div>
+            <div>@T.Format("{0} month(s)", Model.UsefulLifeMonths)</div>
         </div>
     </div>
 </div>
@@ -259,7 +259,7 @@
                                 <div>@(string.IsNullOrWhiteSpace(cost.OffsetAccountDisplay) ? "-" : cost.OffsetAccountDisplay)</div>
                                 @if (!string.IsNullOrWhiteSpace(cost.ExpenseAccountDisplay))
                                 {
-                                    <small class="text-muted">Exp: @cost.ExpenseAccountDisplay</small>
+                                    <small class="text-muted">@T.Format("Exp: {0}", cost.ExpenseAccountDisplay)</small>
                                 }
                             </td>
                             <td>

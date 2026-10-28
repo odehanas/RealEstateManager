@@ -32,7 +32,7 @@
             <td><a asp-action="Details" asp-route-id="@p.Id">@p.PaymentNumber</a></td>
             <td>@p.PaymentDate.ToString("dd/MM/yyyy")</td>
             <td>@(p.Vendor?.Name ?? p.VendorBill?.Vendor?.Name)</td>
-            <td>@(p.IsAdvance ? "Advance" : "Payment")</td>
+            <td>@(p.IsAdvance ? T["Advance"] : T["Payment"])</td>
             <td>@p.ClearingNumber</td>
             <td class="small">@(bills.TryGetValue(p.Id, out var b) ? b : p.VendorBill?.BillNumber)</td>
             <td class="small">@p.PaymentMethod @p.Reference</td>

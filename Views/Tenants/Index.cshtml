@@ -46,7 +46,7 @@
                 <td>@item.Phone</td>
                 <td>@item.Nationality</td>
                 <td>@item.IdNumber</td>
-                <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                <td>@(item.IsActive ? T["Active"] : T["Inactive"])</td>
                 <td>
                     @if (canEdit)
                     {

@@ -18,7 +18,7 @@
 @if (Model.ReplacesPdcId.HasValue)
 {
     <div class="alert alert-warning">
-        This cheque replaces cheque <strong>@Model.ReplacesChequeNumber</strong>, which will be marked <strong>Replaced</strong> once this one is saved.
+        @T.HtmlFormat("This cheque replaces cheque <strong>{0}</strong>, which will be marked <strong>Replaced</strong> once this one is saved.", Model.ReplacesChequeNumber)
     </div>
 }
 
@@ -54,7 +54,7 @@
                     var isSelected = Model.CustomerInvoiceId == invoice.Id || selectedInvoiceId == invoice.Id;
 
                     <option value="@invoice.Id" selected="@(isSelected ? "selected" : null)">
-                        @invoice.InvoiceNumber - @invoice.Lease?.Tenant?.FullName - @invoice.Lease?.Unit?.Property?.Code/@invoice.Lease?.Unit?.UnitNumber - Outstanding: @outstanding.ToString("N2")
+                        @T.Format("{0} - {1} - {2}/{3} - Outstanding: {4}", invoice.InvoiceNumber, invoice.Lease?.Tenant?.FullName, invoice.Lease?.Unit?.Property?.Code, invoice.Lease?.Unit?.UnitNumber, outstanding.ToString("N2"))
                     </option>
                 }
             </select>

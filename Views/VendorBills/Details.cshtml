@@ -67,7 +67,7 @@
                 <span class="badge bg-dark align-middle">@T["Period locked"]</span>
             }
         </h2>
-        <p class="text-muted mb-0">@Model.DocumentType from @Model.Vendor?.Name</p>
+        <p class="text-muted mb-0">@T.Format("{0} from {1}", Model.DocumentType, Model.Vendor?.Name)</p>
     </div>
 
     @* Draft -> Post -> Reset to Draft. Both actions route through
@@ -134,14 +134,14 @@
                 }
                 @if (!string.IsNullOrWhiteSpace(company?.TrnNumber))
                 {
-                    <div><strong>TRN @company.TrnNumber</strong></div>
+                    <div>@T.HtmlFormat("<strong>TRN {0}</strong>", company.TrnNumber)</div>
                 }
             </div>
         </div>
         <div class="doc-title-block">
             <div class="doc-title">@Model.DocumentType</div>
             <div class="doc-number">@Model.BillNumber</div>
-            <span class="doc-status">@(isPosted ? "Posted" : "Draft")</span>
+            <span class="doc-status">@(isPosted ? T["Posted"] : T["Draft"])</span>
         </div>
     </div>
 
@@ -164,11 +164,11 @@
             <div class="doc-party-line">@Model.Vendor?.Code</div>
             @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn))
             {
-                <div class="doc-party-line"><strong>TRN @Model.SupplierTrn</strong></div>
+                <div class="doc-party-line">@T.HtmlFormat("<strong>TRN {0}</strong>", Model.SupplierTrn)</div>
             }
             @if (!string.IsNullOrWhiteSpace(Model.Vendor?.TradeLicenseNumber))
             {
-                <div class="doc-party-line">Licence @Model.Vendor.TradeLicenseNumber</div>
+                <div class="doc-party-line">@T.Format("Licence {0}", Model.Vendor.TradeLicenseNumber)</div>
             }
             <div class="doc-field" style="margin-top:2mm">
                 <span class="label">@T["Supplier's bill no."]</span>
@@ -198,7 +198,7 @@
             }
             <div class="doc-field">
                 <span class="label">@T["Journal entry"]</span>
-                <span class="value">@(Model.JournalEntry?.EntryNumber ?? "Not journalised")</span>
+                <span class="value">@(Model.JournalEntry?.EntryNumber ?? T["Not journalised"])</span>
             </div>
         </div>
     </div>
@@ -214,7 +214,7 @@
                             @Model.Vendor?.Code &mdash; @Model.Vendor?.Name<br />
                             @if (!string.IsNullOrWhiteSpace(Model.SupplierTrn))
                             {
-                                <span class="small text-muted">TRN @Model.SupplierTrn</span>
+                                <span class="small text-muted">@T.Format("TRN {0}", Model.SupplierTrn)</span>
                             }
                         </dd>
                         <dt>@T["Supplier's Bill No."]</dt>
@@ -259,13 +259,13 @@
                                     @Model.JournalEntry.EntryNumber
                                 </a>
                                 <span class="badge @(isPosted ? "bg-success" : "bg-warning text-dark")">
-                                    @(isPosted ? "Posted" : "Draft")
+                                    @(isPosted ? T["Posted"] : T["Draft"])
                                 </span>
                             }
                             else if (Model.JournalEntryId.HasValue)
                             {
                                 @* The bill points at an entry that is gone or belongs to another company. *@
-                                <span class="text-danger">Entry #@Model.JournalEntryId not found</span>
+                                <span class="text-danger">@T.Format("Entry #{0} not found", Model.JournalEntryId)</span>
                             }
                             else
                             {
@@ -303,8 +303,7 @@
                     {
                         <tr>
                             <td colspan="9" class="text-muted">
-                                This bill was raised automatically and carries no detail lines.
-                                Its total is @Money(Model.TotalAmount) @currency.
+                                @T.Format("This bill was raised automatically and carries no detail lines. Its total is {0} {1}.", Money(Model.TotalAmount), currency)
                             </td>
                         </tr>
                     }
@@ -317,8 +316,7 @@
                                 @if (line.NonRecoverableVatAmount > 0m)
                                 {
                                     <span class="doc-line-note">
-                                        Includes @Money(line.NonRecoverableVatAmount) irrecoverable VAT
-                                        (@RealEstateManager.Domain.InputTaxAttributions.Describe(line.InputTaxAttribution))
+                                        @T.Format("Includes {0} irrecoverable VAT ({1})", Money(line.NonRecoverableVatAmount), RealEstateManager.Domain.InputTaxAttributions.Describe(line.InputTaxAttribution))
                                     </span>
                                 }
                             </td>
@@ -361,9 +359,7 @@
             @if (Model.VatAmount > 0m)
             {
                 <div>
-                    Input tax of @Money(Model.VatAmount) @currency:
-                    @Money(Model.RecoverableVatAmount) recoverable,
-                    @Money(Model.NonRecoverableVatAmount) charged to cost.
+                    @T.Format("Input tax of {0} {1}: {2} recoverable, {3} charged to cost.", Money(Model.VatAmount), currency, Money(Model.RecoverableVatAmount), Money(Model.NonRecoverableVatAmount))
                 </div>
             }
         </div>
@@ -371,7 +367,7 @@
         <div class="doc-totals">
             <div class="doc-total-row"><span>@T["Subtotal"]</span><span class="amount">@Money(Model.Subtotal)</span></div>
             <div class="doc-total-row"><span>@T["VAT"]</span><span class="amount">@Money(Model.VatAmount)</span></div>
-            <div class="doc-total-row grand"><span>Total @currency</span><span class="amount">@Money(Model.TotalAmount)</span></div>
+            <div class="doc-total-row grand"><span>@T.Format("Total {0}", currency)</span><span class="amount">@Money(Model.TotalAmount)</span></div>
             <div class="doc-total-row"><span>@T["Paid"]</span><span class="amount">@Money(Model.AmountPaid)</span></div>
             <div class="doc-total-row balance"><span>@T["Balance Due"]</span><span class="amount">@Money(Model.BalanceDue)</span></div>
         </div>
@@ -395,7 +391,7 @@
                 <div class="card-body totals-box">
                     <div class="row"><div class="col">@T["Subtotal"]</div><div class="col text-end">@Money(Model.Subtotal)</div></div>
                     <div class="row"><div class="col">@T["VAT"]</div><div class="col text-end">@Money(Model.VatAmount)</div></div>
-                    <div class="row grand"><div class="col">Total (@currency)</div><div class="col text-end">@Money(Model.TotalAmount)</div></div>
+                    <div class="row grand"><div class="col">@T.Format("Total ({0})", currency)</div><div class="col text-end">@Money(Model.TotalAmount)</div></div>
                     <div class="row"><div class="col">@T["Paid"]</div><div class="col text-end">@Money(Model.AmountPaid)</div></div>
                     <div class="row fw-bold"><div class="col">@T["Balance Due"]</div><div class="col text-end">@Money(Model.BalanceDue)</div></div>
 
@@ -434,7 +430,7 @@
                             <tr>
                                 <td>@c.ClearingNumber</td>
                                 <td>@c.ClearingDate.ToString("dd/MM/yyyy")</td>
-                                <td>@(c.ClearingType == RealEstateManager.Domain.VendorClearingTypes.Advance ? "Advance " : "Payment ")<a asp-controller="VendorPayments" asp-action="Details" asp-route-id="@source?.Id">@source?.PaymentNumber</a></td>
+                                <td>@(c.ClearingType == RealEstateManager.Domain.VendorClearingTypes.Advance ? T["Advance"] : T["Payment"])<a asp-controller="VendorPayments" asp-action="Details" asp-route-id="@source?.Id">@source?.PaymentNumber</a></td>
                                 <td class="num">@Money(line.Amount)</td>
                                 <td>@c.Status</td>
                             </tr>
@@ -463,7 +459,7 @@
                                 <td>@payment.PaymentNumber</td>
                                 <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
                                 <td class="num">@Money(payment.Amount)</td>
-                                <td>@(payment.JournalEntryId.HasValue ? "Posted" : "Draft")</td>
+                                <td>@(payment.JournalEntryId.HasValue ? T["Posted"] : T["Draft"])</td>
                             </tr>
                         }
                     </tbody>
@@ -485,6 +481,6 @@
 
     <div class="doc-footer d-none d-print-flex">
         <span>@(company?.LegalName ?? company?.Name) &middot; @Model.BillNumber &middot; @Model.DocumentType</span>
-        <span>Printed @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+        <span>@T.Format("Printed {0}", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))</span>
     </div>
 </div>

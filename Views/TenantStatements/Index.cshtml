@@ -82,12 +82,12 @@ else
             <strong>@Model.TenantCode - @Model.TenantName</strong>
         </div>
         <div class="card-body">
-            <div><strong>Lease Scope:</strong> @Model.LeaseDisplay</div>
-            <div><strong>Statement Period:</strong> @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</div>
-            <div><strong>Opening Balance:</strong> @Model.OpeningBalance.ToString("N2")</div>
-            <div><strong>Total Charges:</strong> @Model.TotalCharges.ToString("N2")</div>
-            <div><strong>Total Credits:</strong> @Model.TotalCredits.ToString("N2")</div>
-            <div><strong>Closing Balance:</strong> @Model.ClosingBalance.ToString("N2")</div>
+            <div>@T.HtmlFormat("<strong>Lease Scope:</strong> {0}", Model.LeaseDisplay)</div>
+            <div>@T.HtmlFormat("<strong>Statement Period:</strong> {0} to {1}", Model.FromDate.ToString("dd/MM/yyyy"), Model.ToDate.ToString("dd/MM/yyyy"))</div>
+            <div>@T.HtmlFormat("<strong>Opening Balance:</strong> {0}", Model.OpeningBalance.ToString("N2"))</div>
+            <div>@T.HtmlFormat("<strong>Total Charges:</strong> {0}", Model.TotalCharges.ToString("N2"))</div>
+            <div>@T.HtmlFormat("<strong>Total Credits:</strong> {0}", Model.TotalCredits.ToString("N2"))</div>
+            <div>@T.HtmlFormat("<strong>Closing Balance:</strong> {0}", Model.ClosingBalance.ToString("N2"))</div>
         </div>
     </div>
 
@@ -133,7 +133,7 @@ else
     <h4>@T["Noted Items PDC"]</h4>
 
     <div class="mb-2">
-        <strong>Total Noted PDC:</strong> @Model.NotedPdcTotal.ToString("N2")
+        @T.HtmlFormat("<strong>Total Noted PDC:</strong> {0}", Model.NotedPdcTotal.ToString("N2"))
     </div>
 
     <table class="table table-bordered table-striped table-sm">

@@ -52,15 +52,15 @@ else
                     {
                         var isPosted = r.JournalEntry?.IsPosted == true;
                         <tr class="@(isPosted ? "" : "text-muted")">
-                            <td><a asp-action="Document" asp-route-id="@r.Id" target="_blank">@(r.TaxInvoiceNumber ?? "Disbursement note")</a></td>
+                            <td><a asp-action="Document" asp-route-id="@r.Id" target="_blank">@(r.TaxInvoiceNumber ?? T["Disbursement note"])</a></td>
                             <td>@r.RechargeDate.ToString("dd/MM/yyyy")</td>
-                            <td>@r.OwnerName @if (r.OwnerTrn != null) { <span class="text-muted small">TRN @r.OwnerTrn</span> }</td>
+                            <td>@r.OwnerName @if (r.OwnerTrn != null) { <span class="text-muted small">@T.Format("TRN {0}", r.OwnerTrn)</span> }</td>
                             <td>@r.Property?.Code</td>
-                            <td>@(r.Treatment == OwnerCostTreatments.Disbursement ? "Disbursement" : "Recharge") <span class="small text-muted">@OwnerRechargeSources.Describe(r.SourceType) @r.SourceReference</span></td>
+                            <td>@(r.Treatment == OwnerCostTreatments.Disbursement ? T["Disbursement"] : T["Recharge"]) <span class="small text-muted">@OwnerRechargeSources.Describe(r.SourceType) @r.SourceReference</span></td>
                             <td class="small">@r.CostCategory</td>
                             <td class="small">@r.Description</td>
                             <td class="text-end">@r.NetAmount.ToString("N2")</td>
-                            <td class="text-end" title="@(r.Treatment == OwnerCostTreatments.Disbursement ? "The supplier's VAT, the owner's to reclaim" : "Our 5% VAT")">@r.OwnerReclaimableVat.ToString("N2")</td>
+                            <td class="text-end" title="@(r.Treatment == OwnerCostTreatments.Disbursement ? T["The supplier's VAT, the owner's to reclaim"] : "Our 5% VAT")">@r.OwnerReclaimableVat.ToString("N2")</td>
                             <td class="text-end fw-semibold">@r.TotalAmount.ToString("N2")</td>
                             <td>@if (!isPosted) { <span class="badge bg-secondary" title="@T["Counts once its entry is posted"]">@T["draft"]</span> }</td>
                         </tr>

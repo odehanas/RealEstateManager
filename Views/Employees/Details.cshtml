@@ -53,15 +53,15 @@
         <div class="card shadow-sm h-100"><div class="card-body">
             <div class="small text-muted text-uppercase">@T["Monthly gross"]</div>
             <div class="fs-3 fw-bold">@e.MonthlyGross.ToString("N2")</div>
-            <div class="small">Basic @e.BasicSalary.ToString("N2") · Allowances @((e.HousingAllowance + e.TransportAllowance + e.OtherAllowance).ToString("N2"))</div>
+            <div class="small">@T.Format("Basic {0} · Allowances {1}", e.BasicSalary.ToString("N2"), (e.HousingAllowance + e.TransportAllowance + e.OtherAllowance).ToString("N2"))</div>
         </div></div>
     </div>
     <div class="col-md-3">
         <div class="card shadow-sm h-100"><div class="card-body">
             <div class="small text-muted text-uppercase">@T["Annual leave available"]</div>
-            <div class="fs-3 fw-bold">@Model.LeaveBalance.Available.ToString("0.##") days</div>
+            <div class="fs-3 fw-bold">@T.Format("{0} days", Model.LeaveBalance.Available.ToString("0.##"))</div>
             <div class="small">Earned @Model.LeaveBalance.Accrued.ToString("0.##") + opening @Model.LeaveBalance.Opening.ToString("0.##") − taken @Model.LeaveBalance.Taken.ToString("0.##")
-                @if (Model.LeaveBalance.Pending > 0) { <text>· @Model.LeaveBalance.Pending.ToString("0.##") pending</text> }</div>
+                @if (Model.LeaveBalance.Pending > 0) { <text>@T.Format("· {0} pending", Model.LeaveBalance.Pending.ToString("0.##"))</text> }</div>
         </div></div>
     </div>
     <div class="col-md-3">
@@ -133,25 +133,21 @@
             else
             {
                 <p class="mb-2">
-                    Username <strong>@portalUser.Username</strong> ·
-                    @(portalUser.IsActive ? "active" : "disabled")
-                    @(portalUser.MustChangePassword ? "· still on the temporary password" : "")
-                    @(portalUser.LastLoginAt.HasValue ? $"· last sign-in {portalUser.LastLoginAt.Value.ToLocalTime():dd/MM/yyyy HH:mm}" : "· never signed in")
-                    @(portalUser.LockedOutUntil > DateTime.UtcNow ? "· locked after wrong passwords" : "")
+                    @T.HtmlFormat("Username <strong>{0}</strong> · {1} {2} {3} {4}", portalUser.Username, portalUser.IsActive ? "active" : "disabled", portalUser.MustChangePassword ? "· still on the temporary password" : "", portalUser.LastLoginAt.HasValue ? $"· last sign-in {portalUser.LastLoginAt.Value.ToLocalTime():dd/MM/yyyy HH:mm}" : "· never signed in", portalUser.LockedOutUntil > DateTime.UtcNow ? "· locked after wrong passwords" : "")
                 </p>
             }
             <div class="d-flex flex-wrap gap-2">
                 <form asp-action="IssuePortalAccess" asp-route-id="@e.Id" method="post" class="d-flex gap-2">
                     @Html.AntiForgeryToken()
                     <input name="username" class="form-control form-control-sm" style="width:220px" value="@(portalUser?.Username ?? e.Mobile ?? e.Email)" placeholder="@T["Username (mobile or email)"]" />
-                    <button class="btn btn-sm btn-dark">@(portalUser == null ? "Give portal access" : "Reset password")</button>
+                    <button class="btn btn-sm btn-dark">@(portalUser == null ? T["Give portal access"] : T["Reset password"])</button>
                 </form>
                 @if (portalUser != null)
                 {
                     <form asp-action="SetPortalAccess" asp-route-id="@e.Id" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="active" value="@(portalUser.IsActive ? "false" : "true")" />
-                        <button class="btn btn-sm @(portalUser.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(portalUser.IsActive ? "Disable" : "Enable")</button>
+                        <button class="btn btn-sm @(portalUser.IsActive ? "btn-outline-danger" : "btn-outline-success")">@(portalUser.IsActive ? T["Disable"] : T["Enable"])</button>
                     </form>
                 }
             </div>
@@ -162,11 +158,7 @@
 <div class="card shadow-sm mb-3">
     <div class="card-header bg-light"><h6 class="mb-0">@T["End-of-service gratuity — how it is worked out"]</h6></div>
     <div class="card-body small">
-        Daily basic pay @Model.Gratuity.DailyBasic.ToString("N2") (basic ÷ 30) ×
-        (@Model.Gratuity.FirstFiveYearsDays.ToString("0.##") days for the first five years at 21 days a year
-        + @Model.Gratuity.LaterYearsDays.ToString("0.##") days for later years at 30 days a year)
-        = <strong>@Model.Gratuity.Amount.ToString("N2")</strong>, never more than two years' basic pay.
-        Under UAE law nothing is payable before one year of continuous service.
+        @T.HtmlFormat("Daily basic pay {0} (basic ÷ 30) × ({1} days for the first five years at 21 days a year + {2} days for later years at 30 days a year) = <strong>{3}</strong>, never more than two years' basic pay. Under UAE law nothing is payable before one year of continuous service.", Model.Gratuity.DailyBasic.ToString("N2"), Model.Gratuity.FirstFiveYearsDays.ToString("0.##"), Model.Gratuity.LaterYearsDays.ToString("0.##"), Model.Gratuity.Amount.ToString("N2"))
     </div>
 </div>
 

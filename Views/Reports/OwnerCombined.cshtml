@@ -15,7 +15,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
     <div>
         <h2 class="mb-1">@T["Owner's Combined View"]</h2>
-        <div class="text-muted">The business and the owner's own properties in one place, @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy").</div>
+        <div class="text-muted">@T.Format("The business and the owner's own properties in one place, {0} to {1}.", Model.From.ToString("dd/MM/yyyy"), Model.To.ToString("dd/MM/yyyy"))</div>
     </div>
     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
 </div>
@@ -106,7 +106,7 @@
     own TRN and VAT return. "Between them" removes the commission the owner's properties pay the business, which is income
     to one and a cost to the other. Figures are before VAT.
     @if (Model.OwnerIsVatRegistered) { <text>The owner is VAT registered, so the VAT on the commission is reclaimable and not a cost.</text> }
-    @if (Model.RentVatForOwner != 0m) { <text>VAT of @Model.RentVatForOwner.ToString("N2") on rent invoiced in the owner's name was collected for the owner to declare.</text> }
+    @if (Model.RentVatForOwner != 0m) { <text>@T.Format("VAT of {0} on rent invoiced in the owner's name was collected for the owner to declare.", Model.RentVatForOwner.ToString("N2"))</text> }
     The business column is the <a asp-action="ProfitAndLoss" asp-route-asOfDate="@Model.To.ToString("yyyy-MM-dd")">Profit &amp; Loss</a>
     (from the start of its year); the personal column is <a asp-action="OwnerProfitability" asp-route-fromDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.To.ToString("yyyy-MM-dd")" asp-route-owner="@Model.Owner">Owner Property Profitability</a>.
 </p>

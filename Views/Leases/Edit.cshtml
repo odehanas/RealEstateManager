@@ -12,13 +12,12 @@
     var lastReturn = history.FirstOrDefault(x => x.Status == ApprovalStatuses.Rejected);
 }
 
-<h2>@(termsLocked ? "Contract" : "Edit Lease") <small class="text-muted fs-6">@LeaseStatuses.Describe(status)</small></h2>
+<h2>@(termsLocked ? T["Contract"] : T["Edit Lease"]) <small class="text-muted fs-6">@LeaseStatuses.Describe(status)</small></h2>
 
 @if (status == LeaseStatuses.Draft && lastReturn != null && history.FirstOrDefault() == lastReturn)
 {
     <div class="alert alert-danger">
-        <strong>Returned by @lastReturn.DecidedByName</strong> on @lastReturn.DecidedAt?.ToLocalTime().ToString("dd/MM/yyyy"):
-        “@lastReturn.DecisionComment” Correct it and submit it again.
+        @T.HtmlFormat("<strong>Returned by {0}</strong> on {1}: “{2}” Correct it and submit it again.", lastReturn.DecidedByName, lastReturn.DecidedAt?.ToLocalTime().ToString("dd/MM/yyyy"), lastReturn.DecisionComment)
     </div>
 }
 else if (status == LeaseStatuses.PendingApproval)
@@ -28,8 +27,7 @@ else if (status == LeaseStatuses.PendingApproval)
 else if (termsLocked)
 {
     <div class="alert alert-info">
-        This contract is @status.ToLowerInvariant(): its invoices were created from these terms, so they are locked.
-        Only the notes can be updated.
+        @T.Format("This contract is {0}: its invoices were created from these terms, so they are locked. Only the notes can be updated.", status.ToLowerInvariant())
     </div>
 }
 
@@ -166,7 +164,7 @@ else if (termsLocked)
                 <tr>
                     <td>@step.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@step.RequestedByName</td>
-                    <td>@(step.Status == ApprovalStatuses.Rejected ? "Returned" : step.Status == ApprovalStatuses.Pending ? "Waiting" : step.Status)</td>
+                    <td>@(step.Status == ApprovalStatuses.Rejected ? T["Returned"] : step.Status == ApprovalStatuses.Pending ? T["Waiting"] : step.Status)</td>
                     <td>@(step.DecidedByName ?? "-")</td>
                     <td>@(step.DecisionComment ?? "-")</td>
                 </tr>

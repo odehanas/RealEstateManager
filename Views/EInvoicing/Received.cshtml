@@ -57,12 +57,12 @@
                             @item.SupplierName
                             @if (!string.IsNullOrWhiteSpace(item.SupplierTrn))
                             {
-                                <div class="small text-muted">TRN @item.SupplierTrn</div>
+                                <div class="small text-muted">@T.Format("TRN {0}", item.SupplierTrn)</div>
                             }
                         </td>
                         <td>
                             @item.DocumentNumber
-                            <div class="small text-muted">@(item.IsCreditNote ? "Credit note" : "Invoice") &middot; received @item.ReceivedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                            <div class="small text-muted">@T.Format("{0} · received {1}", item.IsCreditNote ? T["Credit note"] : "Invoice", item.ReceivedAt.ToLocalTime().ToString("dd/MM/yyyy"))</div>
                         </td>
                         <td>@item.IssueDate.ToString("dd/MM/yyyy")</td>
                         <td class="text-end">@item.TotalAmount.ToString("N2")</td>
@@ -80,7 +80,7 @@
                             @if (item.VendorBillId != null)
                             {
                                 <a asp-controller="VendorBills" asp-action="Details" asp-route-id="@item.VendorBillId" class="badge bg-success text-decoration-none">
-                                    Booked as @item.VendorBillNumber
+                                    @T.Format("Booked as {0}", item.VendorBillNumber)
                                 </a>
                             }
                             else
@@ -109,7 +109,7 @@
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@item.Id" />
                                     <input type="hidden" name="ignore" value="@(item.Status == "Ignored" ? "false" : "true")" />
-                                    <button type="submit" class="btn btn-sm btn-link">@(item.Status == "Ignored" ? "Restore" : "Ignore")</button>
+                                    <button type="submit" class="btn btn-sm btn-link">@(item.Status == "Ignored" ? T["Restore"] : T["Ignore"])</button>
                                 </form>
                             }
                         </td>

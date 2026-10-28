@@ -1,0 +1,12 @@
+# ASP.NET Core's own validation messages ({0} is the field's label, already in Arabic)
+The {0} field is required. ||| حقل {0} مطلوب.
+The value '{0}' is not valid for {1}. ||| القيمة '{0}' غير صالحة لـ {1}.
+The value '{0}' is invalid. ||| القيمة '{0}' غير صالحة.
+The field {0} must be a number. ||| يجب أن يكون الحقل {0} رقماً.
+The field {0} must be a date. ||| يجب أن يكون الحقل {0} تاريخاً.
+The field {0} must be between {1} and {2}. ||| يجب أن يكون الحقل {0} بين {1} و{2}.
+The field {0} must be a string with a maximum length of {1}. ||| يجب ألا يتجاوز طول الحقل {0} {1} حرفاً.
+The field {0} must be a string or array type with a maximum length of '{1}'. ||| يجب ألا يتجاوز طول الحقل {0} '{1}'.
+The {0} field is not a valid e-mail address. ||| الحقل {0} ليس بريداً إلكترونياً صالحاً.
+A value is required. ||| القيمة مطلوبة.
+The value '{0}' is not valid. ||| القيمة '{0}' غير صالحة.

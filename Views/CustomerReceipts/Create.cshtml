@@ -25,7 +25,7 @@
                     var isSelected = Model.CustomerInvoiceId == invoice.Id || selectedInvoiceId == invoice.Id;
 
                     <option value="@invoice.Id" selected="@(isSelected ? "selected" : null)">
-                        @invoice.InvoiceNumber - @invoice.Lease?.Tenant?.FullName - @invoice.Lease?.Unit?.Property?.Code/@invoice.Lease?.Unit?.UnitNumber - Outstanding: @outstanding.ToString("N2")
+                        @T.Format("{0} - {1} - {2}/{3} - Outstanding: {4}", invoice.InvoiceNumber, invoice.Lease?.Tenant?.FullName, invoice.Lease?.Unit?.Property?.Code, invoice.Lease?.Unit?.UnitNumber, outstanding.ToString("N2"))
                     </option>
                 }
             </select>

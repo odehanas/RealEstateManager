@@ -23,7 +23,7 @@
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
     <div>
         <h2 class="mb-1">@T["Statement of Cash Flows"]</h2>
-        <p class="text-muted mb-0">@Model.CompanyName &middot; direct method (IAS 7)</p>
+        <p class="text-muted mb-0">@T.Format("{0} · direct method (IAS 7)", Model.CompanyName)</p>
     </div>
     <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">@T["Print"]</button>
 </div>
@@ -43,9 +43,7 @@
 </form>
 
 <div class="d-none d-print-block mb-3">
-    <strong>@Model.CompanyName</strong><br />
-    Statement of Cash Flows for the period @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")<br />
-    Amounts in @Model.Currency
+    @T.HtmlFormat("<strong>{0}</strong><br /> Statement of Cash Flows for the period {1} to {2}<br /> Amounts in {3}", Model.CompanyName, Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"), Model.Currency)
 </div>
 
 @if (!Model.HasCashAccounts)
@@ -108,7 +106,7 @@
                 <tr>
                     <th class="lbl">@T["Cash flows"]</th>
                     <th class="num" style="width:120px">@T["Movements"]</th>
-                    <th class="num" style="width:170px">Amount (@Model.Currency)</th>
+                    <th class="num" style="width:170px">@T.Format("Amount ({0})", Model.Currency)</th>
                 </tr>
             </thead>
             <tbody>
@@ -198,8 +196,7 @@
         <strong class="text-dark">@T["Basis of preparation"]</strong>
         <ul class="mb-2 mt-2">
             <li>@T.Html("Prepared on the <strong>direct method</strong>, which IAS 7 encourages. Every movement is taken from the ledger and classified by the account on the other side of the journal, so the statement reconciles to the cash accounts by construction.")</li>
-            <li><strong>Cash and cash equivalents</strong> comprise
-                @string.Join(", ", Model.CashAccounts.Select(x => $"{x.AccountCode} {x.AccountName}")).
+            <li>@T.HtmlFormat("<strong>Cash and cash equivalents</strong> comprise {0}.", string.Join(", ", Model.CashAccounts.Select(x => $"{x.AccountCode} {x.AccountName}")))
             </li>
             <li>@T.Html("<strong>PDC On Hand is excluded.</strong> A post-dated cheque in the drawer has not been banked and is not readily convertible, so it is not a cash equivalent under IAS 7.")</li>
             <li>@T.Html("<strong>Transfers between cash accounts are excluded</strong> &mdash; topping up petty cash from the bank moves cash between pockets, it is not a cash flow.")</li>

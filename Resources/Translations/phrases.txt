@@ -1,9 +1,16 @@
 "Custom" means the person's ticks differ from the standard roles. Choose a role on the user's page to bring them back in line.
 % of Budget
 (reclaimable by a registered owner)
+({0} days)
 + / − Transaction
 + Add a filter
 + Add line
++ {0} credited
+- <strong>{0}</strong>, until {1}.
+- access to {0} has been suspended. Please contact your service provider.
+- closing entry <strong>{0}</strong>.
+- ended on {0}. Enter an activation code to continue working.
+- period {0} of {1}
 -- account --
 -- category --
 -- choose --
@@ -42,6 +49,7 @@
 3. Open items
 3. Owners' security questions
 3. Payment
+3. People in {0}
 30 under UAE law after the first year.
 31–60 days
 4. Payment details
@@ -53,6 +61,7 @@
 61–90 days
 784-XXXX-XXXXXXX-X
 9-digit routing code (agent ID) of the bank that sends the WPS file.
+<code>39999</code> Opening Balance Control Account is <strong>zero</strong>, which means every debit opening balance has a matching credit across {0} account(s).
 <em>Opening balance</em>
 <strong>1. Switch and provider</strong>
 <strong>1.</strong> Download the ready files (all, or the ones ticked) and upload them in your provider's portal.
@@ -64,7 +73,9 @@
 <strong>Accumulated depreciation</strong>
 <strong>Actual recovery rate</strong> &mdash; (standard + zero rated) ÷ total supplies
 <strong>Add Acquisition Cost</strong>
+<strong>Agreed and applied.</strong> The due date on invoice {0} has been moved. The amount you owe has not changed.
 <strong>Amount lock</strong>
+<strong>Applied.</strong> The invoice due date was moved on {0}. The invoice amount, its VAT and its journal were not touched.
 <strong>Approval limits on payments</strong>
 <strong>Area utilization</strong> &mdash; area of units under a lease that is active and current at the as-of date, divided by total area. This measures let space rather than unit count, so a large vacant unit shows a bigger impact.
 <strong>Asset Details</strong>
@@ -72,6 +83,7 @@
 <strong>Audit trail</strong>
 <strong>Balance brought forward</strong>
 <strong>Bank reconciliation every month</strong>, prepared by one person and reviewed by another, before the month is closed.
+<strong>Bill to:</strong> {0}
 <strong>Bounced</strong>: <code>Dr the tenant / Cr 11450</code> &mdash; charged back, the invoice is open again, plus any returned cheque charge.
 <strong>Breakdown by Category</strong>
 <strong>Browser protection</strong>
@@ -80,13 +92,16 @@
 <strong>By kind of job</strong>
 <strong>By property</strong>
 <strong>By technician</strong>
+<strong>Cannot do that.</strong> {0}
 <strong>Capitalize Asset</strong>
 <strong>Carrying amount</strong>
 <strong>Cash In Hand</strong> is what should physically be in the box. Count it and compare; any difference is a shortage to investigate.
 <strong>Cash KPI</strong>
+<strong>Cash and cash equivalents</strong> comprise {0}.
 <strong>Cleared</strong> by the bank: <code>Dr Bank / Cr 11450</code>. A cheque cleared without being deposited first goes straight from on hand to the bank.
 <strong>Close each month</strong> after review so past figures cannot change.
 <strong>Closed periods</strong>
+<strong>Closing Balance:</strong> {0}
 <strong>Collection ratio &mdash; 40%.</strong> Total collected divided by total invoiced. The single strongest signal of a paying tenant.
 <strong>Contract</strong>
 <strong>Conversation</strong>
@@ -101,6 +116,7 @@
 <strong>Deposited</strong> to the bank for collection: the memorandum is reversed and <code>Dr 11450 Cheques Under Collection / Cr the tenant</code> (receivable, or advance).
 <strong>Depreciate an Existing Building</strong>
 <strong>Disbursement, no VAT</strong> &mdash; the supplier invoices the owner and we pay from our cash as the owner's agent. The cost including the supplier's VAT goes to the owner's account as it is; we charge no VAT and reclaim none. The supplier's VAT is on the owner's VAT return.
+<strong>Done:</strong> {0}
 <strong>Draft entries do not affect the accounts.</strong> Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet and General Ledger. Use <strong>Reset to Draft</strong> to pull an entry back out of the accounts and correct it &mdash; this also unwinds what the posting did to the underlying document, such as the amount paid on an invoice. Entries in a <strong>closed period</strong> cannot be posted or reset.
 <strong>Editable</strong>
 <strong>Expenses by Account</strong>
@@ -118,8 +134,10 @@
 <strong>Input tax</strong> comes from posted vendor bills, using the recoverable / irrecoverable split fixed when each bill was posted &mdash; so this report always agrees with the ledger rather than re-deriving it.
 <strong>Keep administrator rights to as few people as possible</strong> and give owners Owner Oversight rather than full rights where they only need to watch.
 <strong>Landlord KPI</strong>
+<strong>Lease Scope:</strong> {0}
 <strong>Location</strong>
 <strong>Maintenance and expenses charged to the owner</strong>
+<strong>Maintenance requests are on hold.</strong> {0} You can still send other requests, such as asking for more time to pay.
 <strong>Messages</strong>
 <strong>Monthly Depreciation Run</strong>
 <strong>My Cheques</strong>
@@ -130,10 +148,12 @@
 <strong>No opening balances have been entered.</strong> That is correct if this company started from nothing. If you are migrating from another system, enter each account's balance below &mdash; and remember that every debit needs a matching credit, or the Trial Balance and Balance Sheet will not balance.
 <strong>No owner equity account is configured.</strong> Open <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the equity account you want to use for owner drawings (the standard chart seeds <code>34100 Owner's Current Account</code>), and set <strong>Owner Account</strong> to <em>Yes</em>. Until then the owner withdrawal dimension is inactive and this report has nothing to show.
 <strong>No petty cash float is configured.</strong> Open <strong>Setup &rsaquo; Chart of Accounts</strong>, edit the asset account you use for petty cash (the standard chart seeds <code>11150 Petty Cash</code>), and set <strong>Petty Cash Float</strong> to <em>Yes</em>. Enter the cash you started with as that account's <strong>Opening Balance</strong>.
+<strong>Notes:</strong> {0}
 <strong>Occupancy</strong> &mdash; units with status <em>Occupied</em> divided by total units. Driven by unit status, which is set automatically when a lease becomes active.
 <strong>One person, one login.</strong> Never share accounts &mdash; the audit trail is only as good as the logins behind it.
 <strong>Open</strong>
 <strong>Opening Balance (brought forward)</strong>
+<strong>Opening Balance:</strong> {0}
 <strong>Opening balance</strong> is the cash you started with, entered on the account in the Chart of Accounts.
 <strong>Opening balances are not balanced.</strong> Total debit opening balances must equal total credit opening balances for the Trial Balance and Balance Sheet to remain in balance from day one. Review the manual opening balance on the equity / retained earnings account (or the contra account you use for the opening journal) so that the difference is zero.
 <strong>Output Tax &mdash; Supplies Made</strong>
@@ -150,6 +170,7 @@
 <strong>Payments Received</strong>
 <strong>Payments</strong>
 <strong>Payroll and salary advances</strong>
+<strong>Period:</strong> {0} to {1}
 <strong>Petty cash counts</strong> by surprise at least monthly, matched to the vouchers in the system.
 <strong>Please note.</strong> This is a request, not an agreement. The amount you owe does not change, and the current due date stays in force unless and until we confirm otherwise. We will reply here.
 <strong>Printer offset</strong>
@@ -171,7 +192,9 @@
 <strong>Rent gap</strong> &mdash; annualised revenue forgone. This is the number to attack first.
 <strong>Rent realisation</strong> &mdash; contracted against standard. Below 100% means vacancy or leases signed below the asking rent; above 100% means units are let above asking.
 <strong>Repeat Floors Up the Building</strong>
+<strong>Returned by {0}</strong> on {1}: “{2}” Correct it and submit it again.
 <strong>Review Business Performance and the Owner Monitor weekly</strong>: results, collections, large postings, payments released, old drafts. Administrators check the Audit Logs.
+<strong>Review Year {0} ({1} - {2})</strong>
 <strong>Roles and permissions</strong>
 <strong>Running contracts without an attested copy</strong>
 <strong>Sent &mdash; awaiting the provider's answer</strong>
@@ -181,18 +204,28 @@
 <strong>Setup Readiness</strong>
 <strong>Sign-in protection</strong>
 <strong>Standard rent</strong> &mdash; the sum of each unit's asking rent. <strong>Contracted rent</strong> &mdash; the annual rent on leases active at the as-of date.
+<strong>Statement Period:</strong> {0} to {1}
 <strong>Summary</strong>
 <strong>Switch payment approval on</strong> for every live company, and set limits that suit the business.
+<strong>TRN {0}</strong>
 <strong>Tax invoices cannot be issued yet.</strong> A tax invoice must show the supplier's TRN and address. Fill both in below and save.
+<strong>Tax period:</strong> {0} to {1}
 <strong>Tenant</strong>
 <strong>Tenants with a running contract and no Emirates ID expiry</strong>
 <strong>Tenure &amp; commitment &mdash; 15%.</strong> Years occupied, capped at five years (70% of the component), plus current contract length, capped at 36 months (30%).
 <strong>The invoice</strong>
+<strong>The memorandum entry is in a closed period ({0}).</strong> The received date cannot be changed while that period is closed &mdash; moving a posted entry out of a closed period would alter figures that have already been reported. Reopen the period first, or leave the date as it is.
 <strong>The owner's properties</strong>
 <strong>The request</strong>
 <strong>This credit note</strong>
 <strong>This password is shown once and cannot be retrieved.</strong> It is stored only as a hash. If it is lost, issue a reset from this page, which produces a new one. The tenant must change it the first time they sign in.
 <strong>Title Deed &amp; Land</strong>
+<strong>Today:</strong> {0}
+<strong>Total Charges:</strong> {0}
+<strong>Total Credit:</strong> {0}
+<strong>Total Credits:</strong> {0}
+<strong>Total Debit:</strong> {0}
+<strong>Total Noted PDC:</strong> {0}
 <strong>Transfer on Completion</strong>
 <strong>Transfers between cash accounts are excluded</strong> &mdash; topping up petty cash from the bank moves cash between pockets, it is not a cash flow.
 <strong>Unallocated column present.</strong> Some revenue or expense lines carry no property dimension &mdash; most commonly manual journals posted without a unit / cost centre. Reopen those journals and set the unit so the amount is attributed to a property. The matrix total always reconciles to the general ledger Profit &amp; Loss for the same dates, whether or not lines are allocated.
@@ -200,15 +233,24 @@
 <strong>Update</strong>
 <strong>Upload a Document</strong>
 <strong>Upload a Photo</strong>
+<strong>VAT:</strong> completed on {0}. The first sale or lease of each residential unit is zero rated if made by <strong>{1}</strong> {2}. Later supplies of residential units are exempt.
 <strong>Vacant units are included</strong> with their asking rent, because the empty ones are usually the owner's first question. Untick the box to hide them.
 <strong>Vendor bank details</strong>: confirm any change by phone on a known number before paying &mdash; the most common fraud is a fake "new bank account" email.
+<strong>What happened:</strong> {0}
 <strong>Withdrawals by Category</strong>
 <strong>Withdrawals over Time</strong>
 <strong>Withdrawn</strong> by the tenant before deposit: the memorandum is reversed, the cheque stays here as withdrawn, and the withdrawal charge is invoiced to the tenant.
 <strong>You cannot skip a step.</strong> Each screen selects a record created by the one before it &mdash; there is no unit without a property, no lease without a unit and a tenant, no invoice without a lease, and no receipt without an invoice. If a dropdown is empty, the previous step has not been completed.
 <strong>You have not made any requests yet.</strong>
 <strong>Your account is fully settled.</strong> There is nothing outstanding.
+<strong>{0}</strong> &mdash; tenancy schedule as at {1}
+<strong>{0}</strong> &mdash; the identity printed on every e-invoice, the provider it is sent through, and the date it starts.
+<strong>{0}</strong> &middot; TRN {1} &middot;
+<strong>{0}</strong> ({1})<br /> Statement {2} to {3}
+<strong>{0}</strong> up to {1} until {2}
+<strong>{0}</strong><br /> Statement of Cash Flows for the period {1} to {2}<br /> Amounts in {3}
 A <strong>Managed</strong> property is grouped under the landlord named on the property record, with the management commission shown.
+A building brought in as an opening balance is not depreciated until it is set up here. Split its carrying amount into <strong>land</strong> (never depreciated) and <strong>building</strong>, and give the building's remaining useful life. If it was depreciated in a previous system, enter the building's carrying amount (cost less depreciation so far). Ticking <em>allocate</em> also moves that amount out of the unallocated opening balance ({0} not yet allocated) and onto the property, so the note shows it against the building.
 A building costing <strong>AED 5 million or more</strong> before VAT is a capital asset for VAT. The input tax recovered on it is reviewed every year for <strong>ten years</strong>: if the building is used more for exempt supplies than when the tax was recovered - typically a residential building whose zero-rated first leases are followed by exempt ones - part of the tax is paid back; if it is used more for taxable supplies, more can be recovered. Each year's adjustment goes in the VAT return after the year ends.
 A building under construction collects its costs - land, design, permits, contractors, supervision and borrowing costs - in a work-in-progress account chosen by what it is for: <strong>for sale</strong> (inventory), <strong>for rental</strong> (investment property) or <strong>own use</strong> (fixed asset). Tag supplier bills and journals to the project and the cost to date below is read straight from the ledger.
 A category that has already been used cannot be removed, because posted journals reference it. Deactivate it instead — it then disappears from the General Journal selector while its history stays intact.
@@ -222,6 +264,7 @@ A float is an ordinary asset account flagged as <em>Petty Cash Float</em>. Flag 
 A journal is saved as a <strong>Draft</strong> and has no effect on the accounts until you press <strong>Post</strong>. Only posted entries appear in the Trial Balance, Profit &amp; Loss, Balance Sheet and General Ledger.
 A list of records
 A managed property with no landlord recorded is flagged rather than quietly grouped with the company's own portfolio — fix it on the property record.
+A new contract is a <strong>Draft</strong> until it is {0} - only then are its invoices created and its terms locked.
 A payroll approver approves it.
 A positive balance is an amount you owe; a negative balance means you are in credit. Cheques appear as a payment on the date they cleared, not the date you handed them over. If anything here looks wrong, contact your property manager.
 A replenishment posts <strong>Dr petty cash / Cr bank or cash</strong> &mdash; the float rises and no expense is recorded, because topping up is a transfer, not a cost.
@@ -242,6 +285,7 @@ Accepted
 Access Denied
 Access Notes
 Access Until
+Access for <strong>{0}</strong> has been suspended. Please contact your service provider.
 Access for this company has been suspended by your service provider. Your records are safe and unchanged. Please contact them; access returns as soon as they reactivate the company or you enter a new activation code below.
 Account
 Account <code>39999</code> Opening Balance Control Account has not been created yet. Restart the application and it will be added automatically, after which the reports will balance and this figure will appear there instead.
@@ -267,6 +311,7 @@ Accumulated Depreciation Account
 Accumulated Depreciation Default
 Acknowledge — I have seen it
 Acknowledged
+Acquired {0}
 Acquisition
 Acquisition Date
 Action
@@ -281,6 +326,7 @@ Active
 Active Lease
 Active Leases
 Active Tenant
+Active leases: {0}
 Active staff
 Activity
 Actual
@@ -303,6 +349,7 @@ Add the rentable units inside the property.
 Add: VAT on rent invoiced in the owner's name (the owner's to pay to the FTA)
 Added to cost
 Added to cost (irrecoverable)
+Additional input tax recoverable
 Additions
 Additions and deductions per employee. Approved ones are paid by the next payroll; draft payrolls update by themselves.
 Address
@@ -314,6 +361,7 @@ Administration
 Administrator of this company
 Advance
 Advance (down payment)
+Advance (down payment, special G/L)
 Advance open
 Advance to apply
 Advance to repay
@@ -324,10 +372,12 @@ Advice
 Affects <strong>new</strong> leases only. Invoices already issued keep their original treatment.
 After registration, the system signs you in automatically and opens your new company with the active trial.
 Against invoice
+Against invoice <strong>{0}</strong> of {1} &mdash; {2}, {3}, contract {4}.
 Age
 Agreement Rent
 All
 All Leases
+All amounts in {0}. Collections are receipts plus cleared cheques. Detailed reports are under Reports.
 All buildings
 All decisions
 All employees
@@ -353,6 +403,7 @@ Always the owner's account - it cannot be changed here.
 Amortise prepaid expenses.
 Amount
 Amount (incl. VAT)
+Amount ({0})
 Amount in figures
 Amount in words
 Amount owed to this vendor at the opening cut-off date (positive = payable, negative = advance paid). Feeds the Accounts Payable control account.
@@ -364,6 +415,7 @@ An approval is bound to the exact amount approved. If anyone edits the entry aft
 An approver decides. Once corrected, the period is closed again through the checklist.
 An approver reviews it and approves or turns it down with a reason. <strong>Nobody approves what they entered.</strong> Petty cash always needs a second person.
 An expense voucher posts <strong>Dr expense account / Cr petty cash</strong> &mdash; the float falls and the cost lands in the Profit &amp; Loss.
+An item from the store is posted out of account {0} at once. A bought item is costed by its bill or petty cash voucher.
 An owner can grant a manager a higher limit for a fixed period (up to 180 days) with a reason. It ends automatically and can be revoked early; it can never exceed the owner's own limit. Every delegation shows on the Owner Monitor.
 Annual
 Annual Apportionment Wash-Up
@@ -374,7 +426,9 @@ Annual leave days a year
 Annual leave left
 Annual rent
 Anything worth recording against this bill
+Applications of this advance to bills
 Applied
+Applied at this start: <strong>{0}</strong>
 Applied automatically
 Applied to
 Applied to bills
@@ -384,9 +438,11 @@ Apply Advance to Bills
 Apply Code
 Apply advance to bills
 Apply and Post
+Apply new due date to {0}
 Apply the limits to contracts too
 Apply to bills
 Applying a new activation code also lifts the suspension.
+Appoint a provider by <strong>{0}</strong>; mandatory from <strong>{1}</strong>.
 Approval Limits
 Approval Limits & Delegation
 Approval history
@@ -402,6 +458,7 @@ Approve payroll
 Approve selected
 Approved
 Approved by
+Approved by {0}
 Approving a payroll posts it to the ledger, so the approver's limit must cover the total net pay. Salary advances are checked the same way. Payslips reach employees only after approval.
 Arabic name
 Are backups taken?
@@ -413,6 +470,7 @@ Area Util.
 Area Utilization
 As Of Date
 As at
+As its group / standard default
 As of
 As on the trade licence
 As printed on their invoice
@@ -441,10 +499,13 @@ Assigned to
 Assistant
 At each month end, issue one tax invoice to every landlord for the commission earned that month, plus 5% VAT. The VAT is taken from the owner's money (Due to Landlords) and goes to VAT Payable, so it is in that month's VAT return. Run it after the month's revenue recognition is posted. Commission already invoiced is never invoiced again.
 At least 8 characters.
+At least {0} characters, with upper and lower case letters and a digit, and not containing your username.
+At least {0} characters, with upper and lower case letters and a digit.
 At risk
 Attach a scanned supplier invoice (PDF, JPG, PNG)
 Attendance
 Attendance Summary
+Attendance — {0}
 Attention
 Attributes the cost to a property or unit in the management reports
 Attribution
@@ -495,6 +556,7 @@ Bar chart of withdrawals by category
 Based on posted journal lines and account opening balance.
 Basic
 Basic salary
+Basic {0} · Allowances {1}
 Basis of preparation
 Before VAT; 0 for none. Can be changed on each bounce.
 Before VAT; can be changed on each withdrawal.
@@ -509,6 +571,7 @@ Bill No.
 Bill date
 Bill now
 Bill total
+Bill: {0}
 Billed (Credit)
 Billed in the period
 Billing
@@ -516,6 +579,7 @@ Billing Frequency
 Bills
 Bills are entered as drafts and have no effect on the accounts until posted.
 Bills settled
+Bills settled by this payment
 Bills: VAT in cost
 Bills: net
 Blank if not VAT registered.
@@ -523,6 +587,8 @@ Book
 Book as bill
 Book leave
 Book leave, then approve it. Approved annual leave comes off the balance; approved unpaid leave is deducted by that month's payroll.
+Booked as {0}
+Bought ({0})
 Bought for the job
 Bounced
 Bounced, not yet replaced
@@ -563,6 +629,8 @@ Cancel project
 Cancelled
 Capital Assets Scheme
 Capital Assets Scheme (VAT)
+Capital Assets Scheme adjustment
+Capital Assets Scheme · {0} - {1}
 Capitalizable
 Capitalizable Cost
 Capitalization Date
@@ -571,6 +639,7 @@ Capitalize Asset
 Capitalized
 Capped at two years' basic pay.
 Carrying Amount
+Carrying amount and fair value by property, at {0}
 Cash
 Cash In Hand
 Cash KPI is not available until the default cash account mapping is configured.
@@ -602,10 +671,12 @@ Charge for the period
 Charge this line to the owner of the managed property, with 5% VAT
 Charge to owner
 Charge to tenant (before VAT)
+Charge {0} ({1})
 Charged To
 Charged by approved payrolls, plus any opening provision.
 Charged to (debit)
 Charged to owners
+Charged to {0}
 Chart of Accounts
 Charts and report
 Charts use the groups and totals; for a list, the first text column and first number column.
@@ -613,6 +684,7 @@ Check
 Check the input tax attribution on those draft bills before posting them — once posted, the recoverable and irrecoverable split is fixed in the journal.
 Check the month, then turn it into payroll transactions.
 Checked by
+Checked {0}
 Checklist
 Cheque
 Cheque / transfer ref.
@@ -647,10 +719,12 @@ Choose what to report on, the columns, filters and totals, and show it as a tabl
 Choose what to report on, then select <strong>Run report</strong>.
 Choose your password
 Choose…
+Chq {0}
 City
 Classification: equity counterparts are <em>financing</em>; long-term assets (codes 15000 and above) are <em>investing</em>; everything else is <em>operating</em>.
 Clear
 Clear PDC
+Clear and Post
 Clear search
 Cleared
 Cleared / Returned
@@ -658,7 +732,10 @@ Cleared Date — accounting date
 Cleared on
 Clearing date
 Clearing document
+Clearing {0} day(s) before the cheque date
+Clears every revenue and expense account of the year into retained earnings with one entry on {0}, and carries the balance sheet into {1} as its opening balances.
 Close
+Close fiscal year {0}
 Close the job
 Close the period, then the fiscal year.
 Closed
@@ -680,6 +757,7 @@ Comm. %
 Comment
 Comment (required to turn down)
 Commercial
+Commercial Invoice - no VAT
 Commercial invoice — no input tax.
 Commercial is standard rated; residential leasing is exempt. Units inherit this — set a unit's own treatment only in a mixed-use building.
 Commission
@@ -706,16 +784,19 @@ Completion Transfers
 Completion certificate
 Completion date
 Computed from sub-ledger.
+Confirm and Post
 Consultant
 Contact
 Contact Person
 Continue later using subscription codes
 Contract
 Contract Code
+Contract approval is {0} for this company.
 Contract date
 Contract ends
 Contracted Annual Rent
 Contracted Rent
+Contracted {0} of {1}
 Contracts
 Contracts ending in 90 days
 Contracts ending in the next 90 days
@@ -752,6 +833,7 @@ Costs recharged (posted)
 Count
 Country
 Counts once its entry is posted
+Create
 Create Account
 Create Company
 Create Lease
@@ -770,12 +852,16 @@ Credit Account (Fixed Asset Clearing / CWIP)
 Credit Note
 Credit Notes
 Credit balance owed to the owner
+Credit everything still outstanding ({0})
+Credit note
 Credit note date
+Credit notes: {0}
 Cumulative
 Currency
 Current
 Current (or temporary) password
 Current Contract
+Current Period: {0}
 Current Year Profit / Loss
 Current Year Profit or Loss
 Current due date
@@ -784,21 +870,28 @@ Customer Invoices
 Customer Receipts
 Customer type
 Customs
+D {0} · E {1} · deposits held {2}
 DELETE
+Daily basic pay {0} (basic ÷ 30) × ({1} days for the first five years at 21 days a year + {2} days for later years at 30 days a year) = <strong>{3}</strong>, never more than two years' basic pay. Under UAE law nothing is payable before one year of continuous service.
 Dashboard
 Database Updates
 Date
 Date format
 Date of birth
+Date of issue: {0}
+Date of supply: {0}
+Date: {0}
 Dates
 Day sheet
 Days
 Days Overdue
 Days Remaining
 Days paid
+Deactivate
 Deactivating a category removes it from the General Journal selector but keeps every journal already posted against it, so historical reports are unaffected.
 Deadline
 Debit
+Debits {0} · Credits {1} {2}
 Decide on each bill line
 Decided by
 Decided lately
@@ -815,6 +908,7 @@ Default Direct Expense
 Default General Expense
 Default Property
 Default bank for salaries
+Default cash account
 Delegate
 Delegate authority while you are away
 Delegated authority now:
@@ -826,6 +920,8 @@ Deposit
 Deposit Held
 Deposit ticked cheques on
 Deposit to Bank
+Deposited
+Deposits held {0}
 Depreciate from
 Depreciation
 Depreciation Expense
@@ -841,9 +937,13 @@ Development Projects
 Development cost
 Development project
 Development project (contractor / subcontractor bill)
+Device file columns: <code>EmployeeCode, Date, CheckIn, CheckOut</code> — e.g. <code>EMP-0001, 2026-10-12, 07:58, 17:05</code>. Working day {0}, {1} hours; late after {2} minutes' grace.
 Difference
 DirectExpense
+Disable
 Disable the affected users, change administrator passwords, ask the administrator to rotate the database password, and review the audit log for the period (System Setup › Audit Logs).
+Disbursement
+Disbursement note
 Disposals and other reductions
 Divorced
 Document
@@ -859,6 +959,7 @@ Download PDF
 Download SIF
 Download ready files (ZIP)
 Draft
+Draft (committed)
 Draft - not posted
 Draft Contract
 Draft journals
@@ -867,6 +968,7 @@ Drafts only
 Drag to turn the building, scroll or pinch to zoom, right-drag to move it. Units sit on the side recorded on the unit (front, back, left, right); without one, a floor's units are shared between front and back.
 Drawing style
 Due
+Due - review this year
 Due Date
 Due Lines
 Due Recognition Amount
@@ -884,11 +986,13 @@ E-invoices your suppliers sent through the network. Upload the XML files your pr
 E-invoicing
 E-invoicing is switched off for this company.
 EID expiry
+EID {0}
 Each employee gets the next number in the cheque book.
 Each new version of the application carries its database changes as numbered scripts and applies any it has not applied before, every time the site starts. This page shows what happened at the last start and every script recorded so far.
 Each payroll tops the provision up to what UAE law would pay each employee at the month end.
 Each user only sees the functions assigned by the administrator.
 Each user sees and does only what their permissions allow, company by company. Owners can be given read-only oversight of all reports without being able to change anything.
+Each year: adjustment = input VAT × (taxable use that year − {0}%) ÷ 10. A positive figure is more tax to recover; a negative one is tax to pay back.
 Edit
 Edit Account
 Edit Company
@@ -913,12 +1017,14 @@ Emirate
 Emirates ID
 Emirates ID / ID Number
 Emirates ID expiry
+Emirates IDs, passports, contract and property documents that have expired or expire within {0} days.
 Employee
 Employee Requests
 Employee code
 Employee portal (payslips, leave and certificates on their phone)
 Employee sign in
 Employees
+Enable
 End
 End now
 End of service to date
@@ -930,8 +1036,10 @@ Enter the completion certificate. Its date is copied to the property, where it s
 Enter the missing balance and this account returns to zero on its own. It cannot be cleared by posting a journal — the figure is derived, not stored.
 Enter your username and password to continue.
 Entered
+Entering person may release within own limit: <strong>{0}</strong>
 Entries
 Entry
+Entry #{0} not found
 Entry / document no.
 Entry No.
 Entry Totals
@@ -946,8 +1054,10 @@ Every change made by staff is logged with user, time and address, as are refused
 Every check is green.
 Every e-invoice must say how it is to be paid
 Every invoice and credit note to a business or government tenant must reach your Accredited Service Provider within <strong>14 days</strong> of the supply.
+Every journal entry from {0} to {1}, with its lines and the source it came from.
 Every line becomes a cost of this project, posted to its work-in-progress account.
 Every line posted to an owner account in the period
+Every maintenance job raised by tenants, with who is doing it.
 Every period is closed. The year is ready to close.
 Every period up to today is closed.
 Every process the month needs, checked against the general ledger before the period is locked.
@@ -955,25 +1065,33 @@ Every running contract has its attested copy.
 Every salary in this payroll is paid.
 Every screen's instructions in one place. On any screen, the <strong>Help</strong> button at the top right opens just that screen's topic.
 Every tenant scored on collections, overdue exposure, cheque reliability and tenure — ranked best first.
+Every {0} month(s)
 Everything between the browser and the server travels over HTTPS. Passwords are stored only as one-way hashes. The database sits with the hosting provider behind its own login, which the application holds as a server-side secret.
 Everything tenants have raised through the self-service portal.
+Everything the UAE format requires is in place.
 Example: an accountant on Data Entry records a 7,500 maintenance payment. It needs the Owner level, so a Manager (limit 5,000) cannot release it; the Owner sees it on Business Performance and approves it from their phone or laptop.
 Exempt
 Exempt supplies (residential rent)
 Exempt supplies for the year
+Exp: {0}
 Expected completion
 Expense
 Expense Account
+Expense: {0}
 Expenses
 Expenses and recoverable VAT.
+Expenses {0}
 Expired
 Expired Subscriptions
+Expired {0} day(s) ago
 Expired:
 Expires
+Expires in {0} days
 Expiring 90d
 Expiring Documents
 Expiring In 15 Days
 Expiring within 60 days:
+Expiring within {0} days
 Expiry
 Expiry date
 Explanation (printed on the credit note)
@@ -987,10 +1105,12 @@ Feedback
 Feedback Review
 Female
 Field
+Figures on the invoice: net <strong>{0}</strong>, VAT <strong>{1}</strong>, total <strong>{2}</strong>.
 File
 File (PDF, JPG or PNG, up to 5 MB)
 File (PDF, JPG, PNG, 5 MB)
 Fill in the company details and the first admin account.
+Fill these in before e-invoices can be generated.
 Fills this company with a fictional year of business, from the start of the fiscal year to today: owned and managed properties, tenants, leases, receipts, cheques, deposits, supplier bills, petty cash, journals, VAT, prepayments, fixed assets and tenant requests, property documents, development projects, unit sales and a handover, a contract awaiting approval, the Capital Assets Scheme and e-invoices sent and received, so every screen and report has something to show. It only works on a company with no properties, tenants, vendors, leases or journals yet, and takes up to a minute.
 Filter
 Finance Cost
@@ -1005,6 +1125,7 @@ First used on (year 1 starts)
 Fiscal Start
 Fiscal year
 Fiscal year closing history
+Fiscal year {0} has ended but is not closed: its profit or loss is not yet in retained earnings.
 Five wrong passwords lock an account for 15 minutes, stopping password guessing from the internet. The default ADMIN password and any password set by an administrator must be changed at first sign-in. New passwords need at least 10 characters with upper and lower case letters and a digit.
 Fixed
 Fixed Asset Acc. Dep.
@@ -1058,13 +1179,17 @@ General Journal
 General Ledger
 General ledger revenue and expenses analysed over the property dimension carried on each journal line.
 GeneralExpense
+Generate
 Generate Code
 Generate all
+Generate for {0}
 Generate from attendance
 Generate payroll transactions
 Generated Code
 Generated automatically on save &mdash; ownership, property type, then a sequence (<code>OWN-R-0001</code>). Units and contracts are built on top of it, so it cannot be typed or changed.
+Generated on save
 Generated, ready to send
+Give portal access
 Go
 Goes to
 Grade
@@ -1100,6 +1225,7 @@ How an approval travels
 How it works
 How owners are decided
 How petty cash works here
+How the business is doing, and what is waiting for your decision. Figures from posted entries, {0}.
 How the health score is calculated
 How the network and your customers identify you
 How these measures are built
@@ -1108,19 +1234,27 @@ How to read this
 How to use your portal
 How urgent is it?
 I confirm this cheque was honoured on the cleared date shown above.
+I have reviewed the {0} amber warning(s); they are recorded with the close.
 IBAN
 ID Number
 IP
 Identified by
 If different from the trading name
+If the cleared date is simply wrong, correct it above. If the cheque genuinely was presented and honoured early — by agreement with the tenant, for example — tick below and post. The cash entry will be dated {0}.
+If you report it, quote this reference: <code>{0}</code>
+Ignore
 Import
 Import device file (CSV)
 In
+In Credit
 In Service
 In Service Date
 In ledger
 Inactive
+Included in this version but not applied ({0})
+Includes {0} irrecoverable VAT ({1})
 Income statement line
+Index
 Inherit from property
 Initial Acquisition Cost
 Input Tax
@@ -1129,6 +1263,8 @@ Input VAT
 Input VAT charged
 Input VAT recovered
 Input tax (on our invoices to the owner)
+Input tax of {0} {1}: {2} recoverable, {3} charged to cost.
+Input tax to repay
 Installation
 Insurance expiry
 Insurer
@@ -1149,7 +1285,10 @@ Irrecoverable
 Irrecoverable VAT is not lost from the accounts — it was added to the expense account when each bill was posted, so it already sits in the Profit & Loss as part of the cost.
 Is the data encrypted?
 Issue
+Issue Access
+Issue Commission Invoices at {0}
 Issue date
+Issue portal access
 Issued
 Issued by
 It appears in <strong>Payment Approvals</strong> / <strong>Contract Approvals</strong> and on the <strong>Business Performance</strong> page of everyone whose limit covers it.
@@ -1160,9 +1299,11 @@ Job
 Job and contract
 Job title
 Jobs
+Jobs raised from {0} to {1}, and every job still open.
 Jobs received
 Jobs still open
 Joined
+Joined {0}
 Joined · Probation ends
 Joining date
 Journal
@@ -1171,6 +1312,8 @@ Journal Inquiry
 Journal Lines
 Journal entry
 Journal type
+Journal {0}
+Journal {0} dated {1} {2}
 Kind
 Kind of cost
 Kind of cost, for the owner's reports
@@ -1187,6 +1330,7 @@ Landlords — Managed Properties
 Large if over
 Last Login
 Last Reviewed
+Last change: {0}
 Last name
 Last net salary
 Last sign in
@@ -1218,7 +1362,9 @@ Leave the limit blank for no limit (the owners' level). A payment goes to the lo
 Left
 Legacy balances. Must net to zero.
 Lender, mortgage reference, amount
+Less credit notes — {0}
 Less: VAT on commission
+Less: VAT on our commission ({0}%)
 Less: already paid to the owner
 Less: cost of revenue
 Less: finance costs
@@ -1226,6 +1372,7 @@ Less: maintenance and expenses charged to the owner
 Less: management commission
 Less: our commission
 Less: paid to you before
+Less: {0}
 Let
 Letter to bank
 Level
@@ -1234,6 +1381,8 @@ Liabilities
 Liabilities + Equity
 Liabilities and equity (credit side)
 Liability
+Licence {0}
+Limits apply to contracts: <strong>{0}</strong>
 Line
 Line Memo
 Line Total
@@ -1279,6 +1428,8 @@ Managed
 Managed only
 Managed properties only, if the owner is VAT registered. Printed on our commission tax invoice.
 Managed properties only. Rent invoices show the owner as supplier with the owner's TRN; when the owner has no TRN no VAT is charged. The rent VAT is the owner's and stays off our VAT return; our commission is invoiced to the owner under our TRN. Applies to contracts and invoices posted after it is switched on.
+Managed properties, {0} to {1}: what each property earned its owner, and what it earned us in commission.
+Managed: {0}
 Management Dashboard Snapshot
 Management Fee Revenue
 Management — Owners
@@ -1289,6 +1440,7 @@ Manual OB
 Mapped cash account
 Mapped landlord liability account
 Marital status
+Mark Units: {0}
 Mark as done
 Mark complete
 Mark the day for everyone, or import the file from your time-attendance device.
@@ -1330,13 +1482,17 @@ Monthly recovery
 Months
 Mortgage
 Most dot matrix printers print 10 characters and 6 lines to the inch in their text mode. Print the downloaded file with the printer's <strong>Generic / Text Only</strong> driver (for example <code>copy cheques.txt LPT1</code>, or Notepad set to that printer), with the paper length set to the cheque height.
+Movement in the carrying amount, {0} to {1}
 Movements
 Movements on the owner's equity account, analysed by what the money was spent on — without touching the company's expense accounts.
 Moves the project from planning to under construction. Recording the first cost does this too.
+Moves the {0} still in work in progress to where each unit now belongs, shared by area. Units for <strong>sale</strong> go to 13200 Completed Properties Held for Sale at cost. Units for <strong>rental</strong> go to 15100 Investment Property and units for <strong>own use</strong> to 15200 Fixed Assets; for both, the land part is never depreciated and the building part is entered in the fixed asset register and depreciated monthly over the useful life below (cost model). This is posted at once and cannot be reset.
 Mute
 My Account
 My Contracts
 My Invoices
+My Jobs
+My Maintenance Jobs
 My Payments
 My Profile
 My Requests
@@ -1361,20 +1517,31 @@ Net Margin %
 Net Movement
 Net Posted
 Net Profit / (Loss)
+Net VAT Payable
+Net VAT Reclaimable
+Net VAT payable
+Net VAT refundable
+Net VAT {0}
 Net amount to credit
 Net cash from financing activities
 Net cash from investing activities
 Net cash from operating activities
 Net income
 Net increase / (decrease) in cash
+Net movement {0}
 Net profit / (loss)
 Net profit this year
+Net {0}
+Net {0} to retained earnings
+Never
 New
 New Account
 New Bill
 New Category
+New Credit Note
 New Customer Onboarding
 New Customer?
+New Development Project
 New Expense Voucher
 New Manual Journal
 New Owner Withdrawal Category
@@ -1383,6 +1550,7 @@ New Project
 New Receipt
 New Request
 New Sale Contract
+New Vendor Bill
 New Vendor Payment
 New cheque
 New customer onboarding now starts from the login page. Use this internal screen only for additional company records under administration and future branch-style expansion.
@@ -1390,6 +1558,7 @@ New department, e.g. Building Maintenance
 New password
 New request
 New transaction
+New: {0}
 Next free <code>TNT-00001</code> in sequence.
 Next free <code>VEN-0001</code> in sequence.
 Next payment due
@@ -1407,6 +1576,7 @@ No active lease
 No activity
 No activity in this period.
 No advances.
+No approvals yet.
 No attested contract is on file for this contract yet.
 No audit records found.
 No authority
@@ -1416,6 +1586,7 @@ No changes yet.
 No cheques on record.
 No commission invoiced to this owner yet. Invoices are issued at month end from the Owner Settlements page.
 No commission invoices yet.
+No commission waiting to be invoiced up to {0}.
 No company subscriptions are close to expiry.
 No contracts on record.
 No contracts on this owner's properties up to this date.
@@ -1440,6 +1611,7 @@ No jobs to show.
 No journal entries match these filters.
 No journal entry has been created yet
 No leave yet.
+No limit
 No linked invoice
 No maintenance user is set up, so new jobs wait unassigned. Create one in System Setup &gt; Users with <strong>Carry Out Maintenance Jobs</strong>.
 No managed properties for this selection.
@@ -1454,6 +1626,7 @@ No operating cash movements in this period.
 No owner of a managed property has a TRN recorded. Owners who are not VAT registered do not file a return.
 No payments recorded yet.
 No payroll yet.
+No payslip yet
 No petty cash activity in this period.
 No photos yet.
 No portal login yet.
@@ -1502,19 +1675,26 @@ Not every property has a fair value recorded. IAS 40 requires the fair value of 
 Not in any project:
 Not journalised
 Not journalised yet
+Not over yet
+Not posted
 Not property specific
 Not realistically. After five wrong attempts the account locks for 15 minutes, passwords must be strong, and default passwords have to be changed at first sign-in. Use a different password for this system than for email.
 Not recorded
 Not set
 Not started
+Not used
+Not yet paid
 Not yet payable: less than one year.
+Note
 Noted Items PDC
 Notes
 Notes (optional) - e.g. how the taxable use was worked out
 Nothing awaiting an answer.
+Nothing expires within {0} days.
 Nothing here.
 Nothing in this period.
 Nothing is due to this owner at this date.
+Nothing is waiting for approval.
 Nothing is waiting for you.
 Nothing is waiting.
 Nothing matches every word you typed. Try fewer or different words, or browse the topics below.
@@ -1531,6 +1711,7 @@ Occ.
 Occupancy
 Occupancy, leased area and rent realisation for every property as at the selected date.
 Occupied
+Occupied: {0}
 Off = every payment needs a second person. Petty cash always needs a second person.
 Office
 Offset Account
@@ -1538,6 +1719,7 @@ Oldest (days)
 On A4
 On approval it posts to the accounts (or the contract takes effect). Every step is recorded with who and when.
 On leave
+On {0} of standard rated supplies
 Once a month is closed, nothing can be posted into it. Reopening needs a request and a separate approver.
 One year's share
 Only costs directly needed to complete the building belong here. Marketing, sales commissions, show-flat running costs and general overheads are expenses, not project cost.
@@ -1553,6 +1735,7 @@ Open
 Open A/R
 Open Account Mappings
 Open Balance Sheet
+Open Bills at {0}
 Open Closing Cockpit
 Open Items
 Open Leases
@@ -1570,8 +1753,10 @@ Open bills
 Open building
 Open for
 Open full page
+Open invoices: {0}
 Open items only
 Open original document
+Open periods: {0}
 Open the account
 Open the asset
 Open the draft contract
@@ -1595,6 +1780,7 @@ Opening balance
 Opening balance is computed from sub-ledger detail
 Opening balances are complete and balanced.
 Opening balances are incomplete.
+Opening balances carried into {0} ({1} accounts)
 Opening balances exist on revenue or expense accounts
 Opening gratuity provision
 Opening leave balance (days)
@@ -1628,6 +1814,9 @@ Outstanding is from posted invoices only; drafts carry no ledger balance.
 Over 90 days
 Overdue
 Overdue rent by age
+Overdue {0} day(s)
+Overdue: {0}
+Overridden: {0}
 Override — Exempt
 Override — Standard rated (5%)
 Override — Zero rated (0%)
@@ -1642,6 +1831,7 @@ Owned
 Owned and Managed
 Owned only
 Owned units not already under a sale contract. Off-plan units can be sold before completion; handover needs the unit's cost transferred to held for sale.
+Owned: {0}
 Owner
 Owner (VAT registered)
 Owner Account
@@ -1668,6 +1858,7 @@ Owner's Combined View
 Owner's Share
 Owner's Share Collected
 Owner's net income
+Owner's net income = rent billed less our commission, the VAT on it ({0}%) and maintenance and other costs charged to the owner. VAT on rent invoiced in an owner's name is collected for the owner and is the owner's to declare; it is not income. Our own profitability by property is in the Profit & Loss by Property report.
 Owner's share
 Owners
 Owners' net income
@@ -1690,16 +1881,19 @@ Paid (Debit)
 Paid / Payable From
 Paid From
 Paid Until
+Paid ahead of bills and held on 11550 Advances to Suppliers until applied (SAP special G/L "A"). Open advances: <strong>{0}</strong> - the vendor owes this in goods or services.
 Paid before any bill (SAP special G/L "A" down payment). It is recorded on <strong>11550 Advances to Suppliers</strong>, not in Accounts Payable, and stays open until you apply it to the vendor's bills from <em>Vendor Payments ▸ Apply advance</em>. If the supplier issues a tax invoice for the advance, record it as a vendor bill instead so its VAT can be recovered.
 Paid by
 Paid from
 Paid from (credit)
 Paid from / moved from
 Paid from / to
+Paid in full
 Paid in the period
 Paid now
 Paid or credited
 Paid otherwise
+Paid so far
 Paid to Owner
 Parent Account
 Parking
@@ -1712,12 +1906,14 @@ Password
 Passwords are never stored — only a salted PBKDF2-SHA256 hash with 100,000 iterations. Nobody, including the developer, can read a user's password.
 Past target
 Past the 14-day deadline
+Past the target time for this priority
 Path
 Pay
 Pay an advance
 Pay now
 Pay open bills
 Pay salaries
+Pay the full balance ({0}) or any part of it. The amount starts at what has been collected from tenants ({1}); paying more advances the owner rent that tenants still owe us. Saving posts the payment straight away: Due to Landlords goes down and the bank account is credited.
 Payables — Vendors
 Payee
 Payment
@@ -1727,6 +1923,7 @@ Payment Plan
 Payment date
 Payment method
 Payment number
+Payment of open bills
 Payment request
 Payments
 Payments Received
@@ -1742,6 +1939,7 @@ Payroll
 Payroll Runs
 Payroll Settings
 Payroll Transactions
+Payroll for {0} {1}
 Payroll settings
 Payslip
 Payslips
@@ -1782,6 +1980,7 @@ Portfolio Total
 Portfolio, collections, liabilities, and tenant activity in one operational view.
 Post
 Post Adjustment
+Post All Drafts ({0})
 Post All Due Up To Selected Date
 Post Due Depreciation
 Post Replenishment
@@ -1801,13 +2000,17 @@ Posts every draft matching the filter above. Entries in a closed period are skip
 Pre-fills new lines. Each line may differ.
 Preferred visit
 Preferred visit date
+Preferred visit date: {0}
 Prepaid Asset Account
 Prepaid Expense Default
 Prepaid Insurance
 Prepaid Rent
+Prepaid: {0}
 Prepare payroll
 Prepare the month, have it approved, then pay by WPS, bank transfer or cheque.
 Prepared by
+Prepared by {0} on {1}.
+Prepared by {0} {1}
 Prepared on the <strong>direct method</strong>, which IAS 7 encourages. Every movement is taken from the ledger and classified by the account on the other side of the journal, so the statement reconciles to the cash accounts by construction.
 Prepared · Approved
 Prepayments
@@ -1820,12 +2023,16 @@ Print "A/C Payee Only"
 Print Dashboard
 Print register
 Print statement
+Print the tax invoice
 Print this topic
 Print — laser / inkjet
 Printed on every tax invoice
+Printed on {0}
+Printed {0}
 Priority
 Privacy
 Probation ends
+Profit
 Profit & Loss
 Profit & Loss by Property
 Profit / Loss
@@ -1842,13 +2049,16 @@ Property / Unit
 Property Code
 Property Utilization
 Property and Unit Hierarchy
+Property management commission for {0}{1}.
 Property record
 Provide for end-of-service gratuity every month
 Provided in the accounts
 Provider ref
 Provider's answer
 Provider's batch / upload reference (optional)
+Provider: <strong>{0}</strong> &middot; e-invoicing supplies from <strong>{1}</strong> &middot; {2}
 Provisional rate applied during the year
+Provisional {0}%
 Purchase
 Purpose
 Purpose (optional)
@@ -1860,6 +2070,7 @@ Quantity
 Quarterly
 Re-apply the scope rules after changing settings or a tenant's customer type
 Re-assess
+Re-enable access
 Reactivate
 Read a scanned invoice
 Read invoice
@@ -1875,6 +2086,7 @@ Reason
 Reason (optional)
 Reason For Override
 Reason for leaving
+Reason given by the bank
 Recalculate from employee records
 Receipt
 Receipt no.
@@ -1894,7 +2106,9 @@ Received E-Invoices
 Received from suppliers
 Received into
 Recent Company Feedback
+Recharge
 Recharges to Owners
+Recognises the sale: {0} to revenue, advances received applied, any unpaid balance (with its VAT) becomes a receivable from the buyer, and the unit's cost ({1}) goes to cost of sales. Posted at once; it cannot be reset.
 Recognition Months
 Recognized
 Record a Withdrawal
@@ -1904,6 +2118,7 @@ Record manually
 Recorded
 Recorded before clearing documents
 Recorded in
+Recorded. {0}
 Recoverable
 Recoverable at the actual rate
 Recoverable input tax
@@ -1912,12 +2127,15 @@ Recovered at the time
 Recovery Rate
 Recurring Prepayments
 Reduce or cancel this invoice. Once it has been e-invoiced, a credit note is the only way.
+Ref {0}
 Reference
 Reference (optional)
 Reference Number
+Reference: {0}
 Refresh
 Refundable deposit held as a liability.
 Refunded
+Regenerate
 Register
 Register Payment
 Register the building. Owned or Managed.
@@ -1928,6 +2146,7 @@ Reject selected
 Rejected
 Rejection reason
 Released / decided by
+Released within own limit
 Releases one month of rent at month end.
 Releases up to
 Remaining
@@ -1949,11 +2168,14 @@ Rent Realisation
 Rent billed
 Rent billed (before VAT)
 Rent billed to tenants to date (before VAT)
+Rent collected on your behalf for your managed properties, up to {0}.
+Rent of {0} is invoiced by the company itself, not in the owner's name, so it is on the company's return and not here. Switch on <em>Invoice tenants in the owner's name</em> on the property to change that.
 Rental Revenue - Owned
 Rental and own-use buildings from Development Projects, completed, costing AED 5 million or more. The input VAT comes from the project's posted supplier bills.
 Rental and own-use units only.
 Reopen
 Reopen asked
+Reopen requests for {0}
 Reopen requests waiting for a decision
 Reopened - close again
 Reopened - to close again
@@ -1977,6 +2199,8 @@ Required when resolving or declining. The tenant reads this.
 Required when the source account is Accounts Payable.
 Reserved
 Reset
+Reset Access
+Reset password
 Reset to Draft
 Resetting generates a <strong>new</strong> temporary password and invalidates the old one. Use it when a tenant is locked out or has forgotten their password.
 Residence visa
@@ -1990,6 +2214,7 @@ Response to the tenant
 Rest days
 Rest-day / holiday overtime rate
 Rest-day OT h
+Restore
 Result
 Results, collections, occupancy, and what waits for your decision.
 Retained Earnings - Prior Years
@@ -1998,6 +2223,7 @@ Return to draft for a correction
 Return to login
 Returned
 Returned cheque charge
+Returned {0}
 Revenue
 Revenue Recognition
 Revenue and Expense Accounts
@@ -2006,6 +2232,7 @@ Revenue and expenses, last 12 months
 Revenue is shown as credits less debits; expenses as debits less credits. A negative figure therefore indicates a reversal or reclassification in the period.
 Revenue recognised at handover
 Revenue this year
+Revenue {0}
 Reverse into account
 Review
 Review Feedback
@@ -2035,9 +2262,12 @@ Salary advances
 Salary and payment
 Salary bank name
 Salary bank routing code
+Salary cost posted on {0}; pay on or after that date.
+Sale Contract {0}
 Sale and purchase agreements for units. Payments before handover are held as <strong>advances from buyers</strong>; at <strong>handover</strong> the price becomes revenue and the unit's cost moves from completed properties held for sale to cost of sales. The VAT treatment is set when the contract is signed: the first sale of a new residential unit within three years of completion is zero rated, later residential sales are exempt, commercial units are standard rated.
 Sale price
 Sale price (before VAT)
+Same account as the invoice ({0})
 Sample Data for Training
 Save
 Save & Post
@@ -2141,6 +2371,7 @@ Show / Hide Advanced References
 Show Completed
 Show Posted
 Show at most
+Show decided too
 Show or hide the owner withdrawal category column
 Show vacant units
 Shows current posted balance due to landlords.
@@ -2153,10 +2384,14 @@ Sign out
 Single
 Skipped
 Some working days have no attendance recorded. They are treated as worked; complete the day sheets first if that is not right.
+Something went wrong while opening {0}. Nothing was saved by this request.
 Sort Order
 Source
 Source Document
 Source Type
+Source: <strong>{0}</strong>
+Source: {0}
+Spend per development project as at {0}: the supplier's net price, VAT taken into cost, VAT recovered, what is committed and paid, and the WIP reconciliation. Amounts in {1}.
 Spent
 Spent on
 Split 20 / 30 / 30 / 20
@@ -2179,6 +2414,7 @@ Statement as at
 Statement of Cash Flows
 Statements
 Status
+Status: {0} | Access Until: {1}
 Still in WIP
 Still in work in progress
 Still open
@@ -2194,10 +2430,16 @@ Subject
 Submit New Feedback
 Submit for approval
 Submitted
+Submitted by {0}
 Subscription
+Subscription & Help
 Subscription Control
+Subscription for <strong>{0}</strong> has expired. Enter an activation code to continue processing.
+Subscription is active. Remaining days: <strong>{0}</strong>.
+Subscription: {0}
 Subscriptions and trial periods are enforced automatically.
 Subtotal
+Suggested wording: <em>"Investment property is stated at cost less accumulated depreciation and impairment. Land is not depreciated. Buildings are depreciated on a straight-line basis over their estimated useful lives. The fair value of investment property at {0} was AED {1}, based on valuations by independent valuers."</em>
 Sum of project WIP balances
 Supplier
 Supplier Ref.
@@ -2211,18 +2453,25 @@ Suppliers and service providers.
 Supply date
 Supporting evidence for input tax claimed on this supplier's bills.
 Suspend Company
+Suspend access
 Suspend access - reason (kept on record, not shown to the customer)
 Suspended
 Suspended staff are left out of the payroll.
 Suspending blocks sign-in immediately but keeps the account.
+Switch approval off
+Switch approval on
 Switch on once your provider is appointed. Invoices to business and government tenants are then queued in the E-Invoice Monitor.
 System Admin
 System Admin ignores the permission matrix and always has full access.
 System Setup
 TIN (Tax Identification Number)
 TRN (Tax Registration Number)
+TRN {0}
+TRN: <strong>{0}</strong>
+TRN: {0}
 Table
 Taken
+Taken from the TRN: <strong>{0}</strong>. Leave blank.
 Taken out in the period
 Talk to the assistant
 Targets by priority
@@ -2231,6 +2480,7 @@ Tax Invoice
 Tax Invoice No.
 Tax and Landlord Accounts
 Tax invoice
+Tax invoice no.: <strong>{0}</strong>
 Tax invoices issued to date
 Taxable use
 Taxable use %
@@ -2252,6 +2502,7 @@ Tenant Security Deposit Liability
 Tenant Services
 Tenant Statement
 Tenant Statements
+Tenant's preferred visit date: <strong>{0}</strong>
 Tenants
 Tenants (/portal) and employees (/me) sign in with their own accounts and cookies and can only ever see their own records — never a company screen. Employees see approved payslips, their leave balance and advances, request leave and certificates.
 Tenants are invoiced in the owner's name
@@ -2270,11 +2521,17 @@ The <strong>Movements</strong> column counts the journals behind each figure, so
 The analysis dimension for the owner's own expenditure — separate from the chart of accounts and from unit cost centres.
 The approver's level must cover the contract's annual rent. Off = any contract approver may approve any contract (never their own).
 The bank or cash account the money came from.
+The bank returned the cheque unpaid. The amount is charged back to the tenant: <code>Dr {0} / Cr Cheques Under Collection</code>{1}.
 The business
+The business and the owner's own properties in one place, {0} to {1}.
 The business — net profit
+The cheque is dated <strong>{0}</strong> but you are clearing it on <strong>{1}</strong>. A bank will not normally honour a post-dated cheque before its date.
+The cheque leaves the drawer and goes to the bank for collection. The memorandum entry is reversed and the tenant is credited now: <code>Dr Cheques Under Collection / Cr {0}</code>. When the bank clears it, <strong>Clear</strong> moves it into the bank; if the bank returns it, <strong>Bounced</strong> charges it back.
 The company accredited by the Ministry of Finance that sends your e-invoices
+The company's tax identity for <strong>{0}</strong>, and the recovery rate applied to residual input tax.
 The contract
 The contract no longer exists.
+The cost is shared between the units by area. Add the building's units, with their areas, to {0}, then come back.
 The cost lands here and appears in the Profit & Loss.
 The current due date still applies until we confirm a change.
 The date written on the cheque. <strong>Not</strong> an accounting date.
@@ -2285,9 +2542,13 @@ The default period is the calendar quarter containing the end date. Change the d
 The difference left by every other account's opening balance
 The employee portal is closed for now
 The float receiving the cash.
+The free trial
 The future date written on the cheque. <strong>Does not affect the accounts.</strong>
 The hosting provider backs up the database. Ask your administrator to confirm the schedule and to test a restore at least twice a year.
+The invoice it was for stays open.
 The journal is saved as a draft. Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> to put it into the accounts.
+The list of applied scripts could not be read: {0}
+The maintenance jobs assigned to you. Open one to record the work and the materials used.
 The opening figures are only for staff moved from another system: what was already owed or provided at that date.
 The operating cycle from left to right. Select any icon to open that screen.
 The owned property record for the plot: its title deed, permits and, later, its units.
@@ -2301,24 +2562,40 @@ The register and the ledger disagree.
 The routing code (agent ID) is the bank's 9-digit WPS code. Your bank gives it with the employee's account.
 The site is running, but scripts from this one onwards were not applied, so screens that rely on them may show errors. Send this page to your developer. Once the script is corrected and a new version is deployed, the next start tries again.
 The statement
+The subscription
+The supplier's VAT, the owner's to reclaim
+The system is not available for <strong>{0}</strong> at the moment. Please contact your administrator.
 The system posts on the month-end of the selected month.
+The tenant takes the cheque back before it is deposited. The memorandum entry is reversed and the cheque stays in the register as <strong>Withdrawn</strong>. {0} The charge below is raised to the tenant as a tax invoice.
 The tenant's email address is the usual choice. It must be unique across all tenants.
 Their balance, overdue amount, cheques held and deposit held
+Their number. Ours is {0}.
 Their own invoices, payments, cheques, contracts and account statement
 Their salary is then charged to that building in P&L by Property.
 There are no development projects yet.
 These amounts were posted to a development account without choosing a project, so they are on the balance sheet but in no project's cost. Correct them with a journal that moves them into the right project.
 These determined what was posted and cannot be changed here
+This amount has been deducted from the rent we collected on your behalf, and is shown on your owner settlement statement. {0}
+This bill was raised automatically and carries no detail lines. Its total is {0} {1}.
+This cheque has already cleared, so the received date cannot be moved later than {0}. The clearance entry keeps its own date.
+This cheque replaces cheque <strong>{0}</strong>, which will be marked <strong>Replaced</strong> once this one is saved.
+This cheque was deposited on <strong>{0}</strong> and the tenant was credited then. Clearing it moves the amount from Cheques Under Collection into the bank: <code>Dr Bank / Cr Cheques Under Collection</code>.
 This contract is awaiting approval, so it cannot be changed. Withdraw it from the Leases list to correct it.
+This contract is {0}: its invoices were created from these terms, so they are locked. Only the notes can be updated.
 This entry is the record; there is no separate document page.
 This figure is not posted automatically.
 This figure is the total of the detail below
 This invoice has been reported through e-invoicing. The credit note will be e-invoiced too once posted.
+This job is {0}.
 This page can be updated later with your company privacy and data policy.
 This page could not be shown
 This period has never been asked to reopen.
+This period has not started. Its checklist opens on {0}.
+This period was reopened on request on {0} by {1}. Make the correction, then close it again below.
 This property has no units yet. Add them in Master Data › Units, with their floor and area.
+This screen
 This statement does not reconcile.
+This supplier holds an active VAT registration (TRN {0}), so taxable lines carry 5% and the input tax is claimable to the extent the attribution allows.
 This tenant has no portal access yet. Issue it below and hand the details over.
 Tick cheques due by that date
 Tick only while the registration is <strong>live</strong>. Bills from a supplier that is not registered carry no VAT at all and are treated as commercial invoices, with the whole amount charged direct to cost.
@@ -2337,6 +2614,7 @@ To correct a withdrawal, reset its journal to draft in Operations › Journal In
 To send
 Topping up a float is a <strong>transfer between two asset accounts</strong>, not an expense. Nothing reaches the Profit &amp; Loss here &mdash; the cost was already recorded when each expense voucher was posted.
 Total
+Total ({0})
 Total Amount
 Total Area
 Total Assets
@@ -2354,17 +2632,22 @@ Total budget
 Total cost
 Total cost of revenue
 Total credited
+Total debits {0} equal total credits {1}.
 Total excluding VAT
 Total finance costs
 Total for the period
+Total for {0}
+Total including VAT ({0})
 Total invoiced
 Total of
+Total outstanding {0}
 Total paid
 Total received
 Total rent of the agreements (full contract terms)
 Total revenue
 Total supplies
 Total to pay
+Total {0}
 Totals
 Totals and the balancing line are recalculated when you save.
 Totals by group
@@ -2389,6 +2672,7 @@ Trial Balance, P&L, Balance Sheet.
 Trial End
 Trial Period
 Trial Start
+Trial mode is active for this company. Remaining days: <strong>{0}</strong>.
 Try: <em>"Which tenants are overdue?"</em>, <em>"Vacant units in Tower A"</em>, <em>"Trial balance at 30 September"</em>, <em>"How do I clear a PDC?"</em>, <em>"Fill this form for me"</em>, or attach a scanned invoice with the paperclip. Anything that changes your records is shown as a card for you to confirm.
 Turn down
 Two-letter code.
@@ -2398,6 +2682,7 @@ UAE documents
 Unavailable
 Uncategorised
 Uncleared PDC total
+Uncleared cheques: {0}
 Unclosed Periods
 UnderMaintenance
 Undo corner
@@ -2454,10 +2739,13 @@ User
 User Manual
 Username
 Username (mobile or email)
+Username <strong>{0}</strong> · {1} {2} {3} {4}
 Users
 Users & Permissions
+Users of your company
 Utilities & Insurance
 VAT
+VAT ({0})
 VAT 5%
 VAT Charged
 VAT Payable
@@ -2466,9 +2754,11 @@ VAT Recoverable
 VAT Return
 VAT Settings
 VAT Treatment
+VAT at {0}%
 VAT collected for owner
 VAT in cost
 VAT is derived from the unit, falling back to the property. Commercial leases are standard rated; residential leases are exempt, except the <strong>first</strong> lease of a unit in a new building (within three years of its completion date), which is zero rated automatically. Override only for a genuine exception, and say why.
+VAT of {0} on rent invoiced in the owner's name was collected for the owner to declare.
 VAT on Commission
 VAT on commission
 VAT on costs
@@ -2477,8 +2767,11 @@ VAT recovered
 VAT registered (active)
 VAT reversed
 VAT treatment
+VAT — {0}
+VAT: the first sale or lease of each residential unit is zero rated if made by <strong>{0}</strong>.
 Vac.
 Vacant
+Vacant: {0}
 Valuation
 Valuation Date
 Value
@@ -2494,8 +2787,10 @@ Vendor Payment
 Vendor Payments
 Vendor Statement
 Vendor payments, owner settlements and withdrawals, development costs and petty cash are recorded but not posted until someone with enough authority releases them. Default levels: Accountant up to AED 1,000, Manager up to AED 5,000, Owner unlimited — changeable at any time in Approval Limits. Switch the control on per company there.
+Vendor: {0}
 Vendors
 View
+View / print {0}
 View Statement
 Visa expiry
 Voucher
@@ -2504,8 +2799,10 @@ WIP account
 WIP balance
 WPS (Wage Protection System)
 Waiting
+Waiting for a decision ({0})
 Waiting for an approver.
 Waiting for your decision
+Waiting only
 Warehouse
 Watch
 We will do our best, but cannot promise this exact day.
@@ -2535,6 +2832,7 @@ Which invoice?
 Which jobs
 Which property?
 Which side
+Who may do what in {0}, and how approvals and limits work. Change roles in Users & Permissions, limits in Approval Limits.
 Who may release how much, and temporary authority while you travel.
 Who may release payments, and up to how much. Owners can change these at any time.
 Who occupies each unit, on what terms, and what they owe — grouped by the owner of the property.
@@ -2549,8 +2847,11 @@ Withdraw this request
 Withdrawal
 Withdrawals
 Withdrawn
+Withdrawn {0}
 Withdrawn, not yet replaced
 Within
+Within own limit
+Within {0} days
 Work it out from the numbers above
 Work started
 Worked
@@ -2562,8 +2863,11 @@ Works for building
 Write a reply...
 XML
 Year
+Year-end close - fiscal year {0}
 Years adjusted
 Yes
+Yes (annual rent)
+You
 You are signed in with a temporary password. Please choose your own before continuing.
 You are signed in, but your account does not have permission to open this page.
 You asked to pay by
@@ -2585,6 +2889,7 @@ Your decision
 Your first admin user gets full access for that company.
 Your own request - another approver decides it.
 Your payslips appear here once a payroll is approved.
+Your provider must be appointed by <strong>{0}</strong> and e-invoicing starts on <strong>{1}</strong>.
 Your report
 Your share
 Yours - someone else approves it
@@ -2592,9 +2897,12 @@ Z → A / high → low
 Zero rated (0%)
 Zero rated supplies
 Zero rated supplies for the year
+a payment of up to {0} needs <strong>{1}</strong>, up to {2} needs <strong>{3}</strong>, and anything above goes to <strong>{4}</strong>.
 automatic
+balance of account {0}
 blank = your limit
 breadcrumb
+collected {0} this month, {1} this year
 continues below
 dd MM yyyy (boxes)
 dd-MM-yyyy
@@ -2619,15 +2927,20 @@ e.g. Penalty for damaged equipment, memo HR-12
 e.g. Rent by property this year
 e.g. Sunday, or Saturday,Sunday
 e.g. Visited, compressor needs replacing, parts ordered
+ends {0}
 entry
+expenses {0}{1}
 expired
+expired {0} d ago
 expires soon
 from request to the engineer's response
+from {0}
 if bought
 internal
 let
 limit
 main contractor
+managed by {0} · as at {1}
 memo posts here
 moves every field; negative = left / up
 no TRN
@@ -2636,15 +2949,98 @@ no limit
 not accounting
 of which collected from tenants and available to pay
 on these jobs
+overdue {0}
 owner billed
 payroll transactions
 per year
 rows
+target: first response within {0} h, done within {1}
 tenant credited
 worked out
 worst first
+{0} (too many failed attempts)
+{0} - {1} - {2}/{3} - Outstanding: {4}
+{0} / unit {1} &middot; <strong>{2}</strong>
+{0} / {1} used
+{0} Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> once the reason is resolved.
+{0} account(s)
+{0} active employee(s)
+{0} active employee(s). Unpaid leave and salary advances are picked up automatically.
+{0} amber
+{0} annual rent to renew
+{0} asking
+{0} business tenant(s) are missing a TIN, address or licence.
+{0} business · {1} government · {2} individual (individuals are outside e-invoicing)
+{0} cheque(s)
+{0} chq.
+{0} day(s) left
+{0} days
+{0} days late
+{0} days overdue
+{0} document(s) expire within 30 days
+{0} document(s) expired
+{0} done · {1} declined
+{0} draft invoice(s)
+{0} draft journal(s) tagged to this project, {1} in total, are not posted yet and are not in the cost below. Post them from <strong>Operations &rsaquo; Journal Inquiry</strong>.
+{0} due in 30 days
+{0} due in 30 days · {1}
+{0} expiring in 90 days · {1} rent forgone
+{0} from {1}
+{0} green
+{0} inv.
+{0} invoice(s)
+{0} irrecoverable
+{0} is still in {1} {2} - transfer it below.
+{0} item(s) missing from the company's details.
+{0} journal(s) left as drafts for more than a week (oldest {1}).
+{0} leave request(s) to decide
+{0} let of {1} units
+{0} month(s)
+{0} not yet presented
+{0} occupied of {1} units
+{0} of {1} unit(s) marked · {2} KB · {3}
+{0} of {1} units let · rent {2} · outstanding {3}
+{0} of {1} units · {2} vacant · rent roll {3} a year
+{0} overdue
+{0} overdue for closing
+{0} past target · {1} unassigned
+{0} posting(s) over {1}, highlighted below.
+{0} red
+{0} reopen request(s) waiting
+{0} schedule(s)
+{0} to {1}. Each account sits on the line chosen for it in the chart of accounts (Income statement line).
+{0} unit(s)
+{0} up to {1} until {2}, from {3} ({4})
+{0} vacant
+{0} vacant · {1} expiring in 90 days
+{0} voucher(s)
+{0} | {1} day(s) remaining | Access Until: {2}
+{0} · TRN {1}
+{0} · asked {1}
+{0} · direct method (IAS 7)
+{0} · entered by {1} on {2} · needs <strong>{3}</strong> or above
+{0} · received {1}
+{0} · {1} day(s)
+{0} · {1} · {2} unit(s) on {3} floor(s)
+{0} — accounting date
+{0} — unit {1}
+{0} — {1} employee(s), {2}
+{0}/month · {1} left
+{0}: postings without a project (tag them so they belong to a project)
+| Owner: {0}
+© {0} - RealEstateManager
+· Ref {0}
+· Ref. {0}
+· TRN {0}
+· building depreciated over {0} years
+· commission {0}%
+· {0} pending
 — choose —
+— dated {0}
+… and {0} more.
+← Back to {0}
 ✓ Complete
 ✓ Every business and government tenant is complete
+🔒 Close {0}
 🔒 Closed
 🔒 Year closed

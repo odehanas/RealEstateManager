@@ -86,13 +86,13 @@
                         </tr>
                         <tr>
                             <th>@T["Last sign in"]</th>
-                            <td>@(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm") : "Never")</td>
+                            <td>@(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm") : T["Never"])</td>
                         </tr>
                         @if (Model.LockedOutUntil.HasValue && Model.LockedOutUntil > DateTime.UtcNow)
                         {
                             <tr>
                                 <th>@T["Locked until"]</th>
-                                <td class="text-danger">@Model.LockedOutUntil.Value.ToString("dd/MM/yyyy HH:mm") (too many failed attempts)</td>
+                                <td class="text-danger">@T.Format("{0} (too many failed attempts)", Model.LockedOutUntil.Value.ToString("dd/MM/yyyy HH:mm"))</td>
                             </tr>
                         }
                     </table>
@@ -105,7 +105,7 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="isActive" value="@((!Model.IsActive).ToString().ToLower())" />
                         <button type="submit" class="btn btn-sm @(Model.IsActive ? "btn-outline-danger" : "btn-outline-success")">
-                            @(Model.IsActive ? "Suspend access" : "Re-enable access")
+                            @(Model.IsActive ? T["Suspend access"] : T["Re-enable access"])
                         </button>
                     </form>
                     <span class="text-muted small ms-2">
@@ -119,7 +119,7 @@
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-light">
-                <strong>@(Model.HasAccess ? "Reset Access" : "Issue Access")</strong>
+                <strong>@(Model.HasAccess ? T["Reset Access"] : T["Issue Access"])</strong>
             </div>
             <div class="card-body">
                 <form asp-action="IssuePortalAccess" asp-route-id="@Model.TenantId" method="post">
@@ -134,7 +134,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-dark">
-                        @(Model.HasAccess ? "Reset password" : "Issue portal access")
+                        @(Model.HasAccess ? T["Reset password"] : T["Issue portal access"])
                     </button>
                 </form>
 

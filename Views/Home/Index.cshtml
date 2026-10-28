@@ -59,18 +59,18 @@
          role="status">
         <div>
             <span class="me-1" aria-hidden="true">@Html.Raw(noteIcon)</span>
-            <strong>Subscription: @noteLabel</strong>
+            <strong>@T.Format("Subscription: {0}", noteLabel)</strong>
             @if (subscription.IsSuspended)
             {
-                <span> - access to @subscription.CompanyName has been suspended. Please contact your service provider.</span>
+                <span> @T.Format("- access to {0} has been suspended. Please contact your service provider.", subscription.CompanyName)</span>
             }
             else if (subscription.IsExpired)
             {
-                <span> - ended on @subscription.AccessEndDate?.ToString("dd/MM/yyyy"). Enter an activation code to continue working.</span>
+                <span> @T.Format("- ended on {0}. Enter an activation code to continue working.", subscription.AccessEndDate?.ToString("dd/MM/yyyy"))</span>
             }
             else
             {
-                <span> - <strong>@daysText</strong>, until @subscription.AccessEndDate?.ToString("dd/MM/yyyy").</span>
+                <span> @T.HtmlFormat("- <strong>{0}</strong>, until {1}.", daysText, subscription.AccessEndDate?.ToString("dd/MM/yyyy"))</span>
                 @if (endingSoon)
                 {
                     <span> @T["Renew in time to keep working without interruption."]</span>
@@ -105,7 +105,7 @@
     </div>
     <div class="d-flex align-items-center gap-2">
         <div class="text-muted">
-            <strong>Today:</strong> @Model.Today.ToString("dd/MM/yyyy")
+            @T.HtmlFormat("<strong>Today:</strong> {0}", Model.Today.ToString("dd/MM/yyyy"))
         </div>
         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">@T["Print Dashboard"]</button>
     </div>
@@ -113,8 +113,8 @@
 
 <div class="d-none d-print-block mb-4">
     <h1 class="fw-bold mb-1">@T["Management Dashboard Snapshot"]</h1>
-    <div>Printed on @Model.Today.ToString("dd/MM/yyyy")</div>
-    <div>Current Period: @Model.CurrentPeriodName</div>
+    <div>@T.Format("Printed on {0}", Model.Today.ToString("dd/MM/yyyy"))</div>
+    <div>@T.Format("Current Period: {0}", Model.CurrentPeriodName)</div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -123,8 +123,8 @@
             <div class="card-body">
                 <div class="small text-uppercase opacity-75">@T["Properties"]</div>
                 <div class="display-6 fw-bold">@Model.PropertiesCount</div>
-                <div>Owned: @Model.OwnedPropertiesCount</div>
-                <div>Managed: @Model.ManagedPropertiesCount</div>
+                <div>@T.Format("Owned: {0}", Model.OwnedPropertiesCount)</div>
+                <div>@T.Format("Managed: {0}", Model.ManagedPropertiesCount)</div>
             </div>
         </div>
     </div>
@@ -133,8 +133,8 @@
             <div class="card-body">
                 <div class="small text-uppercase opacity-75">@T["Occupancy"]</div>
                 <div class="display-6 fw-bold">@Model.OccupancyRate.ToString("N2")%</div>
-                <div>Occupied: @Model.OccupiedUnitsCount</div>
-                <div>Vacant: @Model.VacantUnitsCount</div>
+                <div>@T.Format("Occupied: {0}", Model.OccupiedUnitsCount)</div>
+                <div>@T.Format("Vacant: {0}", Model.VacantUnitsCount)</div>
             </div>
         </div>
     </div>
@@ -143,8 +143,8 @@
             <div class="card-body">
                 <div class="small text-uppercase opacity-75">@T["Receivables"]</div>
                 <div class="display-6 fw-bold">@Model.OutstandingReceivables.ToString("N2")</div>
-                <div>Open invoices: @Model.OutstandingInvoicesCount</div>
-                <div>Overdue: @Model.OverdueReceivables.ToString("N2")</div>
+                <div>@T.Format("Open invoices: {0}", Model.OutstandingInvoicesCount)</div>
+                <div>@T.Format("Overdue: {0}", Model.OverdueReceivables.ToString("N2"))</div>
             </div>
         </div>
     </div>
@@ -153,8 +153,8 @@
             <div class="card-body">
                 <div class="small text-uppercase text-muted">@T["Accounting Period"]</div>
                 <div class="fw-bold fs-4">@Model.CurrentPeriodName</div>
-                <div>Open periods: @Model.OpenPeriodsCount</div>
-                <div>Active leases: @Model.ActiveLeasesCount</div>
+                <div>@T.Format("Open periods: {0}", Model.OpenPeriodsCount)</div>
+                <div>@T.Format("Active leases: {0}", Model.ActiveLeasesCount)</div>
             </div>
         </div>
     </div>
@@ -165,24 +165,24 @@
     <div class="card shadow-sm border-0 mb-4 dashboard-print-card">
         <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
             <h5 class="mb-0">@T["HR & Payroll"]</h5>
-            <span class="small text-muted">@hr.ActiveEmployees active employee(s)</span>
+            <span class="small text-muted">@T.Format("{0} active employee(s)", hr.ActiveEmployees)</span>
         </div>
         <div class="card-body d-flex flex-wrap gap-3">
             @if (hr.PayrollDueMonth != null)
             {
-                <a asp-controller="Payroll" asp-action="Index" class="btn btn-outline-danger">Payroll for @hr.PayrollDueMonth @hr.PayrollDueStatus</a>
+                <a asp-controller="Payroll" asp-action="Index" class="btn btn-outline-danger">@T.Format("Payroll for {0} {1}", hr.PayrollDueMonth, hr.PayrollDueStatus)</a>
             }
             @if (hr.ExpiredDocuments > 0)
             {
-                <a asp-controller="Employees" asp-action="Documents" class="btn btn-danger">@hr.ExpiredDocuments document(s) expired</a>
+                <a asp-controller="Employees" asp-action="Documents" class="btn btn-danger">@T.Format("{0} document(s) expired", hr.ExpiredDocuments)</a>
             }
             @if (hr.ExpiringDocuments > 0)
             {
-                <a asp-controller="Employees" asp-action="Documents" asp-route-days="30" class="btn btn-warning">@hr.ExpiringDocuments document(s) expire within 30 days</a>
+                <a asp-controller="Employees" asp-action="Documents" asp-route-days="30" class="btn btn-warning">@T.Format("{0} document(s) expire within 30 days", hr.ExpiringDocuments)</a>
             }
             @if (hr.PendingLeave > 0)
             {
-                <a asp-controller="Leave" asp-action="Index" class="btn btn-outline-dark">@hr.PendingLeave leave request(s) to decide</a>
+                <a asp-controller="Leave" asp-action="Index" class="btn btn-outline-dark">@T.Format("{0} leave request(s) to decide", hr.PendingLeave)</a>
             }
         </div>
     </div>
@@ -197,12 +197,12 @@
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 @if (unclosed.OverdueCount > 0)
                 {
-                    <span class="badge bg-danger">@unclosed.OverdueCount overdue for closing</span>
+                    <span class="badge bg-danger">@T.Format("{0} overdue for closing", unclosed.OverdueCount)</span>
                 }
                 @if (unclosed.PendingReopenRequests > 0)
                 {
                     <a asp-controller="Closing" asp-action="ReopenRequests" class="badge bg-warning text-dark text-decoration-none">
-                        @unclosed.PendingReopenRequests reopen request(s) waiting
+                        @T.Format("{0} reopen request(s) waiting", unclosed.PendingReopenRequests)
                     </a>
                 }
                 <a asp-controller="Closing" asp-action="Index" class="btn btn-sm btn-dark dashboard-no-print">@T["Open Closing Cockpit"]</a>
@@ -212,8 +212,7 @@
             @if (unclosed.UnclosedFiscalYears.Count > 0)
             {
                 <div class="alert alert-danger rounded-0 mb-0 py-2">
-                    Fiscal year @string.Join(", ", unclosed.UnclosedFiscalYears) has ended but is not closed:
-                    its profit or loss is not yet in retained earnings.
+                    @T.Format("Fiscal year {0} has ended but is not closed: its profit or loss is not yet in retained earnings.", string.Join(", ", unclosed.UnclosedFiscalYears))
                 </div>
             }
             @if (unclosed.Periods.Count == 0)
@@ -242,7 +241,7 @@
                                     <td>
                                         @if (p.DaysOverdue > 0)
                                         {
-                                            <span class="badge bg-danger">Overdue @p.DaysOverdue day(s)</span>
+                                            <span class="badge bg-danger">@T.Format("Overdue {0} day(s)", p.DaysOverdue)</span>
                                         }
                                         else
                                         {
@@ -376,7 +375,7 @@
                 {
                     <div class="text-muted small">@T["Uncleared PDC total"]</div>
                     <div class="fs-3 fw-bold">@Model.UnclearedPdcAmount.ToString("N2")</div>
-                    <div>Uncleared cheques: @Model.UnclearedPdcCount</div>
+                    <div>@T.Format("Uncleared cheques: {0}", Model.UnclearedPdcCount)</div>
                     <div class="mt-3">
                         <a class="btn btn-outline-dark btn-sm" href="/PdcReceipts">@T["Open PDC Receipts"]</a>
                     </div>

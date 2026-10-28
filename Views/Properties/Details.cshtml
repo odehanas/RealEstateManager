@@ -73,10 +73,7 @@
         @if (Model.CompletionDate.HasValue)
         {
             <text>
-                <strong>VAT:</strong> completed on @Model.CompletionDate.Value.ToString("dd/MM/yyyy"). The first sale or lease of each
-                residential unit is zero rated if made by <strong>@Model.ZeroRatingWindowEnds!.Value.ToString("dd/MM/yyyy")</strong>
-                @(Model.ZeroRatingWindowEnds < today ? "(this window has closed)" : $"({(Model.ZeroRatingWindowEnds!.Value - today).Days} days left)").
-                Later supplies of residential units are exempt.
+                @T.HtmlFormat("<strong>VAT:</strong> completed on {0}. The first sale or lease of each residential unit is zero rated if made by <strong>{1}</strong> {2}. Later supplies of residential units are exempt.", Model.CompletionDate.Value.ToString("dd/MM/yyyy"), Model.ZeroRatingWindowEnds!.Value.ToString("dd/MM/yyyy"), Model.ZeroRatingWindowEnds < today ? "(this window has closed)" : $"({(Model.ZeroRatingWindowEnds!.Value - today).Days} days left)")
             </text>
         }
         else

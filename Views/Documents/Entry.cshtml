@@ -44,7 +44,7 @@
             <div class="fw-semibold">
                 @if (documentUrl != null)
                 {
-                    <a href="@documentUrl">@(Model.DocumentNumber ?? "Open")</a>
+                    <a href="@documentUrl">@(Model.DocumentNumber ?? T["Open"])</a>
                 }
                 else
                 {

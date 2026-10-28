@@ -22,9 +22,7 @@
 }
 
 <p class="small text-muted">
-    A new contract is a <strong>Draft</strong> until it is
-    @(approvalRequired ? "submitted and approved by a second person" : "activated")
-    - only then are its invoices created and its terms locked.
+    @T.HtmlFormat("A new contract is a <strong>Draft</strong> until it is {0} - only then are its invoices created and its terms locked.", approvalRequired ? "submitted and approved by a second person" : "activated")
 </p>
 
 <table class="table table-bordered table-striped align-middle">
@@ -55,12 +53,12 @@
                 <td>@lease.StartDate.ToString("dd/MM/yyyy")</td>
                 <td>@lease.EndDate.ToString("dd/MM/yyyy")</td>
                 <td class="text-end">@lease.AnnualRent.ToString("N2")</td>
-                <td>@lease.BillingFrequencyMonths month(s)</td>
+                <td>@T.Format("{0} month(s)", lease.BillingFrequencyMonths)</td>
                 <td>
                     @switch (lease.Status)
                     {
                         case LeaseStatuses.Draft:
-                            <span class="badge @(returned ? "bg-danger" : "bg-secondary")">@(returned ? "Returned" : "Draft")</span>
+                            <span class="badge @(returned ? "bg-danger" : "bg-secondary")">@(returned ? T["Returned"] : T["Draft"])</span>
                             break;
                         case LeaseStatuses.PendingApproval:
                             <span class="badge bg-warning text-dark">@T["Awaiting approval"]</span>
@@ -78,11 +76,11 @@
                     }
                     else if (lease.Status == LeaseStatuses.PendingApproval && latest != null)
                     {
-                        <div class="small text-muted mt-1">Submitted by @latest.RequestedByName</div>
+                        <div class="small text-muted mt-1">@T.Format("Submitted by {0}", latest.RequestedByName)</div>
                     }
                     else if (lease.Status == LeaseStatuses.Active && latest?.Status == ApprovalStatuses.Approved)
                     {
-                        <div class="small text-muted mt-1">Approved by @latest.DecidedByName</div>
+                        <div class="small text-muted mt-1">@T.Format("Approved by {0}", latest.DecidedByName)</div>
                     }
                 </td>
                 <td>

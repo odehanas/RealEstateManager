@@ -128,7 +128,7 @@
     <header>
         <nav class="navbar navbar-expand-xl navbar-dark bg-dark shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@T["RealEstateManager"]</a>
+                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : T["Home"])" asp-action="Index">@T["RealEstateManager"]</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                     <span class="navbar-toggler-icon"></span>
@@ -146,7 +146,7 @@
                     <ul class="navbar-nav me-auto mb-2 mb-xl-0">
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@(isMaintenanceOnly ? "My Jobs" : "Home")</a>
+                            <a class="nav-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : T["Home"])" asp-action="Index">@(isMaintenanceOnly ? T["My Jobs"] : T["Home"])</a>
                         </li>
 
                         <li class="nav-item dropdown">
@@ -231,7 +231,7 @@
                                 @if (currentCompanyId.HasValue)
                                 {
                                     <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@(isMaintenanceOnly ? "Help" : "Subscription & Help")</h6></li>
+                                    <li><h6 class="dropdown-header">@(isMaintenanceOnly ? T["Help"] : T["Subscription & Help"])</h6></li>
                                     @if (!isMaintenanceOnly)
                                     {
                                     <li>
@@ -335,7 +335,7 @@
                                         }
                                         <li>
                                             <a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Index">
-                                                @(canHandleServiceRequests ? "Maintenance Jobs" : "My Maintenance Jobs")
+                                                @(canHandleServiceRequests ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
                                             </a>
                                         </li>
                                     }
@@ -602,7 +602,7 @@
                             <button type="button" class="btn btn-light btn-sm fw-semibold"
                                     data-bs-toggle="offcanvas" data-bs-target="#helpPanel" aria-controls="helpPanel"
                                     data-help-key="@helpTopic?.Key"
-                                    title="@(helpTopic != null ? $"Help: {helpTopic.Title}" : "Help")">
+                                    title="@(helpTopic != null ? $"Help: {helpTopic.Title}" : T["Help"])">
                                 <span aria-hidden="true">?</span> Help
                             </button>
 
@@ -633,18 +633,18 @@
         }
         else if (subscriptionBlocked && subscriptionStatus != null && isMaintenanceOnly)
         {
-            <div class="alert alert-danger">The system is not available for <strong>@subscriptionStatus.CompanyName</strong> at the moment. Please contact your administrator.</div>
+            <div class="alert alert-danger">@T.HtmlFormat("The system is not available for <strong>{0}</strong> at the moment. Please contact your administrator.", subscriptionStatus.CompanyName)</div>
         }
         else if (subscriptionBlocked && subscriptionStatus != null)
         {
             <div class="alert alert-danger">
                 @if (subscriptionStatus.IsSuspended)
                 {
-                    <text>Access for <strong>@subscriptionStatus.CompanyName</strong> has been suspended. Please contact your service provider.</text>
+                    <text>@T.HtmlFormat("Access for <strong>{0}</strong> has been suspended. Please contact your service provider.", subscriptionStatus.CompanyName)</text>
                 }
                 else
                 {
-                    <text>Subscription for <strong>@subscriptionStatus.CompanyName</strong> has expired. Enter an activation code to continue processing.</text>
+                    <text>@T.HtmlFormat("Subscription for <strong>{0}</strong> has expired. Enter an activation code to continue processing.", subscriptionStatus.CompanyName)</text>
                 }
                 <a asp-controller="Subscription" asp-action="Index" class="alert-link">@T["Open Subscription"]</a>
             </div>
@@ -653,7 +653,7 @@
         {
             @* Warned in time: a customer should never first learn of the end date by being locked out. *@
             <div class="alert alert-warning">
-                @(subscriptionStatus.IsInTrial ? "The free trial" : "The subscription") for
+                @(subscriptionStatus.IsInTrial ? T["The free trial"] : T["The subscription"]) for
                 <strong>@subscriptionStatus.CompanyName</strong>
                 @(subscriptionStatus.DaysRemaining == 0
                     ? "ends today"
@@ -665,13 +665,13 @@
         @if (TempData["PostingWarning"] is string awaiting && awaiting.Contains(JournalWorkflowService.AwaitingApprovalPrefix))
         {
             @* A payment held for release by someone with enough authority: recorded, not refused. *@
-            <div class="alert alert-info">Recorded. @awaiting[awaiting.IndexOf(JournalWorkflowService.AwaitingApprovalPrefix)..]</div>
+            <div class="alert alert-info">@T.Format("Recorded. {0}", awaiting[awaiting.IndexOf(JournalWorkflowService.AwaitingApprovalPrefix)..])</div>
         }
         else if (TempData["PostingWarning"] is string postingWarning)
         {
             @* A screen that posts on save could not post: the entry is kept as a draft. *@
             <div class="alert alert-warning">
-                @postingWarning Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> once the reason is resolved.
+                @T.HtmlFormat("{0} Post it from <strong>Operations &rsaquo; Journal Inquiry</strong> once the reason is resolved.", postingWarning)
             </div>
         }
         @if (TempData[RealEstateManager.Services.ExpiredFormFilter.MessageKey] is string formExpired)
@@ -683,7 +683,7 @@
 
     <footer class="border-top footer text-muted mt-4">
         <div class="container py-3">
-            &copy; @DateTime.Now.Year - RealEstateManager
+            @T.Format("© {0} - RealEstateManager", DateTime.Now.Year)
         </div>
     </footer>
 

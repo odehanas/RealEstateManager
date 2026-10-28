@@ -30,7 +30,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
     <div>
         <h2 class="mb-0">@T["Project Costs & WIP"]</h2>
-        <div class="text-muted">Spend per development project as at @Model.AsOf.ToString("dd MMMM yyyy"): the supplier's net price, VAT taken into cost, VAT recovered, what is committed and paid, and the WIP reconciliation. Amounts in @c.</div>
+        <div class="text-muted">@T.Format("Spend per development project as at {0}: the supplier's net price, VAT taken into cost, VAT recovered, what is committed and paid, and the WIP reconciliation. Amounts in {1}.", Model.AsOf.ToString("dd MMMM yyyy"), c)</div>
     </div>
     <form method="get" class="d-flex flex-wrap gap-2 align-items-end no-print">
         <div><label class="form-label small mb-0">@T["As at"]</label><input type="date" name="asOf" value="@Model.AsOf.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
@@ -126,7 +126,7 @@ else
     <div class="card-body small">
         @foreach (var r in Model.Reconciliation.Where(x => x.UntaggedLines.Count > 0))
         {
-            <div class="fw-semibold mt-2">@r.Account: postings without a project (tag them so they belong to a project)</div>
+            <div class="fw-semibold mt-2">@T.Format("{0}: postings without a project (tag them so they belong to a project)", r.Account)</div>
             <table class="table table-sm mb-2">
                 <tr><th>@T["Date"]</th><th>@T["Entry"]</th><th>@T["Source"]</th><th>@T["Description"]</th><th class="num">@T["Amount"]</th></tr>
                 @foreach (var l in r.UntaggedLines)
@@ -208,7 +208,7 @@ else
                     <tr class="@(b.Posted ? "" : "table-warning")">
                         <td>@b.Date.ToString("dd/MM/yyyy")</td>
                         <td><a asp-controller="VendorBills" asp-action="Details" asp-route-id="@b.BillId">@b.BillNumber</a> <span class="text-muted small">@b.VendorReference</span></td>
-                        <td>@b.Vendor</td><td>@(b.Posted ? b.Status : "Draft (committed)")</td>
+                        <td>@b.Vendor</td><td>@(b.Posted ? b.Status : T["Draft (committed)"])</td>
                         <td class="num">@M(b.Net)</td><td class="num">@M(b.CapitalisedVat)</td><td class="num">@M(b.RecoverableVat)</td><td class="num">@M(b.Total)</td><td class="num">@M(b.Paid)</td>
                     </tr>
                 }

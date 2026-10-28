@@ -38,17 +38,14 @@
         <a asp-action="Settings">E-Invoicing Settings</a>.
         @if (Model.AppointmentDeadline != null)
         {
-            <br /><text>Your provider must be appointed by <strong>@Model.AppointmentDeadline.Value.ToString("dd MMMM yyyy")</strong>
-            and e-invoicing starts on <strong>@Model.StartDate?.ToString("dd MMMM yyyy")</strong>.</text>
+            <br /><text>@T.HtmlFormat("Your provider must be appointed by <strong>{0}</strong> and e-invoicing starts on <strong>{1}</strong>.", Model.AppointmentDeadline.Value.ToString("dd MMMM yyyy"), Model.StartDate?.ToString("dd MMMM yyyy"))</text>
         }
     </div>
 }
 else
 {
     <div class="small text-muted mb-3">
-        Provider: <strong>@Model.ProviderName</strong>
-        &middot; e-invoicing supplies from <strong>@Model.StartDate?.ToString("dd MMM yyyy")</strong>
-        &middot; @EInvoicingRevenueBands.Describe(Model.RevenueBand)
+        @T.HtmlFormat("Provider: <strong>{0}</strong> &middot; e-invoicing supplies from <strong>{1}</strong> &middot; {2}", Model.ProviderName, Model.StartDate?.ToString("dd MMM yyyy"), EInvoicingRevenueBands.Describe(Model.RevenueBand))
     </div>
 }
 
@@ -58,11 +55,11 @@ else
         <strong>@T["Setup is incomplete:"]</strong>
         @if (Model.CompanySetupProblems > 0)
         {
-            <text>@Model.CompanySetupProblems item(s) missing from the company's details. </text>
+            <text>@T.Format("{0} item(s) missing from the company's details.", Model.CompanySetupProblems) </text>
         }
         @if (Model.TenantsNeedingAttention > 0)
         {
-            <text>@Model.TenantsNeedingAttention business tenant(s) are missing a TIN, address or licence. </text>
+            <text>@T.Format("{0} business tenant(s) are missing a TIN, address or licence.", Model.TenantsNeedingAttention) </text>
         }
         Files cannot be generated until these are filled in &mdash; see <a asp-action="Settings">E-Invoicing Settings</a>.
     </div>
@@ -98,7 +95,7 @@ else
 @if (Model.UnpostedInScope > 0)
 {
     <div class="alert alert-warning">
-        <strong>@Model.UnpostedInScope draft invoice(s)</strong> to business tenants have a supply date that has already passed.
+        <strong>@T.Format("{0} draft invoice(s)", Model.UnpostedInScope)</strong> to business tenants have a supply date that has already passed.
         The 14 days run from the supply, not from posting &mdash;
         <a asp-controller="CustomerInvoices" asp-action="Index">post them</a> so they can be e-invoiced in time.
     </div>
@@ -155,7 +152,7 @@ else
                                 </td>
                                 <td>
                                     @row.Number
-                                    <div class="small text-muted">@(row.IsCreditNote ? "Credit note" : "Invoice")</div>
+                                    <div class="small text-muted">@(row.IsCreditNote ? T["Credit note"] : T["Invoice"])</div>
                                 </td>
                                 <td>@row.TenantName</td>
                                 <td>@row.SupplyDate.ToString("dd/MM/yyyy")</td>
@@ -176,7 +173,7 @@ else
                                 <td class="text-nowrap">
                                     <button type="submit" class="btn btn-sm btn-outline-primary"
                                             formaction="@Url.Action("Generate", new { kind = row.Kind, id = row.Id })">
-                                        @(row.Status == EInvoiceStatuses.Pending ? "Generate" : "Regenerate")
+                                        @(row.Status == EInvoiceStatuses.Pending ? T["Generate"] : T["Regenerate"])
                                     </button>
                                     @if (row.Status != EInvoiceStatuses.Pending)
                                     {
@@ -242,14 +239,14 @@ else
                         <tr>
                             <td>
                                 @row.Number
-                                <div class="small text-muted">@(row.IsCreditNote ? "Credit note" : "Invoice")</div>
+                                <div class="small text-muted">@(row.IsCreditNote ? T["Credit note"] : T["Invoice"])</div>
                             </td>
                             <td>@row.TenantName</td>
                             <td>
                                 @row.SubmittedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
                                 @if (!string.IsNullOrWhiteSpace(row.ProviderReference))
                                 {
-                                    <div class="small text-muted">Ref @row.ProviderReference</div>
+                                    <div class="small text-muted">@T.Format("Ref {0}", row.ProviderReference)</div>
                                 }
                             </td>
                             <td class="text-end">@row.Total.ToString("N2")</td>

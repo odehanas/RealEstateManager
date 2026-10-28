@@ -8,7 +8,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h2 class="mb-0">@(companyAdminOnly ? "Users of your company" : "Users")</h2>
+        <h2 class="mb-0">@(companyAdminOnly ? T["Users of your company"] : T["Users"])</h2>
         @if (companyAdminOnly)
         {
             <p class="text-muted small mb-0">
@@ -46,7 +46,7 @@
             <tr>
                 <td>@item.Username</td>
                 <td>@item.DisplayName</td>
-                <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                <td>@(item.IsActive ? T["Active"] : T["Inactive"])</td>
                 <td>@item.RoleDisplay</td>
                 <td>@item.CompaniesDisplay</td>
                 <td>@(string.IsNullOrWhiteSpace(item.PermissionsDisplay) ? "-" : item.PermissionsDisplay)</td>

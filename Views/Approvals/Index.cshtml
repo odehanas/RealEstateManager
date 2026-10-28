@@ -32,7 +32,7 @@
 <div class="card shadow-sm mb-4">
     <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <strong>Contract approval is @(approvalRequired ? "ON" : "OFF") for this company.</strong>
+            <strong>@T.Format("Contract approval is {0} for this company.", approvalRequired ? "ON" : "OFF")</strong>
             <div class="small text-muted">
                 @if (approvalRequired)
                 {
@@ -49,7 +49,7 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="requireContractApproval" value="@(approvalRequired ? "false" : "true")" />
             <button type="submit" class="btn btn-sm @(approvalRequired ? "btn-outline-secondary" : "btn-primary")">
-                @(approvalRequired ? "Switch approval off" : "Switch approval on")
+                @(approvalRequired ? T["Switch approval off"] : T["Switch approval on"])
             </button>
         </form>
     </div>
@@ -69,14 +69,14 @@
     <tbody>
         @if (Model.Count == 0)
         {
-            <tr><td colspan="6" class="text-center text-muted py-4">@(showAll ? "No approvals yet." : "Nothing is waiting for approval.")</td></tr>
+            <tr><td colspan="6" class="text-center text-muted py-4">@(showAll ? T["No approvals yet."] : T["Nothing is waiting for approval."])</td></tr>
         }
         @foreach (var request in Model)
         {
             var mine = userId.HasValue && ApprovalService.FourEyesBlock(request, userId.Value) != null;
             <tr>
                 <td>
-                    <div class="small text-muted">@(request.DocumentType == ApprovalDocumentTypes.Lease ? "Contract" : request.DocumentType)</div>
+                    <div class="small text-muted">@(request.DocumentType == ApprovalDocumentTypes.Lease ? T["Contract"] : request.DocumentType)</div>
                     <strong>@request.DocumentNumber</strong>
                 </td>
                 <td>@request.Summary</td>
@@ -118,7 +118,7 @@
                 <td class="text-nowrap">
                     <a asp-action="Review" asp-route-id="@request.Id"
                        class="btn btn-sm @(request.Status == ApprovalStatuses.Pending && !mine ? "btn-primary" : "btn-outline-secondary")">
-                        @(request.Status == ApprovalStatuses.Pending && !mine ? "Review" : "View")
+                        @(request.Status == ApprovalStatuses.Pending && !mine ? T["Review"] : T["View"])
                     </a>
                     @if (request.Status == ApprovalStatuses.Pending && mine)
                     {

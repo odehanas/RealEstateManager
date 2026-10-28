@@ -31,7 +31,7 @@
             </div>
             <div class="text-end">
                 <div><strong>@Model.SettlementNumber</strong></div>
-                <div>Date: @Model.SettlementDate.ToString("dd/MM/yyyy")</div>
+                <div>@T.Format("Date: {0}", Model.SettlementDate.ToString("dd/MM/yyyy"))</div>
                 @if (!Model.IsPosted)
                 {
                     <span class="badge bg-warning text-dark">@T["Draft - not posted"]</span>
@@ -40,7 +40,7 @@
         </div>
 
         <p class="mb-1"><strong>To:</strong> @Model.OwnerName</p>
-        <p class="text-muted">Rent collected on your behalf for your managed properties, up to @Model.AsOfDate.ToString("dd/MM/yyyy").</p>
+        <p class="text-muted">@T.Format("Rent collected on your behalf for your managed properties, up to {0}.", Model.AsOfDate.ToString("dd/MM/yyyy"))</p>
 
         @if (statement != null && statement.Contracts.Count > 0)
         {
@@ -97,13 +97,13 @@
         <p class="mb-1"><strong>Paid by:</strong> @Model.PaymentMethod
             @if (!string.IsNullOrWhiteSpace(Model.ReferenceNumber))
             {
-                <span>&middot; Ref. @Model.ReferenceNumber</span>
+                <span>@T.Format("· Ref. {0}", Model.ReferenceNumber)</span>
             }
         </p>
         @if (!string.IsNullOrWhiteSpace(Model.Notes))
         {
-            <p class="mb-1"><strong>Notes:</strong> @Model.Notes</p>
+            <p class="mb-1">@T.HtmlFormat("<strong>Notes:</strong> {0}", Model.Notes)</p>
         }
-        <p class="text-muted small mt-4 mb-0">Prepared by @(Model.CreatedByName ?? "-") on @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy").</p>
+        <p class="text-muted small mt-4 mb-0">@T.Format("Prepared by {0} on {1}.", Model.CreatedByName ?? "-", Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy"))</p>
     </div>
 </div>

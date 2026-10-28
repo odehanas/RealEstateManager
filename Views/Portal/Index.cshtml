@@ -9,7 +9,7 @@
     <div class="col-6 col-lg-3">
         <div class="card stat shadow-sm h-100 @(Model.OutstandingBalance > 0 ? "bg-danger" : Model.IsInCredit ? "bg-info" : "bg-success") text-white">
             <div class="card-body">
-                <div class="label">@(Model.IsInCredit ? "In Credit" : "Balance Due")</div>
+                <div class="label">@(Model.IsInCredit ? T["In Credit"] : T["Balance Due"])</div>
                 <div class="value">@Math.Abs(Model.OutstandingBalance).ToString("N2")</div>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="card-body">
                 <div class="label">@T["Overdue"]</div>
                 <div class="value">@Model.OverdueAmount.ToString("N2")</div>
-                <div class="small">@Model.OverdueCount invoice(s)</div>
+                <div class="small">@T.Format("{0} invoice(s)", Model.OverdueCount)</div>
             </div>
         </div>
     </div>
@@ -28,7 +28,7 @@
             <div class="card-body">
                 <div class="label">@T["Cheques Held"]</div>
                 <div class="value">@Model.PdcsOnHandTotal.ToString("N2")</div>
-                <div class="small">@Model.PdcsOnHand.Count not yet presented</div>
+                <div class="small">@T.Format("{0} not yet presented", Model.PdcsOnHand.Count)</div>
             </div>
         </div>
     </div>
@@ -57,7 +57,7 @@
                         Due @next.DueDate.ToString("dd MMMM yyyy")
                         @if (next.IsOverdue)
                         {
-                            <span class="badge bg-danger ms-1">@next.DaysOverdue days overdue</span>
+                            <span class="badge bg-danger ms-1">@T.Format("{0} days overdue", next.DaysOverdue)</span>
                         }
                     </div>
                 </div>
@@ -87,7 +87,7 @@ else if (Model.IsSettled)
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div>
-                            <div class="fw-semibold">@contract.PropertyName &mdash; unit @contract.UnitCode</div>
+                            <div class="fw-semibold">@T.Format("{0} — unit {1}", contract.PropertyName, contract.UnitCode)</div>
                             <div class="small text-muted">
                                 @contract.ContractNumber<br />
                                 @contract.StartDate.ToString("dd/MM/yyyy") to @contract.EndDate.ToString("dd/MM/yyyy")
@@ -98,7 +98,7 @@ else if (Model.IsSettled)
                             <div class="small text-muted">@T["per year"]</div>
                             @if (contract.IsExpiringSoon)
                             {
-                                <span class="badge bg-warning text-dark mt-1">Expires in @contract.DaysToExpiry days</span>
+                                <span class="badge bg-warning text-dark mt-1">@T.Format("Expires in {0} days", contract.DaysToExpiry)</span>
                             }
                         </div>
                     </div>
@@ -124,7 +124,7 @@ else if (Model.IsSettled)
                 <div class="fw-semibold">@Model.TotalPaid.ToString("N2")</div>
                 @if (Model.TotalCredited > 0m)
                 {
-                    <div class="text-muted mt-1">Credit notes: @Model.TotalCredited.ToString("N2")</div>
+                    <div class="text-muted mt-1">@T.Format("Credit notes: {0}", Model.TotalCredited.ToString("N2"))</div>
                 }
             </div>
             <div class="col-6 col-md-3">

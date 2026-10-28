@@ -32,14 +32,13 @@ else if (ob.IsBalanced)
             @if (ob.HasControlAccount)
             {
                 <text>
-                    <code>39999</code> Opening Balance Control Account is <strong>zero</strong>, which means every
-                    debit opening balance has a matching credit across @ob.AccountsWithOpeningBalance account(s).
+                    @T.HtmlFormat("<code>39999</code> Opening Balance Control Account is <strong>zero</strong>, which means every debit opening balance has a matching credit across {0} account(s).", ob.AccountsWithOpeningBalance)
                 </text>
             }
             else
             {
                 <text>
-                    Total debits @ob.TotalDebit.ToString("N2") equal total credits @ob.TotalCredit.ToString("N2").
+                    @T.Format("Total debits {0} equal total credits {1}.", ob.TotalDebit.ToString("N2"), ob.TotalCredit.ToString("N2"))
                 </text>
             }
         </div>

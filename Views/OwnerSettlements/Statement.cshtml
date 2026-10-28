@@ -43,7 +43,7 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light">
         <strong>@Model.OwnerName</strong>
-        <span class="text-muted small ms-2">managed by @Model.CompanyName &middot; as at @Model.AsOfDate.ToString("dd/MM/yyyy")</span>
+        <span class="text-muted small ms-2">@T.Format("managed by {0} · as at {1}", Model.CompanyName, Model.AsOfDate.ToString("dd/MM/yyyy"))</span>
     </div>
     <div class="card-body">
         <table class="table table-sm mb-0" style="max-width: 560px;">
@@ -53,7 +53,7 @@
                 <tr><td>@T["Less: our commission"]</td><td class="text-end">(@Model.Commission.ToString("N2"))</td></tr>
                 @if (Model.CommissionVatRate > 0)
                 {
-                    <tr><td>Less: VAT on our commission (@Model.CommissionVatRate.ToString("0.##")%)</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
+                    <tr><td>@T.Format("Less: VAT on our commission ({0}%)", Model.CommissionVatRate.ToString("0.##"))</td><td class="text-end">(@Model.CommissionVat.ToString("N2"))</td></tr>
                 }
                 @if (Model.RentVatForOwner != 0m)
                 {
@@ -219,7 +219,7 @@
                 <td>@s.PaymentMethod</td>
                 <td>@(s.ReferenceNumber ?? "-")</td>
                 <td class="text-end">@s.AmountPaid.ToString("N2")</td>
-                <td>@(s.IsPosted ? "Posted" : "Draft")</td>
+                <td>@(s.IsPosted ? T["Posted"] : T["Draft"])</td>
                 <td class="statement-no-print"><a asp-action="Print" asp-route-id="@s.Id">@T["Advice"]</a></td>
             </tr>
         }
@@ -236,10 +236,7 @@
         else
         {
             <p class="small text-muted">
-                Pay the full balance (@Model.MaximumPayable.ToString("N2")) or any part of it. The amount starts at what
-                has been collected from tenants (@Model.AvailableFromCollections.ToString("N2")); paying more advances the
-                owner rent that tenants still owe us. Saving posts the payment straight away:
-                Due to Landlords goes down and the bank account is credited.
+                @T.Format("Pay the full balance ({0}) or any part of it. The amount starts at what has been collected from tenants ({1}); paying more advances the owner rent that tenants still owe us. Saving posts the payment straight away: Due to Landlords goes down and the bank account is credited.", Model.MaximumPayable.ToString("N2"), Model.AvailableFromCollections.ToString("N2"))
             </p>
             <form asp-action="Pay" method="post" class="row g-3">
                 <input type="hidden" name="OwnerName" value="@Model.OwnerName" />

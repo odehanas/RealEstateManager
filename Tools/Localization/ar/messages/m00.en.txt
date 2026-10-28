@@ -1,0 +1,260 @@
+A TIN is 10 digits.
+A UAE IBAN has 23 characters and starts with AE.
+A VAT registered supplier must have a TRN on file.
+A bill needs at least one line.
+A cheque amount cannot be negative.
+A cheque dated on or before the month end should be deposited, and one at the bank cleared or recorded as bounced.
+A cheque that is {0} cannot be cleared.
+A credit note cannot be dated before the invoice it credits.
+A delegation can run for at most 180 days; renew it if needed.
+A draft has no effect on the accounts and cannot be posted once the month is closed.
+A journal entry must contain at least two lines.
+A journal line cannot have both debit and credit.
+A later fiscal year is closed. Its close has to be undone first.
+A level called {0} already exists.
+A limited contract needs its end date.
+A month with nothing posted is unusual for a running business, and worth a second look.
+A payment dated before the handover must be recorded before the handover is posted.
+A payment is dated after this handover date - hand over on or after the last payment, or correct the date.
+A payment on this contract is not posted yet. Post it first.
+A payroll with net pay
+A practice company, "{0}{1}", is being filled with sample properties, tenants and transactions. In a minute or two, switch to it from the company menu to practise without touching your real records.
+A preferred visit date cannot be in the past.
+A project named "{0}" already exists.
+A property named "{0}" already exists ({1}). Use a distinct name so the two can be told apart on reports.
+A request to reopen this period is already waiting for a decision.
+A username is required. The tenant's email address is the usual choice.
+A withdrawal can only be charged to an owner's account.
+A withdrawal cannot be dated in the future.
+A {0} entry cannot be reset to draft. Post a reversing journal instead.
+Absent without leave per attendance, {0}
+Account cannot be its own parent.
+Account mapping for '{0}' is not configured.
+Account mappings saved successfully.
+Account name is required.
+Account not found.
+Account number already exists.
+Account number is required.
+Account type is required.
+Account was not found.
+Account {0} Advances to Suppliers is missing from the chart of accounts.
+Account {0} Advances to Suppliers is missing from the chart of accounts. Add it under Assets to pay vendor advances.
+Account {0} Property Maintenance is missing from the chart of accounts.
+Account {0} is missing from the chart of accounts. Restart the application once so it is added.
+Account {0} only holds differences that still need to be explained.
+Account {0} {1} is missing from the chart of accounts.
+Accounts 11300 and 61200 are needed. Restart the application once so they are added.
+Accounts 15100 and 15150 are needed for the note. Restart the application once so they are added.
+Accounts 15100, 15150 and 62100 are needed. Restart the application once so they are added.
+Accounts Payable is not mapped in Account Mappings.
+Accredited Service Provider
+Accumulated depreciation account is required.
+Accumulated depreciation for asset {0}
+Acquisition cost added successfully.
+Activation code applied successfully. Subscription access has been restored.
+Activation code duration must be greater than zero.
+Activation code generated: {0}
+Activation code is invalid or already used.
+Activation code is required.
+Activation code {0} is cancelled and can no longer be used.
+Activity log (Audit Logs): what staff changed, refused attempts
+Additional acquisition costs can only be added while the asset is in Draft status.
+Admin Full Name
+Advance (down payment) {0}
+Advance applied to bills {0}
+Advance from buyer - {0}
+Advance of {0} to {1} recorded. {2} will be recovered from each payroll.
+Advance to vendor {0}
+Advance {0} applied: {1}, clearing document {2}.
+Advance {0} has {1} left to apply.
+Advance {0} is not posted or has nothing left to apply.
+Advance {0} of {1} recorded.
+Advances From Customers
+Advances applied on handover - {0}
+Affection / site plan
+All checks green.
+All companies, subscriptions, database updates
+All {0} invoice(s) of the period are issued.
+Allowances cannot be negative.
+Amortised prepayments: {0} journal(s) posted.
+Amount must be greater than zero.
+Amount to pay
+Amounts must be positive.
+Amounts paid must be positive.
+An account with child accounts should not be postable.
+An outline can have at most 60 corners.
+An owner withdrawal category can only be used on an owner's current account. Remove the category from:
+Annual leave days should be between 0 and 60.
+Annual revenue AED 50 million or more
+Annual revenue below AED 50 million
+Another copy of the application was applying updates at the same time. Restart the site to check again.
+Answer maintenance calls, payment postponement requests and complaints raised by tenants through the self-service portal.
+Answer tenant service requests from the portal
+Approval levels assigned.
+Approval levels saved. New limits apply to payments entered from now on.
+Approve Period Reopening
+Approve a prepared payroll into the accounts. Nobody can approve a payroll they prepared unless they are the company's only payroll approver.
+Approve or return contracts that others have submitted, and switch contract approval on or off for the company. Nobody can approve a contract they created or submitted.
+Approve reopening a closed month
+Approve tenancy contracts (never their own)
+Approve the payroll before paying it.
+Approve the payroll into the accounts
+Ask someone with that authority to record it.
+Ask the assistant by voice or text about the system and the company's figures, and have it prepare entries for the user to confirm. It can only see and do what the user's other permissions allow.
+Asset account is required.
+Asset code already exists.
+Asset code is required.
+Asset name is required.
+Asset(s) {0} are in service but have no depreciation for this month.
+At least two journal lines are required.
+Attendance cannot be recorded for a future date.
+Attendance for {0} saved for {1} employee(s).
+Attested contract (Municipality)
+Balance due from buyer - {0}
+Bank transfer (needs the company IBAN)
+Bill {0} has no lines to post.
+Bill {0} has {1} open; {2} cannot be paid against it.
+Bill {0} has {1} open; {2} cannot be settled against it.
+Bill {0} is not posted yet. Post the bill before this payment.
+Bill {0} saved as a draft. Review it, then post it to book it to the accounts.
+Bill {0} settled from advance {1}
+Billing frequency must be 1, 2, 3, 4, 6, or 12.
+Booked from supplier e-invoice {0} (UUID {1}).
+Borrowing costs (capitalised)
+Budget amounts cannot be negative.
+Building part of {0}, transferred on completion. The land part is not depreciated.
+Building permit date
+Building permit number
+Buildings - own use
+Built-up area (sq ft)
+Business (B2B — e-invoice required)
+Business Performance page
+Business: owned properties. Personal: the owner's properties managed by the business.
+But asset(s) {0} have no depreciation line for this month.
+Buyer balance settled - {0}
+Cabinet decision (government entity)
+Capital Assets Scheme - {0}, year {1}
+Capital Assets Scheme year {0} - input tax repaid
+Capital Assets Scheme year {0} - more input tax recoverable
+Capital asset VAT adjustment
+Capitalization amount must be greater than zero.
+Capitalization credit account is required.
+Carries out maintenance jobs only: new tenant maintenance requests are assigned to them, and they see just their own jobs, record the work and materials, and mark them done.
+Carry Out Maintenance Jobs
+Cash receipt posted - {0}
+Category code already exists.
+Change in the nature of the supply
+Charge invoice {0} was saved as a draft but not posted: {1}
+Charge to the owner
+Chart of accounts
+Check the cleared date, or confirm below to go ahead anyway.
+Check the payment details: the amount must be greater than zero.
+Check: the document reads {0}, but the tenant record has {1}.
+Cheque / post-dated cheque
+Cheque / transfer reference
+Cheque 104207 is deposited...
+Cheque alignment test
+Cheque charges income
+Cheque number already exists.
+Cheque number is required.
+Cheque number {0} is already used by another PDC.
+Cheque returned unpaid by bank {0}
+Cheque returned unpaid{0}
+Cheque under collection {0}
+Cheque withdrawal charge
+Cheque {0} is deposited to the bank and now under collection.
+Cheque {0} is deposited.
+Cheque {0} is deposited...
+Cheque {0} is received and replaces cheque {1}.
+Cheque {0} is recorded as bounced
+Cheque {0} is withdrawn and handed back to the tenant.
+Cheque {0} returned unpaid
+Cheque {0} updated. The memorandum entry is now dated {1}.
+Cheque {0} was cleared as a draft but not posted: {1}
+Cheque {0} was saved as a draft but not posted: {1}
+Cheques Under Collection
+Choose a data source you have access to.
+Choose a development project that takes costs.
+Choose a password different from the current one.
+Choose a password that is not a common one.
+Choose a payment method.
+Choose a postable account to credit.
+Choose a postable account.
+Choose a username of at least 4 characters - the mobile number or email is usual.
+Choose an advance of this vendor.
+Choose an owned property.
+Choose count, total, average, lowest or highest.
+Choose how tenants pay.
+Choose how the tenant is identified.
+Choose one of the seven emirates.
+Choose one or more e-invoice XML files to upload.
+Choose the CSV file exported from the attendance device.
+Choose the account the advance is paid from.
+Choose the account the cost is paid from or moved from - not the project's own account.
+Choose the account the money was paid from.
+Choose the asset account the project's cost is collected in.
+Choose the bank account the salaries are paid from.
+Choose the bank or cash account the money went into.
+Choose the bank or cash account the owner is paid from.
+Choose the buyer.
+Choose the document type.
+Choose the document you need.
+Choose the employee.
+Choose the file to upload.
+Choose the invoice you need more time for.
+Choose the kind of request.
+Choose the kind of transaction.
+Choose the owner's property the cost is for.
+Choose the payment method.
+Choose the photo to upload.
+Choose the property.
+Choose the reason for the credit note.
+Choose the registration type.
+Choose the revenue band (or a start date) so the system knows which supplies to e-invoice.
+Choose the revenue band.
+Choose the type of leave.
+Choose the vendor first.
+Choose the {0} account in Payroll Settings.
+Choose two different floors that are already marked.
+Choose what the building is for: sale, rental or own use.
+Choose what the cost was for.
+Choose what the money was spent on.
+Choose what unit {0} is for.
+Choose where the material came from.
+Choose whether the tenant is an individual, a business or a government entity.
+Choose who receives the authority.
+Clear acquisition cost for asset {0}
+Clear and Post
+Cleared date cannot be earlier than received date.
+Click at least three corners to outline the unit.
+Close every period first. Still open: {0}.
+Close fiscal year {0} first: its results must be in retained earnings before this year's.
+Closed from the Closing Cockpit by {0}
+Closing entry removed; fiscal year {0} must be closed again.
+Code Duration (Days)
+Commercial / trade licence
+Commercial invoice - the supplier is not registered for VAT.
+Commercial property - standard rated at 5%.
+Commission invoice was not found.
+Commission on the owner's own properties is paid from one to the other.
+Commission paid to the business
+Commission tax invoice
+Commission tax invoice {0} - {1}
+Company account mapping setup was not found.
+Company created successfully.
+Company created successfully. Please log in with your new admin account.
+Company created successfully. Your 15-day trial has started.
+Company name already exists.
+Company record was not found.
+Company updated successfully.
+Company was not found.
+Completion certificate number
+Confirm new password
+Contract approval is off: a contract takes effect when its creator activates it.
+Contract approval is on: every new contract must be approved by a second person before it takes effect.
+Contract cancelled; the unit is available again.
+Contract {0} is active. Its rent invoices and income schedule are created.
+Contract {0} is awaiting approval. Withdraw it first to change it.
+Contract {0} is saved as a draft. It has no effect until it is
+Contract {0} is submitted for approval.
+Contract {0} signed: {1} including VAT ({2}).

@@ -64,7 +64,7 @@
                     @invoice.CashReceived.ToString("N2")
                     @if (invoice.CreditedAmount > 0m)
                     {
-                        <div class="small text-muted">+ @invoice.CreditedAmount.ToString("N2") credited</div>
+                        <div class="small text-muted">@T.Format("+ {0} credited", invoice.CreditedAmount.ToString("N2"))</div>
                     }
                 </td>
                 <td class="text-end">@balance.ToString("N2")</td>
@@ -100,8 +100,8 @@
 
                         <a asp-action="TaxInvoice" asp-route-id="@invoice.Id" target="_blank"
                            class="btn btn-sm btn-outline-dark"
-                           title="@(invoice.TaxInvoiceNumber != null ? "Print the tax invoice" : "Print the invoice — no output tax on this supply")">
-                            @(invoice.TaxInvoiceNumber != null ? "Tax Invoice" : "Invoice")
+                           title="@(invoice.TaxInvoiceNumber != null ? T["Print the tax invoice"] : "Print the invoice — no output tax on this supply")">
+                            @(invoice.TaxInvoiceNumber != null ? T["Tax Invoice"] : T["Invoice"])
                         </a>
 
                         @if (balance > 0 && invoicePosted)

@@ -13,17 +13,14 @@
 {
     case PdcStepViewModel.Deposit:
         <div class="alert alert-info">
-            The cheque leaves the drawer and goes to the bank for collection. The memorandum entry is reversed and the
-            tenant is credited now: <code>Dr Cheques Under Collection / Cr @(Model.SettlementMode == "Receivable" ? "Accounts Receivable" : "Advances from Customers")</code>.
-            When the bank clears it, <strong>Clear</strong> moves it into the bank; if the bank returns it, <strong>Bounced</strong> charges it back.
+            @T.HtmlFormat("The cheque leaves the drawer and goes to the bank for collection. The memorandum entry is reversed and the tenant is credited now: <code>Dr Cheques Under Collection / Cr {0}</code>. When the bank clears it, <strong>Clear</strong> moves it into the bank; if the bank returns it, <strong>Bounced</strong> charges it back.", Model.SettlementMode == "Receivable" ? T["Accounts Receivable"] : "Advances from Customers")
         </div>
         break;
     case PdcStepViewModel.Bounce:
         <div class="alert alert-danger">
             @if (deposited)
             {
-                <text>The bank returned the cheque unpaid. The amount is charged back to the tenant:
-                <code>Dr @(Model.SettlementMode == "Receivable" ? "Accounts Receivable" : "Advances from Customers") / Cr Cheques Under Collection</code>@(Model.SettlementMode == "Receivable" ? ", and the invoice is open again" : "").</text>
+                <text>@T.HtmlFormat("The bank returned the cheque unpaid. The amount is charged back to the tenant: <code>Dr {0} / Cr Cheques Under Collection</code>{1}.", Model.SettlementMode == "Receivable" ? T["Accounts Receivable"] : "Advances from Customers", Model.SettlementMode == "Receivable" ? ", and the invoice is open again" : "")</text>
             }
             else
             {
@@ -35,9 +32,7 @@
         break;
     case PdcStepViewModel.Withdraw:
         <div class="alert alert-warning">
-            The tenant takes the cheque back before it is deposited. The memorandum entry is reversed and the cheque stays in
-            the register as <strong>Withdrawn</strong>. @(Model.SettlementMode == "Receivable" ? "The invoice it was for stays open." : "")
-            The charge below is raised to the tenant as a tax invoice.
+            @T.HtmlFormat("The tenant takes the cheque back before it is deposited. The memorandum entry is reversed and the cheque stays in the register as <strong>Withdrawn</strong>. {0} The charge below is raised to the tenant as a tax invoice.", Model.SettlementMode == "Receivable" ? T["The invoice it was for stays open."] : "")
         </div>
         break;
 }
@@ -57,11 +52,11 @@
         <div class="col-md-6"><label class="form-label">@T["Lease"]</label><input class="form-control" value="@Model.LeaseDisplay" readonly /></div>
         <div class="col-md-2"><label class="form-label">@T["Invoice"]</label><input class="form-control" value="@Model.InvoiceDisplay" readonly /></div>
         <div class="col-md-2"><label class="form-label">@T["Cheque date"]</label><input class="form-control" value="@Model.ChequeDate.ToString("dd/MM/yyyy")" readonly /></div>
-        <div class="col-md-2"><label class="form-label">@(Model.DepositedDate.HasValue ? "Deposited" : "Received")</label><input class="form-control" value="@((Model.DepositedDate ?? Model.ReceivedDate).ToString("dd/MM/yyyy"))" readonly /></div>
+        <div class="col-md-2"><label class="form-label">@(Model.DepositedDate.HasValue ? T["Deposited"] : T["Received"])</label><input class="form-control" value="@((Model.DepositedDate ?? Model.ReceivedDate).ToString("dd/MM/yyyy"))" readonly /></div>
 
         <div class="col-md-3">
             <label asp-for="StepDate" class="form-label">
-                @(Model.Kind switch { PdcStepViewModel.Bounce => "Date returned", PdcStepViewModel.Withdraw => "Date withdrawn", _ => "Date deposited" }) &mdash; accounting date
+                @T.Format("{0} — accounting date", Model.Kind switch { PdcStepViewModel.Bounce => "Date returned", PdcStepViewModel.Withdraw => "Date withdrawn", _ => "Date deposited" })
             </label>
             <input asp-for="StepDate" type="date" class="form-control" />
         </div>
@@ -74,7 +69,7 @@
                 <div class="form-text" id="chargeTotal"></div>
             </div>
             <div class="col-md-6">
-                <label asp-for="Reason" class="form-label">@(Model.Kind == PdcStepViewModel.Bounce ? "Reason given by the bank" : "Note")</label>
+                <label asp-for="Reason" class="form-label">@(Model.Kind == PdcStepViewModel.Bounce ? T["Reason given by the bank"] : T["Note"])</label>
                 <input asp-for="Reason" class="form-control" maxlength="300"
                        placeholder="@(Model.Kind == PdcStepViewModel.Bounce ? "e.g. insufficient funds, signature mismatch" : "e.g. tenant to pay by bank transfer")" />
             </div>

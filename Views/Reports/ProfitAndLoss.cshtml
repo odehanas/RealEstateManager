@@ -27,7 +27,7 @@
         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
     </form>
 </div>
-<p class="text-muted">@Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy"). Each account sits on the line chosen for it in the chart of accounts (Income statement line).</p>
+<p class="text-muted">@T.Format("{0} to {1}. Each account sits on the line chosen for it in the chart of accounts (Income statement line).", Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))</p>
 
 <style>
     .is-table td, .is-table th { padding: .3rem .6rem; }
@@ -70,12 +70,12 @@
         @* ---------------- Operating costs: fixed, then recurring *@
         @foreach (var line in new[] { RealEstateManager.Domain.StatementLines.FixedCosts, RealEstateManager.Domain.StatementLines.RecurringCosts })
         {
-            <tr class="line-head"><td colspan="3">Less: @RealEstateManager.Domain.StatementLines.Describe(line).ToLowerInvariant()</td></tr>
+            <tr class="line-head"><td colspan="3">@T.Format("Less: {0}", RealEstateManager.Domain.StatementLines.Describe(line).ToLowerInvariant())</td></tr>
             @foreach (var row in Model.RowsOf(line))
             {
                 <tr class="acct"><td>@Drill(LedgerUrl(row.AccountId), row.AccountCode) @Drill(LedgerUrl(row.AccountId), row.AccountName)</td><td class="text-end text-muted">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td><td></td></tr>
             }
-            <tr class="subtotal"><td colspan="2">Total @RealEstateManager.Domain.StatementLines.Describe(line).ToLowerInvariant()</td><td class="text-end">(@Model.TotalOf(line).ToString("N2"))</td></tr>
+            <tr class="subtotal"><td colspan="2">@T.Format("Total {0}", RealEstateManager.Domain.StatementLines.Describe(line).ToLowerInvariant())</td><td class="text-end">(@Model.TotalOf(line).ToString("N2"))</td></tr>
         }
         <tr class="result"><td colspan="2">@T["Operating profit"]</td><td class="text-end @(Model.OperatingProfit < 0 ? "neg" : "")">@Money(Model.OperatingProfit)</td></tr>
 

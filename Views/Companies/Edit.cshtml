@@ -165,7 +165,7 @@
             </form>
             @if (!string.IsNullOrWhiteSpace(Model.SubscriptionNotes))
             {
-                <p class="small text-muted mb-4">Last change: @Model.SubscriptionNotes</p>
+                <p class="small text-muted mb-4">@T.Format("Last change: {0}", Model.SubscriptionNotes)</p>
             }
         }
 
@@ -237,7 +237,7 @@
                                     }
                                 </td>
                                 <td>@code.IssuedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@(code.ActivatedAt.HasValue ? code.ActivatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Not used")</td>
+                                <td>@(code.ActivatedAt.HasValue ? code.ActivatedAt.Value.ToString("dd/MM/yyyy HH:mm") : T["Not used"])</td>
                                 <td>@(string.IsNullOrWhiteSpace(code.Notes) ? "-" : code.Notes)</td>
                                 <td class="text-nowrap">
                                     <button type="button" class="btn btn-sm btn-outline-secondary js-copy-text" data-copy="@code.Code">@T["Copy"]</button>

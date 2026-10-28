@@ -146,7 +146,7 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
             <div>
-                <h5 class="mb-0">@selected.Name <span class="text-muted fw-normal">- period @selected.PeriodNumber of @selected.FiscalYear</span></h5>
+                <h5 class="mb-0">@selected.Name <span class="text-muted fw-normal">@T.Format("- period {0} of {1}", selected.PeriodNumber, selected.FiscalYear)</span></h5>
                 <div class="small text-muted">@selected.StartDate.ToString("dd/MM/yyyy") to @selected.EndDate.ToString("dd/MM/yyyy")</div>
             </div>
             @if (selected.IsClosed)
@@ -160,24 +160,23 @@
             else
             {
                 <div class="d-flex gap-2">
-                    <span class="badge bg-danger">@Model.RedCount red</span>
-                    <span class="badge bg-warning text-dark">@Model.AmberCount amber</span>
-                    <span class="badge bg-success">@Model.GreenCount green</span>
+                    <span class="badge bg-danger">@T.Format("{0} red", Model.RedCount)</span>
+                    <span class="badge bg-warning text-dark">@T.Format("{0} amber", Model.AmberCount)</span>
+                    <span class="badge bg-success">@T.Format("{0} green", Model.GreenCount)</span>
                 </div>
             }
         </div>
 
         @if (selected.IsFuture)
         {
-            <div class="card-body text-muted">This period has not started. Its checklist opens on @selected.StartDate.ToString("dd/MM/yyyy").</div>
+            <div class="card-body text-muted">@T.Format("This period has not started. Its checklist opens on {0}.", selected.StartDate.ToString("dd/MM/yyyy"))</div>
         }
         else if (!selected.IsClosed)
         {
             @if (selected.IsReopened)
             {
                 <div class="alert alert-primary m-3 mb-0">
-                    This period was reopened on request on @selected.ReopenedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") by @selected.ReopenedByName.
-                    Make the correction, then close it again below.
+                    @T.Format("This period was reopened on request on {0} by {1}. Make the correction, then close it again below.", selected.ReopenedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm"), selected.ReopenedByName)
                 </div>
             }
             <div class="table-responsive">
@@ -239,14 +238,14 @@
                     {
                         <div class="form-check mb-0">
                             <input class="form-check-input" type="checkbox" name="acknowledgeWarnings" value="true" id="ack" required />
-                            <label class="form-check-label" for="ack">I have reviewed the @Model.AmberCount amber warning(s); they are recorded with the close.</label>
+                            <label class="form-check-label" for="ack">@T.Format("I have reviewed the {0} amber warning(s); they are recorded with the close.", Model.AmberCount)</label>
                         </div>
                     }
                     else
                     {
                         <span class="text-success">@T["Every check is green."]</span>
                     }
-                    <button type="submit" class="btn btn-danger ms-auto" disabled="@(!Model.CanClose)">&#128274; Close @selected.Name</button>
+                    <button type="submit" class="btn btn-danger ms-auto" disabled="@(!Model.CanClose)">@T.Format("🔒 Close {0}", selected.Name)</button>
                 </form>
             </div>
         }
@@ -306,7 +305,7 @@
         <div class="row g-3 mb-4">
             <div class="col-lg-7">
                 <div class="card shadow-sm h-100">
-                    <div class="card-header bg-light"><h6 class="mb-0">Reopen requests for @selected.Name</h6></div>
+                    <div class="card-header bg-light"><h6 class="mb-0">@T.Format("Reopen requests for {0}", selected.Name)</h6></div>
                     <div class="card-body p-0">
                         @if (Model.RequestHistory.Count == 0)
                         {
@@ -385,7 +384,7 @@
 @* ---------------- Year-end ---------------- *@
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Year-end close - fiscal year @yearEnd.FiscalYear</h5>
+        <h5 class="mb-0">@T.Format("Year-end close - fiscal year {0}", yearEnd.FiscalYear)</h5>
         @if (yearEnd.IsClosed)
         {
             <span class="badge bg-dark fs-6">@T["🔒 Year closed"]</span>
@@ -401,29 +400,27 @@
     </div>
     <div class="card-body">
         <p class="text-muted">
-            Clears every revenue and expense account of the year into retained earnings with one entry on
-            @(yearEnd.EndDate?.ToString("dd/MM/yyyy") ?? "the last day of the year"), and carries the balance sheet into
-            @(yearEnd.FiscalYear + 1) as its opening balances.
+            @T.Format("Clears every revenue and expense account of the year into retained earnings with one entry on {0}, and carries the balance sheet into {1} as its opening balances.", yearEnd.EndDate?.ToString("dd/MM/yyyy") ?? "the last day of the year", yearEnd.FiscalYear + 1)
         </p>
 
         <div class="row g-3 mb-3">
             <div class="col-md-3">
                 <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">Revenue @(yearEnd.IsClosed ? "cleared" : "to clear")</div>
+                    <div class="small text-muted">@T.Format("Revenue {0}", yearEnd.IsClosed ? "cleared" : "to clear")</div>
                     <div class="fs-5 fw-bold">@yearEnd.TotalRevenue.ToString("N2")</div>
-                    @if (!yearEnd.IsClosed) { <div class="small text-muted">@yearEnd.RevenueAccounts account(s)</div> }
+                    @if (!yearEnd.IsClosed) { <div class="small text-muted">@T.Format("{0} account(s)", yearEnd.RevenueAccounts)</div> }
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">Expenses @(yearEnd.IsClosed ? "cleared" : "to clear")</div>
+                    <div class="small text-muted">@T.Format("Expenses {0}", yearEnd.IsClosed ? "cleared" : "to clear")</div>
                     <div class="fs-5 fw-bold">@yearEnd.TotalExpenses.ToString("N2")</div>
-                    @if (!yearEnd.IsClosed) { <div class="small text-muted">@yearEnd.ExpenseAccounts account(s)</div> }
+                    @if (!yearEnd.IsClosed) { <div class="small text-muted">@T.Format("{0} account(s)", yearEnd.ExpenseAccounts)</div> }
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">Net @(yearEnd.NetProfitOrLoss >= 0 ? "profit" : "loss") to retained earnings</div>
+                    <div class="small text-muted">@T.Format("Net {0} to retained earnings", yearEnd.NetProfitOrLoss >= 0 ? "profit" : "loss")</div>
                     <div class="fs-5 fw-bold @(yearEnd.NetProfitOrLoss >= 0 ? "text-success" : "text-danger")">@yearEnd.NetProfitOrLoss.ToString("N2")</div>
                     @if (yearEnd.RetainedEarningsAccount != null) { <div class="small text-muted">@yearEnd.RetainedEarningsAccount</div> }
                 </div>
@@ -442,13 +439,13 @@
                 Closed on @yearEnd.ClosedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") by @yearEnd.ClosedByName
                 @if (yearEnd.JournalEntryNumber != null)
                 {
-                    <text>- closing entry <strong>@yearEnd.JournalEntryNumber</strong>.</text>
+                    <text>@T.HtmlFormat("- closing entry <strong>{0}</strong>.", yearEnd.JournalEntryNumber)</text>
                 }
             </p>
             @if (yearEnd.CarryForwards.Count > 0)
             {
                 <details>
-                    <summary class="fw-semibold mb-2">Opening balances carried into @(yearEnd.FiscalYear + 1) (@yearEnd.CarryForwards.Count accounts)</summary>
+                    <summary class="fw-semibold mb-2">@T.Format("Opening balances carried into {0} ({1} accounts)", yearEnd.FiscalYear + 1, yearEnd.CarryForwards.Count)</summary>
                     <div class="table-responsive">
                         <table class="table table-sm table-striped mb-0">
                             <thead class="table-light"><tr><th>@T["Account"]</th><th>@T["Type"]</th><th class="text-end">@T["Debit"]</th><th class="text-end">@T["Credit"]</th></tr></thead>
@@ -494,7 +491,7 @@
                   onsubmit="return confirm('Close fiscal year @yearEnd.FiscalYear? Revenue and expenses are transferred to retained earnings.');">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="fiscalYear" value="@yearEnd.FiscalYear" />
-                <button type="submit" class="btn btn-danger" disabled="@(!yearEnd.CanClose)">Close fiscal year @yearEnd.FiscalYear</button>
+                <button type="submit" class="btn btn-danger" disabled="@(!yearEnd.CanClose)">@T.Format("Close fiscal year {0}", yearEnd.FiscalYear)</button>
             </form>
         }
     </div>

@@ -20,7 +20,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
         <h2 class="mb-0">Payroll @run.PeriodStart.ToString("MMMM yyyy") <span class="text-muted fs-5">@run.RunNumber</span></h2>
-        <div class="text-muted">Prepared by @run.PreparedByName @(run.ApprovedByName != null ? $"· Approved by {run.ApprovedByName} on {run.ApprovedAt?.ToLocalTime():dd/MM/yyyy}" : "")</div>
+        <div class="text-muted">@T.Format("Prepared by {0} {1}", run.PreparedByName, run.ApprovedByName != null ? $"· Approved by {run.ApprovedByName} on {run.ApprovedAt?.ToLocalTime():dd/MM/yyyy}" : "")</div>
     </div>
     <div class="d-flex flex-wrap gap-2 no-print">
         <span class="badge fs-6 align-self-center @(isDraft ? "bg-secondary" : run.Status == PayrollRunStatuses.Paid ? "bg-success" : "bg-primary")">@run.Status</span>
@@ -85,7 +85,7 @@ else if (run.Payments.Count == 0 && Model.CanApprove)
     <div class="no-print mb-3">
         <form asp-action="ReturnToDraft" asp-route-id="@run.Id" method="post" onsubmit="return confirm('Take this payroll out of the accounts and back to draft?');">
             @Html.AntiForgeryToken()<button class="btn btn-sm btn-outline-warning">@T["Return to draft for a correction"]</button>
-            @if (run.JournalEntry != null) { <span class="small text-muted ms-2">Journal @run.JournalEntry.EntryNumber</span> }
+            @if (run.JournalEntry != null) { <span class="small text-muted ms-2">@T.Format("Journal {0}", run.JournalEntry.EntryNumber)</span> }
         </form>
     </div>
 }
@@ -138,7 +138,7 @@ else if (run.Payments.Count == 0 && Model.CanApprove)
                     <td class="small">
                         @SalaryPaymentMethods.Describe(l.PaymentMethod)
                         @if (l.IsPaid) { <span class="badge bg-success">@T["Paid"]</span> }
-                        @if (l.ChequeNumber != null) { <div>Chq @l.ChequeNumber</div> }
+                        @if (l.ChequeNumber != null) { <div>@T.Format("Chq {0}", l.ChequeNumber)</div> }
                         <div><a asp-action="Payslip" asp-route-id="@l.Id" target="_blank" class="no-print">@T["Payslip"]</a></div>
                     </td>
                     @if (isDraft)
@@ -187,7 +187,7 @@ else if (run.Payments.Count == 0 && Model.CanApprove)
             <div class="col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0">@SalaryPaymentMethods.Describe(method) — @count employee(s), @amount.ToString("N2")</h6>
+                        <h6 class="mb-0">@T.Format("{0} — {1} employee(s), {2}", SalaryPaymentMethods.Describe(method), count, amount.ToString("N2"))</h6>
                     </div>
                     <div class="card-body">
                         <form asp-action="Pay" asp-route-id="@run.Id" method="post" class="d-flex flex-column gap-2">
@@ -196,7 +196,7 @@ else if (run.Payments.Count == 0 && Model.CanApprove)
                             <div><label class="form-label small mb-0">@T["Payment date"]</label><input name="paymentDate" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" min="@run.JournalEntry?.EntryDate.ToString("yyyy-MM-dd")" class="form-control" /></div>
                             @if (run.JournalEntry != null)
                             {
-                                <div class="small text-muted">Salary cost posted on @run.JournalEntry.EntryDate.ToString("dd/MM/yyyy"); pay on or after that date.</div>
+                                <div class="small text-muted">@T.Format("Salary cost posted on {0}; pay on or after that date.", run.JournalEntry.EntryDate.ToString("dd/MM/yyyy"))</div>
                             }
                             <div>
                                 <label class="form-label small mb-0">@T["Paid from"]</label>

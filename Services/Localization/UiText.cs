@@ -39,14 +39,84 @@ namespace RealEstateManager.Services.Localization
             _arabic = File.Exists(path)
                 ? Normalise(JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path)) ?? new())
                 : new Dictionary<string, string>();
+            _templates = new(BuildTemplates);
         }
 
         public string this[string english] => Translate(english);
 
         public IHtmlContent Html(string englishHtml) => new HtmlString(Translate(englishHtml));
 
-        public string Format(string englishTemplate, params object?[] values) =>
-            string.Format(CultureInfo.CurrentCulture, Translate(englishTemplate), values);
+        public string Format(string englishTemplate, params object?[] values) => SafeFormat(englishTemplate, values);
+
+        /// <summary>A sentence with inline markup and values; the values are HTML-encoded.</summary>
+        public IHtmlContent HtmlFormat(string englishHtmlTemplate, params object?[] values) =>
+            new HtmlString(SafeFormat(englishHtmlTemplate, values.Select(v => v is IHtmlContent ? (object?)Render(v) : System.Net.WebUtility.HtmlEncode(Convert.ToString(v, CultureInfo.CurrentCulture))).ToArray()));
+
+        /// <summary>
+        /// A message built in code ("Cheque 104207 is deposited..."): translated whole when the
+        /// dictionary has it, otherwise matched against the dictionary's templates
+        /// ("Cheque {0} is deposited...") and its values carried into the Arabic.
+        /// </summary>
+        public string Message(string? english)
+        {
+            if (string.IsNullOrWhiteSpace(english) || !UiLanguages.IsArabic)
+                return english ?? string.Empty;
+
+            // Already Arabic: a note kept in TempData is drawn on more than one page.
+            if (english.Any(c => c >= '؀' && c <= 'ۿ'))
+                return english;
+
+            var key = Key(english);
+            if (_arabic.TryGetValue(key, out var exact) && !string.IsNullOrWhiteSpace(exact))
+                return exact;
+
+            // A message can be several sentences joined; translate each when the whole is unknown.
+            foreach (var (pattern, arabic) in _templates.Value)
+            {
+                var match = pattern.Match(key);
+                if (!match.Success)
+                    continue;
+                var values = match.Groups.Cast<System.Text.RegularExpressions.Group>().Skip(1)
+                    .Select(g => (object?)(_arabic.TryGetValue(g.Value, out var word) ? word : g.Value)).ToArray();
+                try { return string.Format(CultureInfo.CurrentCulture, arabic, values); }
+                catch (FormatException) { break; }
+            }
+
+            var sentences = System.Text.RegularExpressions.Regex.Split(key, @"(?<=[.!?])\s+(?=[A-Z])");
+            if (sentences.Length > 1)
+            {
+                var parts = sentences.Select(Message).ToList();
+                if (parts.Where((p, i) => p != sentences[i]).Any())
+                    return string.Join(' ', parts);
+            }
+
+            _missing.TryAdd(english, 0);
+            return english;
+        }
+
+        private readonly Lazy<List<(System.Text.RegularExpressions.Regex Pattern, string Arabic)>> _templates;
+
+        private List<(System.Text.RegularExpressions.Regex, string)> BuildTemplates() =>
+            _arabic.Where(x => x.Key.Contains("{0}"))
+                .OrderByDescending(x => System.Text.RegularExpressions.Regex.Replace(x.Key, @"\{\d+\}", string.Empty).Length)
+                .Select(x => (new System.Text.RegularExpressions.Regex(
+                    "^" + System.Text.RegularExpressions.Regex.Replace(System.Text.RegularExpressions.Regex.Escape(x.Key), @"\\\{\d+}", "(.+?)") + "$",
+                    System.Text.RegularExpressions.RegexOptions.Singleline | System.Text.RegularExpressions.RegexOptions.CultureInvariant), x.Value))
+                .ToList();
+
+        private string SafeFormat(string template, object?[] values)
+        {
+            var translated = Translate(template);
+            try { return string.Format(CultureInfo.CurrentCulture, translated, values); }
+            catch (FormatException) { return string.Format(CultureInfo.CurrentCulture, template, values); }
+        }
+
+        private static string Render(object? content)
+        {
+            using var writer = new StringWriter();
+            ((IHtmlContent)content!).WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
+            return writer.ToString();
+        }
 
         /// <summary>Phrases asked for in Arabic that have no translation yet, for the translator.</summary>
         public IReadOnlyCollection<string> Missing => _missing.Keys.OrderBy(x => x).ToList();
@@ -142,5 +212,57 @@ namespace RealEstateManager.Services.Localization
                 return _text[english ?? WordBreak.Replace(name, " ")];
             };
         }
+    }
+}
+
+namespace RealEstateManager.Services.Localization
+{
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Filters;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures;
+
+    /// <summary>
+    /// Messages written in code - validation errors and the notes passed to the next page
+    /// in TempData - are translated just before an Arabic page is drawn, so no controller or
+    /// service has to know the user's language.
+    /// </summary>
+    public class UiMessageTranslationFilter : IResultFilter
+    {
+        private readonly UiText _text;
+        private readonly ITempDataDictionaryFactory _tempDataFactory;
+
+        public UiMessageTranslationFilter(UiText text, ITempDataDictionaryFactory tempDataFactory)
+        {
+            _text = text;
+            _tempDataFactory = tempDataFactory;
+        }
+
+        public void OnResultExecuting(ResultExecutingContext context)
+        {
+            if (!UiLanguages.IsArabic || context.Result is not (ViewResult or PartialViewResult))
+                return;
+
+            foreach (var entry in context.ModelState.Values)
+            {
+                if (entry.Errors.Count == 0)
+                    continue;
+                var errors = entry.Errors.ToList();
+                entry.Errors.Clear();
+                foreach (var error in errors)
+                    entry.Errors.Add(_text.Message(error.ErrorMessage));
+            }
+
+            var tempData = _tempDataFactory.GetTempData(context.HttpContext);
+            foreach (var key in tempData.Keys.ToList())
+            {
+                if (tempData.Peek(key) is string message)
+                {
+                    tempData[key] = _text.Message(message);
+                    tempData.Keep(key);
+                }
+            }
+        }
+
+        public void OnResultExecuted(ResultExecutedContext context) { }
     }
 }

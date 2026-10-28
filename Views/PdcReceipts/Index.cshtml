@@ -23,19 +23,19 @@
 <div class="row g-3 mb-3">
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
         <div class="text-muted small">On hand <span class="opacity-75">(11400)</span></div>
-        <div class="h5 mb-0">@onHand.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@onHand.Count cheque(s)</div>
+        <div class="h5 mb-0">@onHand.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@T.Format("{0} cheque(s)", onHand.Count)</div>
     </div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
         <div class="text-muted small">At bank, under collection <span class="opacity-75">(11450)</span></div>
-        <div class="h5 mb-0">@atBank.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@atBank.Count cheque(s)</div>
+        <div class="h5 mb-0">@atBank.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@T.Format("{0} cheque(s)", atBank.Count)</div>
     </div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 @(bounced.Count > 0 ? "border-danger" : "")"><div class="card-body py-2">
         <div class="text-muted small">@T["Bounced, not yet replaced"]</div>
-        <div class="h5 mb-0 @(bounced.Count > 0 ? "text-danger" : "")">@bounced.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@bounced.Count cheque(s)</div>
+        <div class="h5 mb-0 @(bounced.Count > 0 ? "text-danger" : "")">@bounced.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@T.Format("{0} cheque(s)", bounced.Count)</div>
     </div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100"><div class="card-body py-2">
         <div class="text-muted small">@T["Withdrawn, not yet replaced"]</div>
-        <div class="h5 mb-0">@withdrawn.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@withdrawn.Count cheque(s)</div>
+        <div class="h5 mb-0">@withdrawn.Sum(x => x.Amount).ToString("N2")</div><div class="small text-muted">@T.Format("{0} cheque(s)", withdrawn.Count)</div>
     </div></div></div>
 </div>
 
@@ -112,8 +112,8 @@
                 <td>@(pdc.DepositedDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                 <td>
                     @if (pdc.ClearedDate.HasValue) { <span class="text-success">@pdc.ClearedDate.Value.ToString("dd/MM/yyyy")</span> }
-                    else if (pdc.BouncedDate.HasValue) { <span class="text-danger" title="@pdc.BounceReason">Returned @pdc.BouncedDate.Value.ToString("dd/MM/yyyy")</span> }
-                    else if (pdc.WithdrawnDate.HasValue) { <span>Withdrawn @pdc.WithdrawnDate.Value.ToString("dd/MM/yyyy")</span> }
+                    else if (pdc.BouncedDate.HasValue) { <span class="text-danger" title="@pdc.BounceReason">@T.Format("Returned {0}", pdc.BouncedDate.Value.ToString("dd/MM/yyyy"))</span> }
+                    else if (pdc.WithdrawnDate.HasValue) { <span>@T.Format("Withdrawn {0}", pdc.WithdrawnDate.Value.ToString("dd/MM/yyyy"))</span> }
                     else { <span>-</span> }
                 </td>
                 <td>@pdc.Lease?.ContractNumber</td>
@@ -124,7 +124,7 @@
                     @if (pdc.ChargeInvoice != null)
                     {
                         <div class="small"><a asp-controller="CustomerInvoices" asp-action="TaxInvoice" asp-route-id="@pdc.ChargeInvoice.Id" target="_blank"
-                              title="@pdc.ChargeInvoice.ChargeType">Charge @pdc.ChargeInvoice.InvoiceNumber (@pdc.ChargeInvoice.TotalAmount.ToString("N2"))</a></div>
+                              title="@pdc.ChargeInvoice.ChargeType">@T.Format("Charge {0} ({1})", pdc.ChargeInvoice.InvoiceNumber, pdc.ChargeInvoice.TotalAmount.ToString("N2"))</a></div>
                     }
                 </td>
                 <td>@(string.IsNullOrWhiteSpace(pdc.BankName) ? "-" : pdc.BankName)</td>

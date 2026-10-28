@@ -1,0 +1,260 @@
+The {0} account in Payroll Settings must be an active, postable account.
+There are no generated e-invoices ready to send. Generate them first.
+There are no open capitalizable acquisition costs to capitalize.
+There were no draft entries to post.
+This PDC is already cleared.
+This account is locked after repeated wrong passwords. Try again in {0} minute(s).
+This account is locked after {0} wrong passwords. Try again in {1} minute(s), or ask an administrator.
+This account is temporarily locked. Try again in {0} minute(s).
+This advance has been applied to bills by {0}
+This bill has no journal entry to reset.
+This bill has {0} posted payment(s) against it. Reset those first.
+This bill is posted and cannot be edited. Reset it to draft first.
+This bill is posted. Reset it to draft before changing it.
+This bill is settled by clearing document(s) {0}
+This cheque has already cleared. Reset the clearance entry first.
+This cheque has been deposited, bounced or withdrawn since. Reset that entry first.
+This cheque has bounced since it was deposited. Reset the bounce entry first.
+This cheque has cleared since it was deposited. Reset the clearance entry first.
+This cheque is already at the bank, so it cannot be withdrawn. If the bank returns it, record it as bounced.
+This cheque was cleared on {0}, so the received date cannot be later than that.
+This company does not require contract approval. Activate the contract instead.
+This company is already suspended.
+This company is not suspended.
+This company requires contract approval. Submit the contract for approval instead.
+This contract already has invoices, so it cannot be deleted.
+This contract is not waiting for approval.
+This contract's annual rent of {0} is above your approval authority ({1}
+This credit note has been sent to the FTA through your e-invoicing provider and can no longer be reset. If it was wrong, raise a new invoice for the difference.
+This credit note has no journal entry to reset.
+This credit note is posted. Reset it to draft before changing it.
+This database has no record of applied scripts, and it is either empty or older than script 14, so it cannot be told which scripts it already has. Nothing was applied. Bring it up to date by hand (or restore a current backup), then restart the site.
+This document is already booked as a vendor bill.
+This document is already waiting for approval.
+This entry is already a draft.
+This entry is already posted.
+This invoice has been sent to the FTA through your e-invoicing provider and can no longer be reset. Correct it with a credit note (Operations ▸ Customer Invoices ▸ Credit Note).
+This invoice has {0} cleared cheque(s) against it. Reset those first.
+This invoice has {0} posted credit note(s) against it. Reset those first.
+This invoice has {0} posted receipt(s) against it. Reset those first.
+This is marked as a full tax invoice but the recipient TRN is missing.
+This is not a payment postponement request.
+This payment has already been decided.
+This payment of {0} has not been approved for release. It waits in Controls ▸ Payment Approvals.
+This payroll is already a draft.
+This payroll is approved. Return it to draft to change it.
+This project is already closed.
+This project was cancelled and takes no costs.
+This request can no longer be withdrawn because work has already started on it.
+This request does not name an invoice and a new date.
+This request has already been decided.
+This request is no longer waiting for a decision.
+This request is no longer waiting for approval.
+This script runs without a transaction, so statements before the failing one were kept.
+This session is not a tenant portal session.
+This user has no company access assigned.
+This voucher would take the float below zero. Balance on {0} is {1} and the voucher is {2}. Record a replenishment first.
+This would clear the cheque {0} day(s) before its cheque date of {1}. A bank will not normally honour a post-dated cheque early.
+Tick the cheques to deposit first.
+Tick the documents you uploaded to your provider first.
+Title deed date
+Title deed number
+Title deed {0} is already recorded on {1} - {2}.
+To whom it may concern
+Total amount must be greater than zero.
+Trade licence / registration number
+Trade licence number
+Transactions recorded in the month
+Trial balance agrees at {0}.
+Trial balance debits {0} against credits {1}. Usually the opening balances do not balance.
+Trial balance, P&L, balance sheet, statements, and ledgers.
+Two scripts share the number {0}: {1}
+UAE Dirhams (AED)
+UAE Dirhams Twelve Thousand Five Hundred and Fils 50/100 Only
+Umm Al Quwain
+Under maintenance - not available to let
+Unearned revenue from tenant billing
+Unit Cost Center
+Unit handed over: the sale is now revenue and the unit's cost is in cost of sales.
+Unit number already exists in this property.
+Unit sale payment
+Unit sale payment {0} - {1}
+Unit title deed number
+Unit {0} handed over
+Unit {0} held for sale - cost on completion
+United Arab Emirates
+Unknown closing step.
+Use &lt;strong&gt;Advance&lt;/strong&gt; ...
+Use at least {0} characters.
+Use the AI Assistant
+Use the AI assistant (only within the person's own rights)
+Use upper and lower case letters and at least one digit.
+Useful life in months must be greater than zero.
+User created successfully.
+User id is required.
+User updated successfully.
+User was not found.
+Username already exists.
+Users, roles and permissions of this company
+VAT 5% on {0} recharged
+VAT Payable is not mapped in Account Mapping.
+VAT on commission {0} - {1}
+VAT on costs
+VAT on invoice {0}
+VAT on invoice {0}, the owner's to declare
+VAT on the commission (owner not VAT registered)
+VAT settings saved.
+Vacant - never let
+Vendor bill lines (project costs, VAT)
+Vendor bill was not found.
+Vendor bill {0} - {1} ref {2}
+Vendor bills, vendor payments, petty cash, owner settlements
+Vendor clearing documents (bills settled by payments and advances)
+Vendor is required when the paid / payable account is Accounts Payable.
+Vendor is required when the payment / payable account is Accounts Payable.
+Vendor payment was not found.
+Vendor was not found.
+View Business Performance
+View Master Data
+View properties, units, tenants and vendors
+Views everything and approves contracts, payments and payroll up to their approval limit. Enters no records.
+Voucher posted: {0} for {1}.
+Voucher recorded for {0}. {1}
+Voucher saved as a draft but not posted: {0}
+WPS (salary file)
+WPS salary file {0} is ready to upload to your bank.
+Waiting for approval:
+Withdrawal of {0} recorded and posted.
+Withdrawn by the requester.
+Withdrawn by the submitter.
+Within {0}'s own authority ({1}).
+Year {0} adjustment of {1} posted ({2}
+Year {0} has already been adjusted.
+Year {0} reviewed: no change in use, no adjustment.
+Year {0} runs to {1}; adjust it once the year is over.
+Year-end closing
+Year-end closing of {0}
+You already have leave booked over some of those dates.
+You already have one of these waiting with HR.
+You are not on an approval level. Ask an owner to place you on one in System Setup ▸ Approval Limits.
+You asked for this reopening, so another approver has to decide it.
+You can delegate at most your own authority ({0}
+You can only delete your own reports.
+You can only give access to companies you administer.
+You cannot deactivate your own account.
+You cannot delegate to yourself.
+You cannot remove your own administrator rights. Ask another administrator of the company to do it.
+You created this document, so someone else has to approve it.
+You do not have access to that data source.
+You entered this payment, so someone else has to release it.
+You have {0} day(s) of annual leave available by then; {1} requested.
+You prepared this payroll, so another approver has to approve it.
+You submitted this for approval, so someone else has to approve it.
+Your current password is incorrect.
+Your password has been changed.
+Your request for a {0} is sent to HR. You can print it here once it is issued.
+Your request has been withdrawn.
+Your request to reopen {0} is sent to the approvers.
+Your tenant record could not be found.
+Your {0} leave request for {1} day(s) is sent to HR.
+Zero rated as set on the unit or property.
+{0} "{1}" is already registered to {2} - {3}. Each record must carry its own identifiers; edit the existing record instead of creating a second one.
+{0} (fiscal year {1}) is closed. {2} dated {3} cannot be created, posted, changed or removed in a closed period. Date the transaction in an open period, or ask for the period to be reopened from the Closing Cockpit.
+{0} (includes {1} irrecoverable VAT)
+{0} ({1}) taken from the maintenance store for job {2} and charged to
+{0} - building (investment property)
+{0} - land ({1} unit(s)), not depreciated
+{0} - year {1} input tax repaid
+{0} active contract(s) cover the period but nothing is scheduled for recognition. Check the contracts' schedules.
+{0} already has leave booked over some of those dates.
+{0} bounced cheque(s) in the last 12 months ({1})
+{0} cannot be closed yet:
+{0} cannot be issued yet.
+{0} charges VAT, but the company has no TRN. Only a VAT registered business may charge VAT - enter the TRN in E-Invoicing Settings, or credit this invoice and re-issue it without VAT.
+{0} cheque(s) deposited on {1}: {2}
+{0} cheque(s) numbered {1} are ready to print.
+{0} cheque(s) totalling {1} dated on or before {2} are not cleared yet.
+{0} commission tax invoice(s) issued at {1}: {2}
+{0} cost transferred out of work in progress on completion
+{0} could not be generated - see below.
+{0} could not be posted.
+{0} document(s) marked as sent to the provider. They are now locked: corrections need a credit note.
+{0} does not need an e-invoice (individual tenant, or before the start date).
+{0} does not need an e-invoice.
+{0} for {1} was saved but its VAT journal is still a draft: {2}
+{0} has already been sent to the provider.
+{0} has already been sent to the provider. Correct it with a credit note.
+{0} has already been {1}.
+{0} has no TIN or TRN. Every business on the e-invoicing network is identified by its TIN ({1}).
+{0} has no owner recorded.
+{0} has not started yet.
+{0} has {1} day(s) of annual leave available by then; {2} requested. Book the rest as unpaid leave.
+{0} is above your authority ({1}). It needs {2} level or above.
+{0} is already being depreciated as investment property.
+{0} is already closed.
+{0} is already open.
+{0} is approved and now in effect.
+{0} is closed, so nothing can be posted on {1}. Choose a date in an open month.
+{0} is closed, so the memorandum entry cannot be dated into it.
+{0} is closed. An entry cannot be posted into a closed period.
+{0} is closed. Entries in a closed period cannot be reset - those figures have already been reported. Post a correcting journal instead.
+{0} is closed. Every period of {1} is now closed - run the year-end close.
+{0} is closed. Nothing can be run in it.
+{0} is closed. Nothing more can be posted into it.
+{0} is not a managed property; only an owner's property can be charged to its owner.
+{0} is not posted. Only a posted credit note can be issued.
+{0} is not posted. Only a posted invoice can be issued.
+{0} is open again for {1}'s correction. Close it again from the cockpit when done.
+{0} is overdue on {1} invoice(s)
+{0} is returned to its creator with your reason.
+{0} is scheduled but nothing is recorded in the general ledger.
+{0} is withdrawn and back in draft.
+{0} journal(s) posted in the period.
+{0} land - not depreciated
+{0} leave of {1} day(s) for {2} is waiting for approval.
+{0} may release payments {1}
+{0} number {1} filled in.
+{0} of {1} invoice(s) totalling {2} are not issued.
+{0} of {1} needs {2} level or above to approve
+{0} of {1} recorded and posted.
+{0} of {1} {2}(s) totalling {3} are not posted.
+{0} owes {1} in advances; more cannot be recovered.
+{0} payroll transaction(s) generated from {1} attendance.
+{0} posted document(s) were re-assessed against the current settings and tenant details.
+{0} posted document(s) were re-assessed.
+{0} recorded on job {1}; its cost is booked by {2}.
+{0} reduces invoice {1}, which has not been sent yet. Send the invoice first.
+{0} registered under the Capital Assets Scheme.
+{0} request(s) to postpone a payment in the last 12 months
+{0} returned cheque(s) still need to be replaced
+{0} reverses VAT, but the company has no TRN. Enter the TRN in E-Invoicing Settings.
+{0} set up: {1} depreciated over {2} years from {3}, about {4} a month. Land is not depreciated.
+{0} transferred and posted: land {1}, building {2}.
+{0} unit outline(s) added from floor {1} to floor {2}. Check them, and adjust any that do not sit right.
+{0} unused code(s) were cancelled with it.
+{0} {1} could not be processed: {2}
+{0} {1} issued to {2}. They can print it from the portal.
+{0} {1} needs release by {2} level or above. It reaches the accounts once approved in Controls ▸ Payment Approvals.
+{0} {1} was cancelled and takes no costs
+{0} {1}(s) posted; the ledger agrees at {2}.
+{0}'s net salary is negative. Correct the deductions first.
+{0}: 14-digit MOHRE person code
+{0}: 9-digit bank routing code
+{0}: choose the account this cost is charged to.
+{0}: document {1} from {2} was already received.
+{0}: empty, or larger than 5 MB.
+{0}: enter the authority that issued their trade licence ({1}).
+{0}: enter the passport's issuing country as a two-letter code, e.g. IN or GB ({1}).
+{0}: enter the trade licence number (or Emirates ID / passport) that identifies them ({1}).
+{0}: received, but it is not marked as a UAE (PINT AE) document - check it with the supplier.
+{0}: received, but no vendor has TRN/TIN {1}. Set the supplier up under Master Data ▸ Vendors, then book it.
+{0}: saved as a draft, not posted - {1}
+{0}: select the emirate of their address ({1}).
+{0}: the TIN "{1}" is not valid - it must be 10 digits starting with 1 ({2}).
+{0}: the TRN "{1}" is not valid - 15 digits, starting with 1 and ending with 03 ({2}).
+{0}: the amount cannot be negative.
+{0}: the city is missing ({1}).
+{0}: the country code must be two letters, e.g. AE ({1}).
+{0}: the net amount and VAT do not add up to the total.
+{0}: the quantity cannot be negative.
+{0}: the selected account was not found.

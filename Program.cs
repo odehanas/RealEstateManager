@@ -51,6 +51,7 @@ builder.Services.AddScoped<ServiceRequestService>();
 builder.Services.AddSingleton<HelpCatalogService>();
 // English / Arabic screens: the dictionary, and the labels written by asp-for.
 builder.Services.AddSingleton<RealEstateManager.Services.Localization.UiText>();
+builder.Services.AddScoped<RealEstateManager.Services.Localization.UiMessageTranslationFilter>();
 builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
     .Configure<RealEstateManager.Services.Localization.UiText>((options, text) =>
         options.ModelMetadataDetailsProviders.Add(new RealEstateManager.Services.Localization.LocalizedDisplayMetadataProvider(text)));
@@ -197,6 +198,7 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.AddService<SubscriptionEnforcementFilter>();
     options.Filters.AddService<PermissionEnforcementFilter>();
     options.Filters.Add(new ExpiredFormFilter());
+    options.Filters.AddService<RealEstateManager.Services.Localization.UiMessageTranslationFilter>();
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

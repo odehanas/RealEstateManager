@@ -62,7 +62,7 @@
 </form>
 
 <div class="d-none d-print-block mb-3">
-    <strong>Period:</strong> @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")
+    @T.HtmlFormat("<strong>Period:</strong> {0} to {1}", Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))
 </div>
 
 <div class="row g-3 mb-3">
@@ -85,7 +85,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm h-100 border-0 @(Model.NetProfitOrLoss >= 0 ? "bg-primary" : "bg-danger") text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">Net @(Model.NetProfitOrLoss >= 0 ? "Profit" : "Loss")</div>
+                <div class="small text-uppercase opacity-75">@T.Format("Net {0}", Model.NetProfitOrLoss >= 0 ? T["Profit"] : "Loss")</div>
                 <div class="h4 fw-bold mb-0">@Model.NetProfitOrLoss.ToString("N2")</div>
             </div>
         </div>

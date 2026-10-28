@@ -42,6 +42,26 @@ def main():
                 else:
                     key = matches[0]
             result[key] = arabic
+
+    # Messages from the code: ar/messages/mNN.en.txt and its translation mNN.ar.txt, line for line.
+    messages_missing = 0
+    for english_file in sorted(glob.glob(os.path.join(PROJECT, 'Tools', 'Localization', 'ar', 'messages', '*.en.txt'))):
+        arabic_file = english_file[:-len('.en.txt')] + '.ar.txt'
+        english_lines = open(english_file, encoding='utf-8').read().splitlines()
+        if not os.path.exists(arabic_file):
+            messages_missing += len(english_lines); continue
+        arabic_lines = open(arabic_file, encoding='utf-8').read().splitlines()
+        if len(arabic_lines) != len(english_lines):
+            problems.append(f'{os.path.basename(arabic_file)}: {len(arabic_lines)} lines for {len(english_lines)} messages - not used')
+            messages_missing += len(english_lines); continue
+        for english, arabic in zip(english_lines, arabic_lines):
+            if english.strip() and arabic.strip():
+                if english.count('{') != arabic.count('{'):
+                    problems.append(f'{os.path.basename(arabic_file)}: values differ in: {english[:70]}')
+                result.setdefault(english.strip(), arabic.strip())
+    if messages_missing:
+        problems.append(f'{messages_missing} code messages have no Arabic sheet yet')
+
     json.dump(dict(sorted(result.items())), open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     todo = [p for p in phrases if p not in result]
     print(f'{len(result)} translations; {len(todo)} of {len(phrases)} screen phrases still in English')

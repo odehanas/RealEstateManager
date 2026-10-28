@@ -20,7 +20,7 @@
         <h2 class="mb-1">@T["VAT Return"]</h2>
         <p class="text-muted mb-0">
             @Model.CompanyName
-            @if (!string.IsNullOrWhiteSpace(Model.CompanyTrn)) { <text>&middot; TRN @Model.CompanyTrn</text> }
+            @if (!string.IsNullOrWhiteSpace(Model.CompanyTrn)) { <text>@T.Format("· TRN {0}", Model.CompanyTrn)</text> }
         </p>
     </div>
     <div class="d-flex gap-2 no-print">
@@ -51,7 +51,7 @@
 </form>
 
 <div class="d-none d-print-block mb-3">
-    <strong>Tax period:</strong> @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")
+    @T.HtmlFormat("<strong>Tax period:</strong> {0} to {1}", Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))
 </div>
 
 <div class="row g-3 mb-4">
@@ -60,7 +60,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Output Tax Due"]</div>
                 <div class="h4 fw-bold mb-0">@Model.StandardRatedVat.ToString("N2")</div>
-                <div class="small opacity-75">On @Model.StandardRatedNet.ToString("N0") of standard rated supplies</div>
+                <div class="small opacity-75">@T.Format("On {0} of standard rated supplies", Model.StandardRatedNet.ToString("N0"))</div>
             </div>
         </div>
     </div>
@@ -69,14 +69,14 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Input Tax Recoverable"]</div>
                 <div class="h4 fw-bold mb-0">@Model.InputVatRecoverable.ToString("N2")</div>
-                <div class="small opacity-75">@Model.InputVatNonRecoverable.ToString("N2") irrecoverable</div>
+                <div class="small opacity-75">@T.Format("{0} irrecoverable", Model.InputVatNonRecoverable.ToString("N2"))</div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="card shadow-sm h-100 border-0 @(Model.NetVatPayable >= 0 ? "bg-danger" : "bg-dark") text-white">
             <div class="card-body py-3">
-                <div class="small text-uppercase opacity-75">@(Model.NetVatPayable >= 0 ? "Net VAT Payable" : "Net VAT Reclaimable")</div>
+                <div class="small text-uppercase opacity-75">@(Model.NetVatPayable >= 0 ? T["Net VAT Payable"] : T["Net VAT Reclaimable"])</div>
                 <div class="h4 fw-bold mb-0">@Math.Abs(Model.NetVatPayable).ToString("N2")</div>
             </div>
         </div>
@@ -86,7 +86,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Recovery Rate"]</div>
                 <div class="h4 fw-bold mb-0">@Model.ActualRecoveryRate.ToString("N2")%</div>
-                <div class="small opacity-75">Provisional @Model.ProvisionalRecoveryRate.ToString("N2")%</div>
+                <div class="small opacity-75">@T.Format("Provisional {0}%", Model.ProvisionalRecoveryRate.ToString("N2"))</div>
             </div>
         </div>
     </div>
@@ -115,7 +115,7 @@
                         <td class="lbl">
                             @if (line.IsCreditNote)
                             {
-                                <text>&nbsp;&nbsp;Less credit notes &mdash; @VatCategories.Describe(line.VatCategory)</text>
+                                <text>@T.Format("Less credit notes — {0}", VatCategories.Describe(line.VatCategory))</text>
                             }
                             else
                             {
@@ -162,7 +162,7 @@
                 @foreach (var line in Model.InputLines)
                 {
                     <tr>
-                        <td class="lbl">@(line.Attribution == "CapitalAssetsScheme" ? "Capital Assets Scheme adjustment" : InputTaxAttributions.Describe(line.Attribution))</td>
+                        <td class="lbl">@(line.Attribution == "CapitalAssetsScheme" ? T["Capital Assets Scheme adjustment"] : InputTaxAttributions.Describe(line.Attribution))</td>
                         <td class="text-end">@line.BillCount</td>
                         <td class="text-end">@line.NetAmount.ToString("N2")</td>
                         <td class="text-end">@line.VatAmount.ToString("N2")</td>
@@ -234,7 +234,7 @@
                 <tfoot>
                     <tr>
                         <td class="lbl">
-                            <strong>@(washUp.Adjustment >= 0 ? "Additional input tax recoverable" : "Input tax to repay")</strong>
+                            <strong>@(washUp.Adjustment >= 0 ? T["Additional input tax recoverable"] : T["Input tax to repay"])</strong>
                         </td>
                         <td class="text-end fw-bold @(washUp.Adjustment >= 0 ? "text-success" : "text-danger")">
                             @Math.Abs(washUp.Adjustment).ToString("N2")

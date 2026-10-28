@@ -49,7 +49,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Unit Occupancy"]</div>
                 <div class="h3 fw-bold mb-1">@Model.OccupancyRate.ToString("N1")%</div>
-                <div class="small">@Model.OccupiedUnits occupied of @Model.TotalUnits units</div>
+                <div class="small">@T.Format("{0} occupied of {1} units", Model.OccupiedUnits, Model.TotalUnits)</div>
             </div>
         </div>
     </div>
@@ -67,7 +67,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Rent Realisation"]</div>
                 <div class="h3 fw-bold mb-1">@Model.RentRealisationRate.ToString("N1")%</div>
-                <div class="small">Contracted @Model.ContractedAnnualRent.ToString("N0") of @Model.StandardAnnualRent.ToString("N0")</div>
+                <div class="small">@T.Format("Contracted {0} of {1}", Model.ContractedAnnualRent.ToString("N0"), Model.StandardAnnualRent.ToString("N0"))</div>
             </div>
         </div>
     </div>
@@ -76,7 +76,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Annual Rent Gap"]</div>
                 <div class="h3 fw-bold mb-1">@Model.RentGap.ToString("N0")</div>
-                <div class="small">@Model.VacantUnits vacant &middot; @Model.LeasesExpiringIn90Days expiring in 90 days</div>
+                <div class="small">@T.Format("{0} vacant · {1} expiring in 90 days", Model.VacantUnits, Model.LeasesExpiringIn90Days)</div>
             </div>
         </div>
     </div>

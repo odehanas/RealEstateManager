@@ -52,7 +52,7 @@
         <div class="col-md-4" id="statementLineBox">
             <label asp-for="StatementLine" class="form-label">@T["Income statement line"]</label>
             <select asp-for="StatementLine" class="form-select" id="statementLine">
-                <option value="">@(Model.InheritedStatementLine != null ? $"As its group / default: {RealEstateManager.Domain.StatementLines.Describe(Model.InheritedStatementLine)}" : "As its group / standard default")</option>
+                <option value="">@(Model.InheritedStatementLine != null ? $"As its group / default: {RealEstateManager.Domain.StatementLines.Describe(Model.InheritedStatementLine)}" : T["As its group / standard default"])</option>
                 <optgroup label="Revenue" data-type="Revenue">
                     @foreach (var line in RealEstateManager.Domain.StatementLines.Revenue)
                     {

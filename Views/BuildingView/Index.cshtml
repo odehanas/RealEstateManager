@@ -36,7 +36,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <h5 class="mb-0">@b.Name</h5>
-                            <div class="small text-muted">@b.Code &middot; @b.OwnershipType &middot; @b.Units unit(s) on @b.Floors floor(s)</div>
+                            <div class="small text-muted">@T.Format("{0} · {1} · {2} unit(s) on {3} floor(s)", b.Code, b.OwnershipType, b.Units, b.Floors)</div>
                         </div>
                         <div class="text-end">
                             <div class="fs-5">@b.OccupancyPercent.ToString("0")%</div>
@@ -52,7 +52,7 @@
                     </div>
                     <div class="d-flex justify-content-between small">
                         <span><strong class="text-success">@b.Good</strong> healthy &middot; <strong class="text-warning">@b.Watch</strong> watch &middot; <strong class="text-danger">@b.Risk</strong> at risk</span>
-                        <span class="text-muted">overdue @b.Overdue.ToString("N0")</span>
+                        <span class="text-muted">@T.Format("overdue {0}", b.Overdue.ToString("N0"))</span>
                     </div>
                 </div>
                 <div class="card-footer bg-white border-0 pt-0">

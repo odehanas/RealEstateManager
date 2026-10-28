@@ -39,7 +39,7 @@
             <div class="card-body">
                 <div class="small text-uppercase text-muted">@T["Open Items"]</div>
                 <div class="display-6 fw-bold">@Model.OpenItems</div>
-                <div class="small text-muted">New: @Model.NewItems</div>
+                <div class="small text-muted">@T.Format("New: {0}", Model.NewItems)</div>
             </div>
         </div>
     </div>

@@ -46,7 +46,7 @@
         </div>
 
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white"><strong>@T["Timeline"]</strong> <span class="text-muted small">target: first response within @target.ResponseHours h, done within @(target.ResolveHours >= 48 ? $"{target.ResolveHours / 24} days" : $"{target.ResolveHours} h")</span></div>
+            <div class="card-header bg-white"><strong>@T["Timeline"]</strong> <span class="text-muted small">@T.Format("target: first response within {0} h, done within {1}", target.ResponseHours, target.ResolveHours >= 48 ? $"{target.ResolveHours / 24} days" : $"{target.ResolveHours} h")</span></div>
             <ul class="list-group list-group-flush small">
                 <li class="list-group-item d-flex justify-content-between"><span>@T["Requested"]</span><span>@Local(Model.SubmittedAt)</span></li>
                 <li class="list-group-item d-flex justify-content-between"><span>@T["First response"]</span><span>@Local(Model.AcknowledgedAt) <span class="text-muted">@Since(Model.AcknowledgedAt)</span></span></li>
@@ -58,7 +58,7 @@
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white d-flex justify-content-between">
                 <strong>@T["Materials used"]</strong>
-                <span class="small text-muted">Charged to @chargedTo</span>
+                <span class="small text-muted">@T.Format("Charged to {0}", chargedTo)</span>
             </div>
             @if (materials.Count > 0)
             {
@@ -77,7 +77,7 @@
                                             <span>@T["Store"]</span>
                                             if (m.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Entry" asp-route-id="@m.JournalEntryId" class="small">@T["entry"]</a> }
                                         }
-                                        else { <span>Bought (@m.Reference)</span> }
+                                        else { <span>@T.Format("Bought ({0})", m.Reference)</span> }
                                     </td>
                                     <td class="text-end">@m.Quantity.ToString("0.###")</td>
                                     <td class="text-end">@m.UnitCost.ToString("N2")</td>
@@ -109,7 +109,7 @@
                     </div>
                     <div class="col-md-2"><label class="form-label small mb-0" for="matRef">@T["Bill / receipt"]</label><input id="matRef" name="Reference" class="form-control form-control-sm" maxlength="100" placeholder="@T["if bought"]" /></div>
                     <div class="col-12 d-flex justify-content-between align-items-center">
-                        <span class="small text-muted">An item from the store is posted out of account @MaintenanceStandards.StockAccountCode at once. A bought item is costed by its bill or petty cash voucher.</span>
+                        <span class="small text-muted">@T.Format("An item from the store is posted out of account {0} at once. A bought item is costed by its bill or petty cash voucher.", MaintenanceStandards.StockAccountCode)</span>
                         <button type="submit" class="btn btn-sm btn-dark">@T["Add material"]</button>
                     </div>
                 </form>
@@ -146,7 +146,7 @@
                 }
                 @if (Model.Status == ServiceRequestStatuses.Resolved)
                 {
-                    <div class="small mb-2"><strong>Done:</strong> @Model.ResolutionNotes</div>
+                    <div class="small mb-2">@T.HtmlFormat("<strong>Done:</strong> {0}", Model.ResolutionNotes)</div>
                     <form asp-action="Step" method="post" class="d-inline">
                         <input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="step" value="reopen" />
                         <button class="btn btn-sm btn-outline-secondary">@T["Reopen"]</button>
@@ -161,7 +161,7 @@
                 }
                 @if (Model.Status is ServiceRequestStatuses.Closed or ServiceRequestStatuses.Rejected)
                 {
-                    <div class="text-muted small">This job is @ServiceRequestStatuses.Describe(Model.Status).ToLowerInvariant().</div>
+                    <div class="text-muted small">@T.Format("This job is {0}.", ServiceRequestStatuses.Describe(Model.Status).ToLowerInvariant())</div>
                 }
 
                 @if (seesAll && isOpen && technicians.Count > 0)

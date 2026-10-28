@@ -49,7 +49,7 @@ else
                                 @invoice.DueDate.ToString("dd/MM/yyyy")
                                 @if (invoice.IsOverdue)
                                 {
-                                    <div class="small text-danger fw-semibold">@invoice.DaysOverdue days late</div>
+                                    <div class="small text-danger fw-semibold">@T.Format("{0} days late", invoice.DaysOverdue)</div>
                                 }
                             </td>
                             <td class="text-end">@invoice.Subtotal.ToString("N2")</td>
@@ -59,7 +59,7 @@ else
                                 @invoice.CashPaid.ToString("N2")
                                 @if (invoice.CreditedAmount > 0m)
                                 {
-                                    <div class="small text-muted">+ @invoice.CreditedAmount.ToString("N2") credited</div>
+                                    <div class="small text-muted">@T.Format("+ {0} credited", invoice.CreditedAmount.ToString("N2"))</div>
                                 }
                             </td>
                             <td class="text-end @(invoice.Outstanding > 0 ? "text-danger fw-semibold" : "")">

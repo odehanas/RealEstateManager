@@ -1,0 +1,260 @@
+Cost amount must be greater than zero.
+Cost collected in
+Cost description is required.
+Cost of revenue
+Cost of unit {0} sold
+Costs are already posted to this project, so the account they are collected in cannot be changed.
+Costs are recorded against this project. An abandoned project's costs must be written off with a journal before it is cancelled.
+Costs recharged from bill {0}
+Could not allocate a bill number.
+Could not allocate a contract code for unit {0}.
+Could not allocate a property code for prefix {0}. Check for corrupt codes in the property list.
+Could not allocate a request number.
+Could not allocate a tenant code. Check for corrupt codes in the tenant list.
+Could not allocate a unit code for property {0}.
+Could not allocate a vendor code. Check for corrupt codes in the vendor list.
+Could not issue portal access.
+Create & Edit Master Data
+Create and edit properties, units, tenants and vendors
+Created {Table}. The database already contains the changes of scripts up to {Level}, so {Count} scripts were recorded as applied without running them.
+Credit against invoice {0} - {1}, unit {2}, contract {3}. {4}
+Credit note account
+Credit note against {0} - {1}
+Credit note not found.
+Credit note posted. The invoice balance and the output VAT have been reduced.
+Credit note was not found.
+Credit note {0} - {1} reduced
+Credit note {0} against {1}
+Credit note {0} is for {1}, but only {2} is still outstanding on invoice {3}.
+Credit note {0} saved as a draft. Post it to reduce the invoice and reverse the VAT.
+Current password is incorrect.
+Current user is not recognized.
+Customer credit note
+Customer invoice was not found.
+Customer receipt was not found.
+Damage / loss recovery
+Data Entry (Normal User)
+Date the adjustment after the end of the year it covers - it goes in the VAT return after that year.
+Dear {0} user,{1}{2}Your subscription activation code is:{3}{4}{5}{6}{7}This code adds {8} day(s) to your subscription.{9}Please sign in, open the Subscription page, enter the code, and click Apply Code.{10}{11}Thank you.
+Debit and credit must not be negative.
+Default company must be one of the selected companies.
+DefaultConnection is not configured correctly. Checked active configuration and appsettings files under: {0}.
+Delegation to {0} ended.
+Department of Economy and Tourism
+Deposit Cheque to Bank
+Deposit amount must be greater than zero.
+Deposit {0} was saved as a draft but not posted: {1}
+Depreciation expense account is required.
+Depreciation expense for asset {0}
+Depreciation schedule can only be generated for active fixed assets.
+Depreciation schedule cannot be regenerated after posting has started.
+Describe the cost.
+Describe what you need.
+Description is required.
+Design and consultancy
+Development completion transfer
+Development completions (transfers out of WIP)
+Disbursement - paid on the owner's behalf, no VAT
+Documents of type {0} cannot be approved here.
+Documents of type {0} cannot be handled here.
+Does the day-to-day work: tenants, contracts, invoices, receipts, cheques, bills, payments, HR and payroll preparation. Approves nothing.
+Draft contract {0} is deleted.
+Due To Landlords
+Due date of invoice {0} moved from {1} to {2}. The amount owed is unchanged.
+Due to Landlords is not mapped in Account Mapping.
+E-credit note {0} is ready to send.
+E-invoice for {0} is ready to send.
+E-invoice supplies from
+E-invoices are produced in AED. This company's base currency is
+E-invoicing is switched on
+E-invoicing settings saved.
+Each bill can appear only once.
+Earlier periods closed
+Ejari / registration certificate
+Electricity / water account
+Emirates ID / ID number
+Employee Code,Employee Name,Bank,IBAN,Amount,Reference\r
+Employee not found.
+Employees, documents, leave, attendance, salary advances
+Employees, their contracts and UAE documents, departments, leave and salary advances.
+Employment certificate (no salary)
+End date must be later than start date.
+End of service expense
+End of service provision
+End of service provision {0}
+Enter an amount greater than zero.
+Enter the 9-digit routing code of the company's salary bank in Payroll Settings.
+Enter the Accredited Service Provider you have appointed. E-invoices can only be sent through one.
+Enter the amount advanced.
+Enter the amount of the advance.
+Enter the amount received.
+Enter the amount taken out.
+Enter the amount.
+Enter the authority that issued the company's trade licence ({0}).
+Enter the basic salary.
+Enter the building's carrying amount - the part to be depreciated.
+Enter the building's remaining useful life in years (1 to 100).
+Enter the building's useful life in years (1 to 100) for the rental or own-use units.
+Enter the cheque size in millimetres.
+Enter the company's 13-digit MOHRE establishment number in Payroll Settings before producing a WPS file.
+Enter the country as a two-letter code, e.g. AE.
+Enter the credit note date.
+Enter the date on the supplier's document.
+Enter the department name.
+Enter the input tax charged and the part recovered (no more than the tax charged).
+Enter the last working day.
+Enter the net amount to credit.
+Enter the number of the first cheque, e.g. 000451.
+Enter the number of {0}.
+Enter the project name.
+Enter the reason the provider gave for the rejection.
+Enter the sale price before VAT.
+Entries {0} do not balance.
+Entry {0} posted. It now affects the accounts.
+Entry {0} reset to draft. It no longer affects the accounts.
+Entry,Date,Period,Source,Document,Reference,Entry description,Status,Posted by,Account code,Account,Line description,Property,Debit,Credit
+Every asset in service is depreciated for the month, and the ledger shows the scheduled amount.
+Every contract instalment dated in the month is posted to receivables.
+Every earlier period is closed.
+Every journal dated in the period is posted.
+Every posted document already had the right e-invoicing status.
+Every posted entry balances, and the trial balance at the month end has equal debits and credits.
+Everything in this company: all records, all approvals, users and settings. Tick "Administrator of this company" too.
+Exempt supplies - not recoverable
+Exempt supply - lease of residential property.
+Existing building brought under the cost model. Land of {0} is not depreciated.
+Expense account is required for non-capitalizable costs.
+Expense account is required.
+Explain the credit in a sentence - it is printed on the document.
+Explain why the period has to be reopened (at least {0} characters): what is wrong, and what will be posted.
+Feedback item was not found.
+Feedback status updated successfully.
+Financial reports, statements and Build Your Own Report
+First recognition date cannot be earlier than payment date.
+First run on this database: it already contained the changes of scripts up to {0}, so {1} scripts were recorded as applied without running them again.
+First supply of a new residential unit, before completion (off plan) - zero rated.
+First supply of a new residential unit, within three years of completion on {0} - zero rated.
+Fiscal Year Start Month
+Fiscal year close undone
+Fiscal year closed
+Fiscal year closing for {0}: revenue and expenses to retained earnings
+Fiscal year {0} cannot be closed yet:
+Fiscal year {0} has no accounting periods.
+Fiscal year {0} is already closed.
+Fiscal year {0} is closed, and its opening balances come from this year. A period of an earlier year cannot be reopened while a later year is closed.
+Fiscal year {0} is closed. {1}
+Fixed Asset Clearing
+Fixed asset capitalisation
+Fixed asset capitalization for {0}
+Fixed asset capitalized successfully. Depreciation schedule has been created.
+Fixed asset clearing account is not configured in Account Mapping Setup.
+Fixed asset cost must be greater than zero.
+Fixed asset draft saved. Add acquisition costs and capitalize it when ready for use.
+Fixed asset purchase
+Fixed asset was not found.
+Floor number (for the building view)
+For maintenance engineers and technicians only: new maintenance requests are assigned to them, and they see just their own jobs, record the work and materials used, and resolve them.
+For rental (investment property)
+For sale (inventory)
+From date cannot be later than to date.
+From {0} lease(s) between {1} and {2}, weighted by unit area and days let: {3}% taxable (standard or zero rated), {4}% exempt.
+Generic / Text Only
+Give a reason when overriding the VAT treatment derived from the unit.
+Give a value for "{0}".
+Give the bill or receipt number the item was bought on.
+Give the cost of the item taken from the store.
+Give the reason for suspending - it is kept on the company's record.
+Give the reason, e.g. "Owner travelling 1-15 August".
+Give the report a name.
+Give the request a short title.
+Give the values for "{0}", separated by commas.
+Goods or services returned
+Government entity (B2G — e-invoice required)
+Group account cannot be postable.
+Handle Tenant Requests
+Handover of unit {0} - {1}
+How tenants pay
+Imported {0} attendance record(s) over {1} day(s).
+In-service date cannot be earlier than acquisition date.
+Incorrect username or password.
+Individual (B2C — outside e-invoicing)
+Infrastructure and utility connections
+Initial acquisition cost
+Initial acquisition cost cannot be negative.
+Initial cost credit account is required when an initial acquisition cost is entered.
+Initial payment for {0}
+Input VAT on this project's costs
+Instrument not defined
+Insurance policy number
+Internal note added.
+Internal note added. The tenant cannot see it.
+Invalid username or password.
+Investment property - building
+Investment property allocated to {0} - {1}
+Investment property allocation
+Invoice is required when settlement mode is Receivable.
+Invoice not found.
+Invoice {0} has not been posted yet. Post it from Customer Invoices first.
+Invoice {0} has not been posted yet. Post it from Customer Invoices, then clear this cheque.
+Invoice {0} has not been posted yet. Post it from Customer Invoices, then deposit this cheque.
+Invoice {0} has nothing outstanding to credit. Amounts already paid are refunded, not credited.
+Invoice {0} is already paid in full.
+Invoice {0} is not posted yet. Post it before clearing cheque {1}.
+Invoice {0} is not posted yet. Post the invoice before crediting it.
+Invoice {0} is not posted yet. Post the invoice before this receipt.
+Invoice {0} is now due on {1}.
+Invoiced in the owner's name, and {0} is not registered for VAT - no VAT is charged.
+Invoices, receipts, payables, journals, closing, fixed assets, and prepayments.
+Invoices, receipts, post-dated cheques, deposits, credit notes
+Issued invoices: {0} posted.
+It carries {0}. Reconcile the opening balances before the figures are reported.
+It could not be posted, so nothing was recorded: {0}
+Job {0} assigned to {1}.
+Journal (no source document)
+Journal entry is not balanced.
+Journal entry was not found.
+Journal lines (ledger)
+Journals, fixed assets, revenue recognition, month-end closing
+Kind of cost
+Land / municipality number
+Land and acquisition costs
+Late on {0} day(s), {1}
+Lease contracts and related operations.
+Lease not available
+Leave that started more than 30 days ago has to be booked by HR.
+Ledger in balance
+Liability to landlord from tenant billing
+Line {0} of bill {1} has no account. Open the bill and choose one before posting.
+Line {0}: a cost for {1} must be posted to the project's account {2}.
+Line {0}: a development cost cannot also be charged to an owner.
+Line {0}: this bill is for {1} {2}, but the line is tagged to {3}. Split costs of another project onto their own bill.
+Maintenance Engineer / Technician
+Maintenance Materials Stock
+Maintenance and costs of the properties
+Maintenance materials for job {0}
+Maintenance requests are on hold for your account because
+Management Fee Revenue
+Management commission (managed properties)
+Management commission {0} - {1} / {2}, contract {3}
+Management fee revenue recognized
+Map the Retained Earnings account under Account Mappings.
+Mapped account for '{0}' is inactive.
+Mapped account for '{0}' must be a postable account.
+Mapped account for '{0}' must be postable.
+Mapped account for '{0}' was not found.
+Mark the document as sent to the provider first.
+Mark the request as resolved first - that is the record of your agreement.
+Mark the units of floors {0} and {1} on this photo first - the step between floors is measured from them.
+Marked as an individual but holds a trade licence or TRN. If this tenant is a business, change the customer type to Business - their invoices then need an e-invoice.
+Master Data ▸ Tenants ▸ {0}
+Materials are recorded on maintenance jobs only.
+Message sent to the tenant.
+Monthly depreciation for asset {0}
+Months close in order, so a later month never moves an earlier one that is still open.
+Name the asset.
+Nationality {0} filled in.
+Net loss for {0} transferred to retained earnings
+Net profit / (loss)
+Net profit for {0} transferred to retained earnings
+Net salaries payable {0}
+No HTTP context.

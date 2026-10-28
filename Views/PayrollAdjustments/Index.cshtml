@@ -68,7 +68,7 @@
         <select name="status" class="form-select" onchange="this.form.submit()">
             @foreach (var s in new[] { "Open", PayrollAdjustmentStatuses.Pending, PayrollAdjustmentStatuses.Approved, PayrollAdjustmentStatuses.Rejected, "All" })
             {
-                <option value="@s" selected="@(s == Model.Status)">@(s == "Open" ? "Not yet paid" : s)</option>
+                <option value="@s" selected="@(s == Model.Status)">@(s == "Open" ? T["Not yet paid"] : s)</option>
             }
         </select>
     </div>
@@ -107,7 +107,7 @@
                         <td class="small">@a.Description</td>
                         <td class="small">@a.Source</td>
                         <td>@a.Status @if (a.DecidedByName != null) { <div class="small text-muted">@a.DecidedByName</div> }</td>
-                        <td class="small">@(a.PayrollRun == null ? "Waiting" : $"{a.PayrollRun.RunNumber} ({a.PayrollRun.Status})")</td>
+                        <td class="small">@(a.PayrollRun == null ? T["Waiting"] : $"{a.PayrollRun.RunNumber} ({a.PayrollRun.Status})")</td>
                         <td>
                             @if (!paid)
                             {

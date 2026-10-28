@@ -118,7 +118,7 @@
             {
                 var status = d.RevokedAt != null ? $"Ended by {d.RevokedByName}" : d.IsActiveOn(today) ? "Active" : d.StartDate > today ? "Starts later" : "Expired";
                 <tr>
-                    <td>@d.FromName</td><td>@d.ToName</td><td>@(d.MaxAmount?.ToString("N2") ?? "No limit")</td>
+                    <td>@d.FromName</td><td>@d.ToName</td><td>@(d.MaxAmount?.ToString("N2") ?? T["No limit"])</td>
                     <td>@d.StartDate.ToString("dd/MM/yyyy") – @d.EndDate.ToString("dd/MM/yyyy")</td><td class="small">@d.Reason</td>
                     <td><span class="badge @(status == "Active" ? "bg-success" : "bg-secondary")">@status</span></td>
                     <td>

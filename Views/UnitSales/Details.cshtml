@@ -21,8 +21,8 @@
 
 <div class="d-flex justify-content-between align-items-center mb-2">
     <div>
-        <h2 class="mb-0">Sale Contract @Model.ContractNumber</h2>
-        <div class="text-muted">@Model.Unit?.Property?.Name / unit @Model.Unit?.UnitNumber &middot; <strong>@UnitSaleStatuses.Describe(Model.Status)</strong></div>
+        <h2 class="mb-0">@T.Format("Sale Contract {0}", Model.ContractNumber)</h2>
+        <div class="text-muted">@T.HtmlFormat("{0} / unit {1} &middot; <strong>{2}</strong>", Model.Unit?.Property?.Name, Model.Unit?.UnitNumber, UnitSaleStatuses.Describe(Model.Status))</div>
     </div>
     <div class="no-print d-flex gap-2">
         <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back"]</a>
@@ -71,7 +71,7 @@
                 {
                     Title = "Price Paid",
                     Value = Model.TotalPrice == 0m ? 0m : Math.Round(received * 100m / Model.TotalPrice, 1),
-                    Bands = new() { new(0m, 100m, RealEstateManager.Models.GaugeModel.Blue, received >= Model.TotalPrice ? "Paid in full" : "Paid so far") }
+                    Bands = new() { new(0m, 100m, RealEstateManager.Models.GaugeModel.Blue, received >= Model.TotalPrice ? T["Paid in full"] : T["Paid so far"]) }
                 })" />
                 <table class="table table-sm mb-0">
                     <tr><td>@T["Price including VAT"]</td><td class="text-end">@Model.TotalPrice.ToString("N2")</td></tr>
@@ -178,9 +178,7 @@
             <div class="card shadow-sm h-100 border-primary"><div class="card-body">
                 <h6>@T["Handover"]</h6>
                 <p class="small text-muted">
-                    Recognises the sale: @Model.SalePrice.ToString("N2") to revenue, advances received applied, any unpaid balance (with its VAT)
-                    becomes a receivable from the buyer, and the unit's cost (@(unitCost == 0 ? "not yet transferred - complete the project and transfer the unit as for sale first" : unitCost.ToString("N2")))
-                    goes to cost of sales. Posted at once; it cannot be reset.
+                    @T.Format("Recognises the sale: {0} to revenue, advances received applied, any unpaid balance (with its VAT) becomes a receivable from the buyer, and the unit's cost ({1}) goes to cost of sales. Posted at once; it cannot be reset.", Model.SalePrice.ToString("N2"), unitCost == 0 ? "not yet transferred - complete the project and transfer the unit as for sale first" : unitCost.ToString("N2"))
                 </p>
                 <form asp-action="Handover" asp-route-id="@Model.Id" method="post" class="row g-2" onsubmit="return confirm('Hand the unit over and post the sale?');">
                     <div class="col-md-4"><input type="date" name="handoverDate" value="@today.ToString("yyyy-MM-dd")" class="form-control form-control-sm" required /></div>

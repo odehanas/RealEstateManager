@@ -151,7 +151,7 @@ else
                     <td class="small">@r.OtherAccount</td>
                     <td class="text-end">@(r.Withdrawn == 0 ? "" : r.Withdrawn.ToString("N2"))</td>
                     <td class="text-end">@(r.PutIn == 0 ? "" : r.PutIn.ToString("N2"))</td>
-                    <td class="small">@(r.RecordedHere ? "This screen" : "Journal")</td>
+                    <td class="small">@(r.RecordedHere ? T["This screen"] : T["Journal"])</td>
                 </tr>
             }
         </tbody>

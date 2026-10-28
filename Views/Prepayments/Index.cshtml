@@ -119,16 +119,16 @@
                     <td>@item.PaymentDate.ToString("dd/MM/yyyy")</td>
                     <td>@item.FirstRecognitionDate.ToString("dd/MM/yyyy")</td>
                     <td>
-                        <div>Prepaid: @item.PrepaidAccountDisplay</div>
-                        <div>Expense: @item.ExpenseAccountDisplay</div>
-                        <div>Source: @item.OffsetAccountDisplay</div>
+                        <div>@T.Format("Prepaid: {0}", item.PrepaidAccountDisplay)</div>
+                        <div>@T.Format("Expense: {0}", item.ExpenseAccountDisplay)</div>
+                        <div>@T.Format("Source: {0}", item.OffsetAccountDisplay)</div>
                         @if (!string.IsNullOrWhiteSpace(item.VendorDisplay))
                         {
-                            <div>Vendor: @item.VendorDisplay</div>
+                            <div>@T.Format("Vendor: {0}", item.VendorDisplay)</div>
                         }
                         @if (!string.IsNullOrWhiteSpace(item.VendorBillNumber))
                         {
-                            <div>Bill: @item.VendorBillNumber</div>
+                            <div>@T.Format("Bill: {0}", item.VendorBillNumber)</div>
                         }
                     </td>
                     <td>@(string.IsNullOrWhiteSpace(item.InitialJournalEntryNumber) ? "-" : item.InitialJournalEntryNumber)</td>

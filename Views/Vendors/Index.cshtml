@@ -47,7 +47,7 @@
                 <td>@vendor.ContactPerson</td>
                 <td>@vendor.Email</td>
                 <td>@vendor.Phone</td>
-                <td>@(vendor.IsActive ? "Active" : "Inactive")</td>
+                <td>@(vendor.IsActive ? T["Active"] : T["Inactive"])</td>
                 <td>
                     @if (canEdit)
                     {

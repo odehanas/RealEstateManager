@@ -10,7 +10,7 @@
     var defaults = ViewBag.DefaultWipAccounts as Dictionary<string, int> ?? new();
 }
 
-<h2>@(isNew ? "New Development Project" : $"Edit {Model.Code} - {Model.Name}")</h2>
+<h2>@(isNew ? T["New Development Project"] : $"Edit {Model.Code} - {Model.Name}")</h2>
 
 <form asp-action="Save" method="post">
     <input type="hidden" asp-for="Id" />

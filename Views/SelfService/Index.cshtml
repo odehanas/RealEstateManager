@@ -15,7 +15,7 @@
     <div class="card-body">
         <div class="fw-bold">@Model.FullName</div>
         <div class="text-muted small">@Model.EmployeeCode · @Model.JobTitle @(Model.Department != null ? "· " + Model.Department.Name : "")</div>
-        <div class="text-muted small">Joined @Model.JoiningDate.ToString("dd MMM yyyy")</div>
+        <div class="text-muted small">@T.Format("Joined {0}", Model.JoiningDate.ToString("dd MMM yyyy"))</div>
     </div>
 </div>
 
@@ -31,7 +31,7 @@
         <a asp-action="Payslips" class="card shadow-sm stat text-decoration-none text-reset h-100"><div class="card-body">
             <div class="label">@T["Last net salary"]</div>
             <div class="value">@(last?.Net.ToString("N0") ?? "—")</div>
-            <div class="small text-muted">@(last?.PayrollRun?.PeriodStart.ToString("MMMM yyyy") ?? "No payslip yet")</div>
+            <div class="small text-muted">@(last?.PayrollRun?.PeriodStart.ToString("MMMM yyyy") ?? T["No payslip yet"])</div>
         </div></a>
     </div>
     <div class="col-6">
@@ -70,7 +70,7 @@
             {
                 <div class="d-flex justify-content-between small border-bottom py-1">
                     <span>@a.AdvanceDate.ToString("dd MMM yyyy") · @a.Amount.ToString("N0")</span>
-                    <span>@a.MonthlyInstalment.ToString("N0")/month · @a.Outstanding.ToString("N0") left</span>
+                    <span>@T.Format("{0}/month · {1} left", a.MonthlyInstalment.ToString("N0"), a.Outstanding.ToString("N0"))</span>
                 </div>
             }
         </div>

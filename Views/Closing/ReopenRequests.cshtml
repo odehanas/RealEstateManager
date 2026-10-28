@@ -24,7 +24,7 @@
 }
 
 <div class="card shadow-sm mb-4">
-    <div class="card-header bg-light"><h5 class="mb-0">Waiting for a decision (@Model.Pending.Count)</h5></div>
+    <div class="card-header bg-light"><h5 class="mb-0">@T.Format("Waiting for a decision ({0})", Model.Pending.Count)</h5></div>
     <div class="card-body p-0">
         @if (Model.Pending.Count == 0)
         {
@@ -58,7 +58,7 @@
                         <td>@r.Status</td>
                         <td class="small">@r.DecidedByName<br />@r.DecidedAt?.ToLocalTime().ToString("dd/MM/yyyy")</td>
                         <td class="small">@r.DecisionComment</td>
-                        <td class="small">@(r.ReclosedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? (r.Status == PeriodReopenStatuses.Approved ? "Still open" : ""))</td>
+                        <td class="small">@(r.ReclosedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? (r.Status == PeriodReopenStatuses.Approved ? T["Still open"] : ""))</td>
                     </tr>
                 }
             </tbody>

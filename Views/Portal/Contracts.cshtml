@@ -23,7 +23,7 @@ else
                 <div>
                     <strong>@contract.ContractNumber</strong>
                     <div class="small @(contract.IsCurrent ? "opacity-75" : "text-muted")">
-                        @contract.PropertyName &mdash; unit @contract.UnitCode
+                        @T.Format("{0} — unit {1}", contract.PropertyName, contract.UnitCode)
                     </div>
                 </div>
                 <div>
@@ -32,7 +32,7 @@ else
                         <span class="badge bg-light text-dark">@T["Current"]</span>
                         @if (contract.IsExpiringSoon)
                         {
-                            <span class="badge bg-warning text-dark ms-1">Expires in @contract.DaysToExpiry days</span>
+                            <span class="badge bg-warning text-dark ms-1">@T.Format("Expires in {0} days", contract.DaysToExpiry)</span>
                         }
                     }
                     else
@@ -53,7 +53,7 @@ else
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-muted">@T["Billing"]</div>
-                        <div class="fw-semibold">Every @contract.BillingFrequencyMonths month(s)</div>
+                        <div class="fw-semibold">@T.Format("Every {0} month(s)", contract.BillingFrequencyMonths)</div>
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-muted">@T["Security deposit"]</div>

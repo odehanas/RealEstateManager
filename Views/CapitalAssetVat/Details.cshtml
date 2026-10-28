@@ -11,7 +11,7 @@
 <div class="d-flex justify-content-between align-items-center mb-2">
     <div>
         <h2 class="mb-0">@Model.Name</h2>
-        <div class="text-muted">Capital Assets Scheme &middot; @Model.Property?.Code - @Model.Property?.Name</div>
+        <div class="text-muted">@T.Format("Capital Assets Scheme · {0} - {1}", Model.Property?.Code, Model.Property?.Name)</div>
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back"]</a>
 </div>
@@ -32,8 +32,7 @@
     <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body"><div class="text-muted small">@T["One year's share"]</div><div class="fs-5">@((Model.InputVat / 10m).ToString("N2"))</div></div></div></div>
 </div>
 
-<p class="small text-muted">Each year: adjustment = input VAT &times; (taxable use that year &minus; @Model.OriginalRecoveryPercent.ToString("0.##")%) &divide; 10.
-A positive figure is more tax to recover; a negative one is tax to pay back.</p>
+<p class="small text-muted">@T.Format("Each year: adjustment = input VAT × (taxable use that year − {0}%) ÷ 10. A positive figure is more tax to recover; a negative one is tax to pay back.", Model.OriginalRecoveryPercent.ToString("0.##"))</p>
 
 <table class="table table-bordered table-sm">
     <thead><tr><th>@T["Year"]</th><th>@T["Period"]</th><th class="text-end">@T["Taxable use"]</th><th class="text-end">@T["Adjustment"]</th><th>@T["Accounted on"]</th><th>@T["Journal"]</th><th>@T["Notes"]</th></tr></thead>
@@ -55,7 +54,7 @@ A positive figure is more tax to recover; a negative one is tax to pay back.</p>
                 }
                 else
                 {
-                    <td colspan="5">@(end > DateTime.Today ? "Not over yet" : "Due - review this year")</td>
+                    <td colspan="5">@(end > DateTime.Today ? T["Not over yet"] : T["Due - review this year"])</td>
                 }
             </tr>
         }
@@ -66,7 +65,7 @@ A positive figure is more tax to recover; a negative one is tax to pay back.</p>
 {
     var (s, e) = CapitalAssetVatService.YearPeriod(Model, nextYear);
     <div class="card shadow-sm border-primary">
-        <div class="card-header bg-light"><strong>Review Year @nextYear (@s.ToString("dd/MM/yyyy") - @e.ToString("dd/MM/yyyy"))</strong></div>
+        <div class="card-header bg-light">@T.HtmlFormat("<strong>Review Year {0} ({1} - {2})</strong>", nextYear, s.ToString("dd/MM/yyyy"), e.ToString("dd/MM/yyyy"))</div>
         <div class="card-body">
             <p class="small text-muted">@explanation</p>
             <form asp-action="Adjust" asp-route-id="@Model.Id" method="post" class="row g-3"

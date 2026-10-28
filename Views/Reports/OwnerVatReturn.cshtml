@@ -15,7 +15,7 @@
     <div>
         <h2 class="mb-1">@T["Owner VAT Return"]</h2>
         <div class="text-muted">
-            @if (Model.Owner != null) { <text><strong>@Model.Owner</strong> &middot; TRN @Model.OwnerTrn &middot; </text> }
+            @if (Model.Owner != null) { <text>@T.HtmlFormat("<strong>{0}</strong> &middot; TRN {1} &middot;", Model.Owner, Model.OwnerTrn) </text> }
             @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy")
         </div>
     </div>
@@ -30,7 +30,7 @@
         <label class="form-label small mb-0" for="owner">@T["Owner (VAT registered)"]</label>
         <select id="owner" name="owner" class="form-select form-select-sm">
             <option value="">@T["-- choose --"]</option>
-            @foreach (var o in Model.Owners) { <option value="@o.Name" selected="@(o.Name == Model.Owner ? "selected" : null)">@o.Name &middot; TRN @o.Trn</option> }
+            @foreach (var o in Model.Owners) { <option value="@o.Name" selected="@(o.Name == Model.Owner ? "selected" : null)">@T.Format("{0} · TRN {1}", o.Name, o.Trn)</option> }
         </select>
     </div>
     <div class="col-auto"><label class="form-label small mb-0" for="startDate">@T["From"]</label><input id="startDate" type="date" name="startDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
@@ -51,15 +51,14 @@ else
     @if (Model.NotBilledInOwnerName.Count > 0)
     {
         <div class="alert alert-warning small">
-            Rent of @string.Join(", ", Model.NotBilledInOwnerName) is invoiced by the company itself, not in the owner's name, so it is on
-            the company's return and not here. Switch on <em>Invoice tenants in the owner's name</em> on the property to change that.
+            @T.HtmlFormat("Rent of {0} is invoiced by the company itself, not in the owner's name, so it is on the company's return and not here. Switch on <em>Invoice tenants in the owner's name</em> on the property to change that.", string.Join(", ", Model.NotBilledInOwnerName))
         </div>
     }
 
     <div class="row g-3 mb-3">
         <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Output tax (on rent)"]</div><div class="h4 mb-0">@Money(Model.OutputTax)</div></div></div></div>
         <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">@T["Input tax (on our invoices to the owner)"]</div><div class="h4 mb-0">@Money(Model.InputTax)</div></div></div></div>
-        <div class="col-md-4"><div class="card shadow-sm h-100 border-primary"><div class="card-body"><div class="text-muted small">@(Model.NetPayable >= 0 ? "Net VAT payable" : "Net VAT refundable")</div><div class="h4 mb-0 text-primary">@Money(Math.Abs(Model.NetPayable))</div></div></div></div>
+        <div class="col-md-4"><div class="card shadow-sm h-100 border-primary"><div class="card-body"><div class="text-muted small">@(Model.NetPayable >= 0 ? T["Net VAT payable"] : T["Net VAT refundable"])</div><div class="h4 mb-0 text-primary">@Money(Math.Abs(Model.NetPayable))</div></div></div></div>
     </div>
 
     <div class="card shadow-sm mb-3">
@@ -72,7 +71,7 @@ else
                 <tr><td>@T["Exempt supplies (residential rent)"]</td><td class="text-end">@Money(Model.SuppliesNet(VatCategories.Exempt))</td><td class="text-end">-</td></tr>
                 <tr><td>@T["Standard rated expenses (our commission and recharges)"]</td><td class="text-end">@Money(Model.Purchases.Sum(x => x.Net))</td><td class="text-end">@Money(Model.InputTax)</td></tr>
             </tbody>
-            <tfoot><tr><td colspan="2">Net VAT @(Model.NetPayable >= 0 ? "payable" : "refundable")</td><td class="text-end">@Money(Math.Abs(Model.NetPayable))</td></tr></tfoot>
+            <tfoot><tr><td colspan="2">@T.Format("Net VAT {0}", Model.NetPayable >= 0 ? "payable" : "refundable")</td><td class="text-end">@Money(Math.Abs(Model.NetPayable))</td></tr></tfoot>
         </table>
     </div>
 

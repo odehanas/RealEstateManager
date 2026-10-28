@@ -42,8 +42,7 @@
 @if (Model.DraftCount > 0)
 {
     <div class="alert alert-warning no-print">
-        @Model.DraftCount draft journal(s) tagged to this project, @Model.DraftCosts.ToString("N2") in total, are not posted yet and
-        are not in the cost below. Post them from <strong>Operations &rsaquo; Journal Inquiry</strong>.
+        @T.HtmlFormat("{0} draft journal(s) tagged to this project, {1} in total, are not posted yet and are not in the cost below. Post them from <strong>Operations &rsaquo; Journal Inquiry</strong>.", Model.DraftCount, Model.DraftCosts.ToString("N2"))
     </div>
 }
 @if (p.Status == DevelopmentProjectStatuses.Completed)
@@ -52,7 +51,7 @@
         Completed on <strong>@p.CompletionDate?.ToString("dd/MM/yyyy")</strong>@(p.CompletionCertificateNumber != null ? $" (certificate {p.CompletionCertificateNumber})" : "").
         @if (Model.InWorkInProgress != 0)
         {
-            <text>@Model.InWorkInProgress.ToString("N2") is still in @p.WipAccount?.Code @p.WipAccount?.Name - transfer it below.</text>
+            <text>@T.Format("{0} is still in {1} {2} - transfer it below.", Model.InWorkInProgress.ToString("N2"), p.WipAccount?.Code, p.WipAccount?.Name)</text>
         }
         else
         {
@@ -60,8 +59,7 @@
         }
         @if (isResidential && p.CompletionDate.HasValue)
         {
-            <br /><text>VAT: the first sale or lease of each residential unit is zero rated if made by
-            <strong>@p.CompletionDate.Value.AddYears(3).AddDays(-1).ToString("dd/MM/yyyy")</strong>.</text>
+            <br /><text>@T.HtmlFormat("VAT: the first sale or lease of each residential unit is zero rated if made by <strong>{0}</strong>.", p.CompletionDate.Value.AddYears(3).AddDays(-1).ToString("dd/MM/yyyy"))</text>
         }
     </div>
 }
@@ -191,7 +189,7 @@
                 land @t.LandCost.ToString("N2") + building @t.BuildingCost.ToString("N2") = <strong>@((t.LandCost + t.BuildingCost).ToString("N2"))</strong>
                 @if (t.BuildingUsefulLifeYears > 0)
                 {
-                    <span class="text-muted">&middot; building depreciated over @t.BuildingUsefulLifeYears years</span>
+                    <span class="text-muted">@T.Format("· building depreciated over {0} years", t.BuildingUsefulLifeYears)</span>
                 }
             </div>
             <table class="table table-sm mb-0">
@@ -232,17 +230,12 @@
         <div class="card-header bg-light">@T.Html("<strong>Transfer on Completion</strong>")</div>
         <div class="card-body">
             <p class="small text-muted">
-                Moves the @Model.InWorkInProgress.ToString("N2") still in work in progress to where each unit now belongs, shared by
-                area. Units for <strong>sale</strong> go to 13200 Completed Properties Held for Sale at cost. Units for <strong>rental</strong>
-                go to 15100 Investment Property and units for <strong>own use</strong> to 15200 Fixed Assets; for both, the land part is
-                never depreciated and the building part is entered in the fixed asset register and depreciated monthly over the useful
-                life below (cost model). This is posted at once and cannot be reset.
+                @T.HtmlFormat("Moves the {0} still in work in progress to where each unit now belongs, shared by area. Units for <strong>sale</strong> go to 13200 Completed Properties Held for Sale at cost. Units for <strong>rental</strong> go to 15100 Investment Property and units for <strong>own use</strong> to 15200 Fixed Assets; for both, the land part is never depreciated and the building part is entered in the fixed asset register and depreciated monthly over the useful life below (cost model). This is posted at once and cannot be reset.", Model.InWorkInProgress.ToString("N2"))
             </p>
             @if (transferUnits.Count == 0)
             {
                 <div class="alert alert-warning mb-0">
-                    The cost is shared between the units by area. Add the building's units, with their areas, to
-                    @(p.Property == null ? "the project's property (choose one in Edit first)" : p.Property.Code + " in Master Data ▸ Units"), then come back.
+                    @T.Format("The cost is shared between the units by area. Add the building's units, with their areas, to {0}, then come back.", p.Property == null ? "the project's property (choose one in Edit first)" : p.Property.Code + " in Master Data ▸ Units")
                 </div>
             }
             else

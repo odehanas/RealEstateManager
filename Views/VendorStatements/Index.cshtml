@@ -61,11 +61,11 @@ else
             <strong>@Model.VendorCode - @Model.VendorName</strong>
             @if (!string.IsNullOrWhiteSpace(Model.VendorTrn))
             {
-                <span class="text-muted small ms-2">TRN @Model.VendorTrn</span>
+                <span class="text-muted small ms-2">@T.Format("TRN {0}", Model.VendorTrn)</span>
             }
         </div>
         <div class="card-body row g-3">
-            <div class="col-md-12"><strong>Statement Period:</strong> @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</div>
+            <div class="col-md-12">@T.HtmlFormat("<strong>Statement Period:</strong> {0} to {1}", Model.FromDate.ToString("dd/MM/yyyy"), Model.ToDate.ToString("dd/MM/yyyy"))</div>
             <div class="col-6 col-md-3"><div class="text-muted small">@T["Opening balance"]</div><div class="fs-5">@Model.OpeningBalance.ToString("N2")</div></div>
             <div class="col-6 col-md-3"><div class="text-muted small">@T["Billed in the period"]</div><div class="fs-5">@Model.TotalBilled.ToString("N2")</div></div>
             <div class="col-6 col-md-3"><div class="text-muted small">@T["Paid in the period"]</div><div class="fs-5">@Model.TotalPaid.ToString("N2")</div></div>
@@ -119,7 +119,7 @@ else
         </tfoot>
     </table>
 
-    <h4>Open Bills at @Model.ToDate.ToString("dd/MM/yyyy")</h4>
+    <h4>@T.Format("Open Bills at {0}", Model.ToDate.ToString("dd/MM/yyyy"))</h4>
     <table class="table table-bordered table-sm">
         <thead>
             <tr>
@@ -157,7 +157,7 @@ else
     @if (Model.AdvanceRows.Count > 0)
     {
         <h5 class="mt-4">@T["Advances (down payments) - kept apart from payables"]</h5>
-        <p class="small text-muted mb-1">Paid ahead of bills and held on 11550 Advances to Suppliers until applied (SAP special G/L "A"). Open advances: <strong>@Model.AdvancesOpen.ToString("N2")</strong> - the vendor owes this in goods or services.</p>
+        <p class="small text-muted mb-1">@T.HtmlFormat("Paid ahead of bills and held on 11550 Advances to Suppliers until applied (SAP special G/L \"A\"). Open advances: <strong>{0}</strong> - the vendor owes this in goods or services.", Model.AdvancesOpen.ToString("N2"))</p>
         <table class="table table-sm table-bordered">
             <thead class="table-light"><tr><th>@T["Date"]</th><th>@T["Type"]</th><th>@T["Reference"]</th><th>@T["Description"]</th><th class="text-end">@T["Paid"]</th><th class="text-end">@T["Applied"]</th><th class="text-end">@T["Open advance"]</th></tr></thead>
             <tbody>

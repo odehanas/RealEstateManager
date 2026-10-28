@@ -1,0 +1,397 @@
+# Sheet 10: screen sentences with values ({0}, {1}... are the values; keep them and the tags)
+({0} days) ||| ({0} يوماً)
++ {0} credited ||| + {0} مُشعر دائن
+- <strong>{0}</strong>, until {1}. ||| - <strong>{0}</strong>، حتى {1}.
+- access to {0} has been suspended. ||| - تم إيقاف الوصول إلى {0}. يرجى التواصل مع مزود الخدمة.
+- closing entry <strong>{0}</strong>. ||| - قيد الإقفال <strong>{0}</strong>.
+- ended on {0}. ||| - انتهى في {0}. أدخل رمز تفعيل لمواصلة العمل.
+- period {0} of {1} ||| - الفترة {0} من {1}
+3. People in {0} ||| 3. الأشخاص في {0}
+<code>39999</code> Opening Balance Control Account is <strong>zero</strong> ||| حساب مراقبة الأرصدة الافتتاحية <code>39999</code> رصيده <strong>صفر</strong>، أي أن لكل رصيد افتتاحي مدين ما يقابله دائناً عبر {0} حساب.
+<strong>Agreed and applied.</strong> ||| <strong>تمت الموافقة والتطبيق.</strong> نُقل تاريخ استحقاق الفاتورة {0}. لم يتغير المبلغ المستحق عليك.
+<strong>Applied.</strong> The invoice due date ||| <strong>تم التطبيق.</strong> نُقل تاريخ استحقاق الفاتورة في {0}. لم يُمس مبلغ الفاتورة ولا ضريبتها ولا قيدها.
+<strong>Bill to:</strong> {0} ||| <strong>الفاتورة إلى:</strong> {0}
+<strong>Cannot do that.</strong> {0} ||| <strong>لا يمكن تنفيذ ذلك.</strong> {0}
+<strong>Cash and cash equivalents</strong> comprise {0}. ||| <strong>النقد وما يعادله</strong> يشمل {0}.
+<strong>Closing Balance:</strong> {0} ||| <strong>الرصيد الختامي:</strong> {0}
+<strong>Done:</strong> {0} ||| <strong>تم:</strong> {0}
+<strong>Lease Scope:</strong> {0} ||| <strong>نطاق العقود:</strong> {0}
+<strong>Maintenance requests are on hold.</strong> ||| <strong>طلبات الصيانة معلقة.</strong> {0} لا يزال بإمكانك إرسال طلبات أخرى، مثل طلب مهلة للسداد.
+<strong>Notes:</strong> {0} ||| <strong>ملاحظات:</strong> {0}
+<strong>Opening Balance:</strong> {0} ||| <strong>الرصيد الافتتاحي:</strong> {0}
+<strong>Period:</strong> {0} to {1} ||| <strong>الفترة:</strong> {0} إلى {1}
+<strong>Returned by {0}</strong> on {1}: ||| <strong>أعاده {0}</strong> في {1}: «{2}» صححه وأرسله مجدداً.
+<strong>Review Year {0} ({1} - {2})</strong> ||| <strong>مراجعة سنة {0} ({1} - {2})</strong>
+<strong>Statement Period:</strong> {0} to {1} ||| <strong>فترة الكشف:</strong> {0} إلى {1}
+<strong>TRN {0}</strong> ||| <strong>الرقم الضريبي {0}</strong>
+<strong>Tax period:</strong> {0} to {1} ||| <strong>الفترة الضريبية:</strong> {0} إلى {1}
+<strong>The memorandum entry is in a closed period ({0}).</strong> ||| <strong>القيد النظامي في فترة مقفلة ({0}).</strong> لا يمكن تغيير تاريخ الاستلام طالما الفترة مقفلة &mdash; نقل قيد مرحّل من فترة مقفلة سيغيّر أرقاماً سبق الإبلاغ عنها. أعد فتح الفترة أولاً، أو اترك التاريخ كما هو.
+<strong>Today:</strong> {0} ||| <strong>اليوم:</strong> {0}
+<strong>Total Charges:</strong> {0} ||| <strong>إجمالي المطالبات:</strong> {0}
+<strong>Total Credit:</strong> {0} ||| <strong>إجمالي الدائن:</strong> {0}
+<strong>Total Credits:</strong> {0} ||| <strong>إجمالي الدائن:</strong> {0}
+<strong>Total Debit:</strong> {0} ||| <strong>إجمالي المدين:</strong> {0}
+<strong>Total Noted PDC:</strong> {0} ||| <strong>إجمالي الشيكات المؤجلة المسجلة نظامياً:</strong> {0}
+<strong>VAT:</strong> completed on {0}. ||| <strong>الضريبة:</strong> أُنجز في {0}. البيع أو التأجير الأول لكل وحدة سكنية خاضع لنسبة الصفر إذا تم بحلول <strong>{1}</strong> {2}. التوريدات اللاحقة للوحدات السكنية معفاة.
+<strong>What happened:</strong> {0} ||| <strong>ما الذي حدث:</strong> {0}
+<strong>{0}</strong> &mdash; tenancy schedule as at {1} ||| <strong>{0}</strong> &mdash; جدول الإيجارات كما في {1}
+<strong>{0}</strong> &mdash; the identity printed on every e-invoice ||| <strong>{0}</strong> &mdash; الهوية المطبوعة على كل فاتورة إلكترونية، ومزود الخدمة الذي تُرسل عبره، وتاريخ البدء.
+<strong>{0}</strong> &middot; TRN {1} &middot; ||| <strong>{0}</strong> &middot; الرقم الضريبي {1} &middot;
+<strong>{0}</strong> ({1})<br /> Statement {2} to {3} ||| <strong>{0}</strong> ({1})<br /> كشف الحساب من {2} إلى {3}
+<strong>{0}</strong> up to {1} until {2} ||| <strong>{0}</strong> حتى {1} لغاية {2}
+<strong>{0}</strong><br /> Statement of Cash Flows ||| <strong>{0}</strong><br /> قائمة التدفقات النقدية للفترة من {1} إلى {2}<br /> المبالغ بعملة {3}
+A building brought in as an opening balance ||| المبنى المُدخل كرصيد افتتاحي لا يُهلك حتى يُعدّ هنا. قسّم قيمته الدفترية إلى <strong>أرض</strong> (لا تُهلك أبداً) و<strong>مبنى</strong>، وأدخل العمر الإنتاجي المتبقي للمبنى. إذا كان يُهلك في نظام سابق فأدخل القيمة الدفترية للمبنى (التكلفة ناقصاً الإهلاك حتى الآن). تحديد <em>التوزيع</em> ينقل أيضاً ذلك المبلغ من الرصيد الافتتاحي غير الموزع إلى هذا العقار.
+A new contract is a <strong>Draft</strong> until ||| العقد الجديد <strong>مسودة</strong> حتى {0} - عندها فقط تُنشأ فواتيره وتُقفل شروطه.
+Access for <strong>{0}</strong> has been suspended. ||| تم إيقاف الوصول إلى <strong>{0}</strong>. يرجى التواصل مع مزود الخدمة.
+Acquired {0} ||| اقتُني في {0}
+Active leases: {0} ||| العقود النافذة: {0}
+Additional input tax recoverable ||| ضريبة مدخلات إضافية قابلة للاسترداد
+Advance (down payment, special G/L) ||| دفعة مقدمة (حساب خاص)
+Against invoice <strong>{0}</strong> of {1} ||| مقابل الفاتورة <strong>{0}</strong> بتاريخ {1} &mdash; {2}، {3}، العقد {4}.
+All amounts in {0}. ||| جميع المبالغ بعملة {0}. التحصيلات هي سندات القبض زائد الشيكات المحصّلة. التقارير التفصيلية في قائمة التقارير.
+Amount ({0}) ||| المبلغ ({0})
+An item from the store is posted out of account {0} at once. ||| المادة من المخزن تُرحّل من الحساب {0} فوراً. والمادة المشتراة تُكلّف بفاتورتها أو سند النثرية.
+Applications of this advance to bills ||| تطبيقات هذه الدفعة المقدمة على الفواتير
+Applied at this start: <strong>{0}</strong> ||| طُبّق عند هذا التشغيل: <strong>{0}</strong>
+Apply new due date to {0} ||| تطبيق تاريخ الاستحقاق الجديد على {0}
+Appoint a provider by <strong>{0}</strong> ||| عيّن مزود خدمة بحلول <strong>{0}</strong>؛ وإلزامي اعتباراً من <strong>{1}</strong>.
+Approved by {0} ||| اعتمده {0}
+As its group / standard default ||| حسب مجموعته / الافتراضي القياسي
+At least {0} characters, with upper and lower case letters and a digit, and not containing ||| {0} أحرف على الأقل، تتضمن أحرفاً كبيرة وصغيرة ورقماً، ولا تحتوي على اسم المستخدم.
+At least {0} characters, with upper and lower case letters and a digit. ||| {0} أحرف على الأقل، تتضمن أحرفاً كبيرة وصغيرة ورقماً.
+Attendance — {0} ||| الحضور — {0}
+Basic {0} ||| الأساسي {0} · البدلات {1}
+Bill: {0} ||| الفاتورة: {0}
+Bills settled by this payment ||| الفواتير المسددة بهذه الدفعة
+Booked as {0} ||| سُجلت كـ {0}
+Bought ({0}) ||| مشتراة ({0})
+Capital Assets Scheme adjustment ||| تسوية نظام الأصول الرأسمالية
+Capital Assets Scheme · {0} - {1} ||| نظام الأصول الرأسمالية · {0} - {1}
+Carrying amount and fair value by property, at {0} ||| القيمة الدفترية والقيمة العادلة حسب العقار، كما في {0}
+Charge {0} ({1}) ||| الرسوم {0} ({1})
+Charged to {0} ||| محمّل على {0}
+Checked {0} ||| فُحص {0}
+Chq {0} ||| شيك {0}
+Clear and Post ||| تحصيل وترحيل
+Clearing {0} day(s) before the cheque date ||| التحصيل قبل تاريخ الشيك بـ {0} يوم
+Clears every revenue and expense account ||| يُقفل كل حسابات الإيرادات والمصروفات للسنة في الأرباح المحتجزة بقيد واحد في {0}، ويرحّل الميزانية العمومية إلى {1} كأرصدة افتتاحية.
+Close fiscal year {0} ||| إقفال السنة المالية {0}
+Commercial Invoice - no VAT ||| فاتورة تجارية - بدون ضريبة
+Confirm and Post ||| تأكيد وترحيل
+Contract approval is {0} for this company. ||| اعتماد العقود {0} لهذه الشركة.
+Contracted {0} of {1} ||| المتعاقد عليه {0} من {1}
+Create ||| إنشاء
+Credit everything still outstanding ({0}) ||| إشعار دائن بكل المتبقي ({0})
+Credit note ||| إشعار دائن
+Credit notes: {0} ||| الإشعارات الدائنة: {0}
+Current Period: {0} ||| الفترة الحالية: {0}
+D {0} ||| مدين {0} · دائن {1} · التأمينات المحتفظ بها {2}
+Daily basic pay {0} ||| الأجر الأساسي اليومي {0} (الأساسي ÷ 30) × ({1} يوماً للسنوات الخمس الأولى بواقع 21 يوماً في السنة + {2} يوماً للسنوات اللاحقة بواقع 30 يوماً في السنة) = <strong>{3}</strong>، ولا تزيد عن راتب أساسي لسنتين. وفق قانون دولة الإمارات لا يُستحق شيء قبل سنة من الخدمة المتصلة.
+Date of issue: {0} ||| تاريخ الإصدار: {0}
+Date of supply: {0} ||| تاريخ التوريد: {0}
+Date: {0} ||| التاريخ: {0}
+Deactivate ||| تعطيل
+Debits {0} ||| المدين {0} · الدائن {1} {2}
+Default cash account ||| حساب النقد الافتراضي
+Deposited ||| مودَع
+Deposits held {0} ||| التأمينات المحتفظ بها {0}
+Device file columns: ||| أعمدة ملف الجهاز: <code>EmployeeCode, Date, CheckIn, CheckOut</code> — مثال <code>EMP-0001, 2026-10-12, 07:58, 17:05</code>. يوم العمل يبدأ {0}، {1} ساعات؛ ويُعد التأخير بعد {2} دقيقة سماح.
+Disable ||| تعطيل
+Disbursement ||| مدفوع نيابة عن المالك
+Disbursement note ||| إشعار مصروف مدفوع نيابة
+Draft (committed) ||| مسودة (ملتزم به)
+Due - review this year ||| مستحق - راجعه هذه السنة
+EID {0} ||| الهوية {0}
+Each year: adjustment = ||| كل سنة: التسوية = ضريبة المدخلات × (نسبة الاستخدام الخاضع تلك السنة − {0}%) ÷ 10. الرقم الموجب ضريبة إضافية تُسترد؛ والسالب ضريبة تُعاد.
+Emirates IDs, passports, contract and property documents ||| الهويات الإماراتية وجوازات السفر ومستندات العقود والعقارات المنتهية أو التي تنتهي خلال {0} يوماً.
+Enable ||| تفعيل
+Entering person may release within own limit: ||| يمكن للمُدخل الصرف ضمن حده: <strong>{0}</strong>
+Entry #{0} not found ||| القيد رقم {0} غير موجود
+Every journal entry from {0} to {1} ||| كل قيود اليومية من {0} إلى {1}، مع بنودها ومصدرها.
+Every maintenance job raised by tenants ||| كل أعمال الصيانة التي رفعها المستأجرون، ومن ينفذها.
+Every {0} month(s) ||| كل {0} شهر
+Everything the UAE format requires is in place. ||| كل ما تتطلبه الصيغة الإماراتية متوفر.
+Exp: {0} ||| ينتهي: {0}
+Expense: {0} ||| المصروف: {0}
+Expenses {0} ||| المصروفات {0}
+Expired {0} day(s) ago ||| انتهى منذ {0} يوم
+Expires in {0} days ||| ينتهي خلال {0} يوماً
+Expiring within {0} days ||| ينتهي خلال {0} يوماً
+Figures on the invoice: ||| أرقام الفاتورة: الصافي <strong>{0}</strong>، الضريبة <strong>{1}</strong>، الإجمالي <strong>{2}</strong>.
+Fill these in before e-invoices can be generated. ||| أكمل هذه البيانات قبل إنشاء الفواتير الإلكترونية.
+Fiscal year {0} has ended but is not closed ||| انتهت السنة المالية {0} لكنها لم تُقفل: ربحها أو خسارتها لم تُرحّل بعد إلى الأرباح المحتجزة.
+Generate ||| إنشاء
+Generate for {0} ||| إنشاء لـ {0}
+Generated on save ||| يُنشأ عند الحفظ
+Give portal access ||| منح دخول للبوابة
+How the business is doing ||| كيف تسير الأعمال، وما ينتظر قرارك. الأرقام من القيود المرحّلة، {0}.
+I have reviewed the {0} amber warning(s) ||| راجعت التحذيرات الصفراء ({0})؛ وتُسجل مع الإقفال.
+If the cleared date is simply wrong ||| إذا كان تاريخ التحصيل خاطئاً فصححه أعلاه. وإذا قُدّم الشيك وصُرف فعلاً مبكراً — باتفاق مع المستأجر مثلاً — فحدد أدناه ورحّل. سيُؤرخ القيد النقدي في {0}.
+If you report it, quote this reference: ||| إذا أبلغت عنه فاذكر هذا المرجع: <code>{0}</code>
+Ignore ||| تجاهل
+In Credit ||| رصيد دائن
+Included in this version but not applied ({0}) ||| مضمّن في هذا الإصدار لكنه لم يُطبق ({0})
+Includes {0} irrecoverable VAT ({1}) ||| يتضمن {0} ضريبة غير قابلة للاسترداد ({1})
+Index ||| الفهرس
+Input tax of {0} {1}: ||| ضريبة مدخلات {0} {1}: {2} قابلة للاسترداد، و{3} محمّلة على التكلفة.
+Input tax to repay ||| ضريبة مدخلات واجبة الإعادة
+Issue Access ||| إصدار الدخول
+Issue Commission Invoices at {0} ||| إصدار فواتير العمولة في {0}
+Issue portal access ||| إصدار دخول للبوابة
+Jobs raised from {0} to {1} ||| الأعمال المرفوعة من {0} إلى {1}، وكل عمل لا يزال مفتوحاً.
+Joined {0} ||| التحق في {0}
+Journal {0} ||| القيد {0}
+Journal {0} dated {1} {2} ||| القيد {0} بتاريخ {1} {2}
+Last change: {0} ||| آخر تغيير: {0}
+Less credit notes — {0} ||| يُخصم الإشعارات الدائنة — {0}
+Less: VAT on our commission ({0}%) ||| يُخصم: الضريبة على عمولتنا ({0}%)
+Less: {0} ||| يُخصم: {0}
+Licence {0} ||| الرخصة {0}
+Limits apply to contracts: <strong>{0}</strong> ||| تنطبق الحدود على العقود: <strong>{0}</strong>
+Managed properties, {0} to {1} ||| العقارات المُدارة، من {0} إلى {1}: ما حققه كل عقار لمالكه، وما حققه لنا من عمولة.
+Managed: {0} ||| المُدارة: {0}
+Mark Units: {0} ||| تحديد الوحدات: {0}
+Movement in the carrying amount, {0} to {1} ||| الحركة في القيمة الدفترية، من {0} إلى {1}
+Moves the {0} still in work in progress ||| ينقل مبلغ {0} المتبقي في الأعمال قيد التنفيذ إلى حيث تنتمي كل وحدة الآن، موزعاً حسب المساحة. وحدات <strong>البيع</strong> تذهب إلى 13200 العقارات المنجزة المحتفظ بها للبيع بالتكلفة. ووحدات <strong>التأجير</strong> إلى 15100 العقارات الاستثمارية، ووحدات <strong>الاستخدام الخاص</strong> إلى 15200 الأصول الثابتة؛ وفي الحالتين لا يُهلك جزء الأرض ويُدخل جزء المبنى في سجل الأصول الثابتة.
+My Jobs ||| أعمالي
+My Maintenance Jobs ||| أعمال الصيانة الخاصة بي
+Net VAT Payable ||| صافي الضريبة المستحقة
+Net VAT Reclaimable ||| صافي الضريبة القابلة للاسترداد
+Net VAT payable ||| صافي الضريبة المستحقة
+Net VAT refundable ||| صافي الضريبة المستردة
+Net VAT {0} ||| صافي الضريبة {0}
+Net movement {0} ||| صافي الحركة {0}
+Net {0} ||| الصافي {0}
+Net {0} to retained earnings ||| صافي {0} إلى الأرباح المحتجزة
+Never ||| أبداً
+New Credit Note ||| إشعار دائن جديد
+New Development Project ||| مشروع تطوير جديد
+New Vendor Bill ||| فاتورة مورد جديدة
+New: {0} ||| جديد: {0}
+No approvals yet. ||| لا توجد اعتمادات بعد.
+No commission waiting to be invoiced up to {0}. ||| لا توجد عمولة بانتظار الفوترة حتى {0}.
+No limit ||| بلا حد
+No payslip yet ||| لا توجد قسيمة راتب بعد
+Not over yet ||| لم ينتهِ بعد
+Not posted ||| غير مرحّل
+Not used ||| غير مستخدم
+Not yet paid ||| لم يُدفع بعد
+Note ||| ملاحظة
+Nothing expires within {0} days. ||| لا شيء ينتهي خلال {0} يوماً.
+Nothing is waiting for approval. ||| لا يوجد ما ينتظر الاعتماد.
+Occupied: {0} ||| المشغولة: {0}
+On {0} of standard rated supplies ||| على {0} من التوريدات الخاضعة للنسبة الأساسية
+Open Bills at {0} ||| الفواتير المفتوحة في {0}
+Open invoices: {0} ||| الفواتير المفتوحة: {0}
+Open periods: {0} ||| الفترات المفتوحة: {0}
+Opening balances carried into {0} ({1} accounts) ||| الأرصدة الافتتاحية المرحّلة إلى {0} ({1} حساب)
+Overdue {0} day(s) ||| متأخر {0} يوم
+Overdue: {0} ||| المتأخر: {0}
+Overridden: {0} ||| متجاوز: {0}
+Owned: {0} ||| المملوكة: {0}
+Owner's net income = rent billed ||| صافي دخل المالك = الإيجار المفوتر ناقصاً عمولتنا وضريبتها ({0}%) والصيانة والتكاليف الأخرى المحمّلة على المالك. الضريبة على الإيجار المفوتر باسم المالك تُحصّل للمالك ويقرّ بها هو؛ وليست دخلاً. ربحيتنا الخاصة حسب العقار في تقرير الأرباح والخسائر حسب العقار.
+Paid ahead of bills and held on 11550 ||| مدفوعة قبل الفواتير ومحتفظ بها في 11550 دفعات مقدمة للموردين حتى تطبيقها (حساب خاص "A" في SAP). الدفعات المقدمة المفتوحة: <strong>{0}</strong> - يدين المورد بها سلعاً أو خدمات.
+Paid in full ||| مدفوع بالكامل
+Paid so far ||| المدفوع حتى الآن
+Past the target time for this priority ||| تجاوز الوقت المستهدف لهذه الأولوية
+Pay the full balance ({0}) or any part of it. ||| ادفع الرصيد كاملاً ({0}) أو أي جزء منه. يبدأ المبلغ بما حُصّل من المستأجرين ({1})؛ ودفع أكثر من ذلك يُعدّ دفعة مقدمة للمالك من إيجار لا يزال مستحقاً على المستأجرين. الحفظ يرحّل الدفعة فوراً: ينخفض المستحق للملاك ويُقيد الحساب البنكي دائناً.
+Payment of open bills ||| دفع الفواتير المفتوحة
+Payroll for {0} {1} ||| رواتب {0} {1}
+Post All Drafts ({0}) ||| ترحيل كل المسودات ({0})
+Preferred visit date: {0} ||| تاريخ الزيارة المفضل: {0}
+Prepaid: {0} ||| مدفوع مقدماً: {0}
+Prepared by {0} on {1}. ||| أعدّه {0} في {1}.
+Prepared by {0} {1} ||| أعدّه {0} {1}
+Print the tax invoice ||| طباعة الفاتورة الضريبية
+Printed on {0} ||| طُبع في {0}
+Printed {0} ||| طُبع {0}
+Profit ||| الربح
+Property management commission for {0}{1}. ||| عمولة إدارة العقار عن {0}{1}.
+Provider: <strong>{0}</strong> ||| المزود: <strong>{0}</strong> &middot; توريدات الفوترة الإلكترونية اعتباراً من <strong>{1}</strong> &middot; {2}
+Provisional {0}% ||| مؤقتة {0}%
+Re-enable access ||| إعادة تفعيل الدخول
+Reason given by the bank ||| السبب الذي ذكره البنك
+Recharge ||| إعادة تحميل
+Recognises the sale: ||| يعترف بالبيع: {0} إلى الإيرادات، وتُطبق الدفعات المقدمة المستلمة، ويصبح أي رصيد غير مدفوع (مع ضريبته) ذمة مدينة على المشتري، وتذهب تكلفة الوحدة ({1}) إلى تكلفة المبيعات. يُرحّل فوراً؛ ولا يمكن إعادته.
+Recorded. {0} ||| تم التسجيل. {0}
+Ref {0} ||| المرجع {0}
+Reference: {0} ||| المرجع: {0}
+Regenerate ||| إعادة الإنشاء
+Released within own limit ||| صُرف ضمن الحد الخاص
+Rent collected on your behalf ||| الإيجار المحصّل نيابة عنك لعقاراتك المُدارة، حتى {0}.
+Rent of {0} is invoiced by the company itself ||| إيجار {0} تفوتره الشركة نفسها، لا باسم المالك، لذا يظهر في إقرار الشركة لا هنا. فعّل <em>فوترة المستأجرين باسم المالك</em> على العقار لتغيير ذلك.
+Reopen requests for {0} ||| طلبات إعادة فتح {0}
+Reset Access ||| إعادة تعيين الدخول
+Reset password ||| إعادة تعيين كلمة المرور
+Restore ||| استعادة
+Returned {0} ||| مرتجع {0}
+Revenue {0} ||| الإيرادات {0}
+Salary cost posted on {0} ||| رُحّلت تكلفة الرواتب في {0}؛ ادفع في ذلك التاريخ أو بعده.
+Sale Contract {0} ||| عقد البيع {0}
+Same account as the invoice ({0}) ||| نفس حساب الفاتورة ({0})
+Show decided too ||| عرض المقرر أيضاً
+Something went wrong while opening {0}. ||| حدث خطأ أثناء فتح {0}. لم يُحفظ شيء بهذا الطلب.
+Source: <strong>{0}</strong> ||| المصدر: <strong>{0}</strong>
+Source: {0} ||| المصدر: {0}
+Spend per development project as at {0} ||| الإنفاق لكل مشروع تطوير كما في {0}: السعر الصافي للمورد، والضريبة المحمّلة على التكلفة، والضريبة المستردة، والملتزم به والمدفوع، ومطابقة الأعمال قيد التنفيذ. المبالغ بعملة {1}.
+Status: {0} | Access Until: {1} ||| الحالة: {0} | الوصول حتى: {1}
+Submitted by {0} ||| قدّمه {0}
+Subscription & Help ||| الاشتراك والمساعدة
+Subscription for <strong>{0}</strong> has expired. ||| انتهى اشتراك <strong>{0}</strong>. أدخل رمز تفعيل لمواصلة المعالجة.
+Subscription is active. Remaining days: ||| الاشتراك نشط. الأيام المتبقية: <strong>{0}</strong>.
+Subscription: {0} ||| الاشتراك: {0}
+Suggested wording: ||| الصياغة المقترحة: <em>"تُدرج العقارات الاستثمارية بالتكلفة ناقصاً مجمع الإهلاك والانخفاض في القيمة. لا تُهلك الأرض. تُهلك المباني بطريقة القسط الثابت على مدى أعمارها الإنتاجية المقدرة. بلغت القيمة العادلة للعقارات الاستثمارية في {0} مبلغ {1} درهم، بناءً على تقييمات مقيّمين مستقلين."</em>
+Suspend access ||| إيقاف الدخول
+Switch approval off ||| تعطيل الاعتماد
+Switch approval on ||| تفعيل الاعتماد
+TRN {0} ||| الرقم الضريبي {0}
+TRN: <strong>{0}</strong> ||| الرقم الضريبي: <strong>{0}</strong>
+TRN: {0} ||| الرقم الضريبي: {0}
+Taken from the TRN: <strong>{0}</strong>. ||| مأخوذ من الرقم الضريبي: <strong>{0}</strong>. اتركه فارغاً.
+Tax invoice no.: <strong>{0}</strong> ||| رقم الفاتورة الضريبية: <strong>{0}</strong>
+Tenant's preferred visit date: ||| تاريخ الزيارة المفضل للمستأجر: <strong>{0}</strong>
+The bank returned the cheque unpaid. ||| أعاد البنك الشيك دون صرف. يُعاد تحميل المبلغ على المستأجر: <code>من حـ/ {0} إلى حـ/ شيكات برسم التحصيل</code>{1}.
+The business and the owner's own properties in one place ||| الشركة وعقارات المالك الخاصة في مكان واحد، من {0} إلى {1}.
+The cheque is dated <strong>{0}</strong> ||| الشيك مؤرخ <strong>{0}</strong> لكنك تحصّله في <strong>{1}</strong>. لا يصرف البنك عادة الشيك المؤجل قبل تاريخه.
+The cheque leaves the drawer ||| يخرج الشيك من الدرج إلى البنك للتحصيل. يُعكس القيد النظامي ويُقيد المبلغ للمستأجر الآن: <code>من حـ/ شيكات برسم التحصيل إلى حـ/ {0}</code>. عندما يصرفه البنك، ينقله <strong>تحصيل</strong> إلى البنك؛ وإذا أعاده البنك، يعيد <strong>مرتجع</strong> تحميله.
+The company's tax identity for <strong>{0}</strong> ||| الهوية الضريبية للشركة لـ <strong>{0}</strong>، ونسبة الاسترداد المطبقة على ضريبة المدخلات المتبقية.
+The cost is shared between the units by area. ||| تُوزّع التكلفة على الوحدات حسب المساحة. أضف وحدات المبنى بمساحاتها إلى {0}، ثم عد.
+The free trial ||| الفترة التجريبية المجانية
+The invoice it was for stays open. ||| تبقى الفاتورة المرتبطة به مفتوحة.
+The list of applied scripts could not be read: {0} ||| تعذرت قراءة قائمة النصوص المطبقة: {0}
+The maintenance jobs assigned to you. ||| أعمال الصيانة المسندة إليك. افتح أحدها لتسجيل العمل والمواد المستخدمة.
+The subscription ||| الاشتراك
+The supplier's VAT, the owner's to reclaim ||| ضريبة المورد، يستردها المالك
+The system is not available for <strong>{0}</strong> ||| النظام غير متاح لـ <strong>{0}</strong> حالياً. يرجى التواصل مع المسؤول.
+The tenant takes the cheque back ||| يسترد المستأجر الشيك قبل إيداعه. يُعكس القيد النظامي ويبقى الشيك في السجل بحالة <strong>مسحوب</strong>. {0} تُصدر الرسوم أدناه للمستأجر بفاتورة ضريبية.
+Their number. Ours is {0}. ||| رقمهم. رقمنا {0}.
+This amount has been deducted from the rent ||| خُصم هذا المبلغ من الإيجار الذي حصّلناه نيابة عنك، ويظهر في كشف تسوية المالك. {0}
+This bill was raised automatically ||| أُنشئت هذه الفاتورة تلقائياً وليس لها بنود تفصيلية. إجماليها {0} {1}.
+This cheque has already cleared, so the received date ||| حُصّل هذا الشيك بالفعل، لذا لا يمكن نقل تاريخ الاستلام إلى ما بعد {0}. يحتفظ قيد التحصيل بتاريخه.
+This cheque replaces cheque <strong>{0}</strong> ||| هذا الشيك بديل عن الشيك <strong>{0}</strong>، الذي سيُحدد <strong>مستبدَل</strong> بعد حفظ هذا الشيك.
+This cheque was deposited on <strong>{0}</strong> ||| أُودع هذا الشيك في <strong>{0}</strong> وقُيد المبلغ للمستأجر حينها. التحصيل ينقل المبلغ من شيكات برسم التحصيل إلى البنك: <code>من حـ/ البنك إلى حـ/ شيكات برسم التحصيل</code>.
+This contract is {0}: its invoices were created ||| هذا العقد {0}: أُنشئت فواتيره من هذه الشروط، لذا هي مقفلة. يمكن تحديث الملاحظات فقط.
+This job is {0}. ||| هذا العمل {0}.
+This period has not started. ||| لم تبدأ هذه الفترة. تُفتح قائمة التحقق الخاصة بها في {0}.
+This period was reopened on request ||| أُعيد فتح هذه الفترة بناءً على طلب في {0} من قبل {1}. أجرِ التصحيح ثم أقفلها مجدداً أدناه.
+This screen ||| هذه الشاشة
+This supplier holds an active VAT registration ||| لهذا المورد تسجيل ضريبي ساري (الرقم الضريبي {0})، لذا تحمل البنود الخاضعة 5% وتُطالب بضريبة المدخلات بالقدر الذي يسمح به التصنيف.
+Total ({0}) ||| الإجمالي ({0})
+Total debits {0} equal total credits {1}. ||| إجمالي المدين {0} يساوي إجمالي الدائن {1}.
+Total for {0} ||| الإجمالي لـ {0}
+Total including VAT ({0}) ||| الإجمالي شامل الضريبة ({0})
+Total outstanding {0} ||| إجمالي المستحق {0}
+Total {0} ||| الإجمالي {0}
+Trial mode is active for this company. ||| الوضع التجريبي نشط لهذه الشركة. الأيام المتبقية: <strong>{0}</strong>.
+Uncleared cheques: {0} ||| الشيكات غير المحصّلة: {0}
+Username <strong>{0}</strong> ||| اسم المستخدم <strong>{0}</strong> · {1} {2} {3} {4}
+Users of your company ||| مستخدمو شركتك
+VAT ({0}) ||| الضريبة ({0})
+VAT at {0}% ||| الضريبة بنسبة {0}%
+VAT of {0} on rent invoiced in the owner's name ||| حُصّلت ضريبة قدرها {0} على الإيجار المفوتر باسم المالك ليقرّ بها المالك.
+VAT — {0} ||| الضريبة — {0}
+VAT: the first sale or lease ||| الضريبة: البيع أو التأجير الأول لكل وحدة سكنية خاضع لنسبة الصفر إذا تم بحلول <strong>{0}</strong>.
+Vacant: {0} ||| الشاغرة: {0}
+Vendor: {0} ||| المورد: {0}
+View / print {0} ||| عرض / طباعة {0}
+Waiting for a decision ({0}) ||| بانتظار قرار ({0})
+Waiting only ||| المنتظر فقط
+Who may do what in {0} ||| من يحق له فعل ماذا في {0}، وكيف تعمل الاعتمادات والحدود. غيّر الأدوار من المستخدمين والصلاحيات، والحدود من حدود الاعتماد.
+Withdrawn {0} ||| مسحوب {0}
+Within own limit ||| ضمن الحد الخاص
+Within {0} days ||| خلال {0} يوماً
+Year-end close - fiscal year {0} ||| إقفال نهاية السنة - السنة المالية {0}
+Yes (annual rent) ||| نعم (الإيجار السنوي)
+You ||| أنت
+Your provider must be appointed by ||| يجب تعيين مزود الخدمة بحلول <strong>{0}</strong> وتبدأ الفوترة الإلكترونية في <strong>{1}</strong>.
+a payment of up to {0} needs ||| الدفعة حتى {0} تحتاج إلى <strong>{1}</strong>، وحتى {2} تحتاج إلى <strong>{3}</strong>، وما يزيد على ذلك يذهب إلى <strong>{4}</strong>.
+balance of account {0} ||| رصيد الحساب {0}
+collected {0} this month, {1} this year ||| حُصّل {0} هذا الشهر، و{1} هذه السنة
+ends {0} ||| ينتهي {0}
+expenses {0}{1} ||| المصروفات {0}{1}
+expired {0} d ago ||| انتهى منذ {0} يوم
+from {0} ||| من {0}
+managed by {0} ||| يديره {0} · كما في {1}
+overdue {0} ||| متأخر {0}
+target: first response within {0} h ||| المستهدف: أول استجابة خلال {0} ساعة، والإنجاز خلال {1}
+{0} (too many failed attempts) ||| {0} (محاولات فاشلة كثيرة)
+{0} - {1} - {2}/{3} - Outstanding: {4} ||| {0} - {1} - {2}/{3} - المستحق: {4}
+{0} / unit {1} &middot; <strong>{2}</strong> ||| {0} / الوحدة {1} &middot; <strong>{2}</strong>
+{0} / {1} used ||| {0} / {1} مستخدم
+{0} Post it from <strong>Operations ||| {0} رحّله من <strong>العمليات &rsaquo; الاستعلام عن القيود</strong> بعد معالجة السبب.
+{0} account(s) ||| {0} حساب
+{0} active employee(s) ||| {0} موظف نشط
+{0} active employee(s). Unpaid leave ||| {0} موظف نشط. تُحتسب الإجازات بدون راتب وسلف الرواتب تلقائياً.
+{0} amber ||| {0} أصفر
+{0} annual rent to renew ||| {0} إيجار سنوي للتجديد
+{0} asking ||| {0} مطلوب
+{0} business tenant(s) are missing ||| {0} مستأجر من جهات الأعمال ينقصهم رقم التعريف الضريبي أو العنوان أو الرخصة.
+{0} business · {1} government ||| {0} جهة أعمال · {1} جهة حكومية · {2} أفراد (الأفراد خارج نطاق الفوترة الإلكترونية)
+{0} cheque(s) ||| {0} شيك
+{0} chq. ||| {0} شيك
+{0} day(s) left ||| متبقي {0} يوم
+{0} days ||| {0} يوماً
+{0} days late ||| متأخر {0} يوماً
+{0} days overdue ||| متأخر {0} يوماً
+{0} document(s) expire within 30 days ||| {0} مستند ينتهي خلال 30 يوماً
+{0} document(s) expired ||| {0} مستند منتهٍ
+{0} done · {1} declined ||| {0} منجز · {1} مرفوض
+{0} draft invoice(s) ||| {0} فاتورة مسودة
+{0} draft journal(s) tagged to this project ||| {0} قيد مسودة مرتبط بهذا المشروع، بإجمالي {1}، لم تُرحّل بعد وليست في التكلفة أدناه. رحّلها من <strong>العمليات &rsaquo; الاستعلام عن القيود</strong>.
+{0} due in 30 days ||| {0} مستحق خلال 30 يوماً
+{0} due in 30 days · {1} ||| {0} مستحق خلال 30 يوماً · {1}
+{0} expiring in 90 days · {1} rent forgone ||| {0} ينتهي خلال 90 يوماً · {1} إيجار ضائع
+{0} from {1} ||| {0} من {1}
+{0} green ||| {0} أخضر
+{0} inv. ||| {0} فاتورة
+{0} invoice(s) ||| {0} فاتورة
+{0} irrecoverable ||| {0} غير قابل للاسترداد
+{0} is still in {1} {2} - transfer it below. ||| {0} لا يزال في {1} {2} - حوّله أدناه.
+{0} item(s) missing from the company's details. ||| {0} بند ناقص في بيانات الشركة.
+{0} journal(s) left as drafts for more than a week ||| {0} قيد متروك كمسودة لأكثر من أسبوع (الأقدم {1}).
+{0} leave request(s) to decide ||| {0} طلب إجازة بانتظار القرار
+{0} let of {1} units ||| {0} مؤجرة من {1} وحدة
+{0} month(s) ||| {0} شهر
+{0} not yet presented ||| {0} لم تُقدم بعد
+{0} occupied of {1} units ||| {0} مشغولة من {1} وحدة
+{0} of {1} unit(s) marked ||| {0} من {1} وحدة محددة · {2} كيلوبايت · {3}
+{0} of {1} units let · rent {2} ||| {0} من {1} وحدة مؤجرة · الإيجار {2} · المستحق {3}
+{0} of {1} units · {2} vacant ||| {0} من {1} وحدة · {2} شاغرة · الإيجارات {3} سنوياً
+{0} overdue ||| {0} متأخر
+{0} overdue for closing ||| {0} متأخرة عن الإقفال
+{0} past target · {1} unassigned ||| {0} تجاوز المستهدف · {1} غير مسند
+{0} posting(s) over {1}, highlighted below. ||| {0} قيد يتجاوز {1}، مميزة أدناه.
+{0} red ||| {0} أحمر
+{0} reopen request(s) waiting ||| {0} طلب إعادة فتح بالانتظار
+{0} schedule(s) ||| {0} جدول
+{0} to {1}. Each account sits on the line ||| من {0} إلى {1}. يقع كل حساب في البند المختار له في دليل الحسابات (بند قائمة الدخل).
+{0} unit(s) ||| {0} وحدة
+{0} up to {1} until {2}, from {3} ({4}) ||| {0} حتى {1} لغاية {2}، من {3} ({4})
+{0} vacant ||| {0} شاغرة
+{0} vacant · {1} expiring in 90 days ||| {0} شاغرة · {1} تنتهي خلال 90 يوماً
+{0} voucher(s) ||| {0} سند
+{0} | {1} day(s) remaining | Access Until: {2} ||| {0} | متبقي {1} يوم | الوصول حتى: {2}
+{0} · TRN {1} ||| {0} · الرقم الضريبي {1}
+{0} · asked {1} ||| {0} · طُلب {1}
+{0} · direct method (IAS 7) ||| {0} · الطريقة المباشرة (المعيار المحاسبي الدولي 7)
+{0} · entered by {1} on {2} ||| {0} · أدخله {1} في {2} · يحتاج إلى <strong>{3}</strong> أو أعلى
+{0} · received {1} ||| {0} · استُلم {1}
+{0} · {1} day(s) ||| {0} · {1} يوم
+{0} · {1} · {2} unit(s) on {3} floor(s) ||| {0} · {1} · {2} وحدة على {3} طابق
+{0} — accounting date ||| {0} — التاريخ المحاسبي
+{0} — unit {1} ||| {0} — الوحدة {1}
+{0} — {1} employee(s), {2} ||| {0} — {1} موظف، {2}
+{0}/month · {1} left ||| {0}/شهرياً · متبقي {1}
+{0}: postings without a project ||| {0}: قيود بدون مشروع (اربطها لتنتمي إلى مشروع)
+| Owner: {0} ||| | المالك: {0}
+© {0} - RealEstateManager ||| © {0} - RealEstateManager
+· Ref {0} ||| · المرجع {0}
+· Ref. {0} ||| · المرجع {0}
+· TRN {0} ||| · الرقم الضريبي {0}
+· building depreciated over {0} years ||| · يُهلك المبنى على {0} سنة
+· commission {0}% ||| · العمولة {0}%
+· {0} pending ||| · {0} قيد الانتظار
+— dated {0} ||| — بتاريخ {0}
+… and {0} more. ||| … و{0} أخرى.
+← Back to {0} ||| ← العودة إلى {0}
+🔒 Close {0} ||| 🔒 إقفال {0}

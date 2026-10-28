@@ -7,7 +7,7 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
     <div>
-        <h2 class="mb-0">Attendance — @monthStart.ToString("MMMM yyyy")</h2>
+        <h2 class="mb-0">@T.Format("Attendance — {0}", monthStart.ToString("MMMM yyyy"))</h2>
         <div class="text-muted">@T["Check the month, then turn it into payroll transactions."]</div>
     </div>
     <div class="d-flex gap-2">
@@ -67,7 +67,7 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="year" value="@Model.Year" />
             <input type="hidden" name="month" value="@Model.Month" />
-            <button class="btn btn-dark">Generate for @monthStart.ToString("MMMM yyyy")</button>
+            <button class="btn btn-dark">@T.Format("Generate for {0}", monthStart.ToString("MMMM yyyy"))</button>
         </form>
         <a asp-controller="PayrollAdjustments" asp-action="Index" asp-route-month="@monthStart.ToString("yyyy-MM")" asp-route-status="All" class="btn btn-outline-dark">@T["See the transactions"]</a>
     </div>

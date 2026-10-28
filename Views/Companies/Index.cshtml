@@ -33,8 +33,7 @@
                             <li class="list-group-item px-0">
                                 <div class="fw-semibold">@item.CompanyName</div>
                                 <div class="small text-muted">
-                                    Status: @item.SubscriptionStatus |
-                                    Access Until: @(item.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")
+                                    @T.Format("Status: {0} | Access Until: {1}", item.SubscriptionStatus, item.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")
                                 </div>
                             </li>
                         }
@@ -63,9 +62,7 @@
                             <li class="list-group-item px-0">
                                 <div class="fw-semibold">@item.CompanyName</div>
                                 <div class="small text-muted">
-                                    @item.SubscriptionStatus |
-                                    @item.DaysRemaining day(s) remaining |
-                                    Access Until: @(item.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")
+                                    @T.Format("{0} | {1} day(s) remaining | Access Until: {2}", item.SubscriptionStatus, item.DaysRemaining, item.AccessEndDate?.ToString("dd/MM/yyyy") ?? "-")
                                 </div>
                             </li>
                         }
@@ -109,7 +106,7 @@
                 <td>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.FiscalYearStartMonth)</td>
                 <td>@item.SubscriptionStatus</td>
                 <td>@(item.AccessEndDate.HasValue ? $"{item.AccessEndDate.Value:dd/MM/yyyy} ({item.DaysRemaining} days)" : "-")</td>
-                <td>@item.ActivationCodesUsed / @item.ActivationCodesIssued used</td>
+                <td>@T.Format("{0} / {1} used", item.ActivationCodesUsed, item.ActivationCodesIssued)</td>
                 <td>@item.UsersCount</td>
                 <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
                 <td class="text-center">

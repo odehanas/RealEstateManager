@@ -16,7 +16,7 @@
 }
 @if (TempData["JournalError"] is string journalError)
 {
-    <div class="alert alert-danger py-2"><strong>Cannot do that.</strong> @journalError</div>
+    <div class="alert alert-danger py-2">@T.HtmlFormat("<strong>Cannot do that.</strong> {0}", journalError)</div>
 }
 
 <div class="alert alert-light border small">

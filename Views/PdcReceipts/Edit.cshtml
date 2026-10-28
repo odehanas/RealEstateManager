@@ -25,10 +25,7 @@
 @if (Model.MemoPeriodClosed)
 {
     <div class="alert alert-warning">
-        <strong>The memorandum entry is in a closed period (@Model.MemoPeriodName).</strong>
-        The received date cannot be changed while that period is closed &mdash; moving a posted entry out of
-        a closed period would alter figures that have already been reported. Reopen the period first, or
-        leave the date as it is.
+        @T.HtmlFormat("<strong>The memorandum entry is in a closed period ({0}).</strong> The received date cannot be changed while that period is closed &mdash; moving a posted entry out of a closed period would alter figures that have already been reported. Reopen the period first, or leave the date as it is.", Model.MemoPeriodName)
     </div>
 }
 
@@ -110,10 +107,10 @@
                 <div class="col-md-6">
                     <div class="text-muted small">@T["Memorandum entry"]</div>
                     <div class="fw-semibold">
-                        @(Model.MemoEntryNumber ?? "Not posted")
+                        @(Model.MemoEntryNumber ?? T["Not posted"])
                         @if (Model.MemoPostedOn.HasValue)
                         {
-                            <text>&mdash; dated @Model.MemoPostedOn.Value.ToString("dd/MM/yyyy")</text>
+                            <text>@T.Format("— dated {0}", Model.MemoPostedOn.Value.ToString("dd/MM/yyyy"))</text>
                         }
                     </div>
                 </div>
@@ -132,8 +129,7 @@
             @if (Model.IsCleared)
             {
                 <div class="alert alert-info small mt-3 mb-0">
-                    This cheque has already cleared, so the received date cannot be moved later than
-                    @Model.ClearedDate!.Value.ToString("dd/MM/yyyy"). The clearance entry keeps its own date.
+                    @T.Format("This cheque has already cleared, so the received date cannot be moved later than {0}. The clearance entry keeps its own date.", Model.ClearedDate!.Value.ToString("dd/MM/yyyy"))
                 </div>
             }
             else

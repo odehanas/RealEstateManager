@@ -84,3 +84,7 @@ Vendor Reference ||| مرجع المورد
 Weekly Off Days ||| أيام الراحة الأسبوعية
 Work Start Time ||| وقت بداية العمل
 Working Hours Per Day ||| ساعات العمل اليومية
+Cleared Date ||| تاريخ التحصيل
+Invoice Display ||| الفاتورة
+Lease Display ||| العقد
+Title ||| العنوان

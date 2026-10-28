@@ -51,14 +51,14 @@ else
                         <tr><th>@T["Unit"]</th><td>@lease.Unit?.UnitNumber</td></tr>
                         <tr><th>@T["Period"]</th><td>@lease.StartDate.ToString("dd/MM/yyyy") to @lease.EndDate.ToString("dd/MM/yyyy")</td></tr>
                         <tr><th>@T["Annual rent"]</th><td>@lease.AnnualRent.ToString("N2")</td></tr>
-                        <tr><th>@T["Billing"]</th><td>Every @lease.BillingFrequencyMonths month(s)</td></tr>
+                        <tr><th>@T["Billing"]</th><td>@T.Format("Every {0} month(s)", lease.BillingFrequencyMonths)</td></tr>
                         <tr>
                             <th>@T["VAT"]</th>
                             <td>
                                 @lease.VatCategory @(lease.VatRate > 0 ? $"({lease.VatRate:0.##}%)" : "")
                                 @if (!string.IsNullOrWhiteSpace(lease.VatOverrideReason))
                                 {
-                                    <div class="small text-danger">Overridden: @lease.VatOverrideReason</div>
+                                    <div class="small text-danger">@T.Format("Overridden: {0}", lease.VatOverrideReason)</div>
                                 }
                             </td>
                         </tr>
@@ -94,7 +94,7 @@ else
                         </tbody>
                         <tfoot>
                             <tr class="fw-bold">
-                                <td>@Model.Instalments.Count invoice(s)</td>
+                                <td>@T.Format("{0} invoice(s)", Model.Instalments.Count)</td>
                                 <td class="text-end">@Model.Instalments.Sum(x => x.Subtotal).ToString("N2")</td>
                                 <td class="text-end">@Model.Instalments.Sum(x => x.VatAmount).ToString("N2")</td>
                                 <td class="text-end">@Model.Instalments.Sum(x => x.TotalAmount).ToString("N2")</td>
@@ -149,7 +149,7 @@ else
                 <tr>
                     <td>@step.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@step.RequestedByName</td>
-                    <td>@(step.Status == ApprovalStatuses.Rejected ? "Returned" : step.Status)</td>
+                    <td>@(step.Status == ApprovalStatuses.Rejected ? T["Returned"] : step.Status)</td>
                     <td>@(step.DecidedByName ?? "-")</td>
                     <td>@(step.DecisionComment ?? "-")</td>
                 </tr>

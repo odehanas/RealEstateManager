@@ -33,8 +33,7 @@
     </form>
 </div>
 <div class="small text-muted mb-2">
-    Device file columns: <code>EmployeeCode, Date, CheckIn, CheckOut</code> — e.g. <code>EMP-0001, 2026-10-12, 07:58, 17:05</code>.
-    Working day @Model.Settings.WorkStartTime.ToString(@"hh\:mm"), @Model.Settings.WorkingHoursPerDay.ToString("0.#") hours; late after @Model.Settings.LateGraceMinutes minutes' grace.
+    @T.HtmlFormat("Device file columns: <code>EmployeeCode, Date, CheckIn, CheckOut</code> — e.g. <code>EMP-0001, 2026-10-12, 07:58, 17:05</code>. Working day {0}, {1} hours; late after {2} minutes' grace.", Model.Settings.WorkStartTime.ToString(@"hh\:mm"), Model.Settings.WorkingHoursPerDay.ToString("0.#"), Model.Settings.LateGraceMinutes)
 </div>
 
 <form asp-action="Save" method="post">

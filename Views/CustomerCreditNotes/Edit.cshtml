@@ -9,10 +9,9 @@
 
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
-        <h2 class="mb-1">@(isNew ? "New Credit Note" : $"Credit Note {Model.CreditNoteNumber}")</h2>
+        <h2 class="mb-1">@(isNew ? T["New Credit Note"] : $"Credit Note {Model.CreditNoteNumber}")</h2>
         <p class="text-muted mb-0">
-            Against invoice <strong>@(Model.TaxInvoiceNumber ?? Model.InvoiceNumber)</strong> of @Model.InvoiceDate.ToString("dd MMM yyyy")
-            &mdash; @Model.TenantName, @Model.PropertyUnit, contract @Model.ContractNumber.
+            @T.HtmlFormat("Against invoice <strong>{0}</strong> of {1} &mdash; {2}, {3}, contract {4}.", Model.TaxInvoiceNumber ?? Model.InvoiceNumber, Model.InvoiceDate.ToString("dd MMM yyyy"), Model.TenantName, Model.PropertyUnit, Model.ContractNumber)
         </p>
     </div>
     <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
@@ -63,7 +62,7 @@
                             <div class="form-check">
                                 <input asp-for="CreditFullOutstanding" class="form-check-input" type="checkbox" id="fullCredit" />
                                 <label class="form-check-label" for="fullCredit">
-                                    Credit everything still outstanding (@Model.Outstanding.ToString("N2"))
+                                    @T.Format("Credit everything still outstanding ({0})", Model.Outstanding.ToString("N2"))
                                 </label>
                             </div>
                         </div>
@@ -76,7 +75,7 @@
                         <div class="col-md-8">
                             <label asp-for="DebitAccountId" class="form-label">@T["Reverse into account"]</label>
                             <select asp-for="DebitAccountId" class="form-select">
-                                <option value="">Same account as the invoice (@Model.DefaultAccountName)</option>
+                                <option value="">@T.Format("Same account as the invoice ({0})", Model.DefaultAccountName)</option>
                                 @foreach (var account in Model.Accounts)
                                 {
                                     <option value="@account.Value">@account.Text</option>
@@ -102,7 +101,7 @@
             <div class="card-header bg-light">@T.Html("<strong>The invoice</strong>")</div>
             <div class="card-body small">
                 <div class="d-flex justify-content-between"><span>@T["Net"]</span><span>@Model.InvoiceSubtotal.ToString("N2")</span></div>
-                <div class="d-flex justify-content-between"><span>VAT &mdash; @VatCategories.Describe(Model.VatCategory)</span><span>@Model.InvoiceVat.ToString("N2")</span></div>
+                <div class="d-flex justify-content-between"><span>@T.Format("VAT — {0}", VatCategories.Describe(Model.VatCategory))</span><span>@Model.InvoiceVat.ToString("N2")</span></div>
                 <div class="d-flex justify-content-between fw-semibold border-top pt-1"><span>@T["Total"]</span><span>@Model.InvoiceTotal.ToString("N2")</span></div>
                 <div class="d-flex justify-content-between text-muted"><span>@T["Paid or credited"]</span><span>@Model.AlreadySettled.ToString("N2")</span></div>
                 <div class="d-flex justify-content-between fw-semibold"><span>@T["Outstanding"]</span><span>@Model.Outstanding.ToString("N2")</span></div>

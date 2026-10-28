@@ -32,7 +32,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-2">
     <div>
-        <h2 class="mb-0">Mark Units: @Model.Title</h2>
+        <h2 class="mb-0">@T.Format("Mark Units: {0}", Model.Title)</h2>
         <div class="text-muted">@Model.Property?.Code - @Model.Property?.Name</div>
     </div>
     <div class="d-flex gap-2">

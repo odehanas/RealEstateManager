@@ -114,7 +114,7 @@
         </form>
         @if (Model.PendingCommission.Count == 0)
         {
-            <p class="mb-0 text-muted">No commission waiting to be invoiced up to @Model.InvoiceMonthEnd.ToString("dd/MM/yyyy").</p>
+            <p class="mb-0 text-muted">@T.Format("No commission waiting to be invoiced up to {0}.", Model.InvoiceMonthEnd.ToString("dd/MM/yyyy"))</p>
         }
         else
         {
@@ -135,7 +135,7 @@
                 <input type="hidden" name="monthEnd" value="@Model.InvoiceMonthEnd.ToString("yyyy-MM-dd")" />
                 <button type="submit" class="btn btn-primary"
                         onclick="return confirm('Issue and post the commission tax invoices dated @Model.InvoiceMonthEnd.ToString("dd/MM/yyyy")?');">
-                    Issue Commission Invoices at @Model.InvoiceMonthEnd.ToString("dd/MM/yyyy")
+                    @T.Format("Issue Commission Invoices at {0}", Model.InvoiceMonthEnd.ToString("dd/MM/yyyy"))
                 </button>
             </form>
         }

@@ -14,7 +14,7 @@
     <div>
         <h2 class="mb-1">@ViewData["Title"]</h2>
         <div class="text-muted">
-            @(seesAll ? "Every maintenance job raised by tenants, with who is doing it." : "The maintenance jobs assigned to you. Open one to record the work and the materials used.")
+            @(seesAll ? T["Every maintenance job raised by tenants, with who is doing it."] : T["The maintenance jobs assigned to you. Open one to record the work and the materials used."])
         </div>
     </div>
     @if (seesAll)
@@ -86,7 +86,7 @@ else
                             <td>@job.Tenant</td>
                             @if (seesAll) { <td>@(job.Technician ?? "not assigned")</td> }
                             <td><span class="badge @ServiceRequestStatuses.BadgeClass(job.Status)">@ServiceRequestStatuses.Describe(job.Status)</span></td>
-                            <td class="text-end @(job.IsOpen && job.ResolveLate ? "text-danger fw-semibold" : "")" title="@(job.IsOpen && job.ResolveLate ? "Past the target time for this priority" : "")">@Hours(job.AgeHours)</td>
+                            <td class="text-end @(job.IsOpen && job.ResolveLate ? "text-danger fw-semibold" : "")" title="@(job.IsOpen && job.ResolveLate ? T["Past the target time for this priority"] : "")">@Hours(job.AgeHours)</td>
                             <td class="text-end">@(job.Materials == 0m ? "" : job.Materials.ToString("N2"))</td>
                         </tr>
                     }

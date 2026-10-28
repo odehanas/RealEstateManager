@@ -39,7 +39,7 @@
                 <img src="@Url.Action("Image", new { id = photo.Id })" class="card-img-top" alt="@photo.Title" style="max-height:220px;object-fit:contain;background:#f1f3f5" />
                 <div class="card-body">
                     <h5 class="card-title mb-1">@photo.Title</h5>
-                    <div class="small text-muted mb-2">@photo.Areas.Count of @unitCount unit(s) marked &middot; @(photo.SizeBytes / 1024) KB &middot; @photo.UploadedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                    <div class="small text-muted mb-2">@T.Format("{0} of {1} unit(s) marked · {2} KB · {3}", photo.Areas.Count, unitCount, photo.SizeBytes / 1024, photo.UploadedAt.ToLocalTime().ToString("dd/MM/yyyy"))</div>
                     <div class="d-flex gap-2">
                         <a asp-action="Mark" asp-route-id="@photo.Id" class="btn btn-sm btn-dark">@T["Mark units"]</a>
                         <form asp-action="Delete" asp-route-id="@photo.Id" method="post" onsubmit="return confirm('Delete this photo and every unit outline marked on it?');">

@@ -76,7 +76,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Overdue"]</div>
                 <div class="h3 fw-bold mb-1">@Model.TotalOverdue.ToString("N2")</div>
-                <div class="small">Total outstanding @Model.TotalOutstanding.ToString("N2")</div>
+                <div class="small">@T.Format("Total outstanding {0}", Model.TotalOutstanding.ToString("N2"))</div>
             </div>
         </div>
     </div>
@@ -102,7 +102,7 @@
                 <div class="h5 fw-bold mb-1">
                     A @Model.GradeCount("A") &middot; B @Model.GradeCount("B") &middot; C @Model.GradeCount("C")
                 </div>
-                <div class="small">D @Model.GradeCount("D") &middot; E @Model.GradeCount("E") &middot; deposits held @Model.TotalDepositHeld.ToString("N0")</div>
+                <div class="small">@T.Format("D {0} · E {1} · deposits held {2}", Model.GradeCount("D"), Model.GradeCount("E"), Model.TotalDepositHeld.ToString("N0"))</div>
             </div>
         </div>
     </div>
@@ -185,20 +185,20 @@ else
                                 @row.OverdueAmount.ToString("N2")
                                 @if (row.OverdueInvoiceCount > 0)
                                 {
-                                    <div class="small text-muted">@row.OverdueInvoiceCount inv.</div>
+                                    <div class="small text-muted">@T.Format("{0} inv.", row.OverdueInvoiceCount)</div>
                                 }
                             </td>
                             <td class="text-end">@(row.OldestOverdueDays > 0 ? row.OldestOverdueDays.ToString() : "-")</td>
                             <td class="text-end">@(row.AverageDaysToPay.HasValue ? row.AverageDaysToPay.Value.ToString("N1") : "-")</td>
                             <td class="text-end">
                                 @row.PdcClearedAmount.ToString("N2")
-                                <div class="small text-muted">@row.PdcClearedCount chq.</div>
+                                <div class="small text-muted">@T.Format("{0} chq.", row.PdcClearedCount)</div>
                             </td>
                             <td class="text-end @(row.PdcBouncedCount > 0 ? "text-danger fw-semibold" : "")">
                                 @row.PdcBouncedAmount.ToString("N2")
                                 @if (row.PdcBouncedCount > 0)
                                 {
-                                    <div class="small">@row.PdcBouncedCount chq.</div>
+                                    <div class="small">@T.Format("{0} chq.", row.PdcBouncedCount)</div>
                                 }
                             </td>
                             <td class="text-end">@row.PdcOnHandAmount.ToString("N2")</td>
@@ -209,7 +209,7 @@ else
                                 @if (row.CurrentContractNumber != null)
                                 {
                                     @row.CurrentContractNumber
-                                    <div class="small text-muted">ends @row.CurrentContractEnd!.Value.ToString("dd/MM/yyyy")</div>
+                                    <div class="small text-muted">@T.Format("ends {0}", row.CurrentContractEnd!.Value.ToString("dd/MM/yyyy"))</div>
                                 }
                                 else
                                 {

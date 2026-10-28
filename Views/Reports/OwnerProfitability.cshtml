@@ -8,8 +8,7 @@
     <div>
         <h2 class="mb-1">@T["Owner Property Profitability"]</h2>
         <div class="text-muted">
-            Managed properties, @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"): what each property earned its owner,
-            and what it earned us in commission.
+            @T.Format("Managed properties, {0} to {1}: what each property earned its owner, and what it earned us in commission.", Model.From.ToString("dd/MM/yyyy"), Model.To.ToString("dd/MM/yyyy"))
         </div>
     </div>
     <a asp-controller="OwnerSettlements" asp-action="Index" class="btn btn-outline-secondary">@T["Owner Settlements"]</a>
@@ -66,7 +65,7 @@ else
                                 <a asp-controller="Properties" asp-action="Details" asp-route-id="@r.PropertyId">@r.PropertyCode</a> @r.PropertyName
                                 @if (r.BilledInOwnerName) { <span class="badge bg-info text-dark" title="@T["Tenants are invoiced in the owner's name"]">@T["owner billed"]</span> }
                             </td>
-                            <td>@r.OwnerName @if (!string.IsNullOrWhiteSpace(r.OwnerTrn)) { <span class="text-muted small">TRN @r.OwnerTrn</span> } else { <span class="text-muted small">@T["no TRN"]</span> }</td>
+                            <td>@r.OwnerName @if (!string.IsNullOrWhiteSpace(r.OwnerTrn)) { <span class="text-muted small">@T.Format("TRN {0}", r.OwnerTrn)</span> } else { <span class="text-muted small">@T["no TRN"]</span> }</td>
                             <td class="text-end">@r.Let / @r.Units</td>
                             <td class="text-end">@r.RentBilled.ToString("N2")</td>
                             <td class="text-end">@r.Commission.ToString("N2") <span class="text-muted small">(@r.CommissionPercentage.ToString("0.##")%)</span></td>
@@ -122,8 +121,6 @@ else
     }
 
     <p class="small text-muted">
-        Owner's net income = rent billed less our commission, the VAT on it (@Model.CommissionVatRate.ToString("0.##")%) and maintenance and other costs charged to the owner.
-        VAT on rent invoiced in an owner's name is collected for the owner and is the owner's to declare; it is not income.
-        Our own profitability by property is in the Profit &amp; Loss by Property report.
+        @T.Format("Owner's net income = rent billed less our commission, the VAT on it ({0}%) and maintenance and other costs charged to the owner. VAT on rent invoiced in an owner's name is collected for the owner and is the owner's to declare; it is not income. Our own profitability by property is in the Profit & Loss by Property report.", Model.CommissionVatRate.ToString("0.##"))
     </p>
 }

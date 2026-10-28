@@ -72,7 +72,7 @@
 </form>
 
 <div class="d-none d-print-block mb-3">
-    <strong>@Model.CompanyName</strong> &mdash; tenancy schedule as at @Model.AsOfDate.ToString("dd/MM/yyyy")
+    @T.HtmlFormat("<strong>{0}</strong> &mdash; tenancy schedule as at {1}", Model.CompanyName, Model.AsOfDate.ToString("dd/MM/yyyy"))
 </div>
 
 <div class="row g-3 mb-4">
@@ -81,7 +81,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Occupancy"]</div>
                 <div class="h3 fw-bold mb-1">@Model.OccupancyRate.ToString("N1")%</div>
-                <div class="small">@Model.OccupiedUnits let of @Model.TotalUnits units</div>
+                <div class="small">@T.Format("{0} let of {1} units", Model.OccupiedUnits, Model.TotalUnits)</div>
             </div>
         </div>
     </div>
@@ -90,7 +90,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Contracted Annual Rent"]</div>
                 <div class="h3 fw-bold mb-1">@Model.TotalAnnualRent.ToString("N0")</div>
-                <div class="small">Deposits held @Model.TotalDepositHeld.ToString("N0")</div>
+                <div class="small">@T.Format("Deposits held {0}", Model.TotalDepositHeld.ToString("N0"))</div>
             </div>
         </div>
     </div>
@@ -107,8 +107,8 @@
         <div class="card shadow-sm h-100 border-0 bg-dark text-white">
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Attention"]</div>
-                <div class="h3 fw-bold mb-1">@Model.VacantUnits vacant</div>
-                <div class="small">@Model.ExpiringSoon expiring in 90 days &middot; @Model.TotalVacancyCost.ToString("N0") rent forgone</div>
+                <div class="h3 fw-bold mb-1">@T.Format("{0} vacant", Model.VacantUnits)</div>
+                <div class="small">@T.Format("{0} expiring in 90 days · {1} rent forgone", Model.ExpiringSoon, Model.TotalVacancyCost.ToString("N0"))</div>
             </div>
         </div>
     </div>
@@ -132,17 +132,15 @@ else
                 <div>
                     <div class="name">@ownerGroup.Key</div>
                     <div class="stats">
-                        @(isManaged ? "Managed" : "Owned")
+                        @(isManaged ? T["Managed"] : T["Owned"])
                         @if (isManaged && commission > 0)
                         {
-                            <text>&middot; commission @commission.ToString("N2")%</text>
+                            <text>@T.Format("· commission {0}%", commission.ToString("N2"))</text>
                         }
                     </div>
                 </div>
                 <div class="stats text-end">
-                    @occupied of @groupRows.Count units let &middot;
-                    rent @groupRows.Sum(x => x.AnnualRent).ToString("N0") &middot;
-                    outstanding @groupRows.Sum(x => x.Outstanding).ToString("N0")
+                    @T.Format("{0} of {1} units let · rent {2} · outstanding {3}", occupied, groupRows.Count, groupRows.Sum(x => x.AnnualRent).ToString("N0"), groupRows.Sum(x => x.Outstanding).ToString("N0"))
                 </div>
             </div>
 
@@ -217,7 +215,7 @@ else
                                         }
                                         else
                                         {
-                                            <span class="text-muted">@row.StandardAnnualRent.ToString("N2") asking</span>
+                                            <span class="text-muted">@T.Format("{0} asking", row.StandardAnnualRent.ToString("N2"))</span>
                                         }
                                     </td>
                                     <td class="small">@VatCategories.Describe(row.VatCategory)</td>
@@ -240,7 +238,7 @@ else
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="7">Total for @ownerGroup.Key</td>
+                                <td colspan="7">@T.Format("Total for {0}", ownerGroup.Key)</td>
                                 <td class="text-end">@groupRows.Sum(x => x.AnnualRent).ToString("N2")</td>
                                 <td></td>
                                 <td class="text-end">@groupRows.Sum(x => x.DepositHeld).ToString("N2")</td>

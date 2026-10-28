@@ -43,7 +43,7 @@
     <div class="alert alert-danger no-print">@error</div>
 }
 
-<h5>Movement in the carrying amount, @Model.FromDate.ToString("dd/MM/yyyy") to @Model.ToDate.ToString("dd/MM/yyyy")</h5>
+<h5>@T.Format("Movement in the carrying amount, {0} to {1}", Model.FromDate.ToString("dd/MM/yyyy"), Model.ToDate.ToString("dd/MM/yyyy"))</h5>
 <table class="table table-sm table-bordered note" style="max-width: 720px;">
     <thead><tr><th></th><th class="num">@T["AED"]</th></tr></thead>
     <tbody>
@@ -69,7 +69,7 @@
     </tbody>
 </table>
 
-<h5 class="mt-4">Carrying amount and fair value by property, at @Model.ToDate.ToString("dd/MM/yyyy")</h5>
+<h5 class="mt-4">@T.Format("Carrying amount and fair value by property, at {0}", Model.ToDate.ToString("dd/MM/yyyy"))</h5>
 <div class="table-responsive">
     <table class="table table-sm table-bordered note">
         <thead>
@@ -131,10 +131,7 @@
 }
 
 <p class="small text-muted">
-    Suggested wording: <em>"Investment property is stated at cost less accumulated depreciation and impairment. Land is not
-    depreciated. Buildings are depreciated on a straight-line basis over their estimated useful lives. The fair value of
-    investment property at @Model.ToDate.ToString("dd MMMM yyyy") was AED @Model.TotalFairValue.ToString("N0"), based on valuations by
-    independent valuers."</em>
+    @T.HtmlFormat("Suggested wording: <em>\"Investment property is stated at cost less accumulated depreciation and impairment. Land is not depreciated. Buildings are depreciated on a straight-line basis over their estimated useful lives. The fair value of investment property at {0} was AED {1}, based on valuations by independent valuers.\"</em>", Model.ToDate.ToString("dd MMMM yyyy"), Model.TotalFairValue.ToString("N0"))
 </p>
 
 @{
@@ -147,11 +144,7 @@
         <div class="card-header bg-light">@T.Html("<strong>Depreciate an Existing Building</strong>")</div>
         <div class="card-body">
             <p class="small text-muted">
-                A building brought in as an opening balance is not depreciated until it is set up here. Split its carrying amount
-                into <strong>land</strong> (never depreciated) and <strong>building</strong>, and give the building's remaining useful
-                life. If it was depreciated in a previous system, enter the building's carrying amount (cost less depreciation so far).
-                Ticking <em>allocate</em> also moves that amount out of the unallocated opening balance
-                (@unallocated.ToString("N2") not yet allocated) and onto the property, so the note shows it against the building.
+                @T.HtmlFormat("A building brought in as an opening balance is not depreciated until it is set up here. Split its carrying amount into <strong>land</strong> (never depreciated) and <strong>building</strong>, and give the building's remaining useful life. If it was depreciated in a previous system, enter the building's carrying amount (cost less depreciation so far). Ticking <em>allocate</em> also moves that amount out of the unallocated opening balance ({0} not yet allocated) and onto the property, so the note shows it against the building.", unallocated.ToString("N2"))
             </p>
             <form asp-action="SetUpBuilding" method="post" class="row g-3"
                   onsubmit="return confirm('Set up depreciation for this building? Its monthly depreciation will be posted by the depreciation run.');">

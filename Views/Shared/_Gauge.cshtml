@@ -68,6 +68,6 @@
     }
     @if (Model.Link != null)
     {
-        <a href="@Model.Link" class="gauge-link">@(Model.LinkText ?? "Details")</a>
+        <a href="@Model.Link" class="gauge-link">@(Model.LinkText ?? T["Details"])</a>
     }
 </div>

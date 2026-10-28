@@ -12,7 +12,7 @@
         <h2 class="mb-0">@T["Payment Approvals"]</h2>
         <div class="text-muted">@T["Payments held until someone whose authority covers the amount releases them. Nobody releases a payment they entered."]</div>
     </div>
-    <a asp-action="Index" asp-route-all="@(!all)" class="btn btn-outline-dark">@(all ? "Waiting only" : "Show decided too")</a>
+    <a asp-action="Index" asp-route-all="@(!all)" class="btn btn-outline-dark">@(all ? T["Waiting only"] : T["Show decided too"])</a>
 </div>
 
 @if (TempData["ApprovalSuccess"] is string ok) { <div class="alert alert-success">@ok</div> }
@@ -32,11 +32,11 @@
             <div>
                 <strong>@a.Amount.ToString("N2")</strong> — @a.Description
                 <div class="small text-muted">
-                    @a.SourceType · entered by @a.RequestedByName on @a.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · needs <strong>@a.RequiredLevel</strong> or above
+                    @T.HtmlFormat("{0} · entered by {1} on {2} · needs <strong>{3}</strong> or above", a.SourceType, a.RequestedByName, a.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm"), a.RequiredLevel)
                 </div>
             </div>
             <span class="badge align-self-start @(a.Status switch { PaymentApprovalStatuses.Pending => "bg-warning text-dark", PaymentApprovalStatuses.Rejected => "bg-danger", _ => "bg-success" })">
-                @(a.Status == PaymentApprovalStatuses.SelfReleased ? "Released within own limit" : a.Status)
+                @(a.Status == PaymentApprovalStatuses.SelfReleased ? T["Released within own limit"] : a.Status)
             </span>
         </div>
         <div class="card-body">
@@ -49,7 +49,7 @@
                         <tr><td>@l.Account?.Code @l.Account?.Name</td><td class="small">@l.Description</td><td class="text-end">@(l.Debit == 0 ? "" : l.Debit.ToString("N2"))</td><td class="text-end">@(l.Credit == 0 ? "" : l.Credit.ToString("N2"))</td></tr>
                     }
                 </table>
-                <div class="small text-muted mb-2">Journal @a.JournalEntry.EntryNumber dated @a.JournalEntry.EntryDate.ToString("dd/MM/yyyy") @(a.JournalEntry.DocumentNumber != null ? "· " + a.JournalEntry.DocumentNumber : "")</div>
+                <div class="small text-muted mb-2">@T.Format("Journal {0} dated {1} {2}", a.JournalEntry.EntryNumber, a.JournalEntry.EntryDate.ToString("dd/MM/yyyy"), a.JournalEntry.DocumentNumber != null ? "· " + a.JournalEntry.DocumentNumber : "")</div>
             }
             @if (!pending)
             {

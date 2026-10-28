@@ -40,11 +40,11 @@
                 <strong>@EmployeeRequestTypes.Describe(r.RequestType)</strong>
                 <span class="badge @Badge(r.Status)">@r.Status</span>
             </div>
-            <div class="small text-muted">@r.AddressedTo · asked @r.RequestedAt.ToLocalTime().ToString("dd MMM yyyy")</div>
+            <div class="small text-muted">@T.Format("{0} · asked {1}", r.AddressedTo, r.RequestedAt.ToLocalTime().ToString("dd MMM yyyy"))</div>
             @if (!string.IsNullOrEmpty(r.Comment)) { <div class="small">HR: @r.Comment</div> }
             @if (r.Status == EmployeeRequestStatuses.Issued)
             {
-                <a asp-action="Document" asp-route-id="@r.Id" class="btn btn-sm btn-outline-success mt-2">View / print @r.ReferenceNumber</a>
+                <a asp-action="Document" asp-route-id="@r.Id" class="btn btn-sm btn-outline-success mt-2">@T.Format("View / print {0}", r.ReferenceNumber)</a>
             }
         </div>
     }

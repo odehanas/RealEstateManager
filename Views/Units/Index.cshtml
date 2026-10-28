@@ -34,11 +34,11 @@
                         @property.PropertyType | @property.OwnershipType
                         @if (!string.IsNullOrWhiteSpace(property.OwnerName))
                         {
-                            <span>| Owner: @property.OwnerName</span>
+                            <span>@T.Format("| Owner: {0}", property.OwnerName)</span>
                         }
                     </div>
                 </div>
-                <span class="badge bg-light text-dark">@property.Units.Count unit(s)</span>
+                <span class="badge bg-light text-dark">@T.Format("{0} unit(s)", property.Units.Count)</span>
             </div>
         </div>
 

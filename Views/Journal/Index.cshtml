@@ -29,7 +29,7 @@
 @if (TempData["JournalError"] is string journalError)
 {
     <div class="alert alert-danger py-2">
-        <strong>Cannot do that.</strong> @journalError
+        @T.HtmlFormat("<strong>Cannot do that.</strong> {0}", journalError)
     </div>
 }
 
@@ -98,7 +98,7 @@
         <input type="hidden" name="toDate" value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" />
         <input type="hidden" name="sourceType" value="@Model.SourceType" />
         <button type="submit" class="btn btn-primary">
-            Post All Drafts (@draftCount)
+            @T.Format("Post All Drafts ({0})", draftCount)
         </button>
         <span class="text-muted small ms-2">
             @T["Posts every draft matching the filter above. Entries in a closed period are skipped, and any that fail are listed individually rather than stopping the run."]

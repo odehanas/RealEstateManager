@@ -47,7 +47,7 @@
     {
         <div class="list-group-item">
             <div class="d-flex justify-content-between">
-                <strong>@l.LeaveType · @l.Days.ToString("0.#") day(s)</strong>
+                <strong>@T.Format("{0} · {1} day(s)", l.LeaveType, l.Days.ToString("0.#"))</strong>
                 <span class="badge @Badge(l.Status)">@l.Status</span>
             </div>
             <div class="small text-muted">@l.StartDate.ToString("dd MMM yyyy") – @l.EndDate.ToString("dd MMM yyyy")</div>

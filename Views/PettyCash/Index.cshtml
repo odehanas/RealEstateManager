@@ -72,7 +72,7 @@
 </form>
 
 <div class="d-none d-print-block mb-3">
-    <strong>Period:</strong> @Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy")
+    @T.HtmlFormat("<strong>Period:</strong> {0} to {1}", Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))
 </div>
 
 <div class="row g-3 mb-4">
@@ -97,7 +97,7 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Spent"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalExpenses.ToString("N2")</div>
-                <div class="small opacity-75">@Model.VoucherCount voucher(s)</div>
+                <div class="small opacity-75">@T.Format("{0} voucher(s)", Model.VoucherCount)</div>
             </div>
         </div>
     </div>

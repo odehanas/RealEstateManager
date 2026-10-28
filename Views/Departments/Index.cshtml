@@ -24,11 +24,11 @@
             <tr>
                 <td>@d.Name</td>
                 <td class="text-end">@(counts.TryGetValue(d.Id, out var c) ? c : 0)</td>
-                <td>@(d.IsActive ? "Active" : "Inactive")</td>
+                <td>@(d.IsActive ? T["Active"] : T["Inactive"])</td>
                 <td>
                     <form asp-action="Toggle" asp-route-id="@d.Id" method="post">
                         @Html.AntiForgeryToken()
-                        <button class="btn btn-sm btn-outline-secondary">@(d.IsActive ? "Deactivate" : "Activate")</button>
+                        <button class="btn btn-sm btn-outline-secondary">@(d.IsActive ? T["Deactivate"] : T["Activate"])</button>
                     </form>
                 </td>
             </tr>

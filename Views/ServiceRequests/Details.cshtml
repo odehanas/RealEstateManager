@@ -49,8 +49,7 @@
                 @if (Model.PreferredVisitDate.HasValue)
                 {
                     <div class="small text-muted mt-2">
-                        Tenant's preferred visit date:
-                        <strong>@Model.PreferredVisitDate.Value.ToString("dd/MM/yyyy")</strong>
+                        @T.HtmlFormat("Tenant's preferred visit date: <strong>{0}</strong>", Model.PreferredVisitDate.Value.ToString("dd/MM/yyyy"))
                     </div>
                 }
             </div>
@@ -87,9 +86,7 @@
                     @if (Model.PostponementApplied)
                     {
                         <div class="alert alert-success mb-0 small">
-                            <strong>Applied.</strong> The invoice due date was moved on
-                            @Model.PostponementAppliedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm").
-                            The invoice amount, its VAT and its journal were not touched.
+                            @T.HtmlFormat("<strong>Applied.</strong> The invoice due date was moved on {0}. The invoice amount, its VAT and its journal were not touched.", Model.PostponementAppliedAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm"))
                         </div>
                     }
                     else if (Model.AwaitingPostponementAction)
@@ -98,7 +95,7 @@
                               onsubmit="return confirm('Move the due date on @Model.RelatedInvoiceNumber to @Model.RequestedNewDueDate?.ToString("dd/MM/yyyy")?');">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="btn btn-warning">
-                                Apply new due date to @Model.RelatedInvoiceNumber
+                                @T.Format("Apply new due date to {0}", Model.RelatedInvoiceNumber)
                             </button>
                             <div class="form-text">
                                 @T["Changes only the invoice's due date, which is what drives chasing and the ageing report. The amount owed, the VAT and the journal entry are untouched — granting more time to pay is not a credit note."]

@@ -52,7 +52,7 @@
             <div class="card-body">
                 <div class="text-muted small">@T["Due to Post"]</div>
                 <div class="fs-4 fw-bold">@Model.PendingDepreciationAmount.ToString("N2")</div>
-                <div>@Model.PendingDepreciationCount schedule(s)</div>
+                <div>@T.Format("{0} schedule(s)", Model.PendingDepreciationCount)</div>
             </div>
         </div>
     </div>
@@ -116,7 +116,7 @@
                 <tr>
                     <td>
                         <div>@asset.AssetCode - @asset.Name</div>
-                        <small class="text-muted">Acquired @asset.AcquisitionDate.ToString("dd/MM/yyyy")</small>
+                        <small class="text-muted">@T.Format("Acquired {0}", asset.AcquisitionDate.ToString("dd/MM/yyyy"))</small>
                     </td>
                     <td>@asset.AssetCategory</td>
                     <td>@asset.PropertyDisplay</td>

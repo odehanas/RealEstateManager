@@ -31,7 +31,7 @@
             </div>
             <div class="col-md-2"><label class="form-label">@T["Year"]</label><input name="year" type="number" value="@Model.NewYear" class="form-control" /></div>
             <div class="col-md-3"><button class="btn btn-dark w-100">@T["Prepare payroll"]</button></div>
-            <div class="col-md-4 text-muted small">@Model.ActiveEmployees active employee(s). Unpaid leave and salary advances are picked up automatically.</div>
+            <div class="col-md-4 text-muted small">@T.Format("{0} active employee(s). Unpaid leave and salary advances are picked up automatically.", Model.ActiveEmployees)</div>
         </form>
     </div>
 </div>

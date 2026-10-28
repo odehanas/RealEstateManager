@@ -12,7 +12,7 @@
 <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
     @if (returnUrl != null)
     {
-        <a href="@returnUrl" class="btn btn-outline-dark btn-sm">&larr; Back to @returnTo</a>
+        <a href="@returnUrl" class="btn btn-outline-dark btn-sm">@T.Format("← Back to {0}", returnTo)</a>
     }
     <h2 class="mb-0 me-auto">@T["General Ledger"]</h2>
     <div class="btn-group btn-group-sm d-print-none" role="group" aria-label="@T["Open a report"]">
@@ -69,10 +69,10 @@
             <strong>@Model.AccountCode - @Model.AccountName</strong> | @Model.AccountType
         </div>
         <div class="card-body">
-            <div><strong>Opening Balance:</strong> @Model.OpeningBalance.ToString("N2")</div>
-            <div><strong>Total Debit:</strong> @Model.TotalDebit.ToString("N2")</div>
-            <div><strong>Total Credit:</strong> @Model.TotalCredit.ToString("N2")</div>
-            <div><strong>Closing Balance:</strong> @Model.ClosingBalance.ToString("N2")</div>
+            <div>@T.HtmlFormat("<strong>Opening Balance:</strong> {0}", Model.OpeningBalance.ToString("N2"))</div>
+            <div>@T.HtmlFormat("<strong>Total Debit:</strong> {0}", Model.TotalDebit.ToString("N2"))</div>
+            <div>@T.HtmlFormat("<strong>Total Credit:</strong> {0}", Model.TotalCredit.ToString("N2"))</div>
+            <div>@T.HtmlFormat("<strong>Closing Balance:</strong> {0}", Model.ClosingBalance.ToString("N2"))</div>
         </div>
     </div>
 

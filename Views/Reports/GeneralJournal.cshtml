@@ -20,7 +20,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
     <div>
         <h2 class="mb-0">@T["General Journal"]</h2>
-        <div class="text-muted">Every journal entry from @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy"), with its lines and the source it came from.</div>
+        <div class="text-muted">@T.Format("Every journal entry from {0} to {1}, with its lines and the source it came from.", Model.From.ToString("dd/MM/yyyy"), Model.To.ToString("dd/MM/yyyy"))</div>
     </div>
     <div class="d-flex gap-2 no-print">
         <a class="btn btn-outline-secondary" asp-action="GeneralJournal"
@@ -74,7 +74,7 @@
             <div class="text-muted small">@T["Entries"]</div>
             <div class="fs-4 fw-semibold">@Model.Entries.Count</div>
             <div class="small @(balanced ? "text-success" : "text-danger")">
-                Debits @Model.TotalDebit.ToString("N2") · Credits @Model.TotalCredit.ToString("N2") @(balanced ? "· balanced" : "· NOT balanced")
+                @T.Format("Debits {0} · Credits {1} {2}", Model.TotalDebit.ToString("N2"), Model.TotalCredit.ToString("N2"), balanced ? "· balanced" : "· NOT balanced")
             </div>
         </div></div>
     </div>
@@ -119,14 +119,14 @@
                 <td>@e.EntryDate.ToString("dd/MM/yyyy")</td>
                 <td colspan="5">
                     <a asp-controller="Documents" asp-action="Entry" asp-route-id="@e.Id" class="fw-bold" title="@T["Open the journal entry"]">@e.EntryNumber</a>
-                    <span class="ms-2">Source: <strong>@e.SourceLabel</strong></span>
+                    <span class="ms-2">@T.HtmlFormat("Source: <strong>{0}</strong>", e.SourceLabel)</span>
                     @if (!string.IsNullOrEmpty(e.DocumentNumber) || e.SourceType != null)
                     {
                         <span class="ms-1">· <a asp-controller="Documents" asp-action="Open" asp-route-entryId="@e.Id" title="@T["Open the original document"]">@(e.DocumentNumber ?? "open document")</a></span>
                     }
                     @if (!string.IsNullOrEmpty(e.ReferenceNumber))
                     {
-                        <span class="ms-1 text-muted">· Ref @e.ReferenceNumber</span>
+                        <span class="ms-1 text-muted">@T.Format("· Ref {0}", e.ReferenceNumber)</span>
                     }
                     @if (e.Status != GeneralJournalReportService.StatusPosted)
                     {
