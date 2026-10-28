@@ -80,7 +80,7 @@
         { "key": "vat-return", "title": "VAT Return", "path": "Reporting ▸ VAT Return", "summary": "Output and input tax for a tax period, and the annual wash-up.", "screens": ["Reports.VatReturn"] },
         { "key": "building-view", "title": "Building View", "path": "Reporting ▸ Building View", "summary": "Each building drawn floor by floor, units coloured by rent health; select a unit for its details.", "screens": ["BuildingView"] },
         { "key": "management-reports", "title": "Tenant & Property Reports", "path": "Reporting ▸ Management — Tenants & Properties", "summary": "P&L by property, property utilization, tenant health and ranking.", "screens": ["Reports.ProfitAndLossByProperty", "Reports.PropertyUtilization", "Reports.TenantHealth"] },
-        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule, owner withdrawals and owner property profitability.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals", "Reports.OwnerProfitability"] }
+        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule, owner withdrawals, owner property profitability and the owner's combined view.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals", "Reports.OwnerProfitability", "Reports.OwnerCombined"] }
       ]
     },
     {

@@ -141,6 +141,7 @@ namespace RealEstateManager.Controllers
                 Name = model.Name.Trim(),
                 AccountType = model.AccountType,
                 ReportingGroup = model.ReportingGroup,
+                StatementLine = CleanStatementLine(model),
                 ParentAccountId = model.ParentAccountId,
                 IsGroup = model.IsGroup,
                 IsPostable = model.IsPostable,
@@ -183,6 +184,8 @@ namespace RealEstateManager.Controllers
                 Name = account.Name,
                 AccountType = account.AccountType,
                 ReportingGroup = account.ReportingGroup,
+                StatementLine = account.StatementLine,
+                InheritedStatementLine = await StatementLineResolver.InheritedAsync(_db, account),
                 ParentAccountId = account.ParentAccountId,
                 IsGroup = account.IsGroup,
                 IsPostable = account.IsPostable,
@@ -270,6 +273,7 @@ namespace RealEstateManager.Controllers
             account.Name = model.Name.Trim();
             account.AccountType = model.AccountType;
             account.ReportingGroup = model.ReportingGroup;
+            account.StatementLine = CleanStatementLine(model);
             account.ParentAccountId = model.ParentAccountId;
             account.IsGroup = model.IsGroup;
             account.IsPostable = model.IsPostable;
@@ -298,6 +302,19 @@ namespace RealEstateManager.Controllers
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>Only revenue and expense accounts carry an income statement line, and only a known one on the right side.</summary>
+        private static string? CleanStatementLine(AccountFormViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.StatementLine))
+                return null;
+            return model.AccountType switch
+            {
+                "Revenue" when StatementLines.Revenue.Contains(model.StatementLine) => model.StatementLine,
+                "Expense" when StatementLines.Costs.Contains(model.StatementLine) => model.StatementLine,
+                _ => null
+            };
         }
 
         private void ValidateAccountForm(AccountFormViewModel model)

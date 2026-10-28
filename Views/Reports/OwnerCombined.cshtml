@@ -1,0 +1,112 @@
+﻿@model RealEstateManager.Services.OwnerCombinedService.Report
+@{
+    ViewData["Title"] = "Owner's Combined View";
+    string Money(decimal value) => value == 0m ? "-" : value < 0 ? $"({Math.Abs(value):N2})" : value.ToString("N2");
+}
+
+<style>
+    .cv td, .cv th { padding: .35rem .6rem; }
+    .cv .head td { font-weight: 600; background: #f6f8fa; }
+    .cv .total td { font-weight: 600; border-top: 1px solid #adb5bd; }
+    .cv .result td { font-weight: 700; border-top: 2px solid #0f2740; background: #eef3f8; }
+    .cv .between { color: #6c757d; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div>
+        <h2 class="mb-1">Owner's Combined View</h2>
+        <div class="text-muted">The business and the owner's own properties in one place, @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy").</div>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">Print</button>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-auto"><label class="form-label small mb-0" for="fromDate">From</label><input id="fromDate" type="date" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="toDate">To</label><input id="toDate" type="date" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto">
+        <label class="form-label small mb-0" for="owner">Owner of the properties</label>
+        <select id="owner" name="owner" class="form-select form-select-sm">
+            <option value="">-- choose --</option>
+            @foreach (var o in Model.Owners) { <option value="@o" selected="@(o == Model.Owner ? "selected" : null)">@o</option> }
+        </select>
+    </div>
+    <div class="col-auto"><button class="btn btn-sm btn-dark">Show</button></div>
+</form>
+
+@if (Model.Owner == null)
+{
+    <div class="alert alert-info">Choose the owner whose properties the business manages. The business column is the company's own income statement.</div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">The business &mdash; net profit</div><div class="h4 mb-0">@Money(Model.BusinessNet)</div></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Personal investments &mdash; net income</div><div class="h4 mb-0">@Money(Model.PersonalNet)</div></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm h-100 border-primary"><div class="card-body"><div class="text-muted small">Combined</div><div class="h4 mb-0 text-primary">@Money(Model.BusinessNet + Model.PersonalNet)</div></div></div></div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="table-responsive">
+        <table class="table table-sm cv mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th></th>
+                    <th class="text-end">The business</th>
+                    <th class="text-end">Personal investments<br /><span class="fw-normal small">@(Model.Owner ?? "")</span></th>
+                    <th class="text-end">Between them</th>
+                    <th class="text-end">Combined</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in Model.Lines)
+                {
+                    if (line.Kind == "head")
+                    {
+                        <tr class="head"><td colspan="5">@line.Label</td></tr>
+                        continue;
+                    }
+                    <tr class="@line.Kind">
+                        <td>@line.Label @if (line.Note != null) { <div class="small text-muted fw-normal">@line.Note</div> }</td>
+                        <td class="text-end">@Money(line.Business)</td>
+                        <td class="text-end">@Money(line.Personal)</td>
+                        <td class="text-end between">@Money(line.Between)</td>
+                        <td class="text-end">@Money(line.Combined)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (Model.Properties.Count > 0)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>The owner's properties</strong></div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light"><tr><th>Property</th><th class="text-end">Rent</th><th class="text-end">Commission</th><th class="text-end">Costs</th><th class="text-end">Net income</th></tr></thead>
+                <tbody>
+                    @foreach (var p in Model.Properties)
+                    {
+                        <tr>
+                            <td><a asp-controller="Properties" asp-action="Details" asp-route-id="@p.PropertyId">@p.PropertyCode</a> @p.PropertyName</td>
+                            <td class="text-end">@p.RentBilled.ToString("N2")</td>
+                            <td class="text-end">@p.Commission.ToString("N2")</td>
+                            <td class="text-end">@p.Expenses.ToString("N2")</td>
+                            <td class="text-end">@p.OwnerNetIncome.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<p class="small text-muted">
+    A management view, not a tax consolidation: the business and the owner remain separate taxable persons, each with its
+    own TRN and VAT return. "Between them" removes the commission the owner's properties pay the business, which is income
+    to one and a cost to the other. Figures are before VAT.
+    @if (Model.OwnerIsVatRegistered) { <text>The owner is VAT registered, so the VAT on the commission is reclaimable and not a cost.</text> }
+    @if (Model.RentVatForOwner != 0m) { <text>VAT of @Model.RentVatForOwner.ToString("N2") on rent invoiced in the owner's name was collected for the owner to declare.</text> }
+    The business column is the <a asp-action="ProfitAndLoss" asp-route-asOfDate="@Model.To.ToString("yyyy-MM-dd")">Profit &amp; Loss</a>
+    (from the start of its year); the personal column is <a asp-action="OwnerProfitability" asp-route-fromDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.To.ToString("yyyy-MM-dd")" asp-route-owner="@Model.Owner">Owner Property Profitability</a>.
+</p>

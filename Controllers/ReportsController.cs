@@ -291,6 +291,24 @@ namespace RealEstateManager.Controllers
             return View(await profitability.GetAsync(companyId, from, to, owner));
         }
 
+        /// <summary>
+        /// The owner's combined management view: the business's income statement beside the
+        /// result of the owner's own managed properties, and the two together.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> OwnerCombined(DateTime? fromDate, DateTime? toDate, string? owner,
+            [FromServices] OwnerCombinedService combined)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var company = await _db.Companies.AsNoTracking().FirstAsync(x => x.Id == companyId);
+            var to = (toDate ?? DateTime.Today).Date;
+            var from = (fromDate ?? GetFiscalYearStart(to, company.FiscalYearStartMonth)).Date;
+            if (from > to)
+                (from, to) = (to, from);
+
+            return View(await combined.GetAsync(companyId, from, to, owner));
+        }
+
         // A CSV cell: quoted when needed, and a leading = + - @ neutralised so a
         // spreadsheet never runs it as a formula.
         private static string Csv(string? value)

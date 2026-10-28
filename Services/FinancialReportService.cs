@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
+using RealEstateManager.Domain;
 
 namespace RealEstateManager.Services
 {
@@ -135,6 +136,11 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.Code)
                 .ToListAsync();
 
+            // Each account's income statement line: its own, its group's, or the default.
+            var lines = await StatementLineResolver.ResolveAllAsync(_db, companyId);
+            string LineOf(int accountId, string type) =>
+                lines.TryGetValue(accountId, out var line) ? line : type == "Revenue" ? StatementLines.OtherIncome : StatementLines.FixedCosts;
+
             var revenueRows = rows
                 .Where(x => x.AccountType == "Revenue")
                 .Select(x => new ProfitAndLossRowDto
@@ -142,6 +148,7 @@ namespace RealEstateManager.Services
                     AccountId = x.AccountId,
                     AccountCode = x.Code,
                     AccountName = x.Name,
+                    StatementLine = LineOf(x.AccountId, x.AccountType),
                     Amount = x.TotalCredit - x.TotalDebit
                 })
                 .Where(x => x.Amount != 0m)
@@ -154,6 +161,7 @@ namespace RealEstateManager.Services
                     AccountId = x.AccountId,
                     AccountCode = x.Code,
                     AccountName = x.Name,
+                    StatementLine = LineOf(x.AccountId, x.AccountType),
                     Amount = x.TotalDebit - x.TotalCredit
                 })
                 .Where(x => x.Amount != 0m)
@@ -358,6 +366,19 @@ namespace RealEstateManager.Services
         public decimal TotalRevenue { get; set; }
         public decimal TotalExpenses { get; set; }
         public decimal NetProfitOrLoss { get; set; }
+
+        // ---- The income statement layout, by statement line ----------------
+
+        public IEnumerable<ProfitAndLossRowDto> RowsOf(string line) =>
+            (StatementLines.IsRevenueLine(line) ? Revenue : Expenses).Where(x => x.StatementLine == line);
+
+        public decimal TotalOf(string line) => RowsOf(line).Sum(x => x.Amount);
+
+        public decimal CostOfRevenue => TotalOf(StatementLines.CostOfRevenue);
+        public decimal GrossProfit => TotalRevenue - CostOfRevenue;
+        public decimal OperatingCosts => TotalOf(StatementLines.FixedCosts) + TotalOf(StatementLines.RecurringCosts);
+        public decimal OperatingProfit => GrossProfit - OperatingCosts;
+        public decimal FinanceCosts => TotalOf(StatementLines.FinanceCosts);
     }
 
     public class ProfitAndLossRowDto
@@ -365,6 +386,9 @@ namespace RealEstateManager.Services
         public int AccountId { get; set; }
         public string AccountCode { get; set; } = string.Empty;
         public string AccountName { get; set; } = string.Empty;
+
+        /// <summary>The income statement line (see StatementLines).</summary>
+        public string StatementLine { get; set; } = string.Empty;
         public decimal Amount { get; set; }
     }
 

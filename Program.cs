@@ -220,6 +220,7 @@ builder.Services.AddScoped<FinancialReportService>();
 builder.Services.AddScoped<GeneralJournalReportService>();
 builder.Services.AddScoped<MaintenanceService>();
 builder.Services.AddScoped<OwnerProfitabilityService>();
+builder.Services.AddScoped<OwnerCombinedService>();
 builder.Services.AddScoped<DocumentLinkService>();
 builder.Services.AddScoped<ManagementReportService>();
 builder.Services.AddScoped<LedgerInquiryService>();

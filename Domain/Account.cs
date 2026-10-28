@@ -16,6 +16,12 @@ namespace RealEstateManager.Domain
         // Assets, Liabilities, Equity, Revenue, DirectExpense, GeneralExpense
         public string ReportingGroup { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Income statement line of a revenue or expense account (see <see cref="StatementLines"/>).
+        /// Null: the parent group's line, or the standard default.
+        /// </summary>
+        public string? StatementLine { get; set; }
+
         public bool IsControlAccount { get; set; } = false;
 
         // Marks an equity account that represents an owner's current account /

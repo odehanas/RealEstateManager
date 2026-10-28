@@ -18,68 +18,80 @@
     a.drill:hover { color: var(--bs-link-color); border-bottom-style: solid; }
 </style>
 
-<h2>Profit and Loss</h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
+    <h2 class="mb-0">Profit and Loss</h2>
+    <form method="get" class="d-flex gap-2 align-items-center">
+        <label for="asOfDate" class="small text-muted">As of</label>
+        <input type="date" id="asOfDate" name="asOfDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control form-control-sm" />
+        <button type="submit" class="btn btn-sm btn-dark">Refresh</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">Print</button>
+    </form>
+</div>
+<p class="text-muted">@Model.StartDate.ToString("dd/MM/yyyy") to @Model.EndDate.ToString("dd/MM/yyyy"). Each account sits on the line chosen for it in the chart of accounts (Income statement line).</p>
 
-<form method="get" class="mb-3">
-    <label for="asOfDate">As Of Date</label>
-    <input type="date" id="asOfDate" name="asOfDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
-    <button type="submit">Refresh</button>
-</form>
+<style>
+    .is-table td, .is-table th { padding: .3rem .6rem; }
+    .is-table .line-head td { font-weight: 600; background: #f6f8fa; }
+    .is-table .acct td:first-child { padding-left: 1.6rem; }
+    .is-table .subtotal td { font-weight: 600; border-top: 1px solid #adb5bd; }
+    .is-table .result td { font-weight: 700; border-top: 2px solid #0f2740; background: #eef3f8; }
+    .is-table .neg { color: #b42318; }
+</style>
 
-<h4>Revenue</h4>
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Account</th>
-            <th class="text-end">Amount</th>
-        </tr>
-    </thead>
+@{
+    string Money(decimal value) => value < 0 ? $"({Math.Abs(value):N2})" : value.ToString("N2");
+}
+
+<table class="table table-sm is-table">
     <tbody>
-        @foreach (var row in Model.Revenue)
+        @* ---------------- Revenue *@
+        <tr class="line-head"><td colspan="3">Revenue</td></tr>
+        @foreach (var line in RealEstateManager.Domain.StatementLines.Revenue)
         {
-            <tr>
-                <td>@Drill(LedgerUrl(row.AccountId), row.AccountCode)</td>
-                <td>@Drill(LedgerUrl(row.AccountId), row.AccountName)</td>
-                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td>
-            </tr>
+            var rows = Model.RowsOf(line).ToList();
+            if (rows.Count == 0) { continue; }
+            <tr><td colspan="2" class="fw-semibold">@RealEstateManager.Domain.StatementLines.Describe(line)</td><td class="text-end fw-semibold">@Money(Model.TotalOf(line))</td></tr>
+            @foreach (var row in rows)
+            {
+                <tr class="acct"><td>@Drill(LedgerUrl(row.AccountId), row.AccountCode) @Drill(LedgerUrl(row.AccountId), row.AccountName)</td><td class="text-end text-muted">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td><td></td></tr>
+            }
         }
+        <tr class="subtotal"><td colspan="2">Total revenue</td><td class="text-end">@Money(Model.TotalRevenue)</td></tr>
+
+        @* ---------------- Cost of revenue and gross profit *@
+        <tr class="line-head"><td colspan="3">Less: cost of revenue</td></tr>
+        @foreach (var row in Model.RowsOf(RealEstateManager.Domain.StatementLines.CostOfRevenue))
+        {
+            <tr class="acct"><td>@Drill(LedgerUrl(row.AccountId), row.AccountCode) @Drill(LedgerUrl(row.AccountId), row.AccountName)</td><td class="text-end text-muted">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td><td></td></tr>
+        }
+        <tr class="subtotal"><td colspan="2">Total cost of revenue</td><td class="text-end">(@Model.CostOfRevenue.ToString("N2"))</td></tr>
+        <tr class="result"><td colspan="2">Gross profit</td><td class="text-end @(Model.GrossProfit < 0 ? "neg" : "")">@Money(Model.GrossProfit)</td></tr>
+
+        @* ---------------- Operating costs: fixed, then recurring *@
+        @foreach (var line in new[] { RealEstateManager.Domain.StatementLines.FixedCosts, RealEstateManager.Domain.StatementLines.RecurringCosts })
+        {
+            <tr class="line-head"><td colspan="3">Less: @RealEstateManager.Domain.StatementLines.Describe(line).ToLowerInvariant()</td></tr>
+            @foreach (var row in Model.RowsOf(line))
+            {
+                <tr class="acct"><td>@Drill(LedgerUrl(row.AccountId), row.AccountCode) @Drill(LedgerUrl(row.AccountId), row.AccountName)</td><td class="text-end text-muted">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td><td></td></tr>
+            }
+            <tr class="subtotal"><td colspan="2">Total @RealEstateManager.Domain.StatementLines.Describe(line).ToLowerInvariant()</td><td class="text-end">(@Model.TotalOf(line).ToString("N2"))</td></tr>
+        }
+        <tr class="result"><td colspan="2">Operating profit</td><td class="text-end @(Model.OperatingProfit < 0 ? "neg" : "")">@Money(Model.OperatingProfit)</td></tr>
+
+        @* ---------------- Finance costs and the result *@
+        <tr class="line-head"><td colspan="3">Less: finance costs</td></tr>
+        @foreach (var row in Model.RowsOf(RealEstateManager.Domain.StatementLines.FinanceCosts))
+        {
+            <tr class="acct"><td>@Drill(LedgerUrl(row.AccountId), row.AccountCode) @Drill(LedgerUrl(row.AccountId), row.AccountName)</td><td class="text-end text-muted">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td><td></td></tr>
+        }
+        <tr class="subtotal"><td colspan="2">Total finance costs</td><td class="text-end">(@Model.FinanceCosts.ToString("N2"))</td></tr>
+        <tr class="result"><td colspan="2">Net profit / (loss)</td><td class="text-end @(Model.NetProfitOrLoss < 0 ? "neg" : "")">@Money(Model.NetProfitOrLoss)</td></tr>
     </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="2">Total Revenue</th>
-            <th class="text-end">@Model.TotalRevenue.ToString("N2")</th>
-        </tr>
-    </tfoot>
 </table>
 
-<h4>Expenses</h4>
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Account</th>
-            <th class="text-end">Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var row in Model.Expenses)
-        {
-            <tr>
-                <td>@Drill(LedgerUrl(row.AccountId), row.AccountCode)</td>
-                <td>@Drill(LedgerUrl(row.AccountId), row.AccountName)</td>
-                <td class="text-end">@Drill(LedgerUrl(row.AccountId), row.Amount.ToString("N2"))</td>
-            </tr>
-        }
-    </tbody>
-    <tfoot>
-        <tr>
-            <th colspan="2">Total Expenses</th>
-            <th class="text-end">@Model.TotalExpenses.ToString("N2")</th>
-        </tr>
-        <tr>
-            <th colspan="2">Net Profit / Loss</th>
-            <th class="text-end">@Model.NetProfitOrLoss.ToString("N2")</th>
-        </tr>
-    </tfoot>
-</table>
+<p class="small text-muted">
+    The rent of managed properties belongs to their owners and is not revenue here; only the commission is. Costs of managed
+    properties are charged to their owners (Due to Landlords) and do not appear here either &mdash; see
+    <a asp-action="OwnerProfitability">Owner Property Profitability</a> and <a asp-action="OwnerCombined">the owner's combined view</a>.
+</p>

@@ -10,6 +10,12 @@
         public string AccountType { get; set; } = string.Empty;
         public string ReportingGroup { get; set; } = string.Empty;
 
+        /// <summary>Income statement line; empty = as its group / the default.</summary>
+        public string? StatementLine { get; set; }
+
+        /// <summary>What the line is when left empty, shown on the form.</summary>
+        public string? InheritedStatementLine { get; set; }
+
         public int? ParentAccountId { get; set; }
 
         public bool IsGroup { get; set; } = false;

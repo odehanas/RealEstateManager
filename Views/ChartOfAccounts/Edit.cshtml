@@ -50,6 +50,27 @@
             </select>
         </div>
 
+        <div class="col-md-4" id="statementLineBox">
+            <label asp-for="StatementLine" class="form-label">Income statement line</label>
+            <select asp-for="StatementLine" class="form-select" id="statementLine">
+                <option value="">@(Model.InheritedStatementLine != null ? $"As its group / default: {RealEstateManager.Domain.StatementLines.Describe(Model.InheritedStatementLine)}" : "As its group / standard default")</option>
+                <optgroup label="Revenue" data-type="Revenue">
+                    @foreach (var line in RealEstateManager.Domain.StatementLines.Revenue)
+                    {
+                        <option value="@line" selected="@(Model.StatementLine == line ? "selected" : null)">@RealEstateManager.Domain.StatementLines.Describe(line)</option>
+                    }
+                </optgroup>
+                <optgroup label="Costs" data-type="Expense">
+                    @foreach (var line in RealEstateManager.Domain.StatementLines.Costs)
+                    {
+                        <option value="@line" selected="@(Model.StatementLine == line ? "selected" : null)">@RealEstateManager.Domain.StatementLines.Describe(line)</option>
+                    }
+                </optgroup>
+            </select>
+            <div class="form-text">Revenue and expense accounts only: where the account appears on the Profit &amp; Loss. Fixed costs: the same every month (salaries, office rent, depreciation). Recurring costs: running costs that move with activity (utilities, supplies).</div>
+        </div>
+
+
         <div class="col-md-4">
             <label asp-for="ParentAccountId" class="form-label">Parent Account</label>
             <select asp-for="ParentAccountId" class="form-select">
@@ -190,5 +211,27 @@
 </form>
 
 @section Scripts {
+<script>
+    // The income statement line only means something for revenue and expense accounts.
+    (function () {
+        var type = document.querySelector('[name="AccountType"]');
+        var box = document.getElementById('statementLineBox');
+        var select = document.getElementById('statementLine');
+        if (!type || !box || !select) return;
+        function sync() {
+            var t = type.value;
+            box.style.display = (t === 'Revenue' || t === 'Expense') ? '' : 'none';
+            select.querySelectorAll('optgroup').forEach(function (g) {
+                var show = g.getAttribute('data-type') === t;
+                g.hidden = !show;
+                g.querySelectorAll('option').forEach(function (o) { o.disabled = !show; });
+            });
+            if (select.selectedOptions[0] && select.selectedOptions[0].disabled) select.value = '';
+        }
+        type.addEventListener('change', sync);
+        sync();
+    })();
+</script>
+
     <partial name="_ValidationScriptsPartial" />
 }
