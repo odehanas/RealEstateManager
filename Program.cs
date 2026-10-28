@@ -222,6 +222,7 @@ builder.Services.AddScoped<MaintenanceService>();
 builder.Services.AddScoped<OwnerRechargeService>();
 builder.Services.AddScoped<OwnerProfitabilityService>();
 builder.Services.AddScoped<OwnerCombinedService>();
+builder.Services.AddScoped<OwnerVatReturnService>();
 builder.Services.AddScoped<DocumentLinkService>();
 builder.Services.AddScoped<ManagementReportService>();
 builder.Services.AddScoped<LedgerInquiryService>();

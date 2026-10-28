@@ -309,6 +309,24 @@ namespace RealEstateManager.Controllers
             return View(await combined.GetAsync(companyId, from, to, owner));
         }
 
+        /// <summary>
+        /// The VAT return of a VAT-registered owner of managed properties, from the rent
+        /// invoiced in their name and the company's tax invoices to them. Defaults to the
+        /// calendar quarter, like the company's return.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> OwnerVatReturn(DateTime? startDate, DateTime? endDate, string? owner,
+            [FromServices] OwnerVatReturnService ownerVat)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var to = (endDate ?? DateTime.Today).Date;
+            var from = (startDate ?? new DateTime(to.Year, ((to.Month - 1) / 3) * 3 + 1, 1)).Date;
+            if (from > to)
+                (from, to) = (to, from);
+
+            return View(await ownerVat.GetAsync(companyId, from, to, owner));
+        }
+
         // A CSV cell: quoted when needed, and a leading = + - @ neutralised so a
         // spreadsheet never runs it as a formula.
         private static string Csv(string? value)

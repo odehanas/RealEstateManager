@@ -1,0 +1,118 @@
+﻿@model RealEstateManager.Services.OwnerVatReturnService.Report
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = "Owner VAT Return";
+    string Money(decimal v) => v < 0 ? $"({Math.Abs(v):N2})" : v.ToString("N2");
+}
+
+<style>
+    .ovr th { background: #0f2740; color: #fff; }
+    .ovr tfoot td { font-weight: 700; background: #eef2f7; }
+    @@media print { .no-print { display: none !important; } }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+    <div>
+        <h2 class="mb-1">Owner VAT Return</h2>
+        <div class="text-muted">
+            @if (Model.Owner != null) { <text><strong>@Model.Owner</strong> &middot; TRN @Model.OwnerTrn &middot; </text> }
+            @Model.From.ToString("dd/MM/yyyy") to @Model.To.ToString("dd/MM/yyyy")
+        </div>
+    </div>
+    <div class="d-flex gap-2 no-print">
+        <a asp-action="VatReturn" asp-route-startDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-endDate="@Model.To.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary btn-sm">Company VAT Return</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">Print</button>
+    </div>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label small mb-0" for="owner">Owner (VAT registered)</label>
+        <select id="owner" name="owner" class="form-select form-select-sm">
+            <option value="">-- choose --</option>
+            @foreach (var o in Model.Owners) { <option value="@o.Name" selected="@(o.Name == Model.Owner ? "selected" : null)">@o.Name &middot; TRN @o.Trn</option> }
+        </select>
+    </div>
+    <div class="col-auto"><label class="form-label small mb-0" for="startDate">From</label><input id="startDate" type="date" name="startDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><label class="form-label small mb-0" for="endDate">To</label><input id="endDate" type="date" name="endDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
+    <div class="col-auto"><button class="btn btn-sm btn-dark">Show</button></div>
+</form>
+
+@if (Model.Owners.Count == 0)
+{
+    <div class="alert alert-info">No owner of a managed property has a TRN recorded. Owners who are not VAT registered do not file a return.</div>
+}
+else if (Model.Owner == null)
+{
+    <div class="alert alert-info">Choose the owner and the tax period.</div>
+}
+else
+{
+    @if (Model.NotBilledInOwnerName.Count > 0)
+    {
+        <div class="alert alert-warning small">
+            Rent of @string.Join(", ", Model.NotBilledInOwnerName) is invoiced by the company itself, not in the owner's name, so it is on
+            the company's return and not here. Switch on <em>Invoice tenants in the owner's name</em> on the property to change that.
+        </div>
+    }
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Output tax (on rent)</div><div class="h4 mb-0">@Money(Model.OutputTax)</div></div></div></div>
+        <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Input tax (on our invoices to the owner)</div><div class="h4 mb-0">@Money(Model.InputTax)</div></div></div></div>
+        <div class="col-md-4"><div class="card shadow-sm h-100 border-primary"><div class="card-body"><div class="text-muted small">@(Model.NetPayable >= 0 ? "Net VAT payable" : "Net VAT refundable")</div><div class="h4 mb-0 text-primary">@Money(Math.Abs(Model.NetPayable))</div></div></div></div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>Summary</strong></div>
+        <table class="table table-sm mb-0 ovr">
+            <thead><tr><th>Box</th><th class="text-end">Amount</th><th class="text-end">VAT</th></tr></thead>
+            <tbody>
+                <tr><td>Standard rated supplies (rent, 5%)</td><td class="text-end">@Money(Model.SuppliesNet(VatCategories.Standard))</td><td class="text-end">@Money(Model.SuppliesVat(VatCategories.Standard))</td></tr>
+                <tr><td>Zero rated supplies</td><td class="text-end">@Money(Model.SuppliesNet(VatCategories.ZeroRated))</td><td class="text-end">-</td></tr>
+                <tr><td>Exempt supplies (residential rent)</td><td class="text-end">@Money(Model.SuppliesNet(VatCategories.Exempt))</td><td class="text-end">-</td></tr>
+                <tr><td>Standard rated expenses (our commission and recharges)</td><td class="text-end">@Money(Model.Purchases.Sum(x => x.Net))</td><td class="text-end">@Money(Model.InputTax)</td></tr>
+            </tbody>
+            <tfoot><tr><td colspan="2">Net VAT @(Model.NetPayable >= 0 ? "payable" : "refundable")</td><td class="text-end">@Money(Math.Abs(Model.NetPayable))</td></tr></tfoot>
+        </table>
+    </div>
+
+    @foreach (var (title, docs) in new[] { ("Supplies: rent invoiced in the owner's name", Model.Supplies), ("Expenses: the company's tax invoices to the owner", Model.Purchases) })
+    {
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white"><strong>@title</strong></div>
+            @if (docs.Count == 0)
+            {
+                <div class="card-body text-muted small py-2">None in this period.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light"><tr><th>Date</th><th>Document</th><th>Kind</th><th>Description</th><th>VAT</th><th class="text-end">Amount</th><th class="text-end">VAT</th></tr></thead>
+                        <tbody>
+                            @foreach (var d in docs.OrderBy(x => x.Date))
+                            {
+                                <tr>
+                                    <td>@d.Date.ToString("dd/MM/yyyy")</td>
+                                    <td>@if (d.Link != null) { <a href="@d.Link" target="_blank">@d.Number</a> } else { @d.Number }</td>
+                                    <td>@d.Kind</td>
+                                    <td class="small">@d.Description</td>
+                                    <td>@d.Category</td>
+                                    <td class="text-end">@Money(d.Net)</td>
+                                    <td class="text-end">@Money(d.Vat)</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot><tr class="fw-semibold"><td colspan="5" class="text-end">Total</td><td class="text-end">@Money(docs.Sum(x => x.Net))</td><td class="text-end">@Money(docs.Sum(x => x.Vat))</td></tr></tfoot>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+
+    <p class="small text-muted">
+        Built from what passes through the company for this owner. The owner files under their own TRN and must add any
+        other supplies or expenses of theirs that are outside this system. Input tax on the company's tax invoices is
+        reclaimable only once the owner holds them.
+    </p>
+}

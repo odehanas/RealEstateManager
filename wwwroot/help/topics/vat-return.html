@@ -53,3 +53,19 @@ expense account the residual costs were charged to. Then update the provisional 
 <h3>Settling with the FTA</h3>
 <p>When you pay the VAT due, post a manual journal: Dr <code>21400</code> VAT Payable for the output tax, Cr
 <code>11300</code> VAT Recoverable for the input tax, Cr <code>11100</code> Cash for the net amount paid.</p>
+
+<h3>Owner VAT Return</h3>
+<p><span class="path">Reporting ▸ Owner VAT Return</span></p>
+<p>The VAT position of a VAT-registered owner of managed properties, for them to file under their own TRN. Choose the
+owner (only owners with a TRN are listed) and the tax period &mdash; the calendar quarter by default.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:30%">Part</th><th>What it contains</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Output tax</strong></td><td>Rent invoiced in the owner's name (see <a href="#properties">invoicing in the owner's name</a>), by VAT category, less credit notes against it.</td></tr>
+        <tr><td><strong>Input tax</strong></td><td>The company's tax invoices to the owner: management commission and <a href="#owner-settlements">recharged costs</a>.</td></tr>
+        <tr><td><strong>Net VAT</strong></td><td>Payable when output exceeds input, refundable otherwise.</td></tr>
+    </tbody>
+</table>
+<p>Every document is listed and opens. If some of the owner's properties are still invoiced by the company, a note says
+so: that rent is on the company's return, not the owner's. The owner adds any other income or costs of theirs that are
+outside this system.</p>
