@@ -1,0 +1,17 @@
+# Sheet 15: petty cash amounts on hold while vouchers wait for approval (whole texts; {0} are values).
+On hold for approval: {0} ||| محجوز بانتظار الاعتماد: {0}
+Available to spend: {0} ||| المتاح للصرف: {0}
+<strong>{0} is on hold</strong> in {1} voucher(s) waiting for approval in <strong>Controls &rsaquo; Payment Approvals</strong>. The cash is still in the box but promised, so new vouchers can use only the <strong>Available</strong> balance. ||| <strong>{0} محجوز</strong> في {1} سند بانتظار الاعتماد في <strong>الضوابط &lsaquo; اعتمادات المدفوعات</strong>. النقد لا يزال في الصندوق لكنه مخصص، فلا تستطيع السندات الجديدة استخدام إلا الرصيد <strong>المتاح</strong>.
+Top-ups waiting for approval ({0}) are not counted until they are released. ||| مبالغ التعويض بانتظار الاعتماد ({0}) لا تُحتسب حتى يُفرج عنها.
+On Hold ||| محجوز
+Available ||| المتاح
+On hold ||| محجوز
+Waiting for approval since {0}, entered by {1}. Not counted in the totals until released. ||| بانتظار الاعتماد منذ {0}، أدخله {1}. لا يُحتسب في الإجماليات حتى يُفرج عنه.
+A voucher waiting for approval puts its amount <strong>on hold</strong>: it is not spent yet, but no other voucher can use that cash. Releasing it posts it; turning it down frees the amount. ||| السند بانتظار الاعتماد يضع مبلغه <strong>محجوزاً</strong>: لم يُصرف بعد، لكن لا يستطيع أي سند آخر استخدام ذلك النقد. الإفراج عنه يرحّله؛ ورفضه يحرر المبلغ.
+Available to spend now: ||| المتاح للصرف الآن:
+cash in hand ||| النقد في الصندوق
+on hold for approval ||| محجوز بانتظار الاعتماد
+Not enough cash available in the float. Cash in hand is {0}, of which {1} is on hold for vouchers waiting for approval, so {2} can be spent and the voucher is {3}. Wait for the approvals, or record a replenishment first. ||| لا يوجد نقد كافٍ متاح في العهدة. النقد في الصندوق {0}، منه {1} محجوز لسندات بانتظار الاعتماد، فالمتاح للصرف {2} والسند {3}. انتظر الاعتمادات، أو سجّل تعويضاً أولاً.
+The petty cash float holds {0} on {1}, less than the voucher's {2}. Record a replenishment before releasing it. ||| رصيد عهدة المصروفات النثرية {0} في {1}، وهو أقل من مبلغ السند {2}. سجّل تعويضاً قبل الإفراج عنه.
+Voucher recorded for {0}. Waiting for approval: {1} needs release by {2} level or above. It reaches the accounts once approved in Controls ▸ Payment Approvals. Until then the amount is on hold in the float. ||| سُجل السند لـ {0}. بانتظار الاعتماد: {1} يحتاج إلى صرف من مستوى {2} أو أعلى. يصل إلى الحسابات بعد اعتماده في الضوابط ▸ اعتمادات المدفوعات. وحتى ذلك الحين يبقى المبلغ محجوزاً في العهدة.
+Waiting for approval: {0} needs release by {1} level or above. It reaches the accounts once approved in Controls ▸ Payment Approvals. ||| بانتظار الاعتماد: {0} يحتاج إلى صرف من مستوى {1} أو أعلى. يصل إلى الحسابات بعد اعتماده في الضوابط ▸ اعتمادات المدفوعات.

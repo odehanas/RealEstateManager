@@ -18,6 +18,11 @@ namespace RealEstateManager.Models
         public decimal TotalReplenishments => Floats.Sum(x => x.Replenishments);
         public decimal TotalExpenses => Floats.Sum(x => x.Expenses);
         public decimal TotalClosingBalance => Floats.Sum(x => x.ClosingBalance);
+        public decimal TotalOnHold => Floats.Sum(x => x.OnHold);
+        public decimal TotalAvailable => Floats.Sum(x => x.Available);
+
+        /// <summary>Vouchers and top-ups entered but waiting for release in Payment Approvals.</summary>
+        public List<PettyCashHoldViewModel> Holds { get; set; } = new();
 
         public int VoucherCount => Vouchers.Count;
 
@@ -40,6 +45,15 @@ namespace RealEstateManager.Models
         public decimal Expenses { get; set; }
         public decimal ClosingBalance { get; set; }
 
+        /// <summary>Vouchers waiting for approval: still in the box, but promised.</summary>
+        public decimal OnHold { get; set; }
+
+        /// <summary>Top-ups waiting for approval: not in the box yet, so not counted.</summary>
+        public decimal IncomingOnHold { get; set; }
+
+        /// <summary>What a new voucher may use: cash in hand less what is on hold.</summary>
+        public decimal Available => ClosingBalance - OnHold;
+
         public string Display => $"{AccountCode} - {AccountName}";
     }
 
@@ -54,6 +68,22 @@ namespace RealEstateManager.Models
         public string PettyCashAccountDisplay { get; set; } = string.Empty;
         public string CounterpartDisplay { get; set; } = string.Empty;
 
+        public decimal ExpenseAmount { get; set; }
+        public decimal ReplenishmentAmount { get; set; }
+
+        public bool IsReplenishment => ReplenishmentAmount > 0m;
+    }
+
+    /// <summary>A petty cash voucher or top-up entered, held back until someone releases it.</summary>
+    public class PettyCashHoldViewModel
+    {
+        public int JournalEntryId { get; set; }
+        public DateTime EntryDate { get; set; }
+        public string? VoucherNumber { get; set; }
+        public string? Description { get; set; }
+        public string PettyCashAccountDisplay { get; set; } = string.Empty;
+        public string RequestedByName { get; set; } = string.Empty;
+        public DateTime RequestedAt { get; set; }
         public decimal ExpenseAmount { get; set; }
         public decimal ReplenishmentAmount { get; set; }
 
@@ -112,6 +142,9 @@ namespace RealEstateManager.Models
 
         /// <summary>Live balance of the selected float, shown on the form.</summary>
         public decimal CurrentFloatBalance { get; set; }
+
+        /// <summary>Of that balance, what vouchers waiting for approval already hold.</summary>
+        public decimal CurrentOnHold { get; set; }
     }
 
     public class PettyCashReplenishmentViewModel

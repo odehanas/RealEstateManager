@@ -55,6 +55,21 @@ choose the <strong>Funding Account</strong> (normally your bank or main cash acc
 
 <figure data-shot="petty-cash"></figure>
 
+<h3>Vouchers waiting for approval: the amount on hold</h3>
+<p>When payment approval is switched on, a voucher above the custodian's own limit is not posted at once: it waits in
+<span class="path">Controls ▸ Payment Approvals</span>. Its amount is then <strong>on hold</strong> in the float - the cash is still
+in the box, but it is promised to that voucher, so no other voucher can spend it.</p>
+<ul>
+    <li>The <strong>Float Balances</strong> table shows <strong>On Hold</strong> and <strong>Available</strong> (cash in hand less what
+        is on hold); the Cash In Hand card shows both too.</li>
+    <li>Each held voucher appears at the top of the journal, in amber, marked <em>On hold</em> with who entered it and since
+        when. It is outside the totals until it is released.</li>
+    <li>A new voucher larger than the <strong>Available</strong> balance is refused, with the cash in hand and the amount on hold
+        in the message. The voucher form shows what is available as you choose the float.</li>
+    <li>Releasing the voucher posts it and the hold becomes spending; turning it down frees the amount.</li>
+    <li>A top-up waiting for approval is listed too, but it is not counted until it is released: the money is not in the box yet.</li>
+</ul>
+
 <h3>Counting the cash</h3>
 <p>The screen shows the float's opening balance, every voucher and replenishment in the date range, and the
 closing balance. Count the box and compare it with the closing balance. A shortfall means a voucher is missing

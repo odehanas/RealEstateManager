@@ -12,6 +12,8 @@
     .pc-table td.memo { white-space: normal; min-width: 220px; }
     .pc-table tfoot td { font-weight: 700; background: #eef2f7; }
     .pc-table tr.replenish td { background: #eefaf1; }
+    .pc-table tr.on-hold td { background: #fff8e6; color: #6b5200; }
+    .pc-table tr.on-hold .hold-note { font-size: .78rem; color: #8a6d00; }
     .mix-bar { height: 6px; border-radius: 3px; background: #e3e8ee; overflow: hidden; margin-top: 3px; }
     .mix-bar span { display: block; height: 100%; background: #1e6fd9; }
     .scroll-x { overflow-x: auto; }
@@ -106,11 +108,31 @@
             <div class="card-body py-3">
                 <div class="small text-uppercase opacity-75">@T["Cash In Hand"]</div>
                 <div class="h4 fw-bold mb-0">@Model.TotalClosingBalance.ToString("N2")</div>
-                <div class="small opacity-75">@T["Balance to count in the box"]</div>
+                @if (Model.TotalOnHold > 0m)
+                {
+                    <div class="small">@T.Format("On hold for approval: {0}", Model.TotalOnHold.ToString("N2"))</div>
+                    <div class="small fw-bold">@T.Format("Available to spend: {0}", Model.TotalAvailable.ToString("N2"))</div>
+                }
+                else
+                {
+                    <div class="small opacity-75">@T["Balance to count in the box"]</div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+@if (Model.Holds.Count > 0)
+{
+    <div class="alert alert-warning py-2">
+        @T.HtmlFormat("<strong>{0} is on hold</strong> in {1} voucher(s) waiting for approval in <strong>Controls &rsaquo; Payment Approvals</strong>. The cash is still in the box but promised, so new vouchers can use only the <strong>Available</strong> balance.",
+            Model.TotalOnHold.ToString("N2"), Model.Holds.Count(h => !h.IsReplenishment))
+        @if (Model.Holds.Any(h => h.IsReplenishment))
+        {
+            <br />@T.Format("Top-ups waiting for approval ({0}) are not counted until they are released.", Model.Holds.Where(h => h.IsReplenishment).Sum(h => h.ReplenishmentAmount).ToString("N2"))
+        }
+    </div>
+}
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-light">@T.Html("<strong>Float Balances</strong>")</div>
@@ -123,6 +145,8 @@
                     <th class="text-end">@T["Replenished"]</th>
                     <th class="text-end">@T["Spent"]</th>
                     <th class="text-end">@T["Cash In Hand"]</th>
+                    <th class="text-end">@T["On Hold"]</th>
+                    <th class="text-end">@T["Available"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,6 +164,8 @@
                         <td class="text-end text-success">@item.Replenishments.ToString("N2")</td>
                         <td class="text-end text-danger">@item.Expenses.ToString("N2")</td>
                         <td class="text-end fw-semibold @(item.ClosingBalance < 0 ? "text-danger" : "")">@item.ClosingBalance.ToString("N2")</td>
+                        <td class="text-end @(item.OnHold > 0 ? "text-warning-emphasis" : "text-muted")">@(item.OnHold == 0m ? "-" : item.OnHold.ToString("N2"))</td>
+                        <td class="text-end fw-bold @(item.Available < 0 ? "text-danger" : "")">@item.Available.ToString("N2")</td>
                     </tr>
                 }
             </tbody>
@@ -150,6 +176,8 @@
                     <td class="text-end">@Model.TotalReplenishments.ToString("N2")</td>
                     <td class="text-end">@Model.TotalExpenses.ToString("N2")</td>
                     <td class="text-end">@Model.TotalClosingBalance.ToString("N2")</td>
+                    <td class="text-end">@(Model.TotalOnHold == 0m ? "-" : Model.TotalOnHold.ToString("N2"))</td>
+                    <td class="text-end">@Model.TotalAvailable.ToString("N2")</td>
                 </tr>
             </tfoot>
         </table>
@@ -203,7 +231,7 @@
         <strong>@T["Petty Cash Journal"]</strong>
         <span class="text-muted small ms-2">@T["Green rows are replenishments; the rest are expenses"]</span>
     </div>
-    @if (Model.Vouchers.Count == 0)
+    @if (Model.Vouchers.Count == 0 && Model.Holds.Count == 0)
     {
         <div class="card-body text-muted">@T["No petty cash activity in this period."]</div>
     }
@@ -224,6 +252,26 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach (var hold in Model.Holds)
+                    {
+                        <tr class="on-hold">
+                            <td>@hold.EntryDate.ToString("dd/MM/yyyy")</td>
+                            <td><code>@hold.VoucherNumber</code></td>
+                            <td class="memo">
+                                @hold.Description
+                                <div class="hold-note">
+                                    <span class="badge bg-warning text-dark">@T["On hold"]</span>
+                                    @T.Format("Waiting for approval since {0}, entered by {1}. Not counted in the totals until released.",
+                                        hold.RequestedAt.ToLocalTime().ToString("dd/MM/yyyy"), hold.RequestedByName)
+                                </div>
+                            </td>
+                            <td>-</td>
+                            <td>@hold.PettyCashAccountDisplay</td>
+                            <td></td>
+                            <td class="text-end">@(hold.ExpenseAmount == 0m ? "-" : "(" + hold.ExpenseAmount.ToString("N2") + ")")</td>
+                            <td class="text-end">@(hold.ReplenishmentAmount == 0m ? "-" : "(" + hold.ReplenishmentAmount.ToString("N2") + ")")</td>
+                        </tr>
+                    }
                     @foreach (var voucher in Model.Vouchers)
                     {
                         <tr class="@(voucher.IsReplenishment ? "replenish" : "")">
@@ -260,6 +308,7 @@
             <li>@T.Html("A replenishment posts <strong>Dr petty cash / Cr bank or cash</strong> &mdash; the float rises and no expense is recorded, because topping up is a transfer, not a cost.")</li>
             <li>@T.Html("<strong>Cash In Hand</strong> is what should physically be in the box. Count it and compare; any difference is a shortage to investigate.")</li>
             <li>@T["A voucher that would take the float below zero is rejected — that almost always means a replenishment was never recorded."]</li>
+            <li>@T.Html("A voucher waiting for approval puts its amount <strong>on hold</strong>: it is not spent yet, but no other voucher can use that cash. Releasing it posts it; turning it down frees the amount.")</li>
         </ul>
     </div>
 </div>

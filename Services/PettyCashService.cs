@@ -93,6 +93,30 @@ namespace RealEstateManager.Services
                 })
                 .ToListAsync();
 
+            // Vouchers and top-ups waiting for release. A held voucher has not left the box
+            // yet, but the cash is promised to it, so it comes off what can still be spent.
+            var holds = await GetHoldsAsync(floatIds);
+            model.Holds = holds
+                .Where(h => !pettyCashAccountId.HasValue || h.AccountId == pettyCashAccountId.Value)
+                .Select(h =>
+                {
+                    var account = floatAccounts.First(f => f.Id == h.AccountId);
+                    return new PettyCashHoldViewModel
+                    {
+                        JournalEntryId = h.JournalEntryId,
+                        EntryDate = h.EntryDate,
+                        VoucherNumber = h.VoucherNumber,
+                        Description = h.Description,
+                        PettyCashAccountDisplay = $"{account.Code} - {account.Name}",
+                        RequestedByName = h.RequestedByName,
+                        RequestedAt = h.RequestedAt,
+                        ExpenseAmount = h.Credit,
+                        ReplenishmentAmount = h.Debit
+                    };
+                })
+                .OrderBy(h => h.EntryDate).ThenBy(h => h.VoucherNumber)
+                .ToList();
+
             foreach (var account in floatAccounts)
             {
                 var prior = floatLines.Where(l => l.AccountId == account.Id && l.EntryDate < startDate);
@@ -112,7 +136,9 @@ namespace RealEstateManager.Services
                     OpeningBalance = opening,
                     Replenishments = replenished,
                     Expenses = spent,
-                    ClosingBalance = opening + replenished - spent
+                    ClosingBalance = opening + replenished - spent,
+                    OnHold = holds.Where(h => h.AccountId == account.Id).Sum(h => h.Credit),
+                    IncomingOnHold = holds.Where(h => h.AccountId == account.Id).Sum(h => h.Debit)
                 });
             }
 
@@ -263,6 +289,16 @@ namespace RealEstateManager.Services
                     $"{currentBalance:N2} and the voucher is {model.Amount:N2}. Record a replenishment first.");
             }
 
+            // Cash promised to vouchers still waiting for approval is not there to spend again.
+            var onHold = (await GetHoldsAsync(new List<int> { pettyCashAccount.Id })).Sum(h => h.Credit);
+            if (onHold > 0m && model.Amount > currentBalance - onHold)
+            {
+                throw new InvalidOperationException(
+                    $"Not enough cash available in the float. Cash in hand is {currentBalance:N2}, of which {onHold:N2} " +
+                    $"is on hold for vouchers waiting for approval, so {Math.Max(0m, currentBalance - onHold):N2} can be spent " +
+                    $"and the voucher is {model.Amount:N2}. Wait for the approvals, or record a replenishment first.");
+            }
+
             // Charged on to the owner of a managed property: the cost plus 5% VAT goes to Due
             // to Landlords on a recharge tax invoice, not to the expense account.
             Property? rechargeProperty = null;
@@ -400,9 +436,89 @@ namespace RealEstateManager.Services
                 lines: lines);
         }
 
+        /// <summary>The float's cash in hand today and how much of it vouchers waiting for approval hold.</summary>
+        public async Task<(decimal CashInHand, decimal OnHold)> GetAvailabilityAsync(int companyId, int accountId)
+        {
+            var balance = await GetFloatBalanceAsync(companyId, accountId, DateTime.Today);
+            var onHold = (await GetHoldsAsync(new List<int> { accountId })).Sum(h => h.Credit);
+            return (balance, onHold);
+        }
+
+        /// <summary>
+        /// Before a held voucher is released: is the cash still in the box? Normally yes,
+        /// because the hold kept it from being spent; this catches vouchers held before
+        /// holds were counted, and floats emptied by journals entered elsewhere.
+        /// </summary>
+        public static async Task<string?> CheckReleaseAsync(ApplicationDbContext db, int journalEntryId)
+        {
+            var entry = await db.JournalEntries.AsNoTracking()
+                .Where(x => x.Id == journalEntryId)
+                .Select(x => new { x.CompanyId, x.EntryDate, x.SourceType })
+                .FirstOrDefaultAsync();
+            if (entry == null || entry.SourceType != "PettyCashExpense")
+                return null;
+
+            var floatLine = await db.JournalEntryLines.AsNoTracking()
+                .Where(x => x.JournalEntryId == journalEntryId && x.Account!.IsPettyCashAccount && x.Credit > 0m)
+                .Select(x => new { x.AccountId, x.Credit, x.Account!.OpeningBalance })
+                .FirstOrDefaultAsync();
+            if (floatLine == null)
+                return null;
+
+            var movement = await db.JournalEntryLines
+                .Where(x => x.JournalEntry!.CompanyId == entry.CompanyId && x.JournalEntry.IsPosted &&
+                            x.JournalEntry.EntryDate <= entry.EntryDate && x.AccountId == floatLine.AccountId)
+                .SumAsync(x => (decimal?)(x.Debit - x.Credit)) ?? 0m;
+            var balance = floatLine.OpeningBalance + movement;
+
+            return floatLine.Credit > balance
+                ? $"The petty cash float holds {balance:N2} on {entry.EntryDate:dd/MM/yyyy}, less than the voucher's " +
+                  $"{floatLine.Credit:N2}. Record a replenishment before releasing it."
+                : null;
+        }
+
         // =====================================================================
         //  INTERNALS
         // =====================================================================
+
+        private record Hold(int JournalEntryId, int AccountId, DateTime EntryDate, string? VoucherNumber, string? Description,
+            string RequestedByName, DateTime RequestedAt, decimal Debit, decimal Credit);
+
+        /// <summary>
+        /// The float lines of drafts held in Payment Approvals. Only Pending counts: a payment
+        /// turned down stays a draft but holds nothing, and a released one is posted.
+        /// </summary>
+        private async Task<List<Hold>> GetHoldsAsync(List<int> floatIds)
+        {
+            var pending = await _db.PaymentApprovals.AsNoTracking()
+                .Where(x => x.Status == PaymentApprovalStatuses.Pending && !x.JournalEntry!.IsPosted)
+                .Select(x => new { x.JournalEntryId, x.RequestedByName, x.RequestedAt })
+                .ToListAsync();
+            if (pending.Count == 0)
+                return new List<Hold>();
+
+            var ids = pending.Select(x => x.JournalEntryId).Distinct().ToList();
+            var lines = await _db.JournalEntryLines.AsNoTracking()
+                .Where(x => ids.Contains(x.JournalEntryId) && floatIds.Contains(x.AccountId))
+                .Select(x => new
+                {
+                    x.JournalEntryId,
+                    x.AccountId,
+                    x.JournalEntry!.EntryDate,
+                    x.JournalEntry.DocumentNumber,
+                    Description = x.Description ?? x.JournalEntry.Description,
+                    x.Debit,
+                    x.Credit
+                })
+                .ToListAsync();
+
+            return lines.Select(l =>
+            {
+                var approval = pending.First(p => p.JournalEntryId == l.JournalEntryId);
+                return new Hold(l.JournalEntryId, l.AccountId, l.EntryDate, l.DocumentNumber, l.Description,
+                    approval.RequestedByName, approval.RequestedAt, l.Debit, l.Credit);
+            }).ToList();
+        }
 
         private async Task<decimal> GetFloatBalanceAsync(int companyId, int accountId, DateTime asOfDate)
         {

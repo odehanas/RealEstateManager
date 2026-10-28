@@ -32,8 +32,12 @@
                         }
                     </select>
                     <div class="form-text">
-                        Cash in hand now:
-                        <strong id="floatBalance">@Model.CurrentFloatBalance.ToString("N2")</strong>
+                        @T["Available to spend now:"]
+                        <strong id="floatBalance">@((Model.CurrentFloatBalance - Model.CurrentOnHold).ToString("N2"))</strong>
+                        <span id="floatHoldNote" class="text-warning-emphasis @(Model.CurrentOnHold > 0m ? "" : "d-none")">
+                            &middot; @T["cash in hand"] <span id="floatCash">@Model.CurrentFloatBalance.ToString("N2")</span>,
+                            @T["on hold for approval"] <span id="floatOnHold">@Model.CurrentOnHold.ToString("N2")</span>
+                        </span>
                     </div>
                 </div>
 
@@ -133,14 +137,19 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // Keep the "cash in hand" figure honest when the custodian switches float.
+        // Keep the "available to spend" figure honest when the custodian switches float.
         document.getElementById("pettyCashAccountId").addEventListener("change", function () {
             var id = this.value;
             if (!id) return;
 
             fetch('@Url.Action("FloatBalance", "PettyCash")' + '?pettyCashAccountId=' + encodeURIComponent(id))
                 .then(function (r) { return r.json(); })
-                .then(function (d) { document.getElementById("floatBalance").textContent = d.formatted; })
+                .then(function (d) {
+                    document.getElementById("floatBalance").textContent = d.formatted;
+                    document.getElementById("floatCash").textContent = d.cashFormatted;
+                    document.getElementById("floatOnHold").textContent = d.onHoldFormatted;
+                    document.getElementById("floatHoldNote").classList.toggle("d-none", !(d.onHold > 0));
+                })
                 .catch(function () { /* leave the previous figure in place */ });
         });
     </script>

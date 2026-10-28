@@ -54,11 +54,8 @@ namespace RealEstateManager.Controllers
             var floats = await _pettyCashService.GetFloatAccountsAsync();
             var selected = pettyCashAccountId ?? floats.FirstOrDefault()?.Id ?? 0;
 
-            var model = new PettyCashExpenseViewModel
-            {
-                PettyCashAccountId = selected,
-                CurrentFloatBalance = await GetBalanceForFormAsync(selected)
-            };
+            var model = new PettyCashExpenseViewModel { PettyCashAccountId = selected };
+            (model.CurrentFloatBalance, model.CurrentOnHold) = await GetAvailabilityForFormAsync(selected);
 
             return View(model);
         }
@@ -68,7 +65,7 @@ namespace RealEstateManager.Controllers
         public async Task<IActionResult> Create(PettyCashExpenseViewModel model)
         {
             await LoadExpenseListsAsync();
-            model.CurrentFloatBalance = await GetBalanceForFormAsync(model.PettyCashAccountId);
+            (model.CurrentFloatBalance, model.CurrentOnHold) = await GetAvailabilityForFormAsync(model.PettyCashAccountId);
 
             if (model.Amount <= 0m)
                 ModelState.AddModelError(nameof(model.Amount), "Amount must be greater than zero.");
@@ -91,7 +88,7 @@ namespace RealEstateManager.Controllers
                 TempData["PettyCashMessage"] = notPosted == null
                     ? $"Voucher posted: {model.Description} for {model.Amount:N2}."
                     : notPosted.StartsWith(JournalWorkflowService.AwaitingApprovalPrefix)
-                        ? $"Voucher recorded for {model.Amount:N2}. {notPosted}"
+                        ? $"Voucher recorded for {model.Amount:N2}. {notPosted} Until then the amount is on hold in the float."
                         : $"Voucher saved as a draft but not posted: {notPosted}";
                 return RedirectToAction(nameof(Index), new { pettyCashAccountId = model.PettyCashAccountId });
             }
@@ -153,33 +150,27 @@ namespace RealEstateManager.Controllers
         }
 
         /// <summary>
-        /// Returns the current balance of a float, for the live figure on the entry form.
+        /// Returns what can be spent from a float, for the live figure on the entry form:
+        /// the cash in hand less what vouchers waiting for approval hold.
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> FloatBalance(int pettyCashAccountId)
         {
-            var balance = await GetBalanceForFormAsync(pettyCashAccountId);
-            return Json(new { balance, formatted = balance.ToString("N2") });
+            var (balance, onHold) = await GetAvailabilityForFormAsync(pettyCashAccountId);
+            return Json(new
+            {
+                balance,
+                formatted = (balance - onHold).ToString("N2"),
+                onHold,
+                onHoldFormatted = onHold.ToString("N2"),
+                cashFormatted = balance.ToString("N2")
+            });
         }
 
-        private async Task<decimal> GetBalanceForFormAsync(int pettyCashAccountId)
-        {
-            if (pettyCashAccountId == 0)
-                return 0m;
-
-            var companyId = User.GetRequiredCurrentCompanyId();
-
-            var dashboard = await _pettyCashService.GetDashboardAsync(
-                companyId,
-                DateTime.Today,
-                DateTime.Today,
-                pettyCashAccountId);
-
-            return dashboard.Floats
-                .Where(x => x.AccountId == pettyCashAccountId)
-                .Select(x => x.ClosingBalance)
-                .FirstOrDefault();
-        }
+        private async Task<(decimal CashInHand, decimal OnHold)> GetAvailabilityForFormAsync(int pettyCashAccountId) =>
+            pettyCashAccountId == 0
+                ? (0m, 0m)
+                : await _pettyCashService.GetAvailabilityAsync(User.GetRequiredCurrentCompanyId(), pettyCashAccountId);
 
         private async Task LoadExpenseListsAsync()
         {

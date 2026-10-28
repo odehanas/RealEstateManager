@@ -73,6 +73,10 @@ namespace RealEstateManager.Services
             if (problem != null)
                 return (false, problem);
 
+            var shortfall = await PettyCashService.CheckReleaseAsync(_db, approval.JournalEntryId);
+            if (shortfall != null)
+                return (false, shortfall);
+
             var authority = await _authority.GetAuthorityAsync(userId, approval.CompanyId, isSystemAdmin);
             approval.Status = PaymentApprovalStatuses.Approved;
             approval.DecidedByAppUserId = userId;
