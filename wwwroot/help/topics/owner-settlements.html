@@ -109,3 +109,35 @@ again, so nothing is paid twice by mistake.</p>
         Due to Landlords for the owner's properties. Each is listed with its date, property and entry.</li>
 </ul>
 <p>The amount that may be paid to the owner follows: it can never exceed the owner's share after these lines.</p>
+
+<h3>Recharging costs to owners</h3>
+<p>Costs the company incurs for an owner's managed property &mdash; a contractor's bill, petty cash, an item from the
+maintenance store &mdash; can be <strong>charged on to the owner</strong>. The company is the one dealing with the
+supplier, so the recharge is the company's own supply to the owner: it carries <strong>5% VAT</strong> and a
+<strong>tax invoice</strong> in the company's series, and the company reclaims the input VAT it paid on the cost.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Where</th><th>How</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Vendor bill</strong></td><td>Tick <strong>Charge to owner</strong> under the line's property (a managed property).</td></tr>
+        <tr><td><strong>Petty cash voucher</strong></td><td>Choose the managed property and tick <strong>Charge to the owner (+5% VAT)</strong>.</td></tr>
+        <tr><td><strong>Maintenance store item</strong></td><td>Automatic for a job on a managed property.</td></tr>
+    </tbody>
+</table>
+<p>For a recharge of cost <em>C</em>:</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>21500 Due to Landlords (the owner, tagged to the property)</td><td class="num dr">C + 5%</td><td class="num">&mdash;</td></tr>
+        <tr><td>Accounts Payable / petty cash / maintenance store</td><td class="num">&mdash;</td><td class="num cr">what was paid</td></tr>
+        <tr><td>21400 VAT Payable &mdash; output VAT on the recharge</td><td class="num">&mdash;</td><td class="num cr">5% of C</td></tr>
+    </tbody>
+</table>
+<p>(and, on a bill from a VAT-registered supplier, Dr 11300 VAT Recoverable for the supplier's VAT, as usual).</p>
+<ul>
+    <li>The cost is <strong>not</strong> in the company's Profit &amp; Loss.</li>
+    <li>The owner's statement deducts the cost plus VAT. <a href="#owner-reports">Owner Property Profitability</a> shows the
+        cost without the VAT for a VAT-registered owner, who reclaims it.</li>
+    <li>The output VAT is on the company's <a href="#vat-return">VAT return</a> as <em>Standard rated &ndash; costs recharged to owners</em>.</li>
+    <li><span class="path">Operations ▸ Recharges to Owners</span> lists every recharge with its tax invoice to print for the owner.</li>
+</ul>
+<p>A cost that is not ticked stays the company's own expense.</p>

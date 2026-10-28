@@ -103,6 +103,10 @@ namespace RealEstateManager.Models
         [Display(Name = "Unit Cost Center")]
         public int? UnitId { get; set; }
 
+        /// <summary>Charge the voucher on to the owner of the (managed) property, with 5% VAT.</summary>
+        [Display(Name = "Charge to the owner (+5% VAT)")]
+        public bool RechargeToOwner { get; set; }
+
         /// <summary>Live balance of the selected float, shown on the form.</summary>
         public decimal CurrentFloatBalance { get; set; }
     }

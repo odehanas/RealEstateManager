@@ -95,6 +95,7 @@ namespace RealEstateManager.Services
                         Quantity = x.Quantity,
                         UnitPrice = x.UnitPrice,
                         IsTaxable = x.IsTaxable,
+                        RechargeToOwner = x.RechargeToOwner,
                         InputTaxAttribution = x.InputTaxAttribution,
                         DevelopmentCost = DevelopmentProjectService.CostTag(x.DevelopmentProjectId, x.DevelopmentCostCategory)
                     })
@@ -185,6 +186,23 @@ namespace RealEstateManager.Services
                 lines[i].AccountId = project.WipAccountId;
                 lines[i].PropertyId ??= project.PropertyId;
                 projectTags[lines[i]] = (project.Id, category!);
+            }
+
+            // A line charged on to an owner must be for a managed property, and is a cost of
+            // the owner's, not of a development project.
+            for (var i = 0; i < lines.Count; i++)
+            {
+                if (!lines[i].RechargeToOwner)
+                    continue;
+                lines[i].PropertyId ??= model.PropertyId;
+                var property = lines[i].PropertyId.HasValue
+                    ? await _db.Properties.AsNoTracking().FirstOrDefaultAsync(x => x.Id == lines[i].PropertyId.Value)
+                    : null;
+                var cannot = OwnerRechargeService.CannotRecharge(property);
+                if (cannot != null)
+                    modelState.AddModelError(string.Empty, $"Line {i + 1}: {cannot}");
+                else if (projectTags.ContainsKey(lines[i]))
+                    modelState.AddModelError(string.Empty, $"Line {i + 1}: a development cost cannot also be charged to an owner.");
             }
 
             await ValidateLinesAsync(modelState, companyId, lines);
@@ -350,7 +368,9 @@ namespace RealEstateManager.Services
                 ? VatDeterminationService.CalculateTax(subtotal, VatCategories.Standard)
                 : 0m;
 
-            var attribution = taxable
+            // A cost recharged to an owner feeds a taxable supply (the recharge), so its input
+            // tax is fully recoverable.
+            var attribution = taxable && !source.RechargeToOwner
                 ? Normalise(source.InputTaxAttribution)
                 : InputTaxAttributions.Taxable;
 
@@ -363,6 +383,7 @@ namespace RealEstateManager.Services
                 Description = Trim(source.Description) ?? "(no description)",
                 AccountId = source.AccountId,
                 PropertyId = source.PropertyId,
+                RechargeToOwner = source.RechargeToOwner,
                 Quantity = quantity,
                 UnitPrice = source.UnitPrice,
                 LineSubtotal = subtotal,

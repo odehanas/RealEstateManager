@@ -25,10 +25,13 @@ namespace RealEstateManager.Services
         private readonly ApplicationDbContext _db;
         private readonly ICurrentCompanyAccessor _currentCompanyAccessor;
 
-        public PettyCashService(ApplicationDbContext db, ICurrentCompanyAccessor currentCompanyAccessor)
+        private readonly OwnerRechargeService _recharges;
+
+        public PettyCashService(ApplicationDbContext db, ICurrentCompanyAccessor currentCompanyAccessor, OwnerRechargeService recharges)
         {
             _db = db;
             _currentCompanyAccessor = currentCompanyAccessor;
+            _recharges = recharges;
         }
 
         // =====================================================================
@@ -260,14 +263,33 @@ namespace RealEstateManager.Services
                     $"{currentBalance:N2} and the voucher is {model.Amount:N2}. Record a replenishment first.");
             }
 
+            // Charged on to the owner of a managed property: the cost plus 5% VAT goes to Due
+            // to Landlords on a recharge tax invoice, not to the expense account.
+            Property? rechargeProperty = null;
+            var rechargeVat = 0m;
+            int? debitAccountId = expenseAccount.Id;
+            if (model.RechargeToOwner)
+            {
+                rechargeProperty = model.PropertyId.HasValue ? await _db.Properties.AsNoTracking().FirstOrDefaultAsync(x => x.Id == model.PropertyId.Value) : null;
+                var cannot = OwnerRechargeService.CannotRecharge(rechargeProperty);
+                if (cannot != null)
+                    throw new InvalidOperationException(cannot);
+                var settings = await _db.CompanyAccountSettings.AsNoTracking().FirstOrDefaultAsync(x => x.CompanyId == companyId);
+                debitAccountId = settings?.DueToLandlordsAccountId
+                                 ?? throw new InvalidOperationException("Due to Landlords is not mapped in Account Mapping.");
+                rechargeVat = OwnerRechargeService.VatOn(model.Amount);
+            }
+
             var lines = new List<JournalEntryLine>
             {
                 new()
                 {
-                    AccountId = expenseAccount.Id,
-                    Debit = model.Amount,
+                    AccountId = debitAccountId.Value,
+                    Debit = model.Amount + rechargeVat,
                     Credit = 0m,
-                    Description = BuildLineDescription(model.Description, model.PaidTo),
+                    Description = rechargeVat == 0m
+                        ? BuildLineDescription(model.Description, model.PaidTo)
+                        : $"{BuildLineDescription(model.Description, model.PaidTo)} - charged to the owner (incl. VAT {rechargeVat:N2})",
                     PropertyId = model.PropertyId,
                     UnitId = model.UnitId
                 },
@@ -282,13 +304,35 @@ namespace RealEstateManager.Services
                 }
             };
 
-            return await CreateJournalAsync(
+            if (rechargeVat != 0m)
+            {
+                var vatPayableId = await _db.CompanyAccountSettings.AsNoTracking().Where(x => x.CompanyId == companyId)
+                    .Select(x => x.VatPayableAccountId).FirstOrDefaultAsync()
+                    ?? throw new InvalidOperationException("VAT Payable is not mapped in Account Mapping.");
+                lines.Add(new JournalEntryLine
+                {
+                    AccountId = vatPayableId,
+                    Debit = 0m,
+                    Credit = rechargeVat,
+                    Description = $"Output VAT on {model.Description} recharged to the owner",
+                    PropertyId = model.PropertyId
+                });
+            }
+
+            var journalId = await CreateJournalAsync(
                 companyId,
                 model.VoucherDate,
                 description: $"Petty cash expense - {model.Description}",
                 sourceType: "PettyCashExpense",
                 referenceNumber: model.ReferenceNumber,
                 lines: lines);
+
+            if (rechargeProperty != null)
+                await _recharges.RecordAsync(companyId, OwnerRechargeSources.PettyCash, journalId, model.ReferenceNumber, rechargeProperty.Id, model.UnitId,
+                    model.VoucherDate, $"Petty cash: {model.Description}" + (model.PaidTo != null ? $" (paid to {model.PaidTo})" : string.Empty),
+                    model.Amount, journalId);
+
+            return journalId;
         }
 
         /// <summary>

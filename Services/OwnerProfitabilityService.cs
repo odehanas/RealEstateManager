@@ -36,6 +36,9 @@ namespace RealEstateManager.Services
             public decimal CommissionVat { get; set; }
             public decimal Expenses { get; set; }
 
+            /// <summary>VAT on our recharges to the owner: included in Expenses unless the owner reclaims it.</summary>
+            public decimal RechargeVat { get; set; }
+
             /// <summary>What the property earned its owner in the period.</summary>
             public decimal OwnerNetIncome => RentBilled - Commission - CommissionVat - Expenses;
             public decimal? OwnerMarginPercent => RentBilled == 0m ? null : Math.Round(OwnerNetIncome / RentBilled * 100m, 1);
@@ -99,6 +102,14 @@ namespace RealEstateManager.Services
                     .Select(g => new { PropertyId = g.Key, Amount = g.Sum(x => x.Debit - x.Credit) })
                     .ToDictionaryAsync(x => x.PropertyId, x => x.Amount);
 
+            // VAT on our recharges: part of what the owner was charged; a registered owner reclaims it.
+            var rechargeVat = await _db.OwnerRecharges.AsNoTracking()
+                .Where(x => ids.Contains(x.PropertyId) && x.JournalEntry != null && x.JournalEntry.IsPosted &&
+                            x.RechargeDate >= from && x.RechargeDate <= to)
+                .GroupBy(x => x.PropertyId)
+                .Select(g => new { PropertyId = g.Key, Vat = g.Sum(x => x.VatAmount) })
+                .ToDictionaryAsync(x => x.PropertyId, x => x.Vat);
+
             var units = await _db.Units.AsNoTracking()
                 .Where(x => ids.Contains(x.PropertyId) && x.IsActive)
                 .GroupBy(x => x.PropertyId)
@@ -126,7 +137,9 @@ namespace RealEstateManager.Services
                     RentVatForOwner = (inv?.OwnerVat ?? 0m) - (cr?.OwnerVat ?? 0m),
                     Commission = commission,
                     CommissionVat = VatDeterminationService.Round(commission * vatRate / 100m),
-                    Expenses = expenses.TryGetValue(p.Id, out var e) ? e : 0m
+                    RechargeVat = rechargeVat.TryGetValue(p.Id, out var rv) ? rv : 0m,
+                    Expenses = (expenses.TryGetValue(p.Id, out var e) ? e : 0m) -
+                               (string.IsNullOrWhiteSpace(p.OwnerTrn) ? 0m : (rechargeVat.TryGetValue(p.Id, out var reclaim) ? reclaim : 0m))
                 });
             }
 

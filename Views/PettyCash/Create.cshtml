@@ -96,6 +96,13 @@
                         }
                     </select>
                 </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="RechargeToOwner" class="form-check-input" type="checkbox" />
+                        <label asp-for="RechargeToOwner" class="form-check-label"></label>
+                    </div>
+                    <div class="form-text">For a managed property only: the owner is charged the amount plus 5% VAT on a recharge tax invoice, instead of it being our expense.</div>
+                </div>
                 <div class="col-md-6">
                     <label asp-for="UnitId" class="form-label"></label>
                     <select asp-for="UnitId" class="form-select">

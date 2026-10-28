@@ -151,8 +151,18 @@ namespace RealEstateManager.Services
                 .Select(x => x.TaxInvoiceNumber)
                 .FirstOrDefaultAsync();
 
+            // Recharges of costs to owners are tax invoices of ours too.
+            var lastRecharge = await _db.OwnerRecharges
+                .IgnoreQueryFilters()
+                .Where(x => x.CompanyId == companyId
+                            && x.TaxInvoiceNumber != null
+                            && x.TaxInvoiceNumber.StartsWith(prefix))
+                .OrderByDescending(x => x.TaxInvoiceNumber)
+                .Select(x => x.TaxInvoiceNumber)
+                .FirstOrDefaultAsync();
+
             var next = 1;
-            foreach (var number in new[] { last, lastCommission, lastUnitSale })
+            foreach (var number in new[] { last, lastCommission, lastUnitSale, lastRecharge })
             {
                 if (!string.IsNullOrEmpty(number) && int.TryParse(number[prefix.Length..], out var parsed))
                     next = Math.Max(next, parsed + 1);

@@ -9,13 +9,16 @@ namespace RealEstateManager.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly VatDeterminationService _vatDeterminationService;
+        private readonly OwnerRechargeService _recharges;
 
         public AccountingPostingService(
             ApplicationDbContext db,
-            VatDeterminationService vatDeterminationService)
+            VatDeterminationService vatDeterminationService,
+            OwnerRechargeService recharges)
         {
             _db = db;
             _vatDeterminationService = vatDeterminationService;
+            _recharges = recharges;
         }
 
         public async Task<JournalEntry> PostCustomerInvoiceAsync(int customerInvoiceId)
@@ -458,7 +461,51 @@ namespace RealEstateManager.Services
 
             var lines = new List<JournalEntryLine>();
 
-            foreach (var billLine in bill.Lines.OrderBy(x => x.LineNumber))
+            // Lines charged on to an owner: the cost plus 5% VAT goes to Due to Landlords,
+            // the VAT is our output tax on the recharge. One recharge per property.
+            var rechargeLines = bill.Lines.Where(x => x.RechargeToOwner && (x.PropertyId ?? bill.PropertyId).HasValue).ToList();
+            var dueToLandlordsId = rechargeLines.Count > 0
+                ? (await GetMappedAccountAsync(bill.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords")).Id
+                : 0;
+            var rechargeGroups = rechargeLines
+                .GroupBy(x => (x.PropertyId ?? bill.PropertyId)!.Value)
+                .Select(g => new { PropertyId = g.Key, Net = g.Sum(x => x.ChargedToExpense), UnitId = g.Select(x => x.UnitId).FirstOrDefault(u => u != null) })
+                .ToList();
+
+            foreach (var billLine in bill.Lines.OrderBy(x => x.LineNumber).Where(x => x.RechargeToOwner && (x.PropertyId ?? bill.PropertyId).HasValue))
+            {
+                var net = billLine.ChargedToExpense;
+                if (net == 0m)
+                    continue;
+                lines.Add(new JournalEntryLine
+                {
+                    AccountId = dueToLandlordsId,
+                    Debit = net + OwnerRechargeService.VatOn(net),
+                    Credit = 0m,
+                    Description = $"{billLine.Description} - charged to the owner (incl. VAT {OwnerRechargeService.VatOn(net):N2})",
+                    PropertyId = billLine.PropertyId ?? bill.PropertyId,
+                    UnitId = billLine.UnitId,
+                    VendorId = bill.VendorId,
+                    VendorBillId = bill.Id
+                });
+            }
+
+            var rechargeVat = rechargeLines.Sum(x => OwnerRechargeService.VatOn(x.ChargedToExpense));
+            if (rechargeVat != 0m)
+            {
+                var vatPayable = await GetMappedAccountAsync(bill.CompanyId, settings.VatPayableAccountId, "VAT Payable");
+                lines.Add(new JournalEntryLine
+                {
+                    AccountId = vatPayable.Id,
+                    Debit = 0m,
+                    Credit = rechargeVat,
+                    Description = $"Output VAT on costs of bill {bill.BillNumber} recharged to owners",
+                    PropertyId = bill.PropertyId,
+                    VendorBillId = bill.Id
+                });
+            }
+
+            foreach (var billLine in bill.Lines.OrderBy(x => x.LineNumber).Where(x => !(x.RechargeToOwner && (x.PropertyId ?? bill.PropertyId).HasValue)))
             {
                 if (!billLine.AccountId.HasValue)
                 {
@@ -544,6 +591,7 @@ namespace RealEstateManager.Services
                 existingEntry.Remarks = bill.Notes;
 
                 await _db.SaveChangesAsync();
+                await RecordBillRechargesAsync(bill, rechargeGroups.Select(g => (g.PropertyId, g.UnitId, g.Net)).ToList(), entryDate, existingEntry.Id);
                 return existingEntry;
             }
 
@@ -562,7 +610,21 @@ namespace RealEstateManager.Services
             bill.JournalEntryId = journalEntry.Id;
 
             await _db.SaveChangesAsync();
+            await RecordBillRechargesAsync(bill, rechargeGroups.Select(g => (g.PropertyId, g.UnitId, g.Net)).ToList(), entryDate, journalEntry.Id);
             return journalEntry;
+        }
+
+        private async Task RecordBillRechargesAsync(VendorBill bill, List<(int PropertyId, int? UnitId, decimal Net)> groups, DateTime date, int journalEntryId)
+        {
+            foreach (var (propertyId, unitId, net) in groups.Where(g => g.Net != 0m))
+            {
+                await _recharges.RecordAsync(bill.CompanyId, OwnerRechargeSources.VendorBill, bill.Id, bill.BillNumber, propertyId, unitId, date,
+                    $"Costs recharged from bill {bill.BillNumber}" + (bill.Vendor != null ? $" ({bill.Vendor.Name}" + (bill.VendorReference != null ? $" ref {bill.VendorReference})" : ")") : string.Empty) +
+                    ": " + string.Join("; ", bill.Lines.Where(l => l.RechargeToOwner && (l.PropertyId ?? bill.PropertyId) == propertyId).Select(l => l.Description)),
+                    net, journalEntryId);
+            }
+
+            await _recharges.RemoveOthersAsync(bill.CompanyId, OwnerRechargeSources.VendorBill, bill.Id, groups.Where(g => g.Net != 0m).Select(g => g.PropertyId).ToList());
         }
 
         /// <summary>
@@ -1570,11 +1632,19 @@ namespace RealEstateManager.Services
             }
 
             var text = $"Job {job.RequestNumber}: {material.Description}";
+            // Charged to the owner it is a recharge: 5% output VAT on top of the cost.
+            var vat = material.ChargedTo == "Owner" ? OwnerRechargeService.VatOn(material.Amount) : 0m;
             var lines = new List<JournalEntryLine>
             {
-                new() { AccountId = charge.Id, Debit = material.Amount, Credit = 0m, Description = text, PropertyId = job.PropertyId, UnitId = job.UnitId, TenantId = job.TenantId },
+                new() { AccountId = charge.Id, Debit = material.Amount + vat, Credit = 0m, Description = vat == 0m ? text : $"{text} (incl. VAT {vat:N2})", PropertyId = job.PropertyId, UnitId = job.UnitId, TenantId = job.TenantId },
                 new() { AccountId = stock.Id, Debit = 0m, Credit = material.Amount, Description = text, PropertyId = job.PropertyId, UnitId = job.UnitId }
             };
+            if (vat != 0m)
+            {
+                var settings = await GetCompanyAccountSettingAsync(material.CompanyId);
+                var vatPayable = await GetMappedAccountAsync(material.CompanyId, settings.VatPayableAccountId, "VAT Payable");
+                lines.Add(new() { AccountId = vatPayable.Id, Debit = 0m, Credit = vat, Description = $"Output VAT on {text} recharged to the owner", PropertyId = job.PropertyId });
+            }
 
             var journal = await CreateJournalEntryAsync(
                 material.CompanyId, material.MaterialDate, $"Maintenance materials for job {job.RequestNumber}",
@@ -1582,6 +1652,11 @@ namespace RealEstateManager.Services
 
             material.JournalEntryId = journal.Id;
             await _db.SaveChangesAsync();
+
+            if (vat != 0m && job.PropertyId.HasValue)
+                await _recharges.RecordAsync(material.CompanyId, OwnerRechargeSources.MaintenanceMaterial, material.Id, job.RequestNumber,
+                    job.PropertyId.Value, job.UnitId, material.MaterialDate, $"Maintenance job {job.RequestNumber}: {material.Description}",
+                    material.Amount, journal.Id);
             return journal;
         }
 

@@ -1,0 +1,89 @@
+﻿@model RealEstateManager.Domain.OwnerRecharge
+@{
+    Layout = null;
+    var company = (RealEstateManager.Domain.Company)ViewBag.Company;
+    var unit = ViewBag.Unit as string;
+    var supplier = string.IsNullOrWhiteSpace(company.LegalName) ? company.Name : company.LegalName;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Tax Invoice @Model.TaxInvoiceNumber</title>
+<style>
+    @@page { size: A4 portrait; margin: 14mm; }
+    body { margin: 0; padding: 18px; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; color: #1f2933; background: #f2f4f7; }
+    .sheet { max-width: 190mm; margin: 0 auto; background: #fff; padding: 16mm; box-shadow: 0 0 18px rgba(15,39,64,.12); }
+    h1 { font-size: 18pt; color: #0f2740; margin: 0; }
+    .doc-type { text-transform: uppercase; letter-spacing: .08em; color: #6b7a89; font-size: 9pt; }
+    .head { display: flex; justify-content: space-between; border-bottom: 2px solid #0f2740; padding-bottom: 10px; margin-bottom: 14px; }
+    .parties { display: flex; gap: 24px; margin-bottom: 14px; }
+    .party { flex: 1; border: 1px solid #d8dee6; border-radius: 6px; padding: 10px; }
+    .party h3 { margin: 0 0 4px; font-size: 9pt; text-transform: uppercase; color: #6b7a89; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #0f2740; color: #fff; text-align: left; padding: 6px; font-size: 9.5pt; }
+    td { border-bottom: 1px solid #e4e8ee; padding: 6px; }
+    .num { text-align: right; }
+    .totals td { border: none; padding: 3px 6px; }
+    .grand td { font-weight: 700; border-top: 2px solid #0f2740; }
+    .note { margin-top: 14px; font-size: 9.5pt; color: #4a5866; background: #f6f8fa; padding: 8px 10px; border-radius: 6px; }
+    .muted { color: #6b7a89; font-size: 9.5pt; }
+    @@media print { body { background: #fff; padding: 0; } .sheet { box-shadow: none; padding: 0; } .noprint { display: none; } }
+</style>
+</head>
+<body>
+<div class="noprint" style="max-width:190mm;margin:0 auto 10px;text-align:right"><button onclick="window.print()">Print</button></div>
+<div class="sheet">
+    <div class="head">
+        <div>
+            <div class="doc-type">Tax Invoice &mdash; recharge of costs</div>
+            <h1>@supplier</h1>
+            <div class="muted">@company.AddressLine1 @company.City</div>
+        </div>
+        <div style="text-align:right">
+            <div class="muted">Tax invoice no.</div>
+            <div style="font-size:14pt;font-weight:700;color:#0f2740">@Model.TaxInvoiceNumber</div>
+            <div class="muted">Date @Model.RechargeDate.ToString("dd/MM/yyyy")</div>
+            <div class="muted">TRN: @company.TrnNumber</div>
+        </div>
+    </div>
+
+    <div class="parties">
+        <div class="party">
+            <h3>Billed to (property owner)</h3>
+            <div style="font-weight:600">@Model.OwnerName</div>
+            @if (Model.OwnerTrn != null) { <div class="muted">TRN: @Model.OwnerTrn</div> }
+        </div>
+        <div class="party">
+            <h3>Property</h3>
+            <div style="font-weight:600">@Model.Property?.Code @Model.Property?.Name</div>
+            @if (unit != null) { <div class="muted">Unit @unit</div> }
+        </div>
+    </div>
+
+    <table>
+        <thead><tr><th>Description</th><th class="num">Amount</th><th class="num">VAT @Model.VatRate.ToString("0.##")%</th><th class="num">Total</th></tr></thead>
+        <tbody>
+            <tr>
+                <td>@Model.Description</td>
+                <td class="num">@Model.NetAmount.ToString("N2")</td>
+                <td class="num">@Model.VatAmount.ToString("N2")</td>
+                <td class="num">@Model.TotalAmount.ToString("N2")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table style="max-width:300px;margin-left:auto;margin-top:10px" class="totals">
+        <tr><td>Taxable amount</td><td class="num">@Model.NetAmount.ToString("N2")</td></tr>
+        <tr><td>VAT @Model.VatRate.ToString("0.##")%</td><td class="num">@Model.VatAmount.ToString("N2")</td></tr>
+        <tr class="grand"><td>Total (@company.BaseCurrency)</td><td class="num">@Model.TotalAmount.ToString("N2")</td></tr>
+    </table>
+
+    <div class="note">
+        Costs incurred by @supplier for your property and recharged to you. The amount is deducted from the rent we hold for you
+        and shown on your owner statement. @(Model.OwnerTrn != null ? "As a VAT registered person you may reclaim the VAT shown as input tax." : string.Empty)
+        @if (Model.JournalEntry?.IsPosted != true) { <strong>Draft: the cost is not yet posted.</strong> }
+    </div>
+</div>
+</body>
+</html>

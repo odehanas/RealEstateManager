@@ -80,6 +80,12 @@ namespace RealEstateManager.Domain
         /// <summary>What actually lands on the expense account: net plus irrecoverable tax.</summary>
         public decimal ChargedToExpense => LineSubtotal + NonRecoverableVatAmount;
 
+        /// <summary>
+        /// Charged on to the owner of the (managed) property: posted to Due to Landlords
+        /// with 5% output VAT on a recharge tax invoice, instead of to the account chosen.
+        /// </summary>
+        public bool RechargeToOwner { get; set; }
+
         /// <summary>A development cost: the project it is capitalised into, and what for.</summary>
         public int? DevelopmentProjectId { get; set; }
         public DevelopmentProject? DevelopmentProject { get; set; }

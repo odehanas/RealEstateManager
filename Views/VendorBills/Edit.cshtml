@@ -285,6 +285,13 @@
                                         </option>
                                     }
                                 </select>
+                                @* Checkbox first, hidden fallback second: the binder takes the first value. *@
+                                <div class="form-check small mt-1" title="Charge this line to the owner of the managed property, with 5% VAT">
+                                    <input type="checkbox" name="Lines[@i].RechargeToOwner" value="true" class="form-check-input line-recharge"
+                                           checked="@(line.RechargeToOwner ? "checked" : null)" />
+                                    <input type="hidden" name="Lines[@i].RechargeToOwner" value="false" />
+                                    <label class="form-check-label">Charge to owner</label>
+                                </div>
                                 @if (projects.Count > 0)
                                 {
                                     @* A development cost: picking a project and category charges the line to the project's account. *@

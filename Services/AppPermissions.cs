@@ -287,6 +287,7 @@ namespace RealEstateManager.Services
                 ["EmployeeRequests"] = new[] { AppPermissions.HrManage },
                 ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
                 ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage },
+                ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
                 ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },

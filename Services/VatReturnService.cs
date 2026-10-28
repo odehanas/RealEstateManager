@@ -105,6 +105,35 @@ namespace RealEstateManager.Services
                 report.StandardRatedVat += vat;
             }
 
+            // Costs recharged to the owners of managed properties: our own standard-rated
+            // supply, at 5% on the cost.
+            var recharges = await _db.OwnerRecharges
+                .AsNoTracking()
+                .Where(x => x.CompanyId == companyId
+                            && x.JournalEntry != null && x.JournalEntry.IsPosted
+                            && x.RechargeDate >= startDate
+                            && x.RechargeDate <= endDate)
+                .Select(x => new { x.NetAmount, x.VatAmount })
+                .ToListAsync();
+
+            if (recharges.Count > 0)
+            {
+                var net = recharges.Sum(x => x.NetAmount);
+                var vat = recharges.Sum(x => x.VatAmount);
+
+                report.OutputLines.Add(new VatReturnOutputLineDto
+                {
+                    VatCategory = VatCategories.Standard,
+                    Label = "Standard rated - costs recharged to owners",
+                    SupplyCount = recharges.Count,
+                    NetAmount = net,
+                    VatAmount = vat
+                });
+
+                report.StandardRatedNet += net;
+                report.StandardRatedVat += vat;
+            }
+
             // Unit sales. A payment received before handover is a supply when received (the tax
             // point); whatever is still unpaid at handover is a supply at handover.
             var saleReceipts = await _db.UnitSaleReceipts

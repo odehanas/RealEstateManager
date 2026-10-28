@@ -89,6 +89,9 @@ namespace RealEstateManager.Models
 
         public bool IsTaxable { get; set; } = true;
 
+        /// <summary>Charge this line on to the owner of its managed property (5% VAT recharge).</summary>
+        public bool RechargeToOwner { get; set; }
+
         public string InputTaxAttribution { get; set; } = InputTaxAttributions.Taxable;
 
         /// <summary>
