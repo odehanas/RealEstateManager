@@ -39,7 +39,8 @@
         { "key": "tenants", "title": "Tenants", "path": "Master Data ▸ Tenants", "summary": "The tenant register, identifiers and opening balances.", "screens": ["Tenants"] },
         { "key": "vendors", "title": "Vendors", "path": "Master Data ▸ Vendors", "summary": "Suppliers, their TRN and whether they may charge VAT.", "screens": ["Vendors"] },
         { "key": "leases", "title": "Lease Contracts", "path": "Master Data ▸ Leases", "summary": "Contracts, approval in two levels, contract codes, VAT, the invoice schedule, the printed contract and the attested copy.", "screens": ["Leases", "Approvals"] },
-        { "key": "document-expiry", "title": "Document Expiry", "path": "Master Data ▸ Document Expiry", "summary": "Expired and expiring Emirates IDs, passports, contract and property documents, and contracts without an attested copy.", "screens": ["RecordDocuments"] }
+        { "key": "document-expiry", "title": "Document Expiry", "path": "Master Data ▸ Document Expiry", "summary": "Expired and expiring Emirates IDs, passports, contract and property documents, and contracts without an attested copy.", "screens": ["RecordDocuments"] },
+        { "key": "data-import", "title": "Importing from a Previous System", "path": "Master Data ▸ Import Data", "summary": "The Excel template, how each column is checked, and importing properties, units, tenants, vendors, contracts and employees in one go.", "screens": ["DataImport"] }
       ]
     },
     {

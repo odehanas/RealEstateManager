@@ -275,6 +275,8 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 ["Leases"] = new[] { AppPermissions.LeasesManage },
+                // Each sheet of the import needs its own right as well (checked in the controller).
+                ["DataImport"] = new[] { AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.HrManage },
                 ["Approvals"] = new[] { AppPermissions.LeasesApprove },
                 ["Oversight"] = new[] { AppPermissions.OwnerOversight },
                 ["Assistant"] = new[] { AppPermissions.AssistantUse },

@@ -28,13 +28,13 @@
             <div class="col-md-3"><label asp-for="Employee.NameArabic" class="form-label">@T["Name in Arabic"]</label><input asp-for="Employee.NameArabic" class="form-control" dir="rtl" /></div>
             <div class="col-md-2">
                 <label asp-for="Employee.Gender" class="form-label">@T["Gender"]</label>
-                <select asp-for="Employee.Gender" class="form-select"><option>@T["Male"]</option><option>@T["Female"]</option></select>
+                <select asp-for="Employee.Gender" class="form-select"><option value="Male">@T["Male"]</option><option value="Female">@T["Female"]</option></select>
             </div>
             <div class="col-md-2"><label asp-for="Employee.DateOfBirth" class="form-label">@T["Date of birth"]</label><input asp-for="Employee.DateOfBirth" type="date" class="form-control" /></div>
             <div class="col-md-3"><label asp-for="Employee.Nationality" class="form-label">@T["Nationality"]</label><input asp-for="Employee.Nationality" class="form-control" /></div>
             <div class="col-md-2">
                 <label asp-for="Employee.MaritalStatus" class="form-label">@T["Marital status"]</label>
-                <select asp-for="Employee.MaritalStatus" class="form-select"><option></option><option>@T["Single"]</option><option>@T["Married"]</option><option>@T["Divorced"]</option><option>@T["Widowed"]</option></select>
+                <select asp-for="Employee.MaritalStatus" class="form-select"><option></option><option value="Single">@T["Single"]</option><option value="Married">@T["Married"]</option><option value="Divorced">@T["Divorced"]</option><option value="Widowed">@T["Widowed"]</option></select>
             </div>
             <div class="col-md-3"><label asp-for="Employee.Mobile" class="form-label">@T["Mobile"]</label><input asp-for="Employee.Mobile" class="form-control" /></div>
             <div class="col-md-4"><label asp-for="Employee.Email" class="form-label">@T["Email"]</label><input asp-for="Employee.Email" class="form-control" /></div>

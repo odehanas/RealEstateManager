@@ -1,0 +1,148 @@
+@model RealEstateManager.Controllers.DataImportViewModel
+@using RealEstateManager.Services.Import
+@{
+    ViewData["Title"] = T["Import Data"];
+    const int shownIssues = 300;
+
+    string SheetName(string key) => string.IsNullOrEmpty(key) ? T["File"] : T[ImportSchema.Sheet(key).Name];
+    string ColumnName(ImportIssue issue) =>
+        issue.Column == null || string.IsNullOrEmpty(issue.Sheet) ? "" :
+        ImportSchema.Sheet(issue.Sheet).Columns.FirstOrDefault(c => c.Key == issue.Column) is { } column ? T[column.Header] : issue.Column;
+    // Names of sheets and columns carried in a message are translated with it.
+    string Message(ImportIssue issue) => T.Message(T.Format(issue.Message, issue.Values.Select(v => v is string s ? (object)T[s] : v).ToArray()));
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Import Data"]</h2>
+        <p class="text-muted mb-0">@T["Bring your properties, units, tenants, vendors, contracts and employees over from your previous system."]</p>
+    </div>
+</div>
+
+@if (Model.Error != null)
+{
+    <div class="alert alert-danger">@T.Message(Model.Error)</div>
+}
+
+@if (Model.Result != null)
+{
+    <div class="card border-success shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="text-success mb-2">@T["Imported."]</h5>
+            <ul class="mb-3">
+                @foreach (var sheet in ImportSchema.Sheets.Where(s => Model.Result.Count(s.Key) > 0))
+                {
+                    <li>@T.Format("{0}: {1}", T[sheet.Name], Model.Result.Count(sheet.Key))</li>
+                }
+            </ul>
+            <a class="btn btn-success" asp-action="Result" asp-route-token="@Model.Token">@T["Download the result file"]</a>
+            <span class="text-muted small ms-2">@T["Your file with each record's new code beside it, for your records and for later files."]</span>
+            @if (Model.Result.Count(ImportSchema.Leases) > 0)
+            {
+                <div class="alert alert-info mt-3 mb-0">
+                    @T.Html("The contracts are <strong>drafts</strong>. Open <strong>Master Data &rsaquo; Leases</strong>, review each one and activate it to create its invoices.")
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5>@T["1. Download the template"]</h5>
+                <p class="text-muted small">@T["An Excel workbook with a sheet for each kind of record, dropdown lists, date and number cells, and instructions. Pointing at a header shows what the column takes."]</p>
+                @if (Model.Sheets.Count == 0)
+                {
+                    <div class="alert alert-warning mb-0">@T["You do not have permission to import any master data."]</div>
+                }
+                else
+                {
+                    <a class="btn btn-primary" asp-action="Template">@T["Download template (.xlsx)"]</a>
+                    <div class="small text-muted mt-2">@T.Format("Sheets you can import: {0}.", string.Join(", ", Model.Sheets.Select(s => T[s.Name])))</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5>@T["2. Upload the filled file"]</h5>
+                <p class="text-muted small">@T["It is checked first. Nothing is imported until every row is right; then everything is imported together."]</p>
+                @if (Model.Sheets.Count > 0)
+                {
+                    <form asp-action="Check" method="post" enctype="multipart/form-data" class="d-flex flex-wrap gap-2">
+                        @Html.AntiForgeryToken()
+                        <input type="file" name="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="form-control" style="max-width:360px" required />
+                        <button type="submit" class="btn btn-dark">@T["Check the file"]</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.Batch is { } batch)
+{
+    @if (!batch.IsValid)
+    {
+        <div class="card border-danger shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                <strong>@T.Format("{0} problem(s) found. Nothing was imported.", batch.Issues.Count)</strong>
+            </div>
+            <div class="card-body pb-0">
+                <p class="small text-muted">@T["Correct these rows in your file and upload it again. The row numbers are the rows of the Excel sheet."]</p>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                    <thead class="table-light">
+                        <tr><th>@T["Sheet"]</th><th class="text-end">@T["Row"]</th><th>@T["Column"]</th><th>@T["Problem"]</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var issue in batch.Issues.OrderBy(i => Array.FindIndex(ImportSchema.Sheets, s => s.Key == i.Sheet)).ThenBy(i => i.Row).Take(shownIssues))
+                        {
+                            <tr>
+                                <td>@SheetName(issue.Sheet)</td>
+                                <td class="text-end">@(issue.Row > 0 ? issue.Row.ToString() : "")</td>
+                                <td>@ColumnName(issue)</td>
+                                <td>@Message(issue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (batch.Issues.Count > shownIssues)
+            {
+                <div class="card-footer small">@T.Format("The first {0} are shown.", shownIssues)</div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card border-success shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="mb-2">@T.Format("{0} is ready to import.", Model.FileName ?? "")</h5>
+                <table class="table table-sm w-auto mb-3">
+                    @foreach (var sheet in ImportSchema.Sheets.Where(s => batch.Count(s.Key) > 0))
+                    {
+                        <tr><td>@T[sheet.Name]</td><td class="text-end fw-semibold">@batch.Count(sheet.Key)</td></tr>
+                    }
+                </table>
+                @if (batch.NewDepartments.Count > 0)
+                {
+                    <p class="small">@T.Format("These departments are not in the system yet and will be created: {0}.", string.Join(", ", batch.NewDepartments))</p>
+                }
+                @if (batch.Count(ImportSchema.Leases) > 0)
+                {
+                    <p class="small text-muted">@T["Contracts are imported as drafts: no invoices are created until each one is activated."]</p>
+                }
+                <form asp-action="Import" method="post" onsubmit="this.querySelector('button').disabled = true;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="token" value="@Model.Token" />
+                    <button type="submit" class="btn btn-success">@T.Format("Import {0} record(s)", batch.Total)</button>
+                </form>
+            </div>
+        </div>
+    }
+}

@@ -48,20 +48,20 @@
         <div class="col-md-4">
             <label asp-for="PaymentMethod" class="form-label"></label>
             <select asp-for="PaymentMethod" class="form-select">
-                <option>@T["Bank"]</option>
-                <option>@T["Cash"]</option>
-                <option>@T["Cheque"]</option>
-                <option>@T["Transfer"]</option>
+                <option value="Bank">@T["Bank"]</option>
+                <option value="Cash">@T["Cash"]</option>
+                <option value="Cheque">@T["Cheque"]</option>
+                <option value="Transfer">@T["Transfer"]</option>
             </select>
         </div>
 
         <div class="col-md-4">
             <label asp-for="Status" class="form-label"></label>
             <select asp-for="Status" class="form-select">
-                <option>@T["Held"]</option>
-                <option>@T["Applied"]</option>
-                <option>@T["Refunded"]</option>
-                <option>@T["Forfeited"]</option>
+                <option value="Held">@T["Held"]</option>
+                <option value="Applied">@T["Applied"]</option>
+                <option value="Refunded">@T["Refunded"]</option>
+                <option value="Forfeited">@T["Forfeited"]</option>
             </select>
         </div>
     </div>

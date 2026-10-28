@@ -44,6 +44,12 @@ namespace RealEstateManager.Services.Localization
 
         public string this[string english] => Translate(english);
 
+        /// <summary>The Arabic of a text whatever the current language, or the English when there is none.</summary>
+        public string ArabicFor(string english) =>
+            !string.IsNullOrEmpty(english) && _arabic.TryGetValue(Key(english), out var arabic) && !string.IsNullOrWhiteSpace(arabic)
+                ? arabic
+                : english;
+
         public IHtmlContent Html(string englishHtml) => new HtmlString(Translate(englishHtml));
 
         public string Format(string englishTemplate, params object?[] values) => SafeFormat(englishTemplate, values);

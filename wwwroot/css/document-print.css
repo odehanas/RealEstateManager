@@ -41,6 +41,8 @@ body {
 header,
 nav,
 .navbar,
+.app-sidebar,
+.sidebar-backdrop,
 footer,
 .no-print,
 .btn,
@@ -51,6 +53,10 @@ form.d-inline,
 
 /* Bootstrap's container caps the width for reading on a monitor. On paper the
    page margin already does that job, so the cap only wastes the sheet. */
+.app-main {
+    margin: 0 !important;
+}
+
 .container,
 .container-fluid {
     max-width: none !important;

@@ -41,10 +41,10 @@
             <label asp-for="UsageType" class="form-label"></label>
             <select asp-for="UsageType" class="form-select">
                 <option value="">@T["Select"]</option>
-                <option>@T["Residential"]</option>
-                <option>@T["Commercial"]</option>
-                <option>@T["Warehouse"]</option>
-                <option>@T["Office"]</option>
+                <option value="Residential">@T["Residential"]</option>
+                <option value="Commercial">@T["Commercial"]</option>
+                <option value="Warehouse">@T["Warehouse"]</option>
+                <option value="Office">@T["Office"]</option>
             </select>
         </div>
 
@@ -74,10 +74,10 @@
             <label asp-for="FloorSide" class="form-label"></label>
             <select asp-for="FloorSide" class="form-select">
                 <option value="">@T["Not set"]</option>
-                <option>@T["Front"]</option>
-                <option>@T["Back"]</option>
-                <option>@T["Left"]</option>
-                <option>@T["Right"]</option>
+                <option value="Front">@T["Front"]</option>
+                <option value="Back">@T["Back"]</option>
+                <option value="Left">@T["Left"]</option>
+                <option value="Right">@T["Right"]</option>
             </select>
             <div class="form-text">@T["Optional. Where the unit sits in the 3D building view."]</div>
         </div>
@@ -101,10 +101,10 @@
         <div class="col-md-4">
             <label asp-for="Status" class="form-label"></label>
             <select asp-for="Status" class="form-select">
-                <option>@T["Vacant"]</option>
-                <option>@T["Reserved"]</option>
-                <option>@T["Occupied"]</option>
-                <option>@T["UnderMaintenance"]</option>
+                <option value="Vacant">@T["Vacant"]</option>
+                <option value="Reserved">@T["Reserved"]</option>
+                <option value="Occupied">@T["Occupied"]</option>
+                <option value="UnderMaintenance">@T["UnderMaintenance"]</option>
             </select>
         </div>
 

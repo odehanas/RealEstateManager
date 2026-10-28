@@ -29,11 +29,11 @@
             <label asp-for="AccountType" class="form-label">@T["Account Type"]</label>
             <select asp-for="AccountType" class="form-select">
                 <option value="">@T["Select Type"]</option>
-                <option>@T["Asset"]</option>
-                <option>@T["Liability"]</option>
-                <option>@T["Equity"]</option>
-                <option>@T["Revenue"]</option>
-                <option>@T["Expense"]</option>
+                <option value="Asset">@T["Asset"]</option>
+                <option value="Liability">@T["Liability"]</option>
+                <option value="Equity">@T["Equity"]</option>
+                <option value="Revenue">@T["Revenue"]</option>
+                <option value="Expense">@T["Expense"]</option>
             </select>
         </div>
 
@@ -41,12 +41,12 @@
             <label asp-for="ReportingGroup" class="form-label">@T["Reporting Group"]</label>
             <select asp-for="ReportingGroup" class="form-select">
                 <option value="">@T["Select Group"]</option>
-                <option>@T["Assets"]</option>
-                <option>@T["Liabilities"]</option>
-                <option>@T["Equity"]</option>
-                <option>@T["Revenue"]</option>
-                <option>@T["DirectExpense"]</option>
-                <option>@T["GeneralExpense"]</option>
+                <option value="Assets">@T["Assets"]</option>
+                <option value="Liabilities">@T["Liabilities"]</option>
+                <option value="Equity">@T["Equity"]</option>
+                <option value="Revenue">@T["Revenue"]</option>
+                <option value="DirectExpense">@T["DirectExpense"]</option>
+                <option value="GeneralExpense">@T["GeneralExpense"]</option>
             </select>
         </div>
 

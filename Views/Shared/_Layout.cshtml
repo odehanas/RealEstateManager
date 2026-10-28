@@ -62,7 +62,10 @@
         AppPermissions.MasterDataView,
         AppPermissions.MasterDataManage,
         AppPermissions.AccountingManage);
-    var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors || canApproveContracts;
+    // Importing from a previous system: master data, contracts or employees, each by its own right.
+    var canImportData = isAuthenticated && await PermissionService.HasAnyPermissionAsync(
+        User, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.HrManage);
+    var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors || canApproveContracts || canImportData;
     var showAccountsMenu = canManageAccounting;
     // Operations opens for either job: keeping the books, or answering tenants.
     var showOperationsMenu = canManageAccounting || canHandleServiceRequests || canDoMaintenance;
@@ -116,6 +119,7 @@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     }
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sidebar.css" asp-append-version="true" />
     @* Help topic typography. Every rule is scoped under .help-content, so it cannot touch the application's own tables. *@
     <link rel="stylesheet" href="~/help/help.css" asp-append-version="true" />
     @if (showAssistant)
@@ -125,453 +129,23 @@
     @* Print rules for the whole application. media="print" so it costs nothing on screen. *@
     <link rel="stylesheet" href="~/css/document-print.css" media="print" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-xl navbar-dark bg-dark shadow-sm">
-            <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@T["RealEstateManager"]</a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-                    <span class="navbar-toggler-icon"></span>
+<body class="@(isAuthenticated ? "has-sidebar" : "")">
+    @* Before anything is drawn, so a hidden menu does not flash open on each page. *@
+    <script>try { if (localStorage.getItem('rem-sidebar') === 'hidden') document.body.classList.add('sidebar-hidden'); } catch (e) { }</script>
+    <header class="app-topbar navbar navbar-dark bg-dark shadow-sm">
+        <div class="container-fluid flex-nowrap gap-2">
+            @if (isAuthenticated)
+            {
+                @* Shows or hides the side menu; on a wide screen the choice is remembered. *@
+                <button type="button" class="btn btn-outline-light btn-sm sidebar-toggle" data-sidebar-toggle
+                        aria-controls="appSidebar" aria-expanded="true" title="@T["Show or hide the menu"]">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <span class="visually-hidden">@T["Menu"]</span>
                 </button>
+            }
+            <a class="navbar-brand fw-bold me-2" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@T["RealEstateManager"]</a>
 
-                <div class="collapse navbar-collapse" id="mainNav">
-                    @if (isAuthenticated)
-                    {
-                    @*
-                        Menu order follows the order the work is actually done:
-                        System Setup (configure the company once) -> Master Data (the
-                        things being managed) -> Operations (the daily transactions) ->
-                        Reporting (what came out of them).
-                    *@
-                    <ul class="navbar-nav me-auto mb-2 mb-xl-0">
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@(isMaintenanceOnly ? T["My Jobs"] : T["Home"])</a>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="setupDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                @T["System Setup"]
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="setupDropdown">
-                                @if (canManageAccounting)
-                                {
-                                    <li><h6 class="dropdown-header">@T["Accounting Setup"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="ChartOfAccounts" asp-action="Index">@T["Chart of Accounts"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="AccountMappings" asp-action="Index">@T["Account Mapping"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="OpeningBalances" asp-action="Index">@T["Opening Balances"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="OwnerWithdrawalCategories" asp-action="Index">@T["Owner Withdrawal Categories"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="VatSettings" asp-action="Index">@T["VAT Settings"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Settings">@T["E-Invoicing Settings"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="RevenueRecognition" asp-action="Index">@T["Revenue Recognition"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Prepayments" asp-action="Index">@T["Recurring Prepayments"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Closing" asp-action="Index">@T["Closing Cockpit"]</a>
-                                    </li>
-                                }
-                                @if (canApproveReopen)
-                                {
-                                    <li>
-                                        <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="Closing" asp-action="ReopenRequests">
-                                            Period Reopen Requests
-                                            @if (reopenRequestsWaiting > 0)
-                                            {
-                                                <span class="badge bg-danger ms-2">@reopenRequestsWaiting</span>
-                                            }
-                                        </a>
-                                    </li>
-                                }
-                                @if (isSystemAdmin)
-                                {
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Administration"]</h6></li>
-                                    @if (isPlatformOwner)
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Companies" asp-action="Index">@T["Companies & Subscriptions"]</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="DatabaseUpdates" asp-action="Index">@T["Database Updates"]</a>
-                                        </li>
-                                    }
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="AuditLogs" asp-action="Index">@T["Audit Logs"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Manage">@T["Feedback Review"]</a>
-                                    </li>
-                                }
-                                else if (isCompanyAdmin)
-                                {
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Company Administration"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
-                                    </li>
-                                }
-                                @if (currentCompanyId.HasValue)
-                                {
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@(isMaintenanceOnly ? T["Help"] : T["Subscription & Help"])</h6></li>
-                                    @if (!isMaintenanceOnly)
-                                    {
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Subscription" asp-action="Index">@T["Subscription"]</a>
-                                    </li>
-                                    }
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Help" asp-action="Index">@T["Help"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Help" asp-action="Manual" target="_blank">@T["User Manual"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Help" asp-action="Training" target="_blank">@T["Training Workbook"]</a>
-                                    </li>
-                                    @if (!isMaintenanceOnly)
-                                    {
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Feedback" asp-action="Index">@T["Send Feedback"]</a>
-                                    </li>
-                                    }
-                                }
-                            </ul>
-                        </li>
-
-                        @if (showMasterDataMenu)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="masterDataDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @T["Master Data"]
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="masterDataDropdown">
-                                    @if (canViewMasterData)
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Properties" asp-action="Index">@T["Properties"]</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Units" asp-action="Index">@T["Units"]</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Tenants" asp-action="Index">@T["Tenants"]</a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a>
-                                        </li>
-                                    }
-                                    @if (canManageLeases)
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Leases" asp-action="Index">@T["Leases"]</a>
-                                        </li>
-                                    }
-                                    @if (canApproveContracts)
-                                    {
-                                        <li>
-                                            <a class="dropdown-item d-flex justify-content-between align-items-center gap-3" asp-controller="Approvals" asp-action="Index">
-                                                Approvals
-                                                @if (approvalsWaiting > 0)
-                                                {
-                                                    <span class="badge rounded-pill bg-warning text-dark">@approvalsWaiting</span>
-                                                }
-                                            </a>
-                                        </li>
-                                    }
-                                    @if (canViewVendors)
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Vendors" asp-action="Index">@T["Vendors"]</a>
-                                        </li>
-                                    }
-                                </ul>
-                            </li>
-                        }
-
-                        @if (showOperationsMenu)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="operationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @T["Operations"]
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="operationsDropdown">
-                                    @if (showAccountsMenu)
-                                    {
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Workflow" asp-action="Index">@T["Workflow Guide"]</a>
-                                    </li>
-                                    }
-
-                                    @if (canHandleServiceRequests || canDoMaintenance)
-                                    {
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li><h6 class="dropdown-header">@T["Tenant Services"]</h6></li>
-                                        @if (canHandleServiceRequests)
-                                        {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="ServiceRequests" asp-action="Index">
-                                                @T["Tenant Requests"]
-                                            </a>
-                                        </li>
-                                        }
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Index">
-                                                @(canHandleServiceRequests ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
-                                            </a>
-                                        </li>
-                                    }
-
-                                    @if (showAccountsMenu)
-                                    {
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Receivables — Tenants"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="CustomerInvoices" asp-action="Index">@T["Customer Invoices"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="CustomerCreditNotes" asp-action="Index">@T["Credit Notes"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="CustomerReceipts" asp-action="Index">@T["Customer Receipts"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="PdcReceipts" asp-action="Index">@T["PDC Receipts"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="SecurityDeposits" asp-action="Index">@T["Security Deposits"]</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["E-Invoicing"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Index">@T["E-Invoice Monitor"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="EInvoicing" asp-action="Received">@T["Received E-Invoices"]</a>
-                                    </li>
-
-                                    @* Vendors is master data, not an operation - it lives under Master Data only. *@
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Payables — Vendors"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="VendorBills" asp-action="Index">@T["Vendor Bills"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="VendorPayments" asp-action="Index">@T["Vendor Payments"]</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Development"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="DevelopmentProjects" asp-action="Index">@T["Development Projects"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="UnitSales" asp-action="Index">@T["Unit Sales"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="CapitalAssetVat" asp-action="Index">@T["Capital Assets Scheme (VAT)"]</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Landlords — Managed Properties"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="OwnerSettlements" asp-action="Index">@T["Owner Settlements"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="OwnerRecharges" asp-action="Index">@T["Recharges to Owners"]</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["General Ledger"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="PettyCash" asp-action="Index">@T["Petty Cash"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="FixedAssets" asp-action="Index">@T["Fixed Assets"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="ManualJournals" asp-action="Index">@T["Manual Journals"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="OwnerWithdrawals" asp-action="Index">@T["Owner Withdrawals"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Journal" asp-action="Index">@T["Journal Inquiry"]</a>
-                                    </li>
-                                    }
-                                </ul>
-                            </li>
-                        }
-
-                        @if (showControlsMenu)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="controlsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Controls
-                                    @if (paymentsWaiting > 0) { <span class="badge bg-danger">@paymentsWaiting</span> }
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="controlsDropdown">
-                                    @if (canViewPerformance)
-                                    {
-                                        <li><a class="dropdown-item fw-semibold" asp-controller="Performance" asp-action="Index">@T["Business Performance"]</a></li>
-                                    }
-                                    @if (isOwner)
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Oversight" asp-action="Index">@T["Owner Monitor"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="MaintenanceJobs" asp-action="Dashboard">@T["Maintenance Dashboard"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a></li>
-                                    }
-                                    @if (canReleasePayments)
-                                    {
-                                    <li>
-                                        <a class="dropdown-item d-flex justify-content-between align-items-center" asp-controller="PaymentApprovals" asp-action="Index">
-                                            Payment Approvals
-                                            @if (paymentsWaiting > 0) { <span class="badge bg-danger ms-2">@paymentsWaiting</span> }
-                                        </a>
-                                    </li>
-                                    }
-                                    @if (isOwner)
-                                    {
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li><a class="dropdown-item" asp-controller="AuthorizationMatrix" asp-action="Index">@T["Authorization Matrix"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="ApprovalLimits" asp-action="Index">@T["Approval Limits & Delegation"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Help" asp-action="Controls">@T["Controls & Security Guide"]</a></li>
-                                    }
-                                </ul>
-                            </li>
-                        }
-
-                        @if (showHrMenu)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="hrDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @T["HR & Payroll"]
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="hrDropdown">
-                                    <li><h6 class="dropdown-header">@T["People"]</h6></li>
-                                    <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">@T["Employees"]</a></li>
-                                    @if (canManageHr)
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Attendance" asp-action="Index">@T["Attendance"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Leave" asp-action="Index">@T["Leave"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EmployeeRequests" asp-action="Index">@T["Employee Requests"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Employees" asp-action="Documents">@T["Expiring Documents"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Departments" asp-action="Index">@T["Departments"]</a></li>
-                                    }
-                                    @if (canRunPayroll)
-                                    {
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li><h6 class="dropdown-header">@T["Payroll"]</h6></li>
-                                        <li><a class="dropdown-item" asp-controller="PayrollAdjustments" asp-action="Index">@T["Payroll Transactions"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Index">@T["Payroll Runs"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="EmployeeAdvances" asp-action="Index">@T["Salary Advances"]</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Payroll" asp-action="Settings">@T["Payroll Settings"]</a></li>
-                                    }
-                                </ul>
-                            </li>
-                        }
-
-                        @if (showReportsMenu)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="reportingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    @T["Reporting"]
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="reportingDropdown">
-                                    <li><a class="dropdown-item fw-semibold" asp-controller="ReportBuilder" asp-action="Index">@T["Build Your Own Report"]</a></li>
-                                    <li><a class="dropdown-item" asp-controller="ProjectCosts" asp-action="Index">@T["Project Costs & WIP"]</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Financial Reports"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TrialBalance">@T["Trial Balance"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLoss">@T["Profit & Loss"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="BalanceSheet">@T["Balance Sheet"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="CashFlow">@T["Statement of Cash Flows"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="InvestmentProperty" asp-action="Index">@T["Investment Property Note"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="GeneralJournal">@T["General Journal"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Journal" asp-action="GeneralLedger">@T["General Ledger"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="VatReturn">@T["VAT Return"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerVatReturn">@T["Owner VAT Return"]</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Management — Tenants & Properties"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="BuildingView" asp-action="Index">@T["Building View"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="TenantStatements" asp-action="Index">@T["Tenant Statement"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="VendorStatements" asp-action="Index">@T["Vendor Statement"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="TenantHealth">@T["Tenant Health & Ranking"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="PropertyUtilization">@T["Property Utilization"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="ProfitAndLossByProperty">@T["P&L by Property"]</a>
-                                    </li>
-
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><h6 class="dropdown-header">@T["Management — Owners"]</h6></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerTenancySchedule">@T["Owner Tenancy Schedule"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerProfitability">@T["Owner Property Profitability"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerCombined">@T["Owner's Combined View"]</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Reports" asp-action="OwnerWithdrawals">@T["Owner Withdrawals"]</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                    </ul>
-                    }
-
-                    <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                    <div class="topbar-actions d-flex align-items-center gap-2 flex-wrap justify-content-end ms-auto">
                         @if (isAuthenticated)
                         {
                             @if (companies.Count > 1)
@@ -596,7 +170,7 @@
                                 </span>
                             }
 
-                            <span class="navbar-text text-light small">
+                            <span class="navbar-text text-light small d-none d-md-inline">
                                 @displayName
                             </span>
 
@@ -604,7 +178,7 @@
                                     data-bs-toggle="offcanvas" data-bs-target="#helpPanel" aria-controls="helpPanel"
                                     data-help-key="@helpTopic?.Key"
                                     title="@(helpTopic != null ? $"Help: {helpTopic.Title}" : T["Help"])">
-                                <span aria-hidden="true">?</span> Help
+                                <span aria-hidden="true">?</span> @T["Help"]
                             </button>
 
                             <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
@@ -622,12 +196,458 @@
                             <a class="btn btn-outline-light btn-sm" asp-controller="Auth" asp-action="Login">@T["Login"]</a>
                         }
                     </div>
-                </div>
-            </div>
-        </nav>
+        </div>
     </header>
 
-    <div class="container py-4">
+    @if (isAuthenticated)
+    {
+        @*
+                        Menu order follows the order the work is actually done:
+                        System Setup (configure the company once) -> Master Data (the
+                        things being managed) -> Operations (the daily transactions) ->
+                        Reporting (what came out of them).
+                    *@
+        <aside class="app-sidebar" id="appSidebar" aria-label="@T["Main menu"]">
+            <nav>
+                    <ul class="sidebar-nav">
+
+                        <li>
+                            <a class="sidebar-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index"><svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span class="sidebar-label">@(isMaintenanceOnly ? T["My Jobs"] : T["Home"])</span></a>
+                        </li>
+
+                        <li class="sidebar-group">
+                                <button type="button" class="sidebar-link sidebar-group-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#sb-setup" aria-expanded="false" aria-controls="sb-setup">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="sidebar-label">@T["System Setup"]</span><span class="sidebar-caret" aria-hidden="true"></span>
+                                </button>
+                                <ul class="collapse sidebar-sub" id="sb-setup">
+                                @if (canManageAccounting)
+                                {
+                                    <li class="sidebar-heading">@T["Accounting Setup"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="ChartOfAccounts" asp-action="Index">@T["Chart of Accounts"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="AccountMappings" asp-action="Index">@T["Account Mapping"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OpeningBalances" asp-action="Index">@T["Opening Balances"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OwnerWithdrawalCategories" asp-action="Index">@T["Owner Withdrawal Categories"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="VatSettings" asp-action="Index">@T["VAT Settings"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="EInvoicing" asp-action="Settings">@T["E-Invoicing Settings"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="RevenueRecognition" asp-action="Index">@T["Revenue Recognition"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Prepayments" asp-action="Index">@T["Recurring Prepayments"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Closing" asp-action="Index">@T["Closing Cockpit"]</a>
+                                    </li>
+                                }
+                                @if (canApproveReopen)
+                                {
+                                    <li>
+                                        <a class="sidebar-link d-flex justify-content-between align-items-center" asp-controller="Closing" asp-action="ReopenRequests">
+                                            @T["Period Reopen Requests"]
+                                            @if (reopenRequestsWaiting > 0)
+                                            {
+                                                <span class="badge bg-danger ms-2">@reopenRequestsWaiting</span>
+                                            }
+                                        </a>
+                                    </li>
+                                }
+                                @if (isSystemAdmin)
+                                {
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Administration"]</li>
+                                    @if (isPlatformOwner)
+                                    {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Companies" asp-action="Index">@T["Companies & Subscriptions"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="DatabaseUpdates" asp-action="Index">@T["Database Updates"]</a>
+                                        </li>
+                                    }
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="AuditLogs" asp-action="Index">@T["Audit Logs"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Feedback" asp-action="Manage">@T["Feedback Review"]</a>
+                                    </li>
+                                }
+                                else if (isCompanyAdmin)
+                                {
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Company Administration"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
+                                    </li>
+                                }
+                                @if (currentCompanyId.HasValue)
+                                {
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@(isMaintenanceOnly ? T["Help"] : T["Subscription & Help"])</li>
+                                    @if (!isMaintenanceOnly)
+                                    {
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Subscription" asp-action="Index">@T["Subscription"]</a>
+                                    </li>
+                                    }
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Help" asp-action="Index">@T["Help"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Help" asp-action="Manual" target="_blank">@T["User Manual"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Help" asp-action="Training" target="_blank">@T["Training Workbook"]</a>
+                                    </li>
+                                    @if (!isMaintenanceOnly)
+                                    {
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Feedback" asp-action="Index">@T["Send Feedback"]</a>
+                                    </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+
+                        @if (showMasterDataMenu)
+                        {
+                            <li class="sidebar-group">
+                                <button type="button" class="sidebar-link sidebar-group-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#sb-masterData" aria-expanded="false" aria-controls="sb-masterData">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/></svg><span class="sidebar-label">@T["Master Data"]</span><span class="sidebar-caret" aria-hidden="true"></span>
+                                </button>
+                                <ul class="collapse sidebar-sub" id="sb-masterData">
+                                    @if (canViewMasterData)
+                                    {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Properties" asp-action="Index">@T["Properties"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Units" asp-action="Index">@T["Units"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Tenants" asp-action="Index">@T["Tenants"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a>
+                                        </li>
+                                    }
+                                    @if (canManageLeases)
+                                    {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Leases" asp-action="Index">@T["Leases"]</a>
+                                        </li>
+                                    }
+                                    @if (canApproveContracts)
+                                    {
+                                        <li>
+                                            <a class="sidebar-link d-flex justify-content-between align-items-center gap-3" asp-controller="Approvals" asp-action="Index">
+                                                @T["Approvals"]
+                                                @if (approvalsWaiting > 0)
+                                                {
+                                                    <span class="badge rounded-pill bg-warning text-dark">@approvalsWaiting</span>
+                                                }
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (canViewVendors)
+                                    {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Vendors" asp-action="Index">@T["Vendors"]</a>
+                                        </li>
+                                    }
+                                    @if (canImportData)
+                                    {
+                                        <li class="sidebar-divider" role="separator"></li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="DataImport" asp-action="Index">@T["Import Data"]</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showOperationsMenu)
+                        {
+                            <li class="sidebar-group">
+                                <button type="button" class="sidebar-link sidebar-group-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#sb-operations" aria-expanded="false" aria-controls="sb-operations">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/><path d="M17 15l3 2-3 2"/></svg><span class="sidebar-label">@T["Operations"]</span><span class="sidebar-caret" aria-hidden="true"></span>
+                                </button>
+                                <ul class="collapse sidebar-sub" id="sb-operations">
+                                    @if (showAccountsMenu)
+                                    {
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Workflow" asp-action="Index">@T["Workflow Guide"]</a>
+                                    </li>
+                                    }
+
+                                    @if (canHandleServiceRequests || canDoMaintenance)
+                                    {
+                                        <li class="sidebar-divider" role="separator"></li>
+                                        <li class="sidebar-heading">@T["Tenant Services"]</li>
+                                        @if (canHandleServiceRequests)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="ServiceRequests" asp-action="Index">
+                                                @T["Tenant Requests"]
+                                            </a>
+                                        </li>
+                                        }
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenanceJobs" asp-action="Index">
+                                                @(canHandleServiceRequests ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
+                                            </a>
+                                        </li>
+                                    }
+
+                                    @if (showAccountsMenu)
+                                    {
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Receivables — Tenants"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="CustomerInvoices" asp-action="Index">@T["Customer Invoices"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="CustomerCreditNotes" asp-action="Index">@T["Credit Notes"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="CustomerReceipts" asp-action="Index">@T["Customer Receipts"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="PdcReceipts" asp-action="Index">@T["PDC Receipts"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="SecurityDeposits" asp-action="Index">@T["Security Deposits"]</a>
+                                    </li>
+
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["E-Invoicing"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="EInvoicing" asp-action="Index">@T["E-Invoice Monitor"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="EInvoicing" asp-action="Received">@T["Received E-Invoices"]</a>
+                                    </li>
+
+                                    @* Vendors is master data, not an operation - it lives under Master Data only. *@
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Payables — Vendors"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="VendorBills" asp-action="Index">@T["Vendor Bills"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="VendorPayments" asp-action="Index">@T["Vendor Payments"]</a>
+                                    </li>
+
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Development"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="DevelopmentProjects" asp-action="Index">@T["Development Projects"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="UnitSales" asp-action="Index">@T["Unit Sales"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="CapitalAssetVat" asp-action="Index">@T["Capital Assets Scheme (VAT)"]</a>
+                                    </li>
+
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Landlords — Managed Properties"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OwnerSettlements" asp-action="Index">@T["Owner Settlements"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OwnerRecharges" asp-action="Index">@T["Recharges to Owners"]</a>
+                                    </li>
+
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["General Ledger"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="PettyCash" asp-action="Index">@T["Petty Cash"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="FixedAssets" asp-action="Index">@T["Fixed Assets"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="ManualJournals" asp-action="Index">@T["Manual Journals"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OwnerWithdrawals" asp-action="Index">@T["Owner Withdrawals"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Journal" asp-action="Index">@T["Journal Inquiry"]</a>
+                                    </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showControlsMenu)
+                        {
+                            <li class="sidebar-group">
+                                <button type="button" class="sidebar-link sidebar-group-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#sb-controls" aria-expanded="false" aria-controls="sb-controls">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span class="sidebar-label">@T["Controls"]
+                                    @if (paymentsWaiting > 0) { <span class="badge bg-danger ms-1">@paymentsWaiting</span> }</span><span class="sidebar-caret" aria-hidden="true"></span>
+                                </button>
+                                <ul class="collapse sidebar-sub" id="sb-controls">
+                                    @if (canViewPerformance)
+                                    {
+                                        <li><a class="sidebar-link fw-semibold" asp-controller="Performance" asp-action="Index">@T["Business Performance"]</a></li>
+                                    }
+                                    @if (isOwner)
+                                    {
+                                        <li><a class="sidebar-link" asp-controller="Oversight" asp-action="Index">@T["Owner Monitor"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="MaintenanceJobs" asp-action="Dashboard">@T["Maintenance Dashboard"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a></li>
+                                    }
+                                    @if (canReleasePayments)
+                                    {
+                                    <li>
+                                        <a class="sidebar-link d-flex justify-content-between align-items-center" asp-controller="PaymentApprovals" asp-action="Index">
+                                            @T["Payment Approvals"]
+                                            @if (paymentsWaiting > 0) { <span class="badge bg-danger ms-2">@paymentsWaiting</span> }
+                                        </a>
+                                    </li>
+                                    }
+                                    @if (isOwner)
+                                    {
+                                        <li class="sidebar-divider" role="separator"></li>
+                                        <li><a class="sidebar-link" asp-controller="AuthorizationMatrix" asp-action="Index">@T["Authorization Matrix"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="ApprovalLimits" asp-action="Index">@T["Approval Limits & Delegation"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="Help" asp-action="Controls">@T["Controls & Security Guide"]</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showHrMenu)
+                        {
+                            <li class="sidebar-group">
+                                <button type="button" class="sidebar-link sidebar-group-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#sb-hr" aria-expanded="false" aria-controls="sb-hr">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.4 3-5.5 6-5.5s5.4 2.1 6 5.5"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.3M18 14.8c1.7.8 2.8 2.6 3 5.2"/></svg><span class="sidebar-label">@T["HR & Payroll"]</span><span class="sidebar-caret" aria-hidden="true"></span>
+                                </button>
+                                <ul class="collapse sidebar-sub" id="sb-hr">
+                                    <li class="sidebar-heading">@T["People"]</li>
+                                    <li><a class="sidebar-link" asp-controller="Employees" asp-action="Index">@T["Employees"]</a></li>
+                                    @if (canManageHr)
+                                    {
+                                        <li><a class="sidebar-link" asp-controller="Attendance" asp-action="Index">@T["Attendance"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="Leave" asp-action="Index">@T["Leave"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="EmployeeRequests" asp-action="Index">@T["Employee Requests"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="Employees" asp-action="Documents">@T["Expiring Documents"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="Departments" asp-action="Index">@T["Departments"]</a></li>
+                                    }
+                                    @if (canRunPayroll)
+                                    {
+                                        <li class="sidebar-divider" role="separator"></li>
+                                        <li class="sidebar-heading">@T["Payroll"]</li>
+                                        <li><a class="sidebar-link" asp-controller="PayrollAdjustments" asp-action="Index">@T["Payroll Transactions"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="Payroll" asp-action="Index">@T["Payroll Runs"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="EmployeeAdvances" asp-action="Index">@T["Salary Advances"]</a></li>
+                                        <li><a class="sidebar-link" asp-controller="Payroll" asp-action="Settings">@T["Payroll Settings"]</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (showReportsMenu)
+                        {
+                            <li class="sidebar-group">
+                                <button type="button" class="sidebar-link sidebar-group-toggle collapsed" data-bs-toggle="collapse" data-bs-target="#sb-reporting" aria-expanded="false" aria-controls="sb-reporting">
+                                    <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="sidebar-label">@T["Reporting"]</span><span class="sidebar-caret" aria-hidden="true"></span>
+                                </button>
+                                <ul class="collapse sidebar-sub" id="sb-reporting">
+                                    <li><a class="sidebar-link fw-semibold" asp-controller="ReportBuilder" asp-action="Index">@T["Build Your Own Report"]</a></li>
+                                    <li><a class="sidebar-link" asp-controller="ProjectCosts" asp-action="Index">@T["Project Costs & WIP"]</a></li>
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Financial Reports"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="TrialBalance">@T["Trial Balance"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="ProfitAndLoss">@T["Profit & Loss"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="BalanceSheet">@T["Balance Sheet"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="CashFlow">@T["Statement of Cash Flows"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="InvestmentProperty" asp-action="Index">@T["Investment Property Note"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="GeneralJournal">@T["General Journal"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Journal" asp-action="GeneralLedger">@T["General Ledger"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="VatReturn">@T["VAT Return"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="OwnerVatReturn">@T["Owner VAT Return"]</a>
+                                    </li>
+
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Management — Tenants & Properties"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="BuildingView" asp-action="Index">@T["Building View"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="TenantStatements" asp-action="Index">@T["Tenant Statement"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="VendorStatements" asp-action="Index">@T["Vendor Statement"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="TenantHealth">@T["Tenant Health & Ranking"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="PropertyUtilization">@T["Property Utilization"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="ProfitAndLossByProperty">@T["P&L by Property"]</a>
+                                    </li>
+
+                                    <li class="sidebar-divider" role="separator"></li>
+                                    <li class="sidebar-heading">@T["Management — Owners"]</li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="OwnerTenancySchedule">@T["Owner Tenancy Schedule"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="OwnerProfitability">@T["Owner Property Profitability"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="OwnerCombined">@T["Owner's Combined View"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Reports" asp-action="OwnerWithdrawals">@T["Owner Withdrawals"]</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+            </nav>
+        </aside>
+        <div class="sidebar-backdrop" data-sidebar-close></div>
+    }
+
+    <div class="app-main">
+    <div class="container-fluid app-content py-4">
         @if (ViewData["SubscriptionShownOnPage"] is true)
         {
             @* The page shows the subscription itself (the dashboard's status note). *@
@@ -683,10 +703,11 @@
     </div>
 
     <footer class="border-top footer text-muted mt-4">
-        <div class="container py-3">
+        <div class="container-fluid app-content py-3">
             @T.Format("© {0} - RealEstateManager", DateTime.Now.Year)
         </div>
     </footer>
+    </div>
 
     @if (isAuthenticated)
     {

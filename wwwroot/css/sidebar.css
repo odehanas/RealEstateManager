@@ -1,0 +1,210 @@
+/* ==========================================================================
+   The side menu (Views/Shared/_Layout.cshtml). Beside the page on a wide screen,
+   where the menu button hides it for more room (remembered in the browser);
+   over the page on a tablet or phone, opened by the same button. Placed with
+   logical properties, so it sits on the right in Arabic.
+   ========================================================================== */
+:root {
+    --sidebar-w: 250px;
+    --topbar-h: 56px;
+}
+
+.app-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    min-height: var(--topbar-h);
+}
+
+.sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    padding: .3rem .45rem;
+}
+
+    .sidebar-toggle svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+.app-sidebar {
+    position: fixed;
+    top: var(--topbar-h);
+    bottom: 0;
+    inset-inline-start: 0;
+    width: var(--sidebar-w);
+    background: #1d2227;
+    color: #cfd6dd;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    z-index: 1025;
+    padding: .6rem 0 2rem;
+    transition: transform .2s ease;
+    scrollbar-width: thin;
+}
+
+.sidebar-nav,
+.sidebar-sub {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    width: 100%;
+    padding: .5rem 1rem;
+    color: #cfd6dd;
+    text-decoration: none;
+    background: none;
+    border: 0;
+    border-inline-start: 3px solid transparent;
+    text-align: start;
+    font-size: .92rem;
+    line-height: 1.3;
+}
+
+    .sidebar-link:hover,
+    .sidebar-link:focus-visible {
+        color: #fff;
+        background: rgba(255, 255, 255, .07);
+    }
+
+    .sidebar-link.active {
+        color: #fff;
+        background: rgba(78, 161, 255, .16);
+        border-inline-start-color: #4ea1ff;
+        font-weight: 600;
+    }
+
+.sidebar-icon {
+    flex: 0 0 auto;
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .9;
+}
+
+.sidebar-label {
+    flex: 1 1 auto;
+}
+
+.sidebar-group-toggle {
+    font-weight: 600;
+    color: #e6ebf0;
+}
+
+.sidebar-caret {
+    width: 8px;
+    height: 8px;
+    border-inline-end: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform .15s ease;
+    opacity: .7;
+}
+
+.sidebar-group-toggle.collapsed .sidebar-caret {
+    transform: rotate(-45deg);
+}
+
+[dir="rtl"] .sidebar-group-toggle.collapsed .sidebar-caret {
+    transform: rotate(135deg);
+}
+
+.sidebar-sub .sidebar-link {
+    padding-block: .38rem;
+    padding-inline-start: 2.75rem;
+    font-size: .86rem;
+}
+
+.sidebar-heading {
+    padding: .7rem 1rem .25rem;
+    padding-inline-start: 2.75rem;
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #8b97a3;
+}
+
+.sidebar-divider {
+    margin: .4rem 1rem .1rem;
+    margin-inline-start: 2.75rem;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+}
+
+.sidebar-backdrop {
+    display: none;
+}
+
+.app-content {
+    max-width: 1600px;
+}
+
+/* Wide screens: the menu beside the page; the button hides it for more room. */
+@media (min-width: 992px) {
+    body.has-sidebar .app-main {
+        margin-inline-start: var(--sidebar-w);
+        transition: margin .2s ease;
+    }
+
+    body.sidebar-hidden .app-sidebar {
+        transform: translateX(-100%);
+    }
+
+    [dir="rtl"] body.sidebar-hidden .app-sidebar {
+        transform: translateX(100%);
+    }
+
+    body.has-sidebar.sidebar-hidden .app-main {
+        margin-inline-start: 0;
+    }
+}
+
+/* Tablets and phones: the menu slides over the page and closes when a page is chosen. */
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+        width: min(84vw, 300px);
+    }
+
+    [dir="rtl"] .app-sidebar {
+        transform: translateX(100%);
+    }
+
+    body.sidebar-open .app-sidebar {
+        transform: none;
+        box-shadow: 0 0 30px rgba(0, 0, 0, .35);
+    }
+
+    body.sidebar-open .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 32, .45);
+        z-index: 1020;
+    }
+
+    .topbar-actions .form-select {
+        max-width: 160px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .app-sidebar,
+    body.has-sidebar .app-main,
+    .sidebar-caret {
+        transition: none;
+    }
+}

@@ -12,7 +12,7 @@
             <option value="">--</option>
             @foreach (var emirate in PropertyRegistrationLists.Emirates)
             {
-                <option value="@emirate">@emirate</option>
+                <option value="@emirate">@T[emirate]</option>
             }
         </select>
     </div>
@@ -62,7 +62,7 @@
             <option value="">--</option>
             @foreach (var tenure in PropertyRegistrationLists.TenureTypes)
             {
-                <option value="@tenure">@tenure</option>
+                <option value="@tenure">@T[tenure]</option>
             }
         </select>
     </div>
@@ -72,7 +72,7 @@
             <option value="">--</option>
             @foreach (var use in PropertyRegistrationLists.LandUses)
             {
-                <option value="@use">@use</option>
+                <option value="@use">@T[use]</option>
             }
         </select>
     </div>

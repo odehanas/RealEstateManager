@@ -1,0 +1,212 @@
+# Sheet 17: importing master data from a previous system (template, checks, screen). {0} are values.
+Import Data ||| استيراد البيانات
+Instructions ||| التعليمات
+System code ||| رمز النظام
+Sheet ||| الورقة
+Row ||| الصف
+Column ||| العمود
+Problem ||| المشكلة
+File ||| الملف
+Buildings and plots. The system gives each one its property code. ||| المباني والأراضي. يعطي النظام كلاً منها رمز العقار الخاص به.
+Property ref ||| مرجع العقار
+Your own reference for the property, unique in this file. Units and employees use it to name the property. ||| مرجعك الخاص للعقار، فريد في هذا الملف. تستخدمه الوحدات والموظفون للإشارة إلى العقار.
+Property type ||| نوع العقار
+Ownership ||| الملكية
+VAT treatment ||| المعاملة الضريبية
+Owned: the rent is the company's. Managed: the company manages it for a landlord. ||| مملوك: الإيجار للشركة. مُدار: تديره الشركة لمالك.
+Blank means standard rated. ||| الفارغ يعني النسبة الأساسية.
+Owner name ||| اسم المالك
+Owner TRN ||| الرقم الضريبي للمالك
+Required for a managed property: the landlord. ||| مطلوب للعقار المُدار: المالك.
+Commission % ||| العمولة %
+A managed property's management commission, e.g. 5. ||| عمولة إدارة العقار المُدار، مثل 5.
+Asset value ||| قيمة الأصل
+Number of floors ||| عدد الطوابق
+Built-up area (sq ft) ||| المساحة المبنية (قدم مربع)
+Completion date ||| تاريخ الإنجاز
+Title deed number ||| رقم سند الملكية
+Area / community ||| المنطقة / المجتمع
+Plot number ||| رقم الأرض
+The units in each property. The system gives each one its unit code. ||| الوحدات في كل عقار. يعطي النظام كلاً منها رمز الوحدة الخاص بها.
+Unit ref ||| مرجع الوحدة
+Your own reference for the unit, unique in this file. Contracts use it to name the unit. ||| مرجعك الخاص للوحدة، فريد في هذا الملف. تستخدمه العقود للإشارة إلى الوحدة.
+The property's ref on the Properties sheet, or the code of a property already in the system. ||| مرجع العقار في ورقة العقارات، أو رمز عقار موجود في النظام.
+As written, e.g. G, 3, B1. ||| كما يُكتب، مثل G أو 3 أو B1.
+Floor number ||| رقم الطابق
+For the building drawing: 0 = ground, -1 = first basement. ||| لرسم المبنى: 0 = الأرضي، -1 = السرداب الأول.
+Use ||| الاستخدام
+Area (sq ft) ||| المساحة (قدم مربع)
+Asking annual rent ||| الإيجار السنوي المطلوب
+Blank means Vacant. A unit becomes Occupied when its contract is activated. ||| الفارغ يعني شاغرة. تصبح الوحدة مشغولة عند تفعيل عقدها.
+Blank means the property's treatment. ||| الفارغ يعني معاملة العقار.
+Parking bays ||| مواقف السيارات
+Electricity / water account ||| حساب الكهرباء / الماء
+Tenants and other customers. The system gives each one its tenant code. ||| المستأجرون وغيرهم من العملاء. يعطي النظام كلاً منهم رمز المستأجر الخاص به.
+Tenant ref ||| مرجع المستأجر
+Your own reference for the tenant, unique in this file. Contracts use it to name the tenant. ||| مرجعك الخاص للمستأجر، فريد في هذا الملف. تستخدمه العقود للإشارة إلى المستأجر.
+Full name ||| الاسم الكامل
+Party type ||| نوع الطرف
+Emirates ID ||| الهوية الإماراتية
+Emirates ID expiry ||| انتهاء الهوية الإماراتية
+Passport number ||| رقم جواز السفر
+Passport expiry ||| انتهاء جواز السفر
+Trade licence number ||| رقم الرخصة التجارية
+15 digits, for a VAT registered tenant. ||| 15 رقماً، للمستأجر المسجل في الضريبة.
+Country code ||| رمز الدولة
+Two letters, e.g. AE. Blank means AE. ||| حرفان، مثل AE. الفارغ يعني AE.
+Opening balance ||| الرصيد الافتتاحي
+What the tenant owed at the start, from your old system. Negative when in credit. ||| ما كان على المستأجر عند البدء، من نظامك القديم. سالب عندما يكون دائناً.
+Suppliers and contractors. The system gives each one its vendor code. ||| الموردون والمقاولون. يعطي النظام كلاً منهم رمز المورد الخاص به.
+Vendor ref ||| مرجع المورد
+Your own reference for the vendor, unique in this file. ||| مرجعك الخاص للمورد، فريد في هذا الملف.
+Service type ||| نوع الخدمة
+Contact person ||| مسؤول التواصل
+VAT registered ||| مسجل في الضريبة
+Yes or No. A VAT registered vendor needs a TRN. ||| نعم أو لا. المورد المسجل في الضريبة يحتاج إلى رقم ضريبي.
+What the company owed the vendor at the start, from your old system. ||| ما كان على الشركة للمورد عند البدء، من نظامك القديم.
+Running contracts. They are imported as drafts: review each one and activate it, which creates its invoices. ||| العقود السارية. تُستورد كمسودات: راجع كلاً منها وفعّله، فيُنشئ فواتيره.
+The unit's ref on the Units sheet, or the code of a unit already in the system. ||| مرجع الوحدة في ورقة الوحدات، أو رمز وحدة موجودة في النظام.
+The tenant's ref on the Tenants sheet, or the code of a tenant already in the system. ||| مرجع المستأجر في ورقة المستأجرين، أو رمز مستأجر موجود في النظام.
+Old contract number ||| رقم العقد القديم
+Kept in the contract's notes; the system gives the contract its own number. ||| يُحفظ في ملاحظات العقد؛ ويعطي النظام العقد رقمه الخاص.
+Start date ||| تاريخ البداية
+End date ||| تاريخ النهاية
+Annual rent ||| الإيجار السنوي
+Billing every (months) ||| الفوترة كل (أشهر)
+1, 2, 3, 4, 6 or 12. ||| 1 أو 2 أو 3 أو 4 أو 6 أو 12.
+Security deposit ||| التأمين
+Staff for HR & Payroll. The system gives each one an employee code. ||| الموظفون للموارد البشرية والرواتب. يعطي النظام كلاً منهم رمز موظف.
+Employee ref ||| مرجع الموظف
+Your own reference for the employee, unique in this file. ||| مرجعك الخاص للموظف، فريد في هذا الملف.
+First name ||| الاسم الأول
+Last name ||| اسم العائلة
+Name in Arabic ||| الاسم بالعربية
+Date of birth ||| تاريخ الميلاد
+By name. A department not in the system yet is created. ||| بالاسم. يُنشأ القسم غير الموجود في النظام بعد.
+Job title ||| المسمى الوظيفي
+The building the employee works for, if any: its ref on the Properties sheet or its property code. ||| المبنى الذي يعمل له الموظف، إن وُجد: مرجعه في ورقة العقارات أو رمز العقار.
+Joining date ||| تاريخ الالتحاق
+Contract type ||| نوع العقد
+Blank means Unlimited. ||| الفارغ يعني غير محدد المدة.
+Contract end date ||| تاريخ انتهاء العقد
+Required for a limited contract. ||| مطلوب للعقد محدد المدة.
+Residence visa number ||| رقم تأشيرة الإقامة
+Residence visa expiry ||| انتهاء تأشيرة الإقامة
+Labour card number ||| رقم بطاقة العمل
+Labour card expiry ||| انتهاء بطاقة العمل
+MOHRE person code ||| الرمز الشخصي لدى وزارة الموارد البشرية
+Basic salary ||| الراتب الأساسي
+Housing allowance ||| بدل السكن
+Transport allowance ||| بدل المواصلات
+Other allowance ||| بدلات أخرى
+Salary paid by ||| طريقة دفع الراتب
+Bank transfer ||| تحويل بنكي
+Blank means WPS. WPS and bank transfer need the IBAN. ||| الفارغ يعني نظام حماية الأجور. نظام حماية الأجور والتحويل البنكي يحتاجان إلى رقم الآيبان.
+Bank name ||| اسم البنك
+Bank routing code ||| رمز توجيه البنك
+Annual leave days ||| أيام الإجازة السنوية
+Blank means 30. ||| الفارغ يعني 30.
+{0} is required. ||| {0} مطلوب.
+The cell shows an Excel error ({0}). ||| الخلية تعرض خطأ Excel ({0}).
+{0} is too long: at most {1} characters. ||| {0} طويل جداً: {1} حرفاً كحد أقصى.
+{0} must be a whole number. ||| يجب أن يكون {0} عدداً صحيحاً.
+{0} must be a number, without currency or units. ||| يجب أن يكون {0} رقماً، دون عملة أو وحدات.
+{0} can have at most two decimals. ||| يمكن أن يحتوي {0} على خانتين عشريتين كحد أقصى.
+{0} cannot be less than {1}. ||| لا يمكن أن يكون {0} أقل من {1}.
+{0} cannot be more than {1}. ||| لا يمكن أن يكون {0} أكثر من {1}.
+{0} must be a date, e.g. 31/12/2026. ||| يجب أن يكون {0} تاريخاً، مثل 31/12/2026.
+{0} is not a believable date. ||| {0} ليس تاريخاً معقولاً.
+{0} must be Yes or No. ||| يجب أن يكون {0} نعم أو لا.
+{0} must be one of: {1}. ||| يجب أن يكون {0} أحد: {1}.
+{0} is not a valid email address. ||| {0} ليس عنوان بريد إلكتروني صحيحاً.
+{0} must be 15 digits. ||| يجب أن يكون {0} 15 رقماً.
+{0} must be 10 digits. ||| يجب أن يكون {0} 10 أرقام.
+{0}: a UAE IBAN has 23 characters and starts with AE. ||| {0}: الآيبان الإماراتي من 23 حرفاً ويبدأ بـ AE.
+{0} must be 9 digits. ||| يجب أن يكون {0} 9 أرقام.
+{0} must be 14 digits. ||| يجب أن يكون {0} 14 رقماً.
+{0} must be a two-letter country code, e.g. AE. ||| يجب أن يكون {0} رمز دولة من حرفين، مثل AE.
+A whole number. ||| عدد صحيح.
+A number, without currency or units. ||| رقم، دون عملة أو وحدات.
+A date, e.g. 31/12/2026. ||| تاريخ، مثل 31/12/2026.
+Yes or No. ||| نعم أو لا.
+One of: {0}. ||| أحد: {0}.
+Text, up to {0} characters. ||| نص، حتى {0} حرفاً.
+Required. ||| مطلوب.
+RealEstateManager - data import template ||| RealEstateManager - نموذج استيراد البيانات
+How to use it ||| طريقة الاستخدام
+Fill one row per record on each sheet, starting on row 2. Leave a sheet empty if you have nothing for it. ||| املأ صفاً لكل سجل في كل ورقة، بدءاً من الصف 2. واترك الورقة فارغة إن لم يكن لديك شيء لها.
+Do not rename the sheets or change the headers. Headers with * are required. ||| لا تغيّر أسماء الأوراق ولا العناوين. العناوين التي تحمل * مطلوبة.
+Choose from the dropdown lists; type dates as dates (31/12/2026) and numbers without currency or units. ||| اختر من القوائم المنسدلة؛ واكتب التواريخ كتواريخ (31/12/2026) والأرقام دون عملة أو وحدات.
+Give every record your own reference in its ref column, unique on that sheet. Other sheets use it: a unit names its property ref, a contract its unit ref and tenant ref. A record already in the system can be named by its code instead. ||| أعطِ كل سجل مرجعك الخاص في عمود المرجع، فريداً في تلك الورقة. تستخدمه الأوراق الأخرى: تذكر الوحدة مرجع عقارها، ويذكر العقد مرجع وحدته ومرجع مستأجره. ويمكن الإشارة إلى سجل موجود في النظام برمزه بدلاً من ذلك.
+Upload the file in Master Data > Import Data. It is checked first: nothing is imported until every row is right, and then everything is imported together. ||| ارفع الملف من البيانات الرئيسية > استيراد البيانات. يُفحص أولاً: لا يُستورد شيء حتى يصح كل صف، ثم يُستورد كل شيء معاً.
+The system gives every record its own code. After the import, download the result file: it is your file with each record's new code beside it. ||| يعطي النظام كل سجل رمزه الخاص. بعد الاستيراد، نزّل ملف النتيجة: وهو ملفك مع الرمز الجديد لكل سجل بجانبه.
+Contracts arrive as drafts. Review each one and activate it to create its invoices. ||| تصل العقود كمسودات. راجع كلاً منها وفعّله لإنشاء فواتيره.
+What it holds ||| ما تحتويه
+Point at a header to see what the column takes. ||| أشر إلى العنوان لمعرفة ما يقبله العمود.
+The file could not be read as an Excel workbook (.xlsx). Download the template and fill that. ||| تعذرت قراءة الملف كمصنف Excel (.xlsx). نزّل النموذج واملأه.
+You do not have permission to import {0}. Remove the sheet's rows, or ask someone who has. ||| ليست لديك صلاحية استيراد {0}. احذف صفوف الورقة، أو اطلب ذلك ممن لديه الصلاحية.
+The file has no rows to import. ||| لا يحتوي الملف على صفوف للاستيراد.
+The column "{0}" is not one of this sheet's columns. Do not change the headers. ||| العمود "{0}" ليس من أعمدة هذه الورقة. لا تغيّر العناوين.
+The required column "{0}" is missing. ||| العمود المطلوب "{0}" غير موجود.
+{0} has more than {1} rows. Split it into several files. ||| تحتوي {0} على أكثر من {1} صف. قسّمها على عدة ملفات.
+A managed property needs the owner's name. ||| العقار المُدار يحتاج إلى اسم المالك.
+Another row of this file has the same property name. ||| صف آخر في هذا الملف يحمل اسم العقار نفسه.
+Another row of this file has the same title deed. ||| صف آخر في هذا الملف يحمل سند الملكية نفسه.
+Title deed {0} is already recorded on another property. ||| سند الملكية {0} مسجل بالفعل على عقار آخر.
+No property "{0}" on the Properties sheet or in the system. ||| لا يوجد عقار "{0}" في ورقة العقارات ولا في النظام.
+Another row of this file has the same {0}. ||| صف آخر في هذا الملف يحمل {0} نفسه.
+No unit "{0}" on the Units sheet or in the system. ||| لا توجد وحدة "{0}" في ورقة الوحدات ولا في النظام.
+No tenant "{0}" on the Tenants sheet or in the system. ||| لا يوجد مستأجر "{0}" في ورقة المستأجرين ولا في النظام.
+Row {0} of this sheet is for the same unit over some of the same dates. ||| الصف {0} في هذه الورقة للوحدة نفسها في بعض التواريخ نفسها.
+The contract cannot end before the joining date. ||| لا يمكن أن ينتهي العقد قبل تاريخ الالتحاق.
+An employee with Emirates ID {0} is already in the system. ||| يوجد موظف بالهوية الإماراتية {0} في النظام بالفعل.
+The ref "{0}" is already used on row {1}. Each row needs its own. ||| المرجع "{0}" مستخدم بالفعل في الصف {1}. يحتاج كل صف إلى مرجعه الخاص.
+The file has problems; nothing was imported. ||| في الملف مشكلات؛ لم يُستورد شيء.
+Choose the filled template to upload. ||| اختر النموذج المعبأ لرفعه.
+The file is larger than 10 MB. Split it into several files. ||| الملف أكبر من 10 ميغابايت. قسّمه على عدة ملفات.
+Upload the template as an Excel workbook (.xlsx). ||| ارفع النموذج كمصنف Excel (.xlsx).
+That upload has expired. Upload the file again. ||| انتهت صلاحية ذلك الرفع. ارفع الملف مجدداً.
+Nothing was imported: {0} ||| لم يُستورد شيء: {0}
+Bring your properties, units, tenants, vendors, contracts and employees over from your previous system. ||| انقل عقاراتك ووحداتك ومستأجريك ومورديك وعقودك وموظفيك من نظامك السابق.
+Imported. ||| تم الاستيراد.
+Download the result file ||| تنزيل ملف النتيجة
+Your file with each record's new code beside it, for your records and for later files. ||| ملفك مع الرمز الجديد لكل سجل بجانبه، لسجلاتك وللملفات اللاحقة.
+The contracts are <strong>drafts</strong>. Open <strong>Master Data &rsaquo; Leases</strong>, review each one and activate it to create its invoices. ||| العقود <strong>مسودات</strong>. افتح <strong>البيانات الرئيسية &lsaquo; عقود الإيجار</strong>، وراجع كلاً منها وفعّله لإنشاء فواتيره.
+1. Download the template ||| 1. نزّل النموذج
+An Excel workbook with a sheet for each kind of record, dropdown lists, date and number cells, and instructions. Pointing at a header shows what the column takes. ||| مصنف Excel بورقة لكل نوع من السجلات، وقوائم منسدلة، وخلايا للتواريخ والأرقام، وتعليمات. الإشارة إلى العنوان تعرض ما يقبله العمود.
+You do not have permission to import any master data. ||| ليست لديك صلاحية استيراد أي بيانات رئيسية.
+Download template (.xlsx) ||| تنزيل النموذج (.xlsx)
+Sheets you can import: {0}. ||| الأوراق التي يمكنك استيرادها: {0}.
+2. Upload the filled file ||| 2. ارفع الملف المعبأ
+It is checked first. Nothing is imported until every row is right; then everything is imported together. ||| يُفحص أولاً. لا يُستورد شيء حتى يصح كل صف؛ ثم يُستورد كل شيء معاً.
+Check the file ||| فحص الملف
+{0} problem(s) found. Nothing was imported. ||| وُجدت {0} مشكلة. لم يُستورد شيء.
+Correct these rows in your file and upload it again. The row numbers are the rows of the Excel sheet. ||| صحّح هذه الصفوف في ملفك وارفعه مجدداً. أرقام الصفوف هي صفوف ورقة Excel.
+The first {0} are shown. ||| تُعرض أول {0}.
+{0} is ready to import. ||| {0} جاهز للاستيراد.
+These departments are not in the system yet and will be created: {0}. ||| هذه الأقسام غير موجودة في النظام بعد وسيتم إنشاؤها: {0}.
+Contracts are imported as drafts: no invoices are created until each one is activated. ||| تُستورد العقود كمسودات: لا تُنشأ فواتير حتى يُفعّل كل منها.
+Import {0} record(s) ||| استيراد {0} سجل
+TRN ||| الرقم الضريبي
+Individual ||| فرد
+Business ||| شركة
+Government ||| جهة حكومية
+Unlimited ||| غير محدد المدة
+Limited ||| محدد المدة
+Part-time ||| دوام جزئي
+Temporary ||| مؤقت
+WPS ||| نظام حماية الأجور
+Abu Dhabi ||| أبوظبي
+Dubai ||| دبي
+Sharjah ||| الشارقة
+Ajman ||| عجمان
+Fujairah ||| الفجيرة
+Freehold ||| تملك حر
+Leasehold ||| إيجار طويل الأجل
+Musataha ||| مساطحة
+Usufruct ||| حق انتفاع
+Government grant ||| منحة حكومية
+Mixed use ||| متعدد الاستخدامات
+Industrial ||| صناعي
+Hospitality ||| ضيافة
+Agricultural ||| زراعي

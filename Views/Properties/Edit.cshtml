@@ -34,18 +34,18 @@
             <label asp-for="PropertyType" class="form-label"></label>
             <select asp-for="PropertyType" class="form-select">
                 <option value="">@T["Select"]</option>
-                <option>@T["Residential"]</option>
-                <option>@T["Commercial"]</option>
-                <option>@T["Warehouse"]</option>
-                <option>@T["MixedUse"]</option>
+                <option value="Residential">@T["Residential"]</option>
+                <option value="Commercial">@T["Commercial"]</option>
+                <option value="Warehouse">@T["Warehouse"]</option>
+                <option value="MixedUse">@T["MixedUse"]</option>
             </select>
         </div>
 
         <div class="col-md-3">
             <label asp-for="OwnershipType" class="form-label"></label>
             <select asp-for="OwnershipType" class="form-select">
-                <option>@T["Owned"]</option>
-                <option>@T["Managed"]</option>
+                <option value="Owned">@T["Owned"]</option>
+                <option value="Managed">@T["Managed"]</option>
             </select>
         </div>
 

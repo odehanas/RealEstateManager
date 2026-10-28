@@ -1,0 +1,4 @@
+Controls ||| الضوابط
+Menu ||| القائمة
+Main menu ||| القائمة الرئيسية
+Show or hide the menu ||| إظهار القائمة أو إخفاؤها
