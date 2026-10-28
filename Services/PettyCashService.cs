@@ -267,6 +267,7 @@ namespace RealEstateManager.Services
             // to Landlords on a recharge tax invoice, not to the expense account.
             Property? rechargeProperty = null;
             var rechargeVat = 0m;
+            var treatment = OwnerCostTreatments.Recharge;
             int? debitAccountId = expenseAccount.Id;
             if (model.RechargeToOwner)
             {
@@ -277,21 +278,26 @@ namespace RealEstateManager.Services
                 var settings = await _db.CompanyAccountSettings.AsNoTracking().FirstOrDefaultAsync(x => x.CompanyId == companyId);
                 debitAccountId = settings?.DueToLandlordsAccountId
                                  ?? throw new InvalidOperationException("Due to Landlords is not mapped in Account Mapping.");
-                rechargeVat = OwnerRechargeService.VatOn(model.Amount);
+                // A disbursement passes the amount on as paid, with no VAT of ours.
+                treatment = await _recharges.TreatmentAsync(companyId);
+                rechargeVat = treatment == OwnerCostTreatments.Disbursement ? 0m : OwnerRechargeService.VatOn(model.Amount);
             }
+            var category = rechargeProperty != null ? OwnerCostCategories.Clean(model.OwnerCostCategory) : null;
 
             var lines = new List<JournalEntryLine>
             {
                 new()
                 {
                     AccountId = debitAccountId.Value,
-                    Debit = model.Amount + rechargeVat,
+                    Debit = model.Amount,
                     Credit = 0m,
-                    Description = rechargeVat == 0m
+                    Description = rechargeProperty == null
                         ? BuildLineDescription(model.Description, model.PaidTo)
-                        : $"{BuildLineDescription(model.Description, model.PaidTo)} - charged to the owner (incl. VAT {rechargeVat:N2})",
+                        : $"{BuildLineDescription(model.Description, model.PaidTo)} - " +
+                          (treatment == OwnerCostTreatments.Disbursement ? "paid on the owner's behalf" : "recharged to the owner"),
                     PropertyId = model.PropertyId,
-                    UnitId = model.UnitId
+                    UnitId = model.UnitId,
+                    OwnerCostCategory = category
                 },
                 new()
                 {
@@ -306,6 +312,16 @@ namespace RealEstateManager.Services
 
             if (rechargeVat != 0m)
             {
+                lines.Add(new JournalEntryLine
+                {
+                    AccountId = debitAccountId.Value,
+                    Debit = rechargeVat,
+                    Credit = 0m,
+                    Description = $"VAT 5% on {model.Description} recharged",
+                    PropertyId = model.PropertyId,
+                    UnitId = model.UnitId,
+                    OwnerCostCategory = OwnerCostCategories.Vat
+                });
                 var vatPayableId = await _db.CompanyAccountSettings.AsNoTracking().Where(x => x.CompanyId == companyId)
                     .Select(x => x.VatPayableAccountId).FirstOrDefaultAsync()
                     ?? throw new InvalidOperationException("VAT Payable is not mapped in Account Mapping.");
@@ -330,7 +346,7 @@ namespace RealEstateManager.Services
             if (rechargeProperty != null)
                 await _recharges.RecordAsync(companyId, OwnerRechargeSources.PettyCash, journalId, model.ReferenceNumber, rechargeProperty.Id, model.UnitId,
                     model.VoucherDate, $"Petty cash: {model.Description}" + (model.PaidTo != null ? $" (paid to {model.PaidTo})" : string.Empty),
-                    model.Amount, journalId);
+                    model.Amount, journalId, treatment, 0m, category);
 
             return journalId;
         }

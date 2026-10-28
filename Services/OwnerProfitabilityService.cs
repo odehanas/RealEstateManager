@@ -36,8 +36,11 @@ namespace RealEstateManager.Services
             public decimal CommissionVat { get; set; }
             public decimal Expenses { get; set; }
 
-            /// <summary>VAT on our recharges to the owner: included in Expenses unless the owner reclaims it.</summary>
+            /// <summary>VAT on costs charged to the owner: included in Expenses unless the owner reclaims it.</summary>
             public decimal RechargeVat { get; set; }
+
+            /// <summary>The owner's costs by kind (maintenance, utilities...), before reclaimable VAT.</summary>
+            public Dictionary<string, decimal> CostsByCategory { get; set; } = new();
 
             /// <summary>What the property earned its owner in the period.</summary>
             public decimal OwnerNetIncome => RentBilled - Commission - CommissionVat - Expenses;
@@ -52,6 +55,10 @@ namespace RealEstateManager.Services
             public List<string> Owners { get; set; } = new();
             public List<Row> Rows { get; set; } = new();
             public decimal CommissionVatRate { get; set; }
+
+            /// <summary>Every cost category with an amount, in the standard order.</summary>
+            public List<string> Categories => OwnerCostCategories.All.Append(OwnerCostCategories.Vat)
+                .Where(c => Rows.Any(r => r.CostsByCategory.GetValueOrDefault(c) != 0m)).ToList();
         }
 
         public async Task<Report> GetAsync(int companyId, DateTime from, DateTime to, string? owner)
@@ -92,23 +99,19 @@ namespace RealEstateManager.Services
             var dueToLandlords = await _db.CompanyAccountSettings.AsNoTracking()
                 .Where(x => x.CompanyId == companyId).Select(x => x.DueToLandlordsAccountId).FirstOrDefaultAsync();
             var chargeSources = new[] { "MaintenanceMaterial", "VendorBill", "PettyCashExpense", "ManualJournal" };
-            var expenses = dueToLandlords == null
-                ? new Dictionary<int, decimal>()
-                : await _db.JournalEntryLines.AsNoTracking()
+            // Costs charged to owners, by property and by kind (the OwnerCostCategory dimension
+            // on the journal line). Lines with no kind - manual journals - count as Other.
+            var costLines = dueToLandlords == null
+                ? new List<(int PropertyId, string Category, decimal Amount)>()
+                : (await _db.JournalEntryLines.AsNoTracking()
                     .Where(x => x.AccountId == dueToLandlords.Value && x.Debit > 0m && x.PropertyId != null && ids.Contains(x.PropertyId.Value) &&
                                 x.JournalEntry!.IsPosted && x.JournalEntry.EntryDate >= from && x.JournalEntry.EntryDate <= to &&
                                 chargeSources.Contains(x.JournalEntry.SourceType!))
-                    .GroupBy(x => x.PropertyId!.Value)
-                    .Select(g => new { PropertyId = g.Key, Amount = g.Sum(x => x.Debit - x.Credit) })
-                    .ToDictionaryAsync(x => x.PropertyId, x => x.Amount);
-
-            // VAT on our recharges: part of what the owner was charged; a registered owner reclaims it.
-            var rechargeVat = await _db.OwnerRecharges.AsNoTracking()
-                .Where(x => ids.Contains(x.PropertyId) && x.JournalEntry != null && x.JournalEntry.IsPosted &&
-                            x.RechargeDate >= from && x.RechargeDate <= to)
-                .GroupBy(x => x.PropertyId)
-                .Select(g => new { PropertyId = g.Key, Vat = g.Sum(x => x.VatAmount) })
-                .ToDictionaryAsync(x => x.PropertyId, x => x.Vat);
+                    .GroupBy(x => new { PropertyId = x.PropertyId!.Value, x.OwnerCostCategory })
+                    .Select(g => new { g.Key.PropertyId, g.Key.OwnerCostCategory, Amount = g.Sum(x => x.Debit - x.Credit) })
+                    .ToListAsync())
+                    .Select(x => (x.PropertyId, Category: x.OwnerCostCategory ?? OwnerCostCategories.Other, x.Amount))
+                    .ToList();
 
             var units = await _db.Units.AsNoTracking()
                 .Where(x => ids.Contains(x.PropertyId) && x.IsActive)
@@ -137,9 +140,13 @@ namespace RealEstateManager.Services
                     RentVatForOwner = (inv?.OwnerVat ?? 0m) - (cr?.OwnerVat ?? 0m),
                     Commission = commission,
                     CommissionVat = VatDeterminationService.Round(commission * vatRate / 100m),
-                    RechargeVat = rechargeVat.TryGetValue(p.Id, out var rv) ? rv : 0m,
-                    Expenses = (expenses.TryGetValue(p.Id, out var e) ? e : 0m) -
-                               (string.IsNullOrWhiteSpace(p.OwnerTrn) ? 0m : (rechargeVat.TryGetValue(p.Id, out var reclaim) ? reclaim : 0m))
+                    CostsByCategory = costLines.Where(x => x.PropertyId == p.Id)
+                        .GroupBy(x => x.Category).ToDictionary(g => g.Key, g => g.Sum(x => x.Amount)),
+                    RechargeVat = costLines.Where(x => x.PropertyId == p.Id && x.Category == OwnerCostCategories.Vat).Sum(x => x.Amount),
+                    // A registered owner reclaims the VAT on costs charged to them; for anyone else it is a cost.
+                    Expenses = costLines.Where(x => x.PropertyId == p.Id &&
+                                                   (x.Category != OwnerCostCategories.Vat || string.IsNullOrWhiteSpace(p.OwnerTrn)))
+                                        .Sum(x => x.Amount)
                 });
             }
 

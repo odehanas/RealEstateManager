@@ -20,6 +20,11 @@ namespace RealEstateManager.Services
             _vat = vat;
         }
 
+        /// <summary>The company's choice of recharge or disbursement.</summary>
+        public async Task<string> TreatmentAsync(int companyId) =>
+            await _db.Companies.AsNoTracking().Where(x => x.Id == companyId).Select(x => x.OwnerCostTreatment).FirstOrDefaultAsync()
+            ?? OwnerCostTreatments.Recharge;
+
         /// <summary>The output VAT on a recharge of this net cost.</summary>
         public static decimal VatOn(decimal net) => VatDeterminationService.CalculateTax(net, VatCategories.Standard);
 
@@ -36,7 +41,8 @@ namespace RealEstateManager.Services
         /// </summary>
         public async Task<OwnerRecharge> RecordAsync(
             int companyId, string sourceType, int sourceId, string? sourceReference, int propertyId, int? unitId,
-            DateTime date, string description, decimal net, int journalEntryId)
+            DateTime date, string description, decimal net, int journalEntryId,
+            string treatment = OwnerCostTreatments.Recharge, decimal supplierVat = 0m, string? category = null)
         {
             var property = await _db.Properties.AsNoTracking().FirstAsync(x => x.Id == propertyId);
             var recharge = await _db.OwnerRecharges.FirstOrDefaultAsync(x =>
@@ -47,7 +53,8 @@ namespace RealEstateManager.Services
                 _db.OwnerRecharges.Add(recharge);
             }
 
-            var vat = VatOn(net);
+            var isDisbursement = treatment == OwnerCostTreatments.Disbursement;
+            var vat = isDisbursement ? 0m : VatOn(net);
             recharge.SourceReference = sourceReference;
             recharge.UnitId = unitId;
             recharge.OwnerName = property.OwnerName?.Trim() ?? string.Empty;
@@ -57,9 +64,15 @@ namespace RealEstateManager.Services
             recharge.NetAmount = net;
             recharge.VatRate = VatDeterminationService.StandardRate;
             recharge.VatAmount = vat;
-            recharge.TotalAmount = net + vat;
+            recharge.Treatment = isDisbursement ? OwnerCostTreatments.Disbursement : OwnerCostTreatments.Recharge;
+            recharge.SupplierVatAmount = isDisbursement ? supplierVat : 0m;
+            recharge.VatRate = isDisbursement ? 0m : VatDeterminationService.StandardRate;
+            recharge.TotalAmount = net + vat + recharge.SupplierVatAmount;
+            recharge.CostCategory = category;
             recharge.JournalEntryId = journalEntryId;
-            recharge.TaxInvoiceNumber ??= await _vat.GenerateTaxInvoiceNumberAsync(companyId, date);
+            // A disbursement is not our supply: no tax invoice of ours.
+            if (!isDisbursement)
+                recharge.TaxInvoiceNumber ??= await _vat.GenerateTaxInvoiceNumberAsync(companyId, date);
 
             await _db.SaveChangesAsync();
             return recharge;

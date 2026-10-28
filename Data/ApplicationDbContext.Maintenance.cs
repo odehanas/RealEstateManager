@@ -42,6 +42,9 @@ namespace RealEstateManager.Data
                 entity.Property(x => x.VatAmount).HasPrecision(18, 2);
                 entity.Property(x => x.TotalAmount).HasPrecision(18, 2);
                 entity.Property(x => x.TaxInvoiceNumber).HasMaxLength(30);
+                entity.Property(x => x.Treatment).HasMaxLength(20);
+                entity.Property(x => x.SupplierVatAmount).HasPrecision(18, 2);
+                entity.Property(x => x.CostCategory).HasMaxLength(40);
 
                 entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);

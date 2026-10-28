@@ -292,6 +292,12 @@
                                     <input type="hidden" name="Lines[@i].RechargeToOwner" value="false" />
                                     <label class="form-check-label">Charge to owner</label>
                                 </div>
+                                <select name="Lines[@i].OwnerCostCategory" class="form-select form-select-sm mt-1" title="Kind of cost, for the owner's reports">
+                                    @foreach (var category in RealEstateManager.Domain.OwnerCostCategories.All)
+                                    {
+                                        <option value="@category" selected="@(category == line.OwnerCostCategory ? "selected" : null)">@category</option>
+                                    }
+                                </select>
                                 @if (projects.Count > 0)
                                 {
                                     @* A development cost: picking a project and category charges the line to the project's account. *@

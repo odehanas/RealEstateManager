@@ -4,12 +4,13 @@
     var company = (RealEstateManager.Domain.Company)ViewBag.Company;
     var unit = ViewBag.Unit as string;
     var supplier = string.IsNullOrWhiteSpace(company.LegalName) ? company.Name : company.LegalName;
+    var isDisbursement = Model.Treatment == RealEstateManager.Domain.OwnerCostTreatments.Disbursement;
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Tax Invoice @Model.TaxInvoiceNumber</title>
+<title>@(isDisbursement ? "Disbursement Note" : $"Tax Invoice {Model.TaxInvoiceNumber}")</title>
 <style>
     @@page { size: A4 portrait; margin: 14mm; }
     body { margin: 0; padding: 18px; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; color: #1f2933; background: #f2f4f7; }
@@ -36,13 +37,13 @@
 <div class="sheet">
     <div class="head">
         <div>
-            <div class="doc-type">Tax Invoice &mdash; recharge of costs</div>
+            <div class="doc-type">@(isDisbursement ? "Disbursement note — paid on your behalf" : "Tax Invoice — recharge of costs")</div>
             <h1>@supplier</h1>
             <div class="muted">@company.AddressLine1 @company.City</div>
         </div>
         <div style="text-align:right">
-            <div class="muted">Tax invoice no.</div>
-            <div style="font-size:14pt;font-weight:700;color:#0f2740">@Model.TaxInvoiceNumber</div>
+            <div class="muted">@(isDisbursement ? "Supplier's document" : "Tax invoice no.")</div>
+            <div style="font-size:14pt;font-weight:700;color:#0f2740">@(isDisbursement ? Model.SourceReference : Model.TaxInvoiceNumber)</div>
             <div class="muted">Date @Model.RechargeDate.ToString("dd/MM/yyyy")</div>
             <div class="muted">TRN: @company.TrnNumber</div>
         </div>
@@ -62,26 +63,35 @@
     </div>
 
     <table>
-        <thead><tr><th>Description</th><th class="num">Amount</th><th class="num">VAT @Model.VatRate.ToString("0.##")%</th><th class="num">Total</th></tr></thead>
+        <thead><tr><th>Description</th><th class="num">Amount</th><th class="num">@(isDisbursement ? "Supplier's VAT" : $"VAT {Model.VatRate:0.##}%")</th><th class="num">Total</th></tr></thead>
         <tbody>
             <tr>
-                <td>@Model.Description</td>
+                <td>@Model.Description @if (Model.CostCategory != null) { <div class="muted">@Model.CostCategory</div> }</td>
                 <td class="num">@Model.NetAmount.ToString("N2")</td>
-                <td class="num">@Model.VatAmount.ToString("N2")</td>
+                <td class="num">@Model.OwnerReclaimableVat.ToString("N2")</td>
                 <td class="num">@Model.TotalAmount.ToString("N2")</td>
             </tr>
         </tbody>
     </table>
 
     <table style="max-width:300px;margin-left:auto;margin-top:10px" class="totals">
-        <tr><td>Taxable amount</td><td class="num">@Model.NetAmount.ToString("N2")</td></tr>
-        <tr><td>VAT @Model.VatRate.ToString("0.##")%</td><td class="num">@Model.VatAmount.ToString("N2")</td></tr>
+        <tr><td>@(isDisbursement ? "Cost before VAT" : "Taxable amount")</td><td class="num">@Model.NetAmount.ToString("N2")</td></tr>
+        <tr><td>@(isDisbursement ? "Supplier's VAT" : $"VAT {Model.VatRate:0.##}%")</td><td class="num">@Model.OwnerReclaimableVat.ToString("N2")</td></tr>
         <tr class="grand"><td>Total (@company.BaseCurrency)</td><td class="num">@Model.TotalAmount.ToString("N2")</td></tr>
     </table>
 
     <div class="note">
-        Costs incurred by @supplier for your property and recharged to you. The amount is deducted from the rent we hold for you
-        and shown on your owner statement. @(Model.OwnerTrn != null ? "As a VAT registered person you may reclaim the VAT shown as input tax." : string.Empty)
+        @if (isDisbursement)
+        {
+            <text>Paid by @supplier from its account on your behalf, as your agent; @supplier charges no VAT on it. The supplier's invoice is
+            addressed to you@(Model.OwnerTrn != null ? " and you may reclaim the supplier's VAT shown with it" : string.Empty).</text>
+        }
+        else
+        {
+            <text>Costs incurred by @supplier for your property and recharged to you.
+            @(Model.OwnerTrn != null ? "As a VAT registered person you may reclaim the VAT shown as input tax." : string.Empty)</text>
+        }
+        The amount is deducted from the rent we hold for you and shown on your owner statement.
         @if (Model.JournalEntry?.IsPosted != true) { <strong>Draft: the cost is not yet posted.</strong> }
     </div>
 </div>

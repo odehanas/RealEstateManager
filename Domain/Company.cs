@@ -2,6 +2,9 @@ namespace RealEstateManager.Domain
 {
     public class Company
     {
+        /// <summary>How costs of owners' managed properties are passed on (see OwnerCostTreatments).</summary>
+        public string OwnerCostTreatment { get; set; } = RealEstateManager.Domain.OwnerCostTreatments.Recharge;
+
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string BaseCurrency { get; set; } = "AED";

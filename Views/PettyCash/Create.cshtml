@@ -101,7 +101,16 @@
                         <input asp-for="RechargeToOwner" class="form-check-input" type="checkbox" />
                         <label asp-for="RechargeToOwner" class="form-check-label"></label>
                     </div>
-                    <div class="form-text">For a managed property only: the owner is charged the amount plus 5% VAT on a recharge tax invoice, instead of it being our expense.</div>
+                    <div class="form-text">For a managed property only: the owner is charged the amount (plus 5% VAT when the company recharges; as paid when it disburses &mdash; see VAT Settings), instead of it being our expense.</div>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="OwnerCostCategory" class="form-label"></label>
+                    <select asp-for="OwnerCostCategory" class="form-select">
+                        @foreach (var category in RealEstateManager.Domain.OwnerCostCategories.All)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="UnitId" class="form-label"></label>

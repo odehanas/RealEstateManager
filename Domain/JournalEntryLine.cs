@@ -50,6 +50,12 @@ namespace RealEstateManager.Domain
 
         /// <summary>What the development cost was for: land, construction, design...</summary>
         public string? DevelopmentCostCategory { get; set; }
+
+        /// <summary>
+        /// The kind of cost on a line charging an owner (see OwnerCostCategories): the
+        /// dimension the owners' profitability is broken down by.
+        /// </summary>
+        public string? OwnerCostCategory { get; set; }
         public OwnerWithdrawalCategory? OwnerWithdrawalCategory { get; set; }
     }
 }

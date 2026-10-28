@@ -41,7 +41,8 @@ namespace RealEstateManager.Controllers
                 Country = company.Country,
                 Phone = company.Phone,
                 Email = company.Email,
-                ProvisionalVatRecoveryRate = company.ProvisionalVatRecoveryRate
+                ProvisionalVatRecoveryRate = company.ProvisionalVatRecoveryRate,
+                OwnerCostTreatment = company.OwnerCostTreatment
             };
 
             await PopulateReadinessAsync(model, companyId);
@@ -79,6 +80,9 @@ namespace RealEstateManager.Controllers
             company.Phone = Trim(model.Phone);
             company.Email = Trim(model.Email);
             company.ProvisionalVatRecoveryRate = model.ProvisionalVatRecoveryRate;
+            company.OwnerCostTreatment = RealEstateManager.Domain.OwnerCostTreatments.All.Contains(model.OwnerCostTreatment)
+                ? model.OwnerCostTreatment
+                : RealEstateManager.Domain.OwnerCostTreatments.Recharge;
 
             await _db.SaveChangesAsync();
 

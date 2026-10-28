@@ -110,6 +110,7 @@ namespace RealEstateManager.Services
             var recharges = await _db.OwnerRecharges
                 .AsNoTracking()
                 .Where(x => x.CompanyId == companyId
+                            && x.Treatment == OwnerCostTreatments.Recharge   // a disbursement is not our supply
                             && x.JournalEntry != null && x.JournalEntry.IsPosted
                             && x.RechargeDate >= startDate
                             && x.RechargeDate <= endDate)
@@ -236,6 +237,7 @@ namespace RealEstateManager.Services
                 .AsNoTracking()
                 .Where(x => x.VendorBill != null
                             && x.VendorBill.CompanyId == companyId
+                            && !x.IsDisbursement   // paid on an owner's behalf: the supplier's VAT is the owner's
                             && x.VendorBill.JournalEntryId != null
                             && x.VendorBill.Status != "Cancelled"
                             && x.VendorBill.BillDate >= startDate

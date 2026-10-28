@@ -133,12 +133,15 @@ namespace RealEstateManager.Services
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
                             x.RechargeDate >= start && x.RechargeDate <= end)
                 .OrderBy(x => x.RechargeDate)
-                .Select(x => new { x.Id, x.RechargeDate, x.TaxInvoiceNumber, x.Description, x.NetAmount, x.VatAmount })
+                .Select(x => new { x.Id, x.RechargeDate, x.TaxInvoiceNumber, x.SourceReference, x.Description, x.NetAmount, x.VatAmount, x.SupplierVatAmount, x.Treatment })
                 .ToListAsync();
+            // A recharge: our tax invoice. A disbursement: the supplier's invoice in the owner's name.
             report.Purchases.AddRange(recharges.Select(x => new Document
             {
-                Date = x.RechargeDate, Number = x.TaxInvoiceNumber ?? "-", Kind = "Recharged costs",
-                Description = x.Description, Net = x.NetAmount, Vat = x.VatAmount,
+                Date = x.RechargeDate,
+                Number = x.Treatment == OwnerCostTreatments.Disbursement ? (x.SourceReference ?? "-") : x.TaxInvoiceNumber ?? "-",
+                Kind = x.Treatment == OwnerCostTreatments.Disbursement ? "Supplier's invoice (paid on your behalf)" : "Recharged costs",
+                Description = x.Description, Net = x.NetAmount, Vat = x.VatAmount + x.SupplierVatAmount,
                 Link = $"/OwnerRecharges/Document/{x.Id}"
             }));
 

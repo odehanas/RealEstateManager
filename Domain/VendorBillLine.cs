@@ -86,6 +86,12 @@ namespace RealEstateManager.Domain
         /// </summary>
         public bool RechargeToOwner { get; set; }
 
+        /// <summary>Passed on as a disbursement (no VAT, no input VAT reclaimed), fixed when the bill was saved.</summary>
+        public bool IsDisbursement { get; set; }
+
+        /// <summary>The kind of cost charged to the owner (see OwnerCostCategories).</summary>
+        public string? OwnerCostCategory { get; set; }
+
         /// <summary>A development cost: the project it is capitalised into, and what for.</summary>
         public int? DevelopmentProjectId { get; set; }
         public DevelopmentProject? DevelopmentProject { get; set; }

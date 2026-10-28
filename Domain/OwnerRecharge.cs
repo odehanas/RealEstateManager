@@ -34,7 +34,18 @@ namespace RealEstateManager.Domain
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
 
-        /// <summary>Sequential tax invoice number in the company's series.</summary>
+        /// <summary>Recharge (5% VAT, our tax invoice) or Disbursement (no VAT; the supplier's VAT is the owner's).</summary>
+        public string Treatment { get; set; } = OwnerCostTreatments.Recharge;
+
+        /// <summary>On a disbursement: the supplier's VAT, which the owner reclaims with the supplier's invoice.</summary>
+        public decimal SupplierVatAmount { get; set; }
+
+        public string? CostCategory { get; set; }
+
+        /// <summary>The VAT a registered owner reclaims on this cost: ours on a recharge, the supplier's on a disbursement.</summary>
+        public decimal OwnerReclaimableVat => VatAmount + SupplierVatAmount;
+
+        /// <summary>Sequential tax invoice number in the company's series (recharges only).</summary>
         public string? TaxInvoiceNumber { get; set; }
 
         /// <summary>The entry that charged it to the owner; the recharge counts once that entry is posted.</summary>

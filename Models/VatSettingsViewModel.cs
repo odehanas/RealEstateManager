@@ -4,6 +4,9 @@ namespace RealEstateManager.Models
 {
     public class VatSettingsViewModel
     {
+        /// <summary>How costs of owners' managed properties are passed on: Recharge or Disbursement.</summary>
+        public string OwnerCostTreatment { get; set; } = RealEstateManager.Domain.OwnerCostTreatments.Recharge;
+
         public string CompanyName { get; set; } = string.Empty;
 
         [Display(Name = "Registered Legal Name")]

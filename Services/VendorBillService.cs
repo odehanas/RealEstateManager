@@ -96,6 +96,7 @@ namespace RealEstateManager.Services
                         UnitPrice = x.UnitPrice,
                         IsTaxable = x.IsTaxable,
                         RechargeToOwner = x.RechargeToOwner,
+                        OwnerCostCategory = x.OwnerCostCategory,
                         InputTaxAttribution = x.InputTaxAttribution,
                         DevelopmentCost = DevelopmentProjectService.CostTag(x.DevelopmentProjectId, x.DevelopmentCostCategory)
                     })
@@ -268,7 +269,7 @@ namespace RealEstateManager.Services
             var lineNumber = 1;
             foreach (var source in lines)
             {
-                var line = BuildLine(source, lineNumber++, canChargeVat, company.ProvisionalVatRecoveryRate);
+                var line = BuildLine(source, lineNumber++, canChargeVat, company.ProvisionalVatRecoveryRate, company.OwnerCostTreatment);
                 if (projectTags.TryGetValue(source, out var tag))
                 {
                     line.DevelopmentProjectId = tag.ProjectId;
@@ -355,7 +356,8 @@ namespace RealEstateManager.Services
         /// only place a VAT amount on a purchase is calculated.
         /// </summary>
         private static VendorBillLine BuildLine(
-            VendorBillLineViewModel source, int lineNumber, bool vendorCanChargeVat, decimal provisionalRate)
+            VendorBillLineViewModel source, int lineNumber, bool vendorCanChargeVat, decimal provisionalRate,
+            string ownerCostTreatment = OwnerCostTreatments.Recharge)
         {
             var quantity = source.Quantity == 0m ? 1m : source.Quantity;
             var subtotal = VatDeterminationService.Round(quantity * source.UnitPrice);
@@ -377,6 +379,12 @@ namespace RealEstateManager.Services
             var (recoverable, nonRecoverable, appliedRate) =
                 VatDeterminationService.SplitInputTax(vatAmount, attribution, provisionalRate);
 
+            // A disbursement is paid on the owner's behalf: the supplier's VAT is the owner's
+            // to reclaim, never ours, so it is passed on with the cost.
+            var isDisbursement = source.RechargeToOwner && ownerCostTreatment == OwnerCostTreatments.Disbursement;
+            if (isDisbursement)
+                (recoverable, nonRecoverable, appliedRate) = (0m, vatAmount, 0m);
+
             return new VendorBillLine
             {
                 LineNumber = lineNumber,
@@ -384,6 +392,8 @@ namespace RealEstateManager.Services
                 AccountId = source.AccountId,
                 PropertyId = source.PropertyId,
                 RechargeToOwner = source.RechargeToOwner,
+                IsDisbursement = isDisbursement,
+                OwnerCostCategory = source.RechargeToOwner ? OwnerCostCategories.Clean(source.OwnerCostCategory) : null,
                 Quantity = quantity,
                 UnitPrice = source.UnitPrice,
                 LineSubtotal = subtotal,

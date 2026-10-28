@@ -93,6 +93,34 @@ else
             </table>
         </div>
     </div>
+    @if (Model.Categories.Count > 0)
+    {
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white"><strong>Costs charged to owners, by kind</strong></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Kind of cost</th>
+                            @foreach (var r in rows.Where(r => r.CostsByCategory.Count > 0)) { <th class="text-end">@r.PropertyCode</th> }
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <tr class="@(category == RealEstateManager.Domain.OwnerCostCategories.Vat ? "text-muted" : "")">
+                                <td>@category @if (category == RealEstateManager.Domain.OwnerCostCategories.Vat) { <span class="small">(reclaimable by a registered owner)</span> }</td>
+                                @foreach (var r in rows.Where(r => r.CostsByCategory.Count > 0)) { <td class="text-end">@(r.CostsByCategory.GetValueOrDefault(category) == 0m ? "-" : r.CostsByCategory[category].ToString("N2"))</td> }
+                                <td class="text-end fw-semibold">@rows.Sum(r => r.CostsByCategory.GetValueOrDefault(category)).ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
     <p class="small text-muted">
         Owner's net income = rent billed less our commission, the VAT on it (@Model.CommissionVatRate.ToString("0.##")%) and maintenance and other costs charged to the owner.
         VAT on rent invoiced in an owner's name is collected for the owner and is the owner's to declare; it is not income.

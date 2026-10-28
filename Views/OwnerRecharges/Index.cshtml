@@ -12,7 +12,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
         <h2 class="mb-1">Recharges to Owners</h2>
-        <div class="text-muted">Costs of managed properties charged on to their owners with 5% VAT, each with its tax invoice.</div>
+        <div class="text-muted">Costs of managed properties passed on to their owners: recharges with 5% VAT and our tax invoice, or disbursements paid on the owner's behalf with no VAT.</div>
     </div>
 </div>
 
@@ -31,7 +31,7 @@
 
 <div class="row g-3 mb-3">
     <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Costs recharged (posted)</div><div class="h4 mb-0">@posted.Sum(x => x.NetAmount).ToString("N2")</div></div></div></div>
-    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Output VAT on recharges</div><div class="h4 mb-0">@posted.Sum(x => x.VatAmount).ToString("N2")</div></div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Our output VAT on recharges</div><div class="h4 mb-0">@posted.Sum(x => x.VatAmount).ToString("N2")</div></div></div></div>
     <div class="col-md-4"><div class="card shadow-sm h-100"><div class="card-body"><div class="text-muted small">Charged to owners</div><div class="h4 mb-0">@posted.Sum(x => x.TotalAmount).ToString("N2")</div></div></div></div>
 </div>
 
@@ -45,21 +45,22 @@ else
         <div class="table-responsive">
             <table class="table table-sm table-hover align-middle mb-0">
                 <thead class="table-light">
-                    <tr><th>Tax invoice</th><th>Date</th><th>Owner</th><th>Property</th><th>From</th><th>Description</th><th class="text-end">Cost</th><th class="text-end">VAT 5%</th><th class="text-end">Total</th><th></th></tr>
+                    <tr><th>Document</th><th>Date</th><th>Owner</th><th>Property</th><th>How</th><th>Kind</th><th>Description</th><th class="text-end">Cost</th><th class="text-end">VAT</th><th class="text-end">Total</th><th></th></tr>
                 </thead>
                 <tbody>
                     @foreach (var r in Model)
                     {
                         var isPosted = r.JournalEntry?.IsPosted == true;
                         <tr class="@(isPosted ? "" : "text-muted")">
-                            <td><a asp-action="Document" asp-route-id="@r.Id" target="_blank">@r.TaxInvoiceNumber</a></td>
+                            <td><a asp-action="Document" asp-route-id="@r.Id" target="_blank">@(r.TaxInvoiceNumber ?? "Disbursement note")</a></td>
                             <td>@r.RechargeDate.ToString("dd/MM/yyyy")</td>
                             <td>@r.OwnerName @if (r.OwnerTrn != null) { <span class="text-muted small">TRN @r.OwnerTrn</span> }</td>
                             <td>@r.Property?.Code</td>
-                            <td>@OwnerRechargeSources.Describe(r.SourceType) @r.SourceReference</td>
+                            <td>@(r.Treatment == OwnerCostTreatments.Disbursement ? "Disbursement" : "Recharge") <span class="small text-muted">@OwnerRechargeSources.Describe(r.SourceType) @r.SourceReference</span></td>
+                            <td class="small">@r.CostCategory</td>
                             <td class="small">@r.Description</td>
                             <td class="text-end">@r.NetAmount.ToString("N2")</td>
-                            <td class="text-end">@r.VatAmount.ToString("N2")</td>
+                            <td class="text-end" title="@(r.Treatment == OwnerCostTreatments.Disbursement ? "The supplier's VAT, the owner's to reclaim" : "Our 5% VAT")">@r.OwnerReclaimableVat.ToString("N2")</td>
                             <td class="text-end fw-semibold">@r.TotalAmount.ToString("N2")</td>
                             <td>@if (!isPosted) { <span class="badge bg-secondary" title="Counts once its entry is posted">draft</span> }</td>
                         </tr>

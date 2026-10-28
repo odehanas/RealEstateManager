@@ -92,6 +92,9 @@ namespace RealEstateManager.Models
         /// <summary>Charge this line on to the owner of its managed property (5% VAT recharge).</summary>
         public bool RechargeToOwner { get; set; }
 
+        /// <summary>The kind of cost charged to the owner.</summary>
+        public string? OwnerCostCategory { get; set; }
+
         public string InputTaxAttribution { get; set; } = InputTaxAttributions.Taxable;
 
         /// <summary>

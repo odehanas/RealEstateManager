@@ -99,6 +99,30 @@
         </div>
     </div>
 
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light"><strong>Costs Passed On to Owners of Managed Properties</strong></div>
+        <div class="card-body">
+            <p class="small text-muted">How a cost ticked <em>Charge to owner</em> on a vendor bill or petty cash voucher is passed on.
+            The choice is kept on each bill and voucher when saved, so changing it later does not alter what is already recorded.</p>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" asp-for="OwnerCostTreatment" value="Recharge" id="treatRecharge" />
+                <label class="form-check-label" for="treatRecharge">
+                    <strong>Recharge with 5% VAT</strong> &mdash; the supplier invoices us; we reclaim their VAT and charge the owner the cost
+                    plus 5% VAT on our own tax invoice. Our output VAT is on our return; a registered owner reclaims it.
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" asp-for="OwnerCostTreatment" value="Disbursement" id="treatDisbursement" />
+                <label class="form-check-label" for="treatDisbursement">
+                    <strong>Disbursement, no VAT</strong> &mdash; the supplier invoices the owner and we pay from our cash as the owner's agent.
+                    The cost including the supplier's VAT goes to the owner's account as it is; we charge no VAT and reclaim none. The
+                    supplier's VAT is on the owner's VAT return.
+                </label>
+            </div>
+            <div class="small text-muted mt-2">Items taken from the maintenance store are our own goods, so they are always recharged with VAT.</div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-dark">Save VAT Settings</button>
 </form>
 
