@@ -11,7 +11,8 @@
         "--no-launch-profile",
         "--",
         "--ConnectionStrings:DefaultConnection=Server=(localdb)\\ClaudeREM;Database=RemDemo;Trusted_Connection=True;TrustServerCertificate=True",
-        "--urls=http://localhost:5199"
+        "--urls=http://localhost:5199",
+        "--environment=Development"
       ],
       "port": 5199
     },
@@ -27,7 +28,8 @@
         "--ConnectionStrings:DefaultConnection=Server=(localdb)\\ClaudeREM;Database=RemDemo;Trusted_Connection=True;TrustServerCertificate=True",
         "--Assistant:Enabled=true",
         "--Assistant:OpenAIApiKey=test-dummy-key-not-real",
-        "--urls=http://localhost:5199"
+        "--urls=http://localhost:5199",
+        "--environment=Development"
       ],
       "port": 5199
     }

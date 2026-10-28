@@ -44,14 +44,18 @@ namespace RealEstateManager.Services
             FinancialReportService reports,
             FixedAssetService fixedAssets,
             AccountingPostingService posting,
-            JournalWorkflowService workflow)
+            JournalWorkflowService workflow,
+            Push.PushNotifier push)
         {
             _db = db;
             _reports = reports;
             _fixedAssets = fixedAssets;
             _posting = posting;
             _workflow = workflow;
+            _push = push;
         }
+
+        private readonly Push.PushNotifier _push;
 
         // =====================================================================
         //  CHECKLIST
@@ -890,6 +894,11 @@ namespace RealEstateManager.Services
             AddEvent(period, AccountingPeriodActions.ReopenRequested, reason, userName);
             await _db.SaveChangesAsync();
 
+            await _push.ToPermissionAsync(companyId, AppPermissions.PeriodReopenApprove, userId,
+                "{0} asks to reopen {1}", new object?[] { userName, period.Name },
+                "{0}", new object?[] { reason },
+                "/Closing/ReopenRequests", $"reopen-{period.Id}");
+
             return (true, $"Your request to reopen {period.Name} is sent to the approvers.");
         }
 
@@ -922,6 +931,9 @@ namespace RealEstateManager.Services
             Decide(request, PeriodReopenStatuses.Rejected, userId, userName, comment);
             AddEvent(request.AccountingPeriod!, AccountingPeriodActions.ReopenRejected, comment.Trim(), userName);
             await _db.SaveChangesAsync();
+            if (request.RequestedByAppUserId != userId)
+                _push.ToStaff(new[] { request.RequestedByAppUserId }, "Reopening {0} was turned down", new object?[] { request.AccountingPeriod!.Name },
+                    "{0}", new object?[] { comment.Trim() }, "/Closing", $"reopen-{request.AccountingPeriodId}");
             return (true, $"The request to reopen {request.AccountingPeriod!.Name} is turned down.");
         }
 
@@ -961,6 +973,10 @@ namespace RealEstateManager.Services
 
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
+
+            if (request.RequestedByAppUserId != userId)
+                _push.ToStaff(new[] { request.RequestedByAppUserId }, "{0} is open again", new object?[] { period.Name },
+                    "Reopened by {0} for your correction.", new object?[] { userName }, "/Closing", $"reopen-{period.Id}");
 
             return (true, $"{period.Name} is open again for {request.RequestedByName}'s correction. Close it again from the cockpit when done." +
                           (yearUndone ? $" The close of fiscal year {period.FiscalYear} was undone and must be run again." : string.Empty));

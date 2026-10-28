@@ -7,6 +7,16 @@ using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
 using RealEstateManager.Services;
 
+// "dotnet run -- --create-push-keys": prints a new key pair for phone notifications, to be set
+// as Push:PublicKey and Push:PrivateKey in the hosting environment. Nothing is started or stored.
+if (args.Contains("--create-push-keys"))
+{
+    var (publicKey, privateKey) = RealEstateManager.Services.Push.WebPushSender.CreateKeys();
+    Console.WriteLine($"Push:PublicKey={publicKey}");
+    Console.WriteLine($"Push:PrivateKey={privateKey}");
+    return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = ResolveConnectionString(builder);
@@ -55,6 +65,14 @@ builder.Services.AddScoped<RealEstateManager.Services.Localization.UiMessageTran
 builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
     .Configure<RealEstateManager.Services.Localization.UiText>((options, text) =>
         options.ModelMetadataDetailsProviders.Add(new RealEstateManager.Services.Localization.LocalizedDisplayMetadataProvider(text)));
+// Phone and browser notifications (Web Push). The keys are secrets: Push:PublicKey and
+// Push:PrivateKey from the hosting environment or user-secrets. Without them nothing is sent.
+builder.Services.Configure<RealEstateManager.Services.Push.PushOptions>(builder.Configuration.GetSection("Push"));
+builder.Services.AddHttpClient<RealEstateManager.Services.Push.WebPushSender>(client => client.Timeout = TimeSpan.FromSeconds(15));
+builder.Services.AddSingleton<RealEstateManager.Services.Push.PushQueue>();
+builder.Services.AddScoped<RealEstateManager.Services.Push.PushNotifier>();
+builder.Services.AddScoped<RealEstateManager.Services.Push.PushRegistrationService>();
+builder.Services.AddHostedService<RealEstateManager.Services.Push.PushWorker>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, PlatformOwnerAuthorizationHandler>();

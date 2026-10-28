@@ -38,10 +38,13 @@ namespace RealEstateManager.Services
         private readonly ApplicationDbContext _db;
         private readonly IServiceProvider _services;
 
-        public ApprovalService(ApplicationDbContext db, IServiceProvider services)
+        private readonly Push.PushNotifier _push;
+
+        public ApprovalService(ApplicationDbContext db, IServiceProvider services, Push.PushNotifier push)
         {
             _db = db;
             _services = services;
+            _push = push;
         }
 
         public async Task<ApprovalRequest> SubmitAsync(
@@ -67,6 +70,11 @@ namespace RealEstateManager.Services
 
             _db.ApprovalRequests.Add(request);
             await _db.SaveChangesAsync();
+
+            await _push.ToPermissionAsync(companyId, AppPermissions.LeasesApprove, userId,
+                "{0} is waiting for your approval", new object?[] { documentNumber },
+                "{0}", new object?[] { request.Summary },
+                "/Approvals", $"approval-{request.Id}");
             return request;
         }
 
@@ -143,6 +151,10 @@ namespace RealEstateManager.Services
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
 
+            if (request.RequestedByAppUserId != userId)
+                _push.ToStaff(new[] { request.RequestedByAppUserId }, "{0} is approved", new object?[] { request.DocumentNumber },
+                    "Approved by {0}.", new object?[] { userName }, DocumentUrl(request), $"approval-{request.Id}");
+
             return (true, $"{request.DocumentNumber} is approved and now in effect.");
         }
 
@@ -162,6 +174,10 @@ namespace RealEstateManager.Services
             await handler!.OnReturnedAsync(request!.DocumentId);
             await _db.SaveChangesAsync();
             await transaction.CommitAsync();
+
+            if (request.RequestedByAppUserId != userId)
+                _push.ToStaff(new[] { request.RequestedByAppUserId }, "{0} was returned to you", new object?[] { request.DocumentNumber },
+                    "{0}", new object?[] { comment!.Trim() }, DocumentUrl(request), $"approval-{request.Id}");
 
             return (true, $"{request.DocumentNumber} is returned to its creator with your reason.");
         }

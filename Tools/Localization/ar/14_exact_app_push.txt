@@ -1,0 +1,53 @@
+# Sheet 14: installing the app on a phone, and the notifications it receives (whole texts; {0} are values).
+App and notifications ||| التطبيق والإشعارات
+Install it on this phone or computer: it opens from your home screen like any app, without the browser bar. ||| ثبّته على هذا الهاتف أو الحاسوب: يُفتح من الشاشة الرئيسية مثل أي تطبيق، دون شريط المتصفح.
+Install app ||| تثبيت التطبيق
+On iPhone or iPad: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>. Open it from the home screen to turn on notifications. ||| على iPhone أو iPad: اضغط <strong>مشاركة</strong>، ثم <strong>إضافة إلى الشاشة الرئيسية</strong>. افتحه من الشاشة الرئيسية لتفعيل الإشعارات.
+Get a notification on this phone when we reply to your requests. ||| استلم إشعاراً على هذا الهاتف عندما نرد على طلباتك.
+Get a notification on this phone when your leave or a document request is decided. ||| استلم إشعاراً على هذا الهاتف عند البت في إجازتك أو طلب مستند.
+Get a notification on this device when something needs you: a maintenance job, an approval or a tenant's request. ||| استلم إشعاراً على هذا الجهاز عندما يحتاجك شيء: عمل صيانة، أو اعتماد، أو طلب مستأجر.
+Turn on notifications ||| تفعيل الإشعارات
+Notifications are on for this device. ||| الإشعارات مفعّلة على هذا الجهاز.
+Turn off ||| إيقاف
+Notifications are blocked for this site. Allow them in the browser's site settings, then come back here. ||| الإشعارات محظورة لهذا الموقع. اسمح بها من إعدادات الموقع في المتصفح، ثم عد إلى هنا.
+That did not work. Try again in a moment. ||| لم ينجح ذلك. حاول مجدداً بعد قليل.
+Not now ||| ليس الآن
+My HR ||| شؤوني الوظيفية
+{0} ||| {0}
+{0}: {1} ||| {0}: {1}
+{0} - {1} ||| {0} - {1}
+New tenant request {0} ||| طلب مستأجر جديد {0}
+New maintenance job {0} ||| عمل صيانة جديد {0}
+{0} replied on {1} ||| رد {0} على {1}
+Request {0} ||| الطلب {0}
+We have seen your request and will be in touch. ||| اطلعنا على طلبك وسنتواصل معك.
+Work on your request has started. ||| بدأ العمل على طلبك.
+Your request is resolved. Open it to read our reply. ||| تم حل طلبك. افتحه لقراءة ردنا.
+Your request was declined. Open it to read why. ||| تم رفض طلبك. افتحه لمعرفة السبب.
+Your request is closed. ||| تم إغلاق طلبك.
+New reply on {0} ||| رد جديد على {0}
+Open the request to read it. ||| افتح الطلب لقراءته.
+{0} is waiting for your approval ||| {0} بانتظار اعتمادك
+{0} is approved ||| تم اعتماد {0}
+Approved by {0}. ||| اعتمده {0}.
+{0} was returned to you ||| أُعيد إليك {0}
+A payment is waiting for release ||| دفعة بانتظار الإفراج
+Your payment is released ||| تم الإفراج عن دفعتك
+{0} - released by {1}. ||| {0} - أفرج عنها {1}.
+Your payment was turned down ||| تم رفض دفعتك
+{0} asks to reopen {1} ||| يطلب {0} إعادة فتح {1}
+Reopening {0} was turned down ||| تم رفض إعادة فتح {0}
+{0} is open again ||| أُعيد فتح {0}
+Reopened by {0} for your correction. ||| أعاد فتحها {0} لتصحيحك.
+Leave request from {0} ||| طلب إجازة من {0}
+{0} day(s) from {1} to {2} ||| {0} يوم من {1} إلى {2}
+Document request from {0} ||| طلب مستند من {0}
+Open Employee Requests to issue or decline it. ||| افتح طلبات الموظفين لإصداره أو رفضه.
+Your leave is approved ||| تمت الموافقة على إجازتك
+Your leave request was declined ||| تم رفض طلب إجازتك
+Your leave was cancelled ||| تم إلغاء إجازتك
+{0} to {1} ||| من {0} إلى {1}
+{0} to {1}. {2} ||| من {0} إلى {1}. {2}
+Your document is ready ||| مستندك جاهز
+{0} - you can print it from My HR. ||| {0} - يمكنك طباعته من شؤوني الوظيفية.
+Your document request was declined ||| تم رفض طلب المستند

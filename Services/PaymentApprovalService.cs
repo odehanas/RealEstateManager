@@ -15,11 +15,23 @@ namespace RealEstateManager.Services
         private readonly ApprovalAuthorityService _authority;
         private readonly JournalWorkflowService _workflow;
 
-        public PaymentApprovalService(ApplicationDbContext db, ApprovalAuthorityService authority, JournalWorkflowService workflow)
+        private readonly Push.PushNotifier _push;
+
+        public PaymentApprovalService(ApplicationDbContext db, ApprovalAuthorityService authority, JournalWorkflowService workflow,
+            Push.PushNotifier push)
         {
             _db = db;
             _authority = authority;
             _workflow = workflow;
+            _push = push;
+        }
+
+        /// <summary>The person who entered the payment hears what became of it.</summary>
+        private void TellRequester(PaymentApproval approval, int deciderId, string title, string body, object?[] values)
+        {
+            if (approval.RequestedByAppUserId is int requester && requester != deciderId)
+                _push.ToStaff(new[] { requester }, title, Array.Empty<object?>(), body, values,
+                    "/PaymentApprovals?all=true", $"payment-{approval.Id}");
         }
 
         public Task<int> CountPendingAsync() =>
@@ -84,6 +96,7 @@ namespace RealEstateManager.Services
                 return (false, $"Not released: {posted.Message}");
             }
 
+            TellRequester(approval, userId, "Your payment is released", "{0} - released by {1}.", new object?[] { approval.Description, userName });
             return (true, $"Payment of {approval.Amount:N2} released and posted. {approval.Description}");
         }
 
@@ -106,6 +119,7 @@ namespace RealEstateManager.Services
             approval.DecidedAt = DateTime.UtcNow;
             approval.Comment = Limit(comment.Trim(), 500);
             await _db.SaveChangesAsync();
+            TellRequester(approval, userId, "Your payment was turned down", "{0}: {1}", new object?[] { approval.Description, comment.Trim() });
             return (true, $"Payment of {approval.Amount:N2} turned down. It stays a draft, out of the accounts.");
         }
 

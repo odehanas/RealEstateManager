@@ -1,0 +1,24 @@
+@model string
+@inject Microsoft.Extensions.Options.IOptions<RealEstateManager.Services.Push.PushOptions> PushOptions
+@{
+    // The installable app of this part of the site: "/" (staff), "/portal/" (tenants) or "/me/" (employees).
+    var appBase = Model;
+    var appName = appBase switch { "/portal/" => T["Tenant Portal"], "/me/" => T["My HR"], _ => "RealEstateManager" };
+    var signedIn = appBase switch
+    {
+        "/portal/" => User.IsTenantPortalUser(),
+        "/me/" => User.IsEmployeePortalUser(),
+        _ => User.Identity?.IsAuthenticated == true && !User.IsTenantPortalUser() && !User.IsEmployeePortalUser()
+    };
+    // Only offered once someone is signed in, and only when the server has its notification keys.
+    var pushKey = signedIn && PushOptions.Value.IsConfigured ? PushOptions.Value.PublicKey!.Trim() : "";
+}
+<link rel="manifest" href="@(appBase)manifest.webmanifest?lang=@RealEstateManager.Services.Localization.UiLanguages.Current" />
+<meta name="theme-color" content="@(appBase == "/" ? "#212529" : "#0f2740")" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="@appName" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="apple-touch-icon" href="~/img/app/apple-touch-icon.png" />
+<script src="~/js/app-install.js" asp-append-version="true" defer
+        data-app-base="@appBase" data-push-key="@pushKey" data-signed-in="@(signedIn ? "true" : "false")"></script>

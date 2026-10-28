@@ -60,12 +60,16 @@ namespace RealEstateManager.Services
         private readonly IHttpContextAccessor _http;
         private readonly HrService _hr;
 
-        public EmployeePortalService(ApplicationDbContext db, PasswordHashingService hashing, IHttpContextAccessor http, HrService hr)
+        private readonly Push.PushNotifier _push;
+
+        public EmployeePortalService(ApplicationDbContext db, PasswordHashingService hashing, IHttpContextAccessor http, HrService hr,
+            Push.PushNotifier push)
         {
             _db = db;
             _hashing = hashing;
             _http = http;
             _hr = hr;
+            _push = push;
         }
 
         // =====================================================================
@@ -254,6 +258,10 @@ namespace RealEstateManager.Services
                 RequestedAt = DateTime.UtcNow
             });
             await _db.SaveChangesAsync();
+            await _push.ToPermissionAsync(employee.CompanyId, AppPermissions.HrManage, null,
+                "Leave request from {0}", new object?[] { employee.FullName },
+                "{0} day(s) from {1} to {2}", new object?[] { days.ToString("0.##"), start.ToString("dd/MM/yyyy"), end.ToString("dd/MM/yyyy") },
+                "/Leave", $"leave-{employeeId}");
             return (true, $"Your {leaveType.ToLowerInvariant()} leave request for {days:0.##} day(s) is sent to HR.");
         }
 
@@ -278,6 +286,10 @@ namespace RealEstateManager.Services
                 RequestedAt = DateTime.UtcNow
             });
             await _db.SaveChangesAsync();
+            await _push.ToPermissionAsync(employee.CompanyId, AppPermissions.HrManage, null,
+                "Document request from {0}", new object?[] { employee.FullName },
+                "Open Employee Requests to issue or decline it.", Array.Empty<object?>(),
+                "/EmployeeRequests", $"hr-request-{employeeId}");
             return (true, $"Your request for a {EmployeeRequestTypes.Describe(type).ToLowerInvariant()} is sent to HR. You can print it here once it is issued.");
         }
     }

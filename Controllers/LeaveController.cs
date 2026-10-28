@@ -115,6 +115,18 @@ namespace RealEstateManager.Controllers
             request.DecisionComment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim();
             await _db.SaveChangesAsync();
 
+            var title = status switch
+            {
+                LeaveStatuses.Approved => "Your leave is approved",
+                LeaveStatuses.Rejected => "Your leave request was declined",
+                _ => "Your leave was cancelled"
+            };
+            await HttpContext.RequestServices.GetRequiredService<Services.Push.PushNotifier>().ToEmployeeAsync(request.EmployeeId,
+                title, Array.Empty<object?>(),
+                request.DecisionComment == null ? "{0} to {1}" : "{0} to {1}. {2}",
+                new object?[] { request.StartDate.ToString("dd/MM/yyyy"), request.EndDate.ToString("dd/MM/yyyy"), request.DecisionComment },
+                "/me/leave", $"leave-{request.Id}");
+
             TempData["HrSuccess"] = $"{request.Employee?.FullName}'s {request.LeaveType.ToLowerInvariant()} leave is {status.ToLowerInvariant()}.";
             return RedirectToAction(nameof(Index));
         }

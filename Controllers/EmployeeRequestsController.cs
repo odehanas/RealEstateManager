@@ -48,6 +48,10 @@ namespace RealEstateManager.Controllers
             request.DecidedByName = CurrentUserName();
             request.DecidedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
+            await HttpContext.RequestServices.GetRequiredService<Services.Push.PushNotifier>().ToEmployeeAsync(request.EmployeeId,
+                "Your document is ready", Array.Empty<object?>(),
+                "{0} - you can print it from My HR.", new object?[] { request.ReferenceNumber },
+                "/me/requests", $"hr-request-{request.Id}");
 
             TempData["HrSuccess"] = $"{EmployeeRequestTypes.Describe(request.RequestType)} {request.ReferenceNumber} issued to {request.Employee?.FullName}. They can print it from the portal.";
             return RedirectToAction(nameof(Index));
@@ -69,6 +73,10 @@ namespace RealEstateManager.Controllers
             request.DecidedByName = CurrentUserName();
             request.DecidedAt = DateTime.UtcNow;
             await _db.SaveChangesAsync();
+            await HttpContext.RequestServices.GetRequiredService<Services.Push.PushNotifier>().ToEmployeeAsync(request.EmployeeId,
+                "Your document request was declined", Array.Empty<object?>(),
+                "{0}", new object?[] { request.Comment },
+                "/me/requests", $"hr-request-{request.Id}");
 
             TempData["HrSuccess"] = $"Request from {request.Employee?.FullName} declined.";
             return RedirectToAction(nameof(Index));

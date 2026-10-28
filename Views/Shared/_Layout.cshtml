@@ -106,6 +106,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RealEstateManager</title>
+    <partial name="_AppHead" model="@("/")" />
     @if (RealEstateManager.Services.Localization.UiLanguages.IsArabic)
     {
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
@@ -128,7 +129,7 @@
     <header>
         <nav class="navbar navbar-expand-xl navbar-dark bg-dark shadow-sm">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : T["Home"])" asp-action="Index">@T["RealEstateManager"]</a>
+                <a class="navbar-brand fw-bold" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@T["RealEstateManager"]</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                     <span class="navbar-toggler-icon"></span>
@@ -146,7 +147,7 @@
                     <ul class="navbar-nav me-auto mb-2 mb-xl-0">
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : T["Home"])" asp-action="Index">@(isMaintenanceOnly ? T["My Jobs"] : T["Home"])</a>
+                            <a class="nav-link" asp-controller="@(isMaintenanceOnly ? "MaintenanceJobs" : "Home")" asp-action="Index">@(isMaintenanceOnly ? T["My Jobs"] : T["Home"])</a>
                         </li>
 
                         <li class="nav-item dropdown">

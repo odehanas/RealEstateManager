@@ -34,13 +34,17 @@ namespace RealEstateManager.Services
             ApplicationDbContext db,
             ApprovalAuthorityService authority,
             CompanyContextOverride systemContext,
-            IHttpContextAccessor http)
+            IHttpContextAccessor http,
+            Push.PushNotifier push)
         {
             _db = db;
             _authority = authority;
             _systemContext = systemContext;
             _http = http;
+            _push = push;
         }
+
+        private readonly Push.PushNotifier _push;
 
         /// <summary>Message prefix the screens recognise: the payment is waiting for release, not refused.</summary>
         public const string AwaitingApprovalPrefix = "Waiting for approval:";
@@ -126,6 +130,12 @@ namespace RealEstateManager.Services
 
             _db.PaymentApprovals.Add(approval);
             await _db.SaveChangesAsync();
+
+            if (!canSelfRelease)
+                await _push.ToPermissionAsync(companyId, AppPermissions.PaymentsApprove, userId,
+                    "A payment is waiting for release", Array.Empty<object?>(),
+                    "{0} - {1}", new object?[] { approval.Description, userName },
+                    "/PaymentApprovals", $"payment-{approval.Id}");
 
             if (!canSelfRelease)
                 return $"{AwaitingApprovalPrefix} {amount:N2} needs release by {requiredLevel} level or above. It reaches the accounts once approved in Controls ▸ Payment Approvals.";

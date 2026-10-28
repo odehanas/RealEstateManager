@@ -97,6 +97,7 @@ namespace RealEstateManager.Data
             ConfigureMaintenance(modelBuilder);
             ConfigureRecordDocuments(modelBuilder);
             ConfigurePdcLifecycle(modelBuilder);
+            ConfigurePush(modelBuilder);
 
             modelBuilder.Entity<Company>()
                 .Property(x => x.Name)

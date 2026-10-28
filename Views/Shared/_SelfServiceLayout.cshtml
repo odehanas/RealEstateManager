@@ -13,6 +13,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - My HR</title>
+    <partial name="_AppHead" model="@("/me/")" />
     @if (RealEstateManager.Services.Localization.UiLanguages.IsArabic)
     {
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />

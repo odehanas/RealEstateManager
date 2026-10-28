@@ -149,6 +149,8 @@ namespace RealEstateManager.Controllers
                 CreatedAt = DateTime.UtcNow
             });
             await _db.SaveChangesAsync();
+            if (technician.Id != User.GetAppUserId())
+                _requests.NotifyTechnician(job, technician.Id);
 
             TempData["JobSuccess"] = $"Job {job.RequestNumber} assigned to {technician.Name}.";
             return RedirectToAction(nameof(Details), new { id });

@@ -28,10 +28,12 @@ namespace RealEstateManager.Services
     public class ServiceRequestService
     {
         private readonly ApplicationDbContext _db;
+        private readonly Push.PushNotifier _push;
 
-        public ServiceRequestService(ApplicationDbContext db)
+        public ServiceRequestService(ApplicationDbContext db, Push.PushNotifier push)
         {
             _db = db;
+            _push = push;
         }
 
         // =====================================================================
@@ -216,8 +218,25 @@ namespace RealEstateManager.Services
             _db.TenantServiceRequests.Add(request);
             await _db.SaveChangesAsync();
 
+            if (request.AssignedToAppUserId.HasValue)
+                NotifyTechnician(request, request.AssignedToAppUserId.Value);
+
+            // Raised by the tenant: the people who handle requests hear about it.
+            if (portalUserId.HasValue)
+                await _push.ToPermissionAsync(request.CompanyId, AppPermissions.ServiceRequestsManage, null,
+                    "New tenant request {0}", new object?[] { request.RequestNumber },
+                    "{0}: {1}", new object?[] { tenant.FullName, request.Subject },
+                    $"/ServiceRequests/Details/{request.Id}", $"request-{request.Id}");
+
             return request;
         }
+
+        /// <summary>The technician a maintenance job was just given to.</summary>
+        public void NotifyTechnician(TenantServiceRequest job, int technicianId) =>
+            _push.ToStaff(new[] { technicianId },
+                "New maintenance job {0}", new object?[] { job.RequestNumber },
+                "{0}", new object?[] { job.Subject },
+                $"/MaintenanceJobs/Details/{job.Id}", $"job-{job.Id}");
 
         public async Task<List<ServiceRequestListItemViewModel>> GetTenantRequestsAsync(int tenantId)
         {
@@ -299,6 +318,19 @@ namespace RealEstateManager.Services
             });
 
             await _db.SaveChangesAsync();
+
+            // The person working it hears of the reply; with nobody on it yet, whoever handles requests.
+            const string title = "{0} replied on {1}";
+            var values = new object?[] { request.Tenant?.FullName ?? "The tenant", request.RequestNumber };
+            var url = request.AssignedToAppUserId.HasValue && request.RequestType == ServiceRequestTypes.Maintenance
+                ? $"/MaintenanceJobs/Details/{request.Id}"
+                : $"/ServiceRequests/Details/{request.Id}";
+            if (request.AssignedToAppUserId.HasValue)
+                _push.ToStaff(new[] { request.AssignedToAppUserId.Value }, title, values, "{0}", new object?[] { request.Subject }, url, $"request-{request.Id}");
+            else
+                await _push.ToPermissionAsync(request.CompanyId, AppPermissions.ServiceRequestsManage, null,
+                    title, values, "{0}", new object?[] { request.Subject }, url, $"request-{request.Id}");
+
             return true;
         }
 
@@ -501,6 +533,9 @@ namespace RealEstateManager.Services
             if (!string.IsNullOrWhiteSpace(priority) && ServiceRequestPriorities.All.Contains(priority))
                 request.Priority = priority;
 
+            var reassignedTo = assignedToAppUserId.HasValue && assignedToAppUserId != request.AssignedToAppUserId
+                ? assignedToAppUserId
+                : null;
             if (assignedToAppUserId.HasValue)
                 request.AssignedToAppUserId = assignedToAppUserId.Value;
 
@@ -536,8 +571,27 @@ namespace RealEstateManager.Services
 
             await _db.SaveChangesAsync();
 
+            if (reassignedTo.HasValue && reassignedTo != actingAppUserId && request.RequestType == ServiceRequestTypes.Maintenance)
+                NotifyTechnician(request, reassignedTo.Value);
+
+            if (previous != newStatus && TenantStatusMessage(newStatus) is { } line)
+                await _push.ToTenantAsync(request.TenantId,
+                    "Request {0}", new object?[] { request.RequestNumber }, line, Array.Empty<object?>(),
+                    $"/portal/requests/{request.Id}", $"request-{request.Id}");
+
             return (true, $"Request {request.RequestNumber} is now {ServiceRequestStatuses.Describe(newStatus)}.");
         }
+
+        /// <summary>What the tenant's phone says when their request moves on; nothing for the steps they do themselves.</summary>
+        private static string? TenantStatusMessage(string status) => status switch
+        {
+            ServiceRequestStatuses.Acknowledged => "We have seen your request and will be in touch.",
+            ServiceRequestStatuses.InProgress => "Work on your request has started.",
+            ServiceRequestStatuses.Resolved => "Your request is resolved. Open it to read our reply.",
+            ServiceRequestStatuses.Rejected => "Your request was declined. Open it to read why.",
+            ServiceRequestStatuses.Closed => "Your request is closed.",
+            _ => null
+        };
 
         public async Task<bool> AddStaffCommentAsync(
             int companyId, int requestId, int? appUserId, string? userName, string body, bool isInternal)
@@ -563,6 +617,14 @@ namespace RealEstateManager.Services
             });
 
             await _db.SaveChangesAsync();
+
+            // A note among staff stays among staff.
+            if (!isInternal)
+                await _push.ToTenantAsync(request.TenantId,
+                    "New reply on {0}", new object?[] { request.RequestNumber },
+                    "Open the request to read it.", Array.Empty<object?>(),
+                    $"/portal/requests/{request.Id}", $"request-{request.Id}");
+
             return true;
         }
 

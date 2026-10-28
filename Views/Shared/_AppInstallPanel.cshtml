@@ -1,0 +1,54 @@
+@model bool
+@{
+    // Install the app and turn on notifications for this device. Model = dismissible: a banner on the
+    // home pages that "Not now" hides, or (false) the permanent setting on the profile or help page.
+    var dismissible = Model;
+    var path = Context.Request.Path.Value ?? "";
+    var audience = path.StartsWith("/portal", StringComparison.OrdinalIgnoreCase) ? "tenant"
+                 : path.StartsWith("/me", StringComparison.OrdinalIgnoreCase) ? "employee" : "staff";
+    var why = audience switch
+    {
+        "tenant" => T["Get a notification on this phone when we reply to your requests."],
+        "employee" => T["Get a notification on this phone when your leave or a document request is decided."],
+        _ => T["Get a notification on this device when something needs you: a maintenance job, an approval or a tenant's request."]
+    };
+}
+<div class="card border-0 shadow-sm mb-3 d-none d-print-none" data-app-panel data-dismissible="@(dismissible ? "true" : "false")">
+    <div class="card-body py-3">
+        <div class="d-flex align-items-start gap-3">
+            <img src="~/img/app/icon-192.png" alt="" width="40" height="40" style="border-radius:9px" />
+            <div class="flex-grow-1">
+                <div class="fw-semibold mb-1">@T["App and notifications"]</div>
+
+                <div class="d-none" data-when="install">
+                    <p class="small text-muted mb-2">@T["Install it on this phone or computer: it opens from your home screen like any app, without the browser bar."]</p>
+                    <button type="button" class="btn btn-sm btn-primary mb-2" data-action="install">@T["Install app"]</button>
+                </div>
+
+                <div class="d-none" data-when="ios-install">
+                    <p class="small text-muted mb-2">@T.Html("On iPhone or iPad: tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>. Open it from the home screen to turn on notifications.")</p>
+                </div>
+
+                <div class="d-none" data-when="push-off">
+                    <p class="small text-muted mb-2">@why</p>
+                    <button type="button" class="btn btn-sm btn-primary mb-2" data-action="push-on">@T["Turn on notifications"]</button>
+                </div>
+
+                <div class="d-none" data-when="push-on">
+                    <p class="small mb-2"><span class="text-success fw-semibold">@T["Notifications are on for this device."]</span>
+                        <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-action="push-off">@T["Turn off"]</button></p>
+                </div>
+
+                <div class="d-none" data-when="push-blocked">
+                    <p class="small text-muted mb-2">@T["Notifications are blocked for this site. Allow them in the browser's site settings, then come back here."]</p>
+                </div>
+
+                <div class="small text-danger d-none" data-app-error>@T["That did not work. Try again in a moment."]</div>
+            </div>
+            @if (dismissible)
+            {
+                <button type="button" class="btn-close" data-action="dismiss" aria-label="@T["Not now"]" title="@T["Not now"]"></button>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f2740" />
+    <title>No connection - RealEstateManager</title>
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f2f4f7;
+               font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #0f2740; }
+        .card { background: #fff; border-radius: 14px; padding: 28px 24px; max-width: 340px; margin: 16px; text-align: center;
+                box-shadow: 0 6px 24px rgba(15, 39, 64, .08); }
+        img { width: 64px; height: 64px; border-radius: 14px; }
+        h1 { font-size: 1.15rem; margin: 14px 0 6px; }
+        p { color: #5b6774; margin: 0 0 6px; line-height: 1.5; }
+        .ar { direction: rtl; margin-top: 14px; padding-top: 14px; border-top: 1px solid #e3e7ec; }
+        button { margin-top: 16px; min-height: 44px; padding: 0 22px; border: 0; border-radius: 8px; background: #1e6fd9; color: #fff; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="/img/app/icon-192.png" alt="" />
+        <h1>No connection</h1>
+        <p>This page needs the internet. Check your connection and try again.</p>
+        <div class="ar" lang="ar">
+            <h1>لا يوجد اتصال</h1>
+            <p>هذه الصفحة تحتاج إلى الإنترنت. تحقق من اتصالك وحاول مجدداً.</p>
+        </div>
+        <button type="button" onclick="location.reload()">Try again · حاول مجدداً</button>
+    </div>
+</body>
+</html>
