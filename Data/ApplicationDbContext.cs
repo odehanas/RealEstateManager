@@ -65,6 +65,8 @@ namespace RealEstateManager.Data
         public DbSet<TenantPortalUser> TenantPortalUsers => Set<TenantPortalUser>();
         public DbSet<TenantServiceRequest> TenantServiceRequests => Set<TenantServiceRequest>();
         public DbSet<TenantServiceRequestComment> TenantServiceRequestComments => Set<TenantServiceRequestComment>();
+        public DbSet<WhatsAppConnection> WhatsAppConnections => Set<WhatsAppConnection>();
+        public DbSet<WhatsAppInboundMessage> WhatsAppInboundMessages => Set<WhatsAppInboundMessage>();
         public DbSet<CustomerCreditNote> CustomerCreditNotes => Set<CustomerCreditNote>();
         public DbSet<ReceivedEInvoice> ReceivedEInvoices => Set<ReceivedEInvoice>();
         public DbSet<ApprovalRequest> ApprovalRequests => Set<ApprovalRequest>();
@@ -1408,6 +1410,38 @@ namespace RealEstateManager.Data
                 .WithMany()
                 .HasForeignKey(x => x.RelatedInvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WhatsAppConnection>(entity =>
+            {
+                entity.Property(x => x.PublicKey).HasMaxLength(64);
+                entity.Property(x => x.PhoneNumberId).HasMaxLength(50);
+                entity.Property(x => x.DisplayPhoneNumber).HasMaxLength(30);
+                entity.Property(x => x.ProtectedAppSecret).HasMaxLength(2000);
+                entity.Property(x => x.ProtectedVerifyToken).HasMaxLength(2000);
+                entity.Property(x => x.DefaultCallingCode).HasMaxLength(5);
+                entity.HasIndex(x => x.CompanyId).IsUnique();
+                entity.HasIndex(x => x.PublicKey).IsUnique();
+                entity.HasIndex(x => x.PhoneNumberId).IsUnique();
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<WhatsAppInboundMessage>(entity =>
+            {
+                entity.Property(x => x.MessageId).HasMaxLength(200);
+                entity.Property(x => x.Sender).HasMaxLength(128);
+                entity.Property(x => x.ProfileName).HasMaxLength(200);
+                entity.Property(x => x.MessageType).HasMaxLength(30);
+                entity.Property(x => x.Status).HasMaxLength(20);
+                entity.Property(x => x.ReviewReason).HasMaxLength(30);
+                entity.HasIndex(x => new { x.CompanyId, x.MessageId }).IsUnique();
+                entity.HasIndex(x => new { x.CompanyId, x.Status, x.ReceivedAt });
+                entity.HasIndex(x => new { x.CompanyId, x.TenantId, x.ReceivedAt });
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Tenant).WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.TenantServiceRequest).WithMany().HasForeignKey(x => x.TenantServiceRequestId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
 
             modelBuilder.Entity<TenantServiceRequestComment>().Property(x => x.AuthorType).HasMaxLength(20);
             modelBuilder.Entity<TenantServiceRequestComment>().Property(x => x.AuthorName).HasMaxLength(200);

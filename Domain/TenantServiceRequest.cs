@@ -204,6 +204,13 @@ namespace RealEstateManager.Domain
         public static readonly string[] All =
             { Maintenance, PaymentPostponement, ContractRenewal, Complaint, Other };
 
+        /// <summary>
+        /// What a request from WhatsApp can be sorted into. Not a postponement: that needs
+        /// an invoice and a date, and a free-form message gives neither.
+        /// </summary>
+        public static readonly string[] Classifiable =
+            { Maintenance, ContractRenewal, Complaint, Other };
+
         public static string Describe(string type) => type switch
         {
             Maintenance => "Maintenance / repair",

@@ -1,0 +1,78 @@
+@model RealEstateManager.Models.WhatsAppSettingsViewModel
+@{
+    ViewData["Title"] = T["WhatsApp Connection"];
+    var callbackUrl = ViewBag.CallbackUrl as string;
+}
+
+@if (TempData["RequestSuccess"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">@T["WhatsApp Connection"]</h2>
+        <p class="text-muted mb-0 small">@T["Connects this company's own WhatsApp Business number, so tenants' messages become requests by themselves."]</p>
+    </div>
+    <a asp-controller="WhatsAppInbox" asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["WhatsApp Messages"]</a>
+</div>
+
+<div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <form asp-action="Index" method="post" autocomplete="off" class="card shadow-sm mb-3">
+            @Html.AntiForgeryToken()
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="PhoneNumberId" class="form-label fw-semibold">@T["Phone Number ID"]</label>
+                    <input asp-for="PhoneNumberId" class="form-control" inputmode="numeric" dir="ltr" />
+                    <div class="form-text">@T["From your Meta app, under WhatsApp, API Setup. It is not the phone number itself."]</div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="DisplayPhoneNumber" class="form-label">@T["WhatsApp number"]</label>
+                    <input asp-for="DisplayPhoneNumber" class="form-control" dir="ltr" placeholder="+971 50 000 0000" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="AppSecret" class="form-label fw-semibold">@T["App Secret"]</label>
+                    <input asp-for="AppSecret" type="password" class="form-control" autocomplete="new-password" dir="ltr" value="" />
+                    <div class="form-text">
+                        @(Model.Exists
+                            ? T["A secret is stored and cannot be shown. Leave this empty to keep it."]
+                            : T["From your Meta app, under App settings, Basic. It is stored encrypted and never shown again."])
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="DefaultCallingCode" class="form-label">@T["Country calling code"]</label>
+                    <input asp-for="DefaultCallingCode" class="form-control" style="max-width:120px" inputmode="numeric" dir="ltr" />
+                    <div class="form-text">@T["Used for tenants' phone numbers written without a country, like 050 123 4567."]</div>
+                </div>
+                <div class="form-check mb-3">
+                    <input asp-for="IsEnabled" class="form-check-input" />
+                    <label asp-for="IsEnabled" class="form-check-label">@T["Receive messages"]</label>
+                </div>
+                <button type="submit" class="btn btn-dark">@T["Save"]</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">@T.Html("<strong>Give these to Meta</strong>")</div>
+            <div class="card-body small">
+                @if (callbackUrl == null)
+                {
+                    <p class="text-muted mb-0">@T["Save the form first. The address and the token are then created for this company."]</p>
+                }
+                else
+                {
+                    <p class="mb-2">@T["In your Meta app, under WhatsApp, Configuration, enter these and subscribe to the messages field."]</p>
+                    <label class="form-label fw-semibold" for="callbackUrl">@T["Callback URL"]</label>
+                    <input id="callbackUrl" class="form-control form-control-sm mb-2" dir="ltr" readonly value="@callbackUrl" />
+                    <label class="form-label fw-semibold" for="verifyToken">@T["Verify token"]</label>
+                    <input id="verifyToken" class="form-control form-control-sm" dir="ltr" readonly value="@Model.VerifyToken" />
+                }
+            </div>
+        </div>
+    </div>
+</div>

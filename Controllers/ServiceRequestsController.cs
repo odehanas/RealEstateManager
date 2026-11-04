@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
 using RealEstateManager.Domain;
 using RealEstateManager.Services;
+using RealEstateManager.Services.WhatsApp;
 
 namespace RealEstateManager.Controllers
 {
@@ -18,13 +19,16 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly ServiceRequestService _serviceRequestService;
+        private readonly WhatsAppIntakeService _whatsApp;
 
         public ServiceRequestsController(
             ApplicationDbContext db,
-            ServiceRequestService serviceRequestService)
+            ServiceRequestService serviceRequestService,
+            WhatsAppIntakeService whatsApp)
         {
             _db = db;
             _serviceRequestService = serviceRequestService;
+            _whatsApp = whatsApp;
         }
 
         [HttpGet]
@@ -37,6 +41,7 @@ namespace RealEstateManager.Controllers
             status ??= "Open";
 
             var model = await _serviceRequestService.GetQueueAsync(companyId, status, type);
+            ViewBag.WhatsAppWaiting = await _whatsApp.CountWaitingAsync(companyId);
             return View(model);
         }
 
@@ -50,6 +55,7 @@ namespace RealEstateManager.Controllers
                 return NotFound();
 
             await LoadListsAsync();
+            ViewBag.Classify = await _serviceRequestService.GetClassifyOptionsAsync(companyId, id);
             return View(model);
         }
 
@@ -59,15 +65,33 @@ namespace RealEstateManager.Controllers
         /// unpaid invoices. From here on it is an ordinary request on the tenant's record.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Create(int? tenantId)
+        public async Task<IActionResult> Create(int? tenantId, int? whatsAppMessageId)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
             var tenants = await _serviceRequestService.GetTenantOptionsAsync(companyId);
+
+            // Coming from the WhatsApp review list: the message fills in the form.
+            Domain.WhatsAppInboundMessage? message = null;
+            if (whatsAppMessageId.HasValue)
+            {
+                message = await _whatsApp.GetWaitingAsync(companyId, whatsAppMessageId.Value);
+                if (message == null)
+                {
+                    TempData["RequestError"] = "Someone has already dealt with this WhatsApp message.";
+                    return RedirectToAction("Index", "WhatsAppInbox");
+                }
+            }
 
             var model = tenantId.HasValue && tenants.Any(x => x.Id == tenantId.Value)
                 ? await _serviceRequestService.BuildCreateModelAsync(tenantId.Value)
                 : new Models.ServiceRequestCreateViewModel();
             model.ReceivedAt = DateTime.Now;
+            if (message != null)
+            {
+                WhatsAppIntakeService.FillFromMessage(model, message);
+                model.ReceivedAt ??= DateTime.Now;
+                ViewBag.WhatsAppMessage = message;
+            }
 
             await LoadCreateListsAsync(tenants, tenantId);
             return View(model);
@@ -75,10 +99,13 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int? tenantId, Models.ServiceRequestCreateViewModel model)
+        public async Task<IActionResult> Create(int? tenantId, int? whatsAppMessageId, Models.ServiceRequestCreateViewModel model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
             var tenants = await _serviceRequestService.GetTenantOptionsAsync(companyId);
+
+            if (whatsAppMessageId.HasValue)
+                ViewBag.WhatsAppMessage = await _whatsApp.GetWaitingAsync(companyId, whatsAppMessageId.Value);
 
             if (!tenantId.HasValue || tenants.All(x => x.Id != tenantId.Value))
             {
@@ -87,8 +114,10 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            var request = await _serviceRequestService.CreateAsync(
-                ModelState, tenantId.Value, null, model, true, User.GetAppUserId(), GetDisplayName());
+            var request = whatsAppMessageId.HasValue
+                ? await _whatsApp.LogForTenantAsync(ModelState, companyId, whatsAppMessageId.Value, tenantId.Value, model, User.GetAppUserId(), GetDisplayName())
+                : await _serviceRequestService.CreateAsync(
+                    ModelState, tenantId.Value, null, model, true, User.GetAppUserId(), GetDisplayName());
 
             if (request == null)
             {
@@ -99,6 +128,18 @@ namespace RealEstateManager.Controllers
 
             TempData["RequestSuccess"] = $"Request {request.RequestNumber} logged for the tenant.";
             return RedirectToAction(nameof(Details), new { id = request.Id });
+        }
+
+        /// <summary>Says what a request that WhatsApp opened by itself is really about.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Classify(int id, string requestType, string? category, int? leaseId)
+        {
+            var (success, message) = await _serviceRequestService.ClassifyWhatsAppRequestAsync(
+                User.GetRequiredCurrentCompanyId(), id, requestType, category, leaseId, User.GetAppUserId(), GetDisplayName());
+
+            TempData[success ? "RequestSuccess" : "RequestError"] = message;
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         [HttpPost]

@@ -251,6 +251,56 @@
             </div>
         </div>
 
+        @if (ViewBag.Classify is RealEstateManager.Models.ServiceRequestClassifyOptions classify)
+        {
+            <div class="card shadow-sm mb-3 border-info">
+                <div class="card-header bg-white">@T.Html("<strong>Sort this WhatsApp request</strong>")</div>
+                <div class="card-body small">
+                    <p class="text-muted">@T["It came in by itself, so nobody has said yet what it is about. Choosing maintenance sends it to the maintenance team."]</p>
+                    @if (classify.MaintenanceHold != null)
+                    {
+                        <div class="alert alert-warning py-2">@T.HtmlFormat("<strong>On the portal this tenant cannot raise maintenance requests.</strong> {0} You can still log one here.", classify.MaintenanceHold)</div>
+                    }
+                    <form asp-action="Classify" asp-route-id="@Model.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="mb-2">
+                            <label class="form-label" for="classifyType">@T["Kind of request"]</label>
+                            <select id="classifyType" name="requestType" class="form-select form-select-sm">
+                                @foreach (var type in ServiceRequestTypes.Classifiable)
+                                {
+                                    <option value="@type" selected="@(type == classify.RequestType ? "selected" : null)">@T[ServiceRequestTypes.Describe(type)]</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="classifyCategory">@T["What kind of problem?"]</label>
+                            <select id="classifyCategory" name="category" class="form-select form-select-sm">
+                                <option value="">@T["-- choose --"]</option>
+                                @foreach (var category in ServiceRequestCategories.Maintenance)
+                                {
+                                    <option value="@category" selected="@(category == classify.Category ? "selected" : null)">@category</option>
+                                }
+                            </select>
+                        </div>
+                        @if (classify.Leases.Count > 0)
+                        {
+                            <div class="mb-2">
+                                <label class="form-label" for="classifyLease">@T["Which property?"]</label>
+                                <select id="classifyLease" name="leaseId" class="form-select form-select-sm">
+                                    <option value="">@T["-- not about a specific property --"]</option>
+                                    @foreach (var lease in classify.Leases)
+                                    {
+                                        <option value="@lease.LeaseId" selected="@(lease.LeaseId == classify.LeaseId ? "selected" : null)">@lease.Description (@lease.ContractNumber)</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        <button type="submit" class="btn btn-sm btn-dark">@T["Save"]</button>
+                    </form>
+                </div>
+            </div>
+        }
+
         @if (!isFinished)
         {
             <div class="card shadow-sm">

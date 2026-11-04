@@ -57,6 +57,8 @@ builder.Services.AddScoped<PortalBoundaryFilter>();
 builder.Services.AddScoped<TenantPortalAuthService>();
 builder.Services.AddScoped<TenantPortalService>();
 builder.Services.AddScoped<ServiceRequestService>();
+builder.Services.AddScoped<RealEstateManager.Services.WhatsApp.WhatsAppConnectionService>();
+builder.Services.AddScoped<RealEstateManager.Services.WhatsApp.WhatsAppIntakeService>();
 builder.Services.AddScoped<RealEstateManager.Services.Import.MasterDataImportService>();
 // Singleton: the help files only change on deployment, which restarts the app.
 builder.Services.AddSingleton<HelpCatalogService>();

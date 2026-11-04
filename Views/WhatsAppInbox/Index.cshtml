@@ -1,0 +1,108 @@
+@model RealEstateManager.Models.WhatsAppInboxViewModel
+@using RealEstateManager.Domain
+@using RealEstateManager.Services
+@inject PermissionService PermissionService
+@{
+    ViewData["Title"] = T["WhatsApp Messages"];
+    var canConnect = await PermissionService.HasPermissionAsync(User, AppPermissions.OwnerOversight);
+}
+
+@if (TempData["RequestSuccess"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (TempData["RequestError"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">@T["WhatsApp Messages"]</h2>
+        <p class="text-muted mb-0 small">@T["Messages that could not safely go on one tenant's record. Nothing here reaches a tenant until you decide."]</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="ServiceRequests" asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Tenant Requests"]</a>
+        @if (canConnect)
+        {
+            <a asp-controller="WhatsAppSettings" asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["WhatsApp Connection"]</a>
+        }
+    </div>
+</div>
+
+@if (!Model.IsConnected)
+{
+    <div class="alert alert-warning small">@T["WhatsApp is not connected for this company, so no new messages will arrive."]</div>
+}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-action="Index" class="btn btn-sm @(Model.ShowHandled ? "btn-outline-dark" : "btn-dark")">
+        @T["Needs review"] <span class="badge bg-light text-dark">@Model.WaitingCount</span>
+    </a>
+    <a asp-action="Index" asp-route-handled="true" class="btn btn-sm @(Model.ShowHandled ? "btn-dark" : "btn-outline-dark")">@T["Handled"]</a>
+</div>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="alert alert-light border">@(Model.ShowHandled ? T["No messages have been handled yet."] : T["Nothing is waiting for review."])</div>
+}
+
+@foreach (var item in Model.Items)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                <div>
+                    <strong dir="ltr">@item.SenderDisplay</strong>
+                    @if (!string.IsNullOrWhiteSpace(item.ProfileName))
+                    {
+                        <span class="text-muted">(@item.ProfileName)</span>
+                    }
+                </div>
+                <span class="text-muted small">@item.SentAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+
+            @if (string.IsNullOrWhiteSpace(item.Body))
+            {
+                <p class="text-muted fst-italic mb-2">@T.Format("A {0} message with no text. Open WhatsApp to see it.", item.MessageType)</p>
+            }
+            else
+            {
+                <p class="mb-2" style="white-space: pre-wrap" dir="auto">@item.Body</p>
+            }
+
+            @if (Model.ShowHandled)
+            {
+                <div class="small">
+                    <span class="badge bg-light text-dark border">@T[WhatsAppMessageStatuses.Describe(item.Status)]</span>
+                    @if (item.TenantName != null)
+                    {
+                        <span>@item.TenantName</span>
+                    }
+                    @if (item.RequestId.HasValue)
+                    {
+                        <a asp-controller="ServiceRequests" asp-action="Details" asp-route-id="@item.RequestId">@item.RequestNumber</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="small text-danger mb-2">@T[WhatsAppReviewReasons.Describe(item.ReviewReason)]</div>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    @foreach (var tenant in item.Candidates)
+                    {
+                        <a asp-controller="ServiceRequests" asp-action="Create" asp-route-tenantId="@tenant.Id" asp-route-whatsAppMessageId="@item.Id"
+                           class="btn btn-sm btn-dark">@T.Format("Log for {0}", $"{tenant.Name} ({tenant.Code})")</a>
+                    }
+                    <a asp-controller="ServiceRequests" asp-action="Create" asp-route-whatsAppMessageId="@item.Id"
+                       class="btn btn-sm @(item.Candidates.Count == 0 ? "btn-dark" : "btn-outline-dark")">@T["Choose a tenant"]</a>
+                    <form asp-action="Dismiss" asp-route-id="@item.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('@T["Dismiss this message? No request will be created."]');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Dismiss"]</button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+}

@@ -4,6 +4,7 @@
     ViewData["Title"] = T["Log a Request for a Tenant"];
     var tenants = ViewBag.Tenants as List<RealEstateManager.Models.ServiceRequestTenantOption> ?? new();
     var tenantId = ViewBag.TenantId as int?;
+    var whatsAppMessage = ViewBag.WhatsAppMessage as WhatsAppInboundMessage;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -16,9 +17,21 @@
 
 <div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
 
+@if (whatsAppMessage != null)
+{
+    <div class="alert alert-info small">
+        <div class="fw-semibold mb-1">@T["From the WhatsApp review list"]: <span dir="ltr">@RealEstateManager.Services.WhatsApp.WhatsAppPhoneNumbers.Display(whatsAppMessage.Sender)</span>@(whatsAppMessage.ProfileName != null ? $" ({whatsAppMessage.ProfileName})" : "")</div>
+        @T["Check this is the right tenant. If the number is theirs, add it to their record so the next message finds them by itself."]
+    </div>
+}
+
 <div class="row">
     <div class="col-lg-8">
         <form method="get" class="card shadow-sm mb-3">
+            @if (whatsAppMessage != null)
+            {
+                <input type="hidden" name="whatsAppMessageId" value="@whatsAppMessage.Id" />
+            }
             <div class="card-body">
                 <label class="form-label fw-semibold" for="tenantFilter">@T["Which tenant?"]</label>
                 <input id="tenantFilter" type="search" class="form-control mb-2" autocomplete="off"
@@ -49,6 +62,10 @@
             <form asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="tenantId" value="@tenantId" />
+                @if (whatsAppMessage != null)
+                {
+                    <input type="hidden" name="whatsAppMessageId" value="@whatsAppMessage.Id" />
+                }
 
                 <div class="card shadow-sm mb-3">
                     <div class="card-body">

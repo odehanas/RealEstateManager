@@ -1,0 +1,56 @@
+# Sheet 19: tenant requests arriving by themselves from WhatsApp, the review list and the connection (whole texts; {0} are values).
+WhatsApp Messages ||| رسائل واتساب
+WhatsApp Connection ||| ربط واتساب
+WhatsApp to review ||| واتساب للمراجعة
+Messages that could not safely go on one tenant's record. Nothing here reaches a tenant until you decide. ||| رسائل لا يمكن إضافتها بأمان إلى سجل مستأجر واحد. ولا يصل شيء منها إلى أي مستأجر حتى تقرر ذلك.
+WhatsApp is not connected for this company, so no new messages will arrive. ||| واتساب غير مربوط لهذه الشركة، لذلك لن تصل رسائل جديدة.
+Needs review ||| تحتاج إلى مراجعة
+Handled ||| تمت معالجتها
+No messages have been handled yet. ||| لم تُعالج أي رسائل بعد.
+Nothing is waiting for review. ||| لا يوجد شيء بانتظار المراجعة.
+A {0} message with no text. Open WhatsApp to see it. ||| رسالة من نوع {0} بدون نص. افتح واتساب لرؤيتها.
+Log for {0} ||| تسجيل باسم {0}
+Choose a tenant ||| اختر مستأجراً
+Dismiss ||| تجاهل
+Dismiss this message? No request will be created. ||| هل تريد تجاهل هذه الرسالة؟ لن يُنشأ أي طلب.
+Message dismissed. No request was created. ||| تم تجاهل الرسالة. ولم يُنشأ أي طلب.
+Someone has already dealt with this WhatsApp message. ||| عالج شخص آخر رسالة واتساب هذه بالفعل.
+Request created ||| أُنشئ طلب
+Added to request ||| أُضيفت إلى طلب
+Logged by staff ||| سجلها الموظفون
+Dismissed ||| تم تجاهلها
+No tenant has this phone number ||| لا يوجد مستأجر بهذا الرقم
+Several tenants have this phone number ||| أكثر من مستأجر لديه هذا الرقم
+WhatsApp did not give the phone number ||| لم يُظهر واتساب رقم الهاتف
+No text to make a request from ||| لا يوجد نص لإنشاء طلب منه
+Arrived while the subscription was inactive ||| وصلت أثناء توقف الاشتراك
+The request could not be created automatically ||| تعذر إنشاء الطلب تلقائياً
+From the WhatsApp review list ||| من قائمة مراجعة واتساب
+Check this is the right tenant. If the number is theirs, add it to their record so the next message finds them by itself. ||| تأكد من أنه المستأجر الصحيح. وإذا كان الرقم له فأضفه إلى سجله كي تصل إليه الرسالة التالية تلقائياً.
+<strong>Sort this WhatsApp request</strong> ||| <strong>تصنيف طلب واتساب هذا</strong>
+It came in by itself, so nobody has said yet what it is about. Choosing maintenance sends it to the maintenance team. ||| وصل هذا الطلب تلقائياً، ولم يحدد أحد موضوعه بعد. واختيار الصيانة يرسله إلى فريق الصيانة.
+This request can no longer be changed. ||| لم يعد بالإمكان تغيير هذا الطلب.
+That contract is not this tenant's. ||| هذا العقد لا يخص هذا المستأجر.
+Request updated. ||| تم تحديث الطلب.
+WhatsApp message to review ||| رسالة واتساب للمراجعة
+Connects this company's own WhatsApp Business number, so tenants' messages become requests by themselves. ||| يربط رقم واتساب للأعمال الخاص بهذه الشركة، فتتحول رسائل المستأجرين إلى طلبات تلقائياً.
+Phone Number ID ||| معرّف رقم الهاتف
+From your Meta app, under WhatsApp, API Setup. It is not the phone number itself. ||| من تطبيقك في Meta، ضمن WhatsApp ثم API Setup. وهو ليس رقم الهاتف نفسه.
+WhatsApp number ||| رقم واتساب
+App Secret ||| المفتاح السري للتطبيق
+A secret is stored and cannot be shown. Leave this empty to keep it. ||| المفتاح السري محفوظ ولا يمكن عرضه. اترك هذا الحقل فارغاً للإبقاء عليه.
+From your Meta app, under App settings, Basic. It is stored encrypted and never shown again. ||| من تطبيقك في Meta، ضمن App settings ثم Basic. ويُحفظ مشفراً ولا يُعرض مرة أخرى.
+Country calling code ||| رمز الاتصال الدولي
+Used for tenants' phone numbers written without a country, like 050 123 4567. ||| يُستخدم لأرقام المستأجرين المكتوبة بدون رمز الدولة، مثل 050 123 4567.
+Receive messages ||| استقبال الرسائل
+<strong>Give these to Meta</strong> ||| <strong>أدخل هذه البيانات في Meta</strong>
+Save the form first. The address and the token are then created for this company. ||| احفظ النموذج أولاً. وبعدها يُنشأ العنوان والرمز لهذه الشركة.
+In your Meta app, under WhatsApp, Configuration, enter these and subscribe to the messages field. ||| في تطبيقك في Meta، ضمن WhatsApp ثم Configuration، أدخل هذه البيانات واشترك في الحقل messages.
+Callback URL ||| عنوان الاستدعاء (Callback URL)
+Verify token ||| رمز التحقق (Verify token)
+WhatsApp connection saved. ||| تم حفظ ربط واتساب.
+The Phone Number ID is the long number Meta shows under API Setup, in digits only. ||| معرّف رقم الهاتف هو الرقم الطويل الذي تعرضه Meta ضمن API Setup، بالأرقام فقط.
+Enter the country calling code in digits, for example 971. ||| أدخل رمز الاتصال الدولي بالأرقام، مثل 971.
+Enter the App Secret of your Meta app. ||| أدخل المفتاح السري لتطبيقك في Meta.
+That does not look like an App Secret. Copy it again from your Meta app. ||| لا يبدو هذا مفتاحاً سرياً صحيحاً. انسخه مرة أخرى من تطبيقك في Meta.
+This WhatsApp number is already connected to another company. ||| رقم واتساب هذا مربوط بالفعل بشركة أخرى.

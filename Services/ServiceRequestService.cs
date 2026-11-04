@@ -91,7 +91,8 @@ namespace RealEstateManager.Services
         /// validation failed, in which case modelState carries the reasons. The tenant's
         /// own request from the portal passes portalUserId; a request that reached the
         /// office another way (WhatsApp, a call, a visit) passes the staff member who logged
-        /// it, and only then are the source and the time received taken from the form.
+        /// it, and only then are the source and the time received taken from the form. A request
+        /// that logged itself (WhatsApp intake) has nobody who already knows, so it asks for notifyStaff.
         /// </summary>
         public async Task<TenantServiceRequest?> CreateAsync(
             ModelStateDictionary modelState,
@@ -100,7 +101,8 @@ namespace RealEstateManager.Services
             ServiceRequestCreateViewModel model,
             bool loggedByStaff = false,
             int? loggedByAppUserId = null,
-            string? loggedByName = null)
+            string? loggedByName = null,
+            bool notifyStaff = false)
         {
 
             var tenant = await _db.Tenants.AsNoTracking().FirstOrDefaultAsync(x => x.Id == tenantId);
@@ -259,7 +261,7 @@ namespace RealEstateManager.Services
                     $"/portal/requests/{request.Id}", $"request-{request.Id}");
 
             // Raised by the tenant: the people who handle requests hear about it.
-            if (portalUserId.HasValue)
+            if (portalUserId.HasValue || notifyStaff)
                 await _push.ToPermissionAsync(request.CompanyId, AppPermissions.ServiceRequestsManage, null,
                     "New tenant request {0}", new object?[] { request.RequestNumber },
                     "{0}: {1}", new object?[] { tenant.FullName, request.Subject },
@@ -267,6 +269,99 @@ namespace RealEstateManager.Services
 
             return request;
         }
+
+        /// <summary>
+        /// What a member of staff can set on a request WhatsApp opened by itself, or null when
+        /// it is not one or has moved on. Such a request arrives as "Other request" because
+        /// nothing in a free-form message says what it is.
+        /// </summary>
+        public async Task<ServiceRequestClassifyOptions?> GetClassifyOptionsAsync(int companyId, int requestId)
+        {
+            var request = await _db.TenantServiceRequests.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == requestId && x.CompanyId == companyId);
+
+            if (request == null || !await CanBeClassifiedAsync(request))
+                return null;
+
+            var options = new ServiceRequestCreateViewModel();
+            await PopulateOptionsAsync(options, request.TenantId);
+
+            return new ServiceRequestClassifyOptions
+            {
+                RequestType = request.RequestType,
+                Category = request.Category,
+                LeaseId = request.LeaseId,
+                Leases = options.Leases,
+                MaintenanceHold = (await TenantStandingService.GetAsync(_db, request.TenantId)).Message
+            };
+        }
+
+        /// <summary>
+        /// Sorts a request WhatsApp opened by itself. Choosing maintenance is a person's decision,
+        /// so like staff logging a request it is not stopped by a payment hold; the screen shows
+        /// the hold first. From maintenance it goes to the team as any other job does.
+        /// </summary>
+        public async Task<(bool Success, string Message)> ClassifyWhatsAppRequestAsync(
+            int companyId, int requestId, string requestType, string? category, int? leaseId, int? appUserId, string? userName)
+        {
+            var request = await _db.TenantServiceRequests
+                .FirstOrDefaultAsync(x => x.Id == requestId && x.CompanyId == companyId);
+
+            if (request == null || !await CanBeClassifiedAsync(request))
+                return (false, "This request can no longer be changed.");
+
+            if (!ServiceRequestTypes.Classifiable.Contains(requestType))
+                return (false, "Choose the kind of request.");
+
+            Lease? lease = null;
+            if (leaseId.HasValue)
+            {
+                lease = await _db.Leases.AsNoTracking().Include(x => x.Unit)
+                    .FirstOrDefaultAsync(x => x.Id == leaseId.Value && x.TenantId == request.TenantId);
+                if (lease == null)
+                    return (false, "That contract is not this tenant's.");
+            }
+
+            var wasMaintenance = request.RequestType == ServiceRequestTypes.Maintenance;
+            var isMaintenance = requestType == ServiceRequestTypes.Maintenance;
+
+            request.RequestType = requestType;
+            request.Category = isMaintenance ? Trim(category) : null;
+            request.LeaseId = lease?.Id;
+            request.UnitId = lease?.UnitId;
+            request.PropertyId = lease?.Unit?.PropertyId;
+
+            if (isMaintenance && !wasMaintenance)
+                request.AssignedToAppUserId = await MaintenanceService.PickTechnicianAsync(_db, companyId);
+            else if (!isMaintenance && wasMaintenance)
+                request.AssignedToAppUserId = null;
+
+            request.Comments.Add(new TenantServiceRequestComment
+            {
+                AuthorType = ServiceRequestAuthorTypes.Staff,
+                AuthorName = userName ?? "Staff",
+                AppUserId = appUserId,
+                Body = $"Sorted as: {ServiceRequestTypes.Describe(requestType)}.",
+                IsInternal = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
+
+            if (isMaintenance && !wasMaintenance && request.AssignedToAppUserId.HasValue)
+                NotifyTechnician(request, request.AssignedToAppUserId.Value);
+
+            return (true, "Request updated.");
+        }
+
+        /// <summary>Only one that opened itself: a person logging a request has already said what it is.</summary>
+        private async Task<bool> CanBeClassifiedAsync(TenantServiceRequest request) =>
+            request.Source == ServiceRequestSources.WhatsApp &&
+            ServiceRequestTypes.Classifiable.Contains(request.RequestType) &&
+            (request.Status == ServiceRequestStatuses.Submitted || request.Status == ServiceRequestStatuses.Acknowledged) &&
+            await _db.WhatsAppInboundMessages.AsNoTracking().AnyAsync(x =>
+                x.TenantServiceRequestId == request.Id && x.CompanyId == request.CompanyId &&
+                x.Status == WhatsAppMessageStatuses.RequestCreated);
 
         /// <summary>The technician a maintenance job was just given to.</summary>
         public void NotifyTechnician(TenantServiceRequest job, int technicianId) =>

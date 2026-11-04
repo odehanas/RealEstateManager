@@ -288,6 +288,9 @@ namespace RealEstateManager.Services
                 ["PaymentApprovals"] = new[] { AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight },
                 ["EmployeeRequests"] = new[] { AppPermissions.HrManage },
                 ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
+                ["WhatsAppInbox"] = new[] { AppPermissions.ServiceRequestsManage },
+                // The company's WhatsApp credentials: the owners' seat, not whoever answers tenants.
+                ["WhatsAppSettings"] = new[] { AppPermissions.OwnerOversight },
                 ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage },
                 ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
