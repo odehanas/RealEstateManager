@@ -280,6 +280,52 @@ else
         </div>
     </div>
 
+    @* Only worth showing once a location has been used; before that every row would sit under "No location". *@
+    @if (Model.Locations.Any(x => x.LocationId.HasValue))
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">@T.Html("<strong>Breakdown by Category and Location</strong>")</div>
+            <div class="scroll-x">
+                <table class="table table-bordered table-sm mb-0 ow-table">
+                    <thead>
+                        <tr>
+                            <th class="cat">@T["Category"]</th>
+                            @foreach (var location in Model.Locations)
+                            {
+                                <th class="text-end">@(location.LocationId.HasValue ? location.Name : T["No location"])</th>
+                            }
+                            <th class="text-end">@T["Total"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.Categories)
+                        {
+                            <tr class="@(row.CategoryId.HasValue ? "" : "uncat")">
+                                <td class="cat"><span class="text-muted">@row.CategoryCode</span> <strong>@row.CategoryName</strong></td>
+                                @foreach (var location in Model.Locations)
+                                {
+                                    var amount = Model.AmountAt(row.CategoryId, location.LocationId);
+                                    <td class="text-end">@(amount == 0m ? "-" : amount.ToString("N2"))</td>
+                                }
+                                <td class="text-end fw-semibold">@row.Total.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>@T["Total Movement"]</td>
+                            @foreach (var location in Model.Locations)
+                            {
+                                <td class="text-end">@Model.LocationTotal(location.LocationId).ToString("N2")</td>
+                            }
+                            <td class="text-end">@Model.Categories.Sum(x => x.Total).ToString("N2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    }
+
     <div class="card shadow-sm">
         <div class="card-header bg-light">
             <strong>@T["Detail"]</strong>
@@ -293,6 +339,7 @@ else
                         <th>@T["Entry"]</th>
                         <th class="cat">@T["Description"]</th>
                         <th>@T["Category"]</th>
+                        <th>@T["Location"]</th>
                         <th class="text-end">@T["Withdrawal"]</th>
                         <th class="text-end">@T["Contribution"]</th>
                     </tr>
@@ -314,6 +361,7 @@ else
                                     <span class="badge bg-warning text-dark fw-normal">@T["Uncategorised"]</span>
                                 }
                             </td>
+                            <td>@(line.LocationName ?? "-")</td>
                             <td class="text-end">@(line.Debit == 0m ? "-" : line.Debit.ToString("N2"))</td>
                             <td class="text-end">@(line.Credit == 0m ? "-" : line.Credit.ToString("N2"))</td>
                         </tr>
@@ -321,7 +369,7 @@ else
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="4">@T["Total"]</td>
+                        <td colspan="5">@T["Total"]</td>
                         <td class="text-end">@Model.TotalWithdrawals.ToString("N2")</td>
                         <td class="text-end">@Model.TotalContributions.ToString("N2")</td>
                     </tr>

@@ -181,6 +181,7 @@
                                 <span aria-hidden="true">?</span> @T["Help"]
                             </button>
 
+                            <partial name="_AppLink" model="@(("/Profile/ChangePassword", "btn-outline-light"))" />
                             <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
 
                             <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">@T["Password"]</a>
@@ -234,6 +235,9 @@
                                     </li>
                                     <li>
                                         <a class="sidebar-link" asp-controller="OwnerWithdrawalCategories" asp-action="Index">@T["Owner Withdrawal Categories"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OwnerWithdrawalLocations" asp-action="Index">@T["Owner Withdrawal Locations"]</a>
                                     </li>
                                     <li>
                                         <a class="sidebar-link" asp-controller="VatSettings" asp-action="Index">@T["VAT Settings"]</a>

@@ -1,0 +1,81 @@
+@model List<RealEstateManager.Models.OwnerWithdrawalLocationListItemViewModel>
+@{
+    ViewData["Title"] = T["Owner Withdrawal Locations"];
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Owner Withdrawal Locations"]</h2>
+        <p class="text-muted mb-0">
+            @T["Where the owner's money was spent: the house, the farm, the private office. Any category can be used at any location."]
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Reports" asp-action="OwnerWithdrawals" class="btn btn-outline-secondary btn-sm">@T["Owner Withdrawals Report"]</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">@T["New Location"]</a>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">@T["No locations have been created yet."]</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:110px">@T["Code"]</th>
+                        <th>@T["Location"]</th>
+                        <th>@T["Description"]</th>
+                        <th class="text-end" style="width:90px">@T["Order"]</th>
+                        <th class="text-end" style="width:110px">@T["Lines Used"]</th>
+                        <th class="text-end" style="width:150px">@T["Net Posted"]</th>
+                        <th class="text-center" style="width:90px">@T["Status"]</th>
+                        <th style="width:80px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model)
+                    {
+                        <tr class="@(row.IsActive ? "" : "text-muted")">
+                            <td><code>@row.Code</code></td>
+                            <td class="fw-semibold">@row.Name</td>
+                            <td class="small">@row.Description</td>
+                            <td class="text-end">@row.SortOrder</td>
+                            <td class="text-end">@row.UsageCount</td>
+                            <td class="text-end">@row.NetAmount.ToString("N2")</td>
+                            <td class="text-center">
+                                @if (row.IsActive)
+                                {
+                                    <span class="badge bg-success">@T["Active"]</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@T["Inactive"]</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@row.Id" class="btn btn-outline-secondary btn-sm">@T["Edit"]</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <th colspan="4">@T["Total"]</th>
+                        <th class="text-end">@Model.Sum(x => x.UsageCount)</th>
+                        <th class="text-end">@Model.Sum(x => x.NetAmount).ToString("N2")</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-2 mb-0">
+        @T["A location that has been used stays in the reports. Deactivate it when it is no longer needed: it leaves the selection lists and its history stays intact."]
+    </p>
+}

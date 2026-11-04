@@ -163,6 +163,18 @@ namespace RealEstateManager.Controllers
             return RedirectToAction(nameof(RequestDetails), new { id });
         }
 
+        [HttpPost("requests/{id:int}/rate")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RateRequest(int id, int rating, string? feedback)
+        {
+            var tenantId = User.GetRequiredPortalTenantId();
+
+            var (success, message) = await _serviceRequestService.RateByTenantAsync(tenantId, id, rating, feedback);
+            TempData[success ? "PortalSuccess" : "PortalError"] = message;
+
+            return RedirectToAction(nameof(RequestDetails), new { id });
+        }
+
         [HttpPost("requests/{id:int}/cancel")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelRequest(int id)

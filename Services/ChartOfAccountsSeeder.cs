@@ -168,6 +168,33 @@ namespace RealEstateManager.Services
             await EnsureAccountingPeriodsAsync(db, company);
             await EnsureCompanyAccountSettingsAsync(db, company);
             await EnsureOwnerWithdrawalCategoriesAsync(db, company);
+            await EnsureOwnerWithdrawalLocationsAsync(db, company);
+        }
+
+        /// <summary>The starting list of the owner's places. Like the categories, the company can change all of it.</summary>
+        private static async Task EnsureOwnerWithdrawalLocationsAsync(ApplicationDbContext db, Company company)
+        {
+            if (await db.OwnerWithdrawalLocations.IgnoreQueryFilters().AnyAsync(x => x.CompanyId == company.Id))
+                return;
+
+            var defaults = new (string Code, string Name, int SortOrder)[]
+            {
+                ("LOC-10", "House", 10),
+                ("LOC-20", "Farm", 20),
+                ("LOC-30", "Private Office", 30),
+                ("LOC-99", "Other Location", 99)
+            };
+
+            db.OwnerWithdrawalLocations.AddRange(defaults.Select(x => new OwnerWithdrawalLocation
+            {
+                CompanyId = company.Id,
+                Code = x.Code,
+                Name = x.Name,
+                SortOrder = x.SortOrder,
+                IsActive = true
+            }));
+
+            await db.SaveChangesAsync();
         }
 
         /// <summary>

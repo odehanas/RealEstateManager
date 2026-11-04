@@ -61,6 +61,7 @@ namespace RealEstateManager.Data
 
         public DbSet<CompanyAccountSetting> CompanyAccountSettings => Set<CompanyAccountSetting>();
         public DbSet<OwnerWithdrawalCategory> OwnerWithdrawalCategories => Set<OwnerWithdrawalCategory>();
+        public DbSet<OwnerWithdrawalLocation> OwnerWithdrawalLocations => Set<OwnerWithdrawalLocation>();
         public DbSet<TenantPortalUser> TenantPortalUsers => Set<TenantPortalUser>();
         public DbSet<TenantServiceRequest> TenantServiceRequests => Set<TenantServiceRequest>();
         public DbSet<TenantServiceRequestComment> TenantServiceRequestComments => Set<TenantServiceRequestComment>();
@@ -1306,6 +1307,26 @@ namespace RealEstateManager.Data
                 .HasIndex(x => new { x.CompanyId, x.Code })
                 .IsUnique();
 
+            modelBuilder.Entity<OwnerWithdrawalLocation>().Property(x => x.Code).HasMaxLength(30).IsRequired();
+            modelBuilder.Entity<OwnerWithdrawalLocation>().Property(x => x.Name).HasMaxLength(150).IsRequired();
+            modelBuilder.Entity<OwnerWithdrawalLocation>().Property(x => x.Description).HasMaxLength(500);
+
+            modelBuilder.Entity<JournalEntryLine>()
+                .HasOne(x => x.OwnerWithdrawalLocation)
+                .WithMany(x => x.JournalEntryLines)
+                .HasForeignKey(x => x.OwnerWithdrawalLocationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OwnerWithdrawalLocation>()
+                .HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OwnerWithdrawalLocation>()
+                .HasIndex(x => new { x.CompanyId, x.Code })
+                .IsUnique();
+
             modelBuilder.Entity<TenantPortalUser>()
                 .HasOne(x => x.Tenant)
                 .WithMany()
@@ -1338,6 +1359,8 @@ namespace RealEstateManager.Data
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Priority).HasMaxLength(20);
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Status).HasMaxLength(30);
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.ResolutionNotes).HasMaxLength(4000);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Source).HasMaxLength(20);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.RatingFeedback).HasMaxLength(ServiceRequestRatings.MaxFeedbackLength);
 
             modelBuilder.Entity<TenantServiceRequest>()
                 .HasIndex(x => new { x.CompanyId, x.RequestNumber })
@@ -2005,6 +2028,9 @@ namespace RealEstateManager.Data
                 .HasQueryFilter(x => !IsCompanyFilterEnabled || x.JournalEntry != null && x.JournalEntry.CompanyId == CurrentCompanyIdValue);
 
             modelBuilder.Entity<OwnerWithdrawalCategory>()
+                .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+
+            modelBuilder.Entity<OwnerWithdrawalLocation>()
                 .HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
 
             modelBuilder.Entity<Vendor>()

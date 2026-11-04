@@ -57,5 +57,9 @@ namespace RealEstateManager.Domain
         /// </summary>
         public string? OwnerCostCategory { get; set; }
         public OwnerWithdrawalCategory? OwnerWithdrawalCategory { get; set; }
+
+        /// <summary>Where the owner spent it (house, farm...). Same rule as the category: owner accounts only.</summary>
+        public int? OwnerWithdrawalLocationId { get; set; }
+        public OwnerWithdrawalLocation? OwnerWithdrawalLocation { get; set; }
     }
 }

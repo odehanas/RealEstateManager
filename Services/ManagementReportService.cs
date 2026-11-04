@@ -537,6 +537,8 @@ namespace RealEstateManager.Services
                     CategoryId = x.OwnerWithdrawalCategoryId,
                     CategoryCode = x.OwnerWithdrawalCategory != null ? x.OwnerWithdrawalCategory.Code : null,
                     CategoryName = x.OwnerWithdrawalCategory != null ? x.OwnerWithdrawalCategory.Name : null,
+                    LocationId = x.OwnerWithdrawalLocationId,
+                    LocationName = x.OwnerWithdrawalLocation != null ? x.OwnerWithdrawalLocation.Name : null,
                     Debit = x.Debit,
                     Credit = x.Credit
                 })
@@ -626,6 +628,21 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.EntryDate)
                 .ThenBy(x => x.EntryNumber)
                 .ToList();
+
+            // Location columns, in the company's own order, only those used in the period.
+            // Inactive ones stay: a location switched off today was still spent at last month.
+            var usedLocationIds = periodLines.Where(x => x.LocationId.HasValue).Select(x => x.LocationId!.Value).Distinct().ToList();
+            report.Locations = await _db.OwnerWithdrawalLocations
+                .AsNoTracking()
+                .Where(x => usedLocationIds.Contains(x.Id))
+                .OrderBy(x => x.SortOrder)
+                .ThenBy(x => x.Code)
+                .Select(x => new OwnerWithdrawalLocationColumnDto { LocationId = x.Id, Name = x.Name })
+                .ToListAsync();
+
+            // Earlier withdrawals and money coming in have no location; their column keeps the totals whole.
+            if (periodLines.Any(x => !x.LocationId.HasValue))
+                report.Locations.Add(new OwnerWithdrawalLocationColumnDto { LocationId = null, Name = "No location" });
 
             return report;
         }
@@ -946,8 +963,17 @@ namespace RealEstateManager.Services
         public int? CategoryId { get; set; }
         public string? CategoryCode { get; set; }
         public string? CategoryName { get; set; }
+        public int? LocationId { get; set; }
+        public string? LocationName { get; set; }
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
+    }
+
+    public class OwnerWithdrawalLocationColumnDto
+    {
+        /// <summary>Null for the column of lines with no location.</summary>
+        public int? LocationId { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 
     public class OwnerAccountColumnDto
@@ -992,6 +1018,16 @@ namespace RealEstateManager.Services
         public List<OwnerAccountColumnDto> Accounts { get; set; } = new();
         public List<OwnerWithdrawalCategoryRowDto> Categories { get; set; } = new();
         public List<OwnerWithdrawalLine> Details { get; set; } = new();
+        public List<OwnerWithdrawalLocationColumnDto> Locations { get; set; } = new();
+
+        /// <summary>One cell of the category by location table: debits less credits, like the category rows.</summary>
+        public decimal AmountAt(int? categoryId, int? locationId) => Details
+            .Where(x => x.CategoryId == categoryId && x.LocationId == locationId)
+            .Sum(x => x.Debit - x.Credit);
+
+        public decimal LocationTotal(int? locationId) => Details
+            .Where(x => x.LocationId == locationId)
+            .Sum(x => x.Debit - x.Credit);
 
         public decimal TotalOpeningBalance => Accounts.Sum(x => x.OpeningBalance);
         public decimal TotalWithdrawals => Accounts.Sum(x => x.Withdrawals);

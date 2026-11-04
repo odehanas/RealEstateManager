@@ -6,6 +6,8 @@
     var owners = ViewBag.OwnerAccounts as List<Account> ?? new();
     var paidFrom = ViewBag.PaidFromAccounts as List<Account> ?? new();
     var categories = ViewBag.Categories as List<OwnerWithdrawalCategory> ?? new();
+    var locations = ViewBag.Locations as List<OwnerWithdrawalLocation> ?? new();
+    var locationId = ViewBag.LocationId as int?;
     var from = (DateTime)ViewBag.FromDate;
     var to = (DateTime)ViewBag.ToDate;
     var defaultPaidFrom = paidFrom.FirstOrDefault(x => x.Code == "11100")?.Id;
@@ -84,6 +86,19 @@ else
                         }
                     </select>
                 </div>
+                @if (locations.Count > 0)
+                {
+                    <div class="col-md-3">
+                        <label class="form-label">@T["Location"]</label>
+                        <select name="locationId" class="form-select" required>
+                            <option value="">@T["-- location --"]</option>
+                            @foreach (var l in locations)
+                            {
+                                <option value="@l.Id">@l.Code - @l.Name</option>
+                            }
+                        </select>
+                    </div>
+                }
                 <div class="col-md-3">
                     <label class="form-label">@T["Amount"]</label>
                     <input type="number" step="0.01" min="0.01" name="amount" class="form-control" required />
@@ -117,8 +132,18 @@ else
 <form method="get" class="row g-2 align-items-end mb-3">
     <div class="col-md-3"><label class="form-label">@T["From"]</label><input type="date" name="fromDate" value="@from.ToString("yyyy-MM-dd")" class="form-control" /></div>
     <div class="col-md-3"><label class="form-label">@T["To"]</label><input type="date" name="toDate" value="@to.ToString("yyyy-MM-dd")" class="form-control" /></div>
-    <div class="col-md-2"><button type="submit" class="btn btn-outline-dark w-100">@T["Show"]</button></div>
-    <div class="col-md-4 text-md-end">
+    <div class="col-md-2">
+        <label class="form-label">@T["Location"]</label>
+        <select name="locationId" class="form-select">
+            <option value="">@T["All"]</option>
+            @foreach (var l in locations)
+            {
+                <option value="@l.Id" selected="@(l.Id == locationId ? "selected" : null)">@l.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-1"><button type="submit" class="btn btn-outline-dark w-100">@T["Show"]</button></div>
+    <div class="col-md-3 text-md-end">
         <span class="text-muted small">@T["Withdrawn"]</span> <strong>@Model.Sum(x => x.Withdrawn).ToString("N2")</strong>
         @if (Model.Sum(x => x.PutIn) > 0)
         {
@@ -131,14 +156,14 @@ else
     <table class="table table-bordered table-striped table-sm">
         <thead>
             <tr>
-                <th>@T["Date"]</th><th>@T["Entry"]</th><th>@T["Category"]</th><th>@T["Description"]</th><th>@T["Owner account"]</th><th>@T["Paid from / to"]</th>
+                <th>@T["Date"]</th><th>@T["Entry"]</th><th>@T["Category"]</th><th>@T["Location"]</th><th>@T["Description"]</th><th>@T["Owner account"]</th><th>@T["Paid from / to"]</th>
                 <th class="text-end">@T["Withdrawn"]</th><th class="text-end">@T["Put in"]</th><th>@T["Recorded in"]</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.Count == 0)
             {
-                <tr><td colspan="9" class="text-center text-muted">@T["Nothing in this period."]</td></tr>
+                <tr><td colspan="10" class="text-center text-muted">@T["Nothing in this period."]</td></tr>
             }
             @foreach (var r in Model)
             {
@@ -146,6 +171,7 @@ else
                     <td>@r.Date.ToString("dd/MM/yyyy")</td>
                     <td>@r.EntryNumber @(r.Reference != null ? "· " + r.Reference : "")</td>
                     <td>@(r.Category ?? "-")</td>
+                    <td>@(r.Location ?? "-")</td>
                     <td>@r.Description</td>
                     <td class="small">@r.OwnerAccount</td>
                     <td class="small">@r.OtherAccount</td>

@@ -13,7 +13,8 @@
         _ => T["Get a notification on this device when something needs you: a maintenance job, an approval or a tenant's request."]
     };
 }
-<div class="card border-0 shadow-sm mb-3 d-none d-print-none" data-app-panel data-dismissible="@(dismissible ? "true" : "false")">
+<div class="card border-0 shadow-sm mb-3 d-none d-print-none" data-app-panel data-dismissible="@(dismissible ? "true" : "false")"
+     id="@(dismissible ? null : "app-notifications")">
     <div class="card-body py-3">
         <div class="d-flex align-items-start gap-3">
             <img src="~/img/app/icon-192.png" alt="" width="40" height="40" style="border-radius:9px" />

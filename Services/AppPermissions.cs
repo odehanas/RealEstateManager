@@ -295,6 +295,7 @@ namespace RealEstateManager.Services
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["AccountMappings"] = new[] { AppPermissions.AccountingManage },
                 ["OwnerWithdrawalCategories"] = new[] { AppPermissions.AccountingManage },
+                ["OwnerWithdrawalLocations"] = new[] { AppPermissions.AccountingManage },
                 ["PettyCash"] = new[] { AppPermissions.AccountingManage },
                 ["VatSettings"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerInvoices"] = new[] { AppPermissions.AccountingManage },

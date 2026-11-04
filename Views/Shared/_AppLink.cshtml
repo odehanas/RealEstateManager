@@ -1,0 +1,9 @@
+@model (string Href, string ButtonClass)
+@* The top bar's way to the "App and notifications" card, which never closes: install, notifications on or off. *@
+<a class="btn btn-sm @Model.ButtonClass d-inline-flex align-items-center gap-1" href="@Model.Href#app-notifications"
+   title="@T["App and notifications"]" aria-label="@T["App and notifications"]">
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round">
+        <rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/>
+    </svg>
+    <span class="d-none d-xl-inline">@T["App"]</span>
+</a>

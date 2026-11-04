@@ -73,6 +73,7 @@ else
                         <th>@T["Status"]</th>
                         <th class="text-end">@T["Age"]</th>
                         <th class="text-end">@T["Materials"]</th>
+                        <th class="text-end">@T["Rating"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,6 +91,12 @@ else
                             <td><span class="badge @ServiceRequestStatuses.BadgeClass(job.Status)">@ServiceRequestStatuses.Describe(job.Status)</span></td>
                             <td class="text-end @(job.IsOpen && job.ResolveLate ? "text-danger fw-semibold" : "")" title="@(job.IsOpen && job.ResolveLate ? T["Past the target time for this priority"] : "")">@Hours(job.AgeHours)</td>
                             <td class="text-end">@(job.Materials == 0m ? "" : job.Materials.ToString("N2"))</td>
+                            <td class="text-end">
+                                @if (job.Rating.HasValue)
+                                {
+                                    <span class="badge @ServiceRequestRatings.BadgeClass(job.Rating.Value)">@job.Rating</span>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>

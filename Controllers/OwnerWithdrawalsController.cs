@@ -14,27 +14,29 @@ namespace RealEstateManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(DateTime? fromDate, DateTime? toDate)
+        public async Task<IActionResult> Index(DateTime? fromDate, DateTime? toDate, int? locationId)
         {
             var to = (toDate ?? DateTime.Today).Date;
             var from = (fromDate ?? new DateTime(to.Year, 1, 1)).Date;
 
             ViewBag.FromDate = from;
             ViewBag.ToDate = to;
+            ViewBag.LocationId = locationId;
             ViewBag.OwnerAccounts = await _withdrawals.GetOwnerAccountsAsync();
             ViewBag.PaidFromAccounts = await _withdrawals.GetPaidFromAccountsAsync();
             ViewBag.Categories = await _withdrawals.GetCategoriesAsync();
-            return View(await _withdrawals.GetRegisterAsync(from, to));
+            ViewBag.Locations = await _withdrawals.GetLocationsAsync();
+            return View(await _withdrawals.GetRegisterAsync(from, to, locationId));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Record(
-            DateTime date, int ownerAccountId, int categoryId, decimal amount, int paidFromAccountId, string? description, string? reference)
+            DateTime date, int ownerAccountId, int categoryId, int? locationId, decimal amount, int paidFromAccountId, string? description, string? reference)
         {
             try
             {
-                var (_, warning) = await _withdrawals.RecordAsync(date, ownerAccountId, categoryId, amount, paidFromAccountId, description, reference);
+                var (_, warning) = await _withdrawals.RecordAsync(date, ownerAccountId, categoryId, locationId, amount, paidFromAccountId, description, reference);
                 if (warning != null)
                     TempData["PostingWarning"] = $"The withdrawal was saved but its journal is still a draft: {warning}";
                 else

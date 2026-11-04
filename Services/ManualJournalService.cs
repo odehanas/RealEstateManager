@@ -59,7 +59,7 @@ namespace RealEstateManager.Services
             // The owner expenditure dimension only belongs on owner equity accounts.
             // Posting it anywhere else would put personal spend on a company account.
             var categorisedAccountIds = validLines
-                .Where(x => x.OwnerWithdrawalCategoryId.HasValue)
+                .Where(x => x.OwnerWithdrawalCategoryId.HasValue || x.OwnerWithdrawalLocationId.HasValue)
                 .Select(x => x.AccountId!.Value)
                 .Distinct()
                 .ToList();
@@ -74,8 +74,8 @@ namespace RealEstateManager.Services
                 if (nonOwnerAccounts.Count > 0)
                 {
                     throw new InvalidOperationException(
-                        "An owner withdrawal category can only be used on an owner's current account. " +
-                        "Remove the category from: " + string.Join(", ", nonOwnerAccounts) + ".");
+                        "An owner withdrawal category or location can only be used on an owner's current account. " +
+                        "Remove it from: " + string.Join(", ", nonOwnerAccounts) + ".");
                 }
 
                 var categoryIds = validLines
@@ -89,6 +89,18 @@ namespace RealEstateManager.Services
 
                 if (validCategoryCount != categoryIds.Count)
                     throw new InvalidOperationException("One or more selected owner withdrawal categories were not found.");
+
+                var locationIds = validLines
+                    .Where(x => x.OwnerWithdrawalLocationId.HasValue)
+                    .Select(x => x.OwnerWithdrawalLocationId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                var validLocationCount = await _db.OwnerWithdrawalLocations
+                    .CountAsync(x => locationIds.Contains(x.Id));
+
+                if (validLocationCount != locationIds.Count)
+                    throw new InvalidOperationException("One or more selected owner withdrawal locations were not found.");
             }
 
             // Development costs: the project must take costs, and the line must sit on the
@@ -160,6 +172,7 @@ namespace RealEstateManager.Services
                     VendorId = line.VendorId,
                     LeaseId = line.LeaseId,
                     OwnerWithdrawalCategoryId = line.OwnerWithdrawalCategoryId,
+                    OwnerWithdrawalLocationId = line.OwnerWithdrawalLocationId,
                     DevelopmentProjectId = projectTags.TryGetValue(line, out var tag) ? tag.Project.Id : null,
                     DevelopmentCostCategory = projectTags.TryGetValue(line, out var tag2) ? tag2.Category : null
                 });

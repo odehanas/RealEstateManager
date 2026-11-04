@@ -189,8 +189,36 @@
                     <span class="text-muted">@T["Contract"]</span>
                     <span>@(Model.ContractNumber ?? "—")</span>
                 </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">@T["Received by"]</span>
+                    <span>@T[ServiceRequestSources.Describe(Model.Source)]</span>
+                </div>
             </div>
         </div>
+
+        @if (Model.Rating.HasValue)
+        {
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white">@T.Html("<strong>Tenant's rating</strong>")</div>
+                <div class="card-body small">
+                    <span class="badge @ServiceRequestRatings.BadgeClass(Model.Rating.Value) fs-6">@Model.Rating / @ServiceRequestRatings.Highest</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.RatingFeedback))
+                    {
+                        <div class="mt-2" style="white-space: pre-wrap">@Model.RatingFeedback</div>
+                    }
+                    @if (Model.RatedByStaffName != null)
+                    {
+                        <div class="text-muted mt-2">@T.Format("Recorded for the tenant by {0}", Model.RatedByStaffName)</div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.CanBeRated)
+        {
+            <div class="alert alert-light border small">
+                @T["Not rated yet."] <a asp-controller="MaintenanceJobs" asp-action="Details" asp-route-id="@Model.Id">@T["Open the job to record a rating the tenant gave by WhatsApp or phone."]</a>
+            </div>
+        }
 
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white">@T.Html("<strong>History</strong>")</div>

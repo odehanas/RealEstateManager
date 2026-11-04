@@ -41,6 +41,7 @@
                     <dt class="col-sm-4">@T["Tenant"]</dt><dd class="col-sm-8">@Model.TenantName @if (Model.TenantPhone != null) { <span>&middot; <a href="tel:@Model.TenantPhone">@Model.TenantPhone</a></span> }</dd>
                     <dt class="col-sm-4">@T["Preferred visit"]</dt><dd class="col-sm-8">@(Model.PreferredVisitDate?.ToString("dddd dd/MM/yyyy") ?? "any time")</dd>
                     <dt class="col-sm-4">@T["Technician"]</dt><dd class="col-sm-8">@(Model.AssignedToName ?? "not assigned")</dd>
+                    <dt class="col-sm-4">@T["Received by"]</dt><dd class="col-sm-8">@T[ServiceRequestSources.Describe(Model.Source)]</dd>
                 </dl>
             </div>
         </div>
@@ -179,6 +180,51 @@
                 }
             </div>
         </div>
+
+        @if (Model.Rating.HasValue)
+        {
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white">@T.Html("<strong>Tenant's rating</strong>")</div>
+                <div class="card-body small">
+                    <span class="badge @ServiceRequestRatings.BadgeClass(Model.Rating.Value) fs-6">@Model.Rating / @ServiceRequestRatings.Highest</span>
+                    <span class="text-muted ms-1">@Local(Model.RatedAt)</span>
+                    @if (!string.IsNullOrWhiteSpace(Model.RatingFeedback))
+                    {
+                        <div class="mt-2" style="white-space:pre-wrap">@Model.RatingFeedback</div>
+                    }
+                    @if (Model.RatedByStaffName != null)
+                    {
+                        <div class="text-muted mt-2">@T.Format("Recorded for the tenant by {0}", Model.RatedByStaffName)</div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.CanBeRated)
+        {
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white">@T.Html("<strong>Tenant's rating</strong>")</div>
+                <div class="card-body small">
+                    <div class="text-muted @(seesAll ? "mb-2" : "")">@T["The tenant has not rated this job yet. They can rate it on their portal."]</div>
+                    @if (seesAll)
+                    {
+                        <form asp-action="RecordRating" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <label class="form-label mb-1" for="staffRating">@T["The tenant gave a rating by WhatsApp or phone? Record it here."]</label>
+                            <select id="staffRating" name="rating" class="form-select form-select-sm mb-2" required>
+                                <option value="">@T["-- rating --"]</option>
+                                @for (var score = ServiceRequestRatings.Highest; score >= ServiceRequestRatings.Lowest; score--)
+                                {
+                                    <option value="@score">@score</option>
+                                }
+                            </select>
+                            <textarea name="feedback" class="form-control form-control-sm mb-2" rows="2" maxlength="@ServiceRequestRatings.MaxFeedbackLength"
+                                      placeholder="@T["What the tenant said"]" aria-label="@T["What the tenant said"]"></textarea>
+                            <button class="btn btn-sm btn-outline-dark">@T["Record rating"]</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
 
         <div class="card shadow-sm">
             <div class="card-header bg-white">@T.Html("<strong>Messages</strong>")</div>

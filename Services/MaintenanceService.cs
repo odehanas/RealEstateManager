@@ -179,6 +179,10 @@ namespace RealEstateManager.Services
             public DateTime? WorkStartedAt { get; set; }
             public DateTime? ResolvedAt { get; set; }
             public decimal Materials { get; set; }
+            public string Source { get; set; } = ServiceRequestSources.Portal;
+            public int? Rating { get; set; }
+            public string? RatingFeedback { get; set; }
+            public DateTime? RatedAt { get; set; }
 
             public double? ResponseHours => AcknowledgedAt.HasValue ? (AcknowledgedAt.Value - SubmittedAt).TotalHours : null;
             public double? ResolveHours => ResolvedAt.HasValue ? (ResolvedAt.Value - SubmittedAt).TotalHours : null;
@@ -211,10 +215,24 @@ namespace RealEstateManager.Services
             public int OverdueOpen => Jobs.Count(x => x.IsOpen && x.ResolveLate);
             public decimal MaterialsCost => Jobs.Sum(x => x.Materials);
 
-            public IEnumerable<(string Name, int Jobs, int Open, int Done, double? AvgResolveHours, int Late)> ByTechnician =>
+            // The tenants' ratings. The overall average is the team's score, the measure
+            // of the maintenance manager; each technician's own average is below it.
+            public int RatedCount => Jobs.Count(x => x.Rating.HasValue);
+            public double? AvgRating => AverageRating(Jobs);
+            public int LowRatings => Jobs.Count(x => x.Rating.HasValue && ServiceRequestRatings.IsLow(x.Rating.Value));
+            public double? RatedPercent => Done == 0 ? null : 100.0 * Jobs.Count(x => x.IsDone && x.Rating.HasValue) / Done;
+            public IEnumerable<JobRow> RatedJobs => Jobs.Where(x => x.Rating.HasValue).OrderBy(x => x.Rating).ThenByDescending(x => x.RatedAt);
+
+            public IEnumerable<(string Name, int Jobs, int Open, int Done, double? AvgResolveHours, int Late, double? AvgRating, int Rated)> ByTechnician =>
                 Jobs.GroupBy(x => x.Technician ?? "(not assigned)")
                     .Select(g => (g.Key, g.Count(), g.Count(x => x.IsOpen), g.Count(x => x.IsDone),
-                                  Average(g.Where(x => x.IsDone).Select(x => x.ResolveHours)), g.Count(x => x.ResolveLate)))
+                                  Average(g.Where(x => x.IsDone).Select(x => x.ResolveHours)), g.Count(x => x.ResolveLate),
+                                  AverageRating(g), g.Count(x => x.Rating.HasValue)))
+                    .OrderByDescending(x => x.Item2);
+
+            public IEnumerable<(string Source, int Jobs, int Open)> BySource =>
+                Jobs.GroupBy(x => x.Source)
+                    .Select(g => (g.Key, g.Count(), g.Count(x => x.IsOpen)))
                     .OrderByDescending(x => x.Item2);
 
             public IEnumerable<(string Name, int Jobs, int Open, decimal Materials)> ByProperty =>
@@ -226,6 +244,9 @@ namespace RealEstateManager.Services
                 Jobs.GroupBy(x => string.IsNullOrWhiteSpace(x.Category) ? "General" : x.Category!)
                     .Select(g => (g.Key, g.Count(), Average(g.Where(x => x.IsDone).Select(x => x.ResolveHours))))
                     .OrderByDescending(x => x.Item2);
+
+            private static double? AverageRating(IEnumerable<JobRow> jobs) =>
+                Average(jobs.Select(x => (double?)x.Rating));
 
             private static double? Average(IEnumerable<double?> values)
             {
@@ -269,7 +290,11 @@ namespace RealEstateManager.Services
                     AcknowledgedAt = x.AcknowledgedAt,
                     WorkStartedAt = x.WorkStartedAt,
                     ResolvedAt = x.ResolvedAt,
-                    Materials = _db.MaintenanceMaterials.Where(m => m.TenantServiceRequestId == x.Id).Sum(m => (decimal?)m.Amount) ?? 0m
+                    Materials = _db.MaintenanceMaterials.Where(m => m.TenantServiceRequestId == x.Id).Sum(m => (decimal?)m.Amount) ?? 0m,
+                    Source = x.Source,
+                    Rating = x.Rating,
+                    RatingFeedback = x.RatingFeedback,
+                    RatedAt = x.RatedAt
                 })
                 .ToListAsync();
 

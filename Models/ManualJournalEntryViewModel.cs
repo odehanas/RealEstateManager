@@ -27,6 +27,7 @@ namespace RealEstateManager.Models
         // Owner expenditure dimension. Valid only on lines posted to an account
         // flagged as an owner's current account.
         public int? OwnerWithdrawalCategoryId { get; set; }
+        public int? OwnerWithdrawalLocationId { get; set; }
 
         // "projectId|category" for a cost capitalised into a development project.
         public string? DevelopmentCost { get; set; }

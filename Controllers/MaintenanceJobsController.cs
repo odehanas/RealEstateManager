@@ -60,7 +60,8 @@ namespace RealEstateManager.Controllers
                     Place = x.Unit != null ? x.Unit.UnitNumber : (x.Property != null ? x.Property.Code : "-"),
                     Technician = x.AssignedToAppUserId == null ? null : _db.AppUsers.Where(u => u.Id == x.AssignedToAppUserId).Select(u => u.DisplayName).FirstOrDefault(),
                     SubmittedAt = x.SubmittedAt, AcknowledgedAt = x.AcknowledgedAt, WorkStartedAt = x.WorkStartedAt, ResolvedAt = x.ResolvedAt,
-                    Materials = _db.MaintenanceMaterials.Where(m => m.TenantServiceRequestId == x.Id).Sum(m => (decimal?)m.Amount) ?? 0m
+                    Materials = _db.MaintenanceMaterials.Where(m => m.TenantServiceRequestId == x.Id).Sum(m => (decimal?)m.Amount) ?? 0m,
+                    Source = x.Source, Rating = x.Rating
                 })
                 .ToListAsync();
 
@@ -137,6 +138,13 @@ namespace RealEstateManager.Controllers
             if (job == null || technician == null)
                 return NotFound();
 
+            // A tenant's score stays with the person it was given to.
+            if (job.Rating.HasValue && job.AssignedToAppUserId.HasValue && job.AssignedToAppUserId != technician.Id)
+            {
+                TempData["JobError"] = "This job has been rated, so it cannot move to someone else.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
             job.AssignedToAppUserId = technician.Id;
             _db.TenantServiceRequestComments.Add(new TenantServiceRequestComment
             {
@@ -180,6 +188,23 @@ namespace RealEstateManager.Controllers
             var (ok, message) = await _maintenance.AddMaterialAsync(User.GetRequiredCurrentCompanyId(), entry, DisplayName());
             TempData[ok ? "JobSuccess" : "JobError"] = message;
             return RedirectToAction(nameof(Details), new { id = entry.JobId });
+        }
+
+        /// <summary>
+        /// A supervisor records the rating a tenant gave by WhatsApp or phone. A technician
+        /// cannot: the score measures their own work.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecordRating(int id, int rating, string? feedback)
+        {
+            if (!await SeesAllAsync())
+                return NotFound();
+
+            var (ok, message) = await _requests.RecordRatingForTenantAsync(
+                User.GetRequiredCurrentCompanyId(), id, rating, feedback, User.GetAppUserId(), DisplayName());
+            TempData[ok ? "JobSuccess" : "JobError"] = ok ? "The tenant's rating has been recorded." : message;
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         /// <summary>The owner's maintenance dashboard: status, timings and costs.</summary>

@@ -53,6 +53,54 @@ namespace RealEstateManager.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Logs a request that reached the office another way (WhatsApp, a call, a visit)
+        /// for a tenant. Choosing the tenant reloads the form with their own contracts and
+        /// unpaid invoices. From here on it is an ordinary request on the tenant's record.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Create(int? tenantId)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var tenants = await _serviceRequestService.GetTenantOptionsAsync(companyId);
+
+            var model = tenantId.HasValue && tenants.Any(x => x.Id == tenantId.Value)
+                ? await _serviceRequestService.BuildCreateModelAsync(tenantId.Value)
+                : new Models.ServiceRequestCreateViewModel();
+            model.ReceivedAt = DateTime.Now;
+
+            await LoadCreateListsAsync(tenants, tenantId);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(int? tenantId, Models.ServiceRequestCreateViewModel model)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var tenants = await _serviceRequestService.GetTenantOptionsAsync(companyId);
+
+            if (!tenantId.HasValue || tenants.All(x => x.Id != tenantId.Value))
+            {
+                ModelState.AddModelError(string.Empty, "Choose the tenant the request belongs to.");
+                await LoadCreateListsAsync(tenants, null);
+                return View(model);
+            }
+
+            var request = await _serviceRequestService.CreateAsync(
+                ModelState, tenantId.Value, null, model, true, User.GetAppUserId(), GetDisplayName());
+
+            if (request == null)
+            {
+                await _serviceRequestService.PopulateOptionsAsync(model, tenantId.Value);
+                await LoadCreateListsAsync(tenants, tenantId);
+                return View(model);
+            }
+
+            TempData["RequestSuccess"] = $"Request {request.RequestNumber} logged for the tenant.";
+            return RedirectToAction(nameof(Details), new { id = request.Id });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(
@@ -110,6 +158,16 @@ namespace RealEstateManager.Controllers
 
         private string? GetDisplayName() =>
             User.FindFirst(AppClaimTypes.DisplayName)?.Value ?? User.Identity?.Name;
+
+        private async Task LoadCreateListsAsync(List<Models.ServiceRequestTenantOption> tenants, int? tenantId)
+        {
+            ViewBag.Tenants = tenants;
+            ViewBag.TenantId = tenantId;
+
+            // Staff are not stopped, but they should know before promising a visit.
+            if (tenantId.HasValue)
+                ViewBag.MaintenanceHold = (await TenantStandingService.GetAsync(_db, tenantId.Value)).Message;
+        }
 
         private async Task LoadListsAsync()
         {

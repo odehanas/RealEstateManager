@@ -103,6 +103,27 @@ namespace RealEstateManager.Domain
         /// <summary>What was done. Shown to the tenant, so it is written for them.</summary>
         public string? ResolutionNotes { get; set; }
 
+        /// <summary>How the request reached us. See <see cref="ServiceRequestSources"/>.</summary>
+        public string Source { get; set; } = ServiceRequestSources.Portal;
+
+        // ---------------------------------------------------------------------
+        //  THE TENANT'S RATING OF A MAINTENANCE JOB
+        // ---------------------------------------------------------------------
+
+        /// <summary>1 to 10, given once the job is done. See <see cref="ServiceRequestRatings"/>.</summary>
+        public int? Rating { get; set; }
+
+        /// <summary>What the tenant had to say about the job.</summary>
+        public string? RatingFeedback { get; set; }
+
+        public DateTime? RatedAt { get; set; }
+
+        /// <summary>
+        /// The member of staff who recorded the rating for a tenant who gave it by
+        /// WhatsApp or phone. Empty when the tenant rated the job themselves on the portal.
+        /// </summary>
+        public int? RatedByAppUserId { get; set; }
+
         public ICollection<TenantServiceRequestComment> Comments { get; set; }
             = new List<TenantServiceRequestComment>();
 
@@ -132,6 +153,12 @@ namespace RealEstateManager.Domain
             RelatedInvoiceId.HasValue &&
             RequestedNewDueDate.HasValue &&
             !PostponementApplied;
+
+        /// <summary>A finished maintenance job nobody has rated yet. A job is rated once.</summary>
+        public bool CanBeRated =>
+            RequestType == ServiceRequestTypes.Maintenance &&
+            (Status == ServiceRequestStatuses.Resolved || Status == ServiceRequestStatuses.Closed) &&
+            !Rating.HasValue;
     }
 
     /// <summary>
@@ -253,6 +280,52 @@ namespace RealEstateManager.Domain
             Closed => "bg-dark",
             _ => "bg-secondary"
         };
+    }
+
+    /// <summary>
+    /// How a request reached us. A tenant's own request on the portal is "Portal"; the
+    /// others are logged by staff for the tenant, so the request still sits on the tenant's
+    /// record and is worked and measured like any other.
+    /// </summary>
+    public static class ServiceRequestSources
+    {
+        public const string Portal = "Portal";
+        public const string WhatsApp = "WhatsApp";
+        public const string Phone = "Phone";
+        public const string WalkIn = "WalkIn";
+        public const string Email = "Email";
+        public const string Other = "Other";
+
+        /// <summary>What staff can choose when logging a request for a tenant.</summary>
+        public static readonly string[] StaffLogged = { WhatsApp, Phone, WalkIn, Email, Other };
+
+        public static string Describe(string source) => source switch
+        {
+            Portal => "Tenant portal",
+            WhatsApp => "WhatsApp",
+            Phone => "Phone call",
+            WalkIn => "Office visit",
+            Email => "Email",
+            Other => "Other source",
+            _ => source
+        };
+    }
+
+    public static class ServiceRequestRatings
+    {
+        public const int Lowest = 1;
+        public const int Highest = 10;
+
+        /// <summary>At or below this the manager is told at once, and the dashboard counts it as low.</summary>
+        public const int LowAtOrBelow = 5;
+
+        public static bool IsLow(int rating) => rating <= LowAtOrBelow;
+
+        /// <summary>Bootstrap badge class, so every screen colours a score alike.</summary>
+        public static string BadgeClass(double rating) =>
+            rating <= LowAtOrBelow ? "bg-danger" : rating < 8 ? "bg-warning text-dark" : "bg-success";
+
+        public const int MaxFeedbackLength = 1000;
     }
 
     public static class ServiceRequestAuthorTypes

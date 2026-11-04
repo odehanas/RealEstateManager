@@ -64,6 +64,18 @@
         return navigator.serviceWorker.ready;
     }
 
+    // "Not now" hides the banner for a week, then it offers again; the card on the
+    // Password (or Help) page is always there.
+    var DISMISS_FOR_MS = 7 * 24 * 60 * 60 * 1000;
+
+    function dismissedLately() {
+        var value = read(dismissKey);
+        if (!value) return false;
+        var at = value === 'yes' ? NaN : Number(value);   // "yes": closed before it came back after a week
+        if (isNaN(at)) { store(dismissKey, String(Date.now())); return true; }
+        return Date.now() - at < DISMISS_FOR_MS;
+    }
+
     // ---------------------------------------------------------------- the panel
 
     var panel = null;
@@ -99,7 +111,7 @@
             show('push-blocked', blocked && !dismissible);
 
             var offers = canInstall || iosInstall || off;
-            var visible = dismissible ? offers && read(dismissKey) !== 'yes' : offers || on || blocked;
+            var visible = dismissible ? offers && !dismissedLately() : offers || on || blocked;
             panel.classList.toggle('d-none', !visible);
         });
     }
@@ -152,7 +164,7 @@
             } else if (action === 'push-off') {
                 turnOff();
             } else if (action === 'dismiss') {
-                store(dismissKey, 'yes');
+                store(dismissKey, String(Date.now()));
                 panel.classList.add('d-none');
             }
         });
