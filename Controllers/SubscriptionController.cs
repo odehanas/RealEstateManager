@@ -30,7 +30,8 @@ namespace RealEstateManager.Controllers
             }
 
             var model = await _subscriptionService.BuildCurrentCompanyViewModelAsync(companyId, returnUrl);
-            ViewBag.ExpiredMessage = expired;
+            // The "expired" flag comes from the address; only believe it when access really has lapsed.
+            ViewBag.ExpiredMessage = expired && !await _subscriptionService.IsCompanyAccessibleAsync(companyId);
             return View(model);
         }
 
@@ -60,7 +61,8 @@ namespace RealEstateManager.Controllers
                 ModelState.AddModelError(string.Empty, ex.Message);
                 var model = await _subscriptionService.BuildCurrentCompanyViewModelAsync(companyId, returnUrl);
                 model.ActivationCode = activationCode;
-                ViewBag.ExpiredMessage = true;
+                // Only a company that really has no access is told it has expired.
+                ViewBag.ExpiredMessage = !await _subscriptionService.IsCompanyAccessibleAsync(companyId);
                 return View("Index", model);
             }
         }

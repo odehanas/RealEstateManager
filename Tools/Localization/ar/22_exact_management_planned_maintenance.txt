@@ -70,3 +70,7 @@ jobs from {0} active plan(s) · {1} done ||| أعمال من {0} خطة نشطة
 make-ready, inspections and repairs no tenant asked for ||| تجهيز وفحوصات وإصلاحات لم يطلبها مستأجر
 tenancy ended, no make-ready job raised since ||| انتهى الإيجار ولم يُنشأ عمل تجهيز منذ ذلك الحين
 Days vacant ||| أيام الشغور
+Activation code is invalid. Check it was typed exactly as it was issued. ||| رمز التفعيل غير صحيح. تأكد من كتابته تماماً كما صدر.
+This code was issued for {0}. Switch to {0} with the company selector at the top of the page, then apply it there. ||| صدر هذا الرمز لشركة {0}. انتقل إلى {0} من قائمة الشركات أعلى الصفحة، ثم طبّقه هناك.
+This activation code was cancelled. Ask for a new one. ||| أُلغي رمز التفعيل هذا. اطلب رمزاً جديداً.
+This activation code was already applied on {0}. ||| طُبّق رمز التفعيل هذا بالفعل بتاريخ {0}.
