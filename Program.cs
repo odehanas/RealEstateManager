@@ -65,8 +65,10 @@ builder.Services.AddSingleton<HelpCatalogService>();
 // English / Arabic screens: the dictionary, and the labels written by asp-for.
 builder.Services.AddSingleton<RealEstateManager.Services.Localization.UiText>();
 builder.Services.AddScoped<RealEstateManager.Services.Localization.UiMessageTranslationFilter>();
+// PostConfigure, not Configure: it must come after MVC's own data annotations provider,
+// which otherwise runs later and puts the English [Display(Name)] back on every label.
 builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
-    .Configure<RealEstateManager.Services.Localization.UiText>((options, text) =>
+    .PostConfigure<RealEstateManager.Services.Localization.UiText>((options, text) =>
         options.ModelMetadataDetailsProviders.Add(new RealEstateManager.Services.Localization.LocalizedDisplayMetadataProvider(text)));
 // Phone and browser notifications (Web Push). The keys are secrets: Push:PublicKey and
 // Push:PrivateKey from the hosting environment or user-secrets. Without them nothing is sent.
