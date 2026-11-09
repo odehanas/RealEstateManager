@@ -62,3 +62,6 @@ Less: rent the tenants paid to the owner directly ||| ناقصاً: الإيجا
 The owner received more than their share: this is what the owner owes us, our commission included ||| استلم المالك أكثر من حصته: هذا ما يدين به المالك لنا، بما في ذلك عمولتنا
 Less: paid to you before, including rent tenants paid to you directly ||| ناقصاً: ما دُفع لك سابقاً، بما فيه الإيجار الذي دفعه المستأجرون لك مباشرة
 The form was incomplete, so nothing was saved. Open the page again and save it from there. ||| النموذج غير مكتمل، لذلك لم يُحفظ شيء. افتح الصفحة مرة أخرى واحفظها منها.
+The system is temporarily unavailable ||| النظام غير متاح مؤقتاً
+Your company's subscription needs renewing before jobs can be opened. This is not a problem with your account. ||| يجب تجديد اشتراك شركتك قبل فتح الأعمال. وهذه ليست مشكلة في حسابك.
+Please tell your manager or the company's administrator. ||| يرجى إبلاغ مديرك أو مسؤول الشركة.

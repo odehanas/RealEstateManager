@@ -17,11 +17,18 @@ namespace RealEstateManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(bool expired = false, string? returnUrl = null)
         {
-            // The subscription is the company's business, not the maintenance team's.
-            if (await HttpContext.RequestServices.GetRequiredService<PermissionService>().IsMaintenanceOnlyAsync(User))
-                return RedirectToAction("Index", "MaintenanceJobs");
-
             var companyId = User.GetRequiredCurrentCompanyId();
+
+            // The subscription is the company's business, not the maintenance team's. While it
+            // runs they go to their jobs; once it has lapsed the jobs screen sends them here, so
+            // sending them back would loop forever ("the page isn't redirecting properly").
+            if (await HttpContext.RequestServices.GetRequiredService<PermissionService>().IsMaintenanceOnlyAsync(User))
+            {
+                return await _subscriptionService.IsCompanyAccessibleAsync(companyId)
+                    ? RedirectToAction("Index", "MaintenanceJobs")
+                    : View("Unavailable");
+            }
+
             var model = await _subscriptionService.BuildCurrentCompanyViewModelAsync(companyId, returnUrl);
             ViewBag.ExpiredMessage = expired;
             return View(model);
