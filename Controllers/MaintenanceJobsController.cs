@@ -305,7 +305,7 @@ namespace RealEstateManager.Controllers
         }
 
         private async Task<bool> SeesAllAsync() =>
-            await _permissions.HasAnyPermissionAsync(User, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight);
+            await _permissions.HasAnyPermissionAsync(User, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight);
 
         /// <summary>A technician opens only the jobs assigned to them.</summary>
         private async Task<bool> MayOpenAsync(int id)

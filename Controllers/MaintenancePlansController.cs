@@ -164,7 +164,8 @@ namespace RealEstateManager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private Task<bool> CanEditAsync() => _permissions.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
+        private Task<bool> CanEditAsync() =>
+            _permissions.HasAnyPermissionAsync(User, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage);
 
         private async Task LoadListsAsync()
         {

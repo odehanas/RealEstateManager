@@ -262,7 +262,7 @@ namespace RealEstateManager.Services
 
             // Raised by the tenant: the people who handle requests hear about it.
             if (portalUserId.HasValue || notifyStaff)
-                await _push.ToPermissionAsync(request.CompanyId, AppPermissions.ServiceRequestsManage, null,
+                await _push.ToAnyPermissionAsync(request.CompanyId, PeopleToTell(request), null,
                     "New tenant request {0}", new object?[] { request.RequestNumber },
                     "{0}: {1}", new object?[] { tenant.FullName, request.Subject },
                     $"/ServiceRequests/Details/{request.Id}", $"request-{request.Id}");
@@ -483,6 +483,12 @@ namespace RealEstateManager.Services
 
         private static string Cut(string value, int length) => value.Length <= length ? value : value[..length];
 
+        /// <summary>Who hears about a request: whoever handles requests, and for maintenance the maintenance manager too.</summary>
+        private static string[] PeopleToTell(TenantServiceRequest request) =>
+            request.RequestType == ServiceRequestTypes.Maintenance
+                ? new[] { AppPermissions.ServiceRequestsManage, AppPermissions.MaintenanceManage }
+                : new[] { AppPermissions.ServiceRequestsManage };
+
         /// <summary>The technician a maintenance job was just given to.</summary>
         public void NotifyTechnician(TenantServiceRequest job, int technicianId) =>
             _push.ToStaff(new[] { technicianId },
@@ -583,7 +589,7 @@ namespace RealEstateManager.Services
             if (request.AssignedToAppUserId.HasValue)
                 _push.ToStaff(new[] { request.AssignedToAppUserId.Value }, title, values, "{0}", new object?[] { request.Subject }, url, $"request-{request.Id}");
             else
-                await _push.ToPermissionAsync(request.CompanyId, AppPermissions.ServiceRequestsManage, null,
+                await _push.ToAnyPermissionAsync(request.CompanyId, PeopleToTell(request), null,
                     title, values, "{0}", new object?[] { request.Subject }, url, $"request-{request.Id}");
 
             return true;
@@ -690,7 +696,7 @@ namespace RealEstateManager.Services
 
             // A poor score should reach the manager while it can still be put right.
             if (ServiceRequestRatings.IsLow(rating))
-                await _push.ToPermissionAsync(request.CompanyId, AppPermissions.ServiceRequestsManage, null,
+                await _push.ToAnyPermissionAsync(request.CompanyId, PeopleToTell(request), null,
                     "Low rating on job {0}", new object?[] { request.RequestNumber },
                     "The tenant rated it {0} out of 10.", new object?[] { rating },
                     $"/MaintenanceJobs/Details/{request.Id}", $"rating-{request.Id}");

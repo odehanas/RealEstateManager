@@ -13,6 +13,7 @@ namespace RealEstateManager.Services
         public const string Manager = "Manager";
         public const string DataEntry = "DataEntry";
         public const string MaintenanceEngineer = "MaintenanceEngineer";
+        public const string MaintenanceManager = "MaintenanceManager";
         public const string Custom = "Custom";
 
         public sealed record Role(string Key, string Name, string Summary, string[] Permissions);
@@ -53,7 +54,11 @@ namespace RealEstateManager.Services
 
             new Role(MaintenanceEngineer, "Maintenance Engineer / Technician",
                 "Carries out maintenance jobs only: new tenant maintenance requests are assigned to them, and they see just their own jobs, record the work and materials, and mark them done.",
-                new[] { AppPermissions.MaintenanceExecute })
+                new[] { AppPermissions.MaintenanceExecute }),
+
+            new Role(MaintenanceManager, "Maintenance Manager",
+                "Runs maintenance: sees and assigns every maintenance job, raises make-ready and inspection jobs, sets up the planned maintenance programme and watches the dashboard. Also carries out jobs; untick Carry Out Maintenance Jobs if new jobs should not be given to them.",
+                new[] { AppPermissions.MaintenanceManage, AppPermissions.MaintenanceExecute })
         };
 
         /// <summary>Which role a user's actual permissions amount to, for the Users list and the Authorization Matrix.</summary>

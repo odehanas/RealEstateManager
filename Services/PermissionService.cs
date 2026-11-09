@@ -28,9 +28,10 @@ namespace RealEstateManager.Services
             if (user.IsInRole("SystemAdmin"))
                 return false;
 
+            // A technician, a maintenance manager, or both - and nothing else.
             var permissions = await GetUserPermissionsAsync(user);
-            if (!permissions.Contains(AppPermissions.MaintenanceExecute) ||
-                permissions.Any(p => p != AppPermissions.MaintenanceExecute && p != AppPermissions.AssistantUse))
+            if (!(permissions.Contains(AppPermissions.MaintenanceExecute) || permissions.Contains(AppPermissions.MaintenanceManage)) ||
+                permissions.Any(p => p != AppPermissions.MaintenanceExecute && p != AppPermissions.MaintenanceManage && p != AppPermissions.AssistantUse))
                 return false;
 
             var userId = user.GetAppUserId();

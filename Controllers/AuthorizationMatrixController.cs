@@ -40,6 +40,8 @@ namespace RealEstateManager.Controllers
             new Capability("HR & Payroll", "Prepare and pay the payroll (WPS, transfer, cheques)", new[] { AppPermissions.PayrollManage }),
             new Capability("HR & Payroll", "Approve the payroll into the accounts", new[] { AppPermissions.PayrollApprove }, Limited: true),
             new Capability("Tenants", "Answer tenant service requests from the portal", new[] { AppPermissions.ServiceRequestsManage }),
+            new Capability("Maintenance", "Carry out the maintenance jobs given to them", new[] { AppPermissions.MaintenanceExecute }),
+            new Capability("Maintenance", "Run maintenance: every job, assigning, make-ready, planned programme, dashboard", new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage }),
             new Capability("Viewing", "Financial reports, statements and Build Your Own Report", new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight }),
             new Capability("Viewing", "Business Performance page", new[] { AppPermissions.PerformanceView, AppPermissions.OwnerOversight }),
             new Capability("Viewing", "Owner Monitor: postings and payment releases day by day", new[] { AppPermissions.OwnerOversight }),

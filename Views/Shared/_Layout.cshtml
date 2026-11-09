@@ -41,6 +41,7 @@
     var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
     var canHandleServiceRequests = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
     var canDoMaintenance = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.MaintenanceExecute);
+    var canManageMaintenance = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.MaintenanceManage);
     // A maintenance engineer and nothing else: their jobs and the help, no company figures or subscription.
     var isMaintenanceOnly = isAuthenticated && canDoMaintenance && await PermissionService.IsMaintenanceOnlyAsync(User);
     // Approvers see the queue in the menu with how many contracts wait for them (not their own).
@@ -68,7 +69,7 @@
     var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors || canApproveContracts || canImportData;
     var showAccountsMenu = canManageAccounting;
     // Operations opens for either job: keeping the books, or answering tenants.
-    var showOperationsMenu = canManageAccounting || canHandleServiceRequests || canDoMaintenance;
+    var showOperationsMenu = canManageAccounting || canHandleServiceRequests || canDoMaintenance || canManageMaintenance;
     var showReportsMenu = canViewReports;
     var canManageHr = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.HrManage);
     var canRunPayroll = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PayrollManage, AppPermissions.PayrollApprove);
@@ -407,7 +408,7 @@
                                     </li>
                                     }
 
-                                    @if (canHandleServiceRequests || canDoMaintenance)
+                                    @if (canHandleServiceRequests || canDoMaintenance || canManageMaintenance)
                                     {
                                         <li class="sidebar-divider" role="separator"></li>
                                         <li class="sidebar-heading">@T["Tenant Services"]</li>
@@ -424,13 +425,19 @@
                                         }
                                         <li>
                                             <a class="sidebar-link" asp-controller="MaintenanceJobs" asp-action="Index">
-                                                @(canHandleServiceRequests ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
+                                                @(canHandleServiceRequests || canManageMaintenance ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
                                             </a>
                                         </li>
-                                        @if (canHandleServiceRequests)
+                                        @if (canHandleServiceRequests || canManageMaintenance)
                                         {
                                         <li>
                                             <a class="sidebar-link" asp-controller="MaintenancePlans" asp-action="Index">@T["Planned Maintenance"]</a>
+                                        </li>
+                                        }
+                                        @if (canManageMaintenance)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenanceJobs" asp-action="Dashboard">@T["Maintenance Dashboard"]</a>
                                         </li>
                                         }
                                     }

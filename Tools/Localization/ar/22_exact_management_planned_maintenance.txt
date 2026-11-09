@@ -74,3 +74,10 @@ Activation code is invalid. Check it was typed exactly as it was issued. ||| ر�
 This code was issued for {0}. Switch to {0} with the company selector at the top of the page, then apply it there. ||| صدر هذا الرمز لشركة {0}. انتقل إلى {0} من قائمة الشركات أعلى الصفحة، ثم طبّقه هناك.
 This activation code was cancelled. Ask for a new one. ||| أُلغي رمز التفعيل هذا. اطلب رمزاً جديداً.
 This activation code was already applied on {0}. ||| طُبّق رمز التفعيل هذا بالفعل بتاريخ {0}.
+Manage Maintenance ||| إدارة الصيانة
+For the maintenance manager: sees every maintenance job, assigns and reassigns them, closes them, raises jobs no tenant asked for (make-ready, inspections), runs the planned maintenance programme and watches the maintenance dashboard. Gives no access to other tenant requests or the accounts. ||| لمدير الصيانة: يرى كل أعمال الصيانة، ويسندها ويعيد إسنادها، ويغلقها، وينشئ أعمالاً لم يطلبها مستأجر (التجهيز والفحص)، ويدير برنامج الصيانة المجدولة، ويتابع لوحة الصيانة. ولا يمنح وصولاً إلى طلبات المستأجرين الأخرى أو الحسابات.
+Maintenance Manager ||| مدير الصيانة
+Runs maintenance: sees and assigns every maintenance job, raises make-ready and inspection jobs, sets up the planned maintenance programme and watches the dashboard. Also carries out jobs; untick Carry Out Maintenance Jobs if new jobs should not be given to them. ||| يدير الصيانة: يرى كل أعمال الصيانة ويسندها، وينشئ أعمال التجهيز والفحص، ويُعدّ برنامج الصيانة المجدولة، ويتابع اللوحة. وينفّذ الأعمال أيضاً؛ ألغِ تحديد تنفيذ أعمال الصيانة إن كان لا يجب أن تُسند إليه أعمال جديدة.
+Maintenance ||| الصيانة
+Carry out the maintenance jobs given to them ||| تنفيذ أعمال الصيانة المسندة إليه
+Run maintenance: every job, assigning, make-ready, planned programme, dashboard ||| إدارة الصيانة: كل الأعمال، والإسناد، والتجهيز، والبرنامج المجدول، واللوحة
