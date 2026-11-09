@@ -38,10 +38,21 @@
                 <p style="white-space:pre-wrap">@Model.Description</p>
                 <dl class="row mb-0 small">
                     <dt class="col-sm-4">@T["Unit"]</dt><dd class="col-sm-8">@(Model.UnitDisplay ?? "-") @if (Model.PropertyName != null) { <span class="text-muted">(@Model.PropertyName)</span> }</dd>
-                    <dt class="col-sm-4">@T["Tenant"]</dt><dd class="col-sm-8">@Model.TenantName @if (Model.TenantPhone != null) { <span>&middot; <a href="tel:@Model.TenantPhone">@Model.TenantPhone</a></span> }</dd>
-                    <dt class="col-sm-4">@T["Preferred visit"]</dt><dd class="col-sm-8">@(Model.PreferredVisitDate?.ToString("dddd dd/MM/yyyy") ?? "any time")</dd>
+                    @if (Model.IsInternal)
+                    {
+                        <dt class="col-sm-4">@T["Raised by"]</dt><dd class="col-sm-8">@T[ServiceRequestSources.Describe(Model.Source)] &middot; @T[MaintenancePurposes.Describe(Model.Purpose)]</dd>
+                        <dt class="col-sm-4">@T["Due"]</dt><dd class="col-sm-8">@(Model.PreferredVisitDate?.ToString("dddd dd/MM/yyyy") ?? T["as soon as possible"])</dd>
+                    }
+                    else
+                    {
+                        <dt class="col-sm-4">@T["Tenant"]</dt><dd class="col-sm-8">@Model.TenantName @if (Model.TenantPhone != null) { <span>&middot; <a href="tel:@Model.TenantPhone">@Model.TenantPhone</a></span> }</dd>
+                        <dt class="col-sm-4">@T["Preferred visit"]</dt><dd class="col-sm-8">@(Model.PreferredVisitDate?.ToString("dddd dd/MM/yyyy") ?? "any time")</dd>
+                    }
                     <dt class="col-sm-4">@T["Technician"]</dt><dd class="col-sm-8">@(Model.AssignedToName ?? "not assigned")</dd>
-                    <dt class="col-sm-4">@T["Received by"]</dt><dd class="col-sm-8">@T[ServiceRequestSources.Describe(Model.Source)]</dd>
+                    @if (!Model.IsInternal)
+                    {
+                        <dt class="col-sm-4">@T["Received by"]</dt><dd class="col-sm-8">@T[ServiceRequestSources.Describe(Model.Source)]</dd>
+                    }
                 </dl>
             </div>
         </div>
@@ -140,7 +151,7 @@
                 {
                     <form asp-action="Step" method="post">
                         <input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="step" value="resolve" />
-                        <label class="form-label small" for="resolveNotes">@T["What was done (the tenant reads this)"]</label>
+                        <label class="form-label small" for="resolveNotes">@(Model.IsInternal ? T["What was done"] : T["What was done (the tenant reads this)"])</label>
                         <textarea id="resolveNotes" name="notes" class="form-control mb-2" rows="3" required maxlength="4000">@Model.ResolutionNotes</textarea>
                         <button class="btn btn-success w-100">@T["Mark as done"]</button>
                     </form>
@@ -244,10 +255,19 @@
                 <input type="hidden" name="id" value="@Model.Id" />
                 <textarea name="body" class="form-control form-control-sm mb-2" rows="2" required maxlength="4000" placeholder="@T["e.g. Visited, compressor needs replacing, parts ordered"]" aria-label="@T["Message"]"></textarea>
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="form-check small">
-                        <input class="form-check-input" type="checkbox" name="isInternal" value="true" id="internalNote" checked />
-                        <label class="form-check-label" for="internalNote">@T["Internal (the tenant does not see it)"]</label>
-                    </div>
+                    @if (Model.IsInternal)
+                    {
+                        @* No tenant to read it: every note on this job stays among staff. *@
+                        <input type="hidden" name="isInternal" value="true" />
+                        <span></span>
+                    }
+                    else
+                    {
+                        <div class="form-check small">
+                            <input class="form-check-input" type="checkbox" name="isInternal" value="true" id="internalNote" checked />
+                            <label class="form-check-label" for="internalNote">@T["Internal (the tenant does not see it)"]</label>
+                        </div>
+                    }
                     <button class="btn btn-sm btn-outline-dark">@T["Add"]</button>
                 </div>
             </form>

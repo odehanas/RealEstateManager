@@ -427,6 +427,12 @@
                                                 @(canHandleServiceRequests ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
                                             </a>
                                         </li>
+                                        @if (canHandleServiceRequests)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenancePlans" asp-action="Index">@T["Planned Maintenance"]</a>
+                                        </li>
+                                        }
                                     }
 
                                     @if (showAccountsMenu)

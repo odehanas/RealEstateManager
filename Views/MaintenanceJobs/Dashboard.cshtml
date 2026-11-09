@@ -93,6 +93,55 @@
     </div>
 </div>
 
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Planned maintenance"]</div>
+            <div class="value">@Model.PlannedJobs</div>
+            <div class="note">@T.Format("jobs from {0} active plan(s) · {1} done", Model.ActivePlans, Model.PlannedDone)</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Planned work done by its due date"]</div>
+            <div class="value">@(Model.PlannedOnTimePercent.HasValue ? $"{Model.PlannedOnTimePercent:0}%" : "-")</div>
+            <div class="note @(Model.PlannedOverdue > 0 ? "text-danger" : "")">@T.Format("{0} open and past its due date", Model.PlannedOverdue)</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Raised by management"]</div>
+            <div class="value">@Model.ManagementJobs</div>
+            <div class="note">@T["make-ready, inspections and repairs no tenant asked for"]</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Vacant units to make ready"]</div>
+            <div class="value @(Model.AwaitingMakeReady.Count > 0 ? "text-warning" : "")">@Model.AwaitingMakeReady.Count</div>
+            <div class="note">@T["tenancy ended, no make-ready job raised since"]</div>
+        </div></div>
+    </div>
+</div>
+
+@if (Model.AwaitingMakeReady.Count > 0)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>@T["Vacant units to make ready"]</strong></div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light"><tr><th>@T["Unit"]</th><th>@T["Property"]</th><th>@T["Tenancy ended"]</th><th class="text-end">@T["Days vacant"]</th></tr></thead>
+                <tbody>
+                    @foreach (var unit in Model.AwaitingMakeReady)
+                    {
+                        <tr><td>@unit.Unit</td><td>@unit.Property</td><td>@unit.LastTenancyEnded.ToString("dd/MM/yyyy")</td><td class="text-end">@((DateTime.Today - unit.LastTenancyEnded).Days)</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
 @if (Model.RatedJobs.Any())
 {
     <div class="card shadow-sm mb-3">

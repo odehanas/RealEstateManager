@@ -293,6 +293,7 @@ namespace RealEstateManager.Services
                 // The company's WhatsApp credentials: the owners' seat, not whoever answers tenants.
                 ["WhatsAppSettings"] = new[] { AppPermissions.OwnerOversight },
                 ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage },
+                ["MaintenancePlans"] = new[] { AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
                 ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
                 ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
@@ -356,6 +357,7 @@ namespace RealEstateManager.Services
                 // The approver's desk for reopening closed periods. An approver need not
                 // be an accountant, so these do not require Accounting.Manage.
                 ["Closing.ReopenRequests"] = new[] { AppPermissions.PeriodReopenApprove, AppPermissions.AccountingManage },
+                ["MaintenanceJobs.Create"] = new[] { AppPermissions.ServiceRequestsManage },
                 ["Closing.ApproveReopen"] = new[] { AppPermissions.PeriodReopenApprove },
                 ["Closing.RejectReopen"] = new[] { AppPermissions.PeriodReopenApprove },
 

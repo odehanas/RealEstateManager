@@ -55,7 +55,9 @@ namespace RealEstateManager.Controllers
                 .Select(x => new MaintenanceService.JobRow
                 {
                     Id = x.Id, Number = x.RequestNumber, Subject = x.Subject, Category = x.Category, Priority = x.Priority, Status = x.Status,
-                    Tenant = x.Tenant!.FullName,
+                    Tenant = x.Tenant != null ? x.Tenant.FullName : null,
+                    Purpose = x.Purpose,
+                    DueDate = x.PreferredVisitDate,
                     Property = x.Property != null ? x.Property.Code + " " + x.Property.Name : null,
                     Place = x.Unit != null ? x.Unit.UnitNumber : (x.Property != null ? x.Property.Code : "-"),
                     Technician = x.AssignedToAppUserId == null ? null : _db.AppUsers.Where(u => u.Id == x.AssignedToAppUserId).Select(u => u.DisplayName).FirstOrDefault(),
@@ -69,7 +71,87 @@ namespace RealEstateManager.Controllers
             ViewBag.SeesAll = seesAll;
             ViewBag.TechnicianId = technicianId;
             ViewBag.Technicians = await MaintenanceService.TechniciansAsync(_db, companyId);
+            if (seesAll && show == "Open")
+                ViewBag.AwaitingMakeReady = await _maintenance.VacantUnitsAwaitingMakeReadyAsync(companyId);
             return View(jobs);
+        }
+
+        // =====================================================================
+        //  JOBS NO TENANT ASKED FOR
+        // =====================================================================
+
+        /// <summary>
+        /// A job management raises itself: a vacant unit to make ready for the next tenant,
+        /// an inspection, a repair spotted on a visit. A unit and purpose can be passed in, as
+        /// the make-ready list does.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Create(int? unitId, string? purpose)
+        {
+            var model = new ServiceRequestService.InternalJob
+            {
+                Purpose = MaintenancePurposes.All.Contains(purpose) ? purpose! : MaintenancePurposes.Repair
+            };
+
+            if (unitId.HasValue)
+            {
+                var unit = await _db.Units.AsNoTracking().Include(x => x.Property).FirstOrDefaultAsync(x => x.Id == unitId.Value);
+                if (unit != null)
+                {
+                    model.PropertyId = unit.PropertyId;
+                    model.UnitId = unit.Id;
+                    if (model.Purpose == MaintenancePurposes.MakeReady)
+                    {
+                        model.Subject = $"Make unit {unit.UnitNumber} ready for the next tenant";
+                        model.Description = "Inspect the unit after the tenancy ended, repair what is needed, deep clean and check every fitting, so it can be let again.";
+                    }
+                }
+            }
+
+            await LoadCreateListsAsync();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequireFormFields("PropertyId", "Subject", "Purpose")]
+        public async Task<IActionResult> Create(ServiceRequestService.InternalJob model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadCreateListsAsync();
+                return View(model);
+            }
+
+            model.Source = ServiceRequestSources.Management;
+            model.MaintenancePlanId = null;
+            model.RaisedByAppUserId = User.GetAppUserId();
+            model.RaisedByName = DisplayName();
+
+            var (job, error) = await _requests.CreateMaintenanceJobAsync(User.GetRequiredCurrentCompanyId(), model);
+            if (job == null)
+            {
+                ModelState.AddModelError(string.Empty, error!);
+                await LoadCreateListsAsync();
+                return View(model);
+            }
+
+            TempData["JobSuccess"] = $"Job {job.RequestNumber} raised.";
+            return RedirectToAction(nameof(Details), new { id = job.Id });
+        }
+
+        private async Task LoadCreateListsAsync()
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            ViewBag.Properties = await _db.Properties.AsNoTracking()
+                .Where(x => x.IsActive).OrderBy(x => x.Code)
+                .Select(x => new { x.Id, Name = x.Code + " " + x.Name })
+                .ToListAsync();
+            ViewBag.Units = await _db.Units.AsNoTracking()
+                .Where(x => x.Property!.IsActive).OrderBy(x => x.UnitNumber)
+                .Select(x => new { x.Id, x.PropertyId, x.UnitNumber, x.Status })
+                .ToListAsync();
+            ViewBag.Technicians = await MaintenanceService.TechniciansAsync(_db, companyId);
         }
 
         [HttpGet]

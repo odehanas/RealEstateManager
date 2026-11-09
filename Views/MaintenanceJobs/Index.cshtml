@@ -5,6 +5,7 @@
     var show = ViewBag.Show as string ?? "Open";
     var technicianId = ViewBag.TechnicianId as int?;
     var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
+    var awaiting = ViewBag.AwaitingMakeReady as List<RealEstateManager.Services.MaintenanceService.VacantUnit> ?? new();
     ViewData["Title"] = seesAll ? "Maintenance Jobs" : "My Maintenance Jobs";
 
     string Hours(double? hours) => hours == null ? "-" : hours < 48 ? $"{hours:0.#} h" : $"{hours / 24:0.#} days";
@@ -14,14 +15,44 @@
     <div>
         <h2 class="mb-1">@ViewData["Title"]</h2>
         <div class="text-muted">
-            @(seesAll ? T["Every maintenance job raised by tenants, with who is doing it."] : T["The maintenance jobs assigned to you. Open one to record the work and the materials used."])
+            @(seesAll ? T["Every maintenance job, whether a tenant asked, management raised it or the planned programme opened it, with who is doing it."] : T["The maintenance jobs assigned to you. Open one to record the work and the materials used."])
         </div>
     </div>
     @if (seesAll)
     {
-        <a asp-action="Dashboard" class="btn btn-outline-primary">@T["Maintenance Dashboard"]</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="Create" class="btn btn-dark">@T["Raise a Job"]</a>
+            <a asp-controller="MaintenancePlans" asp-action="Index" class="btn btn-outline-dark">@T["Planned Maintenance"]</a>
+            <a asp-action="Dashboard" class="btn btn-outline-primary">@T["Maintenance Dashboard"]</a>
+        </div>
     }
 </div>
+
+@if (awaiting.Count > 0)
+{
+    <div class="card shadow-sm mb-3 border-warning">
+        <div class="card-header bg-white"><strong>@T["Vacant units to make ready"]</strong> <span class="badge bg-warning text-dark">@awaiting.Count</span></div>
+        <div class="card-body small">
+            <p class="text-muted">@T["Their tenancy has ended and no make-ready job has been raised since."]</p>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light"><tr><th>@T["Unit"]</th><th>@T["Property"]</th><th>@T["Tenancy ended"]</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var unit in awaiting)
+                        {
+                            <tr>
+                                <td>@unit.Unit</td>
+                                <td>@unit.Property</td>
+                                <td>@unit.LastTenancyEnded.ToString("dd/MM/yyyy")</td>
+                                <td class="text-end"><a asp-action="Create" asp-route-unitId="@unit.UnitId" asp-route-purpose="@MaintenancePurposes.MakeReady" class="btn btn-sm btn-outline-dark">@T["Raise make-ready job"]</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
 
 <partial name="_AppInstallPanel" model="true" />
 
@@ -68,7 +99,7 @@ else
                         <th>@T["Priority"]</th>
                         <th>@T["What"]</th>
                         <th>@T["Unit"]</th>
-                        <th>@T["Tenant"]</th>
+                        <th>@T["Tenant / raised by"]</th>
                         @if (seesAll) { <th>@T["Technician"]</th> }
                         <th>@T["Status"]</th>
                         <th class="text-end">@T["Age"]</th>
@@ -86,10 +117,17 @@ else
                             </td>
                             <td>@job.Subject @if (!string.IsNullOrWhiteSpace(job.Category)) { <span class="text-muted small">(@job.Category)</span> }</td>
                             <td>@job.Place</td>
-                            <td>@job.Tenant</td>
+                            <td>
+                                @if (job.Tenant != null) { @job.Tenant }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border">@T[ServiceRequestSources.Describe(job.Source)]</span>
+                                    <div class="small text-muted">@T[MaintenancePurposes.Describe(job.Purpose)]@(job.DueDate.HasValue ? " · " + job.DueDate.Value.ToString("dd/MM/yyyy") : "")</div>
+                                }
+                            </td>
                             @if (seesAll) { <td>@(job.Technician ?? "not assigned")</td> }
                             <td><span class="badge @ServiceRequestStatuses.BadgeClass(job.Status)">@ServiceRequestStatuses.Describe(job.Status)</span></td>
-                            <td class="text-end @(job.IsOpen && job.ResolveLate ? "text-danger fw-semibold" : "")" title="@(job.IsOpen && job.ResolveLate ? T["Past the target time for this priority"] : "")">@Hours(job.AgeHours)</td>
+                            <td class="text-end @(job.IsOpen && job.ResolveLate ? "text-danger fw-semibold" : "")" title="@(job.IsOpen && job.ResolveLate ? (job.IsPlanned ? T["Past its due date"] : T["Past the target time for this priority"]) : "")">@Hours(job.AgeHours)</td>
                             <td class="text-end">@(job.Materials == 0m ? "" : job.Materials.ToString("N2"))</td>
                             <td class="text-end">
                                 @if (job.Rating.HasValue)

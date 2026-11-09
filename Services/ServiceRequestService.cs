@@ -255,7 +255,7 @@ namespace RealEstateManager.Services
 
             // A tenant with the app on their phone sees the office has picked it up.
             if (loggedByStaff)
-                await _push.ToTenantAsync(request.TenantId,
+                await _push.ToTenantAsync(tenantId,
                     "Request {0}", new object?[] { request.RequestNumber },
                     "We have logged your request. You can follow it here.", Array.Empty<object?>(),
                     $"/portal/requests/{request.Id}", $"request-{request.Id}");
@@ -280,11 +280,12 @@ namespace RealEstateManager.Services
             var request = await _db.TenantServiceRequests.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == requestId && x.CompanyId == companyId);
 
-            if (request == null || !await CanBeClassifiedAsync(request))
+            if (request?.TenantId == null || !await CanBeClassifiedAsync(request))
                 return null;
 
+            var tenantId = request.TenantId.Value;
             var options = new ServiceRequestCreateViewModel();
-            await PopulateOptionsAsync(options, request.TenantId);
+            await PopulateOptionsAsync(options, tenantId);
 
             return new ServiceRequestClassifyOptions
             {
@@ -292,7 +293,7 @@ namespace RealEstateManager.Services
                 Category = request.Category,
                 LeaseId = request.LeaseId,
                 Leases = options.Leases,
-                MaintenanceHold = (await TenantStandingService.GetAsync(_db, request.TenantId)).Message
+                MaintenanceHold = (await TenantStandingService.GetAsync(_db, tenantId)).Message
             };
         }
 
@@ -362,6 +363,125 @@ namespace RealEstateManager.Services
             await _db.WhatsAppInboundMessages.AsNoTracking().AnyAsync(x =>
                 x.TenantServiceRequestId == request.Id && x.CompanyId == request.CompanyId &&
                 x.Status == WhatsAppMessageStatuses.RequestCreated);
+
+        // =====================================================================
+        //  JOBS NO TENANT ASKED FOR
+        // =====================================================================
+
+        /// <summary>A maintenance job raised by management or by the planned maintenance programme.</summary>
+        public sealed class InternalJob
+        {
+            public int PropertyId { get; set; }
+            public int? UnitId { get; set; }
+            public string Source { get; set; } = ServiceRequestSources.Management;
+            public string Purpose { get; set; } = MaintenancePurposes.Repair;
+            public string? Category { get; set; }
+            public string Priority { get; set; } = ServiceRequestPriorities.Normal;
+            public string Subject { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
+
+            /// <summary>When the work should be done: a planned job's due date, or a target date.</summary>
+            public DateTime? DueDate { get; set; }
+
+            /// <summary>The technician to give it to; empty for the least busy one.</summary>
+            public int? AssignTo { get; set; }
+
+            public int? MaintenancePlanId { get; set; }
+            public int? RaisedByAppUserId { get; set; }
+            public string? RaisedByName { get; set; }
+        }
+
+        /// <summary>
+        /// Opens a maintenance job that no tenant asked for. It has no tenant, so it never
+        /// shows on the portal and is never rated; everything else - the technician, the
+        /// steps, the materials and who bears their cost, the target times and the dashboard -
+        /// works as for a tenant's request. Returns the job, or why it could not be opened.
+        /// </summary>
+        public async Task<(TenantServiceRequest? Job, string? Error)> CreateMaintenanceJobAsync(int companyId, InternalJob input)
+        {
+            var property = await _db.Properties.AsNoTracking().IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.Id == input.PropertyId && x.CompanyId == companyId);
+            if (property == null)
+                return (null, "Choose the property the work is for.");
+
+            if (input.UnitId.HasValue && !await _db.Units.AsNoTracking().IgnoreQueryFilters()
+                    .AnyAsync(x => x.Id == input.UnitId.Value && x.PropertyId == property.Id))
+                return (null, "That unit is not in the property chosen.");
+
+            if (string.IsNullOrWhiteSpace(input.Subject))
+                return (null, "Give the job a short title.");
+            if (string.IsNullOrWhiteSpace(input.Description))
+                return (null, "Describe the work to be done.");
+            if (!ServiceRequestSources.IsInternal(input.Source))
+                return (null, "A job without a tenant is raised by management or the planned programme.");
+            if (!MaintenancePurposes.All.Contains(input.Purpose))
+                return (null, "Choose what the job is for.");
+            if (!ServiceRequestPriorities.All.Contains(input.Priority))
+                return (null, "Choose how urgent the job is.");
+            if (!string.IsNullOrWhiteSpace(input.Category) && !ServiceRequestCategories.Maintenance.Contains(input.Category))
+                return (null, "Choose the kind of work from the list.");
+
+            var technicians = await MaintenanceService.TechniciansAsync(_db, companyId);
+            int? assignTo = input.AssignTo.HasValue && technicians.Any(t => t.Id == input.AssignTo.Value)
+                ? input.AssignTo
+                : await MaintenanceService.PickTechnicianAsync(_db, companyId);
+
+            for (var attempt = 1; ; attempt++)
+            {
+                var job = new TenantServiceRequest
+                {
+                    CompanyId = companyId,
+                    TenantId = null,
+                    PropertyId = property.Id,
+                    UnitId = input.UnitId,
+                    RequestNumber = await GenerateRequestNumberAsync(companyId),
+                    RequestType = ServiceRequestTypes.Maintenance,
+                    Category = Trim(input.Category),
+                    Subject = Cut(input.Subject.Trim(), 200),
+                    Description = Cut(input.Description.Trim(), 4000),
+                    Priority = input.Priority,
+                    PreferredVisitDate = input.DueDate?.Date,
+                    Status = ServiceRequestStatuses.Submitted,
+                    SubmittedAt = DateTime.UtcNow,
+                    Source = input.Source,
+                    Purpose = input.Purpose,
+                    MaintenancePlanId = input.MaintenancePlanId,
+                    AssignedToAppUserId = assignTo
+                };
+
+                job.Comments.Add(new TenantServiceRequestComment
+                {
+                    AuthorType = ServiceRequestAuthorTypes.Staff,
+                    AuthorName = input.RaisedByName ?? "System",
+                    AppUserId = input.RaisedByAppUserId,
+                    Body = input.Source == ServiceRequestSources.Planned
+                        ? "Opened by the planned maintenance programme."
+                        : $"Raised by management: {MaintenancePurposes.Describe(input.Purpose)}.",
+                    IsInternal = true,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                _db.TenantServiceRequests.Add(job);
+                try
+                {
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateException) when (attempt < 3)
+                {
+                    // Two jobs took the same number at once; the next try gets the next one.
+                    _db.Entry(job).State = EntityState.Detached;
+                    foreach (var comment in job.Comments)
+                        _db.Entry(comment).State = EntityState.Detached;
+                    continue;
+                }
+
+                if (assignTo.HasValue && assignTo != input.RaisedByAppUserId)
+                    NotifyTechnician(job, assignTo.Value);
+                return (job, null);
+            }
+        }
+
+        private static string Cut(string value, int length) => value.Length <= length ? value : value[..length];
 
         /// <summary>The technician a maintenance job was just given to.</summary>
         public void NotifyTechnician(TenantServiceRequest job, int technicianId) =>
@@ -593,9 +713,11 @@ namespace RealEstateManager.Services
         public async Task<ServiceRequestQueueViewModel> GetQueueAsync(
             int companyId, string? status, string? type)
         {
+            // What tenants asked for. A job management or the planned programme raised has no
+            // tenant, and is worked on the Maintenance Jobs screen.
             var query = _db.TenantServiceRequests
                 .AsNoTracking()
-                .Where(x => x.CompanyId == companyId);
+                .Where(x => x.CompanyId == companyId && x.TenantId != null);
 
             if (!string.IsNullOrWhiteSpace(status))
             {
@@ -645,7 +767,7 @@ namespace RealEstateManager.Services
 
             var all = await _db.TenantServiceRequests
                 .AsNoTracking()
-                .Where(x => x.CompanyId == companyId)
+                .Where(x => x.CompanyId == companyId && x.TenantId != null)
                 .Select(x => new
                 {
                     x.Status,
@@ -815,8 +937,9 @@ namespace RealEstateManager.Services
             if (reassignedTo.HasValue && reassignedTo != actingAppUserId && request.RequestType == ServiceRequestTypes.Maintenance)
                 NotifyTechnician(request, reassignedTo.Value);
 
-            if (previous != newStatus && TenantStatusMessage(newStatus, request.CanBeRated) is { } line)
-                await _push.ToTenantAsync(request.TenantId,
+            // A job no tenant asked for has nobody to tell.
+            if (request.TenantId.HasValue && previous != newStatus && TenantStatusMessage(newStatus, request.CanBeRated) is { } line)
+                await _push.ToTenantAsync(request.TenantId.Value,
                     "Request {0}", new object?[] { request.RequestNumber }, line, Array.Empty<object?>(),
                     $"/portal/requests/{request.Id}", $"request-{request.Id}");
 
@@ -861,8 +984,8 @@ namespace RealEstateManager.Services
             await _db.SaveChangesAsync();
 
             // A note among staff stays among staff.
-            if (!isInternal)
-                await _push.ToTenantAsync(request.TenantId,
+            if (!isInternal && request.TenantId.HasValue)
+                await _push.ToTenantAsync(request.TenantId.Value,
                     "New reply on {0}", new object?[] { request.RequestNumber },
                     "Open the request to read it.", Array.Empty<object?>(),
                     $"/portal/requests/{request.Id}", $"request-{request.Id}");
@@ -959,6 +1082,7 @@ namespace RealEstateManager.Services
                 PropertyName = request.Property?.Name,
                 ResolutionNotes = request.ResolutionNotes,
                 Source = request.Source,
+                Purpose = request.Purpose,
                 Rating = request.Rating,
                 RatingFeedback = request.RatingFeedback,
                 RatedAt = request.RatedAt,

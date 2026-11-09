@@ -119,6 +119,11 @@ namespace RealEstateManager.Models
 
         public string Source { get; set; } = ServiceRequestSources.Portal;
 
+        /// <summary>What a job no tenant asked for is for. See <see cref="MaintenancePurposes"/>.</summary>
+        public string? Purpose { get; set; }
+
+        public bool IsInternal => ServiceRequestSources.IsInternal(Source);
+
         // ---- Rating of a maintenance job -------------------------------------
         public int? Rating { get; set; }
         public string? RatingFeedback { get; set; }

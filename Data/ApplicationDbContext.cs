@@ -67,6 +67,7 @@ namespace RealEstateManager.Data
         public DbSet<TenantPortalUser> TenantPortalUsers => Set<TenantPortalUser>();
         public DbSet<TenantServiceRequest> TenantServiceRequests => Set<TenantServiceRequest>();
         public DbSet<TenantServiceRequestComment> TenantServiceRequestComments => Set<TenantServiceRequestComment>();
+        public DbSet<MaintenancePlan> MaintenancePlans => Set<MaintenancePlan>();
         public DbSet<WhatsAppConnection> WhatsAppConnections => Set<WhatsAppConnection>();
         public DbSet<WhatsAppInboundMessage> WhatsAppInboundMessages => Set<WhatsAppInboundMessage>();
         public DbSet<CustomerCreditNote> CustomerCreditNotes => Set<CustomerCreditNote>();
@@ -1400,6 +1401,23 @@ namespace RealEstateManager.Data
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Status).HasMaxLength(30);
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.ResolutionNotes).HasMaxLength(4000);
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Source).HasMaxLength(20);
+            modelBuilder.Entity<TenantServiceRequest>().Property(x => x.Purpose).HasMaxLength(30);
+            modelBuilder.Entity<TenantServiceRequest>()
+                .HasOne(x => x.MaintenancePlan).WithMany().HasForeignKey(x => x.MaintenancePlanId).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MaintenancePlan>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(200);
+                entity.Property(x => x.Description).HasMaxLength(2000);
+                entity.Property(x => x.Category).HasMaxLength(50);
+                entity.Property(x => x.Priority).HasMaxLength(20);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.HasIndex(x => new { x.CompanyId, x.IsActive, x.NextDueDate });
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Unit).WithMany().HasForeignKey(x => x.UnitId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
             modelBuilder.Entity<TenantServiceRequest>().Property(x => x.RatingFeedback).HasMaxLength(ServiceRequestRatings.MaxFeedbackLength);
 
             modelBuilder.Entity<TenantServiceRequest>()

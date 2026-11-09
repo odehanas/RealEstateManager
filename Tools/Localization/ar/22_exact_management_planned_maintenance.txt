@@ -1,0 +1,72 @@
+# Sheet 22: maintenance jobs no tenant asked for - raised by management, make-ready, and the planned maintenance programme (whole texts; {0} are values).
+Raised by management ||| بطلب من الإدارة
+Planned maintenance ||| صيانة مجدولة
+Planned Maintenance ||| الصيانة المجدولة
+Make ready for the next tenant ||| تجهيز الوحدة للمستأجر التالي
+Repair ||| إصلاح
+Inspection ||| فحص
+Preventive maintenance ||| صيانة وقائية
+Improvement ||| تحسين
+Tenant request ||| طلب مستأجر
+Raise a Job ||| إنشاء عمل صيانة
+Raise the job ||| إنشاء العمل
+Raise make-ready job ||| إنشاء عمل تجهيز
+Every maintenance job, whether a tenant asked, management raised it or the planned programme opened it, with who is doing it. ||| كل أعمال الصيانة، سواء طلبها مستأجر أو أنشأتها الإدارة أو فتحها برنامج الصيانة المجدولة، مع من يقوم بها.
+Vacant units to make ready ||| وحدات شاغرة بحاجة إلى تجهيز
+Their tenancy has ended and no make-ready job has been raised since. ||| انتهى إيجارها ولم يُنشأ عمل تجهيز منذ ذلك الحين.
+Tenancy ended ||| انتهاء الإيجار
+Tenant / raised by ||| المستأجر / الجهة الطالبة
+Past its due date ||| تجاوز تاريخ استحقاقه
+Raised by ||| بطلب من
+Due ||| الاستحقاق
+as soon as possible ||| في أقرب وقت
+What was done ||| ما تم إنجازه
+Maintenance no tenant asked for: a vacant unit to make ready, an inspection, a repair spotted on a visit. It is worked and costed like any other job, and never shows on a tenant's portal. ||| صيانة لم يطلبها مستأجر: وحدة شاغرة تحتاج تجهيزاً، أو فحص، أو إصلاح لوحظ أثناء زيارة. تُنفَّذ وتُحسب تكلفتها مثل أي عمل آخر، ولا تظهر في بوابة أي مستأجر.
+What is it for ||| الغرض منه
+-- the building or its common areas -- ||| -- المبنى أو مرافقه المشتركة --
+Due by ||| مستحق بتاريخ
+Assign to ||| إسناد إلى
+The least busy technician ||| الفني الأقل انشغالاً
+The work to be done ||| العمل المطلوب
+Work done on a schedule whether or not a tenant asks. Each entry opens its own job a few days before it is due, and the job goes to the maintenance team like any other. ||| أعمال تُنفَّذ وفق جدول سواء طلبها مستأجر أم لا. يفتح كل بند عملاً خاصاً به قبل موعد استحقاقه بأيام، ويذهب العمل إلى فريق الصيانة مثل أي عمل آخر.
+Open due jobs now ||| فتح الأعمال المستحقة الآن
+New Planned Work ||| عمل مجدول جديد
+Edit Planned Work ||| تعديل العمل المجدول
+Back to Planned Maintenance ||| العودة إلى الصيانة المجدولة
+No planned work yet. Add the regular jobs, for example the AC service every 3 months, the fire alarm check every 6 months and the water tank cleaning every 12. ||| لا توجد أعمال مجدولة بعد. أضف الأعمال الدورية، مثل صيانة المكيفات كل 3 أشهر، وفحص إنذار الحريق كل 6 أشهر، وتنظيف خزان المياه كل 12 شهراً.
+Work ||| العمل
+Where ||| المكان
+Every ||| كل
+Next due ||| الاستحقاق التالي
+Last job ||| آخر عمل
+{0} month(s) ||| {0} شهر
+The least busy ||| الأقل انشغالاً
+The work ||| العمل
+e.g. AC service ||| مثال: صيانة المكيفات
+Every how many months ||| كل كم شهراً
+Open the job (days before) ||| فتح العمل (قبل الاستحقاق بأيام)
+What the technician should do ||| ما يجب على الفني القيام به
+Nothing is due yet. ||| لا يوجد شيء مستحق بعد.
+{0} planned job(s) opened. ||| تم فتح {0} عمل مجدول.
+Planned maintenance "{0}" saved. ||| تم حفظ الصيانة المجدولة "{0}".
+Job {0} raised. ||| تم إنشاء العمل {0}.
+Give the work a name, e.g. AC service. ||| أدخل اسماً للعمل، مثل صيانة المكيفات.
+Choose the property. ||| اختر العقار.
+That unit is not in the property chosen. ||| هذه الوحدة ليست في العقار المختار.
+The work recurs every 1 to 24 months. ||| يتكرر العمل كل 1 إلى 24 شهراً.
+Open the job between 0 and 60 days before it is due. ||| افتح العمل قبل استحقاقه بما بين 0 و60 يوماً.
+Choose how urgent the work is. ||| اختر درجة استعجال العمل.
+Choose the kind of work from the list. ||| اختر نوع العمل من القائمة.
+Choose one of the maintenance team. ||| اختر أحد أعضاء فريق الصيانة.
+Choose the property the work is for. ||| اختر العقار الذي يخصه العمل.
+Give the job a short title. ||| أدخل عنواناً قصيراً للعمل.
+Describe the work to be done. ||| صِف العمل المطلوب.
+A job without a tenant is raised by management or the planned programme. ||| العمل الذي لا يخص مستأجراً تنشئه الإدارة أو برنامج الصيانة المجدولة.
+Choose what the job is for. ||| اختر الغرض من العمل.
+Choose how urgent the job is. ||| اختر درجة استعجال العمل.
+Planned work done by its due date ||| الأعمال المجدولة المنجزة في موعدها
+{0} open and past its due date ||| {0} مفتوح وتجاوز موعد استحقاقه
+jobs from {0} active plan(s) · {1} done ||| أعمال من {0} خطة نشطة · {1} منجزة
+make-ready, inspections and repairs no tenant asked for ||| تجهيز وفحوصات وإصلاحات لم يطلبها مستأجر
+tenancy ended, no make-ready job raised since ||| انتهى الإيجار ولم يُنشأ عمل تجهيز منذ ذلك الحين
+Days vacant ||| أيام الشغور

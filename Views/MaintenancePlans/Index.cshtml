@@ -1,0 +1,78 @@
+@model List<RealEstateManager.Domain.MaintenancePlan>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Planned Maintenance"];
+    var canEdit = ViewBag.CanEdit as bool? ?? false;
+    var latest = ViewBag.Latest as Dictionary<int, (int Id, string Number, string Status, DateTime? Due)> ?? new();
+    var technicians = ViewBag.Technicians as Dictionary<int, string> ?? new();
+}
+
+@if (TempData["PlanMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Planned Maintenance"]</h2>
+        <p class="text-muted mb-0">@T["Work done on a schedule whether or not a tenant asks. Each entry opens its own job a few days before it is due, and the job goes to the maintenance team like any other."]</p>
+    </div>
+    @if (canEdit)
+    {
+        <div class="d-flex gap-2">
+            <form asp-action="OpenDue" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-dark btn-sm">@T["Open due jobs now"]</button>
+            </form>
+            <a asp-action="Create" class="btn btn-primary btn-sm">@T["New Planned Work"]</a>
+        </div>
+    }
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border">@T["No planned work yet. Add the regular jobs, for example the AC service every 3 months, the fire alarm check every 6 months and the water tank cleaning every 12."]</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>@T["Work"]</th>
+                        <th>@T["Where"]</th>
+                        <th>@T["Every"]</th>
+                        <th>@T["Next due"]</th>
+                        <th>@T["Technician"]</th>
+                        <th>@T["Last job"]</th>
+                        <th class="text-center">@T["Status"]</th>
+                        @if (canEdit) { <th style="width:80px"></th> }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var plan in Model)
+                    {
+                        <tr class="@(plan.IsActive ? "" : "text-muted")">
+                            <td>@plan.Name @if (!string.IsNullOrWhiteSpace(plan.Category)) { <span class="small text-muted">(@plan.Category)</span> }</td>
+                            <td>@plan.Property?.Code @(plan.Unit != null ? "· " + plan.Unit.UnitNumber : "")</td>
+                            <td>@T.Format("{0} month(s)", plan.IntervalMonths)</td>
+                            <td>@plan.NextDueDate.ToString("dd/MM/yyyy")</td>
+                            <td>@(plan.AssignToAppUserId.HasValue && technicians.TryGetValue(plan.AssignToAppUserId.Value, out var tech) ? tech : T["The least busy"])</td>
+                            <td>
+                                @if (latest.TryGetValue(plan.Id, out var job))
+                                {
+                                    <a asp-controller="MaintenanceJobs" asp-action="Details" asp-route-id="@job.Id">@job.Number</a>
+                                    <span class="badge @ServiceRequestStatuses.BadgeClass(job.Status)">@ServiceRequestStatuses.Describe(job.Status)</span>
+                                }
+                                else { <span>-</span> }
+                            </td>
+                            <td class="text-center"><span class="badge @(plan.IsActive ? "bg-success" : "bg-secondary")">@(plan.IsActive ? T["Active"] : T["Inactive"])</span></td>
+                            @if (canEdit) { <td><a asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-sm btn-outline-secondary">@T["Edit"]</a></td> }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

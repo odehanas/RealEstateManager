@@ -170,7 +170,12 @@ namespace RealEstateManager.Services
             public string? Category { get; set; }
             public string Priority { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
-            public string Tenant { get; set; } = string.Empty;
+            /// <summary>Empty on a job no tenant asked for.</summary>
+            public string? Tenant { get; set; }
+            public string? Purpose { get; set; }
+
+            /// <summary>When the work should be done: a planned job's due date.</summary>
+            public DateTime? DueDate { get; set; }
             public string Place { get; set; } = string.Empty;
             public string? Property { get; set; }
             public string? Technician { get; set; }
@@ -190,8 +195,16 @@ namespace RealEstateManager.Services
             public bool IsOpen => Status is ServiceRequestStatuses.Submitted or ServiceRequestStatuses.Acknowledged or ServiceRequestStatuses.InProgress;
             public bool IsDone => Status is ServiceRequestStatuses.Resolved or ServiceRequestStatuses.Closed;
 
-            public bool ResponseLate => (ResponseHours ?? (IsOpen ? AgeHours : 0)) > MaintenanceStandards.TargetFor(Priority).ResponseHours;
-            public bool ResolveLate => (ResolveHours ?? (IsOpen ? AgeHours : 0)) > MaintenanceStandards.TargetFor(Priority).ResolveHours;
+            public bool IsPlanned => Source == ServiceRequestSources.Planned;
+            public bool IsInternal => ServiceRequestSources.IsInternal(Source);
+
+            // A planned job is opened days before it is due, so it is measured against its due
+            // date, not against the response times for a tenant waiting on a repair.
+            public bool ResponseLate => !IsPlanned &&
+                (ResponseHours ?? (IsOpen ? AgeHours : 0)) > MaintenanceStandards.TargetFor(Priority).ResponseHours;
+            public bool ResolveLate => IsPlanned
+                ? DueDate.HasValue && (ResolvedAt ?? DateTime.UtcNow) > DueDate.Value.Date.AddDays(1).ToUniversalTime()
+                : (ResolveHours ?? (IsOpen ? AgeHours : 0)) > MaintenanceStandards.TargetFor(Priority).ResolveHours;
         }
 
         public sealed class Dashboard
@@ -208,12 +221,21 @@ namespace RealEstateManager.Services
             public int OpenCount => Jobs.Count(x => x.IsOpen);
             public int Rejected => Jobs.Count(x => x.Status == ServiceRequestStatuses.Rejected);
             public int Unassigned => Jobs.Count(x => x.IsOpen && x.Technician == null);
-            public double? AvgResponseHours => Average(Jobs.Select(x => x.ResponseHours));
+            public double? AvgResponseHours => Average(Jobs.Where(x => !x.IsPlanned).Select(x => x.ResponseHours));
             public double? AvgResolveHours => Average(Jobs.Where(x => x.IsDone).Select(x => x.ResolveHours));
             public int OnTime => Jobs.Count(x => x.IsDone && !x.ResolveLate);
             public double? OnTimePercent => Done == 0 ? null : 100.0 * OnTime / Done;
             public int OverdueOpen => Jobs.Count(x => x.IsOpen && x.ResolveLate);
             public decimal MaterialsCost => Jobs.Sum(x => x.Materials);
+
+            // ---- Work no tenant asked for --------------------------------------
+            public int ActivePlans { get; set; }
+            public int PlannedJobs => Jobs.Count(x => x.IsPlanned);
+            public int PlannedDone => Jobs.Count(x => x.IsPlanned && x.IsDone);
+            public int PlannedOverdue => Jobs.Count(x => x.IsPlanned && x.IsOpen && x.ResolveLate);
+            public double? PlannedOnTimePercent => PlannedDone == 0 ? null : 100.0 * Jobs.Count(x => x.IsPlanned && x.IsDone && !x.ResolveLate) / PlannedDone;
+            public int ManagementJobs => Jobs.Count(x => x.Source == ServiceRequestSources.Management);
+            public List<VacantUnit> AwaitingMakeReady { get; set; } = new();
 
             // The tenants' ratings. The overall average is the team's score, the measure
             // of the maintenance manager; each technician's own average is below it.
@@ -281,7 +303,9 @@ namespace RealEstateManager.Services
                     Category = x.Category,
                     Priority = x.Priority,
                     Status = x.Status,
-                    Tenant = x.Tenant!.FullName,
+                    Tenant = x.Tenant != null ? x.Tenant.FullName : null,
+                    Purpose = x.Purpose,
+                    DueDate = x.PreferredVisitDate,
                     Property = x.Property != null ? x.Property.Code + " " + x.Property.Name : null,
                     Place = x.Unit != null ? x.Unit.UnitNumber : (x.Property != null ? x.Property.Code : "-"),
                     Technician = x.AssignedToAppUserId == null ? null
@@ -304,8 +328,114 @@ namespace RealEstateManager.Services
                 To = to.Date,
                 Jobs = jobs,
                 StockBalance = await StockBalanceAsync(),
-                HasTechnicians = (await TechniciansAsync(_db, companyId)).Count > 0
+                HasTechnicians = (await TechniciansAsync(_db, companyId)).Count > 0,
+                ActivePlans = await _db.MaintenancePlans.CountAsync(x => x.CompanyId == companyId && x.IsActive),
+                AwaitingMakeReady = await VacantUnitsAwaitingMakeReadyAsync(companyId)
             };
+        }
+
+        // =====================================================================
+        //  MAKE READY: VACANT UNITS AFTER A TENANCY
+        // =====================================================================
+
+        public sealed record VacantUnit(int UnitId, int PropertyId, string Property, string Unit, DateTime LastTenancyEnded);
+
+        /// <summary>
+        /// Vacant units whose last tenancy has ended and that have no make-ready job opened
+        /// since: the units the owner wants to see readied for the next tenant.
+        /// </summary>
+        public async Task<List<VacantUnit>> VacantUnitsAwaitingMakeReadyAsync(int companyId)
+        {
+            var today = DateTime.Today;
+            var units = await _db.Units.AsNoTracking()
+                .Where(u => u.Property!.CompanyId == companyId && u.Property.IsActive && u.Status == "Vacant")
+                // Nobody in it now...
+                .Where(u => !_db.Leases.Any(l => l.UnitId == u.Id && l.Status == LeaseStatuses.Active && l.StartDate <= today && l.EndDate >= today))
+                .Select(u => new
+                {
+                    u.Id,
+                    u.PropertyId,
+                    Property = u.Property!.Code + " " + u.Property.Name,
+                    u.UnitNumber,
+                    // ...and someone was: the end of the last tenancy.
+                    LastEnd = _db.Leases
+                        .Where(l => l.UnitId == u.Id && l.Status != LeaseStatuses.Draft && l.Status != LeaseStatuses.PendingApproval && l.StartDate <= today)
+                        .Max(l => (DateTime?)(l.EndDate < today ? l.EndDate : today))
+                })
+                .Where(u => u.LastEnd != null)
+                .ToListAsync();
+
+            var result = new List<VacantUnit>();
+            foreach (var unit in units)
+            {
+                var since = DateTime.SpecifyKind(unit.LastEnd!.Value.Date, DateTimeKind.Local).ToUniversalTime();
+                var readied = await _db.TenantServiceRequests.AsNoTracking()
+                    .AnyAsync(x => x.UnitId == unit.Id && x.Purpose == MaintenancePurposes.MakeReady &&
+                                   x.Status != ServiceRequestStatuses.Cancelled && x.Status != ServiceRequestStatuses.Rejected &&
+                                   x.SubmittedAt >= since);
+                if (!readied)
+                    result.Add(new VacantUnit(unit.Id, unit.PropertyId, unit.Property, unit.UnitNumber, unit.LastEnd.Value.Date));
+            }
+
+            return result.OrderBy(x => x.LastTenancyEnded).ToList();
+        }
+
+        // =====================================================================
+        //  PLANNED MAINTENANCE PROGRAMME
+        // =====================================================================
+
+        /// <summary>
+        /// Opens a job for every active plan whose due date, less its lead days, has come. A
+        /// plan opens one job per run and then moves to its next due date after today, so a
+        /// programme that was paused does not open a backlog of identical jobs. Returns the
+        /// number of jobs opened.
+        /// </summary>
+        public async Task<int> OpenDueJobsAsync(int companyId, ServiceRequestService requests, DateTime today)
+        {
+            var due = await _db.MaintenancePlans.IgnoreQueryFilters()
+                .Where(x => x.CompanyId == companyId && x.IsActive)
+                .ToListAsync();
+            due = due.Where(x => x.NextDueDate.Date.AddDays(-x.LeadDays) <= today.Date).ToList();
+
+            var opened = 0;
+            foreach (var plan in due)
+            {
+                var (job, error) = await requests.CreateMaintenanceJobAsync(companyId, new ServiceRequestService.InternalJob
+                {
+                    PropertyId = plan.PropertyId,
+                    UnitId = plan.UnitId,
+                    Source = ServiceRequestSources.Planned,
+                    Purpose = MaintenancePurposes.Preventive,
+                    Category = plan.Category,
+                    Priority = plan.Priority,
+                    Subject = plan.Name,
+                    Description = string.IsNullOrWhiteSpace(plan.Description) ? plan.Name : plan.Description,
+                    DueDate = plan.NextDueDate,
+                    AssignTo = plan.AssignToAppUserId,
+                    MaintenancePlanId = plan.Id,
+                    RaisedByName = "Planned maintenance programme"
+                });
+
+                if (job == null)
+                {
+                    // A plan pointing at something that has gone stops rather than failing every run.
+                    plan.IsActive = false;
+                    await _db.SaveChangesAsync();
+                    continue;
+                }
+
+                plan.LastJobOpenedAt = DateTime.UtcNow;
+                do
+                {
+                    plan.NextDueDate = plan.NextDueDate.AddMonths(Math.Clamp(plan.IntervalMonths, MaintenancePlan.MinInterval, MaintenancePlan.MaxInterval));
+                }
+                while (plan.NextDueDate.Date.AddDays(-plan.LeadDays) <= today.Date);
+
+                await _db.SaveChangesAsync();
+                opened++;
+            }
+
+            return opened;
         }
     }
 }

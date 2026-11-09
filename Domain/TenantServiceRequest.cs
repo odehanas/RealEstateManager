@@ -19,8 +19,19 @@ namespace RealEstateManager.Domain
         public int CompanyId { get; set; }
         public Company? Company { get; set; }
 
-        public int TenantId { get; set; }
+        /// <summary>
+        /// The tenant who asked. Empty on a maintenance job raised by management or by the
+        /// planned maintenance programme: a vacant unit being made ready has no tenant.
+        /// </summary>
+        public int? TenantId { get; set; }
         public Tenant? Tenant { get; set; }
+
+        /// <summary>What a job raised by management is for. See <see cref="MaintenancePurposes"/>.</summary>
+        public string? Purpose { get; set; }
+
+        /// <summary>The planned maintenance programme entry that opened this job, if any.</summary>
+        public int? MaintenancePlanId { get; set; }
+        public MaintenancePlan? MaintenancePlan { get; set; }
 
         /// <summary>The contract this concerns. Optional - a tenant may ask a general question.</summary>
         public int? LeaseId { get; set; }
@@ -156,6 +167,7 @@ namespace RealEstateManager.Domain
 
         /// <summary>A finished maintenance job nobody has rated yet. A job is rated once.</summary>
         public bool CanBeRated =>
+            TenantId.HasValue &&
             RequestType == ServiceRequestTypes.Maintenance &&
             (Status == ServiceRequestStatuses.Resolved || Status == ServiceRequestStatuses.Closed) &&
             !Rating.HasValue;
@@ -303,12 +315,23 @@ namespace RealEstateManager.Domain
         public const string Email = "Email";
         public const string Other = "Other";
 
+        /// <summary>A job management raised itself: a unit to make ready, an inspection, a repair found on a visit.</summary>
+        public const string Management = "Management";
+
+        /// <summary>A job opened by the planned maintenance programme.</summary>
+        public const string Planned = "Planned";
+
         /// <summary>What staff can choose when logging a request for a tenant.</summary>
         public static readonly string[] StaffLogged = { WhatsApp, Phone, WalkIn, Email, Other };
+
+        /// <summary>Jobs no tenant asked for.</summary>
+        public static bool IsInternal(string source) => source is Management or Planned;
 
         public static string Describe(string source) => source switch
         {
             Portal => "Tenant portal",
+            Management => "Raised by management",
+            Planned => "Planned maintenance",
             WhatsApp => "WhatsApp",
             Phone => "Phone call",
             WalkIn => "Office visit",
@@ -316,6 +339,79 @@ namespace RealEstateManager.Domain
             Other => "Other source",
             _ => source
         };
+    }
+
+    /// <summary>What a maintenance job raised by management is for.</summary>
+    public static class MaintenancePurposes
+    {
+        public const string MakeReady = "MakeReady";
+        public const string Repair = "Repair";
+        public const string Inspection = "Inspection";
+        public const string Preventive = "Preventive";
+        public const string Improvement = "Improvement";
+
+        public static readonly string[] All = { MakeReady, Repair, Inspection, Preventive, Improvement };
+
+        public static string Describe(string? purpose) => purpose switch
+        {
+            MakeReady => "Make ready for the next tenant",
+            Repair => "Repair",
+            Inspection => "Inspection",
+            Preventive => "Preventive maintenance",
+            Improvement => "Improvement",
+            _ => "Tenant request"
+        };
+    }
+
+    /// <summary>
+    /// A planned maintenance programme entry: work done on a schedule whether or not a
+    /// tenant asks - the AC serviced every three months, the fire system every six, the
+    /// water tank cleaned once a year. A few days before each due date it opens a job.
+    /// </summary>
+    public class MaintenancePlan
+    {
+        public int Id { get; set; }
+
+        public int CompanyId { get; set; }
+        public Company? Company { get; set; }
+
+        /// <summary>The job's title, e.g. "AC service".</summary>
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+
+        public int PropertyId { get; set; }
+        public Property? Property { get; set; }
+
+        /// <summary>One unit; empty for the building as a whole or its common areas.</summary>
+        public int? UnitId { get; set; }
+        public Unit? Unit { get; set; }
+
+        /// <summary>The trade, from <see cref="ServiceRequestCategories.Maintenance"/>.</summary>
+        public string? Category { get; set; }
+        public string Priority { get; set; } = ServiceRequestPriorities.Normal;
+
+        /// <summary>Every how many months the work is due: 1 to 24.</summary>
+        public int IntervalMonths { get; set; } = 3;
+
+        /// <summary>The next date the work is due. Moves on by the interval each time a job is opened.</summary>
+        public DateTime NextDueDate { get; set; }
+
+        /// <summary>How many days before the due date the job is opened, so it can be booked.</summary>
+        public int LeadDays { get; set; } = 7;
+
+        /// <summary>A technician who always does this work; empty to give it to the least busy one.</summary>
+        public int? AssignToAppUserId { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public DateTime? LastJobOpenedAt { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string? CreatedByName { get; set; }
+
+        public const int MinInterval = 1;
+        public const int MaxInterval = 24;
+        public const int MaxLeadDays = 60;
     }
 
     public static class ServiceRequestRatings

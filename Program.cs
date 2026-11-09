@@ -305,6 +305,7 @@ builder.Services.AddSingleton<SchemaUpdateStatus>();
 builder.Services.AddSingleton<SchemaScriptRunner>();
 builder.Services.AddSingleton<SampleDataQueue>();
 builder.Services.AddHostedService<SampleDataWorker>();
+builder.Services.AddHostedService<MaintenancePlanWorker>();
 
 var app = builder.Build();
 

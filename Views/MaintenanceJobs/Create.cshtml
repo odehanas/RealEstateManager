@@ -1,0 +1,116 @@
+@model RealEstateManager.Services.ServiceRequestService.InternalJob
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Raise a Job"];
+    var properties = (ViewBag.Properties as System.Collections.IEnumerable)?.Cast<dynamic>().ToList() ?? new List<dynamic>();
+    var units = (ViewBag.Units as System.Collections.IEnumerable)?.Cast<dynamic>().ToList() ?? new List<dynamic>();
+    var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">@T["Raise a Job"]</h2>
+        <p class="text-muted mb-0 small">@T["Maintenance no tenant asked for: a vacant unit to make ready, an inspection, a repair spotted on a visit. It is worked and costed like any other job, and never shows on a tenant's portal."]</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to jobs"]</a>
+</div>
+
+<div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+<form asp-action="Create" method="post" class="card shadow-sm">
+    @Html.AntiForgeryToken()
+    <div class="card-body row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold" for="Purpose">@T["What is it for"]</label>
+            <select id="Purpose" name="Purpose" class="form-select">
+                @foreach (var purpose in MaintenancePurposes.All)
+                {
+                    <option value="@purpose" selected="@(purpose == Model.Purpose ? "selected" : null)">@T[MaintenancePurposes.Describe(purpose)]</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="Priority">@T["How urgent is it?"]</label>
+            <select id="Priority" name="Priority" class="form-select">
+                @foreach (var priority in ServiceRequestPriorities.All)
+                {
+                    <option value="@priority" selected="@(priority == Model.Priority ? "selected" : null)">@priority</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold" for="PropertyId">@T["Property"]</label>
+            <select id="PropertyId" name="PropertyId" class="form-select" required>
+                <option value="">@T["-- choose --"]</option>
+                @foreach (var p in properties)
+                {
+                    <option value="@p.Id" selected="@(p.Id == Model.PropertyId ? "selected" : null)">@p.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="UnitId">@T["Unit"]</label>
+            <select id="UnitId" name="UnitId" class="form-select">
+                <option value="">@T["-- the building or its common areas --"]</option>
+                @foreach (var u in units)
+                {
+                    <option value="@u.Id" data-property="@u.PropertyId" selected="@(u.Id == Model.UnitId ? "selected" : null)">@u.UnitNumber (@u.Status)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="Category">@T["What kind of problem?"]</label>
+            <select id="Category" name="Category" class="form-select">
+                <option value="">@T["-- choose --"]</option>
+                @foreach (var category in ServiceRequestCategories.Maintenance)
+                {
+                    <option value="@category" selected="@(category == Model.Category ? "selected" : null)">@category</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="DueDate">@T["Due by"]</label>
+            <input id="DueDate" name="DueDate" type="date" class="form-control" value="@Model.DueDate?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="AssignTo">@T["Assign to"]</label>
+            <select id="AssignTo" name="AssignTo" class="form-select">
+                <option value="">@T["The least busy technician"]</option>
+                @foreach (var t in technicians)
+                {
+                    <option value="@t.Id" selected="@(t.Id == Model.AssignTo ? "selected" : null)">@t.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="form-label fw-semibold" for="Subject">@T["Short title"]</label>
+            <input id="Subject" name="Subject" class="form-control" maxlength="200" required value="@Model.Subject" />
+        </div>
+        <div class="col-12">
+            <label class="form-label fw-semibold" for="Description">@T["The work to be done"]</label>
+            <textarea id="Description" name="Description" class="form-control" rows="4" maxlength="4000" required>@Model.Description</textarea>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-dark">@T["Raise the job"]</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            // Only the units of the property chosen.
+            var property = document.getElementById('PropertyId');
+            var unit = document.getElementById('UnitId');
+            var all = Array.prototype.slice.call(unit.options, 1);
+            function sync() {
+                var keep = unit.value;
+                while (unit.options.length > 1) unit.remove(1);
+                all.forEach(function (o) { if (o.dataset.property === property.value) unit.appendChild(o); });
+                unit.value = Array.prototype.some.call(unit.options, function (o) { return o.value === keep; }) ? keep : '';
+            }
+            property.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
+}
