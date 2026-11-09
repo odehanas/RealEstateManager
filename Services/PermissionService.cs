@@ -39,6 +39,22 @@ namespace RealEstateManager.Services
                      await _db.AppUserCompanies.AnyAsync(x => x.AppUserId == userId.Value && x.CompanyId == companyId.Value && x.IsCompanyAdmin));
         }
 
+        /// <summary>
+        /// An administrator of the company the user is working in. Read from the database on
+        /// every call, so taking the rights away takes effect at once. False for a System
+        /// Admin, who has everything anyway.
+        /// </summary>
+        public async Task<bool> IsCurrentCompanyAdminAsync(ClaimsPrincipal user)
+        {
+            if (user.IsInRole("SystemAdmin"))
+                return false;
+
+            var userId = user.GetAppUserId();
+            var companyId = user.GetCurrentCompanyId();
+            return userId.HasValue && companyId.HasValue &&
+                   await UserManagerAuthorizationHandler.IsCompanyAdminAsync(_db, userId.Value, companyId.Value);
+        }
+
         public async Task<bool> HasPermissionAsync(ClaimsPrincipal user, string permissionKey)
         {
             if (string.IsNullOrWhiteSpace(permissionKey))

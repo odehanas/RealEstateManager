@@ -5,7 +5,8 @@
     ViewData["Title"] = T["Opening Balances"];
 
     // Typing balances needs the same right as the chart of accounts; anyone else sees the figures only.
-    var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage);
+    var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.AccountingManage)
+                  || await PermissionService.IsCurrentCompanyAdminAsync(User);
     var canEditMasterData = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
     var entryIndex = 0;
 }

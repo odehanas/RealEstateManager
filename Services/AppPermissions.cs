@@ -386,6 +386,37 @@ namespace RealEstateManager.Services
             !string.IsNullOrWhiteSpace(controllerName) &&
             MasterDataReadPermissions.ContainsKey(controllerName);
 
+        /// <summary>
+        /// The System Setup screens. Besides whoever holds their permission, an administrator
+        /// of the company may open them for that company: setting the company up is what an
+        /// administrator is for. Approving a period reopening is not setup, and stays with
+        /// the people given that right.
+        /// </summary>
+        private static readonly HashSet<string> CompanySetupControllers =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "ChartOfAccounts", "AccountMappings", "OpeningBalances", "OwnerWithdrawalCategories",
+                "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing"
+            };
+
+        private static readonly HashSet<string> CompanySetupActions =
+            new(StringComparer.OrdinalIgnoreCase) { "EInvoicing.Settings" };
+
+        private static readonly HashSet<string> NotCompanySetupActions =
+            new(StringComparer.OrdinalIgnoreCase) { "Closing.ReopenRequests", "Closing.ApproveReopen", "Closing.RejectReopen" };
+
+        public static bool IsCompanySetupScreen(string? controllerName, string? actionName)
+        {
+            if (string.IsNullOrWhiteSpace(controllerName))
+                return false;
+
+            var key = $"{controllerName}.{actionName}";
+            if (NotCompanySetupActions.Contains(key))
+                return false;
+
+            return CompanySetupActions.Contains(key) || CompanySetupControllers.Contains(controllerName);
+        }
+
         public static IReadOnlyList<string> ResolvePermissions(string? controllerName, string? actionName)
         {
             if (string.IsNullOrWhiteSpace(controllerName))
