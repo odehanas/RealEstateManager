@@ -533,6 +533,7 @@ namespace RealEstateManager.Services.Import
                 property.Code = await _codes.GeneratePropertyCodeAsync(property.OwnershipType, property.PropertyType);
                 property.CompanyId = companyId;
                 property.IsActive = true;
+                await LandlordService.LinkByOwnerNameAsync(_db, property);
                 _db.Properties.Add(property);
                 await _db.SaveChangesAsync();
                 propertyIds[row.Text("Ref")!] = property.Id;

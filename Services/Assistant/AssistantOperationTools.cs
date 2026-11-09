@@ -554,6 +554,7 @@ namespace RealEstateManager.Services.Assistant
                     property.Code = await ctx.Get<CodeGenerationService>().GeneratePropertyCodeAsync(property.OwnershipType, property.PropertyType);
                     property.CompanyId = ctx.CompanyId;
                     property.IsActive = true;
+                    await LandlordService.LinkByOwnerNameAsync(ctx.Db, property);
                     ctx.Db.Properties.Add(property);
                     await ctx.Db.SaveChangesAsync();
                     return new AssistantActionResult

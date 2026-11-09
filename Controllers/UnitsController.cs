@@ -82,6 +82,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("PropertyId")]
         public async Task<IActionResult> Create(UnitCreateViewModel model)
         {
             ViewBag.Properties = await _db.Properties
@@ -165,6 +166,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("PropertyId", "UnitNumber")]
         public async Task<IActionResult> Edit(int id, UnitCreateViewModel model)
         {
             ViewBag.Properties = await _db.Properties

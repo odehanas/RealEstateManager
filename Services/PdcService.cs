@@ -9,10 +9,24 @@ namespace RealEstateManager.Services
         private readonly ApplicationDbContext _db;
         private readonly AccountingPostingService _accountingPostingService;
 
-        public PdcService(ApplicationDbContext db, AccountingPostingService accountingPostingService)
+        private readonly CollectionAccountService _collection;
+
+        public PdcService(ApplicationDbContext db, AccountingPostingService accountingPostingService, CollectionAccountService collection)
         {
             _db = db;
             _accountingPostingService = accountingPostingService;
+            _collection = collection;
+        }
+
+        /// <summary>
+        /// Who holds the money of this cheque. Fixed the first time the cheque is recorded, so
+        /// one recorded while the company held the rent still clears into the company's bank
+        /// after the property moves to another arrangement.
+        /// </summary>
+        private static string FixCollectionMode(PdcReceipt pdc)
+        {
+            pdc.CollectionMode ??= pdc.Lease!.Unit!.Property!.EffectiveCollectionMode;
+            return pdc.CollectionMode;
         }
 
         public async Task<JournalEntry> ReceivePdcAsync(int pdcReceiptId)
@@ -96,6 +110,7 @@ namespace RealEstateManager.Services
 
             // Status becomes Received when the memorandum journal is posted.
             pdc.MemorandumJournalEntryId = journalEntry.Id;
+            FixCollectionMode(pdc);
 
             if (!pdc.TenantId.HasValue)
             {
@@ -217,10 +232,13 @@ namespace RealEstateManager.Services
                 settings.PdcContraAccountId,
                 "PDC Contra");
 
-            var cashAccount = await GetMappedAccountAsync(
-                pdc.CompanyId,
-                settings.DefaultCashAccountId,
-                "Default Cash");
+            // The company's bank, the owners' funds bank, or - a cheque written to the
+            // landlord - Due to Landlords: the landlord banked it, so we owe them that much less.
+            var collectionMode = FixCollectionMode(pdc);
+            var cashAccount = await _collection.ReceivingAccountAsync(pdc.CompanyId, pdc.Lease!.Unit!.Property!, collectionMode);
+            var clearedTo = collectionMode == CollectionModes.Owner
+                ? "PDC cleared into the owner's account"
+                : "PDC cleared to bank";
 
             Account settlementCreditAccount;
 
@@ -257,7 +275,7 @@ namespace RealEstateManager.Services
                     "PdcClearance",
                     new List<JournalEntryLine>
                     {
-                        Line(pdc, cashAccount.Id, pdc.Amount, 0m, $"PDC cleared to bank {pdc.ChequeNumber}"),
+                        Line(pdc, cashAccount.Id, pdc.Amount, 0m, $"{clearedTo} {pdc.ChequeNumber}"),
                         Line(pdc, collection.Id, 0m, pdc.Amount, $"PDC collected from bank {pdc.ChequeNumber}")
                     });
 
@@ -300,7 +318,7 @@ namespace RealEstateManager.Services
                     AccountId = cashAccount.Id,
                     Debit = pdc.Amount,
                     Credit = 0m,
-                    Description = $"PDC cleared to bank {pdc.ChequeNumber}",
+                    Description = $"{clearedTo} {pdc.ChequeNumber}",
                     PropertyId = property.Id,
                     UnitId = unit.Id,
                     TenantId = tenant.Id,
@@ -417,6 +435,7 @@ namespace RealEstateManager.Services
             await ThrowIfInvoiceNotPostedAsync(pdc);
 
             var settings = await GetCompanyAccountSettingAsync(pdc.CompanyId);
+            FixCollectionMode(pdc);
             var onHand = await GetMappedAccountAsync(pdc.CompanyId, settings.PdcOnHandAccountId, "PDC On Hand");
             var contra = await GetMappedAccountAsync(pdc.CompanyId, settings.PdcContraAccountId, "PDC Contra");
             var collection = await UnderCollectionAccountAsync(pdc.CompanyId, settings);

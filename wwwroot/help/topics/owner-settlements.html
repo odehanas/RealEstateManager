@@ -55,6 +55,34 @@ month posted after its invoice run) is picked up by the next run. A company with
     Correct a mistake with an adjustment in the following month rather than by undoing the invoice.</p>
 </div>
 
+<h3>Who holds the rent: three arrangements</h3>
+<p>Each landlord is a record under <span class="path">Master Data ▸ Landlords</span>, with their TRN, contact details and
+their own bank account. On a managed property, choose the <strong>Landlord</strong> and <strong>Who holds the rent</strong>.
+It decides only where a tenant's money lands, on a receipt or when a cheque clears. Invoices, the cheque register,
+deposits and returned cheques work the same way whichever you choose.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Arrangement</th><th>Where the money goes</th><th style="width:30%">In the accounts</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Company bank account</strong></td><td>The company's own bank, as before.</td><td>Dr the company's cash account.</td></tr>
+        <tr><td><strong>Owners' funds bank account</strong></td><td>A company bank account kept for landlords' money only.
+            You pay landlords from it, so their money never mixes with the company's.</td><td>Dr 11120 Bank - Owners' Funds, or the
+            account listed under <span class="path">System Setup ▸ Bank Accounts</span>.</td></tr>
+        <tr><td><strong>Paid to the owner directly</strong></td><td>The landlord's own bank account. Tenants pay the landlord and
+            cheques are written to the landlord; you still keep the cheque register and follow every cheque.</td><td>Dr Due to
+            Landlords: no company bank moves.</td></tr>
+    </tbody>
+</table>
+<ul>
+    <li>A landlord who wants an owners' funds account of their own: add it under <strong>Bank Accounts</strong> and choose them
+        in <strong>Kept for one landlord only</strong>. Their rent goes there; everyone else's goes to the shared account.</li>
+    <li>A cheque keeps the arrangement it was recorded under, so changing a property's arrangement never moves cheques already received.</li>
+    <li><strong>Paid to the owner directly</strong>: the owner statement shows <em>rent the tenants paid to the owner directly</em>
+        as already paid. When the landlord has received more than their share, the balance turns into what they owe you:
+        your commission. Collect it with the commission tax invoice. If the rent is invoiced in the company's name, the VAT on
+        it is still yours to pay, so invoice it in the owner's name for this arrangement.</li>
+    <li>Security deposits are still held by the company.</li>
+</ul>
+
 <h3>Paying an owner</h3>
 <ol class="steps">
     <li>Open <span class="path">Operations ▸ Owner Settlements</span>. Every landlord named on a managed property is

@@ -82,6 +82,13 @@
 
         public string? Notes { get; set; }
 
+        /// <summary>
+        /// Who holds the money of this cheque, fixed when it is first recorded so that a
+        /// cheque ends where it started even if the property's arrangement changes meanwhile.
+        /// See <see cref="CollectionModes"/>; empty on cheques recorded before it existed.
+        /// </summary>
+        public string? CollectionMode { get; set; }
+
         public int? MemorandumJournalEntryId { get; set; }
         public JournalEntry? MemorandumJournalEntry { get; set; }
 

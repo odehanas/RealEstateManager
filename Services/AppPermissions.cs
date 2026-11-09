@@ -241,6 +241,7 @@ namespace RealEstateManager.Services
                 ["Properties"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
                 ["Units"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
                 ["Tenants"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
+                ["Landlords"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight, AppPermissions.AccountingManage },
 
                 // An accountant entering a bill must be able to find the supplier, so
                 // Accounting.Manage carries read access - but not the right to create
@@ -301,6 +302,7 @@ namespace RealEstateManager.Services
                 ["OwnerWithdrawalLocations"] = new[] { AppPermissions.AccountingManage },
                 ["PettyCash"] = new[] { AppPermissions.AccountingManage },
                 ["VatSettings"] = new[] { AppPermissions.AccountingManage },
+                ["BankAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerInvoices"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerCreditNotes"] = new[] { AppPermissions.AccountingManage },
                 ["EInvoicing"] = new[] { AppPermissions.AccountingManage },
@@ -396,7 +398,7 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 "ChartOfAccounts", "AccountMappings", "OpeningBalances", "OwnerWithdrawalCategories",
-                "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing"
+                "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing", "BankAccounts"
             };
 
         private static readonly HashSet<string> CompanySetupActions =

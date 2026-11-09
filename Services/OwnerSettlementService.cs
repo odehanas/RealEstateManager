@@ -182,7 +182,11 @@ namespace RealEstateManager.Services
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
                             x.ReceiptDate <= asOf)
                 .GroupBy(x => x.CustomerInvoice!.LeaseId)
-                .Select(g => new { LeaseId = g.Key, Amount = g.Sum(x => x.Amount) })
+                .Select(g => new
+                {
+                    LeaseId = g.Key, Amount = g.Sum(x => x.Amount),
+                    ToOwner = g.Sum(x => x.CollectionMode == CollectionModes.Owner ? x.Amount : 0m)
+                })
                 .ToListAsync();
 
             // Cleared cheques count as collected whether they settled an invoice or were
@@ -192,8 +196,15 @@ namespace RealEstateManager.Services
                             x.ClearanceJournalEntry != null && x.ClearanceJournalEntry.IsPosted &&
                             x.ClearedDate != null && x.ClearedDate <= asOf)
                 .GroupBy(x => x.LeaseId)
-                .Select(g => new { LeaseId = g.Key, Amount = g.Sum(x => x.Amount) })
+                .Select(g => new
+                {
+                    LeaseId = g.Key, Amount = g.Sum(x => x.Amount),
+                    ToOwner = g.Sum(x => x.CollectionMode == CollectionModes.Owner ? x.Amount : 0m)
+                })
                 .ToListAsync();
+
+            // Rent the tenants paid to the landlord directly: the landlord already has it.
+            model.ReceivedDirectly = receipts.Sum(x => x.ToOwner) + cheques.Sum(x => x.ToOwner);
 
             foreach (var lease in leases)
             {
@@ -351,7 +362,8 @@ namespace RealEstateManager.Services
                 CommissionVat = statement.CommissionVat,
                 OwnerShare = statement.OwnerShare,
                 CollectedOwnerShare = statement.OwnerShareCollected,
-                PreviouslySettled = statement.PreviouslySettled + statement.PendingSettlements,
+                // Rent the tenants paid the owner directly is, for the owner, money already received.
+                PreviouslySettled = statement.PreviouslySettled + statement.PendingSettlements + statement.ReceivedDirectly,
                 AmountPaid = amount,
                 PaymentMethod = input.PaymentMethod,
                 PaidFromAccountId = input.PaidFromAccountId,

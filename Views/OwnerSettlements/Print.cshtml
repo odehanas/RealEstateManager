@@ -87,7 +87,7 @@
                     <tr><td>@T["VAT on rent billed in your name, less maintenance and expenses charged to you"]</td><td class="text-end">@adjustments.ToString("N2")</td></tr>
                 }
                 <tr class="fw-bold"><td>@T["Your share"]</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
-                <tr><td>@T["Less: paid to you before"]</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
+                <tr><td>@T["Less: paid to you before, including rent tenants paid to you directly"]</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
                 <tr><td>@T["Balance due before this payment"]</td><td class="text-end">@((Model.OwnerShare - Model.PreviouslySettled).ToString("N2"))</td></tr>
                 <tr class="fw-bold table-primary"><td>@T["Paid now"]</td><td class="text-end">@Model.AmountPaid.ToString("N2")</td></tr>
                 <tr class="fw-bold"><td>@T["Balance still due to you"]</td><td class="text-end">@Model.BalanceAfter.ToString("N2")</td></tr>

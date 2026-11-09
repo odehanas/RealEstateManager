@@ -124,6 +124,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("FullName", "PartyType")]
         public async Task<IActionResult> Create(Tenant model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
@@ -158,6 +159,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("FullName", "PartyType")]
         public async Task<IActionResult> Edit(int id, Tenant model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();

@@ -1,0 +1,67 @@
+@model List<RealEstateManager.Models.BankAccountListItemViewModel>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Bank Accounts"];
+}
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Bank Accounts"]</h2>
+        <p class="text-muted mb-0">@T["The company's bank accounts. Keep owners' money in an owners' funds account, apart from the company's own."]</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">@T["New Bank Account"]</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border">@T["No bank accounts listed yet. Rent that a property collects into owners' funds goes to ledger account 11120 Bank - Owners' Funds until you add one."]</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>@T["Name"]</th>
+                        <th>@T["Bank"]</th>
+                        <th>@T["IBAN"]</th>
+                        <th>@T["Ledger account"]</th>
+                        <th>@T["What it is for"]</th>
+                        <th class="text-end">@T["Balance"]</th>
+                        <th class="text-center">@T["Status"]</th>
+                        <th style="width:80px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bank in Model)
+                    {
+                        <tr>
+                            <td>@bank.Name</td>
+                            <td>@(bank.BankName ?? "-")</td>
+                            <td dir="ltr">@(bank.Iban ?? "-")</td>
+                            <td>@bank.AccountCode - @bank.AccountName</td>
+                            <td>
+                                @T[BankAccountPurposes.Describe(bank.Purpose)]
+                                @if (bank.LandlordName != null)
+                                {
+                                    <div class="small text-muted">@T.Format("Only for {0}", bank.LandlordName)</div>
+                                }
+                            </td>
+                            <td class="text-end">@bank.Balance.ToString("N2")</td>
+                            <td class="text-center">
+                                <span class="badge @(bank.IsActive ? "bg-success" : "bg-secondary")">@(bank.IsActive ? T["Active"] : T["Inactive"])</span>
+                            </td>
+                            <td><a asp-action="Edit" asp-route-id="@bank.Id" class="btn btn-sm btn-outline-secondary">@T["Edit"]</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -242,6 +242,8 @@ builder.Services.AddScoped<CodeGenerationService>();
 builder.Services.AddScoped<MasterDataUniquenessService>();
 builder.Services.AddScoped<VendorBillService>();
 builder.Services.AddScoped<ContractQrService>();
+builder.Services.AddScoped<CollectionAccountService>();
+builder.Services.AddScoped<LandlordService>();
 builder.Services.AddScoped<AccountingPostingService>();
 builder.Services.AddScoped<EInvoiceService>();
 builder.Services.AddScoped<CreditNoteService>();

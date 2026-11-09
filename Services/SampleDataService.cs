@@ -375,6 +375,7 @@ namespace RealEstateManager.Services
                     CommissionPercentage = commission,
                     IsActive = true
                 };
+                await LandlordService.LinkByOwnerNameAsync(_db, property);
                 _db.Properties.Add(property);
                 await _db.SaveChangesAsync();
                 _properties[key] = property;

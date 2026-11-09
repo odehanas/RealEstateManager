@@ -40,6 +40,8 @@ namespace RealEstateManager.Data
         public DbSet<AccountingPeriodEvent> AccountingPeriodEvents => Set<AccountingPeriodEvent>();
 
         public DbSet<Property> Properties => Set<Property>();
+        public DbSet<Landlord> Landlords => Set<Landlord>();
+        public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
         public DbSet<Unit> Units => Set<Unit>();
         public DbSet<Tenant> Tenants => Set<Tenant>();
         public DbSet<Lease> Leases => Set<Lease>();
@@ -271,6 +273,42 @@ namespace RealEstateManager.Data
 
             modelBuilder.Entity<Property>().Property(x => x.VatCategory).HasMaxLength(20);
             modelBuilder.Entity<Property>().Property(x => x.OwnerTrn).HasMaxLength(20);
+            modelBuilder.Entity<Property>().Property(x => x.CollectionMode).HasMaxLength(20);
+            modelBuilder.Entity<Property>().Ignore(x => x.EffectiveCollectionMode);
+            modelBuilder.Entity<Property>()
+                .HasOne(x => x.Landlord).WithMany().HasForeignKey(x => x.LandlordId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<PdcReceipt>().Property(x => x.CollectionMode).HasMaxLength(20);
+            modelBuilder.Entity<CustomerReceipt>().Property(x => x.CollectionMode).HasMaxLength(20);
+
+            modelBuilder.Entity<Landlord>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(200);
+                entity.Property(x => x.Trn).HasMaxLength(20);
+                entity.Property(x => x.Email).HasMaxLength(200);
+                entity.Property(x => x.Phone).HasMaxLength(50);
+                entity.Property(x => x.BankName).HasMaxLength(100);
+                entity.Property(x => x.AccountName).HasMaxLength(200);
+                entity.Property(x => x.Iban).HasMaxLength(34);
+                entity.Property(x => x.DefaultCollectionMode).HasMaxLength(20);
+                entity.Property(x => x.Notes).HasMaxLength(1000);
+                entity.HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<BankAccount>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(100);
+                entity.Property(x => x.BankName).HasMaxLength(100);
+                entity.Property(x => x.Iban).HasMaxLength(34);
+                entity.Property(x => x.Purpose).HasMaxLength(20);
+                entity.HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
+                entity.HasIndex(x => x.AccountId).IsUnique();
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Account).WithMany().HasForeignKey(x => x.AccountId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Landlord).WithMany().HasForeignKey(x => x.LandlordId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
 
             // Registration details on the property record.
             modelBuilder.Entity<Property>(entity =>

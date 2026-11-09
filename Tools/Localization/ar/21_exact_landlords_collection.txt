@@ -1,0 +1,64 @@
+# Sheet 21: landlords, the company's bank accounts, and who holds the rent of a managed property (whole texts; {0} are values).
+Landlords ||| الملاك
+Landlord ||| المالك
+New Landlord ||| مالك جديد
+Edit Landlord ||| تعديل المالك
+New landlord ||| مالك جديد
+Back to Landlords ||| العودة إلى الملاك
+The owners of the properties you manage, their bank account, and who holds their rent. ||| ملاك العقارات التي تديرها، وحساباتهم البنكية، ومن يحتفظ بإيجاراتهم.
+No landlords yet. Add one, then choose them on each managed property. ||| لا يوجد ملاك بعد. أضف مالكاً ثم اختره في كل عقار مُدار.
+Who holds the rent, by default ||| من يحتفظ بالإيجار افتراضياً
+Who holds the rent ||| من يحتفظ بالإيجار
+Company bank account ||| الحساب البنكي للشركة
+Owners' funds bank account ||| حساب أموال الملاك البنكي
+Paid to the owner directly ||| يُدفع للمالك مباشرة
+-- managed properties only -- ||| -- للعقارات المُدارة فقط --
+The owner of a managed property; their TRN is printed on our commission tax invoice. ||| مالك العقار المُدار؛ ويُطبع رقمه الضريبي على فاتورة العمولة الضريبية.
+Where tenants' payments land when they pay or a cheque clears. Paid to the owner directly: cheques are written to the owner and no company bank moves. ||| أين تذهب مدفوعات المستأجرين عند السداد أو عند صرف الشيك. الدفع للمالك مباشرة: تُحرر الشيكات باسم المالك ولا يتحرك أي حساب بنكي للشركة.
+If VAT registered. Printed on our commission tax invoice. ||| إذا كان مسجلاً في ضريبة القيمة المضافة. يُطبع على فاتورة العمولة الضريبية.
+Proposed for each of this landlord's properties; a property can still differ. ||| يُقترح لكل عقارات هذا المالك، ويمكن أن يختلف عقار عن غيره.
+The landlord's own bank account ||| الحساب البنكي الخاص بالمالك
+Name ||| الاسم
+TRN ||| الرقم الضريبي
+IBAN ||| رقم الآيبان (IBAN)
+Bank ||| البنك
+Account name ||| اسم الحساب
+Active ||| نشط
+Inactive ||| غير نشط
+Bank Accounts ||| الحسابات البنكية
+New Bank Account ||| حساب بنكي جديد
+Edit Bank Account ||| تعديل الحساب البنكي
+Back to Bank Accounts ||| العودة إلى الحسابات البنكية
+The company's bank accounts. Keep owners' money in an owners' funds account, apart from the company's own. ||| الحسابات البنكية للشركة. احتفظ بأموال الملاك في حساب أموال الملاك، منفصلة عن أموال الشركة.
+No bank accounts listed yet. Rent that a property collects into owners' funds goes to ledger account 11120 Bank - Owners' Funds until you add one. ||| لا توجد حسابات بنكية بعد. الإيجار الذي يُحصَّل لحساب أموال الملاك يذهب إلى الحساب 11120 البنك - أموال الملاك إلى أن تضيف حساباً.
+Ledger account ||| حساب دفتر الأستاذ
+What it is for ||| الغرض منه
+Owners' funds ||| أموال الملاك
+Company operating ||| تشغيلي للشركة
+Only for {0} ||| خاص بـ {0}
+Balance ||| الرصيد
+e.g. Owners' funds - ADCB ||| مثال: أموال الملاك - بنك أبوظبي التجاري
+Where its balance is kept in the chart of accounts. For owners' funds, 11120 Bank - Owners' Funds. ||| مكان رصيده في دليل الحسابات. لأموال الملاك: 11120 البنك - أموال الملاك.
+Owners' funds: only landlords' money goes in, and settlements are paid from it. ||| أموال الملاك: لا تدخله إلا أموال الملاك، وتُدفع التسويات منه.
+Kept for one landlord only ||| مخصص لمالك واحد فقط
+-- all landlords -- ||| -- كل الملاك --
+For a landlord who wants an account of their own; their rent then goes here instead of the shared one. ||| لمالك يريد حساباً خاصاً به؛ فيذهب إيجاره إليه بدلاً من الحساب المشترك.
+Enter the landlord's name. ||| أدخل اسم المالك.
+A landlord with this name already exists. ||| يوجد مالك بهذا الاسم بالفعل.
+That IBAN does not look right. A UAE IBAN is AE followed by 21 digits. ||| رقم الآيبان غير صحيح على ما يبدو. الآيبان الإماراتي هو AE يليه 21 رقماً.
+Choose how this landlord's rent is collected. ||| اختر طريقة تحصيل إيجار هذا المالك.
+The landlord could not be found. ||| تعذر العثور على المالك.
+This landlord already has settlements or commission invoices under this name, so the name cannot change. ||| لهذا المالك تسويات أو فواتير عمولة بهذا الاسم، لذا لا يمكن تغيير الاسم.
+Give the bank account a name. ||| أدخل اسماً للحساب البنكي.
+A bank account with this name already exists. ||| يوجد حساب بنكي بهذا الاسم بالفعل.
+Choose what the account is for. ||| اختر الغرض من الحساب.
+Choose the ledger account this bank account is kept in. Each ledger account belongs to one bank account. ||| اختر حساب دفتر الأستاذ لهذا الحساب البنكي. كل حساب في الدفتر يخص حساباً بنكياً واحداً.
+Choose a landlord of this company. ||| اختر مالكاً من ملاك هذه الشركة.
+The bank account could not be found. ||| تعذر العثور على الحساب البنكي.
+Choose the landlord of this managed property. ||| اختر مالك هذا العقار المُدار.
+Landlord {0} saved. ||| تم حفظ المالك {0}.
+Bank account {0} saved. ||| تم حفظ الحساب البنكي {0}.
+Less: rent the tenants paid to the owner directly ||| ناقصاً: الإيجار الذي دفعه المستأجرون للمالك مباشرة
+The owner received more than their share: this is what the owner owes us, our commission included ||| استلم المالك أكثر من حصته: هذا ما يدين به المالك لنا، بما في ذلك عمولتنا
+Less: paid to you before, including rent tenants paid to you directly ||| ناقصاً: ما دُفع لك سابقاً، بما فيه الإيجار الذي دفعه المستأجرون لك مباشرة
+The form was incomplete, so nothing was saved. Open the page again and save it from there. ||| النموذج غير مكتمل، لذلك لم يُحفظ شيء. افتح الصفحة مرة أخرى واحفظها منها.
