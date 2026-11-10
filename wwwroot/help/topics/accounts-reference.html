@@ -5,11 +5,15 @@
     <tbody>
         <tr><td><strong>10000</strong></td><td><strong>Assets</strong></td><td>Asset</td><td>Assets</td></tr>
         <tr><td>11100</td><td>Cash and Cash Equivalents</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11120</td><td>Bank - Owners' Funds</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11150</td><td>Petty Cash</td><td>Asset</td><td>Assets</td></tr>
         <tr><td>11200</td><td>Accounts Receivable <span class="small muted">(control)</span></td><td>Asset</td><td>Assets</td></tr>
         <tr><td>11300</td><td>VAT Recoverable</td><td>Asset</td><td>Assets</td></tr>
         <tr><td>11400</td><td>PDC On Hand</td><td>Asset</td><td>Assets</td></tr>
         <tr><td>11450</td><td>Cheques Under Collection</td><td>Asset</td><td>Assets</td></tr>
         <tr><td>11500</td><td>Prepaid Expenses</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11550</td><td>Advances to Suppliers</td><td>Asset</td><td>Assets</td></tr>
+        <tr><td>11600</td><td>Employee Advances</td><td>Asset</td><td>Assets</td></tr>
 
         <tr><td>11650</td><td>Maintenance Materials Stock</td><td>Asset</td><td>Assets</td></tr>
         <tr><td>15100</td><td>Investment Property</td><td>Asset</td><td>Assets</td></tr>
@@ -31,6 +35,8 @@
         <tr><td>21400</td><td>VAT Payable</td><td>Liability</td><td>Liabilities</td></tr>
         <tr><td>21500</td><td>Due to Landlords</td><td>Liability</td><td>Liabilities</td></tr>
         <tr><td>21600</td><td>PDC Contra</td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21700</td><td>Salaries Payable</td><td>Liability</td><td>Liabilities</td></tr>
+        <tr><td>21800</td><td>End of Service Benefits Provision</td><td>Liability</td><td>Liabilities</td></tr>
 
         <tr><td><strong>30000</strong></td><td><strong>Equity</strong></td><td>Equity</td><td>Equity</td></tr>
         <tr><td>31100</td><td>Share Capital</td><td>Equity</td><td>Equity</td></tr>
@@ -54,6 +60,10 @@
         <tr><td>61200</td><td>Irrecoverable VAT - Capital Assets Scheme</td><td>Expense</td><td>GeneralExpense</td></tr>
         <tr><td>62100</td><td>Depreciation Expense</td><td>Expense</td><td>GeneralExpense</td></tr>
         <tr><td>63100</td><td>Finance Costs</td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>64100</td><td>Basic Salaries</td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>64200</td><td>Staff Allowances</td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>64300</td><td>Overtime and Bonuses</td><td>Expense</td><td>GeneralExpense</td></tr>
+        <tr><td>64400</td><td>End of Service Benefits Expense</td><td>Expense</td><td>GeneralExpense</td></tr>
     </tbody>
 </table>
 
@@ -61,7 +71,7 @@
 <table class="t-compact">
     <thead><tr><th style="width:12%">Code</th><th style="width:40%">Account</th><th>Purpose</th></tr></thead>
     <tbody>
-        <tr><td>e.g. 11150</td><td>Petty Cash – <em>site name</em></td><td>One Asset account per petty cash float, with <strong>Petty Cash Float</strong> set to Yes. See <a href="#petty-cash">Petty Cash</a>.</td></tr>
+        <tr><td>e.g. 11160</td><td>Petty Cash – <em>site name</em></td><td>One Asset account per additional petty cash float, with <strong>Petty Cash Float</strong> set to Yes. See <a href="#petty-cash">Petty Cash</a>.</td></tr>
         <tr><td>34200…</td><td>Owner's Current Account – <em>owner name</em></td><td>One Equity account per additional owner, with <strong>Owner Account</strong> set to Yes. See <a href="#owner-withdrawals">Owner Withdrawals Explained</a>.</td></tr>
         <tr><td>39999</td><td>Opening Balance Control Account</td><td>Equity. Absorbs any imbalance in opening balances. Should return to zero. See <a href="#opening-balances">Opening Balances</a>.</td></tr>
     </tbody>

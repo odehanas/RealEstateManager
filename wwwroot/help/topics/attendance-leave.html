@@ -1,0 +1,75 @@
+<p>Attendance and leave are what make one month's pay differ from the next: overtime adds to it; unpaid leave,
+absence and lateness reduce it. Record them here and the payroll picks them up by itself. Both screens need
+<em>Manage Employees</em>.</p>
+
+<h3>Leave</h3>
+<p><span class="path">HR &amp; Payroll ▸ Leave</span></p>
+<ol class="steps">
+    <li>Under <strong>Book leave</strong>, choose the employee, the type and the <strong>From</strong> and <strong>To</strong>
+        dates, add a reason and select <strong>Book</strong>. Days are counted as calendar days, both dates included.
+        Employees can also ask for leave themselves from the <a href="#employee-portal">employee portal</a>; their request
+        arrives here as <em>Pending</em>.</li>
+    <li>On a pending request select <strong>Approve</strong> or <strong>Reject</strong>, with a comment if you wish.</li>
+    <li>Approved leave that will not be taken after all: <strong>Cancel leave</strong>.</li>
+</ol>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Type</th><th>Effect when approved</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Annual</strong></td><td>Comes off the employee's annual leave balance. Paid as usual.</td></tr>
+        <tr><td><strong>Unpaid</strong></td><td>The days are deducted by the payroll of the month they fall in. Leave that spans two months is split between them.</td></tr>
+        <tr><td><strong>Sick, Maternity, Parental, Compassionate, Hajj, Other</strong></td><td>Recorded and shown on the attendance sheet as <em>On leave</em>. No effect on the annual balance or the pay.</td></tr>
+    </tbody>
+</table>
+<p>The annual leave balance is the opening balance, plus leave earned month by month at the employee's yearly
+entitlement, less approved annual leave taken. It is shown on the employee's page and in their portal.</p>
+
+<h3>Attendance: the day sheet</h3>
+<p><span class="path">HR &amp; Payroll ▸ Attendance</span></p>
+<ol class="steps">
+    <li>Choose the <strong>Date</strong>. Everyone employed that day is listed. People not yet recorded start as
+        <em>On leave</em> (when approved leave covers the day), <em>Weekly off</em> (on the company's rest day) or <em>Present</em>.</li>
+    <li>Set each person's <strong>Status</strong> and, if you record times, <strong>In</strong> and <strong>Out</strong>.
+        Hours worked, overtime and minutes late are worked out from the times.</li>
+    <li>Select <strong>Save the day</strong>.</li>
+</ol>
+<ul>
+    <li><strong>Absent</strong> means absent without leave. It becomes an unauthorised-absence deduction.</li>
+    <li>Times entered on a weekly off or a holiday are paid as rest-day overtime.</li>
+    <li>On a working day, overtime is the time beyond the normal working day set in Payroll Settings.</li>
+</ul>
+
+<h3>Importing from a time-attendance device</h3>
+<p>Under <strong>Import device file (CSV)</strong>, choose the file exported from the device and select
+<strong>Import</strong>. The file has one line per employee per day:</p>
+<table class="t-compact">
+    <thead><tr><th>Column</th><th>Format</th></tr></thead>
+    <tbody>
+        <tr><td><code>EmployeeCode</code></td><td>The code from the employee register, e.g. EMP-0007</td></tr>
+        <tr><td><code>Date</code></td><td>yyyy-MM-dd or dd/MM/yyyy</td></tr>
+        <tr><td><code>CheckIn</code>, <code>CheckOut</code></td><td>HH:mm</td></tr>
+    </tbody>
+</table>
+<p>A header line is skipped. Someone clocked in is present; someone clocked in on a rest day is recorded as working on
+their weekly off.</p>
+
+<h3>From attendance to pay</h3>
+<ol class="steps">
+    <li>Select <strong>Month summary &amp; payroll</strong>. Each employee's month is summarised: days present, absent, on
+        leave, rest days, days not recorded, late days and minutes, overtime hours and rest-day overtime hours.</li>
+    <li>Check it. Working days with nothing recorded are treated as worked; complete the day sheets first if that is not right.</li>
+    <li>Select <strong>Generate payroll transactions</strong>. One approved transaction is made per employee and kind:
+        overtime, rest-day overtime, unauthorised absence and — if <em>Deduct late time from pay</em> is on in Payroll
+        Settings — late arrival.</li>
+    <li>Select <strong>See the transactions</strong> to review them under <a href="#payroll">Payroll Transactions</a>.</li>
+</ol>
+<p>Generating again replaces what was generated before, so attendance can be corrected and re-run until the month's
+payroll is approved.</p>
+
+<h3>Certificates and letters employees ask for</h3>
+<p><span class="path">HR &amp; Payroll ▸ Employee Requests</span> lists the salary certificates, salary transfer letters
+and employment certificates employees asked for in their portal, with who the letter is addressed to and why.</p>
+<ul>
+    <li><strong>Issue</strong> gives the letter a reference number. You can <strong>Print</strong> it here, and the
+        employee can open and print it from their phone.</li>
+    <li><strong>Decline</strong>, with a reason.</li>
+</ul>

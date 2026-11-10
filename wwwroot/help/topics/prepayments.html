@@ -4,16 +4,16 @@ Profit &amp; Loss evenly.</p>
 
 <h3>Creating a schedule</h3>
 <ol class="steps">
-    <li>Select <strong>New Prepayment</strong>.</li>
-    <li>Enter a <strong>Description</strong> and choose the <strong>Prepayment Type</strong>.</li>
+    <li>Select <strong>New Prepayment Setup</strong>.</li>
+    <li>Enter a <strong>Description</strong> and choose the <strong>Type</strong>: prepaid rent, prepaid insurance, service contract or other. The schedule number is generated if left blank.</li>
     <li>Enter the <strong>Payment Date</strong> and the <strong>Total Amount</strong>.</li>
-    <li>Enter the <strong>First Recognition Date</strong> (normalised to a month end) and the
+    <li>Enter the <strong>First Recognition Month</strong> (the entry is dated the month end) and the
         <strong>Recognition Months</strong>.</li>
-    <li>Choose the <strong>Prepaid Account</strong> (default <code>11500</code>) and the
+    <li>Choose the <strong>Prepaid Asset Account</strong> (default <code>11500</code>) and the
         <strong>Expense Account</strong> the cost belongs in.</li>
-    <li>Choose the <strong>Offset Account</strong> — cash if you paid directly, or Accounts Payable with a
-        <strong>Vendor</strong> if it is on credit.</li>
-    <li><strong>Save</strong>.</li>
+    <li>Choose the account it was <strong>Paid / Payable From</strong> — cash or bank if you paid directly, or Accounts
+        Payable with a <strong>Vendor</strong> if it is on credit.</li>
+    <li>Select <strong>Save Prepayment Setup</strong>.</li>
 </ol>
 
 <p>Saving creates the setup journal as a draft; post it from Journal Inquiry:</p>
@@ -26,8 +26,9 @@ Profit &amp; Loss evenly.</p>
 </table>
 
 <h3>Monthly amortisation</h3>
-<p>Each month end, select <strong>Post All Due Up To Selected Date</strong> to release the instalments due, then post
-the resulting drafts from Journal Inquiry:</p>
+<p>Each month end, set <strong>As Of Date</strong> and select <strong>Post All Due Up To Selected Date</strong> to
+release the instalments due, then post the resulting drafts from Journal Inquiry. <strong>Run amortisation</strong> in the
+<a href="#closing">Closing Cockpit</a> does both in one step for the month being closed:</p>
 <table class="je">
     <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
     <tbody>

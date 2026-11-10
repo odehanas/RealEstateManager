@@ -54,7 +54,9 @@ supplier's own statement, or to answer "what have we paid them this year?".</p>
 </ol>
 <p>The statement shows the opening balance owed, then every posted bill (billed, a credit) and payment (paid, a debit)
 in date order with a running balance, then the closing balance you owe. Underneath, <strong>Open Bills</strong> lists
-the posted bills not yet fully paid at the end date, with the days overdue.</p>
+the posted bills not yet fully paid at the end date, with the days overdue. <strong>Advances (down payments)</strong>
+are listed separately, each with the amount applied to bills and the amount still open: they are kept on
+<code>11550</code> Advances to Suppliers, apart from payables — see <a href="#vendor-payments">Vendor Payments</a>.</p>
 <p>It is read from Accounts Payable itself, so draft bills and payments are not shown, and the closing balances of all
 vendors add up to Accounts Payable in the Trial Balance. Manual journals on Accounts Payable appear when the line was
 given the vendor.</p>

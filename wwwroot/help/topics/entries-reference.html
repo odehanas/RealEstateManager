@@ -12,7 +12,7 @@ the system rejects any entry that does not balance.</p>
             <td>21200 Advances from Customers — subtotal<br/>21400 VAT Payable — VAT</td>
         </tr>
         <tr>
-            <td><strong>Customer invoice</strong><br/><span class="small muted">managed property</span></td>
+            <td><strong>Customer invoice</strong><br/><span class="small muted">managed property, in the company's name</span></td>
             <td>11200 Accounts Receivable — total</td>
             <td>21500 Due to Landlords — subtotal<br/>21400 VAT Payable — VAT</td>
         </tr>
@@ -122,9 +122,49 @@ the system rejects any entry that does not balance.</p>
             <td>21100 Accounts Payable — total</td>
         </tr>
         <tr>
-            <td><strong>Vendor payment</strong></td>
+            <td><strong>Vendor payment</strong><br/><span class="small muted">of open bills</span></td>
             <td>21100 Accounts Payable</td>
-            <td>11100 Cash and Cash Equivalents</td>
+            <td>The bank or cash account paid from</td>
+        </tr>
+        <tr>
+            <td><strong>Vendor advance</strong><br/><span class="small muted">paid before a bill</span></td>
+            <td>11550 Advances to Suppliers</td>
+            <td>The bank or cash account paid from</td>
+        </tr>
+        <tr>
+            <td><strong>Advance applied to bills</strong></td>
+            <td>21100 Accounts Payable</td>
+            <td>11550 Advances to Suppliers</td>
+        </tr>
+        <tr>
+            <td><strong>Customer invoice</strong><br/><span class="small muted">managed property, in the owner's name</span></td>
+            <td>11200 Accounts Receivable — total</td>
+            <td>21500 Due to Landlords — subtotal<br/>21500 Due to Landlords — VAT, the owner's to declare</td>
+        </tr>
+        <tr>
+            <td><strong>Customer receipt</strong><br/><span class="small muted">managed property, by who holds the rent</span></td>
+            <td>The company's bank, 11120 Bank - Owners' Funds, or 21500 Due to Landlords when paid to the owner directly</td>
+            <td>11200 Accounts Receivable</td>
+        </tr>
+        <tr>
+            <td><strong>Cost charged to an owner</strong><br/><span class="small muted">recharge or disbursement</span></td>
+            <td>21500 Due to Landlords — the cost, and its VAT</td>
+            <td>21100 Accounts Payable, the petty cash float or 11650 Maintenance Materials Stock<br/>21400 VAT Payable — our 5% on a recharge</td>
+        </tr>
+        <tr>
+            <td><strong>Salary advance</strong></td>
+            <td>11600 Employee Advances</td>
+            <td>The bank or cash account paid from</td>
+        </tr>
+        <tr>
+            <td><strong>Payroll approved</strong><br/><span class="small muted">monthly salary cost</span></td>
+            <td>64100 Basic Salaries, 64200 Staff Allowances, 64300 Overtime and Bonuses<br/>64400 End of Service Benefits Expense</td>
+            <td>21700 Salaries Payable — net pay<br/>11600 Employee Advances — instalments recovered<br/>21800 End of Service Benefits Provision</td>
+        </tr>
+        <tr>
+            <td><strong>Salaries paid</strong><br/><span class="small muted">each payment batch</span></td>
+            <td>21700 Salaries Payable</td>
+            <td>The bank account paid from</td>
         </tr>
         <tr>
             <td><strong>Petty cash voucher</strong></td>
@@ -169,5 +209,4 @@ the system rejects any entry that does not balance.</p>
     </tbody>
 </table>
 
-<p class="small muted">Every entry above except fixed asset postings is created as a draft (customer invoices and vendor
-bills are posted in the same click). See <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+<p class="small muted">Which of these are posted at once and which wait as drafts is set out screen by screen in <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>

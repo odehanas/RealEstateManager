@@ -3,19 +3,29 @@ fit-out — from acquisition through capitalisation to monthly depreciation.</p>
 
 <h3>Creating an asset</h3>
 <ol class="steps">
-    <li>Select <strong>New Fixed Asset</strong>.</li>
-    <li>Enter the <strong>Asset Code</strong> and <strong>Name</strong>.</li>
-    <li>Select the <strong>Asset Account</strong> and the <strong>Accumulated Depreciation Account</strong>
-        (defaults <code>15200</code> and <code>15300</code>).</li>
-    <li>Enter the <strong>Useful Life (months)</strong> and the <strong>Depreciation Start Date</strong>.</li>
+    <li>Select <strong>Add Fixed Asset</strong>.</li>
+    <li>Enter the <strong>Asset Code</strong>, the <strong>Asset Name</strong> and the <strong>Category</strong>
+        (furniture, equipment, vehicles …). Choose the <strong>Property</strong> it belongs to, or leave
+        <em>Not Property-Specific</em>.</li>
+    <li>Enter the <strong>Acquisition Date</strong> and the <strong>In Service Date</strong>.</li>
+    <li>Enter the <strong>Useful Life (Months)</strong> and any <strong>Residual Value</strong>.</li>
+    <li>Optionally enter the <strong>Initial Acquisition Cost</strong> with the account it was
+        <strong>Paid / Payable From</strong> (and the <strong>Vendor</strong>, when that is Accounts Payable). Further
+        costs are added afterwards.</li>
+    <li>Check the <strong>Asset Account</strong>, the <strong>Accumulated Depreciation Account</strong> and the
+        <strong>Depreciation Expense Account</strong> (defaults <code>15200</code>, <code>15300</code> and <code>62100</code>).</li>
     <li>For assets migrated from a previous system, enter the <strong>Opening Cost</strong> and
         <strong>Opening Accumulated Depreciation</strong>.</li>
-    <li><strong>Save</strong>.</li>
+    <li>Select <strong>Save Draft Asset</strong>.</li>
 </ol>
+<p>The asset is saved as a <strong>draft</strong>. It is not depreciated until it has been capitalised.</p>
 
 <h3>Acquisition costs</h3>
-<p>Open an asset and select <strong>Acquisition</strong> to accumulate the costs that make up its value —
-the supplier invoice, freight, installation, professional fees. Each entry posts:</p>
+<p>Select <strong>Acquisition</strong> on the asset's row to accumulate the costs that make up its value —
+the supplier invoice, freight, installation, customs, testing. For each cost enter the <strong>Cost Date</strong>,
+<strong>Cost Type</strong>, <strong>Amount</strong>, whether it is <strong>Capitalizable</strong>, and the account it was
+<strong>Paid / Payable From</strong>, then select <strong>Add Cost</strong>. Only a draft asset accepts new costs. Each
+entry posts immediately:</p>
 <table class="je">
     <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
     <tbody>
@@ -27,8 +37,10 @@ the supplier invoice, freight, installation, professional fees. Each entry posts
 payable appears in the vendor's sub-ledger.</p>
 
 <h3>Capitalisation</h3>
-<p>When the asset is complete and in use, capitalise it. The accumulated clearing balance moves to the
-asset account and the depreciation schedule is generated over the useful life:</p>
+<p>When the asset is complete and in use, capitalise it on the same screen: enter the
+<strong>Capitalization Date</strong> and select <strong>Capitalize Asset</strong>. The accumulated clearing balance moves
+to the asset account and the depreciation schedule is generated over the useful life. Depreciation starts only after
+capitalisation:</p>
 <table class="je">
     <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
     <tbody>
@@ -39,10 +51,15 @@ asset account and the depreciation schedule is generated over the useful life:</
 
 <h3>Running depreciation</h3>
 <ol class="steps">
-    <li>Open <strong>Depreciation</strong> from the fixed asset screen.</li>
-    <li>Enter the <strong>posting date</strong> — normally the month end being closed.</li>
-    <li>Select <strong>Post Depreciation</strong>. Every scheduled instalment on or before that date is posted.</li>
+    <li>Open <span class="path">Operations ▸ Fixed Assets</span>. The <strong>Due to Post</strong> card shows how many
+        monthly instalments are waiting.</li>
+    <li>Enter the <strong>Posting Date</strong> — normally the month end being closed.</li>
+    <li>Select <strong>Post Due Depreciation</strong>. Every planned instalment up to the month end of that date is
+        posted, for all assets.</li>
 </ol>
+<p><strong>Depreciation</strong> on an asset's row shows its schedule month by month, with what has been posted and its
+net book value. The same run is offered as <strong>Run depreciation</strong> in the
+<a href="#closing">Closing Cockpit</a>.</p>
 
 <table class="je">
     <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>

@@ -1,0 +1,131 @@
+<p>The monthly payroll runs in three stages — <strong>prepare</strong>, <strong>approve</strong>, <strong>pay</strong> —
+and writes its own accounting entries. Preparing and paying needs <em>Prepare &amp; Pay Payroll</em>; approving needs
+<em>Approve Payroll</em>.</p>
+
+<h3>Payroll Settings: once, before the first payroll</h3>
+<p><span class="path">HR &amp; Payroll ▸ Payroll Settings</span></p>
+<table class="t-compact">
+    <thead><tr><th style="width:26%">Section</th><th>What to enter</th></tr></thead>
+    <tbody>
+        <tr><td><strong>WPS</strong></td><td>The company's 13-digit MOHRE establishment number, and the name and 9-digit routing code of the bank that sends the salary file.</td></tr>
+        <tr><td><strong>Accounts</strong></td><td>The accounts the payroll posts to — basic salaries, allowances, overtime and bonuses, salaries payable, employee advances, end-of-service expense and provision — and the default bank salaries are paid from. A payroll cannot be approved until they are chosen.</td></tr>
+        <tr><td><strong>Calculation</strong></td><td>Overtime rate (1.25 = 125% of the basic hourly wage), rest-day and holiday overtime rate (1.5), working hours a day, the time the working day starts, the weekly rest days, minutes of grace before an arrival counts as late, whether late time is deducted from pay, and whether to provide for end-of-service gratuity every month.</td></tr>
+        <tr><td><strong>Cheque layout</strong></td><td>Where the date, payee, amount in words and amount in figures print on your bank's cheque, in millimetres, for laser/inkjet or dot matrix printers. Use the test print buttons on plain paper first.</td></tr>
+    </tbody>
+</table>
+
+<h3>Payroll Transactions: the month's additions and deductions</h3>
+<p><span class="path">HR &amp; Payroll ▸ Payroll Transactions</span></p>
+<p>Anything beyond the fixed salary is a transaction: overtime, rest-day overtime, a bonus, a commission, another
+addition; unauthorised absence, late arrival, a penalty, a damage recovery, another deduction.</p>
+<ol class="steps">
+    <li>Under <strong>New transaction</strong> choose the employee, the date and the <strong>Kind</strong>.</li>
+    <li>Enter the <strong>Hours</strong> (or minutes or days) for kinds measured in time, or the <strong>Amount</strong> for
+        kinds entered as money, and a description.</li>
+    <li>Tick <strong>Approve now</strong> if you may approve it yourself, and select <strong>Save</strong>. Otherwise it
+        waits; tick the waiting ones in the list and select <strong>Approve selected</strong> or <strong>Reject selected</strong>.</li>
+</ol>
+<ul>
+    <li><strong>Generate from attendance</strong> creates the overtime, absence and lateness transactions from the month's
+        attendance — see <a href="#attendance-leave">Attendance &amp; Leave</a>.</li>
+    <li>Overtime is priced at the overtime rate on the basic hourly wage (basic ÷ 30 ÷ daily hours); late minutes at that
+        wage; unauthorised absence reduces the days paid, so it comes off the whole fixed salary.</li>
+    <li>The next payroll pays every approved transaction dated on or before its month end that no earlier payroll has
+        paid. Draft payrolls update by themselves when transactions are approved, changed or removed.</li>
+</ul>
+
+<h3>Salary Advances</h3>
+<p><span class="path">HR &amp; Payroll ▸ Salary Advances</span></p>
+<ol class="steps">
+    <li>Under <strong>Pay an advance</strong> choose the employee, the date, the <strong>Amount</strong>, the
+        <strong>Monthly recovery</strong>, the account it is <strong>Paid from</strong> and the cheque or transfer reference.</li>
+    <li>Select <strong>Save and Post</strong>.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11600</code> Employee Advances</td><td class="num dr">Advance</td><td class="num">—</td></tr>
+        <tr><td>Bank or cash it is paid from</td><td class="num">—</td><td class="num cr">Advance</td></tr>
+    </tbody>
+</table>
+<p>The advance is an asset until it is repaid. Each payroll recovers one instalment, oldest advance first, and the list
+shows what has been recovered and what is outstanding. Where <a href="#payment-approvals">payment approval</a> is on, the
+person recording the advance must hold an approval level that covers its amount; otherwise it is refused and someone
+with that authority records it.</p>
+
+<h3>Step 1 — Prepare the payroll</h3>
+<p><span class="path">HR &amp; Payroll ▸ Payroll Runs</span></p>
+<ol class="steps">
+    <li>Choose the <strong>Month</strong> and <strong>Year</strong> and select <strong>Prepare payroll</strong>. The run is
+        numbered <code>PR-year-month</code> and calculated for everyone employed in the month.</li>
+    <li>Check each line: days paid, basic, allowances, overtime, unpaid and absent days, additions, advance recovery,
+        deductions and net.</li>
+    <li>To change what one person repays this month, edit <strong>Advance</strong> on their line and select
+        <strong>Save the advance recovery</strong>. To add overtime, a bonus or a deduction, use
+        <strong>+ / − Transaction</strong> on the line.</li>
+    <li>If employee records changed since — a new joiner, a leaver, a salary change, newly approved unpaid leave — select
+        <strong>Recalculate from employee records</strong>. Transactions already entered are kept.</li>
+    <li><strong>Print register</strong> prints the whole payroll for review. <strong>Delete draft</strong> removes a run
+        prepared by mistake.</li>
+</ol>
+<p>Fixed pay is pro rata to the days paid: someone who joined or left during the month, or took unpaid leave, is paid
+for their days only. Suspended employees are left out.</p>
+
+<h3>Step 2 — Approve</h3>
+<p>A user with <em>Approve Payroll</em> opens the run and selects <strong>Approve payroll</strong>. When the company has
+more than one payroll approver, the person who prepared the payroll cannot approve it. Where
+<a href="#payment-approvals">payment approval</a> is on, the approver's level must cover the month's net pay. A payroll
+with a negative net salary is refused until the deductions are corrected.</p>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Salary expense — basic, allowances, overtime and bonuses <span class="small muted">(by building, for staff assigned to one)</span></td><td class="num dr">Gross less deductions</td><td class="num">—</td></tr>
+        <tr><td>Employee Advances <span class="small muted">(instalments recovered)</span></td><td class="num">—</td><td class="num cr">Recovered</td></tr>
+        <tr><td>Salaries Payable</td><td class="num">—</td><td class="num cr">Net</td></tr>
+        <tr><td>End-of-service expense</td><td class="num dr">Month's provision</td><td class="num">—</td></tr>
+        <tr><td>End-of-service provision</td><td class="num">—</td><td class="num cr">Month's provision</td></tr>
+    </tbody>
+</table>
+<p>The cost is posted on the day of approval when that falls inside the payroll's month, otherwise on the month end, so
+it always lands in its own month. Payslips become available — <strong>All payslips</strong> on the run, and each
+employee's own in their <a href="#employee-portal">portal</a>.</p>
+<p>A mistake found after approval: <strong>Return to draft for a correction</strong>, provided nothing has been paid and
+the month is still open.</p>
+
+<h3>Step 3 — Pay salaries</h3>
+<p>Under <strong>Pay salaries</strong> the unpaid employees are grouped by how they are paid. Pay each group:</p>
+<ol class="steps">
+    <li>Enter the <strong>Payment date</strong> (on or after the date the salary cost was posted) and the account it is
+        <strong>Paid from</strong>. For cheques, enter the <strong>First cheque number</strong>; each employee gets the
+        next number in the cheque book.</li>
+    <li>Confirm the payment. It appears under <strong>Payments</strong> with its documents.</li>
+</ol>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Method</th><th>Documents</th></tr></thead>
+    <tbody>
+        <tr><td><strong>WPS</strong></td><td><strong>Download SIF</strong>: the Salary Information File in the standard UAE layout, to upload to your bank or exchange house. The same file can be downloaded again later.</td></tr>
+        <tr><td><strong>Bank transfer</strong></td><td><strong>Transfer list (CSV)</strong> and a <strong>Letter to bank</strong> to sign.</td></tr>
+        <tr><td><strong>Cheque</strong></td><td>The cheques themselves, printed on your cheque stationery by laser/inkjet or as a dot matrix file, or on A4 to check the layout.</td></tr>
+    </tbody>
+</table>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Salaries Payable</td><td class="num dr">Batch total</td><td class="num">—</td></tr>
+        <tr><td>Bank it is paid from</td><td class="num">—</td><td class="num cr">Batch total</td></tr>
+    </tbody>
+</table>
+<p>The bank details and MOHRE code are taken from the employee record as it is on the day of payment, so a corrected
+IBAN does not need the payroll redone. A rejected WPS file or a spoilt cheque run: <strong>Cancel</strong> the payment
+while its month is open, and the salaries are payable again.</p>
+
+<h3>Payroll statuses</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:22%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Draft</strong></td><td>Being prepared. Nothing in the accounts.</td></tr>
+        <tr><td><strong>Approved</strong></td><td>Salary cost posted; salaries payable, nothing paid yet.</td></tr>
+        <tr><td><strong>PartlyPaid</strong></td><td>Some payment batches made.</td></tr>
+        <tr><td><strong>Paid</strong></td><td>Every salary in the payroll is paid.</td></tr>
+    </tbody>
+</table>

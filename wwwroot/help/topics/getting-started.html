@@ -46,10 +46,12 @@ a full page of figures.</p>
     <thead><tr><th style="width:20%">Menu</th><th>Contains</th></tr></thead>
     <tbody>
         <tr><td><strong>Home</strong></td><td>The dashboard.</td></tr>
-        <tr><td><strong>System Setup</strong></td><td>Accounting setup — Chart of Accounts, Account Mapping, Opening Balances, Owner Withdrawal Categories, VAT Settings, Revenue Recognition, Recurring Prepayments, Period Closing. Administration (system administrators) — Companies, Users &amp; Permissions, Audit Logs, Feedback Review. Subscription, Help, User Manual, Send Feedback.</td></tr>
-        <tr><td><strong>Master Data</strong></td><td>Properties, Units, Tenants, Leases, Vendors.</td></tr>
-        <tr><td><strong>Operations</strong></td><td>Workflow Guide. Tenant Services — Tenant Requests. Receivables — Customer Invoices, Customer Receipts, PDC Receipts, Security Deposits. Payables — Vendor Bills, Vendor Payments. General Ledger — Petty Cash, Fixed Assets, Manual Journals, Journal Inquiry.</td></tr>
-        <tr><td><strong>Reporting</strong></td><td>Financial — Trial Balance, Profit &amp; Loss, Balance Sheet, Statement of Cash Flows, General Ledger, VAT Return. Management — Tenant Statement, Tenant Health &amp; Ranking, Property Utilization, P&amp;L by Property, Owner Tenancy Schedule, Owner Withdrawals.</td></tr>
+        <tr><td><strong>System Setup</strong></td><td>Accounting setup — Chart of Accounts, Account Mapping, Opening Balances, Owner Withdrawal Categories, VAT Settings, Bank Accounts, Owner Withdrawal Locations, E-Invoicing Settings, Revenue Recognition, Recurring Prepayments, Closing Cockpit, Period Reopen Requests. Administration (system administrators) — Companies, Users &amp; Permissions, Audit Logs, Feedback Review. Subscription, Help, User Manual, Send Feedback.</td></tr>
+        <tr><td><strong>Master Data</strong></td><td>Properties, Units, Landlords, Tenants, Leases, Vendors, Document Expiry, Import Data.</td></tr>
+        <tr><td><strong>Operations</strong></td><td>Workflow Guide. Tenant Services — Tenant Requests, WhatsApp Messages, Maintenance Jobs, Planned Maintenance. Receivables — Customer Invoices, Credit Notes, Customer Receipts, PDC Receipts, Security Deposits. E-Invoicing — E-Invoice Monitor, Received E-Invoices. Payables — Vendor Bills, Vendor Payments. Development — Development Projects, Unit Sales. Landlords — Owner Settlements, Recharges to Owners. General Ledger — Petty Cash, Fixed Assets, Manual Journals, Journal Inquiry.</td></tr>
+        <tr><td><strong>Controls</strong></td><td>For owners and managers: Business Performance, Owner Monitor, Maintenance Dashboard, Document Expiry, Payment Approvals, Authorization Matrix, Approval Limits &amp; Delegation, Controls &amp; Security Guide.</td></tr>
+        <tr><td><strong>HR &amp; Payroll</strong></td><td>People — Employees, Attendance, Leave, Employee Requests, Expiring Documents, Departments. Payroll — Payroll Transactions, Payroll Runs, Salary Advances, Payroll Settings.</td></tr>
+        <tr><td><strong>Reporting</strong></td><td>Build Your Own Report, Project Costs &amp; WIP. Financial — Trial Balance, Profit &amp; Loss, Balance Sheet, Statement of Cash Flows, General Ledger, VAT Return. Management — Tenant Statement, Tenant Health &amp; Ranking, Property Utilization, P&amp;L by Property, Owner Tenancy Schedule, Owner Withdrawals.</td></tr>
     </tbody>
 </table>
 
@@ -79,6 +81,14 @@ company's data by accident.</p>
 <p><span class="path">Home</span> shows the live operating picture: property and unit counts,
 occupancy rate, collections, outstanding receivables, liabilities and recent tenant activity.
 Use <strong>Print Dashboard</strong> for a clean printed snapshot.</p>
+<ul>
+    <li><strong>Unclosed Periods</strong> lists every period up to today that is still open, with its draft journals and
+        how many days it is overdue for closing, and any reopen requests waiting. <strong>Checklist</strong> or
+        <strong>Open Closing Cockpit</strong> takes you to the <a href="#closing">Closing Cockpit</a>.</li>
+    <li><strong>HR &amp; Payroll</strong>, for users with that access: active employees, the state of this month's payroll,
+        staff documents expired or expiring within 30 days, and leave requests to decide.</li>
+    <li>A bar at the top warns when the subscription is about to end; <strong>Manage subscription</strong> opens it.</li>
+</ul>
 
 <figure data-shot="home-dashboard"></figure>
 

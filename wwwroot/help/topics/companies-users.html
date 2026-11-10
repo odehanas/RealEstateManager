@@ -22,6 +22,12 @@ accounting periods.</p>
     suspension. <strong>Reactivate</strong> lifts it; so does a new code issued afterwards, once the customer has paid.</li>
 </ul>
 
+<h4>Sample data for training</h4>
+<p>On a company with no properties, tenants, vendors, leases or journals yet, <strong>Load Sample Data</strong> fills it
+with a fictional year of business — owned and managed properties, tenants, leases, receipts, cheques, supplier bills,
+petty cash, VAT, fixed assets, development projects, unit sales and e-invoices — so every screen and report has
+something to show. It takes up to a minute. Use it for a practice company, never for your real books.</p>
+
 <h3>Users</h3>
 <p><span class="path">System Setup ▸ Users &amp; Permissions</span> — system administrators, and each company's own administrators.</p>
 <ol class="steps">
@@ -71,7 +77,15 @@ accounting periods.</p>
         <tr><td><strong>Carry Out Maintenance Jobs</strong></td><td>Operations</td><td>For maintenance engineers and technicians only: new maintenance requests are assigned to them, and they see just their own jobs, record the work and materials, and mark them done. See <a href="#maintenance-jobs">Maintenance Jobs</a>.</td></tr>
         <tr><td><strong>Manage Maintenance</strong></td><td>Operations</td><td>For the maintenance manager: every maintenance job, assigning and closing them, jobs raised by management, the planned maintenance programme and the maintenance dashboard. No other tenant requests and no accounts.</td></tr>
         <tr><td><strong>Manage Accounting</strong></td><td>Accounting</td><td>Invoices, receipts, PDCs, bills, payments, deposits, petty cash, fixed assets, prepayments, revenue recognition, journals, accounting setup and closing. Also lets the user look vendors up.</td></tr>
-        <tr><td><strong>View Reports</strong></td><td>Reporting</td><td>All financial and management reports.</td></tr>
+        <tr><td><strong>Approve Period Reopening</strong></td><td>Accounting</td><td>Decide requests to reopen a closed period. See <a href="#closing">Period &amp; Year Closing</a>.</td></tr>
+        <tr><td><strong>Owner Oversight</strong></td><td>Owners &amp; Controls</td><td>For owners: the Owner Monitor, approval limits and delegation, the Authorization Matrix and the Controls &amp; Security Guide, and a read-only view of master data and reports. See <a href="#business-performance">Business Performance &amp; Owner Monitor</a>.</td></tr>
+        <tr><td><strong>Release Payments</strong></td><td>Owners &amp; Controls</td><td>The Payment Approvals queue: releasing or turning down payments others entered, up to the person's approval level. See <a href="#payment-approvals">Payment Approvals &amp; Limits</a>.</td></tr>
+        <tr><td><strong>View Business Performance</strong></td><td>Owners &amp; Controls</td><td>The Business Performance screen.</td></tr>
+        <tr><td><strong>Manage Employees</strong></td><td>HR &amp; Payroll</td><td>Employees, their contracts and UAE documents, departments, attendance, leave and employee requests. See <a href="#employees">Employees</a>.</td></tr>
+        <tr><td><strong>Prepare &amp; Pay Payroll</strong></td><td>HR &amp; Payroll</td><td>Payroll transactions, preparing the monthly payroll, payslips, salary advances, payroll settings, and paying salaries by WPS file, bank transfer or cheque. See <a href="#payroll">Payroll</a>.</td></tr>
+        <tr><td><strong>Approve Payroll</strong></td><td>HR &amp; Payroll</td><td>Approve a prepared payroll, or return it to draft.</td></tr>
+        <tr><td><strong>Use the AI Assistant</strong></td><td>General</td><td>The assistant button on every screen. See <a href="#ai-assistant">AI Assistant</a>.</td></tr>
+        <tr><td><strong>View Reports</strong></td><td>Reporting</td><td>All financial and management reports, and Build Your Own Report.</td></tr>
     </tbody>
 </table>
 
@@ -87,7 +101,10 @@ accounting periods.</p>
         <tr><td><strong>Maintenance engineer / technician</strong></td><td>Carry Out Maintenance Jobs only (the Maintenance Engineer role)</td></tr>
         <tr><td><strong>Maintenance manager</strong></td><td>Manage Maintenance · Carry Out Maintenance Jobs (the Maintenance Manager role)</td></tr>
         <tr><td><strong>Accountant</strong></td><td>View Master Data · Manage Accounting · View Reports</td></tr>
-        <tr><td><strong>Owner / auditor</strong></td><td>View Reports only</td></tr>
+        <tr><td><strong>HR officer</strong></td><td>Manage Employees · Prepare &amp; Pay Payroll</td></tr>
+        <tr><td><strong>Payroll approver</strong></td><td>Approve Payroll</td></tr>
+        <tr><td><strong>Owner</strong></td><td>Owner Oversight · Release Payments · View Business Performance · View Reports</td></tr>
+        <tr><td><strong>Auditor</strong></td><td>View Reports only</td></tr>
         <tr><td><strong>Administrator</strong></td><td>The System Administrator role, which bypasses every permission check</td></tr>
     </tbody>
 </table>

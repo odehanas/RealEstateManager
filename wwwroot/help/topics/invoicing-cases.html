@@ -1,0 +1,234 @@
+<p>Every rent invoice follows the same seven steps, from the contract to the money. What changes from one
+property to the next is <strong>whose rent it is</strong> and <strong>whose name is on the invoice</strong>. This topic
+walks through the steps once, then shows exactly what differs in each of the three cases.</p>
+
+<h3>Which case is yours</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:5%"></th><th style="width:27%">Case</th><th>How the property is set up</th><th style="width:30%">Whose rent, whose invoice</th></tr></thead>
+    <tbody>
+        <tr><td><strong>A</strong></td><td><strong>The company's own property</strong></td>
+            <td>Ownership type <strong>Owned</strong>.</td>
+            <td>The rent is the company's revenue. The company invoices in its own name.</td></tr>
+        <tr><td><strong>B</strong></td><td><strong>A landlord's property, invoiced in the company's name</strong></td>
+            <td>Ownership type <strong>Managed</strong>, a <strong>Landlord</strong> and a <strong>Commission %</strong>.
+                <em>Invoice tenants in the owner's name</em> is left unticked.</td>
+            <td>The rent belongs to the landlord; the company earns its commission. The company invoices in its own name.</td></tr>
+        <tr><td><strong>C</strong></td><td><strong>A landlord's property, invoiced in the owner's name</strong></td>
+            <td>As B, with <strong>Invoice tenants in the owner's name</strong> ticked.</td>
+            <td>The rent belongs to the landlord, and the landlord is the supplier on the invoice. The company issues it as agent.</td></tr>
+    </tbody>
+</table>
+<p>All of it is set on the property, under <span class="path">Master Data ▸ Properties</span> — see
+<a href="#properties">Properties</a>. Landlords and their bank details are kept under
+<span class="path">Master Data ▸ Landlords</span>. One company can hold all three kinds of property side by side.</p>
+
+<div class="box">
+    <div class="box-title">A building that belongs to the company's owner personally</div>
+    <p><strong>Owned</strong> means the <em>company</em> owns the building and its rent is the company's revenue. A building
+    that belongs to a shareholder or a family member in their own name is not the company's: register it as
+    <strong>Managed</strong>, with that person as the landlord, so their rent is kept apart from the company's income and
+    they receive an owner statement like any other landlord (case B or C).</p>
+</div>
+
+<div class="box warn">
+    <div class="box-title">Decide before the first contract</div>
+    <p>The ownership type and the owner's-name option are read when each invoice is <strong>posted</strong>. Changing them
+    later does not restate invoices already posted, and existing contracts keep the monthly income plan they were
+    created with. Set them correctly before you create any contract under the property.</p>
+</div>
+
+<h3>The seven steps, the same in every case</h3>
+<ol class="steps">
+    <li><strong>Set up the property.</strong> <span class="path">Master Data ▸ Properties</span>: ownership type and VAT
+        category; for a managed property also the landlord, the commission %, <em>Who holds the rent</em> and whether
+        tenants are invoiced in the owner's name. Then add its units.</li>
+    <li><strong>Create the contract.</strong> <span class="path">Master Data ▸ Leases</span>. A new contract is a
+        <strong>Draft</strong> with no invoices. When it is <strong>activated</strong> — or <strong>approved</strong>, if
+        your company requires approval — the system creates every rent invoice of the term in one go: the annual rent
+        divided by the invoices per year, one invoice for each billing date, numbered
+        <code>INV-&lt;contract&gt;-&lt;year and month&gt;</code>, dated and due on the billing date. Each invoice starts as
+        <strong>Draft</strong> and keeps the VAT treatment the contract had that day. See <a href="#leases">Lease Contracts</a>.</li>
+    <li><strong>Post each invoice when it falls due.</strong> <span class="path">Operations ▸ Customer Invoices</span>, then
+        <strong>Post</strong> on its row. To post a whole month at once, open
+        <span class="path">System Setup ▸ Closing Cockpit</span> and select <strong>Issue invoices</strong> beside
+        <em>Rent invoices of the month issued</em>. Posting writes the journal on the <strong>invoice date</strong> and
+        gives a taxable invoice its tax invoice number. A draft invoice is not in the accounts, cannot be paid and is not
+        shown to the tenant.</li>
+    <li><strong>Hand over the invoice.</strong> <strong>Tax Invoice</strong> (or <strong>Invoice</strong>, when no VAT is
+        charged) on the row opens the document to print or save as PDF. Tenants with portal access see posted invoices
+        there. Where e-invoicing applies, send it from the <a href="#e-invoice-monitor">E-Invoice Monitor</a>.</li>
+    <li><strong>Collect the money.</strong> <strong>Receive</strong> on the row records cash or a transfer — see
+        <a href="#customer-receipts">Customer Receipts</a>. Post-dated cheques are registered under
+        <a href="#pdc-receipts">PDC Receipts</a> and settle the invoice when the bank clears them. The invoice moves to
+        <em>PartiallyPaid</em>, then <em>Paid</em>.</li>
+    <li><strong>Recognise the month's income.</strong> <span class="path">System Setup ▸ Revenue Recognition</span>, or
+        <strong>Run recognition</strong> in the Closing Cockpit. For an owned property this releases one month of rent
+        into revenue; for a managed property it takes one month of commission out of the landlord's money. See
+        <a href="#revenue-recognition">Revenue Recognition</a>.</li>
+    <li><strong>Managed properties only: invoice the commission and pay the landlord.</strong>
+        <span class="path">Operations ▸ Owner Settlements</span>: <strong>Issue Commission Invoices</strong> each month,
+        then <strong>Statement &amp; Pay</strong>. See <a href="#owner-settlements">Owner Settlements</a>.</li>
+</ol>
+
+<h3>What differs between the three cases</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:19%"></th><th>A. Company's own</th><th>B. Landlord's, company's name</th><th>C. Landlord's, owner's name</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Supplier printed on the invoice</strong></td><td>The company, with its TRN</td><td>The company, with its TRN</td>
+            <td>The landlord, with the landlord's TRN, "c/o" the company, and a note that the company issues it as agent</td></tr>
+        <tr><td><strong>VAT on the rent</strong></td><td colspan="2">By the contract's VAT category: 5% on commercial rent, none on exempt residential rent, 0% on a zero-rated first supply</td>
+            <td>The same when the landlord has a TRN. A landlord with no TRN cannot charge VAT: the invoice carries none</td></tr>
+        <tr><td><strong>Tax invoice number</strong></td><td colspan="2">The company's single series, <code>TX-&lt;year&gt;-…</code></td>
+            <td>The landlord's own series for the property, <code>OTI-&lt;property&gt;-&lt;year&gt;-0001</code>. No TRN: the invoice number only</td></tr>
+        <tr><td><strong>The rent, when posted</strong></td><td>Cr <code>21200</code> Advances from Customers</td>
+            <td colspan="2">Cr <code>21500</code> Due to Landlords</td></tr>
+        <tr><td><strong>The VAT, when posted</strong></td><td colspan="2">Cr <code>21400</code> VAT Payable — the company declares and pays it</td>
+            <td>Cr <code>21500</code> Due to Landlords — it is the landlord's to declare, and is passed on with the rent</td></tr>
+        <tr><td><strong>VAT return</strong></td><td colspan="2">In the company's <a href="#vat-return">VAT Return</a></td>
+            <td>Left out of the company's return; shown in the <strong>Owner VAT Return</strong> for that landlord</td></tr>
+        <tr><td><strong>E-invoicing</strong></td><td colspan="2">Queued for the E-Invoice Monitor when the tenant is a business or government body</td>
+            <td><em>Not required</em>: it is not the company's supply</td></tr>
+        <tr><td><strong>Where the tenant's money lands</strong></td><td>The company's bank or cash</td>
+            <td colspan="2">Decided by <em>Who holds the rent</em>: the company's bank, the owners' funds bank account, or the landlord's own account</td></tr>
+        <tr><td><strong>Monthly income entry</strong></td><td>One month of rent: Dr <code>21200</code>, Cr Rental Revenue – Owned</td>
+            <td colspan="2">One month of commission (rent ÷ 12 × commission %): Dr <code>21500</code>, Cr Management Fee Revenue</td></tr>
+        <tr><td><strong>The company's own invoice</strong></td><td>The rent invoice itself</td>
+            <td colspan="2">The monthly <strong>commission tax invoice</strong> to the landlord, with 5% VAT, under the company's TRN</td></tr>
+        <tr><td><strong>What is paid on</strong></td><td>Nothing — the rent is the company's</td>
+            <td>Rent less commission and the VAT on it</td><td>Rent plus the VAT collected for the owner, less commission and the VAT on it</td></tr>
+    </tbody>
+</table>
+
+<h3>Case A — the company's own property</h3>
+<ol class="steps">
+    <li>Property: <strong>Owned</strong>. No landlord, no commission.</li>
+    <li>Activate the contract; the invoices appear as drafts under <span class="path">Operations ▸ Customer Invoices</span>.</li>
+    <li><strong>Post</strong> the invoice on its date. A taxable invoice receives its <code>TX-</code> number.</li>
+    <li>Print the tax invoice; send the e-invoice if the tenant is a business.</li>
+    <li>Receive the payment or clear the cheque.</li>
+    <li>Run revenue recognition every month.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Step</th><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="3">Invoice posted</td><td><code>11200</code> Accounts Receivable</td><td class="num dr">Rent + VAT</td><td class="num">—</td></tr>
+        <tr><td><code>21200</code> Advances from Customers</td><td class="num">—</td><td class="num cr">Rent</td></tr>
+        <tr><td><code>21400</code> VAT Payable <span class="small muted">(only if VAT &gt; 0)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
+        <tr><td rowspan="2">Money received</td><td>Bank or cash</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+        <tr><td rowspan="2">Each month</td><td><code>21200</code> Advances from Customers</td><td class="num dr">Rent ÷ 12</td><td class="num">—</td></tr>
+        <tr><td>Rental Revenue – Owned</td><td class="num">—</td><td class="num cr">Rent ÷ 12</td></tr>
+    </tbody>
+</table>
+
+<h3>Case B — a landlord's property, invoiced in the company's name</h3>
+<ol class="steps">
+    <li>Landlord: add them under <span class="path">Master Data ▸ Landlords</span> with their TRN and bank account.</li>
+    <li>Property: <strong>Managed</strong>, choose the <strong>Landlord</strong>, enter the <strong>Commission %</strong> and
+        choose <strong>Who holds the rent</strong>. Leave <em>Invoice tenants in the owner's name</em> unticked.</li>
+    <li>Activate the contract and <strong>Post</strong> each invoice on its date, exactly as in case A. The tenant's
+        invoice looks the same as one for an owned property: the company is the supplier and the number is from the
+        <code>TX-</code> series.</li>
+    <li>Receive the payment or clear the cheque. The money lands where <em>Who holds the rent</em> says.</li>
+    <li>Run revenue recognition every month: it moves that month's commission from the landlord's money into your revenue.</li>
+    <li>After the month end, <span class="path">Operations ▸ Owner Settlements</span> ▸ <strong>Issue Commission
+        Invoices</strong>. Each landlord gets one tax invoice (<code>CI-&lt;year&gt;-…</code>, with a <code>TX-</code> tax
+        invoice number) for the month's commission plus 5% VAT.</li>
+    <li><strong>Statement &amp; Pay</strong> for the landlord: check the statement and pay the balance, in full or in part.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Step</th><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="3">Invoice posted</td><td><code>11200</code> Accounts Receivable</td><td class="num dr">Rent + VAT</td><td class="num">—</td></tr>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num">—</td><td class="num cr">Rent</td></tr>
+        <tr><td><code>21400</code> VAT Payable <span class="small muted">(only if VAT &gt; 0)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
+        <tr><td rowspan="2">Money received</td><td>Company bank, <code>11120</code> Bank – Owners' Funds, or <code>21500</code> Due to Landlords when paid to the owner directly</td><td class="num dr">Amount</td><td class="num">—</td></tr>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num">—</td><td class="num cr">Amount</td></tr>
+        <tr><td rowspan="2">Each month</td><td><code>21500</code> Due to Landlords</td><td class="num dr">Commission</td><td class="num">—</td></tr>
+        <tr><td>Management Fee Revenue</td><td class="num">—</td><td class="num cr">Commission</td></tr>
+        <tr><td rowspan="2">Commission invoice</td><td><code>21500</code> Due to Landlords</td><td class="num dr">5% of commission</td><td class="num">—</td></tr>
+        <tr><td><code>21400</code> VAT Payable</td><td class="num">—</td><td class="num cr">5% of commission</td></tr>
+        <tr><td rowspan="2">Landlord paid</td><td><code>21500</code> Due to Landlords</td><td class="num dr">Amount paid</td><td class="num">—</td></tr>
+        <tr><td>Bank it is paid from</td><td class="num">—</td><td class="num cr">Amount paid</td></tr>
+    </tbody>
+</table>
+<div class="box">
+    <div class="box-title">The VAT on the rent is the company's to pay in this case</div>
+    <p>Because the invoice is in the company's name, VAT charged on commercial rent goes to the company's VAT Payable and
+    its VAT return — even though the rent itself is the landlord's. If the landlord is VAT registered and should declare
+    that VAT themselves, use case C.</p>
+</div>
+
+<h3>Case C — a landlord's property, invoiced in the owner's name</h3>
+<ol class="steps">
+    <li>Landlord and property as in case B, and tick <strong>Invoice tenants in the owner's name</strong> on the property.
+        Record the landlord's TRN if they are VAT registered: with no TRN, no VAT is charged on the rent.</li>
+    <li>Activate the contract and <strong>Post</strong> each invoice on its date. On posting, the invoice is stamped with
+        the owner's name and TRN as they are that day, and a registered owner's invoice takes the next number in
+        <code>OTI-&lt;property&gt;-&lt;year&gt;-…</code>.</li>
+    <li>Select <strong>Tax Invoice</strong> to print it. The landlord is shown as the supplier, "c/o" your company, with a
+        note that paying the company settles the invoice. A landlord with no TRN gets a plain <strong>Invoice</strong>.</li>
+    <li>There is nothing to send from the E-Invoice Monitor: the column shows <em>Not required</em>.</li>
+    <li>Receive the payment or clear the cheque; the money lands where <em>Who holds the rent</em> says.</li>
+    <li>Run revenue recognition, issue the monthly commission invoice and pay the landlord, as in case B. The owner
+        statement shows an extra line, <em>Add: VAT on rent invoiced in the owner's name</em>, so the VAT you collected for
+        them is paid over with the rent.</li>
+    <li>Give the landlord their figures for the FTA from <span class="path">Reporting ▸ Owner VAT Return</span>: their
+        output tax on the rent, and as input tax the VAT on your commission and on costs recharged to them.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Step</th><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="3">Invoice posted</td><td><code>11200</code> Accounts Receivable</td><td class="num dr">Rent + VAT</td><td class="num">—</td></tr>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num">—</td><td class="num cr">Rent</td></tr>
+        <tr><td><code>21500</code> Due to Landlords <span class="small muted">(VAT, the owner's to declare)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
+    </tbody>
+</table>
+<p>Receipts, the monthly commission, the commission invoice and the payment to the landlord post exactly as in case B.</p>
+
+<h3>Who holds the rent (cases B and C)</h3>
+<p>Set on the managed property. It changes only where the tenant's money lands when a receipt is posted or a cheque
+clears; the invoices are the same.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:28%">Arrangement</th><th>The receipt debits</th><th style="width:38%">Paying the landlord</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Company bank account</strong></td><td>The company's own bank or cash</td><td>From the company's bank</td></tr>
+        <tr><td><strong>Owners' funds bank account</strong></td><td><code>11120</code> Bank – Owners' Funds, or the landlord's own owners' funds account from <span class="path">System Setup ▸ Bank Accounts</span></td><td>From that account, so landlords' money never mixes with the company's</td></tr>
+        <tr><td><strong>Paid to the owner directly</strong></td><td><code>21500</code> Due to Landlords: no company bank moves</td><td>Already with the landlord. The statement shows it as paid; what remains is the commission they owe you</td></tr>
+    </tbody>
+</table>
+<p>For <em>Paid to the owner directly</em>, use case C: if the rent is invoiced in the company's name, the VAT on it is
+still the company's to pay although the money never reached it.</p>
+
+<h3>Other invoices the system issues</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:24%">Document</th><th style="width:20%">Number</th><th>Issued to, and when</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Cheque charge</strong></td><td><code>CHG-&lt;year&gt;-…</code></td><td>The tenant, when a cheque is withdrawn or returned with a charge. Always the company's own invoice and income, with 5% VAT when the company is registered — even on a property invoiced in the owner's name. It is raised for you with the cheque entry and appears in the Customer Invoices list. See <a href="#pdc-receipts">PDC Receipts</a>.</td></tr>
+        <tr><td><strong>Commission tax invoice</strong></td><td><code>CI-&lt;year&gt;-…</code></td><td>Each landlord, monthly, for the commission recognised. See <a href="#owner-settlements">Owner Settlements</a>.</td></tr>
+        <tr><td><strong>Recharge tax invoice or disbursement note</strong></td><td><code>TX-&lt;year&gt;-…</code> for a recharge</td><td>The landlord, for a cost the company paid on their property and ticked <em>Charge to owner</em>. Listed under <span class="path">Operations ▸ Recharges to Owners</span>.</td></tr>
+        <tr><td><strong>Unit sale tax invoice</strong></td><td><code>TX-&lt;year&gt;-…</code></td><td>The buyer of a unit: on a standard-rated sale each payment received before handover gets a tax invoice number. See <a href="#unit-sales">Unit Sales</a>.</td></tr>
+        <tr><td><strong>Credit note</strong></td><td>Its own series</td><td>The tenant, to reduce or cancel a posted invoice. On an invoice issued in the owner's name its VAT comes back out of Due to Landlords, not the company's VAT. See <a href="#credit-notes">Credit Notes</a>.</td></tr>
+    </tbody>
+</table>
+
+<h3>Correcting an invoice</h3>
+<ul>
+    <li><strong>Not yet posted:</strong> nothing is in the accounts. A wrong rent or date is a wrong contract — see
+        <a href="#leases">Lease Contracts</a>.</li>
+    <li><strong>Posted, not sent as an e-invoice, nothing received against it:</strong> reset its journal to draft from
+        <span class="path">Operations ▸ Journal Inquiry</span> — see <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.
+        The tax invoice number it was given stays with it.</li>
+    <li><strong>Anything else:</strong> issue a <a href="#credit-notes">credit note</a> from the <strong>Credit Note</strong>
+        button on its row.</li>
+</ul>
+
+<h3>Checking your work</h3>
+<ul>
+    <li><span class="path">Operations ▸ Customer Invoices</span>: the <strong>GL</strong> column shows <em>Posted</em> or
+        <em>Not Posted</em> for every invoice.</li>
+    <li><span class="path">System Setup ▸ Closing Cockpit</span>: <em>Rent invoices of the month issued</em> is red while
+        any invoice dated in the month is unposted, and the period cannot be closed.</li>
+    <li><span class="path">Reporting ▸ Tenant Statement</span>: every invoice, receipt and credit note of one tenant.</li>
+    <li><span class="path">Operations ▸ Owner Settlements</span>: rent billed, commission and balance per landlord.</li>
+</ul>

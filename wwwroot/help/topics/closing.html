@@ -7,32 +7,75 @@ already closed.</p>
 
 <figure data-shot="closing"></figure>
 
-<h3>Month-end checklist</h3>
+<h3>The Closing Cockpit</h3>
+<p><span class="path">System Setup ▸ Closing Cockpit</span> shows the twelve periods of the fiscal year as tiles. Select
+a period to see its checklist. Each check compares what <em>should</em> be in the accounts for the month with what the
+general ledger actually holds, and shows a light:</p>
+<table class="t-compact">
+    <thead><tr><th style="width:16%">Light</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Green</strong></td><td>Done, and the ledger agrees.</td></tr>
+        <tr><td><strong>Amber</strong></td><td>A warning, such as the ledger differing from the schedule. You may close, but must tick that you have reviewed it; the warning is recorded with the close.</td></tr>
+        <tr><td><strong>Red</strong></td><td>Not done. The period cannot be closed until it is resolved.</td></tr>
+    </tbody>
+</table>
+
+<h3>The checks</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:32%">Check</th><th>What it wants</th><th style="width:20%">Button to fix it</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Earlier periods closed</strong></td><td>Months close in order, oldest first.</td><td>—</td></tr>
+        <tr><td><strong>No draft journals left in the period</strong></td><td>A draft has no effect on the accounts and cannot be posted once the month is closed.</td><td><strong>Post all drafts</strong></td></tr>
+        <tr><td><strong>Rent invoices of the month issued</strong></td><td>Every contract instalment dated in the month is posted. See <a href="#invoicing-cases">Invoicing, Step by Step</a>.</td><td><strong>Issue invoices</strong></td></tr>
+        <tr><td><strong>Revenue recognition run</strong></td><td>The month's rent (or commission) is released, and the ledger shows the same amount.</td><td><strong>Run recognition</strong></td></tr>
+        <tr><td><strong>Depreciation run</strong></td><td>Every asset in service is depreciated for the month.</td><td><strong>Run depreciation</strong></td></tr>
+        <tr><td><strong>Prepayment amortisation run</strong></td><td>The month's share of prepaid expenses is charged.</td><td><strong>Run amortisation</strong></td></tr>
+        <tr><td><strong>Post-dated cheques due are presented</strong></td><td>A cheque dated on or before the month end is deposited, and one at the bank is cleared or recorded as bounced.</td><td>—</td></tr>
+        <tr><td><strong>Transactions recorded in the month</strong></td><td>A month with nothing posted is unusual and worth a second look.</td><td>—</td></tr>
+        <tr><td><strong>Ledger in balance</strong></td><td>The trial balance at the month end has equal debits and credits.</td><td>—</td></tr>
+        <tr><td><strong>Opening balance control account is clear</strong></td><td>Nothing is left unexplained from <a href="#opening-balances">Opening Balances</a>.</td><td>—</td></tr>
+    </tbody>
+</table>
+<p>The buttons run each process for exactly that period's dates, so a run from the cockpit never reaches into another
+month.</p>
+
+<h3>Closing a month, step by step</h3>
 <ol class="steps">
-    <li>Post every customer invoice dated in the month.</li>
-    <li>Record every customer receipt and clear every PDC that the bank honoured.</li>
-    <li>Post every vendor bill and vendor payment.</li>
-    <li>Run <strong>Revenue Recognition</strong> to the month-end date.</li>
-    <li>Run <strong>Depreciation</strong> to the month-end date.</li>
-    <li>Process <strong>Prepayment</strong> amortisation for the month.</li>
-    <li>Post any accruals or adjustments as manual journals.</li>
-    <li>In <span class="path">Operations ▸ Journal Inquiry</span>, set <strong>Posted Only</strong> to <strong>No</strong> for the
-        month and <strong>Post All Drafts</strong>. Nothing left in draft is in the figures you are about to lock.</li>
-    <li>Run the <strong>Trial Balance</strong> and confirm debits equal credits.</li>
-    <li>Review the <strong>Profit &amp; Loss</strong> and <strong>Balance Sheet</strong>.</li>
-    <li>Return to <span class="path">System Setup ▸ Period Closing</span> and <strong>Close Period</strong>.</li>
+    <li>Record the month's receipts, cheques, vendor bills and payments, payroll, and any accruals or adjustments as manual journals.</li>
+    <li>Open <span class="path">System Setup ▸ Closing Cockpit</span> and select the period.</li>
+    <li>Work down the checklist. Use the button beside each red check, or follow its link to the screen where the work is done.</li>
+    <li>Review the <strong>Trial Balance</strong>, <strong>Profit &amp; Loss</strong> and <strong>Balance Sheet</strong> for the month.</li>
+    <li>If amber warnings remain, tick <em>I have reviewed the amber warning(s)</em>.</li>
+    <li>Select <strong>Close</strong>. The tile shows a padlock.</li>
 </ol>
 
 <div class="box warn">
     <div class="box-title">Closing locks the period both ways</div>
-    <p>After a period is closed, nothing can be posted into it and nothing in it can be reset to draft. Late documents
-    go into the next open period — for vendor bills, use the <strong>Accounting Date</strong>. Corrections are made with a
-    journal in an open period.</p>
+    <p>After a period is closed, nothing can be posted into it and nothing in it can be reset to draft, edited or deleted.
+    Late documents go into the next open period — for vendor bills, use the <strong>Accounting Date</strong>. Corrections
+    are made with a journal in an open period, or by asking for the period to be reopened.</p>
 </div>
 
+<h3>Reopening a closed period</h3>
+<p>A closed period opens again only on a written request that an approver agrees to.</p>
+<ol class="steps">
+    <li>In the Closing Cockpit, select the closed period and <strong>Ask for this period to be reopened</strong>. Say what
+        is wrong and what will be posted to correct it, then <strong>Request reopening</strong>. You can withdraw the
+        request while it waits.</li>
+    <li>A user with the <em>Approve Period Reopening</em> permission opens
+        <span class="path">System Setup ▸ Period Reopen Requests</span> (the menu shows how many are waiting) and approves
+        the request or turns it down, with a comment.</li>
+    <li>Once approved, make the correction, then close the period again through the same checklist.</li>
+</ol>
+<p>Every request, its reason, who decided it and when stay on the period's history. If the fiscal year had already been
+closed, reopening one of its periods undoes the year close: the closing entry is removed and the year must be closed
+again.</p>
+
 <h3>Closing the fiscal year</h3>
-<p>After the final period of the year is closed and reviewed, use <strong>Close Year</strong>. The system
-posts a closing journal that transfers the net result of every revenue and expense account into equity:</p>
+<p>When all twelve periods are closed, the <strong>Year-end close</strong> panel at the foot of the cockpit shows the
+year's revenue, expenses and net result, and the balances that will be carried into the next year. Select
+<strong>Close fiscal year</strong>. The system posts one closing journal on the last day of the year that transfers the
+net result of every revenue and expense account into equity:</p>
 <table class="je">
     <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
     <tbody>

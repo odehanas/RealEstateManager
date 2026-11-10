@@ -1,9 +1,21 @@
-<p><strong>Workflow step 6.</strong> Rent invoices are created for you when the lease is saved. Your job on this screen
-is to post them when they fall due, print them for the tenant, and receive payment against them.</p>
+<p><strong>Workflow step 6.</strong> Rent invoices are created for you when the contract takes effect: when it is
+activated, or approved if your company requires approval. Your job on this screen is to post them when they fall due,
+print them for the tenant, and receive payment against them.</p>
+
+<div class="box">
+    <div class="box-title">Your own property, a landlord's, or invoiced in the owner's name?</div>
+    <p>The steps on this screen are the same, but the invoice and its accounting differ. For the full walk-through of
+    each case see <a href="#invoicing-cases">Invoicing, Step by Step</a>.</p>
+</div>
 
 <h3>The invoice list</h3>
-<p>The list shows the invoice number, date, tenant, unit, subtotal, VAT, total, amount paid and status. Invoices
-generated from a lease begin in <strong>Draft</strong>: they exist as documents but have not touched the ledger.</p>
+<p>The list shows the invoice number (with the tax invoice number beneath it once posted), property, unit, tenant,
+invoice date, due date, total, amount paid (and any amount credited), balance and status. The <strong>GL</strong> column
+says whether the invoice is in the accounts &mdash; <em>Posted</em> or <em>Not Posted</em> &mdash; and the
+<strong>E-Invoice</strong> column where it stands on the e-invoicing network. Invoices generated from a contract are
+numbered <code>INV-&lt;contract&gt;-&lt;year and month&gt;</code> and begin in <strong>Draft</strong>: they exist as
+documents but have not touched the ledger. Cheque charges raised from <a href="#pdc-receipts">PDC Receipts</a>
+(<code>CHG-&lt;year&gt;-&hellip;</code>) are listed here too.</p>
 
 <figure data-shot="customer-invoices"></figure>
 
@@ -13,7 +25,11 @@ generated from a lease begin in <strong>Draft</strong>: they exist as documents 
     <li>Select <strong>Post</strong>. The journal is built and posted in one step, and the status becomes <strong>Posted</strong>.</li>
 </ol>
 <p>The journal takes the <strong>invoice date</strong>, not the date you press Post. An invoice dated in a closed
-period cannot be posted.</p>
+period cannot be posted. <strong>Receive</strong> and <strong>Credit Note</strong> appear on the row only once the
+invoice is posted.</p>
+<p>To post every invoice of a month in one step, open <span class="path">System Setup ▸ Closing Cockpit</span> and select
+<strong>Issue invoices</strong> beside <em>Rent invoices of the month issued</em> &mdash; see
+<a href="#closing">Period &amp; Year Closing</a>.</p>
 
 <h4>Owned property</h4>
 <table class="je">
@@ -25,13 +41,23 @@ period cannot be posted.</p>
     </tbody>
 </table>
 
-<h4>Managed property</h4>
+<h4>Managed property, invoiced in the company's name</h4>
 <table class="je">
     <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
     <tbody>
         <tr><td><code>11200</code> Accounts Receivable</td><td class="num dr">Total (rent + VAT)</td><td class="num">—</td></tr>
         <tr><td><code>21500</code> Due to Landlords</td><td class="num">—</td><td class="num cr">Subtotal</td></tr>
         <tr><td><code>21400</code> VAT Payable <span class="small muted">(only if VAT &gt; 0)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
+    </tbody>
+</table>
+
+<h4>Managed property, invoiced in the owner's name</h4>
+<table class="je">
+    <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td><code>11200</code> Accounts Receivable</td><td class="num dr">Total (rent + VAT)</td><td class="num">—</td></tr>
+        <tr><td><code>21500</code> Due to Landlords</td><td class="num">—</td><td class="num cr">Subtotal</td></tr>
+        <tr><td><code>21500</code> Due to Landlords <span class="small muted">(the VAT, the owner's to declare)</span></td><td class="num">—</td><td class="num cr">VAT</td></tr>
     </tbody>
 </table>
 
@@ -55,7 +81,10 @@ document in a new tab.</p>
         <tr><td><strong>Invoice</strong></td><td>No VAT is charged — an exempt residential letting, for example.</td></tr>
     </tbody>
 </table>
-<p>Tax invoices are numbered in a <strong>single sequence for the whole company</strong>, as UAE law requires. The VAT
+<p>Tax invoices are numbered in a <strong>single sequence for the whole company</strong>
+(<code>TX-&lt;year&gt;-&hellip;</code>), as UAE law requires. An invoice issued in a VAT-registered owner's name is the
+owner's document and is numbered in the owner's own series for the property
+(<code>OTI-&lt;property&gt;-&lt;year&gt;-&hellip;</code>); it shows the owner as supplier, "c/o" your company. The VAT
 treatment is fixed on the invoice when it is generated, so a later change to the property or unit never rewrites an
 invoice already issued. Your own TRN, legal name and address come from
 <a href="#vat-settings">VAT Settings</a>.</p>
@@ -65,7 +94,7 @@ invoice already issued. Your own TRN, legal name and address come from
 <h3>E-invoicing</h3>
 <p>The <strong>E-Invoice</strong> column shows where each invoice stands on the UAE e-invoicing network. Invoices to
 business and government tenants are queued for the <a href="#e-invoice-monitor">E-Invoice Monitor</a> when posted;
-invoices to individuals show <em>Not required</em>. Once an invoice has been sent to your provider its e-invoice ID
+invoices to individuals, and invoices issued in an owner's name, show <em>Not required</em>. Once an invoice has been sent to your provider its e-invoice ID
 also appears on the printed tax invoice.</p>
 
 <h3>Receiving payment</h3>
