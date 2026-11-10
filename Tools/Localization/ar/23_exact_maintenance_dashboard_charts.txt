@@ -44,3 +44,9 @@ Declined ||| مرفوض
 Maintenance Scenarios for Training ||| سيناريوهات صيانة للتدريب
 Load Maintenance Scenarios ||| تحميل سيناريوهات الصيانة
 Adds five months of fictional maintenance work to this company, for showing the maintenance screens: jobs from the portal, WhatsApp, phone and management, at every stage from new to closed, on time and late, rated well and badly, with materials on owned and managed properties, a make-ready, inspections and a planned maintenance programme. It needs a company that already has properties and tenants with current contracts, shares the jobs among its maintenance users, and can be loaded once. ||| يضيف خمسة أشهر من أعمال الصيانة الافتراضية إلى هذه الشركة لعرض شاشات الصيانة: أعمال من البوابة وواتساب والهاتف والإدارة، في كل مرحلة من الجديد إلى المقفل، في موعدها ومتأخرة، بتقييمات جيدة وسيئة، مع مواد على عقارات مملوكة ومُدارة، وتجهيز وحدة، ومعاينات، وبرنامج صيانة مجدولة. ويحتاج إلى شركة فيها عقارات ومستأجرون بعقود سارية، ويوزّع الأعمال على مستخدمي الصيانة فيها، ويُحمَّل مرة واحدة.
+# The tenants list: who has a portal login.
+Portal login ||| دخول البوابة
+Can sign in ||| يمكنه الدخول
+Last signed in {0} ||| آخر دخول {0}
+Has not signed in yet ||| لم يسجل الدخول بعد
+No login ||| بلا حساب دخول
