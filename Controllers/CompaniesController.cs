@@ -102,6 +102,26 @@ namespace RealEstateManager.Controllers
             return RedirectToAction(nameof(Edit), new { id });
         }
 
+        /// <summary>
+        /// Adds maintenance jobs at every stage to a training company, for showing the
+        /// maintenance screens and dashboard. Needs properties and tenants; runs once.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoadMaintenanceScenarios(int id)
+        {
+            try
+            {
+                TempData["SuccessMessage"] = await _sampleDataService.AddMaintenanceScenariosAsync(id, User.GetAppUserId());
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Edit), new { id });
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {

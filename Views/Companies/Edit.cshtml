@@ -100,6 +100,21 @@
 
 <div class="card mt-4 shadow-sm">
     <div class="card-body">
+        <h4 class="mb-2">@T["Maintenance Scenarios for Training"]</h4>
+        <p class="text-muted mb-3">
+            @T["Adds five months of fictional maintenance work to this company, for showing the maintenance screens: jobs from the portal, WhatsApp, phone and management, at every stage from new to closed, on time and late, rated well and badly, with materials on owned and managed properties, a make-ready, inspections and a planned maintenance programme. It needs a company that already has properties and tenants with current contracts, shares the jobs among its maintenance users, and can be loaded once."]
+        </p>
+        <form asp-action="LoadMaintenanceScenarios" method="post"
+              onsubmit="return confirm('Add the maintenance scenarios to this company? This cannot be undone.');">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-outline-secondary">@T["Load Maintenance Scenarios"]</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4 shadow-sm">
+    <div class="card-body">
         <h4 class="mb-3">@T["Subscription"]</h4>
 
         <div class="row g-3 mb-4">

@@ -224,7 +224,7 @@ namespace RealEstateManager.Services
             public decimal StockBalance { get; set; }
             public bool HasTechnicians { get; set; }
 
-            public IEnumerable<JobRow> Open => Jobs.Where(x => x.IsOpen).OrderByDescending(x => ServiceRequestPriorities.Weight(x.Priority)).ThenBy(x => x.SubmittedAt);
+            public IEnumerable<JobRow> Open => Jobs.Where(x => x.IsOpen).OrderBy(x => ServiceRequestPriorities.Weight(x.Priority)).ThenBy(x => x.SubmittedAt);
             public int Received => Jobs.Count;
             public int Done => Jobs.Count(x => x.IsDone);
             public int OpenCount => Jobs.Count(x => x.IsOpen);
@@ -329,7 +329,7 @@ namespace RealEstateManager.Services
             public IEnumerable<(string Priority, int WithinTarget, int PastTarget)> ByPriority =>
                 Jobs.Where(x => x.IsOpen || x.IsDone)
                     .GroupBy(x => x.Priority)
-                    .OrderByDescending(g => ServiceRequestPriorities.Weight(g.Key))
+                    .OrderBy(g => ServiceRequestPriorities.Weight(g.Key))
                     .Select(g => (g.Key, g.Count(x => !x.ResolveLate), g.Count(x => x.ResolveLate)));
 
             public IEnumerable<(string Name, int Jobs, int Open, int Done, decimal Materials, decimal OnCompany, decimal ChargedToOwner)> CostByProperty =>

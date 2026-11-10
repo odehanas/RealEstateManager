@@ -412,7 +412,7 @@
                             ticks: { callback: opts.money ? money : whole, precision: 0 } };
             const category = { stacked: !!opts.stacked, grid: { display: false }, border: { color: '#c3c2b7' },
                                position: horizontal && rtl ? 'right' : undefined,
-                               ticks: { callback: function (value) { return short(this.getLabelForValue(value)); } } };
+                               ticks: { autoSkip: !horizontal, callback: function (value) { return short(this.getLabelForValue(value)); } } };
             charts.push(new Chart(canvas, {
                 type: 'bar',
                 data: {

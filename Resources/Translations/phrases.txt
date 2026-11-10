@@ -3086,3 +3086,6 @@ Normal
 Low
 In progress
 Declined
+Maintenance Scenarios for Training
+Load Maintenance Scenarios
+Adds five months of fictional maintenance work to this company, for showing the maintenance screens: jobs from the portal, WhatsApp, phone and management, at every stage from new to closed, on time and late, rated well and badly, with materials on owned and managed properties, a make-ready, inspections and a planned maintenance programme. It needs a company that already has properties and tenants with current contracts, shares the jobs among its maintenance users, and can be loaded once.
