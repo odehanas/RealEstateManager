@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RealEstateManager.Data;
@@ -302,6 +303,203 @@ namespace RealEstateManager.Controllers
             ViewBag.TechnicianId = technicianId;
             ViewBag.Technicians = await MaintenanceService.TechniciansAsync(_db, companyId);
             return View(await _maintenance.GetDashboardAsync(companyId, from, to, technicianId));
+        }
+
+        /// <summary>
+        /// The same period and technician as the dashboard, as an Excel workbook: the
+        /// figures on one sheet, then every job, the cost by property and by unit, the
+        /// technicians, the kinds of job and every material line - so the numbers behind
+        /// the charts can be filtered, pivoted and filed.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> DashboardExcel(DateTime? fromDate, DateTime? toDate, int? technicianId)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var to = (toDate ?? DateTime.Today).Date;
+            var from = (fromDate ?? to.AddDays(-89)).Date;
+            if (from > to)
+                (from, to) = (to, from);
+
+            var d = await _maintenance.GetDashboardAsync(companyId, from, to, technicianId);
+            var materials = await _maintenance.GetMaterialLinesAsync(d.Jobs.Select(x => x.Id).ToList());
+            var company = User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value ?? string.Empty;
+            var technician = technicianId.HasValue
+                ? (await MaintenanceService.TechniciansAsync(_db, companyId)).FirstOrDefault(x => x.Id == technicianId.Value)?.Name
+                : null;
+
+            using var book = new XLWorkbook();
+
+            // A header row, then the rows; numbers stay numbers so they can be summed.
+            IXLWorksheet Sheet(string name, string[] headers, IEnumerable<object?[]> rows, params int[] moneyColumns)
+            {
+                var sheet = book.Worksheets.Add(name);
+                for (var c = 0; c < headers.Length; c++)
+                    sheet.Cell(1, c + 1).Value = headers[c];
+                var header = sheet.Range(1, 1, 1, headers.Length);
+                header.Style.Font.Bold = true;
+                header.Style.Fill.BackgroundColor = XLColor.FromHtml("#1f2937");
+                header.Style.Font.FontColor = XLColor.White;
+
+                var r = 2;
+                foreach (var row in rows)
+                {
+                    for (var c = 0; c < row.Length; c++)
+                    {
+                        var cell = sheet.Cell(r, c + 1);
+                        switch (row[c])
+                        {
+                            case null: break;
+                            case DateTime date: cell.Value = date; cell.Style.DateFormat.Format = date.TimeOfDay == TimeSpan.Zero ? "dd/mm/yyyy" : "dd/mm/yyyy hh:mm"; break;
+                            case decimal money: cell.Value = money; break;
+                            case double number: cell.Value = Math.Round(number, 1); break;
+                            case int count: cell.Value = count; break;
+                            // Text from users never starts a formula.
+                            default: cell.SetValue(row[c]!.ToString()); break;
+                        }
+                    }
+                    r++;
+                }
+
+                foreach (var c in moneyColumns)
+                    sheet.Column(c).Style.NumberFormat.Format = "#,##0.00";
+                sheet.SheetView.FreezeRows(1);
+                if (r > 2)
+                    sheet.Range(1, 1, r - 1, headers.Length).SetAutoFilter();
+                sheet.Columns().AdjustToContents(1, Math.Min(r, 200));
+                foreach (var column in sheet.ColumnsUsed().Where(x => x.Width > 60))
+                    column.Width = 60;
+                return sheet;
+            }
+
+            static object? Local(DateTime? utc) => utc.HasValue ? utc.Value.ToLocalTime() : null;
+
+            // ---- Summary ----------------------------------------------------------
+            var summary = book.Worksheets.Add("Summary");
+            summary.Cell(1, 1).Value = "Maintenance report";
+            summary.Cell(1, 1).Style.Font.Bold = true;
+            summary.Cell(1, 1).Style.Font.FontSize = 16;
+            summary.Cell(2, 1).SetValue(company);
+            summary.Cell(3, 1).SetValue($"Jobs raised from {from:dd/MM/yyyy} to {to:dd/MM/yyyy}, and every job still open" +
+                                         (technician != null ? $" - technician: {technician}" : string.Empty));
+            summary.Cell(4, 1).SetValue($"Prepared {DateTime.Now:dd/MM/yyyy HH:mm}");
+            summary.Range(2, 1, 4, 1).Style.Font.FontColor = XLColor.FromHtml("#6b7280");
+
+            var line = 6;
+            void Section(string title)
+            {
+                line++;
+                summary.Cell(line, 1).Value = title;
+                summary.Range(line, 1, line, 3).Style.Font.Bold = true;
+                summary.Range(line, 1, line, 3).Style.Border.BottomBorder = XLBorderStyleValues.Thin;
+                line++;
+            }
+            void Figure(string label, object? value, string? note = null, bool money = false)
+            {
+                summary.Cell(line, 1).Value = label;
+                var cell = summary.Cell(line, 2);
+                switch (value)
+                {
+                    case null: cell.Value = "-"; break;
+                    case decimal m: cell.Value = m; break;
+                    case double n: cell.Value = Math.Round(n, 1); break;
+                    case int i: cell.Value = i; break;
+                    default: cell.SetValue(value.ToString()); break;
+                }
+                if (money)
+                    cell.Style.NumberFormat.Format = "#,##0.00";
+                cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
+                if (note != null)
+                {
+                    summary.Cell(line, 3).Value = note;
+                    summary.Cell(line, 3).Style.Font.FontColor = XLColor.FromHtml("#6b7280");
+                }
+                line++;
+            }
+
+            Section("Jobs");
+            Figure("Jobs received", d.Received);
+            Figure("Done", d.Done);
+            Figure("Still open", d.OpenCount);
+            Figure("Open and past target", d.OverdueOpen);
+            Figure("Open and unassigned", d.Unassigned);
+            Figure("Declined", d.Rejected);
+
+            Section("Service levels");
+            Figure("Average first response (hours)", d.AvgResponseHours, "from request to the engineer's response; planned jobs left out");
+            Figure("Average time to complete (hours)", d.AvgResolveHours);
+            Figure("Done within target (%)", d.OnTimePercent);
+            Figure("Team rating", d.AvgRating, $"out of {ServiceRequestRatings.Highest}; {d.RatedCount} job(s) rated");
+            Figure("Low ratings", d.LowRatings, $"rated {ServiceRequestRatings.LowAtOrBelow} or below");
+
+            Section("Planned and management work");
+            Figure("Planned maintenance jobs", d.PlannedJobs, $"{d.ActivePlans} active plan(s)");
+            Figure("Planned work done by its due date (%)", d.PlannedOnTimePercent);
+            Figure("Planned work open and past its due date", d.PlannedOverdue);
+            Figure("Raised by management", d.ManagementJobs);
+            Figure("Vacant units to make ready", d.AwaitingMakeReady.Count);
+
+            Section("Cost of materials");
+            Figure("Materials used on these jobs", d.MaterialsCost, null, true);
+            Figure("  taken from the maintenance store", d.MaterialsFromStore, null, true);
+            Figure("  bought for the job", d.MaterialsPurchased, null, true);
+            Figure("  borne by the company", d.MaterialsOnCompany, "owned properties", true);
+            Figure("  charged to owners", d.MaterialsChargedToOwners, "managed properties", true);
+            Figure("Materials per completed job", d.MaterialsPerDoneJob, null, true);
+            Figure("Maintenance store balance", d.StockBalance, $"account {MaintenanceStandards.StockAccountCode}", true);
+            summary.Column(1).Width = 44;
+            summary.Column(2).Width = 16;
+            summary.Column(3).Width = 60;
+
+            // ---- Detail sheets ----------------------------------------------------
+            Sheet("Jobs",
+                new[] { "Job", "Raised", "Property", "Unit", "Tenant", "What", "Kind", "Priority", "Reached us by", "Purpose", "Status", "Technician",
+                        "First response (h)", "Completed", "Time to complete (h)", "Past target", "Due date", "Materials", "Charged to owner", "Rating", "Feedback" },
+                d.Jobs.OrderBy(x => x.SubmittedAt).Select(x => new object?[]
+                {
+                    x.Number, Local(x.SubmittedAt), x.Property, x.Unit, x.Tenant, x.Subject,
+                    string.IsNullOrWhiteSpace(x.Category) ? "General" : x.Category, x.Priority, ServiceRequestSources.Describe(x.Source),
+                    string.IsNullOrWhiteSpace(x.Purpose) ? null : MaintenancePurposes.Describe(x.Purpose), ServiceRequestStatuses.Describe(x.Status),
+                    x.Technician ?? "not assigned", x.ResponseHours, Local(x.ResolvedAt), x.ResolveHours, x.ResolveLate ? "Yes" : "No",
+                    x.DueDate, x.Materials, x.MaterialsChargedToOwner, x.Rating, x.RatingFeedback
+                }), 18, 19);
+
+            Sheet("Cost by property",
+                new[] { "Property", "Jobs", "Open", "Done", "Materials", "Borne by the company", "Charged to the owner", "Materials per job" },
+                d.CostByProperty.Select(x => new object?[]
+                    { x.Name, x.Jobs, x.Open, x.Done, x.Materials, x.OnCompany, x.ChargedToOwner, x.Jobs == 0 ? 0m : Math.Round(x.Materials / x.Jobs, 2) }),
+                5, 6, 7, 8);
+
+            Sheet("Cost by unit",
+                new[] { "Property", "Unit", "Jobs", "Open", "Done", "Materials", "Charged to the owner", "Materials per job" },
+                d.CostByUnit.Select(x => new object?[]
+                    { x.Property, x.Unit, x.Jobs, x.Open, x.Done, x.Materials, x.ChargedToOwner, x.Jobs == 0 ? 0m : Math.Round(x.Materials / x.Jobs, 2) }),
+                6, 7, 8);
+
+            Sheet("By technician",
+                new[] { "Technician", "Jobs", "Open", "Done", "Average to complete (h)", "Past target", "Rating", "Rated jobs" },
+                d.ByTechnician.Select(x => new object?[] { x.Name, x.Jobs, x.Open, x.Done, x.AvgResolveHours, x.Late, x.AvgRating, x.Rated }));
+
+            Sheet("By kind of job",
+                new[] { "Kind", "Jobs", "Average to complete (h)" },
+                d.ByCategory.Select(x => new object?[] { x.Name, x.Jobs, x.AvgResolveHours }));
+
+            Sheet("By month",
+                new[] { "Month", "Jobs raised", "Jobs completed", "Materials on jobs raised" },
+                d.ByMonth.Select(x => new object?[] { x.Month.ToString("MMM yyyy"), x.Raised, x.Completed, x.Materials }), 4);
+
+            Sheet("Materials",
+                new[] { "Date", "Job", "Property", "Unit", "Material", "Quantity", "Unit cost", "Amount", "From", "Reference", "Charged to" },
+                materials.Select(x => new object?[]
+                {
+                    x.Date, x.Job, x.Property, x.Unit, x.Description, x.Quantity, x.UnitCost, x.Amount,
+                    x.Source == MaintenanceMaterialSources.Stock ? "Maintenance store" : "Bought for the job", x.Reference,
+                    x.ChargedTo == "Owner" ? "The owner" : "The company"
+                }), 6, 7, 8);
+
+            using var stream = new MemoryStream();
+            book.SaveAs(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"maintenance-report-{from:yyyyMMdd}-{to:yyyyMMdd}.xlsx");
         }
 
         private async Task<bool> SeesAllAsync() =>

@@ -184,6 +184,15 @@ namespace RealEstateManager.Services
             public DateTime? WorkStartedAt { get; set; }
             public DateTime? ResolvedAt { get; set; }
             public decimal Materials { get; set; }
+
+            /// <summary>The part of the materials taken from the maintenance store; the rest was bought for the job.</summary>
+            public decimal MaterialsFromStore { get; set; }
+
+            /// <summary>The part of the materials charged on to the owner of a managed property.</summary>
+            public decimal MaterialsChargedToOwner { get; set; }
+            public int? PropertyId { get; set; }
+            public int? UnitId { get; set; }
+            public string? Unit { get; set; }
             public string Source { get; set; } = ServiceRequestSources.Portal;
             public int? Rating { get; set; }
             public string? RatingFeedback { get; set; }
@@ -267,6 +276,75 @@ namespace RealEstateManager.Services
                     .Select(g => (g.Key, g.Count(), Average(g.Where(x => x.IsDone).Select(x => x.ResolveHours))))
                     .OrderByDescending(x => x.Item2);
 
+            // ---- For the charts and the cost report ------------------------------
+
+            /// <summary>Materials recorded on the jobs, per completed job.</summary>
+            public decimal? MaterialsPerDoneJob => Done == 0 ? null : Math.Round(MaterialsCost / Done, 2);
+            public decimal MaterialsFromStore => Jobs.Sum(x => x.MaterialsFromStore);
+            public decimal MaterialsPurchased => MaterialsCost - MaterialsFromStore;
+            public decimal MaterialsChargedToOwners => Jobs.Sum(x => x.MaterialsChargedToOwner);
+            public decimal MaterialsOnCompany => MaterialsCost - MaterialsChargedToOwners;
+
+            /// <summary>
+            /// Jobs raised and jobs completed in each month of the period. A job still open
+            /// from before the period is in the list but was not raised in it, so it is
+            /// counted only if it was completed in the period.
+            /// </summary>
+            public List<(DateTime Month, int Raised, int Completed, decimal Materials)> ByMonth
+            {
+                get
+                {
+                    var result = new List<(DateTime, int, int, decimal)>();
+                    var last = new DateTime(To.Year, To.Month, 1);
+                    var month = new DateTime(From.Year, From.Month, 1);
+                    // A very long period would make an unreadable chart: the last three years at most.
+                    if (month < last.AddMonths(-35))
+                        month = last.AddMonths(-35);
+
+                    for (; month <= last; month = month.AddMonths(1))
+                    {
+                        var next = month.AddMonths(1);
+                        var raised = Jobs.Where(x => x.SubmittedAt.ToLocalTime() >= month && x.SubmittedAt.ToLocalTime() < next).ToList();
+                        result.Add((month, raised.Count,
+                            Jobs.Count(x => x.IsDone && x.ResolvedAt.HasValue && x.ResolvedAt.Value.ToLocalTime() >= month && x.ResolvedAt.Value.ToLocalTime() < next),
+                            raised.Sum(x => x.Materials)));
+                    }
+
+                    return result;
+                }
+            }
+
+            public IEnumerable<(string Status, int Jobs)> ByStatus =>
+                Jobs.GroupBy(x => x.Status)
+                    .Select(g => (g.Key, g.Count()))
+                    .OrderBy(x => Array.IndexOf(StatusOrder, x.Item1));
+
+            private static readonly string[] StatusOrder =
+            {
+                ServiceRequestStatuses.Submitted, ServiceRequestStatuses.Acknowledged, ServiceRequestStatuses.InProgress,
+                ServiceRequestStatuses.Resolved, ServiceRequestStatuses.Closed, ServiceRequestStatuses.Rejected
+            };
+
+            /// <summary>Jobs within and past their completion target, by priority. Declined jobs are left out.</summary>
+            public IEnumerable<(string Priority, int WithinTarget, int PastTarget)> ByPriority =>
+                Jobs.Where(x => x.IsOpen || x.IsDone)
+                    .GroupBy(x => x.Priority)
+                    .OrderByDescending(g => ServiceRequestPriorities.Weight(g.Key))
+                    .Select(g => (g.Key, g.Count(x => !x.ResolveLate), g.Count(x => x.ResolveLate)));
+
+            public IEnumerable<(string Name, int Jobs, int Open, int Done, decimal Materials, decimal OnCompany, decimal ChargedToOwner)> CostByProperty =>
+                Jobs.GroupBy(x => x.Property ?? "(no property)")
+                    .Select(g => (g.Key, g.Count(), g.Count(x => x.IsOpen), g.Count(x => x.IsDone), g.Sum(x => x.Materials),
+                                  g.Sum(x => x.Materials - x.MaterialsChargedToOwner), g.Sum(x => x.MaterialsChargedToOwner)))
+                    .OrderByDescending(x => x.Item5).ThenByDescending(x => x.Item2);
+
+            /// <summary>Jobs and materials for each unit. Jobs on a building's common areas are grouped as such.</summary>
+            public IEnumerable<(string Property, string Unit, int Jobs, int Open, int Done, decimal Materials, decimal ChargedToOwner)> CostByUnit =>
+                Jobs.GroupBy(x => (Property: x.Property ?? "(no property)", Unit: x.Unit ?? "(building / common areas)"))
+                    .Select(g => (g.Key.Property, g.Key.Unit, g.Count(), g.Count(x => x.IsOpen), g.Count(x => x.IsDone),
+                                  g.Sum(x => x.Materials), g.Sum(x => x.MaterialsChargedToOwner)))
+                    .OrderByDescending(x => x.Item6).ThenByDescending(x => x.Item3).ThenBy(x => x.Item1).ThenBy(x => x.Item2);
+
             private static double? AverageRating(IEnumerable<JobRow> jobs) =>
                 Average(jobs.Select(x => (double?)x.Rating));
 
@@ -315,6 +393,13 @@ namespace RealEstateManager.Services
                     WorkStartedAt = x.WorkStartedAt,
                     ResolvedAt = x.ResolvedAt,
                     Materials = _db.MaintenanceMaterials.Where(m => m.TenantServiceRequestId == x.Id).Sum(m => (decimal?)m.Amount) ?? 0m,
+                    MaterialsFromStore = _db.MaintenanceMaterials
+                        .Where(m => m.TenantServiceRequestId == x.Id && m.Source == MaintenanceMaterialSources.Stock).Sum(m => (decimal?)m.Amount) ?? 0m,
+                    MaterialsChargedToOwner = _db.MaintenanceMaterials
+                        .Where(m => m.TenantServiceRequestId == x.Id && m.ChargedTo == "Owner").Sum(m => (decimal?)m.Amount) ?? 0m,
+                    PropertyId = x.PropertyId,
+                    UnitId = x.UnitId,
+                    Unit = x.Unit != null ? x.Unit.UnitNumber : null,
                     Source = x.Source,
                     Rating = x.Rating,
                     RatingFeedback = x.RatingFeedback,
@@ -332,6 +417,28 @@ namespace RealEstateManager.Services
                 ActivePlans = await _db.MaintenancePlans.CountAsync(x => x.CompanyId == companyId && x.IsActive),
                 AwaitingMakeReady = await VacantUnitsAwaitingMakeReadyAsync(companyId)
             };
+        }
+
+        public sealed record MaterialLine(
+            DateTime Date, string Job, string? Property, string? Unit, string Description,
+            decimal Quantity, decimal UnitCost, decimal Amount, string Source, string? Reference, string ChargedTo);
+
+        /// <summary>Every material recorded on the given jobs, for the cost sheet of the Excel report.</summary>
+        public async Task<List<MaterialLine>> GetMaterialLinesAsync(IReadOnlyCollection<int> jobIds)
+        {
+            if (jobIds.Count == 0)
+                return new List<MaterialLine>();
+
+            return await _db.MaintenanceMaterials.AsNoTracking()
+                .Where(m => jobIds.Contains(m.TenantServiceRequestId))
+                .OrderBy(m => m.MaterialDate).ThenBy(m => m.Id)
+                .Select(m => new MaterialLine(
+                    m.MaterialDate,
+                    m.ServiceRequest!.RequestNumber,
+                    m.ServiceRequest.Property != null ? m.ServiceRequest.Property.Code + " " + m.ServiceRequest.Property.Name : null,
+                    m.ServiceRequest.Unit != null ? m.ServiceRequest.Unit.UnitNumber : null,
+                    m.Description, m.Quantity, m.UnitCost, m.Amount, m.Source, m.Reference, m.ChargedTo))
+                .ToListAsync();
         }
 
         // =====================================================================

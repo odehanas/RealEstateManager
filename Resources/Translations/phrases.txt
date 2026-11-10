@@ -3044,3 +3044,45 @@ worst first
 🔒 Close {0}
 🔒 Closed
 🔒 Year closed
+Raised
+Completed
+Within target
+Borne by the company
+Charged to the owner
+Maintenance Report
+Prepared {0}
+Every job, the cost by property and by unit, and every material line, as an Excel workbook
+Export to Excel
+Choose Save as PDF in the print window to keep it as a file
+{0}% done within target
+{0} rated {1} or below
+{0} raised by management
+{0} from the store · {1} bought for the job
+Materials per completed job
+materials on these jobs divided by the jobs done
+managed properties · {0} borne by the company
+Jobs raised and completed, by month
+A month that completes fewer jobs than it receives is building a backlog.
+No jobs in this period.
+Within and past target, by priority
+Targets to complete: Urgent 24 h · High 3 days · Normal 5 days · Low 10 days. Planned work is measured against its due date.
+Jobs by status
+Where the jobs stand today.
+Jobs by kind
+What breaks most often.
+Workload by technician
+Jobs done and jobs still open for each person.
+Cost of materials, by property
+Materials recorded on the jobs: borne by the company on its own properties, charged to the owner on managed ones.
+No materials recorded on these jobs.
+Jobs and cost by unit
+highest cost first
+Materials per job
+(all {0} units; the rest are in the Excel report)
+Reached us by
+(building / common areas)
+(no property)
+Normal
+Low
+In progress
+Declined

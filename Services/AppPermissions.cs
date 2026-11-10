@@ -366,6 +366,7 @@ namespace RealEstateManager.Services
 
                 // The owner's view of the maintenance operation.
                 ["MaintenanceJobs.Dashboard"] = new[] { AppPermissions.OwnerOversight, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
+                ["MaintenanceJobs.DashboardExcel"] = new[] { AppPermissions.OwnerOversight, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
                 ["MaintenanceJobs.Details"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
 
                 // Typing opening balances is the same right as on the chart of accounts.
