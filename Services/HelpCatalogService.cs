@@ -170,16 +170,22 @@ namespace RealEstateManager.Services
         public List<HelpSearchResult> Search(string? query)
         {
             var words = (query ?? string.Empty)
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Split(new[] { ' ', ',', '.', '?', '!', ':', ';', '/', '"', '(', ')' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(x => x.Length > 1)
                 .Select(x => x.ToLowerInvariant())
                 .Distinct()
                 .ToList();
 
+            // "How do I pay the owner" is a search for "pay owner": the little words are in
+            // every topic and say nothing. A query made only of them is searched as typed.
+            var meaningful = words.Where(w => !StopWords.Contains(w)).ToList();
+            if (meaningful.Count > 0)
+                words = meaningful;
+
             if (words.Count == 0)
                 return new List<HelpSearchResult>();
 
-            var results = new List<HelpSearchResult>();
+            var scored = new List<(HelpSearchResult Result, int Matched)>();
 
             foreach (var topic in AllTopics)
             {
@@ -188,25 +194,58 @@ namespace RealEstateManager.Services
                 var text = PlainText(RawTopicHtml(topic.Key));
                 var lowerText = text.ToLowerInvariant();
 
-                if (!words.All(w => title.Contains(w) || summary.Contains(w) || lowerText.Contains(w)))
+                var matched = 0;
+                var score = 0;
+                var found = new List<string>();
+                foreach (var word in words)
+                {
+                    // "settlements" also finds "settlement", and the other way round.
+                    var stem = word.Length > 4 && word.EndsWith('s') ? word[..^1] : word;
+                    if (!(title.Contains(stem) || summary.Contains(stem) || lowerText.Contains(stem)))
+                        continue;
+
+                    matched++;
+                    found.Add(stem);
+                    // A word in the title says far more about relevance than one in the body.
+                    score += (title.Contains(stem) ? 10 : 0) +
+                             (summary.Contains(stem) ? 4 : 0) +
+                             Math.Min(5, CountOccurrences(lowerText, stem));
+                }
+
+                if (matched == 0)
                     continue;
 
-                // A word in the title says far more about relevance than one in the body.
-                var score = words.Sum(w =>
-                    (title.Contains(w) ? 10 : 0) +
-                    (summary.Contains(w) ? 4 : 0) +
-                    Math.Min(5, CountOccurrences(lowerText, w)));
-
-                results.Add(new HelpSearchResult
+                scored.Add((new HelpSearchResult
                 {
                     Topic = topic,
                     Score = score,
-                    Excerpt = Excerpt(text, lowerText, words)
-                });
+                    Excerpt = Excerpt(text, lowerText, found)
+                }, matched));
             }
 
-            return results.OrderByDescending(x => x.Score).ThenBy(x => x.Topic.Order).ToList();
+            // Topics with every word come first, as before. When no topic has them all - a
+            // long question, or one word the manual does not use - the closest topics are
+            // offered rather than nothing: those with most of the words, best first.
+            var best = scored.Count == 0 ? 0 : scored.Max(x => x.Matched);
+            var floor = best == words.Count ? words.Count : Math.Max(1, (int)Math.Ceiling(best * 0.6));
+
+            return scored
+                .Where(x => x.Matched >= floor)
+                .OrderByDescending(x => x.Matched)
+                .ThenByDescending(x => x.Result.Score)
+                .ThenBy(x => x.Result.Topic.Order)
+                .Select(x => x.Result)
+                .ToList();
         }
+
+        private static readonly HashSet<string> StopWords = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "a", "an", "the", "to", "of", "in", "on", "at", "for", "from", "by", "with", "and", "or", "is", "are", "was", "be",
+            "do", "does", "did", "can", "could", "should", "would", "will", "how", "what", "where", "when", "which", "who", "why",
+            "i", "we", "you", "it", "this", "that", "these", "those", "my", "our", "your", "me", "us", "there", "here",
+            "about", "into", "as", "if", "then", "so", "not", "no", "yes", "please", "want", "need", "like", "get", "use", "using",
+            "screen", "page", "button", "buttons", "step", "steps", "help", "manual", "topic", "guide", "instructions", "explain", "show", "tell"
+        };
 
         // =====================================================================
         //  LOADING

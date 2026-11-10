@@ -21,8 +21,8 @@ namespace RealEstateManager.Services.Assistant
             yield return new AssistantTool
             {
                 Name = "search_help",
-                Description = "Search the user manual for how to do something in RealEstateManager, what a screen is for, or an accounting rule. Use for every how-to question.",
-                Parameters = Schema.Object(("query", Schema.Str("Keywords, e.g. 'clear pdc' or 'close period'"), true)),
+                Description = "Search the user manual for how to do something in RealEstateManager, what a screen is for, or an accounting rule. Use for every how-to question. Also returns the manual topic of the screen the user is on (thisScreen). Read a topic in full with get_help_topic before explaining it.",
+                Parameters = Schema.Object(("query", Schema.Str("Two or three keywords, e.g. 'owner settlement', 'clear pdc' or 'close period'"), true)),
                 Run = (ctx, args) =>
                 {
                     var help = ctx.Get<HelpCatalogService>();
@@ -34,7 +34,40 @@ namespace RealEstateManager.Services.Assistant
                         summary = x.Topic.Summary,
                         excerpt = x.Excerpt
                     }).ToList();
-                    return Task.FromResult<object?>(new { results, note = results.Count == 0 ? "Nothing in the manual matches. Try other words." : null });
+
+                    // The topic the Help button of the user's screen opens: usually the answer
+                    // to "what do I do here", whatever words the question used.
+                    var parts = (ctx.Screen ?? string.Empty).Split('/', 2);
+                    var screenTopic = parts.Length == 2 ? help.ForScreen(parts[0], parts[1]) : null;
+
+                    return Task.FromResult<object?>(new
+                    {
+                        results,
+                        thisScreen = screenTopic == null ? null : new { key = screenTopic.Key, title = screenTopic.Title, summary = screenTopic.Summary },
+                        note = results.Count == 0
+                            ? "No topic has those words. Do not tell the user the manual has nothing: pick the nearest title from allTopics and read it with get_help_topic."
+                            : null,
+                        // Every topic there is, when the words found nothing, so one can be chosen by title.
+                        allTopics = results.Count == 0 ? help.AllTopics.Select(x => new { key = x.Key, title = x.Title }).ToList() : null
+                    });
+                }
+            };
+
+            yield return new AssistantTool
+            {
+                Name = "list_help_topics",
+                Description = "Every topic of the user manual, by group, with its key and one-line summary. Use it when search_help does not find what you expect, or to see what the manual covers.",
+                Run = (ctx, args) =>
+                {
+                    var help = ctx.Get<HelpCatalogService>();
+                    return Task.FromResult<object?>(new
+                    {
+                        groups = help.Groups.Select(g => new
+                        {
+                            group = g.Title,
+                            topics = g.Topics.Select(t => new { key = t.Key, title = t.Title, summary = t.Summary }).ToList()
+                        }).ToList()
+                    });
                 }
             };
 
@@ -51,8 +84,11 @@ namespace RealEstateManager.Services.Assistant
                     if (topic == null)
                         return Task.FromResult<object?>(new { error = $"No topic '{key}'." });
 
+                    // Long enough for the longest topics (invoicing, owner settlements) to arrive
+                    // whole: a topic cut off half way is how the assistant came to say the manual
+                    // did not cover something it does.
                     var text = help.GetPlainText(topic.Key);
-                    if (text.Length > 6000) text = text[..6000] + " …";
+                    if (text.Length > 20000) text = text[..20000] + " …";
                     return Task.FromResult<object?>(new { title = topic.Title, menu = topic.Path, text });
                 }
             };
