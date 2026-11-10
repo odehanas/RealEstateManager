@@ -50,3 +50,12 @@ Can sign in ||| يمكنه الدخول
 Last signed in {0} ||| آخر دخول {0}
 Has not signed in yet ||| لم يسجل الدخول بعد
 No login ||| بلا حساب دخول
+# Profit and Loss by Property: the owner filter and the unit breakdown.
+Show each unit ||| عرض كل وحدة
+<strong>These are the company's own figures for this owner's properties</strong>: the management commission it earned and the costs it bore itself. The rent belongs to the owner and is not the company's revenue, so it is not here. ||| <strong>هذه أرقام الشركة نفسها عن عقارات هذا المالك</strong>: عمولة الإدارة التي كسبتها والتكاليف التي تحملتها. أما الإيجار فهو للمالك وليس إيراداً للشركة، فلا يظهر هنا.
+Open Owner Property Profitability for the owner's own income, costs and net result. ||| افتح ربحية عقارات المالك لرؤية دخل المالك وتكاليفه وصافي نتيجته.
+Profitability by unit ||| الربحية حسب الوحدة
+No revenue or expense in this period is tagged to a property. ||| لا يوجد إيراد أو مصروف في هذه الفترة منسوب إلى عقار.
+Building as a whole (no unit) ||| المبنى ككل (بلا وحدة)
+Each property's units add up to its column in the table above. Costs of the building that were not given a unit are on the line "Building as a whole". ||| مجموع وحدات كل عقار يساوي عموده في الجدول أعلاه. وتكاليف المبنى التي لم تُنسب إلى وحدة تظهر في سطر «المبنى ككل».
+The company's own properties ||| عقارات الشركة نفسها

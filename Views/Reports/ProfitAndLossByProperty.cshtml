@@ -3,6 +3,9 @@
     ViewData["Title"] = T["Profit & Loss by Property"];
     var propertyOptions = ViewBag.PropertyOptions as List<RealEstateManager.Services.PropertyColumnDto>
         ?? new List<RealEstateManager.Services.PropertyColumnDto>();
+    var ownerOptions = ViewBag.OwnerOptions as List<RealEstateManager.Services.PropertyOwnerOptionDto>
+        ?? new List<RealEstateManager.Services.PropertyOwnerOptionDto>();
+    var ownerName = ownerOptions.FirstOrDefault(x => x.Key == Model.FilteredOwner)?.Name;
     var cols = Model.Columns;
 }
 
@@ -45,16 +48,35 @@
                value="@Model.EndDate.ToString("yyyy-MM-dd")" />
     </div>
     <div class="col-auto">
+        <label class="form-label mb-1" for="owner">@T["Owner"]</label>
+        <select class="form-select form-select-sm" id="owner" name="owner">
+            <option value="">@T["All owners"]</option>
+            @foreach (var option in ownerOptions)
+            {
+                <option value="@option.Key" selected="@(Model.FilteredOwner == option.Key ? "selected" : null)">
+                    @(option.Key == RealEstateManager.Services.PropertyOwnerOptionDto.CompanyKey ? T[option.Name] : option.Name)
+                </option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
         <label class="form-label mb-1" for="propertyId">@T["Property"]</label>
         <select class="form-select form-select-sm" id="propertyId" name="propertyId">
             <option value="">@T["All properties"]</option>
             @foreach (var option in propertyOptions)
             {
-                <option value="@option.PropertyId" selected="@(Model.FilteredPropertyId == option.PropertyId ? "selected" : null)">
+                <option value="@option.PropertyId" data-owner="@option.OwnerKey" selected="@(Model.FilteredPropertyId == option.PropertyId ? "selected" : null)">
                     @option.PropertyCode - @option.PropertyName
                 </option>
             }
         </select>
+    </div>
+    <div class="col-auto">
+        <div class="form-check mb-1">
+            <input type="hidden" name="byUnit" value="false" id="byUnitOff" disabled="@(Model.ByUnit ? "disabled" : null)" />
+            <input class="form-check-input" type="checkbox" id="byUnit" name="byUnit" value="true" checked="@(Model.ByUnit ? "checked" : null)" />
+            <label class="form-check-label" for="byUnit">@T["Show each unit"]</label>
+        </div>
     </div>
     <div class="col-auto">
         <button type="submit" class="btn btn-primary btn-sm">@T["Refresh"]</button>
@@ -63,7 +85,16 @@
 
 <div class="d-none d-print-block mb-3">
     @T.HtmlFormat("<strong>Period:</strong> {0} to {1}", Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))
+    @if (ownerName != null) { <span>&middot; <strong>@T["Owner"]:</strong> @(Model.FilteredOwner == RealEstateManager.Services.PropertyOwnerOptionDto.CompanyKey ? T[ownerName] : ownerName)</span> }
 </div>
+
+@if (Model.FilteredOwner != null && Model.FilteredOwner != RealEstateManager.Services.PropertyOwnerOptionDto.CompanyKey)
+{
+    <div class="alert alert-info py-2 small">
+        @T.Html("<strong>These are the company's own figures for this owner's properties</strong>: the management commission it earned and the costs it bore itself. The rent belongs to the owner and is not the company's revenue, so it is not here.")
+        <a asp-action="OwnerProfitability">@T["Open Owner Property Profitability for the owner's own income, costs and net result."]</a>
+    </div>
+}
 
 <div class="row g-3 mb-3">
     <div class="col-md-4">
@@ -197,4 +228,80 @@ else
     <p class="text-muted small mt-2 mb-0">
         @T["Revenue is shown as credits less debits; expenses as debits less credits. A negative figure therefore indicates a reversal or reclassification in the period."]
     </p>
+
+    @if (Model.ByUnit)
+    {
+        <h4 class="mt-4 mb-2">@T["Profitability by unit"]</h4>
+        @if (Model.Units.Count == 0)
+        {
+            <div class="alert alert-info">@T["No revenue or expense in this period is tagged to a property."]</div>
+        }
+        else
+        {
+            <div class="card shadow-sm">
+                <div class="scroll-x">
+                    <table class="table table-bordered table-sm mb-0 pnl-matrix">
+                        <thead>
+                            <tr>
+                                <th class="acct">@T["Property"] / @T["Unit"]</th>
+                                <th class="text-end">@T["Revenue"]</th>
+                                <th class="text-end">@T["Expenses"]</th>
+                                <th class="text-end">@T["Net Profit / (Loss)"]</th>
+                                <th class="text-end">@T["Net Margin %"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var property in Model.Units.GroupBy(x => new { x.PropertyId, x.PropertyCode, x.PropertyName }))
+                            {
+                                var revenue = property.Sum(x => x.Revenue);
+                                var expenses = property.Sum(x => x.Expenses);
+                                <tr class="grp"><td colspan="5">@property.Key.PropertyCode &middot; @property.Key.PropertyName</td></tr>
+                                @foreach (var unit in property)
+                                {
+                                    <tr>
+                                        <td class="acct">@(unit.UnitId.HasValue ? unit.UnitNumber : T["Building as a whole (no unit)"])</td>
+                                        <td class="text-end @(unit.Revenue < 0 ? "neg" : "")">@(unit.Revenue == 0m ? "-" : unit.Revenue.ToString("N2"))</td>
+                                        <td class="text-end @(unit.Expenses < 0 ? "neg" : "")">@(unit.Expenses == 0m ? "-" : unit.Expenses.ToString("N2"))</td>
+                                        <td class="text-end fw-semibold @(unit.Net < 0 ? "neg" : "")">@unit.Net.ToString("N2")</td>
+                                        <td class="text-end">@(unit.Revenue == 0m ? "-" : unit.Margin.ToString("N1") + "%")</td>
+                                    </tr>
+                                }
+                                <tr class="subtotal">
+                                    <td>@T.Format("Total {0}", property.Key.PropertyCode)</td>
+                                    <td class="text-end">@revenue.ToString("N2")</td>
+                                    <td class="text-end">@expenses.ToString("N2")</td>
+                                    <td class="text-end @(revenue - expenses < 0 ? "neg" : "")">@((revenue - expenses).ToString("N2"))</td>
+                                    <td class="text-end">@(revenue == 0m ? "-" : Math.Round((revenue - expenses) / revenue * 100m, 1).ToString("N1") + "%")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <p class="text-muted small mt-2 mb-0">
+                @T["Each property's units add up to its column in the table above. Costs of the building that were not given a unit are on the line \"Building as a whole\"."]
+            </p>
+        }
+    }
 }
+
+<script>
+    // Choosing an owner leaves only that owner's properties in the Property list.
+    (function () {
+        var owner = document.getElementById('owner'), property = document.getElementById('propertyId');
+        var unit = document.getElementById('byUnit'), unitOff = document.getElementById('byUnitOff');
+        if (!owner || !property) { return; }
+        function narrow() {
+            Array.prototype.forEach.call(property.options, function (option) {
+                var show = !option.value || !owner.value || option.getAttribute('data-owner') === owner.value;
+                option.hidden = !show;
+                option.disabled = !show;
+                if (!show && option.selected) { property.value = ''; }
+            });
+        }
+        owner.addEventListener('change', narrow);
+        narrow();
+        // An unticked box still has to say "no", or the report would switch the units back on.
+        if (unit && unitOff) { unit.addEventListener('change', function () { unitOff.disabled = unit.checked; }); }
+    })();
+</script>

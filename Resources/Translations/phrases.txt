@@ -3094,3 +3094,11 @@ Can sign in
 Last signed in {0}
 Has not signed in yet
 No login
+Show each unit
+<strong>These are the company's own figures for this owner's properties</strong>: the management commission it earned and the costs it bore itself. The rent belongs to the owner and is not the company's revenue, so it is not here.
+Open Owner Property Profitability for the owner's own income, costs and net result.
+Profitability by unit
+No revenue or expense in this period is tagged to a property.
+Building as a whole (no unit)
+Each property's units add up to its column in the table above. Costs of the building that were not given a unit are on the line "Building as a whole".
+The company's own properties
