@@ -292,6 +292,13 @@ namespace RealEstateManager.Controllers
                 .OrderBy(x => x.Code)
                 .ToListAsync();
 
+            // Each line can name the unit the cost is for; the list follows the line's property.
+            ViewBag.Units = await _db.Units
+                .AsNoTracking()
+                .Where(x => x.Property!.IsActive)
+                .OrderBy(x => x.UnitNumber)
+                .ToListAsync();
+
             // Only real, postable expense and asset accounts - a bill line cannot be
             // charged to a heading, and never to a revenue or payable account.
             ViewBag.Accounts = await _db.Accounts

@@ -84,6 +84,9 @@ namespace RealEstateManager.Models
         public int? AccountId { get; set; }
         public int? PropertyId { get; set; }
 
+        /// <summary>The unit the cost is for, when it is for one unit of the property.</summary>
+        public int? UnitId { get; set; }
+
         public decimal Quantity { get; set; } = 1m;
         public decimal UnitPrice { get; set; } = 0m;
 

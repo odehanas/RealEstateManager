@@ -3102,3 +3102,8 @@ No revenue or expense in this period is tagged to a property.
 Building as a whole (no unit)
 Each property's units add up to its column in the table above. Costs of the building that were not given a unit are on the line "Building as a whole".
 The company's own properties
+the same figures, unit by unit
+A cost is shown against a unit when the bill line, petty cash voucher, journal line or maintenance job it came from named that unit. Costs for the building as a whole are on their own line. Commission is worked out unit by unit, so a property's units can differ from its row above by a few fils of rounding.
+The unit this cost is for. Leave it empty for a cost of the whole building.
+Whole building
+Only the units of the property chosen are offered. Choosing a unit first fills in its property.

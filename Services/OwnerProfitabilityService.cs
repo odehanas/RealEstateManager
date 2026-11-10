@@ -47,8 +47,30 @@ namespace RealEstateManager.Services
             public decimal? OwnerMarginPercent => RentBilled == 0m ? null : Math.Round(OwnerNetIncome / RentBilled * 100m, 1);
         }
 
+        /// <summary>
+        /// One unit of a managed property, seen from its owner's side. The line with no
+        /// unit holds the costs charged for the building as a whole.
+        /// </summary>
+        public sealed class UnitRow
+        {
+            public int PropertyId { get; set; }
+            public string PropertyCode { get; set; } = string.Empty;
+            public string PropertyName { get; set; } = string.Empty;
+            public int? UnitId { get; set; }
+            public string? UnitNumber { get; set; }
+            public decimal RentBilled { get; set; }
+            public decimal Commission { get; set; }
+            public decimal CommissionVat { get; set; }
+            public decimal Expenses { get; set; }
+            public decimal OwnerNetIncome => RentBilled - Commission - CommissionVat - Expenses;
+            public decimal? OwnerMarginPercent => RentBilled == 0m ? null : Math.Round(OwnerNetIncome / RentBilled * 100m, 1);
+        }
+
         public sealed class Report
         {
+            /// <summary>The same figures unit by unit; each property's units add up to its row.</summary>
+            public List<UnitRow> Units { get; set; } = new();
+
             public DateTime From { get; set; }
             public DateTime To { get; set; }
             public string? Owner { get; set; }
@@ -113,6 +135,62 @@ namespace RealEstateManager.Services
                     .ToListAsync())
                     .Select(x => (x.PropertyId, Category: x.OwnerCostCategory ?? OwnerCostCategories.Other, x.Amount))
                     .ToList();
+
+            // ---- The same, unit by unit -------------------------------------------
+            var unitRent = (await _db.CustomerInvoices.AsNoTracking()
+                    .Where(x => ids.Contains(x.Lease!.Unit!.PropertyId) && x.JournalEntry != null && x.JournalEntry.IsPosted &&
+                                x.ChargeType == null && x.Status != "Cancelled" && x.InvoiceDate >= from && x.InvoiceDate <= to)
+                    .GroupBy(x => x.Lease!.UnitId)
+                    .Select(g => new { UnitId = g.Key, Net = g.Sum(x => x.Subtotal) })
+                    .ToListAsync())
+                .ToDictionary(x => x.UnitId, x => x.Net);
+            var unitCredits = (await _db.CustomerCreditNotes.AsNoTracking()
+                    .Where(x => ids.Contains(x.CustomerInvoice!.Lease!.Unit!.PropertyId) && x.JournalEntry != null && x.JournalEntry.IsPosted &&
+                                x.CreditNoteDate >= from && x.CreditNoteDate <= to)
+                    .GroupBy(x => x.CustomerInvoice!.Lease!.UnitId)
+                    .Select(g => new { UnitId = g.Key, Net = g.Sum(x => x.Subtotal) })
+                    .ToListAsync())
+                .ToDictionary(x => x.UnitId, x => x.Net);
+            var unitCosts = dueToLandlords == null
+                ? new List<(int PropertyId, int? UnitId, string Category, decimal Amount)>()
+                : (await _db.JournalEntryLines.AsNoTracking()
+                    .Where(x => x.AccountId == dueToLandlords.Value && x.Debit > 0m && x.PropertyId != null && ids.Contains(x.PropertyId.Value) &&
+                                x.JournalEntry!.IsPosted && x.JournalEntry.EntryDate >= from && x.JournalEntry.EntryDate <= to &&
+                                chargeSources.Contains(x.JournalEntry.SourceType!))
+                    .GroupBy(x => new { PropertyId = x.PropertyId!.Value, x.UnitId, x.OwnerCostCategory })
+                    .Select(g => new { g.Key.PropertyId, g.Key.UnitId, g.Key.OwnerCostCategory, Amount = g.Sum(x => x.Debit - x.Credit) })
+                    .ToListAsync())
+                    .Select(x => (x.PropertyId, x.UnitId, Category: x.OwnerCostCategory ?? OwnerCostCategories.Other, x.Amount))
+                    .ToList();
+            var unitNames = await _db.Units.AsNoTracking()
+                .Where(x => ids.Contains(x.PropertyId))
+                .Select(x => new { x.Id, x.PropertyId, x.UnitNumber })
+                .ToListAsync();
+
+            foreach (var p in properties)
+            {
+                // A registered owner reclaims the VAT on costs charged to them; for anyone else it is a cost.
+                bool Counts(string category) => category != OwnerCostCategories.Vat || string.IsNullOrWhiteSpace(p.OwnerTrn);
+
+                foreach (var unit in unitNames.Where(x => x.PropertyId == p.Id).OrderBy(x => x.UnitNumber))
+                {
+                    var rent = unitRent.GetValueOrDefault(unit.Id) - unitCredits.GetValueOrDefault(unit.Id);
+                    var costs = unitCosts.Where(x => x.PropertyId == p.Id && x.UnitId == unit.Id && Counts(x.Category)).Sum(x => x.Amount);
+                    if (rent == 0m && costs == 0m)
+                        continue;
+                    var commission = Math.Round(rent * p.CommissionPercentage / 100m, 2);
+                    report.Units.Add(new UnitRow
+                    {
+                        PropertyId = p.Id, PropertyCode = p.Code, PropertyName = p.Name, UnitId = unit.Id, UnitNumber = unit.UnitNumber,
+                        RentBilled = rent, Commission = commission,
+                        CommissionVat = VatDeterminationService.Round(commission * vatRate / 100m), Expenses = costs
+                    });
+                }
+
+                var building = unitCosts.Where(x => x.PropertyId == p.Id && x.UnitId == null && Counts(x.Category)).Sum(x => x.Amount);
+                if (building != 0m)
+                    report.Units.Add(new UnitRow { PropertyId = p.Id, PropertyCode = p.Code, PropertyName = p.Name, Expenses = building });
+            }
 
             var units = await _db.Units.AsNoTracking()
                 .Where(x => ids.Contains(x.PropertyId) && x.IsActive)

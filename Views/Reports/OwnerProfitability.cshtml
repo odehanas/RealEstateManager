@@ -92,6 +92,49 @@ else
             </table>
         </div>
     </div>
+    @if (Model.Units.Count > 0)
+    {
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white"><strong>@T["Profitability by unit"]</strong> <span class="text-muted small">@T["the same figures, unit by unit"]</span></div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@T["Property"] / @T["Unit"]</th>
+                            <th class="text-end">@T["Rent billed"]</th>
+                            <th class="text-end">@T["Commission"]</th>
+                            <th class="text-end">@T["VAT on commission"]</th>
+                            <th class="text-end">@T["Maintenance & costs"]</th>
+                            <th class="text-end">@T["Owner's net income"]</th>
+                            <th class="text-end">@T["Owner margin"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var property in Model.Units.GroupBy(x => new { x.PropertyId, x.PropertyCode, x.PropertyName }))
+                        {
+                            <tr class="table-light"><td colspan="7" class="fw-semibold">@property.Key.PropertyCode &middot; @property.Key.PropertyName</td></tr>
+                            @foreach (var u in property)
+                            {
+                                <tr>
+                                    <td class="ps-4">@(u.UnitId.HasValue ? u.UnitNumber : T["Building as a whole (no unit)"])</td>
+                                    <td class="text-end">@(u.RentBilled == 0m ? "-" : u.RentBilled.ToString("N2"))</td>
+                                    <td class="text-end">@(u.Commission == 0m ? "-" : u.Commission.ToString("N2"))</td>
+                                    <td class="text-end">@(u.CommissionVat == 0m ? "-" : u.CommissionVat.ToString("N2"))</td>
+                                    <td class="text-end">@(u.Expenses == 0m ? "-" : u.Expenses.ToString("N2"))</td>
+                                    <td class="text-end fw-semibold @(u.OwnerNetIncome < 0m ? "text-danger" : "")">@u.OwnerNetIncome.ToString("N2")</td>
+                                    <td class="text-end">@(u.OwnerMarginPercent.HasValue ? u.OwnerMarginPercent.Value.ToString("0.0") + "%" : "-")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-white small text-muted">
+                @T["A cost is shown against a unit when the bill line, petty cash voucher, journal line or maintenance job it came from named that unit. Costs for the building as a whole are on their own line. Commission is worked out unit by unit, so a property's units can differ from its row above by a few fils of rounding."]
+            </div>
+        </div>
+    }
+
     @if (Model.Categories.Count > 0)
     {
         <div class="card shadow-sm mb-3">
