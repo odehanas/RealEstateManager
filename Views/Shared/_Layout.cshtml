@@ -41,6 +41,7 @@
     var canManageLeases = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.LeasesManage);
     var canHandleServiceRequests = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.ServiceRequestsManage);
     var canDoMaintenance = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.MaintenanceExecute);
+    var canManageMaintenance = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.MaintenanceManage);
     // A maintenance engineer and nothing else: their jobs and the help, no company figures or subscription.
     var isMaintenanceOnly = isAuthenticated && canDoMaintenance && await PermissionService.IsMaintenanceOnlyAsync(User);
     // Approvers see the queue in the menu with how many contracts wait for them (not their own).
@@ -68,7 +69,7 @@
     var showMasterDataMenu = canViewMasterData || canManageLeases || canViewVendors || canApproveContracts || canImportData;
     var showAccountsMenu = canManageAccounting;
     // Operations opens for either job: keeping the books, or answering tenants.
-    var showOperationsMenu = canManageAccounting || canHandleServiceRequests || canDoMaintenance;
+    var showOperationsMenu = canManageAccounting || canHandleServiceRequests || canDoMaintenance || canManageMaintenance;
     var showReportsMenu = canViewReports;
     var canManageHr = isAuthenticated && await PermissionService.HasPermissionAsync(User, AppPermissions.HrManage);
     var canRunPayroll = isAuthenticated && await PermissionService.HasAnyPermissionAsync(User, AppPermissions.PayrollManage, AppPermissions.PayrollApprove);
@@ -181,6 +182,7 @@
                                 <span aria-hidden="true">?</span> @T["Help"]
                             </button>
 
+                            <partial name="_AppLink" model="@(("/Profile/ChangePassword", "btn-outline-light"))" />
                             <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
 
                             <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">@T["Password"]</a>
@@ -220,7 +222,7 @@
                                     <svg class="sidebar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="sidebar-label">@T["System Setup"]</span><span class="sidebar-caret" aria-hidden="true"></span>
                                 </button>
                                 <ul class="collapse sidebar-sub" id="sb-setup">
-                                @if (canManageAccounting)
+                                @if (canManageAccounting || isCompanyAdmin)
                                 {
                                     <li class="sidebar-heading">@T["Accounting Setup"]</li>
                                     <li>
@@ -230,10 +232,16 @@
                                         <a class="sidebar-link" asp-controller="AccountMappings" asp-action="Index">@T["Account Mapping"]</a>
                                     </li>
                                     <li>
+                                        <a class="sidebar-link" asp-controller="BankAccounts" asp-action="Index">@T["Bank Accounts"]</a>
+                                    </li>
+                                    <li>
                                         <a class="sidebar-link" asp-controller="OpeningBalances" asp-action="Index">@T["Opening Balances"]</a>
                                     </li>
                                     <li>
                                         <a class="sidebar-link" asp-controller="OwnerWithdrawalCategories" asp-action="Index">@T["Owner Withdrawal Categories"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="OwnerWithdrawalLocations" asp-action="Index">@T["Owner Withdrawal Locations"]</a>
                                     </li>
                                     <li>
                                         <a class="sidebar-link" asp-controller="VatSettings" asp-action="Index">@T["VAT Settings"]</a>
@@ -293,6 +301,9 @@
                                     <li>
                                         <a class="sidebar-link" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
                                     </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="AuditLogs" asp-action="Index">@T["Audit Logs"]</a>
+                                    </li>
                                 }
                                 @if (currentCompanyId.HasValue)
                                 {
@@ -340,6 +351,9 @@
                                         </li>
                                         <li>
                                             <a class="sidebar-link" asp-controller="Tenants" asp-action="Index">@T["Tenants"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Landlords" asp-action="Index">@T["Landlords"]</a>
                                         </li>
                                         <li>
                                             <a class="sidebar-link" asp-controller="RecordDocuments" asp-action="Expiry">@T["Document Expiry"]</a>
@@ -394,7 +408,7 @@
                                     </li>
                                     }
 
-                                    @if (canHandleServiceRequests || canDoMaintenance)
+                                    @if (canHandleServiceRequests || canDoMaintenance || canManageMaintenance)
                                     {
                                         <li class="sidebar-divider" role="separator"></li>
                                         <li class="sidebar-heading">@T["Tenant Services"]</li>
@@ -405,12 +419,27 @@
                                                 @T["Tenant Requests"]
                                             </a>
                                         </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="WhatsAppInbox" asp-action="Index">@T["WhatsApp Messages"]</a>
+                                        </li>
                                         }
                                         <li>
                                             <a class="sidebar-link" asp-controller="MaintenanceJobs" asp-action="Index">
-                                                @(canHandleServiceRequests ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
+                                                @(canHandleServiceRequests || canManageMaintenance ? T["Maintenance Jobs"] : T["My Maintenance Jobs"])
                                             </a>
                                         </li>
+                                        @if (canHandleServiceRequests || canManageMaintenance)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenancePlans" asp-action="Index">@T["Planned Maintenance"]</a>
+                                        </li>
+                                        }
+                                        @if (canManageMaintenance)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenanceJobs" asp-action="Dashboard">@T["Maintenance Dashboard"]</a>
+                                        </li>
+                                        }
                                     }
 
                                     @if (showAccountsMenu)

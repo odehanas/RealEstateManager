@@ -17,13 +17,21 @@ namespace RealEstateManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(bool expired = false, string? returnUrl = null)
         {
-            // The subscription is the company's business, not the maintenance team's.
-            if (await HttpContext.RequestServices.GetRequiredService<PermissionService>().IsMaintenanceOnlyAsync(User))
-                return RedirectToAction("Index", "MaintenanceJobs");
-
             var companyId = User.GetRequiredCurrentCompanyId();
+
+            // The subscription is the company's business, not the maintenance team's. While it
+            // runs they go to their jobs; once it has lapsed the jobs screen sends them here, so
+            // sending them back would loop forever ("the page isn't redirecting properly").
+            if (await HttpContext.RequestServices.GetRequiredService<PermissionService>().IsMaintenanceOnlyAsync(User))
+            {
+                return await _subscriptionService.IsCompanyAccessibleAsync(companyId)
+                    ? RedirectToAction("Index", "MaintenanceJobs")
+                    : View("Unavailable");
+            }
+
             var model = await _subscriptionService.BuildCurrentCompanyViewModelAsync(companyId, returnUrl);
-            ViewBag.ExpiredMessage = expired;
+            // The "expired" flag comes from the address; only believe it when access really has lapsed.
+            ViewBag.ExpiredMessage = expired && !await _subscriptionService.IsCompanyAccessibleAsync(companyId);
             return View(model);
         }
 
@@ -53,7 +61,8 @@ namespace RealEstateManager.Controllers
                 ModelState.AddModelError(string.Empty, ex.Message);
                 var model = await _subscriptionService.BuildCurrentCompanyViewModelAsync(companyId, returnUrl);
                 model.ActivationCode = activationCode;
-                ViewBag.ExpiredMessage = true;
+                // Only a company that really has no access is told it has expired.
+                ViewBag.ExpiredMessage = !await _subscriptionService.IsCompanyAccessibleAsync(companyId);
                 return View("Index", model);
             }
         }

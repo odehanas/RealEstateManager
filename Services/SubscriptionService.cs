@@ -279,6 +279,32 @@ namespace RealEstateManager.Services
         /// Who entered the code, recorded on it so the owner can see in the activation
         /// history which user of the company applied each one.
         /// </param>
+        /// <summary>
+        /// Says why a code cannot be applied here. A code works only for the company it was
+        /// issued to; the commonest slip is applying it while working in another company,
+        /// so that case names the company to switch to.
+        /// </summary>
+        private async Task<string> WhyCodeRefusedAsync(int companyId, string normalizedCode)
+        {
+            var match = await _db.SubscriptionActivationCodes
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(x => x.Code == normalizedCode)
+                .Select(x => new { x.CompanyId, CompanyName = x.Company!.Name, x.IsCancelled, x.ActivatedAt })
+                .FirstOrDefaultAsync();
+
+            if (match == null)
+                return "Activation code is invalid. Check it was typed exactly as it was issued.";
+
+            if (match.CompanyId != companyId)
+                return $"This code was issued for {match.CompanyName}. Switch to {match.CompanyName} with the company selector at the top of the page, then apply it there.";
+
+            if (match.IsCancelled)
+                return "This activation code was cancelled. Ask for a new one.";
+
+            return $"This activation code was already applied on {match.ActivatedAt!.Value.ToLocalTime():dd/MM/yyyy}.";
+        }
+
         public async Task ActivateCodeAsync(int companyId, string code, string? appliedBy = null)
         {
             var normalizedCode = NormalizeCode(code);
@@ -301,7 +327,7 @@ namespace RealEstateManager.Services
                     !x.ActivatedAt.HasValue);
 
             if (activationCode == null)
-                throw new InvalidOperationException("Activation code is invalid or already used.");
+                throw new InvalidOperationException(await WhyCodeRefusedAsync(companyId, normalizedCode));
 
             var baseDate = DateTime.Today;
             var currentAccessEndDate = GetAccessEndDate(subscription);

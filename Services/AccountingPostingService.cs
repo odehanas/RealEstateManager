@@ -11,14 +11,18 @@ namespace RealEstateManager.Services
         private readonly VatDeterminationService _vatDeterminationService;
         private readonly OwnerRechargeService _recharges;
 
+        private readonly CollectionAccountService _collection;
+
         public AccountingPostingService(
             ApplicationDbContext db,
             VatDeterminationService vatDeterminationService,
-            OwnerRechargeService recharges)
+            OwnerRechargeService recharges,
+            CollectionAccountService collection)
         {
             _db = db;
             _vatDeterminationService = vatDeterminationService;
             _recharges = recharges;
+            _collection = collection;
         }
 
         public async Task<JournalEntry> PostCustomerInvoiceAsync(int customerInvoiceId)
@@ -351,17 +355,18 @@ namespace RealEstateManager.Services
 
             var settings = await GetCompanyAccountSettingAsync(receipt.CompanyId);
 
-            var cashAccount = await GetMappedAccountAsync(
-                receipt.CompanyId,
-                settings.DefaultCashAccountId,
-                "Default Cash");
+            var invoice = receipt.CustomerInvoice!;
+
+            // Who holds the rent of the property decides where the money lands: the company's
+            // bank, the owners' funds bank, or - paid to the landlord - Due to Landlords.
+            receipt.CollectionMode = CollectionAccountService.ModeFor(invoice.Lease!.Unit!.Property!, invoice.IsCharge);
+            var cashAccount = await _collection.ReceivingAccountAsync(receipt.CompanyId, invoice.Lease.Unit.Property!, receipt.CollectionMode);
 
             var receivableAccount = await GetMappedAccountAsync(
                 receipt.CompanyId,
                 settings.AccountsReceivableAccountId,
                 "Accounts Receivable");
 
-            var invoice = receipt.CustomerInvoice!;
             var propertyId = invoice.Lease!.Unit!.Property!.Id;
             var unitId = invoice.Lease.Unit.Id;
             var tenantId = invoice.Lease.Tenant!.Id;
@@ -374,7 +379,9 @@ namespace RealEstateManager.Services
                     AccountId = cashAccount.Id,
                     Debit = receipt.Amount,
                     Credit = 0m,
-                    Description = $"Receipt {receipt.ReceiptNumber}",
+                    Description = receipt.CollectionMode == CollectionModes.Owner
+                        ? $"Receipt {receipt.ReceiptNumber} - paid to the owner directly"
+                        : $"Receipt {receipt.ReceiptNumber}",
                     PropertyId = propertyId,
                     UnitId = unitId,
                     TenantId = tenantId,

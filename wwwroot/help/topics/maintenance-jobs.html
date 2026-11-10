@@ -14,6 +14,15 @@ operation on the <strong>Maintenance Dashboard</strong>.</p>
 more than one, the job goes to the one with the fewest open jobs. If nobody has the permission yet, jobs wait
 unassigned and the Maintenance Jobs screen says so.</p>
 
+<div class="box ok">
+    <div class="box-title">The maintenance manager</div>
+    <p>Give the person who runs maintenance the <strong>Maintenance Manager</strong> role, which ticks
+    <strong>Manage Maintenance</strong>. They see every maintenance job, assign and close them, raise make-ready and inspection
+    jobs, set up the <strong>Planned Maintenance</strong> programme and open the <strong>Maintenance Dashboard</strong>. New
+    maintenance requests and low ratings reach them too. They do not see the other tenant requests or the accounts. The role
+    also ticks <strong>Carry Out Maintenance Jobs</strong>, so jobs can be given to them; untick it if they only supervise.</p>
+</div>
+
 <h3>What the maintenance user sees</h3>
 <p><span class="path">Operations ▸ Tenant Services ▸ My Maintenance Jobs</span></p>
 <p>A maintenance user sees <strong>only the jobs assigned to them</strong> &mdash; not the accounts, not other
@@ -85,6 +94,37 @@ nothing more is expected. A technician cannot close a job.</p>
     </tbody>
 </table>
 
+<h3>Jobs no tenant asked for</h3>
+<p>Maintenance is not only what tenants ask for. A supervisor, anyone with <strong>Handle Tenant Requests</strong>, can raise a
+job from <strong>Maintenance Jobs ▸ Raise a Job</strong>: choose the property, and the unit or leave it for the building and its
+common areas, then say what it is for. The choices are making a vacant unit ready for the next tenant, a repair, an inspection,
+preventive maintenance or an improvement.</p>
+<ul>
+    <li>It goes to the least busy technician, or to the one you choose, and is worked like any other job: acknowledged, started,
+        materials recorded and marked as done.</li>
+    <li>Materials are charged the same way: to the owner for a managed property, to the company for its own.</li>
+    <li>It has no tenant, so it never shows on a tenant's portal, all its notes are internal and it is not rated.</li>
+    <li>It is listed on <strong>Maintenance Jobs</strong>, not on <strong>Tenant Requests</strong>.</li>
+</ul>
+
+<h3>Units to make ready</h3>
+<p>When a tenancy ends, the unit should be inspected, repaired and cleaned before it is let again. <strong>Maintenance Jobs</strong>
+lists every vacant unit whose last tenancy has ended and that has had no make-ready job since, with a
+<strong>Raise make-ready job</strong> button. The owner sees the same list on the dashboard, with the days each unit has been vacant.</p>
+
+<h3>Planned maintenance</h3>
+<p>Regular work is set up once under <strong>Operations ▸ Tenant Services ▸ Planned Maintenance</strong>. Examples are the AC
+service every 3 months, the fire alarm check every 6 months and the water tank cleaning every 12.</p>
+<ol class="steps">
+    <li>Select <strong>New Planned Work</strong>. Name the work, choose the property and, if it is for one unit, the unit.</li>
+    <li>Say <strong>every how many months</strong> it is due, the <strong>next due</strong> date, and how many days before the due
+        date the job should open, so the visit can be booked.</li>
+    <li>Leave <strong>Assign to</strong> empty to give each job to the least busy technician, or choose the one who always does it.</li>
+</ol>
+<p>The system checks every few hours. When a plan comes due it opens a job, marked <strong>Planned maintenance</strong> with its
+due date, and moves the plan to its next date. <strong>Open due jobs now</strong> runs the check at once. A planned job counts as
+late only once its due date has passed, and the dashboard shows the share of planned work done by its due date.</p>
+
 <h3>The Maintenance Dashboard</h3>
 <p><span class="path">Controls ▸ Maintenance Dashboard</span> &mdash; for the owner (Owner Oversight), supervisors
 and report viewers.</p>
@@ -99,3 +139,45 @@ technician. It covers the jobs raised in the period and every job still open:</p
     <li>The open jobs, worst first, and breakdowns <strong>by technician</strong>, <strong>by property</strong> and
         <strong>by kind of job</strong>.</li>
 </ul>
+
+<h4>The charts</h4>
+<table class="t-compact">
+    <thead><tr><th style="width:36%">Chart</th><th>What it tells you</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Jobs raised and completed, by month</strong></td><td>Whether the team keeps up. A month that completes fewer jobs than it receives is building a backlog.</td></tr>
+        <tr><td><strong>Within and past target, by priority</strong></td><td>How many urgent, high, normal and low jobs met their completion target, and how many did not.</td></tr>
+        <tr><td><strong>Jobs by status</strong></td><td>Where the jobs stand today, from submitted to closed.</td></tr>
+        <tr><td><strong>Jobs by kind</strong></td><td>What breaks most often: air conditioning, plumbing, electrical and so on.</td></tr>
+        <tr><td><strong>Workload by technician</strong></td><td>Jobs done and jobs still open for each person, and those not assigned.</td></tr>
+        <tr><td><strong>Cost of materials, by property</strong></td><td>Materials recorded on the jobs: borne by the company on its own properties, charged to the owner on managed ones.</td></tr>
+    </tbody>
+</table>
+<p>Point at a bar to see its figures. The charts follow the period and the technician you chose.</p>
+
+<h4>Cost per property and per unit</h4>
+<p>The cost shown is the <strong>materials recorded on the jobs</strong> &mdash; items taken from the maintenance store and
+items bought for the job (see <em>Materials</em> above). The tiles give the total, how much came from the store and how
+much was bought, the <strong>materials per completed job</strong>, and how much was <strong>charged to owners</strong>.
+<strong>Jobs and cost by unit</strong> lists each unit with its jobs, its materials and the materials per job, highest
+cost first; work on a building's common areas is shown on its own line. A contractor's bill that was not recorded as
+a material on a job is not in these figures: it is in the property's costs under
+<a href="#management-reports">P&amp;L by Property</a>.</p>
+
+<h4>Excel and PDF</h4>
+<ul>
+    <li><strong>Export to Excel</strong> downloads a workbook for the same period and technician: a summary of the
+        figures, then one sheet each for every job, cost by property, cost by unit, the technicians, the kinds of job,
+        the months, and every material line with its quantity, cost and who it was charged to.</li>
+    <li><strong>Print / Save as PDF</strong> lays the dashboard out as a <em>Maintenance Report</em> on A4, with the company
+        name, the period and the date it was prepared. Choose <em>Save as PDF</em> in the print window to keep it as a file
+        for the follow-up meeting or to send to an owner.</li>
+</ul>
+
+<h3>The tenant's rating</h3>
+<p>When a job is marked as done, the tenant is invited to rate it on the portal from <strong>1 to 10</strong> and
+write feedback. A job is rated once. If the tenant gives the rating by WhatsApp or phone, a supervisor can record it
+on the job; the job then shows who entered it, and nobody can enter the rating of a job they carried out themselves.
+Once a job has a rating it can no longer be moved to another technician.</p>
+<p>The dashboard shows the <strong>team rating</strong>, which is the maintenance manager's score, as the average of
+all rated jobs, with each technician's own average beside their name, the number of low ratings, and the feedback,
+lowest first. A rating of 5 or below also sends a notification to the people who handle tenant requests.</p>

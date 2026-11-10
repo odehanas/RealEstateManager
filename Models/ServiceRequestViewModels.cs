@@ -22,9 +22,26 @@ namespace RealEstateManager.Models
         public int? RelatedInvoiceId { get; set; }
         public DateTime? RequestedNewDueDate { get; set; }
 
+        // ---- Logged by staff only; ignored on the portal --------------------
+        public string Source { get; set; } = ServiceRequestSources.WhatsApp;
+
+        /// <summary>When the message or call came in, so a late entry does not hide the wait.</summary>
+        public DateTime? ReceivedAt { get; set; }
+
         // ---- Options for the form -------------------------------------------
         public List<ServiceRequestLeaseOption> Leases { get; set; } = new();
         public List<ServiceRequestInvoiceOption> OutstandingInvoices { get; set; } = new();
+    }
+
+    /// <summary>A tenant in the list staff choose from when logging a request.</summary>
+    public class ServiceRequestTenantOption
+    {
+        public int Id { get; set; }
+        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string? Phone { get; set; }
+
+        public string Display => string.IsNullOrWhiteSpace(Phone) ? $"{Code} - {Name}" : $"{Code} - {Name} - {Phone}";
     }
 
     public class ServiceRequestLeaseOption
@@ -64,6 +81,11 @@ namespace RealEstateManager.Models
 
         public int MessageCount { get; set; }
 
+        public string Source { get; set; } = ServiceRequestSources.Portal;
+
+        /// <summary>Tenant list only: a finished job still waiting for their rating.</summary>
+        public bool CanBeRated { get; set; }
+
         /// <summary>Days since submission, for the staff queue's ageing column.</summary>
         public int AgeInDays => (int)(DateTime.UtcNow.Date - SubmittedAt.Date).TotalDays;
 
@@ -94,6 +116,22 @@ namespace RealEstateManager.Models
         public string? PropertyName { get; set; }
 
         public string? ResolutionNotes { get; set; }
+
+        public string Source { get; set; } = ServiceRequestSources.Portal;
+
+        /// <summary>What a job no tenant asked for is for. See <see cref="MaintenancePurposes"/>.</summary>
+        public string? Purpose { get; set; }
+
+        public bool IsInternal => ServiceRequestSources.IsInternal(Source);
+
+        // ---- Rating of a maintenance job -------------------------------------
+        public int? Rating { get; set; }
+        public string? RatingFeedback { get; set; }
+        public DateTime? RatedAt { get; set; }
+        public bool CanBeRated { get; set; }
+
+        /// <summary>Staff only: who recorded the rating for the tenant; empty when the tenant rated it.</summary>
+        public string? RatedByStaffName { get; set; }
 
         // ---- Postponement ----------------------------------------------------
         public string? RelatedInvoiceNumber { get; set; }

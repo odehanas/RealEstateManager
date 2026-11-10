@@ -1,0 +1,67 @@
+# Sheet 23: the maintenance dashboard's charts, cost figures and report (whole texts; {0} are values).
+Raised ||| المرفوعة
+Completed ||| المنجزة
+Within target ||| ضمن المستهدف
+Borne by the company ||| على الشركة
+Charged to the owner ||| محمّل على المالك
+Maintenance Report ||| تقرير الصيانة
+Prepared {0} ||| أُعد في {0}
+Every job, the cost by property and by unit, and every material line, as an Excel workbook ||| كل الأعمال، والتكلفة حسب العقار وحسب الوحدة، وكل بند مواد، في ملف Excel
+Export to Excel ||| تصدير إلى Excel
+Choose Save as PDF in the print window to keep it as a file ||| اختر «حفظ بصيغة PDF» في نافذة الطباعة لحفظه ملفاً
+{0}% done within target ||| {0}% أُنجز ضمن المستهدف
+{0} rated {1} or below ||| {0} بتقييم {1} أو أقل
+{0} raised by management ||| {0} بطلب من الإدارة
+{0} from the store · {1} bought for the job ||| {0} من المخزن · {1} مشتراة للعمل
+Materials per completed job ||| المواد لكل عمل منجز
+materials on these jobs divided by the jobs done ||| مواد هذه الأعمال مقسومة على الأعمال المنجزة
+managed properties · {0} borne by the company ||| العقارات المُدارة · {0} على الشركة
+Jobs raised and completed, by month ||| الأعمال المرفوعة والمنجزة، حسب الشهر
+A month that completes fewer jobs than it receives is building a backlog. ||| الشهر الذي يُنجز أعمالاً أقل مما يستقبل يراكم أعمالاً متأخرة.
+No jobs in this period. ||| لا توجد أعمال في هذه الفترة.
+Within and past target, by priority ||| ضمن المستهدف ومتجاوزة له، حسب الأولوية
+Targets to complete: Urgent 24 h · High 3 days · Normal 5 days · Low 10 days. Planned work is measured against its due date. ||| مستهدف الإنجاز: عاجل 24 ساعة · مرتفع 3 أيام · عادي 5 أيام · منخفض 10 أيام. وتُقاس الأعمال المجدولة بتاريخ استحقاقها.
+Jobs by status ||| الأعمال حسب الحالة
+Where the jobs stand today. ||| أين تقف الأعمال اليوم.
+Jobs by kind ||| الأعمال حسب النوع
+What breaks most often. ||| ما يتعطل أكثر من غيره.
+Workload by technician ||| حجم العمل حسب الفني
+Jobs done and jobs still open for each person. ||| الأعمال المنجزة والأعمال المفتوحة لكل شخص.
+Cost of materials, by property ||| تكلفة المواد، حسب العقار
+Materials recorded on the jobs: borne by the company on its own properties, charged to the owner on managed ones. ||| المواد المسجلة على الأعمال: على الشركة في عقاراتها، ومحمّلة على المالك في العقارات المُدارة.
+No materials recorded on these jobs. ||| لا توجد مواد مسجلة على هذه الأعمال.
+Jobs and cost by unit ||| الأعمال والتكلفة حسب الوحدة
+highest cost first ||| الأعلى تكلفة أولاً
+Materials per job ||| المواد لكل عمل
+(all {0} units; the rest are in the Excel report) ||| (كل الوحدات وعددها {0}؛ والباقي في تقرير Excel)
+Reached us by ||| وصلنا عبر
+(building / common areas) ||| (المبنى / المناطق المشتركة)
+(no property) ||| (بلا عقار)
+Normal ||| عادي
+Low ||| منخفض
+In progress ||| قيد التنفيذ
+Declined ||| مرفوض
+Maintenance Scenarios for Training ||| سيناريوهات صيانة للتدريب
+Load Maintenance Scenarios ||| تحميل سيناريوهات الصيانة
+Adds five months of fictional maintenance work to this company, for showing the maintenance screens: jobs from the portal, WhatsApp, phone and management, at every stage from new to closed, on time and late, rated well and badly, with materials on owned and managed properties, a make-ready, inspections and a planned maintenance programme. It needs a company that already has properties and tenants with current contracts, shares the jobs among its maintenance users, and can be loaded once. ||| يضيف خمسة أشهر من أعمال الصيانة الافتراضية إلى هذه الشركة لعرض شاشات الصيانة: أعمال من البوابة وواتساب والهاتف والإدارة، في كل مرحلة من الجديد إلى المقفل، في موعدها ومتأخرة، بتقييمات جيدة وسيئة، مع مواد على عقارات مملوكة ومُدارة، وتجهيز وحدة، ومعاينات، وبرنامج صيانة مجدولة. ويحتاج إلى شركة فيها عقارات ومستأجرون بعقود سارية، ويوزّع الأعمال على مستخدمي الصيانة فيها، ويُحمَّل مرة واحدة.
+# The tenants list: who has a portal login.
+Portal login ||| دخول البوابة
+Can sign in ||| يمكنه الدخول
+Last signed in {0} ||| آخر دخول {0}
+Has not signed in yet ||| لم يسجل الدخول بعد
+No login ||| بلا حساب دخول
+# Profit and Loss by Property: the owner filter and the unit breakdown.
+Show each unit ||| عرض كل وحدة
+<strong>These are the company's own figures for this owner's properties</strong>: the management commission it earned and the costs it bore itself. The rent belongs to the owner and is not the company's revenue, so it is not here. ||| <strong>هذه أرقام الشركة نفسها عن عقارات هذا المالك</strong>: عمولة الإدارة التي كسبتها والتكاليف التي تحملتها. أما الإيجار فهو للمالك وليس إيراداً للشركة، فلا يظهر هنا.
+Open Owner Property Profitability for the owner's own income, costs and net result. ||| افتح ربحية عقارات المالك لرؤية دخل المالك وتكاليفه وصافي نتيجته.
+Profitability by unit ||| الربحية حسب الوحدة
+No revenue or expense in this period is tagged to a property. ||| لا يوجد إيراد أو مصروف في هذه الفترة منسوب إلى عقار.
+Building as a whole (no unit) ||| المبنى ككل (بلا وحدة)
+Each property's units add up to its column in the table above. Costs of the building that were not given a unit are on the line "Building as a whole". ||| مجموع وحدات كل عقار يساوي عموده في الجدول أعلاه. وتكاليف المبنى التي لم تُنسب إلى وحدة تظهر في سطر «المبنى ككل».
+The company's own properties ||| عقارات الشركة نفسها
+# Costs by unit: bill lines, petty cash and the owner profitability breakdown.
+the same figures, unit by unit ||| الأرقام نفسها، وحدة بوحدة
+A cost is shown against a unit when the bill line, petty cash voucher, journal line or maintenance job it came from named that unit. Costs for the building as a whole are on their own line. Commission is worked out unit by unit, so a property's units can differ from its row above by a few fils of rounding. ||| تظهر التكلفة على الوحدة عندما يكون بند الفاتورة أو سند المصروفات النثرية أو بند القيد أو عمل الصيانة الذي نشأت عنه قد سمّى تلك الوحدة. وتكاليف المبنى ككل في سطر خاص بها. وتُحتسب العمولة وحدة بوحدة، فقد يختلف مجموع وحدات العقار عن صفه أعلاه ببضعة فلوس بسبب التقريب.
+The unit this cost is for. Leave it empty for a cost of the whole building. ||| الوحدة التي تخصها هذه التكلفة. اتركها فارغة لتكلفة المبنى ككل.
+Whole building ||| المبنى ككل
+Only the units of the property chosen are offered. Choosing a unit first fills in its property. ||| تُعرض وحدات العقار المختار فقط. واختيار الوحدة أولاً يملأ عقارها.

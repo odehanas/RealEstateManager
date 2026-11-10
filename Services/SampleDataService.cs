@@ -69,6 +69,17 @@ namespace RealEstateManager.Services
         }
 
         /// <summary>
+        /// Adds a few months of maintenance work to a company that already has properties
+        /// and tenants: see <see cref="MaintenanceScenarioBuilder"/>. Runs once per company.
+        /// </summary>
+        public async Task<string> AddMaintenanceScenariosAsync(int companyId, int? actingUserId)
+        {
+            using var scope = CreateCompanyScope(companyId, actingUserId);
+            var builder = ActivatorUtilities.CreateInstance<MaintenanceScenarioBuilder>(scope.ServiceProvider);
+            return await builder.BuildAsync(companyId, actingUserId);
+        }
+
+        /// <summary>
         /// A fresh scope whose every query is filtered to the given company, whatever
         /// company the person behind the current request is signed in to.
         /// </summary>
@@ -375,6 +386,7 @@ namespace RealEstateManager.Services
                     CommissionPercentage = commission,
                     IsActive = true
                 };
+                await LandlordService.LinkByOwnerNameAsync(_db, property);
                 _db.Properties.Add(property);
                 await _db.SaveChangesAsync();
                 _properties[key] = property;

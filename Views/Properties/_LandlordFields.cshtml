@@ -1,0 +1,44 @@
+@model RealEstateManager.Domain.Property
+@using RealEstateManager.Domain
+@{
+    var landlords = ViewBag.Landlords as List<Landlord> ?? new();
+}
+
+<div class="col-md-4">
+    <label class="form-label" for="landlordId">@T["Landlord"]</label>
+    <select asp-for="LandlordId" class="form-select" id="landlordId">
+        <option value="">@T["-- managed properties only --"]</option>
+        @foreach (var landlord in landlords)
+        {
+            <option value="@landlord.Id" data-mode="@landlord.DefaultCollectionMode" selected="@(landlord.Id == Model.LandlordId ? "selected" : null)">@landlord.Name</option>
+        }
+    </select>
+    <div class="form-text">
+        @T["The owner of a managed property; their TRN is printed on our commission tax invoice."]
+        <a asp-controller="Landlords" asp-action="Create" target="_blank">@T["New landlord"]</a>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <label class="form-label" for="collectionMode">@T["Who holds the rent"]</label>
+    <select asp-for="CollectionMode" class="form-select" id="collectionMode">
+        @foreach (var mode in CollectionModes.All)
+        {
+            <option value="@mode" selected="@(mode == Model.CollectionMode ? "selected" : null)">@T[CollectionModes.Describe(mode)]</option>
+        }
+    </select>
+    <div class="form-text">@T["Where tenants' payments land when they pay or a cheque clears. Paid to the owner directly: cheques are written to the owner and no company bank moves."]</div>
+</div>
+
+<script>
+    (function () {
+        // Choosing a landlord brings their usual arrangement; it can still be changed for this property.
+        var landlord = document.getElementById('landlordId');
+        var mode = document.getElementById('collectionMode');
+        if (!landlord || !mode) return;
+        landlord.addEventListener('change', function () {
+            var chosen = landlord.options[landlord.selectedIndex];
+            if (chosen && chosen.dataset.mode) mode.value = chosen.dataset.mode;
+        });
+    })();
+</script>

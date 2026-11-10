@@ -7,6 +7,7 @@
       "topics": [
         { "key": "introduction", "title": "About This System", "path": "", "summary": "What the system covers and how owned and managed properties differ.", "screens": [] },
         { "key": "getting-started", "title": "Signing In & Finding Your Way", "path": "Home", "summary": "Signing in, the menus, switching company, changing your password, the dashboard.", "screens": ["Home", "Profile"] },
+        { "key": "phone-app", "title": "Install the App on Your Phone", "path": "App and notifications", "summary": "Installing on iPhone, Android and a computer, turning notifications on and off, and what to do when it does not work.", "screens": ["Profile"] },
         { "key": "training-videos", "title": "Training Videos", "path": "Help", "summary": "Ten short videos showing the main tasks step by step, recorded in the practice company.", "screens": [] },
         { "key": "workflow", "title": "The System Workflow", "path": "Operations ▸ Workflow Guide", "summary": "The order work is done in, from property to payment received.", "screens": ["Workflow"] },
         { "key": "draft-post-reset", "title": "Draft, Post & Reset to Draft", "path": "Operations ▸ Journal Inquiry", "summary": "Why most transactions are saved as drafts, how to post them, and how to correct a posted one.", "screens": [] },
@@ -25,7 +26,7 @@
         { "key": "e-invoicing", "title": "E-Invoicing Settings", "path": "System Setup ▸ E-Invoicing Settings", "summary": "The UAE e-invoicing mandate, your provider, start date and the identity printed on every e-invoice.", "screens": ["EInvoicing.Settings"] },
         { "key": "revenue-recognition", "title": "Revenue Recognition", "path": "System Setup ▸ Revenue Recognition", "summary": "Releasing billed rent into revenue month by month.", "screens": ["RevenueRecognition"] },
         { "key": "prepayments", "title": "Recurring Prepayments", "path": "System Setup ▸ Recurring Prepayments", "summary": "Spreading an up-front payment over the months it covers.", "screens": ["Prepayments"] },
-        { "key": "closing", "title": "Period & Year Closing", "path": "System Setup ▸ Period Closing", "summary": "Month-end checklist, closing a period and closing the fiscal year.", "screens": ["Closing"] },
+        { "key": "closing", "title": "Period & Year Closing", "path": "System Setup ▸ Closing Cockpit", "summary": "The Closing Cockpit checklist, closing a period, reopening one on request, and closing the fiscal year.", "screens": ["Closing"] },
         { "key": "companies-users", "title": "Companies, Users & Permissions", "path": "System Setup ▸ Users & Permissions", "summary": "Companies, user accounts and what each permission allows.", "screens": ["Companies", "Users"] },
         { "key": "subscription-support", "title": "Subscription, Audit Log & Feedback", "path": "System Setup ▸ Subscription & Help", "summary": "Trial and activation, the audit trail, database updates, help and feedback.", "screens": ["Subscription", "AuditLogs", "Feedback", "DatabaseUpdates"] }
       ]
@@ -47,7 +48,8 @@
       "key": "operations",
       "title": "Operations",
       "topics": [
-        { "key": "customer-invoices", "title": "Customer Invoices", "path": "Operations ▸ Customer Invoices", "summary": "Posting rent invoices and printing tax invoices.", "screens": ["CustomerInvoices"] },
+        { "key": "invoicing-cases", "title": "Invoicing, Step by Step: Own, Managed & Owner-Named Properties", "path": "Operations ▸ Customer Invoices", "summary": "The seven steps from contract to money, and exactly what differs for the company's own property, a landlord's property, and a landlord's property invoiced in the owner's name.", "screens": [] },
+        { "key": "customer-invoices", "title": "Customer Invoices", "path": "Operations ▸ Customer Invoices", "summary": "Posting rent invoices, printing tax invoices, and the invoice list.", "screens": ["CustomerInvoices"] },
         { "key": "credit-notes", "title": "Credit Notes", "path": "Operations ▸ Credit Notes", "summary": "Reducing or cancelling an invoice - the only lawful correction once it is e-invoiced.", "screens": ["CustomerCreditNotes"] },
         { "key": "e-invoice-monitor", "title": "E-Invoice Monitor", "path": "Operations ▸ E-Invoice Monitor", "summary": "Generating e-invoices, sending them through your provider within 14 days, and recording the answer.", "screens": ["EInvoicing"] },
         { "key": "received-e-invoices", "title": "Received E-Invoices", "path": "Operations ▸ Received E-Invoices", "summary": "Uploading suppliers' e-invoices and booking them as vendor bills.", "screens": ["EInvoicing.Received", "EInvoicing.Upload", "EInvoicing.ReceivedFile", "EInvoicing.SetReceivedStatus"] },
@@ -56,15 +58,33 @@
         { "key": "security-deposits", "title": "Security Deposits", "path": "Operations ▸ Security Deposits", "summary": "Holding and releasing tenant deposits.", "screens": ["SecurityDeposits"] },
         { "key": "vendor-bills", "title": "Vendor Bills", "path": "Operations ▸ Vendor Bills", "summary": "Multi-line supplier bills, VAT by supplier registration, draft and post.", "screens": ["VendorBills"] },
         { "key": "vendor-payments", "title": "Vendor Payments", "path": "Operations ▸ Vendor Payments", "summary": "Paying a posted bill.", "screens": ["VendorPayments"] },
-        { "key": "development-projects", "title": "Development Projects", "path": "Operations ▸ Development Projects", "summary": "Buildings under construction: budgets, costs, completion, and the transfer to held for sale, investment property or fixed assets.", "screens": ["DevelopmentProjects"] },
+        { "key": "development-projects", "title": "Development Projects", "path": "Operations ▸ Development Projects", "summary": "Buildings under construction: budgets, costs, completion, the transfer to held for sale, investment property or fixed assets, and the Project Costs & WIP report.", "screens": ["DevelopmentProjects", "ProjectCosts"] },
         { "key": "unit-sales", "title": "Unit Sales", "path": "Operations ▸ Unit Sales", "summary": "Sale contracts, payment plans, buyer payments, and handover - revenue and cost of sales at handover.", "screens": ["UnitSales"] },
-        { "key": "owner-settlements", "title": "Owner Settlements", "path": "Operations ▸ Owner Settlements", "summary": "Monthly commission tax invoices with 5% VAT, and paying landlords the rent collected, less commission, in full or in part.", "screens": ["OwnerSettlements", "OwnerRecharges"] },
+        { "key": "owner-settlements", "title": "Owner Settlements", "path": "Operations ▸ Owner Settlements", "summary": "Monthly commission tax invoices with 5% VAT, and paying landlords the rent collected, less commission, in full or in part.", "screens": ["OwnerSettlements", "OwnerRecharges", "Landlords", "BankAccounts"] },
         { "key": "petty-cash", "title": "Petty Cash", "path": "Operations ▸ Petty Cash", "summary": "Cash floats, petty cash vouchers and replenishment.", "screens": ["PettyCash"] },
         { "key": "fixed-assets", "title": "Fixed Assets & Depreciation", "path": "Operations ▸ Fixed Assets", "summary": "Acquisition costs, capitalisation and monthly depreciation.", "screens": ["FixedAssets"] },
         { "key": "manual-journals", "title": "Manual Journals", "path": "Operations ▸ Manual Journals", "summary": "Adjustments, accruals, corrections and owner drawings.", "screens": ["ManualJournals"] },
         { "key": "journal-inquiry", "title": "Journal Inquiry", "path": "Operations ▸ Journal Inquiry", "summary": "Finding journals, posting drafts and resetting posted entries.", "screens": ["Journal.Index", "Journal.Post", "Journal.ResetToDraft", "Journal.PostAllDrafts"] },
-        { "key": "tenant-requests", "title": "Tenant Requests", "path": "Operations ▸ Tenant Requests", "summary": "Answering maintenance, payment postponement and other tenant requests; the payment hold on maintenance.", "screens": ["ServiceRequests"] },
-        { "key": "maintenance-jobs", "title": "Maintenance Jobs & Dashboard", "path": "Operations ▸ Tenant Services ▸ Maintenance Jobs", "summary": "The maintenance team's jobs, materials used, target times and the owner's maintenance dashboard.", "screens": ["MaintenanceJobs"] }
+        { "key": "tenant-requests", "title": "Tenant Requests", "path": "Operations ▸ Tenant Requests", "summary": "Answering maintenance, payment postponement and other tenant requests; the payment hold on maintenance; requests from WhatsApp.", "screens": ["ServiceRequests", "WhatsAppInbox", "WhatsAppSettings"] },
+        { "key": "maintenance-jobs", "title": "Maintenance Jobs & Dashboard", "path": "Operations ▸ Tenant Services ▸ Maintenance Jobs", "summary": "The maintenance team's jobs, materials used, target times and the owner's maintenance dashboard.", "screens": ["MaintenanceJobs", "MaintenancePlans"] }
+      ]
+    },
+    {
+      "key": "hr-payroll",
+      "title": "HR & Payroll",
+      "topics": [
+        { "key": "employees", "title": "Employees, Departments & Documents", "path": "HR & Payroll ▸ Employees", "summary": "The staff register: contract, UAE documents, salary and payment details, end-of-service gratuity, leavers and expiring documents.", "screens": ["Employees", "Departments"] },
+        { "key": "attendance-leave", "title": "Attendance & Leave", "path": "HR & Payroll ▸ Attendance", "summary": "Booking and approving leave, the daily attendance sheet, importing a device file, turning the month into payroll transactions, and employees' certificate requests.", "screens": ["Attendance", "Leave", "EmployeeRequests"] },
+        { "key": "payroll", "title": "Payroll", "path": "HR & Payroll ▸ Payroll Runs", "summary": "Payroll settings, transactions and salary advances; preparing, approving and paying the month by WPS file, bank transfer or cheque.", "screens": ["Payroll", "PayrollAdjustments", "EmployeeAdvances"] },
+        { "key": "employee-portal", "title": "Employee Self-Service", "path": "Employee portal (/me)", "summary": "Giving an employee a login, and what they see and ask for: payslips, leave, advances and certificates.", "screens": [] }
+      ]
+    },
+    {
+      "key": "controls",
+      "title": "Owner Controls",
+      "topics": [
+        { "key": "business-performance", "title": "Business Performance & Owner Monitor", "path": "Controls ▸ Business Performance", "summary": "How the business is doing, what is waiting for your decision, and what happened to the money.", "screens": ["Performance", "Oversight"] },
+        { "key": "payment-approvals", "title": "Payment Approvals & Limits", "path": "Controls ▸ Payment Approvals", "summary": "Holding payments until a second person releases them, approval levels and limits, delegation, and the Authorization Matrix.", "screens": ["PaymentApprovals", "ApprovalLimits", "AuthorizationMatrix", "Help.Controls"] }
       ]
     },
     {
@@ -79,9 +99,10 @@
         { "key": "investment-property", "title": "Investment Property Note", "path": "Reporting ▸ Investment Property Note", "summary": "Cost model: carrying amount movement, depreciation and fair values by property (IAS 40).", "screens": ["InvestmentProperty"] },
         { "key": "real-estate-vat", "title": "Real Estate VAT", "path": "Operations ▸ Capital Assets Scheme (VAT)", "summary": "Zero-rated first supplies of new residential units, exempt later ones, and the ten-year Capital Assets Scheme.", "screens": ["CapitalAssetVat"] },
         { "key": "vat-return", "title": "VAT Return", "path": "Reporting ▸ VAT Return", "summary": "Output and input tax for a tax period, and the annual wash-up.", "screens": ["Reports.VatReturn", "Reports.OwnerVatReturn"] },
-        { "key": "building-view", "title": "Building View", "path": "Reporting ▸ Building View", "summary": "Each building drawn floor by floor, units coloured by rent health; select a unit for its details.", "screens": ["BuildingView"] },
+        { "key": "building-view", "title": "Building View", "path": "Reporting ▸ Building View", "summary": "Each building drawn floor by floor, units coloured by rent health; select a unit for its details.", "screens": ["BuildingView", "BuildingPhotos"] },
         { "key": "management-reports", "title": "Tenant & Property Reports", "path": "Reporting ▸ Management — Tenants & Properties", "summary": "P&L by property, property utilization, tenant health and ranking.", "screens": ["Reports.ProfitAndLossByProperty", "Reports.PropertyUtilization", "Reports.TenantHealth"] },
-        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule, owner withdrawals, owner property profitability and the owner's combined view.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals", "Reports.OwnerProfitability", "Reports.OwnerCombined"] }
+        { "key": "owner-reports", "title": "Owner Reports", "path": "Reporting ▸ Management — Owners", "summary": "The owner tenancy schedule, owner withdrawals, owner property profitability and the owner's combined view.", "screens": ["Reports.OwnerTenancySchedule", "Reports.OwnerWithdrawals", "Reports.OwnerProfitability", "Reports.OwnerCombined"] },
+        { "key": "report-builder", "title": "Build Your Own Report", "path": "Reporting ▸ Build Your Own Report", "summary": "Choose the records, columns, filters and totals, show a table or chart, export, save and share.", "screens": ["ReportBuilder"] }
       ]
     },
     {
@@ -97,7 +118,7 @@
       "title": "Reference",
       "topics": [
         { "key": "ai-assistant", "title": "AI Assistant", "path": "Assistant button, bottom right", "summary": "Ask by voice or text about your figures and how the system works; it prepares entries for you to confirm.", "screens": ["Assistant"] },
-        { "key": "owner-withdrawals", "title": "Owner Withdrawals Explained", "path": "", "summary": "Why owner spending is equity, not expense, how to record it, and the charts by category and over time.", "screens": ["OwnerWithdrawals"] },
+        { "key": "owner-withdrawals", "title": "Owner Withdrawals Explained", "path": "", "summary": "Why owner spending is equity, not expense, how to record it, and the charts by category and over time.", "screens": ["OwnerWithdrawals", "OwnerWithdrawalLocations"] },
         { "key": "accounts-reference", "title": "Chart of Accounts Reference", "path": "", "summary": "The standard accounts created for every company.", "screens": [] },
         { "key": "entries-reference", "title": "Accounting Entries Reference", "path": "", "summary": "Every journal the system writes for you.", "screens": [] },
         { "key": "status-reference", "title": "Status Values Reference", "path": "", "summary": "What each status means on every kind of record.", "screens": [] },

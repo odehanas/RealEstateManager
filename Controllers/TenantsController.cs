@@ -113,6 +113,13 @@ namespace RealEstateManager.Controllers
                 .OrderBy(x => x.Code)
                 .ToListAsync();
 
+            // Who has a portal login, so the list shows it without opening each tenant.
+            ViewBag.PortalLogins = (await _db.TenantPortalUsers.AsNoTracking()
+                    .Select(x => new { x.TenantId, x.Username, x.IsActive, x.LastLoginAt })
+                    .ToListAsync())
+                .GroupBy(x => x.TenantId)
+                .ToDictionary(g => g.Key, g => (g.First().Username, g.First().IsActive, g.First().LastLoginAt));
+
             return View(tenants);
         }
 
@@ -124,6 +131,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("FullName", "PartyType")]
         public async Task<IActionResult> Create(Tenant model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
@@ -158,6 +166,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("FullName", "PartyType")]
         public async Task<IActionResult> Edit(int id, Tenant model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();

@@ -2280,7 +2280,7 @@ Save Notes
 Save Prepayment Setup
 Save Review
 Save VAT Settings
-Save a prepayment once and the system will post the initial prepaid entry immediately, then release the expense automatically at each month-end.
+Save a prepayment once and the system prepares the initial prepaid entry as a draft for you to post, then schedules the expense to be released at each month-end.
 Save and Activate
 Save and Post
 Save and Post Payment
@@ -3044,3 +3044,66 @@ worst first
 🔒 Close {0}
 🔒 Closed
 🔒 Year closed
+Raised
+Completed
+Within target
+Borne by the company
+Charged to the owner
+Maintenance Report
+Prepared {0}
+Every job, the cost by property and by unit, and every material line, as an Excel workbook
+Export to Excel
+Choose Save as PDF in the print window to keep it as a file
+{0}% done within target
+{0} rated {1} or below
+{0} raised by management
+{0} from the store · {1} bought for the job
+Materials per completed job
+materials on these jobs divided by the jobs done
+managed properties · {0} borne by the company
+Jobs raised and completed, by month
+A month that completes fewer jobs than it receives is building a backlog.
+No jobs in this period.
+Within and past target, by priority
+Targets to complete: Urgent 24 h · High 3 days · Normal 5 days · Low 10 days. Planned work is measured against its due date.
+Jobs by status
+Where the jobs stand today.
+Jobs by kind
+What breaks most often.
+Workload by technician
+Jobs done and jobs still open for each person.
+Cost of materials, by property
+Materials recorded on the jobs: borne by the company on its own properties, charged to the owner on managed ones.
+No materials recorded on these jobs.
+Jobs and cost by unit
+highest cost first
+Materials per job
+(all {0} units; the rest are in the Excel report)
+Reached us by
+(building / common areas)
+(no property)
+Normal
+Low
+In progress
+Declined
+Maintenance Scenarios for Training
+Load Maintenance Scenarios
+Adds five months of fictional maintenance work to this company, for showing the maintenance screens: jobs from the portal, WhatsApp, phone and management, at every stage from new to closed, on time and late, rated well and badly, with materials on owned and managed properties, a make-ready, inspections and a planned maintenance programme. It needs a company that already has properties and tenants with current contracts, shares the jobs among its maintenance users, and can be loaded once.
+Portal login
+Can sign in
+Last signed in {0}
+Has not signed in yet
+No login
+Show each unit
+<strong>These are the company's own figures for this owner's properties</strong>: the management commission it earned and the costs it bore itself. The rent belongs to the owner and is not the company's revenue, so it is not here.
+Open Owner Property Profitability for the owner's own income, costs and net result.
+Profitability by unit
+No revenue or expense in this period is tagged to a property.
+Building as a whole (no unit)
+Each property's units add up to its column in the table above. Costs of the building that were not given a unit are on the line "Building as a whole".
+The company's own properties
+the same figures, unit by unit
+A cost is shown against a unit when the bill line, petty cash voucher, journal line or maintenance job it came from named that unit. Costs for the building as a whole are on their own line. Commission is worked out unit by unit, so a property's units can differ from its row above by a few fils of rounding.
+The unit this cost is for. Leave it empty for a cost of the whole building.
+Whole building
+Only the units of the property chosen are offered. Choosing a unit first fills in its property.

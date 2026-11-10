@@ -20,8 +20,17 @@
     <div>
         <h2 class="mb-1">@T["Tenant Requests"]</h2>
         <p class="text-muted mb-0 small">
-            @T["Everything tenants have raised through the self-service portal."]
+            @T["Everything tenants have asked for, through the portal or by WhatsApp, phone or a visit."]
         </p>
+    </div>
+    <div class="d-flex gap-2">
+        @if ((ViewBag.WhatsAppWaiting as int? ?? 0) > 0)
+        {
+            <a asp-controller="WhatsAppInbox" asp-action="Index" class="btn btn-outline-danger">
+                @T["WhatsApp to review"] <span class="badge bg-danger">@ViewBag.WhatsAppWaiting</span>
+            </a>
+        }
+        <a asp-action="Create" class="btn btn-dark">@T["Log a Request for a Tenant"]</a>
     </div>
 </div>
 
@@ -94,7 +103,13 @@ else
                     @foreach (var request in Model.Requests)
                     {
                         <tr>
-                            <td class="small">@request.RequestNumber</td>
+                            <td class="small">
+                                @request.RequestNumber
+                                @if (request.Source != ServiceRequestSources.Portal)
+                                {
+                                    <div><span class="badge bg-light text-dark border">@T[ServiceRequestSources.Describe(request.Source)]</span></div>
+                                }
+                            </td>
                             <td>
                                 @request.TenantName
                                 <div class="small text-muted">@request.TenantCode</div>

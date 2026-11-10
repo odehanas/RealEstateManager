@@ -43,15 +43,22 @@ namespace RealEstateManager.Models
         /// <summary>Settlements saved but whose journal is not posted yet.</summary>
         public decimal PendingSettlements { get; set; }
 
-        /// <summary>What the owner is still owed on the rent billed.</summary>
-        public decimal BalancePayable => OwnerShare - PreviouslySettled;
+        /// <summary>
+        /// Rent the tenants paid straight into the owner's own account, including the part
+        /// that is our commission. It counts as already paid to the owner; when it is more
+        /// than their share, the balance turns negative: the owner owes us the difference.
+        /// </summary>
+        public decimal ReceivedDirectly { get; set; }
+
+        /// <summary>What the owner is still owed on the rent billed. Negative when the owner owes us.</summary>
+        public decimal BalancePayable => OwnerShare - PreviouslySettled - ReceivedDirectly;
 
         /// <summary>
         /// The part of the balance we actually hold in cash: the owner's share of rent
         /// collected, less what was paid. Paying more than this means paying the owner
         /// rent the tenant has not paid us yet.
         /// </summary>
-        public decimal AvailableFromCollections => Math.Max(0m, Math.Min(OwnerShareCollected, OwnerShare) - PreviouslySettled);
+        public decimal AvailableFromCollections => Math.Max(0m, Math.Min(OwnerShareCollected, OwnerShare) - PreviouslySettled - ReceivedDirectly);
 
         /// <summary>The most that may be paid now, after settlements still in draft.</summary>
         public decimal MaximumPayable => Math.Max(0m, BalancePayable - PendingSettlements);

@@ -69,6 +69,10 @@ else
                             <span class="badge @ServiceRequestStatuses.BadgeClass(request.Status)">
                                 @ServiceRequestStatuses.Describe(request.Status)
                             </span>
+                            @if (request.CanBeRated)
+                            {
+                                <span class="badge bg-primary">@T["Rate this job"]</span>
+                            }
                         </div>
                     </a>
                 }
@@ -96,6 +100,10 @@ else
                             <span class="badge @ServiceRequestStatuses.BadgeClass(request.Status)">
                                 @ServiceRequestStatuses.Describe(request.Status)
                             </span>
+                            @if (request.CanBeRated)
+                            {
+                                <span class="badge bg-primary">@T["Rate this job"]</span>
+                            }
                         </div>
                     </a>
                 }

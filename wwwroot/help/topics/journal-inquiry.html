@@ -23,7 +23,8 @@ figure in a report can be traced back to the transaction that caused it.</p>
         <tr><td><strong>Period locked</strong> badge</td><td>Shown instead of the buttons when the entry's period is closed.</td></tr>
     </tbody>
 </table>
-<p>Read <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a> for which screens leave drafts and when a reset is refused.</p>
+<p>Read <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a> for which screens leave drafts and when a reset is refused.
+The links on each entry open the journal itself and the original document it came from.</p>
 
 <div class="box ok">
     <div class="box-title">A good end-of-day habit</div>
@@ -36,11 +37,18 @@ figure in a report can be traced back to the transaction that caused it.</p>
     <thead><tr><th style="width:36%">Source type</th><th>Created by</th></tr></thead>
     <tbody>
         <tr><td><code>CustomerInvoice</code></td><td>Posting a customer invoice</td></tr>
+        <tr><td><code>CustomerCreditNote</code></td><td>Posting a credit note</td></tr>
         <tr><td><code>CustomerReceipt</code></td><td>Saving a customer receipt</td></tr>
-        <tr><td><code>PdcReceiptMemo</code> / <code>PdcClearance</code></td><td>Receiving and clearing a PDC</td></tr>
+        <tr><td><code>PdcReceiptMemo</code> / <code>PdcDeposit</code> / <code>PdcClearance</code> / <code>PdcBounce</code> / <code>PdcWithdrawal</code></td><td>Receiving a PDC, depositing it, and its clearing, return or withdrawal</td></tr>
         <tr><td><code>SecurityDeposit</code></td><td>Saving a security deposit</td></tr>
         <tr><td><code>RevenueRecognitionSchedule</code></td><td>Processing revenue recognition</td></tr>
-        <tr><td><code>VendorBill</code> / <code>VendorPayment</code></td><td>Posting a bill or saving a payment</td></tr>
+        <tr><td><code>VendorBill</code> / <code>VendorPayment</code> / <code>VendorAdvanceClearing</code></td><td>Posting a bill, saving a payment or an advance, applying an advance to bills</td></tr>
+        <tr><td><code>OwnerCommissionInvoice</code> / <code>OwnerSettlement</code></td><td>The monthly commission tax invoice to a landlord, and paying a landlord</td></tr>
+        <tr><td><code>OwnerWithdrawal</code></td><td>Recording an owner withdrawal</td></tr>
+        <tr><td><code>DevelopmentCost</code> / <code>DevelopmentTransfer</code></td><td>A cost on a development project, and its transfer at completion</td></tr>
+        <tr><td><code>UnitSaleReceipt</code> / <code>UnitSaleHandover</code></td><td>A buyer's payment, and the handover of a sold unit</td></tr>
+        <tr><td><code>PayrollRun</code> / <code>PayrollPayment</code> / <code>EmployeeAdvance</code></td><td>Approving a payroll, paying salaries, paying a salary advance</td></tr>
+        <tr><td><code>CapitalAssetVatAdjustment</code></td><td>A yearly Capital Assets Scheme adjustment</td></tr>
         <tr><td><code>PettyCashExpense</code> / <code>PettyCashReplenishment</code></td><td>Petty cash vouchers and top-ups</td></tr>
         <tr><td><code>FixedAsset…</code></td><td>Acquisition, capitalisation, depreciation</td></tr>
         <tr><td><code>PrepaymentSchedule</code> / <code>PrepaymentRecognition</code></td><td>Prepayment setup and amortisation</td></tr>

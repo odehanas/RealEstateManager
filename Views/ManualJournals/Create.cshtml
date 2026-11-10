@@ -10,12 +10,13 @@
     var vendors = ViewBag.Vendors as List<Vendor> ?? new();
     var leases = ViewBag.Leases as List<Lease> ?? new();
     var ownerCategories = ViewBag.OwnerWithdrawalCategories as List<OwnerWithdrawalCategory> ?? new();
+    var ownerLocations = ViewBag.OwnerWithdrawalLocations as List<OwnerWithdrawalLocation> ?? new();
     var ownerAccountIds = ViewBag.OwnerAccountIds as List<int> ?? new();
     var projects = ViewBag.DevelopmentProjects as List<RealEstateManager.Models.DevelopmentCostOption> ?? new();
 
     // The owner withdrawal category is rarely needed here - withdrawals have their own screen -
     // so the column stays hidden unless a line already uses it.
-    var showOwnerCategory = Model.Lines.Any(x => x.OwnerWithdrawalCategoryId.HasValue);
+    var showOwnerCategory = Model.Lines.Any(x => x.OwnerWithdrawalCategoryId.HasValue || x.OwnerWithdrawalLocationId.HasValue);
     var ownerColumnClass = showOwnerCategory ? "owner-cat-col" : "owner-cat-col d-none";
 }
 
@@ -80,6 +81,7 @@
                     <th style="min-width: 180px;">@T["Line Memo"]</th>
                     <th style="min-width: 140px;">@T["Unit Cost Center"]</th>
                     <th style="min-width: 190px;" class="@ownerColumnClass">@T["Owner Withdrawal Category"]</th>
+                    <th style="min-width: 170px;" class="@ownerColumnClass">@T["Owner Withdrawal Location"]</th>
                     @if (projects.Count > 0)
                     {
                         <th style="min-width: 220px;">@T["Development Cost"]</th>
@@ -125,6 +127,16 @@
                                 @foreach (var category in ownerCategories)
                                 {
                                     <option value="@category.Id">@category.Code - @category.Name</option>
+                                }
+                            </select>
+                        </td>
+
+                        <td class="owner-cat-cell @ownerColumnClass">
+                            <select asp-for="Lines[@i].OwnerWithdrawalLocationId" class="form-select owner-location">
+                                <option value="">@T["Not applicable"]</option>
+                                @foreach (var location in ownerLocations)
+                                {
+                                    <option value="@location.Id">@location.Code - @location.Name</option>
                                 }
                             </select>
                         </td>
@@ -247,11 +259,15 @@
                 var accountId = parseInt(accountSelect.value, 10);
                 var isOwnerAccount = ownerAccountIds.indexOf(accountId) !== -1;
 
+                var locationSelect = row.querySelector("select.owner-location");
+
                 categorySelect.disabled = !isOwnerAccount;
+                if (locationSelect) locationSelect.disabled = !isOwnerAccount;
                 row.classList.toggle("owner-line", isOwnerAccount);
 
                 if (!isOwnerAccount) {
                     categorySelect.value = "";
+                    if (locationSelect) locationSelect.value = "";
                 }
             }
 

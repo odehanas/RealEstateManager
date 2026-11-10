@@ -1,28 +1,108 @@
 ﻿@model RealEstateManager.Services.MaintenanceService.Dashboard
 @using RealEstateManager.Domain
+@using RealEstateManager.Services
 @{
     ViewData["Title"] = T["Maintenance Dashboard"];
     var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
     var technicianId = ViewBag.TechnicianId as int?;
+    var technicianName = technicianId.HasValue ? technicians.FirstOrDefault(x => x.Id == technicianId.Value)?.Name : null;
+    var companyName = User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value;
 
     string Hours(double? hours) => hours == null ? "-" : hours < 48 ? $"{hours:0.#} h" : $"{hours / 24:0.#} days";
+
+    var months = Model.ByMonth;
+    var priorities = Model.ByPriority.ToList();
+    var statuses = Model.ByStatus.ToList();
+    var kinds = Model.ByCategory.Take(10).ToList();
+    var team = Model.ByTechnician.Take(10).ToList();
+    var costProperties = Model.CostByProperty.Where(x => x.Materials > 0m).Take(10).ToList();
+    var costUnits = Model.CostByUnit.ToList();
+
+    // Everything the charts draw, with its words already in the reader's language.
+    var chartData = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        words = new
+        {
+            raised = T["Raised"], completed = T["Completed"], within = T["Within target"], past = T["Past target"],
+            open = T["Open"], done = T["Done"], company = T["Borne by the company"], owner = T["Charged to the owner"],
+            jobs = T["Jobs"]
+        },
+        months = months.Select(x => x.Month.ToString("MMM yy")),
+        raised = months.Select(x => x.Raised),
+        completed = months.Select(x => x.Completed),
+        priorities = priorities.Select(x => T[x.Priority]),
+        within = priorities.Select(x => x.WithinTarget),
+        past = priorities.Select(x => x.PastTarget),
+        statuses = statuses.Select(x => T[ServiceRequestStatuses.Describe(x.Status)]),
+        statusJobs = statuses.Select(x => x.Jobs),
+        kinds = kinds.Select(x => x.Name),
+        kindJobs = kinds.Select(x => x.Jobs),
+        team = team.Select(x => x.Name),
+        teamOpen = team.Select(x => x.Open),
+        teamDone = team.Select(x => x.Done),
+        costProperties = costProperties.Select(x => x.Name),
+        costCompany = costProperties.Select(x => x.OnCompany),
+        costOwner = costProperties.Select(x => x.ChargedToOwner)
+    });
 }
 
 <style>
     .kpi .value { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
     .kpi .label { color: #6c757d; font-size: .82rem; }
     .kpi .note { font-size: .78rem; color: #6c757d; }
+    .mnt-chart { position: relative; height: 250px; }
+    .mnt-chart-title { font-weight: 600; }
+    .mnt-chart-note { font-size: .78rem; color: #6c757d; }
+    .mnt-empty { height: 250px; display: flex; align-items: center; justify-content: center; color: #6c757d; font-size: .85rem; }
+    .mnt-report-head { display: none; }
+
+    @@media print {
+        @@page { size: A4 portrait; margin: 12mm; }
+        .mnt-report-head { display: block; border-bottom: 2px solid #111; padding-bottom: 6px; margin-bottom: 10px; }
+        .mnt-report-head h1 { font-size: 18pt; margin: 0; }
+        .mnt-report-head .who { font-size: 10pt; color: #444; }
+        .mnt-screen-head, .mnt-filter { display: none !important; }
+        .mnt-charts { display: flex !important; flex-wrap: wrap; }
+        .mnt-charts > div { flex: 0 0 50% !important; max-width: 50% !important; width: 50% !important; }
+        .mnt-chart { height: 210px; }
+        .mnt-empty { height: 80px; }
+        .mnt-block, .kpi, .mnt-charts { break-inside: avoid; page-break-inside: avoid; }
+        .mnt-charts { margin-bottom: 8px !important; }
+        .mnt-kpis { display: flex !important; flex-wrap: wrap; }
+        .mnt-kpis > div { flex: 0 0 25% !important; max-width: 25% !important; width: 25% !important; padding: 3px !important; }
+        .mnt-kpis .kpi { border: 1px solid #bbb !important; border-radius: 4px; }
+        .mnt-kpis .kpi .card-body { padding: 6px 8px !important; }
+        .kpi .value { font-size: 15pt; }
+        .mnt-section-title { font-size: 11pt; font-weight: 700; border-bottom: 1px solid #999; margin: 12px 0 6px; padding-bottom: 2px; }
+        a { color: inherit !important; text-decoration: none !important; }
+    }
 </style>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+@* On paper and in the PDF: a proper report heading instead of the screen's buttons. *@
+<div class="mnt-report-head">
+    <h1>@T["Maintenance Report"]</h1>
+    <div class="who">
+        @companyName &middot;
+        @T.Format("Jobs raised from {0} to {1}, and every job still open.", Model.From.ToString("dd/MM/yyyy"), Model.To.ToString("dd/MM/yyyy"))
+        @if (technicianName != null) { <span>&middot; @T["Technician"]: @technicianName</span> }
+        &middot; @T.Format("Prepared {0}", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))
+    </div>
+</div>
+
+<div class="mnt-screen-head d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
         <h2 class="mb-1">@T["Maintenance Dashboard"]</h2>
         <div class="text-muted">@T.Format("Jobs raised from {0} to {1}, and every job still open.", Model.From.ToString("dd/MM/yyyy"), Model.To.ToString("dd/MM/yyyy"))</div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">@T["Maintenance Jobs"]</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="DashboardExcel" asp-route-fromDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.To.ToString("yyyy-MM-dd")" asp-route-technicianId="@technicianId"
+           class="btn btn-outline-success" title="@T["Every job, the cost by property and by unit, and every material line, as an Excel workbook"]">@T["Export to Excel"]</a>
+        <button type="button" class="btn btn-outline-dark" onclick="window.print()" title="@T["Choose Save as PDF in the print window to keep it as a file"]">@T["Print / Save as PDF"]</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Maintenance Jobs"]</a>
+    </div>
 </div>
 
-<form method="get" class="row g-2 align-items-end mb-3">
+<form method="get" class="mnt-filter row g-2 align-items-end mb-3">
     <div class="col-auto"><label class="form-label small mb-0" for="fromDate">@T["From"]</label><input id="fromDate" type="date" name="fromDate" value="@Model.From.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
     <div class="col-auto"><label class="form-label small mb-0" for="toDate">@T["To"]</label><input id="toDate" type="date" name="toDate" value="@Model.To.ToString("yyyy-MM-dd")" class="form-control form-control-sm" /></div>
     @if (technicians.Count > 0)
@@ -40,28 +120,146 @@
 
 @if (!Model.HasTechnicians)
 {
-    <div class="alert alert-warning">@T.Html("No maintenance user is set up, so new jobs wait unassigned. Create one in System Setup &gt; Users with <strong>Carry Out Maintenance Jobs</strong>.")</div>
+    <div class="alert alert-warning no-print">@T.Html("No maintenance user is set up, so new jobs wait unassigned. Create one in System Setup &gt; Users with <strong>Carry Out Maintenance Jobs</strong>.")</div>
 }
 
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-3 mnt-kpis">
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Jobs received"]</div><div class="value">@Model.Received</div><div class="note">@T.Format("{0} done · {1} declined", Model.Done, Model.Rejected)</div></div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Still open"]</div><div class="value @(Model.OverdueOpen > 0 ? "text-danger" : "")">@Model.OpenCount</div><div class="note">@T.Format("{0} past target · {1} unassigned", Model.OverdueOpen, Model.Unassigned)</div></div></div></div>
     <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average first response"]</div><div class="value">@Hours(Model.AvgResponseHours)</div><div class="note">@T["from request to the engineer's response"]</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average time to complete"]</div><div class="value">@Hours(Model.AvgResolveHours)</div><div class="note">@(Model.OnTimePercent.HasValue ? $"{Model.OnTimePercent:0}% done within target" : "no completed jobs")</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Average time to complete"]</div><div class="value">@Hours(Model.AvgResolveHours)</div><div class="note">@(Model.OnTimePercent.HasValue ? T.Format("{0}% done within target", Model.OnTimePercent.Value.ToString("0")) : T["no completed jobs"])</div></div></div></div>
+
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@(technicianId.HasValue ? T["Technician's rating"] : T["Team rating"])</div>
+            <div class="value @(Model.AvgRating.HasValue && Model.AvgRating.Value <= ServiceRequestRatings.LowAtOrBelow ? "text-danger" : "")">@(Model.AvgRating.HasValue ? $"{Model.AvgRating:0.0} / {ServiceRequestRatings.Highest}" : "-")</div>
+            <div class="note">@(technicianId.HasValue ? T["average of this technician's rated jobs"] : T["the maintenance manager's score: the average of all rated jobs"])</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Jobs rated"]</div>
+            <div class="value">@Model.RatedCount</div>
+            <div class="note">@(Model.RatedPercent.HasValue ? T.Format("{0}% of the jobs done", Model.RatedPercent.Value.ToString("0")) : T["no completed jobs"]) &middot; @T.Format("{0} rated {1} or below", Model.LowRatings, ServiceRequestRatings.LowAtOrBelow)</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Planned maintenance"]</div>
+            <div class="value">@Model.PlannedJobs</div>
+            <div class="note @(Model.PlannedOverdue > 0 ? "text-danger" : "")">@T.Format("jobs from {0} active plan(s) · {1} done", Model.ActivePlans, Model.PlannedDone) &middot; @T.Format("{0} open and past its due date", Model.PlannedOverdue)</div>
+        </div></div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card shadow-sm h-100 kpi"><div class="card-body">
+            <div class="label">@T["Vacant units to make ready"]</div>
+            <div class="value @(Model.AwaitingMakeReady.Count > 0 ? "text-warning" : "")">@Model.AwaitingMakeReady.Count</div>
+            <div class="note">@T["tenancy ended, no make-ready job raised since"] &middot; @T.Format("{0} raised by management", Model.ManagementJobs)</div>
+        </div></div>
+    </div>
+
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Materials used"]</div><div class="value">@Model.MaterialsCost.ToString("N0")</div><div class="note">@T.Format("{0} from the store · {1} bought for the job", Model.MaterialsFromStore.ToString("N0"), Model.MaterialsPurchased.ToString("N0"))</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Materials per completed job"]</div><div class="value">@(Model.MaterialsPerDoneJob.HasValue ? Model.MaterialsPerDoneJob.Value.ToString("N0") : "-")</div><div class="note">@T["materials on these jobs divided by the jobs done"]</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Charged to owners"]</div><div class="value">@Model.MaterialsChargedToOwners.ToString("N0")</div><div class="note">@T.Format("managed properties · {0} borne by the company", Model.MaterialsOnCompany.ToString("N0"))</div></div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Maintenance store"]</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">@T.Format("balance of account {0}", MaintenanceStandards.StockAccountCode)</div></div></div></div>
 </div>
 
-<div class="row g-3 mb-3">
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Materials used"]</div><div class="value">@Model.MaterialsCost.ToString("N0")</div><div class="note">@T["on these jobs"]</div></div></div></div>
-    <div class="col-6 col-md-3"><div class="card shadow-sm h-100 kpi"><div class="card-body"><div class="label">@T["Maintenance store"]</div><div class="value">@Model.StockBalance.ToString("N0")</div><div class="note">@T.Format("balance of account {0}", MaintenanceStandards.StockAccountCode)</div></div></div></div>
-    <div class="col-md-6"><div class="card shadow-sm h-100"><div class="card-body small text-muted">
-        <strong class="text-dark">@T["Targets by priority"]</strong><br />
-        Urgent: respond in 2 h, done in 24 h &middot; High: 8 h / 3 days &middot; Normal: 24 h / 5 days &middot; Low: 2 days / 10 days.
-        A job past its target shows in red.
-    </div></div></div>
+<div class="row g-3 mb-3 mnt-charts">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="mnt-chart-title">@T["Jobs raised and completed, by month"]</div>
+            <div class="mnt-chart-note">@T["A month that completes fewer jobs than it receives is building a backlog."]</div>
+            @if (Model.Received == 0) { <div class="mnt-empty">@T["No jobs in this period."]</div> } else { <div class="mnt-chart"><canvas id="mntByMonth" role="img" aria-label="@T["Jobs raised and completed, by month"]"></canvas></div> }
+        </div></div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="mnt-chart-title">@T["Within and past target, by priority"]</div>
+            <div class="mnt-chart-note">@T["Targets to complete: Urgent 24 h · High 3 days · Normal 5 days · Low 10 days. Planned work is measured against its due date."]</div>
+            @if (priorities.Count == 0) { <div class="mnt-empty">@T["No jobs in this period."]</div> } else { <div class="mnt-chart"><canvas id="mntByPriority" role="img" aria-label="@T["Within and past target, by priority"]"></canvas></div> }
+        </div></div>
+    </div>
 </div>
+
+@* Each pair of charts is its own row, so a pair is never split across two sheets of paper. *@
+<div class="row g-3 mb-3 mnt-charts">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="mnt-chart-title">@T["Jobs by status"]</div>
+            <div class="mnt-chart-note">@T["Where the jobs stand today."]</div>
+            @if (statuses.Count == 0) { <div class="mnt-empty">@T["No jobs in this period."]</div> } else { <div class="mnt-chart"><canvas id="mntByStatus" role="img" aria-label="@T["Jobs by status"]"></canvas></div> }
+        </div></div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="mnt-chart-title">@T["Jobs by kind"]</div>
+            <div class="mnt-chart-note">@T["What breaks most often."]</div>
+            @if (kinds.Count == 0) { <div class="mnt-empty">@T["No jobs in this period."]</div> } else { <div class="mnt-chart"><canvas id="mntByKind" role="img" aria-label="@T["Jobs by kind"]"></canvas></div> }
+        </div></div>
+    </div>
+</div>
+
+@* Each pair of charts is its own row, so a pair is never split across two sheets of paper. *@
+<div class="row g-3 mb-3 mnt-charts">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="mnt-chart-title">@T["Workload by technician"]</div>
+            <div class="mnt-chart-note">@T["Jobs done and jobs still open for each person."]</div>
+            @if (team.Count == 0) { <div class="mnt-empty">@T["No jobs in this period."]</div> } else { <div class="mnt-chart"><canvas id="mntByTechnician" role="img" aria-label="@T["Workload by technician"]"></canvas></div> }
+        </div></div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="mnt-chart-title">@T["Cost of materials, by property"]</div>
+            <div class="mnt-chart-note">@T["Materials recorded on the jobs: borne by the company on its own properties, charged to the owner on managed ones."]</div>
+            @if (costProperties.Count == 0) { <div class="mnt-empty">@T["No materials recorded on these jobs."]</div> } else { <div class="mnt-chart"><canvas id="mntCostByProperty" role="img" aria-label="@T["Cost of materials, by property"]"></canvas></div> }
+        </div></div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3 mnt-block">
+    <div class="card-header bg-white mnt-section-title"><strong>@T["Jobs and cost by unit"]</strong> <span class="text-muted small">@T["highest cost first"]</span></div>
+    @if (costUnits.Count == 0)
+    {
+        <div class="card-body text-muted small">@T["No jobs in this period."]</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light"><tr><th>@T["Property"]</th><th>@T["Unit"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Done"]</th><th class="text-end">@T["Materials"]</th><th class="text-end">@T["Charged to the owner"]</th><th class="text-end">@T["Materials per job"]</th></tr></thead>
+                <tbody>
+                    @foreach (var u in costUnits.Take(20))
+                    {
+                        <tr><td>@u.Property</td><td>@(u.Unit.StartsWith("(") ? T[u.Unit] : u.Unit)</td><td class="text-end">@u.Jobs</td><td class="text-end">@u.Open</td><td class="text-end">@u.Done</td><td class="text-end">@u.Materials.ToString("N2")</td><td class="text-end">@u.ChargedToOwner.ToString("N2")</td><td class="text-end">@((u.Jobs == 0 ? 0m : u.Materials / u.Jobs).ToString("N2"))</td></tr>
+                    }
+                </tbody>
+                <tfoot><tr class="fw-semibold"><td colspan="2">@T["Total"]@(costUnits.Count > 20 ? " " + T.Format("(all {0} units; the rest are in the Excel report)", costUnits.Count) : "")</td><td class="text-end">@Model.Received</td><td class="text-end">@Model.OpenCount</td><td class="text-end">@Model.Done</td><td class="text-end">@Model.MaterialsCost.ToString("N2")</td><td class="text-end">@Model.MaterialsChargedToOwners.ToString("N2")</td><td></td></tr></tfoot>
+            </table>
+        </div>
+    }
+</div>
+
+@if (Model.AwaitingMakeReady.Count > 0)
+{
+    <div class="card shadow-sm mb-3 mnt-block">
+        <div class="card-header bg-white mnt-section-title"><strong>@T["Vacant units to make ready"]</strong></div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light"><tr><th>@T["Unit"]</th><th>@T["Property"]</th><th>@T["Tenancy ended"]</th><th class="text-end">@T["Days vacant"]</th></tr></thead>
+                <tbody>
+                    @foreach (var unit in Model.AwaitingMakeReady)
+                    {
+                        <tr><td>@unit.Unit</td><td>@unit.Property</td><td>@unit.LastTenancyEnded.ToString("dd/MM/yyyy")</td><td class="text-end">@((DateTime.Today - unit.LastTenancyEnded).Days)</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header bg-white"><strong>@T["Jobs still open"]</strong> <span class="text-muted small">@T["worst first"]</span></div>
+    <div class="card-header bg-white mnt-section-title"><strong>@T["Jobs still open"]</strong> <span class="text-muted small">@T["worst first"]</span></div>
     @if (!Model.Open.Any())
     {
         <div class="card-body text-muted small">@T["Nothing open."]</div>
@@ -91,42 +289,67 @@
     }
 </div>
 
+@if (Model.RatedJobs.Any())
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white mnt-section-title"><strong>@T["Tenants' ratings and feedback"]</strong> <span class="text-muted small">@T["lowest first"]</span></div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light"><tr><th>@T["Job"]</th><th class="text-center">@T["Rating"]</th><th>@T["Feedback"]</th><th>@T["What"]</th><th>@T["Tenant"]</th><th>@T["Technician"]</th></tr></thead>
+                <tbody>
+                    @foreach (var job in Model.RatedJobs.Take(25))
+                    {
+                        <tr>
+                            <td><a asp-action="Details" asp-route-id="@job.Id">@job.Number</a></td>
+                            <td class="text-center"><span class="badge @ServiceRequestRatings.BadgeClass(job.Rating!.Value)">@job.Rating</span></td>
+                            <td style="white-space:pre-wrap">@job.RatingFeedback</td>
+                            <td>@job.Subject</td>
+                            <td>@job.Tenant</td>
+                            <td>@(job.Technician ?? "not assigned")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
 <div class="row g-3">
-    <div class="col-lg-6">
+    <div class="col-lg-6 mnt-block">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">@T.Html("<strong>By technician</strong>")</div>
+            <div class="card-header bg-white mnt-section-title">@T.Html("<strong>By technician</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>@T["Technician"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Done"]</th><th class="text-end">@T["Avg to complete"]</th><th class="text-end">@T["Past target"]</th></tr></thead>
+                    <thead class="table-light"><tr><th>@T["Technician"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Done"]</th><th class="text-end">@T["Avg to complete"]</th><th class="text-end">@T["Past target"]</th><th class="text-end">@T["Rating"]</th></tr></thead>
                     <tbody>
                         @foreach (var t in Model.ByTechnician)
                         {
-                            <tr><td>@t.Name</td><td class="text-end">@t.Jobs</td><td class="text-end">@t.Open</td><td class="text-end">@t.Done</td><td class="text-end">@Hours(t.AvgResolveHours)</td><td class="text-end @(t.Late > 0 ? "text-danger" : "")">@t.Late</td></tr>
+                            <tr><td>@t.Name</td><td class="text-end">@t.Jobs</td><td class="text-end">@t.Open</td><td class="text-end">@t.Done</td><td class="text-end">@Hours(t.AvgResolveHours)</td><td class="text-end @(t.Late > 0 ? "text-danger" : "")">@t.Late</td><td class="text-end" title="@T.Format("{0} rated jobs", t.Rated)">@if (t.AvgRating.HasValue) { <span class="badge @ServiceRequestRatings.BadgeClass(t.AvgRating.Value)">@t.AvgRating.Value.ToString("0.0")</span> <span class="text-muted small">(@t.Rated)</span> } else { <span class="text-muted">-</span> }</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-6 mnt-block">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">@T.Html("<strong>By property</strong>")</div>
+            <div class="card-header bg-white mnt-section-title">@T.Html("<strong>By property</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>@T["Property"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Materials"]</th></tr></thead>
+                    <thead class="table-light"><tr><th>@T["Property"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th><th class="text-end">@T["Materials"]</th><th class="text-end">@T["Charged to the owner"]</th></tr></thead>
                     <tbody>
-                        @foreach (var p in Model.ByProperty)
+                        @foreach (var p in Model.CostByProperty)
                         {
-                            <tr><td>@p.Name</td><td class="text-end">@p.Jobs</td><td class="text-end">@p.Open</td><td class="text-end">@p.Materials.ToString("N2")</td></tr>
+                            <tr><td>@p.Name</td><td class="text-end">@p.Jobs</td><td class="text-end">@p.Open</td><td class="text-end">@p.Materials.ToString("N2")</td><td class="text-end">@p.ChargedToOwner.ToString("N2")</td></tr>
                         }
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    <div class="col-lg-6">
+    <div class="col-lg-6 mnt-block">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-white">@T.Html("<strong>By kind of job</strong>")</div>
+            <div class="card-header bg-white mnt-section-title">@T.Html("<strong>By kind of job</strong>")</div>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
                     <thead class="table-light"><tr><th>@T["Category"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Avg to complete"]</th></tr></thead>
@@ -140,4 +363,110 @@
             </div>
         </div>
     </div>
+    <div class="col-lg-6 mnt-block">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white mnt-section-title"><strong>@T["How requests reached us"]</strong></div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>@T["Reached us by"]</th><th class="text-end">@T["Jobs"]</th><th class="text-end">@T["Open"]</th></tr></thead>
+                    <tbody>
+                        @foreach (var s in Model.BySource)
+                        {
+                            <tr><td>@T[ServiceRequestSources.Describe(s.Source)]</td><td class="text-end">@s.Jobs</td><td class="text-end">@s.Open</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="~/lib/chartjs/chart.umd.js"></script>
+    <script>
+    (function () {
+        if (!window.Chart) return;
+        const d = @Html.Raw(chartData);
+        const w = d.words;
+
+        // Two series colours, checked to stay apart for colour-blind readers; text and
+        // grid stay neutral so the marks carry the meaning.
+        const BLUE = '#2a78d6', ORANGE = '#eb6834', INK = '#52514e', GRID = '#e1e0d9';
+        const rtl = document.documentElement.dir === 'rtl';
+        Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+        Chart.defaults.color = INK;
+        Chart.defaults.animation = false;
+
+        const whole = v => Number.isInteger(v) ? v : '';
+        const money = v => Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 });
+        const charts = [];
+        // A long property or technician name must not push the bars off the chart.
+        const short = text => { text = String(text); return text.length > 24 ? text.slice(0, 23) + '\u2026' : text; };
+
+        function bars(id, labels, datasets, opts) {
+            const canvas = document.getElementById(id);
+            if (!canvas) return;
+            const horizontal = !!opts.horizontal;
+            const value = { beginAtZero: true, stacked: !!opts.stacked, reverse: horizontal && rtl,
+                            grid: { color: GRID }, border: { display: false },
+                            ticks: { callback: opts.money ? money : whole, precision: 0 } };
+            const category = { stacked: !!opts.stacked, grid: { display: false }, border: { color: '#c3c2b7' },
+                               position: horizontal && rtl ? 'right' : undefined,
+                               ticks: { autoSkip: !horizontal, callback: function (value) { return short(this.getLabelForValue(value)); } } };
+            charts.push(new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: datasets.map(s => Object.assign({ borderRadius: 4, borderColor: '#fff', borderWidth: opts.stacked ? 1 : 0,
+                                                                maxBarThickness: 34, categoryPercentage: .72, barPercentage: .9 }, s))
+                },
+                options: {
+                    indexAxis: horizontal ? 'y' : 'x',
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false, axis: horizontal ? 'y' : 'x' },
+                    plugins: {
+                        legend: { display: datasets.length > 1, position: 'bottom', rtl, labels: { boxWidth: 12, boxHeight: 12, usePointStyle: false } },
+                        tooltip: {
+                            rtl,
+                            callbacks: {
+                                title: items => items.length ? labels[items[0].dataIndex] : '',
+                                label: c => ' ' + c.dataset.label + ': ' + (opts.money ? money(c.raw) : c.raw)
+                            }
+                        }
+                    },
+                    scales: horizontal ? { x: value, y: category } : { x: category, y: value }
+                }
+            }));
+        }
+
+        bars('mntByMonth', d.months, [
+            { label: w.raised, data: d.raised, backgroundColor: BLUE },
+            { label: w.completed, data: d.completed, backgroundColor: ORANGE }
+        ], {});
+
+        bars('mntByPriority', d.priorities, [
+            { label: w.within, data: d.within, backgroundColor: BLUE },
+            { label: w.past, data: d.past, backgroundColor: ORANGE }
+        ], { horizontal: true, stacked: true });
+
+        bars('mntByStatus', d.statuses, [{ label: w.jobs, data: d.statusJobs, backgroundColor: BLUE }], {});
+
+        bars('mntByKind', d.kinds, [{ label: w.jobs, data: d.kindJobs, backgroundColor: BLUE }], { horizontal: true });
+
+        bars('mntByTechnician', d.team, [
+            { label: w.done, data: d.teamDone, backgroundColor: BLUE },
+            { label: w.open, data: d.teamOpen, backgroundColor: ORANGE }
+        ], { horizontal: true, stacked: true });
+
+        bars('mntCostByProperty', d.costProperties, [
+            { label: w.company, data: d.costCompany, backgroundColor: BLUE },
+            { label: w.owner, data: d.costOwner, backgroundColor: ORANGE }
+        ], { horizontal: true, stacked: true, money: true });
+
+        // On paper two charts sit side by side on an A4 sheet: draw them at that size,
+        // then back to the screen's.
+        window.addEventListener('beforeprint', () => charts.forEach(c => c.resize(330, 210)));
+        window.addEventListener('afterprint', () => charts.forEach(c => c.resize()));
+    })();
+    </script>
+}

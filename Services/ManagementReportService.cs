@@ -39,8 +39,12 @@ namespace RealEstateManager.Services
             int companyId,
             DateTime startDate,
             DateTime endDate,
-            int? propertyId = null)
+            int? propertyId = null,
+            string? owner = null,
+            bool byUnit = false)
         {
+            owner = string.IsNullOrWhiteSpace(owner) ? null : owner.Trim();
+
             var lines = await _db.JournalEntryLines
                 .AsNoTracking()
                 .Where(x =>
@@ -61,10 +65,21 @@ namespace RealEstateManager.Services
                     PropertyId = x.PropertyId,
                     PropertyCode = x.Property != null ? x.Property.Code : null,
                     PropertyName = x.Property != null ? x.Property.Name : null,
+                    OwnershipType = x.Property != null ? x.Property.OwnershipType : null,
+                    OwnerName = x.Property != null ? x.Property.OwnerName : null,
+                    UnitId = x.UnitId,
+                    UnitNumber = x.Unit != null ? x.Unit.UnitNumber : null,
                     Debit = x.Debit,
                     Credit = x.Credit
                 })
                 .ToListAsync();
+
+            // One owner's properties only: the company's own, or one landlord's managed ones.
+            if (owner == PropertyOwnerOptionDto.CompanyKey)
+                lines = lines.Where(x => x.PropertyId.HasValue && x.OwnershipType != "Managed").ToList();
+            else if (owner != null)
+                lines = lines.Where(x => x.PropertyId.HasValue && x.OwnershipType == "Managed" &&
+                                         string.Equals((x.OwnerName ?? string.Empty).Trim(), owner, StringComparison.OrdinalIgnoreCase)).ToList();
 
             if (propertyId.HasValue)
                 lines = lines.Where(x => x.PropertyId == propertyId.Value).ToList();
@@ -141,6 +156,8 @@ namespace RealEstateManager.Services
                 StartDate = startDate,
                 EndDate = endDate,
                 FilteredPropertyId = propertyId,
+                FilteredOwner = owner,
+                ByUnit = byUnit,
                 Columns = columns,
                 Revenue = revenueRows,
                 Expenses = expenseRows,
@@ -161,7 +178,53 @@ namespace RealEstateManager.Services
             report.TotalExpenses = expenseRows.Sum(x => x.Total);
             report.NetProfitOrLoss = report.TotalRevenue - report.TotalExpenses;
 
+            // The same figures per unit. A line tagged to a property but to no unit - the
+            // building's own costs - gets a line of its own under that property, so each
+            // property's units add up to its column above.
+            if (byUnit)
+            {
+                report.Units = lines
+                    .Where(x => x.PropertyId.HasValue)
+                    .GroupBy(x => new { x.PropertyId, x.PropertyCode, x.PropertyName, x.UnitId, x.UnitNumber })
+                    .Select(g => new PropertyUnitProfitRowDto
+                    {
+                        PropertyId = g.Key.PropertyId!.Value,
+                        PropertyCode = g.Key.PropertyCode ?? "-",
+                        PropertyName = g.Key.PropertyName ?? "-",
+                        UnitId = g.Key.UnitId,
+                        UnitNumber = g.Key.UnitNumber,
+                        Revenue = g.Where(x => x.AccountType == "Revenue").Sum(x => x.Credit - x.Debit),
+                        Expenses = g.Where(x => x.AccountType == "Expense").Sum(x => x.Debit - x.Credit)
+                    })
+                    .Where(x => x.Revenue != 0m || x.Expenses != 0m)
+                    .OrderBy(x => x.PropertyCode).ThenBy(x => x.UnitId.HasValue ? 0 : 1).ThenBy(x => x.UnitNumber)
+                    .ToList();
+            }
+
             return report;
+        }
+
+        /// <summary>
+        /// The owners the by-property Profit and Loss can be narrowed to: the company
+        /// itself, for the properties it owns, and each landlord of a managed property.
+        /// </summary>
+        public async Task<List<PropertyOwnerOptionDto>> GetPropertyOwnerOptionsAsync()
+        {
+            var properties = await _db.Properties.AsNoTracking()
+                .Select(x => new { x.OwnershipType, x.OwnerName })
+                .ToListAsync();
+
+            var options = new List<PropertyOwnerOptionDto>();
+            if (properties.Any(x => x.OwnershipType != "Managed"))
+                options.Add(new PropertyOwnerOptionDto { Key = PropertyOwnerOptionDto.CompanyKey, Name = "The company's own properties" });
+
+            options.AddRange(properties
+                .Where(x => x.OwnershipType == "Managed" && !string.IsNullOrWhiteSpace(x.OwnerName))
+                .Select(x => x.OwnerName!.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x)
+                .Select(x => new PropertyOwnerOptionDto { Key = x, Name = x }));
+            return options;
         }
 
         /// <summary>
@@ -176,7 +239,8 @@ namespace RealEstateManager.Services
                 {
                     PropertyId = x.Id,
                     PropertyCode = x.Code,
-                    PropertyName = x.Name
+                    PropertyName = x.Name,
+                    OwnerKey = x.OwnershipType == "Managed" ? (x.OwnerName ?? string.Empty).Trim() : PropertyOwnerOptionDto.CompanyKey
                 })
                 .ToListAsync();
         }
@@ -537,6 +601,8 @@ namespace RealEstateManager.Services
                     CategoryId = x.OwnerWithdrawalCategoryId,
                     CategoryCode = x.OwnerWithdrawalCategory != null ? x.OwnerWithdrawalCategory.Code : null,
                     CategoryName = x.OwnerWithdrawalCategory != null ? x.OwnerWithdrawalCategory.Name : null,
+                    LocationId = x.OwnerWithdrawalLocationId,
+                    LocationName = x.OwnerWithdrawalLocation != null ? x.OwnerWithdrawalLocation.Name : null,
                     Debit = x.Debit,
                     Credit = x.Credit
                 })
@@ -626,6 +692,21 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.EntryDate)
                 .ThenBy(x => x.EntryNumber)
                 .ToList();
+
+            // Location columns, in the company's own order, only those used in the period.
+            // Inactive ones stay: a location switched off today was still spent at last month.
+            var usedLocationIds = periodLines.Where(x => x.LocationId.HasValue).Select(x => x.LocationId!.Value).Distinct().ToList();
+            report.Locations = await _db.OwnerWithdrawalLocations
+                .AsNoTracking()
+                .Where(x => usedLocationIds.Contains(x.Id))
+                .OrderBy(x => x.SortOrder)
+                .ThenBy(x => x.Code)
+                .Select(x => new OwnerWithdrawalLocationColumnDto { LocationId = x.Id, Name = x.Name })
+                .ToListAsync();
+
+            // Earlier withdrawals and money coming in have no location; their column keeps the totals whole.
+            if (periodLines.Any(x => !x.LocationId.HasValue))
+                report.Locations.Add(new OwnerWithdrawalLocationColumnDto { LocationId = null, Name = "No location" });
 
             return report;
         }
@@ -731,8 +812,36 @@ namespace RealEstateManager.Services
         public int? PropertyId { get; set; }
         public string? PropertyCode { get; set; }
         public string? PropertyName { get; set; }
+        public string? OwnershipType { get; set; }
+        public string? OwnerName { get; set; }
+        public int? UnitId { get; set; }
+        public string? UnitNumber { get; set; }
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
+    }
+
+    /// <summary>An owner to narrow the by-property Profit and Loss to.</summary>
+    public class PropertyOwnerOptionDto
+    {
+        /// <summary>Stands for the company itself: the properties it owns.</summary>
+        public const string CompanyKey = "__company__";
+
+        public string Key { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>Revenue, expenses and result of one unit, or of a building's own lines when there is no unit.</summary>
+    public class PropertyUnitProfitRowDto
+    {
+        public int PropertyId { get; set; }
+        public string PropertyCode { get; set; } = string.Empty;
+        public string PropertyName { get; set; } = string.Empty;
+        public int? UnitId { get; set; }
+        public string? UnitNumber { get; set; }
+        public decimal Revenue { get; set; }
+        public decimal Expenses { get; set; }
+        public decimal Net => Revenue - Expenses;
+        public decimal Margin => Revenue == 0m ? 0m : Math.Round(Net / Revenue * 100m, 1);
     }
 
     public class PropertyColumnDto
@@ -740,6 +849,9 @@ namespace RealEstateManager.Services
         public int? PropertyId { get; set; }
         public string PropertyCode { get; set; } = string.Empty;
         public string PropertyName { get; set; } = string.Empty;
+
+        /// <summary>Whose property it is, as a filter option: see <see cref="PropertyOwnerOptionDto"/>.</summary>
+        public string? OwnerKey { get; set; }
 
         /// <summary>Dictionary key for this column. 0 represents the Unallocated column.</summary>
         public int Key => PropertyId ?? 0;
@@ -767,6 +879,9 @@ namespace RealEstateManager.Services
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int? FilteredPropertyId { get; set; }
+        public string? FilteredOwner { get; set; }
+        public bool ByUnit { get; set; }
+        public List<PropertyUnitProfitRowDto> Units { get; set; } = new();
 
         public List<PropertyColumnDto> Columns { get; set; } = new();
         public List<PropertyProfitAndLossRowDto> Revenue { get; set; } = new();
@@ -946,8 +1061,17 @@ namespace RealEstateManager.Services
         public int? CategoryId { get; set; }
         public string? CategoryCode { get; set; }
         public string? CategoryName { get; set; }
+        public int? LocationId { get; set; }
+        public string? LocationName { get; set; }
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
+    }
+
+    public class OwnerWithdrawalLocationColumnDto
+    {
+        /// <summary>Null for the column of lines with no location.</summary>
+        public int? LocationId { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 
     public class OwnerAccountColumnDto
@@ -992,6 +1116,16 @@ namespace RealEstateManager.Services
         public List<OwnerAccountColumnDto> Accounts { get; set; } = new();
         public List<OwnerWithdrawalCategoryRowDto> Categories { get; set; } = new();
         public List<OwnerWithdrawalLine> Details { get; set; } = new();
+        public List<OwnerWithdrawalLocationColumnDto> Locations { get; set; } = new();
+
+        /// <summary>One cell of the category by location table: debits less credits, like the category rows.</summary>
+        public decimal AmountAt(int? categoryId, int? locationId) => Details
+            .Where(x => x.CategoryId == categoryId && x.LocationId == locationId)
+            .Sum(x => x.Debit - x.Credit);
+
+        public decimal LocationTotal(int? locationId) => Details
+            .Where(x => x.LocationId == locationId)
+            .Sum(x => x.Debit - x.Credit);
 
         public decimal TotalOpeningBalance => Accounts.Sum(x => x.OpeningBalance);
         public decimal TotalWithdrawals => Accounts.Sum(x => x.Withdrawals);

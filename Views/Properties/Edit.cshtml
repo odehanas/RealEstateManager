@@ -61,16 +61,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <label asp-for="OwnerName" class="form-label"></label>
-            <input asp-for="OwnerName" class="form-control" />
-        </div>
-
-        <div class="col-md-4">
-            <label asp-for="OwnerTrn" class="form-label">@T["Owner TRN"]</label>
-            <input asp-for="OwnerTrn" class="form-control" maxlength="20" />
-            <div class="form-text">@T["Managed properties only, if the owner is VAT registered. Printed on our commission tax invoice."]</div>
-        </div>
+        <partial name="_LandlordFields" model="Model" />
 
         <div class="col-md-8">
             <div class="form-check mt-md-4">

@@ -1,0 +1,87 @@
+@model RealEstateManager.Models.BankAccountEditViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using RealEstateManager.Domain
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? T["New Bank Account"] : T["Edit Bank Account"];
+    var ledger = ViewBag.LedgerAccounts as List<SelectListItem> ?? new();
+    var landlords = ViewBag.Landlords as List<SelectListItem> ?? new();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">@(isNew ? T["New Bank Account"] : T["Edit Bank Account"])</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to Bank Accounts"]</a>
+</div>
+
+<div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : Model.Id)" method="post" class="card shadow-sm">
+    @Html.AntiForgeryToken()
+    <div class="card-body row g-3">
+        <div class="col-md-6">
+            <label asp-for="Name" class="form-label fw-semibold"></label>
+            <input asp-for="Name" class="form-control" maxlength="100" placeholder="@T["e.g. Owners' funds - ADCB"]" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="BankName" class="form-label"></label>
+            <input asp-for="BankName" class="form-control" maxlength="100" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Iban" class="form-label"></label>
+            <input asp-for="Iban" class="form-control" maxlength="40" dir="ltr" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="AccountId" class="form-label fw-semibold"></label>
+            <select asp-for="AccountId" class="form-select">
+                <option value="0">@T["-- choose --"]</option>
+                @foreach (var item in ledger)
+                {
+                    <option value="@item.Value" selected="@(item.Value == Model.AccountId.ToString() ? "selected" : null)">@item.Text</option>
+                }
+            </select>
+            <div class="form-text">@T["Where its balance is kept in the chart of accounts. For owners' funds, 11120 Bank - Owners' Funds."]</div>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Purpose" class="form-label fw-semibold"></label>
+            <select asp-for="Purpose" class="form-select" id="purpose">
+                @foreach (var purpose in BankAccountPurposes.All)
+                {
+                    <option value="@purpose" selected="@(purpose == Model.Purpose ? "selected" : null)">@T[BankAccountPurposes.Describe(purpose)]</option>
+                }
+            </select>
+            <div class="form-text">@T["Owners' funds: only landlords' money goes in, and settlements are paid from it."]</div>
+        </div>
+        <div class="col-md-6" id="landlordBox">
+            <label asp-for="LandlordId" class="form-label"></label>
+            <select asp-for="LandlordId" class="form-select">
+                <option value="">@T["-- all landlords --"]</option>
+                @foreach (var item in landlords)
+                {
+                    <option value="@item.Value" selected="@(item.Value == Model.LandlordId?.ToString() ? "selected" : null)">@item.Text</option>
+                }
+            </select>
+            <div class="form-text">@T["For a landlord who wants an account of their own; their rent then goes here instead of the shared one."]</div>
+        </div>
+        <div class="col-12">
+            <div class="form-check">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">@T["Save"]</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            var purpose = document.getElementById('purpose');
+            var box = document.getElementById('landlordBox');
+            function sync() { box.style.display = purpose.value === 'OwnersFunds' ? '' : 'none'; }
+            purpose.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
+}

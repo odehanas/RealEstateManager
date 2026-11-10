@@ -32,6 +32,11 @@ namespace RealEstateManager.Services
             if (await _permissionService.HasAnyPermissionAsync(user, requiredPermissions.ToArray()))
                 return;
 
+            // The company's own administrator sets the company up, whatever else they are ticked for.
+            if (PermissionCatalog.IsCompanySetupScreen(controllerName, actionName) &&
+                await _permissionService.IsCurrentCompanyAdminAsync(user))
+                return;
+
             context.Result = new ForbidResult();
         }
     }

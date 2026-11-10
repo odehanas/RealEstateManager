@@ -9,10 +9,10 @@ clear themselves and do <strong>not</strong> need a receipt.</p>
 <ol class="steps">
     <li>Select <strong>New Receipt</strong>, or <strong>Receive</strong> on the invoice in Customer Invoices.</li>
     <li>Choose the <strong>Invoice</strong> being paid. Its outstanding balance is shown.</li>
-    <li>Enter the <strong>Receipt Number</strong> — unique within the company.</li>
+    <li>Leave the <strong>Receipt Number</strong> blank to have one generated, or enter your own — it must be unique within the company.</li>
     <li>Enter the <strong>Receipt Date</strong> — the date the money actually arrived.</li>
     <li>Enter the <strong>Amount</strong>. Part payments are allowed.</li>
-    <li>Choose the <strong>Payment Method</strong> and save.</li>
+    <li>Choose the <strong>Payment Method</strong> and select <strong>Save and Post</strong>.</li>
 </ol>
 
 <div class="box">
@@ -37,6 +37,20 @@ clear themselves and do <strong>not</strong> need a receipt.</p>
         <tr><td><code>11200</code> Accounts Receivable</td><td class="num">—</td><td class="num cr">Amount</td></tr>
     </tbody>
 </table>
+
+<h4>Managed property: where the money lands</h4>
+<p>For a tenant of a managed property the debit follows <strong>Who holds the rent</strong> on the property. Nothing is
+chosen on the receipt; the credit to Accounts Receivable is the same in every case.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:34%">Who holds the rent</th><th>The receipt debits</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Company bank account</strong></td><td><code>11100</code> Cash and Cash Equivalents, as for an owned property.</td></tr>
+        <tr><td><strong>Owners' funds bank account</strong></td><td><code>11120</code> Bank - Owners' Funds, or the owners' funds account kept for that landlord.</td></tr>
+        <tr><td><strong>Paid to the owner directly</strong></td><td><code>21500</code> Due to Landlords. The tenant paid the landlord, so no company bank moves; record the receipt so the invoice is settled and the owner statement shows the rent as already paid.</td></tr>
+    </tbody>
+</table>
+<p>A cheque charge invoice (<code>CHG-…</code>) is the company's own income and is always received into the company's
+account. See <a href="#owner-settlements">Owner Settlements</a>.</p>
 
 <figure data-shot="customer-receipt-create"></figure>
 

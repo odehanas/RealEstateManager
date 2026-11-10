@@ -88,7 +88,7 @@ namespace RealEstateManager.Controllers
         /// fiscal year to date.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> ProfitAndLossByProperty(DateTime? startDate, DateTime? endDate, int? propertyId)
+        public async Task<IActionResult> ProfitAndLossByProperty(DateTime? startDate, DateTime? endDate, int? propertyId, string? owner, bool? byUnit)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
             var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId);
@@ -101,9 +101,20 @@ namespace RealEstateManager.Controllers
             if (from > to)
                 (from, to) = (to, from);
 
-            ViewBag.PropertyOptions = await _managementReportService.GetPropertyOptionsAsync();
+            var propertyOptions = await _managementReportService.GetPropertyOptionsAsync();
+            ViewBag.PropertyOptions = propertyOptions;
+            ViewBag.OwnerOptions = await _managementReportService.GetPropertyOwnerOptionsAsync();
 
-            var model = await _managementReportService.GetProfitAndLossByPropertyAsync(company.Id, from, to, propertyId);
+            // A property picked under one owner and left selected after changing the owner
+            // would give an empty report: the owner wins.
+            if (!string.IsNullOrWhiteSpace(owner) && propertyId.HasValue &&
+                !propertyOptions.Any(x => x.PropertyId == propertyId && string.Equals(x.OwnerKey, owner.Trim(), StringComparison.OrdinalIgnoreCase)))
+                propertyId = null;
+
+            // Narrowed to one owner or one property, the unit breakdown is what the reader is after.
+            var units = byUnit ?? (!string.IsNullOrWhiteSpace(owner) || propertyId.HasValue);
+
+            var model = await _managementReportService.GetProfitAndLossByPropertyAsync(company.Id, from, to, propertyId, owner, units);
             return View(model);
         }
 

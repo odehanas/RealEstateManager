@@ -59,6 +59,17 @@ category; and the <strong>cost ledger</strong> — every posted cost with its da
 bills or journals tagged to the project are flagged until they are posted. On the project list, an amount posted to a
 development account <em>without</em> a project is shown as <em>Not in any project</em> so it can be corrected.</p>
 
+<h3>Project status</h3>
+<table class="t-compact">
+    <thead><tr><th style="width:24%">Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Planning</strong></td><td>Set up with its budget; nothing spent yet.</td></tr>
+        <tr><td><strong>Under construction</strong></td><td>Select <strong>Start Construction</strong> on the project page. Recording the first cost does this too.</td></tr>
+        <tr><td><strong>Completed</strong></td><td>The completion certificate has been entered. Costs can now be transferred.</td></tr>
+        <tr><td><strong>Cancelled</strong></td><td>Abandoned before anything was recorded against it.</td></tr>
+    </tbody>
+</table>
+
 <h3>Completion</h3>
 <p>When the completion certificate is issued, enter its date and number under <strong>Completion</strong>. The date is
 copied to the property record, where it starts the VAT window below. Late invoices and retention releases can still be
@@ -97,6 +108,24 @@ the same way.</p>
     exempt leases reduce that recovery over the following years under the Capital Assets Scheme — confirm the treatment
     of each project with your tax adviser.</p>
 </div>
+
+<h3>The Project Costs &amp; WIP report</h3>
+<p><span class="path">Reporting ▸ Project Costs &amp; WIP</span> shows what each development project has cost as at a
+date. Choose <strong>As at</strong> and either <em>All projects (summary)</em> or one project, then <strong>Show</strong>.</p>
+<table class="t-compact">
+    <thead><tr><th style="width:34%">Section</th><th>What it shows</th></tr></thead>
+    <tbody>
+        <tr><td><strong>1. Cost by project</strong></td><td>Budget, supplier bills net of VAT, VAT taken into cost, other costs, cost to date, VAT recovered, amounts transferred out, the WIP balance, what is committed in draft bills, the budget left and what is still unpaid to suppliers.</td></tr>
+        <tr><td><strong>2. WIP reconciliation</strong></td><td>The WIP account's balance in the ledger against the sum of the projects' WIP balances. A difference is explained by postings not tagged to a project, which are listed so you can tag them.</td></tr>
+        <tr><td><strong>3. Budget against cost, by category</strong></td><td>Posted, committed and left for each budget category.</td></tr>
+        <tr><td><strong>4. Spend by month</strong></td><td>Posted cost each month and cumulatively.</td></tr>
+        <tr><td><strong>5. Contractors, subcontractors and suppliers</strong></td><td>Per vendor: bills, net, VAT in cost, total billed, paid and unpaid.</td></tr>
+        <tr><td><strong>6. Bills charged to the project</strong></td><td>Each bill with its status; drafts count as committed.</td></tr>
+    </tbody>
+</table>
+<p>Only the lines of a bill that belong to the project are counted, and payments on a bill are shared across its lines
+in proportion. A difference that untagged postings do not explain usually comes from an opening balance entered on the
+WIP account itself: give it to a project with a manual journal.</p>
 
 <h3>Cancelling a project</h3>
 <p>A project can be cancelled only while nothing is recorded against it. An abandoned project's costs must first be written

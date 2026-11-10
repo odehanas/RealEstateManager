@@ -153,6 +153,10 @@
             <div class="card-body">
                 <dl class="row reg mb-0">
                     <dt class="col-5">@T["Ownership"]</dt><dd class="col-7">@Model.OwnershipType @(Model.OwnershipType == "Managed" ? "for " + Show(Model.OwnerName) : "")</dd>
+                    @if (Model.OwnershipType == "Managed")
+                    {
+                        <dt class="col-5">@T["Who holds the rent"]</dt><dd class="col-7">@T[CollectionModes.Describe(Model.EffectiveCollectionMode)]</dd>
+                    }
                     <dt class="col-5">@T["VAT treatment"]</dt><dd class="col-7">@VatCategories.Describe(Model.VatCategory)</dd>
                     <dt class="col-5">@T["Asset value"]</dt><dd class="col-7">@Model.AssetValue.ToString("N2")</dd>
                     <dt class="col-5">@T["Fair value"]</dt><dd class="col-7">@(Model.FairValue.HasValue ? Model.FairValue.Value.ToString("N2") + (Model.FairValueDate.HasValue ? " at " + Date(Model.FairValueDate) : "") + (string.IsNullOrWhiteSpace(Model.ValuerName) ? "" : " (" + Model.ValuerName + ")") : "-")</dd>

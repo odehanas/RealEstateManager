@@ -46,6 +46,17 @@ namespace RealEstateManager.Domain
         public decimal AssetValue { get; set; } = 0m;
         public decimal CommissionPercentage { get; set; } = 0m;
 
+        /// <summary>The landlord of a managed property. Saving copies their name and TRN into OwnerName and OwnerTrn.</summary>
+        public int? LandlordId { get; set; }
+        public Landlord? Landlord { get; set; }
+
+        /// <summary>Who holds the rent of a managed property. See <see cref="CollectionModes"/>.</summary>
+        public string CollectionMode { get; set; } = CollectionModes.Company;
+
+        /// <summary>An owned property's rent is always the company's own.</summary>
+        public string EffectiveCollectionMode =>
+            OwnershipType == "Managed" ? CollectionModes.Clean(CollectionMode) : CollectionModes.Company;
+
         public bool IsActive { get; set; } = true;
 
         // ---- Location ----------------------------------------------------------

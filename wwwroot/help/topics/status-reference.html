@@ -6,8 +6,9 @@
         <tr><td>UnderMaintenance</td><td>Temporarily out of service.</td></tr>
         <tr><td>Reserved</td><td>Held for a prospective tenant.</td></tr>
 
-        <tr><td rowspan="5"><strong>Lease</strong></td><td>Draft</td><td>Being prepared.</td></tr>
-        <tr><td>Active</td><td>In force. Set on creation.</td></tr>
+        <tr><td rowspan="6"><strong>Lease</strong></td><td>Draft</td><td>Being prepared.</td></tr>
+        <tr><td>Awaiting approval</td><td>Submitted to an approver; the unit is held. Returned contracts go back to Draft.</td></tr>
+        <tr><td>Active</td><td>In force: activated, or approved where approval is required.</td></tr>
         <tr><td>Terminated</td><td>Ended early.</td></tr>
         <tr><td>Expired</td><td>Ran to its end date.</td></tr>
         <tr><td>Renewed</td><td>Replaced by a successor contract.</td></tr>
@@ -63,7 +64,31 @@
         <tr><td rowspan="2"><strong>Tenant portal login</strong></td><td>Active</td><td>Can sign in.</td></tr>
         <tr><td>Suspended</td><td>Sign-in blocked; account and history kept.</td></tr>
 
-        <tr><td rowspan="2"><strong>Accounting period</strong></td><td>Open</td><td>Accepts postings.</td></tr>
+        <tr><td rowspan="4"><strong>Security deposit</strong></td><td>Held</td><td>Received and held for the tenant.</td></tr>
+        <tr><td>Applied</td><td>Set against what the tenant owed.</td></tr>
+        <tr><td>Refunded</td><td>Paid back to the tenant.</td></tr>
+        <tr><td>Forfeited</td><td>Kept to cover damages.</td></tr>
+        <tr><td rowspan="2"><strong>Vendor payment</strong></td><td>Posted</td><td>In the accounts; its bills are settled.</td></tr>
+        <tr><td>Awaiting approval / draft</td><td>Held for payment approval, or reset for a correction.</td></tr>
+        <tr><td rowspan="2"><strong>Fixed asset</strong></td><td>Draft</td><td>Accepting acquisition costs; not depreciated.</td></tr>
+        <tr><td>Active</td><td>Capitalised: in the asset account, with a depreciation schedule.</td></tr>
+        <tr><td rowspan="4"><strong>Employee</strong></td><td>Active</td><td>Employed and paid by the payroll.</td></tr>
+        <tr><td>Suspended</td><td>Employed but left out of the payroll.</td></tr>
+        <tr><td>Resigned</td><td>Left; paid up to the last working day.</td></tr>
+        <tr><td>Terminated</td><td>Dismissed; paid up to the last working day.</td></tr>
+        <tr><td rowspan="4"><strong>Leave request</strong></td><td>Pending</td><td>Waiting for HR to decide.</td></tr>
+        <tr><td>Approved</td><td>Counts against the balance (annual) or the pay (unpaid).</td></tr>
+        <tr><td>Rejected</td><td>Turned down.</td></tr>
+        <tr><td>Cancelled</td><td>Approved leave that was not taken.</td></tr>
+        <tr><td rowspan="3"><strong>Payroll transaction</strong></td><td>Pending</td><td>Waiting for approval; not paid.</td></tr>
+        <tr><td>Approved</td><td>Paid or deducted by the next payroll.</td></tr>
+        <tr><td>Rejected</td><td>Not paid.</td></tr>
+        <tr><td rowspan="4"><strong>Payroll run</strong></td><td>Draft</td><td>Being prepared. Nothing in the accounts.</td></tr>
+        <tr><td>Approved</td><td>Salary cost posted; salaries payable.</td></tr>
+        <tr><td>PartlyPaid</td><td>Some payment batches made.</td></tr>
+        <tr><td>Paid</td><td>Every salary paid.</td></tr>
+        <tr><td rowspan="3"><strong>Accounting period</strong></td><td>Open</td><td>Accepts postings.</td></tr>
         <tr><td>Closed</td><td>Locked; figures are final.</td></tr>
+        <tr><td>Reopened</td><td>Opened again on an approved request; to be corrected and closed again.</td></tr>
     </tbody>
 </table>

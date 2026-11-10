@@ -9,6 +9,8 @@
                   ?? new List<RealEstateManager.Models.VendorOptionViewModel>();
     var properties = ViewBag.Properties as List<RealEstateManager.Domain.Property>
                      ?? new List<RealEstateManager.Domain.Property>();
+    var units = ViewBag.Units as List<RealEstateManager.Domain.Unit>
+                ?? new List<RealEstateManager.Domain.Unit>();
     var accounts = ViewBag.Accounts as List<SelectListItem> ?? new List<SelectListItem>();
     var attributions = ViewBag.Attributions as List<SelectListItem> ?? new List<SelectListItem>();
     var projects = ViewBag.DevelopmentProjects as List<RealEstateManager.Models.DevelopmentCostOption> ?? new();
@@ -241,7 +243,7 @@
                     <tr>
                         <th style="width:26%">@T["Description"]</th>
                         <th style="width:20%">@T["Account"]</th>
-                        <th style="width:14%">Property@(projects.Count > 0 ? " / Project" : "")</th>
+                        <th style="width:14%">Property / Unit@(projects.Count > 0 ? " / Project" : "")</th>
                         <th style="width:8%" class="num">@T["Qty"]</th>
                         <th style="width:11%" class="num">@T["Unit Price"]</th>
                         <th style="width:6%">@T["VAT"]</th>
@@ -279,6 +281,16 @@
                                     {
                                         <option value="@property.Id" selected="@(property.Id == line.PropertyId ? "selected" : null)">
                                             @property.Code
+                                        </option>
+                                    }
+                                </select>
+                                @* The unit the cost is for. Only the units of the line's property are offered. *@
+                                <select name="Lines[@i].UnitId" class="form-select form-select-sm mt-1 line-unit" title="@T["The unit this cost is for. Leave it empty for a cost of the whole building."]">
+                                    <option value="">@T["Whole building"]</option>
+                                    @foreach (var unit in units)
+                                    {
+                                        <option value="@unit.Id" data-property="@unit.PropertyId" selected="@(unit.Id == line.UnitId ? "selected" : null)">
+                                            @unit.UnitNumber
                                         </option>
                                     }
                                 </select>
@@ -515,6 +527,8 @@
                 // a ten-line bill for one building bearable.
                 const propertySelect = clone.querySelector('select[name*="PropertyId"]');
                 if (propertySelect && defaultProperty) { propertySelect.value = defaultProperty.value; }
+                const unitSelect = clone.querySelector('.line-unit');
+                if (unitSelect) { unitSelect.value = ''; }
 
                 const projectSelect = clone.querySelector('.line-project');
                 if (projectSelect) { projectSelect.value = ''; }
@@ -550,7 +564,35 @@
                 recalculate();
             }
 
+            // The unit list of a line shows only the units of that line's property; choosing
+            // a unit on a line with no property yet fills the property in.
+            function narrowUnits(row) {
+                const propertySelect = row.querySelector('select[name*="PropertyId"]');
+                const unitSelect = row.querySelector('.line-unit');
+                if (!propertySelect || !unitSelect) { return; }
+                Array.prototype.forEach.call(unitSelect.options, function (option) {
+                    const show = !option.value || !propertySelect.value || option.dataset.property === propertySelect.value;
+                    option.hidden = !show;
+                    option.disabled = !show;
+                    if (!show && option.selected) { unitSelect.value = ''; }
+                });
+            }
+
             function bindRow(row) {
+                const rowProperty = row.querySelector('select[name*="PropertyId"]');
+                const rowUnit = row.querySelector('.line-unit');
+                if (rowProperty && rowUnit) {
+                    rowProperty.addEventListener('change', function () { narrowUnits(row); });
+                    rowUnit.addEventListener('change', function () {
+                        const option = rowUnit.options[rowUnit.selectedIndex];
+                        if (rowUnit.value && option && option.dataset.property && rowProperty.value !== option.dataset.property) {
+                            rowProperty.value = option.dataset.property;
+                            narrowUnits(row);
+                        }
+                    });
+                    narrowUnits(row);
+                }
+
                 row.querySelectorAll('.line-qty, .line-price, .line-taxable, .line-attribution')
                     .forEach(function (field) {
                         field.addEventListener('input', recalculate);
@@ -567,6 +609,7 @@
                         const propertySelect = row.querySelector('select[name*="PropertyId"]');
                         if (accountSelect && option.dataset.account) { accountSelect.value = option.dataset.account; }
                         if (propertySelect && option.dataset.property) { propertySelect.value = option.dataset.property; }
+                        narrowUnits(row);
                     });
                 }
 

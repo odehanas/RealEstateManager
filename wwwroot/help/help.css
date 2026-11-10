@@ -50,6 +50,8 @@
     border: 1px solid var(--hc-line);
     border-radius: 3px;
     padding: .05em .35em;
+    /* A long web address or code wraps rather than running off a phone's screen. */
+    overflow-wrap: anywhere;
 }
 
 .help-content a { color: var(--hc-accent); }

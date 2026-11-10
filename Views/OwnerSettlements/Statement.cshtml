@@ -65,7 +65,15 @@
                 }
                 <tr class="fw-bold"><td>@T["Owner's share"]</td><td class="text-end">@Model.OwnerShare.ToString("N2")</td></tr>
                 <tr><td>@T["Less: already paid to the owner"]</td><td class="text-end">(@Model.PreviouslySettled.ToString("N2"))</td></tr>
+                @if (Model.ReceivedDirectly != 0m)
+                {
+                    <tr><td>@T["Less: rent the tenants paid to the owner directly"]</td><td class="text-end">(@Model.ReceivedDirectly.ToString("N2"))</td></tr>
+                }
                 <tr class="fw-bold table-primary"><td>@T["Balance payable to the owner"]</td><td class="text-end">@Model.BalancePayable.ToString("N2")</td></tr>
+                @if (Model.BalancePayable < 0m)
+                {
+                    <tr><td class="text-danger">@T["The owner received more than their share: this is what the owner owes us, our commission included"]</td><td class="text-end text-danger">@((-Model.BalancePayable).ToString("N2"))</td></tr>
+                }
                 <tr><td class="text-muted">@T["of which collected from tenants and available to pay"]</td><td class="text-end text-muted">@Model.AvailableFromCollections.ToString("N2")</td></tr>
                 @if (Model.PendingSettlements > 0)
                 {

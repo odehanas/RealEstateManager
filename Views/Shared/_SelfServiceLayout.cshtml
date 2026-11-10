@@ -47,6 +47,7 @@
         {
             <div class="d-flex gap-2">
                 <a asp-controller="SelfServiceAccount" asp-action="ChangePassword" class="btn btn-sm btn-outline-light">@T["Password"]</a>
+                <partial name="_AppLink" model="@(("/me/password", "btn-light"))" />
                 <partial name="_LanguageSwitch" model="@("btn-sm btn-light")" />
                 <form asp-controller="SelfServiceAccount" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button class="btn btn-sm btn-light">@T["Sign out"]</button></form>
             </div>

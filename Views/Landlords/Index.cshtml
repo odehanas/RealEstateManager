@@ -1,0 +1,71 @@
+@model List<RealEstateManager.Models.LandlordListItemViewModel>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Landlords"];
+    var canEdit = ViewBag.CanEdit as bool? ?? false;
+}
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Landlords"]</h2>
+        <p class="text-muted mb-0">@T["The owners of the properties you manage, their bank account, and who holds their rent."]</p>
+    </div>
+    @if (canEdit)
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">@T["New Landlord"]</a>
+    }
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">@T["No landlords yet. Add one, then choose them on each managed property."]</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-sm mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>@T["Name"]</th>
+                        <th>@T["TRN"]</th>
+                        <th>@T["Phone"]</th>
+                        <th>@T["IBAN"]</th>
+                        <th>@T["Who holds the rent, by default"]</th>
+                        <th class="text-end">@T["Properties"]</th>
+                        <th class="text-center">@T["Status"]</th>
+                        @if (canEdit)
+                        {
+                            <th style="width:80px"></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var landlord in Model)
+                    {
+                        <tr>
+                            <td>@landlord.Name</td>
+                            <td>@(landlord.Trn ?? "-")</td>
+                            <td dir="ltr">@(landlord.Phone ?? "-")</td>
+                            <td dir="ltr">@(landlord.Iban ?? "-")</td>
+                            <td>@T[CollectionModes.Describe(landlord.DefaultCollectionMode)]</td>
+                            <td class="text-end">@landlord.PropertyCount</td>
+                            <td class="text-center">
+                                <span class="badge @(landlord.IsActive ? "bg-success" : "bg-secondary")">@(landlord.IsActive ? T["Active"] : T["Inactive"])</span>
+                            </td>
+                            @if (canEdit)
+                            {
+                                <td><a asp-action="Edit" asp-route-id="@landlord.Id" class="btn btn-sm btn-outline-secondary">@T["Edit"]</a></td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

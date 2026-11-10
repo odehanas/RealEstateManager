@@ -299,6 +299,17 @@ namespace RealEstateManager.Services
                     $"and the voucher is {model.Amount:N2}. Wait for the approvals, or record a replenishment first.");
             }
 
+            // A unit belongs to one property: the unit decides the property, and a unit of
+            // another property is refused.
+            if (model.UnitId.HasValue)
+            {
+                var unitPropertyId = await _db.Units.AsNoTracking().Where(x => x.Id == model.UnitId.Value).Select(x => (int?)x.PropertyId).FirstOrDefaultAsync()
+                    ?? throw new InvalidOperationException("The unit was not found.");
+                if (model.PropertyId.HasValue && model.PropertyId != unitPropertyId)
+                    throw new InvalidOperationException("The unit does not belong to the property chosen.");
+                model.PropertyId = unitPropertyId;
+            }
+
             // Charged on to the owner of a managed property: the cost plus 5% VAT goes to Due
             // to Landlords on a recharge tax invoice, not to the expense account.
             Property? rechargeProperty = null;

@@ -96,3 +96,59 @@ in the conversation, the tenant sees it, and the button cannot be pressed twice.
     <div class="box-title">Nobody is notified automatically</div>
     <p>There are no emails yet. Check this queue daily, and remind tenants to look at the portal for your replies.</p>
 </div>
+
+<h3>Requests that arrive by WhatsApp, phone or a visit</h3>
+<p>Not every tenant uses the portal. Choose <strong>Log a Request for a Tenant</strong>, find the tenant by name, code
+or phone number, say how the request reached you and when, and paste their message. It becomes an ordinary request
+on the tenant's record: the tenant sees it on the portal, a maintenance job goes to the maintenance team, and it counts
+on the dashboard, where its response time runs from the moment it came in. The thread records who logged it.</p>
+<p>When the message comes in on a connected WhatsApp number, nobody needs to type it: see below.</p>
+
+<h3>Messages that arrive by themselves on WhatsApp</h3>
+<p>A company can connect its own WhatsApp Business number. A tenant then simply sends a message, and it becomes a
+request on their record: it shows in this queue with <strong>WhatsApp</strong> as its source, and on the tenant's portal.
+The people who handle requests are notified.</p>
+<ul>
+    <li><strong>How the tenant is found.</strong> The sender's number is compared with the <strong>Phone</strong> on each active
+        tenant. It must be the same number once written in full: <em>+971 50 123 4567</em> and <em>050 123 4567</em> match, and a
+        record may hold two numbers separated by a slash.</li>
+    <li><strong>It arrives as "Other request".</strong> A message does not say what kind of request it is. Open it and use
+        <strong>Sort this WhatsApp request</strong>. Choosing maintenance sends it to the maintenance team. You see any
+        payment hold first, because a message from WhatsApp never gets round the hold by itself. For more time to pay, log a
+        request yourself, because that needs an invoice and a date.</li>
+    <li><strong>Several messages in a row.</strong> Further messages from the same person within 30 minutes join the request
+        they just opened as messages in its conversation, while it is still open.</li>
+    <li><strong>Sent twice by WhatsApp.</strong> WhatsApp sometimes repeats a delivery. Each message is only ever taken once.</li>
+</ul>
+
+<h3>The WhatsApp Messages review list</h3>
+<p>A message that cannot safely go on one tenant's record waits under <strong>WhatsApp Messages</strong>, and never reaches
+any tenant by itself. That happens when:</p>
+<ul>
+    <li>no active tenant has that number, or <strong>several</strong> do (for example a couple, or one company renting two units);</li>
+    <li>WhatsApp did not give the number, because the person uses a WhatsApp username;</li>
+    <li>the message has no text, such as a voice note or a photo with no caption;</li>
+    <li>the company's subscription was inactive when it arrived, or the request could not be created.</li>
+</ul>
+<p>For each message, choose <strong>Log for</strong> a suggested tenant, <strong>Choose a tenant</strong>, or
+<strong>Dismiss</strong> it. Logging opens the usual form filled in with the message, and the time received is when it was
+sent. If the number really is that tenant's, add it to their record so the next message finds them by itself.</p>
+
+<div class="box warn">
+    <div class="box-title">Nothing is sent back on WhatsApp</div>
+    <p>The system only receives. The tenant gets no reply on WhatsApp: your replies appear on the portal. Photos and voice notes
+    are not stored here. A photo's caption becomes the request and the picture stays in WhatsApp, so ask for it if you need it.</p>
+</div>
+
+<h3>Connecting a WhatsApp number</h3>
+<p>You need the <strong>Owner Oversight</strong> permission, a Meta Business account and a phone number that is not already
+in use on the ordinary WhatsApp apps. Meta may charge for some conversations, according to its own price list.</p>
+<ol class="steps">
+    <li>In Meta for Developers, create an app with the WhatsApp product and add your number.</li>
+    <li>In this system, open <strong>WhatsApp Messages</strong>, then <strong>WhatsApp Connection</strong>. Enter the
+        <strong>Phone Number ID</strong> (under WhatsApp, API Setup) and the <strong>App Secret</strong> (under App settings, Basic),
+        and save. The secret is stored encrypted and is never shown again.</li>
+    <li>The screen now shows a <strong>Callback URL</strong> and a <strong>Verify token</strong>. Enter both in your Meta app under
+        WhatsApp, Configuration, and subscribe to the <strong>messages</strong> field.</li>
+    <li>Send a message to the number from a phone that is on a tenant's record, and check that it appears in the queue.</li>
+</ol>

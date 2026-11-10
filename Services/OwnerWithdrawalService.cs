@@ -12,8 +12,8 @@ namespace RealEstateManager.Services
     ///   Dr  Owner's Current Account (equity)   fixed - with the withdrawal category
     ///       Cr  the account it was paid from   chosen: bank, cash, petty cash, a card...
     ///
-    /// The category is what turns one equity account into a report of where the owner's
-    /// money went (Reporting ▸ Owner Withdrawals).
+    /// The category and the location are what turn one equity account into a report of
+    /// what the owner's money went on and where (Reporting ▸ Owner Withdrawals).
     /// </summary>
     public class OwnerWithdrawalService
     {
@@ -58,12 +58,18 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.SortOrder).ThenBy(x => x.Code)
                 .ToListAsync();
 
+        public async Task<List<OwnerWithdrawalLocation>> GetLocationsAsync() =>
+            await _db.OwnerWithdrawalLocations.AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.SortOrder).ThenBy(x => x.Code)
+                .ToListAsync();
+
         /// <summary>
         /// Records and posts a withdrawal. Returns the journal id and, when posting was not
         /// possible, the reason (the journal is then kept as a draft).
         /// </summary>
         public async Task<(int JournalId, string? Warning)> RecordAsync(
-            DateTime date, int ownerAccountId, int categoryId, decimal amount, int paidFromAccountId,
+            DateTime date, int ownerAccountId, int categoryId, int? locationId, decimal amount, int paidFromAccountId,
             string? description, string? reference)
         {
             var companyId = CompanyId;
@@ -84,7 +90,14 @@ namespace RealEstateManager.Services
             var category = (await GetCategoriesAsync()).FirstOrDefault(x => x.Id == categoryId)
                            ?? throw new InvalidOperationException("Choose what the money was spent on.");
 
-            var text = string.IsNullOrWhiteSpace(description) ? category.Name : description.Trim();
+            // Required while the company has locations; one that has switched them all off is not blocked.
+            var locations = await GetLocationsAsync();
+            var location = locations.FirstOrDefault(x => x.Id == locationId);
+            if (location == null && (locationId.HasValue || locations.Count > 0))
+                throw new InvalidOperationException("Choose where the money was spent.");
+
+            var what = location == null ? category.Name : $"{category.Name} - {location.Name}";
+            var text = string.IsNullOrWhiteSpace(description) ? what : description.Trim();
             var lines = new List<JournalEntryLine>
             {
                 new()
@@ -92,18 +105,19 @@ namespace RealEstateManager.Services
                     AccountId = owner.Id,
                     Debit = Math.Round(amount, 2),
                     Description = text,
-                    OwnerWithdrawalCategoryId = category.Id
+                    OwnerWithdrawalCategoryId = category.Id,
+                    OwnerWithdrawalLocationId = location?.Id
                 },
                 new()
                 {
                     AccountId = paidFrom.Id,
                     Credit = Math.Round(amount, 2),
-                    Description = $"Owner withdrawal - {category.Name}"
+                    Description = $"Owner withdrawal - {what}"
                 }
             };
 
             var journal = await _posting.CreatePreparedJournalAsync(companyId, date.Date,
-                $"Owner withdrawal - {category.Name}: {text}", SourceType, category.Id, lines,
+                $"Owner withdrawal - {what}: {text}", SourceType, category.Id, lines,
                 string.IsNullOrWhiteSpace(reference) ? null : reference.Trim());
 
             var warning = await _workflow.PostNewEntryAsync(journal.Id);
@@ -114,14 +128,15 @@ namespace RealEstateManager.Services
         /// Every posted movement on the owner accounts in the period - withdrawals from this
         /// screen and any made by manual journal - with the account on the other side.
         /// </summary>
-        public async Task<List<OwnerWithdrawalRegisterRow>> GetRegisterAsync(DateTime from, DateTime to)
+        public async Task<List<OwnerWithdrawalRegisterRow>> GetRegisterAsync(DateTime from, DateTime to, int? locationId = null)
         {
             var ownerIds = (await GetOwnerAccountsAsync()).Select(x => x.Id).ToList();
 
             var lines = await _db.JournalEntryLines.AsNoTracking()
                 .Where(x => ownerIds.Contains(x.AccountId) &&
                             x.JournalEntry != null && x.JournalEntry.IsPosted &&
-                            x.JournalEntry.EntryDate >= from && x.JournalEntry.EntryDate <= to)
+                            x.JournalEntry.EntryDate >= from && x.JournalEntry.EntryDate <= to &&
+                            (locationId == null || x.OwnerWithdrawalLocationId == locationId))
                 .Select(x => new
                 {
                     x.JournalEntryId,
@@ -131,6 +146,7 @@ namespace RealEstateManager.Services
                     x.JournalEntry.SourceType,
                     x.Description,
                     Category = x.OwnerWithdrawalCategory != null ? x.OwnerWithdrawalCategory.Name : null,
+                    Location = x.OwnerWithdrawalLocation != null ? x.OwnerWithdrawalLocation.Name : null,
                     OwnerAccount = x.Account!.Code + " " + x.Account.Name,
                     x.Debit,
                     x.Credit
@@ -153,6 +169,7 @@ namespace RealEstateManager.Services
                     Reference = x.DocumentNumber,
                     RecordedHere = x.SourceType == SourceType,
                     Category = x.Category,
+                    Location = x.Location,
                     Description = x.Description,
                     OwnerAccount = x.OwnerAccount,
                     OtherAccount = string.Join(", ", otherSides.Where(o => o.JournalEntryId == x.JournalEntryId).Select(o => o.Account).Distinct()),
@@ -171,6 +188,7 @@ namespace RealEstateManager.Services
         public string? Reference { get; set; }
         public bool RecordedHere { get; set; }
         public string? Category { get; set; }
+        public string? Location { get; set; }
         public string? Description { get; set; }
         public string OwnerAccount { get; set; } = string.Empty;
         public string OtherAccount { get; set; } = string.Empty;

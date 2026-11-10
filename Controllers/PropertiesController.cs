@@ -34,8 +34,9 @@ namespace RealEstateManager.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await LoadLandlordsAsync();
             return View(new Property { OwnershipType = "Owned" });
         }
 
@@ -55,6 +56,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("Name", "PropertyType", "OwnershipType")]
         public async Task<IActionResult> Create(Property model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
@@ -77,11 +79,15 @@ namespace RealEstateManager.Controllers
 
             await _uniquenessService.ValidatePropertyAsync(ModelState, companyId, model);
             await ValidateTitleDeedAsync(companyId, model, null);
+            var landlord = await ResolveLandlordAsync(companyId, model);
 
             if (!ModelState.IsValid)
             {
+                await LoadLandlordsAsync();
                 return View(model);
             }
+
+            ApplyLandlord(model, model, landlord);
 
             // The registration fields bind straight onto the new record; this tidies them.
             model.CopyRegistrationFrom(model);
@@ -109,11 +115,13 @@ namespace RealEstateManager.Controllers
                 return NotFound();
             }
 
+            await LoadLandlordsAsync();
             return View(property);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("Name", "PropertyType", "OwnershipType")]
         public async Task<IActionResult> Edit(int id, Property model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
@@ -135,11 +143,15 @@ namespace RealEstateManager.Controllers
 
             await _uniquenessService.ValidatePropertyAsync(ModelState, companyId, model, id);
             await ValidateTitleDeedAsync(companyId, model, id);
+            var landlord = await ResolveLandlordAsync(companyId, model);
 
+            // Nothing is set on the stored record before this point: the audit log saves this
+            // request's changes too, so a change made before a refusal would be kept anyway.
             if (!ModelState.IsValid)
             {
                 model.Code = property.Code;
                 model.CompanyId = property.CompanyId;
+                await LoadLandlordsAsync();
                 return View(model);
             }
 
@@ -148,18 +160,62 @@ namespace RealEstateManager.Controllers
             property.PropertyType = model.PropertyType;
             property.OwnershipType = model.OwnershipType;
             property.VatCategory = string.IsNullOrWhiteSpace(model.VatCategory) ? property.VatCategory : model.VatCategory;
-            property.OwnerName = model.OwnerName;
-            property.OwnerTrn = string.IsNullOrWhiteSpace(model.OwnerTrn) ? null : model.OwnerTrn.Trim();
             property.RentBilledInOwnerName = model.OwnershipType == "Managed" && model.RentBilledInOwnerName;
             property.AssetValue = model.AssetValue;
             property.CommissionPercentage = model.CommissionPercentage;
             property.IsActive = model.IsActive;
             property.CopyRegistrationFrom(model);
+            ApplyLandlord(model, property, landlord);
 
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id });
         }
+
+        /// <summary>
+        /// The landlord a managed property names, checked to be one of this company's. An
+        /// owned property has none. Changes nothing: ApplyLandlord does that once the form is valid.
+        /// </summary>
+        private async Task<Landlord?> ResolveLandlordAsync(int companyId, Property posted)
+        {
+            if (posted.OwnershipType != "Managed")
+                return null;
+
+            var landlord = posted.LandlordId.HasValue
+                ? await _db.Landlords.AsNoTracking().FirstOrDefaultAsync(x => x.Id == posted.LandlordId.Value && x.CompanyId == companyId)
+                : null;
+
+            if (landlord == null)
+                ModelState.AddModelError(nameof(Property.LandlordId), "Choose the landlord of this managed property.");
+
+            return landlord;
+        }
+
+        /// <summary>
+        /// Copies the landlord's name and TRN onto the property: settlements, commission
+        /// invoices and owner reports go by that name. An owned property's rent is always the
+        /// company's own.
+        /// </summary>
+        private static void ApplyLandlord(Property posted, Property target, Landlord? landlord)
+        {
+            if (landlord == null)
+            {
+                target.LandlordId = null;
+                target.CollectionMode = CollectionModes.Company;
+                return;
+            }
+
+            target.LandlordId = landlord.Id;
+            target.OwnerName = landlord.Name;
+            target.OwnerTrn = landlord.Trn;
+            target.CollectionMode = CollectionModes.Clean(posted.CollectionMode);
+        }
+
+        private async Task LoadLandlordsAsync() =>
+            ViewBag.Landlords = await _db.Landlords.AsNoTracking()
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Name)
+                .ToListAsync();
 
         /// <summary>One title deed is one property: the same deed number twice in an emirate is a duplicate.</summary>
         private async Task ValidateTitleDeedAsync(int companyId, Property model, int? excludeId)

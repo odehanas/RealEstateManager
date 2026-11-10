@@ -92,6 +92,7 @@ namespace RealEstateManager.Services
                         Description = x.Description,
                         AccountId = x.AccountId,
                         PropertyId = x.PropertyId,
+                        UnitId = x.UnitId,
                         Quantity = x.Quantity,
                         UnitPrice = x.UnitPrice,
                         IsTaxable = x.IsTaxable,
@@ -187,6 +188,24 @@ namespace RealEstateManager.Services
                 lines[i].AccountId = project.WipAccountId;
                 lines[i].PropertyId ??= project.PropertyId;
                 projectTags[lines[i]] = (project.Id, category!);
+            }
+
+            // A unit belongs to one property: choosing the unit decides the property, and a
+            // unit of another property is refused rather than silently kept.
+            var unitIds = lines.Where(x => x.UnitId.HasValue).Select(x => x.UnitId!.Value).Distinct().ToList();
+            var unitProperties = unitIds.Count == 0
+                ? new Dictionary<int, int>()
+                : await _db.Units.AsNoTracking().Where(x => unitIds.Contains(x.Id)).ToDictionaryAsync(x => x.Id, x => x.PropertyId);
+            for (var i = 0; i < lines.Count; i++)
+            {
+                if (!lines[i].UnitId.HasValue)
+                    continue;
+                if (!unitProperties.TryGetValue(lines[i].UnitId!.Value, out var unitPropertyId))
+                    modelState.AddModelError(string.Empty, $"Line {i + 1}: the unit was not found.");
+                else if (lines[i].PropertyId.HasValue && lines[i].PropertyId != unitPropertyId)
+                    modelState.AddModelError(string.Empty, $"Line {i + 1}: the unit does not belong to the property chosen on the line.");
+                else
+                    lines[i].PropertyId = unitPropertyId;
             }
 
             // A line charged on to an owner must be for a managed property, and is a cost of
@@ -391,6 +410,7 @@ namespace RealEstateManager.Services
                 Description = Trim(source.Description) ?? "(no description)",
                 AccountId = source.AccountId,
                 PropertyId = source.PropertyId,
+                UnitId = source.UnitId,
                 RechargeToOwner = source.RechargeToOwner,
                 IsDisbursement = isDisbursement,
                 OwnerCostCategory = source.RechargeToOwner ? OwnerCostCategories.Clean(source.OwnerCostCategory) : null,

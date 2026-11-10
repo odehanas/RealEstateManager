@@ -1,0 +1,119 @@
+@model RealEstateManager.Domain.MaintenancePlan
+@using RealEstateManager.Domain
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? T["New Planned Work"] : T["Edit Planned Work"];
+    var properties = (ViewBag.Properties as System.Collections.IEnumerable)?.Cast<dynamic>().ToList() ?? new List<dynamic>();
+    var units = (ViewBag.Units as System.Collections.IEnumerable)?.Cast<dynamic>().ToList() ?? new List<dynamic>();
+    var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">@(isNew ? T["New Planned Work"] : T["Edit Planned Work"])</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@T["Back to Planned Maintenance"]</a>
+</div>
+
+<div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+<form asp-action="@(isNew ? "Create" : "Edit")" asp-route-id="@(isNew ? null : Model.Id)" method="post" class="card shadow-sm">
+    @Html.AntiForgeryToken()
+    <div class="card-body row g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold" for="Name">@T["The work"]</label>
+            <input id="Name" name="Name" class="form-control" maxlength="200" value="@Model.Name" placeholder="@T["e.g. AC service"]" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="Category">@T["What kind of problem?"]</label>
+            <select id="Category" name="Category" class="form-select">
+                <option value="">@T["-- choose --"]</option>
+                @foreach (var category in ServiceRequestCategories.Maintenance)
+                {
+                    <option value="@category" selected="@(category == Model.Category ? "selected" : null)">@category</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="Priority">@T["How urgent is it?"]</label>
+            <select id="Priority" name="Priority" class="form-select">
+                @foreach (var priority in ServiceRequestPriorities.All)
+                {
+                    <option value="@priority" selected="@(priority == Model.Priority ? "selected" : null)">@priority</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold" for="PropertyId">@T["Property"]</label>
+            <select id="PropertyId" name="PropertyId" class="form-select">
+                <option value="0">@T["-- choose --"]</option>
+                @foreach (var p in properties)
+                {
+                    <option value="@p.Id" selected="@(p.Id == Model.PropertyId ? "selected" : null)">@p.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="UnitId">@T["Unit"]</label>
+            <select id="UnitId" name="UnitId" class="form-select">
+                <option value="">@T["-- the building or its common areas --"]</option>
+                @foreach (var u in units)
+                {
+                    <option value="@u.Id" data-property="@u.PropertyId" selected="@(u.Id == Model.UnitId ? "selected" : null)">@u.UnitNumber</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold" for="IntervalMonths">@T["Every how many months"]</label>
+            <input id="IntervalMonths" name="IntervalMonths" type="number" min="1" max="24" class="form-control" value="@Model.IntervalMonths" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold" for="NextDueDate">@T["Next due"]</label>
+            <input id="NextDueDate" name="NextDueDate" type="date" class="form-control" value="@Model.NextDueDate.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="LeadDays">@T["Open the job (days before)"]</label>
+            <input id="LeadDays" name="LeadDays" type="number" min="0" max="60" class="form-control" value="@Model.LeadDays" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="AssignToAppUserId">@T["Assign to"]</label>
+            <select id="AssignToAppUserId" name="AssignToAppUserId" class="form-select">
+                <option value="">@T["The least busy technician"]</option>
+                @foreach (var t in technicians)
+                {
+                    <option value="@t.Id" selected="@(t.Id == Model.AssignToAppUserId ? "selected" : null)">@t.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="form-label" for="Description">@T["What the technician should do"]</label>
+            <textarea id="Description" name="Description" class="form-control" rows="3" maxlength="2000">@Model.Description</textarea>
+        </div>
+        <div class="col-12">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="IsActive" name="IsActive" value="true" @(Model.IsActive ? "checked" : "") />
+                <input type="hidden" name="IsActive" value="false" />
+                <label class="form-check-label" for="IsActive">@T["Active"]</label>
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">@T["Save"]</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            var property = document.getElementById('PropertyId');
+            var unit = document.getElementById('UnitId');
+            var all = Array.prototype.slice.call(unit.options, 1);
+            function sync() {
+                var keep = unit.value;
+                while (unit.options.length > 1) unit.remove(1);
+                all.forEach(function (o) { if (o.dataset.property === property.value) unit.appendChild(o); });
+                unit.value = Array.prototype.some.call(unit.options, function (o) { return o.value === keep; }) ? keep : '';
+            }
+            property.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
+}

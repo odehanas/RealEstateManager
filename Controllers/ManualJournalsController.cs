@@ -95,6 +95,12 @@ namespace RealEstateManager.Controllers
                 .ThenBy(x => x.Code)
                 .ToListAsync();
 
+            ViewBag.OwnerWithdrawalLocations = await _db.OwnerWithdrawalLocations
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.SortOrder)
+                .ThenBy(x => x.Code)
+                .ToListAsync();
+
             // Ids of accounts flagged as owner current accounts, so the General Journal
             // can enable the category selector only on those lines.
             ViewBag.DevelopmentProjects = await DevelopmentProjectService.DevelopmentCostOptions(_db);

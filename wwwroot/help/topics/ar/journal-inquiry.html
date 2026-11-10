@@ -23,7 +23,8 @@
         <tr><td>شارة <strong>الفترة مقفلة</strong></td><td>تظهر بدلاً من الأزرار عندما تكون فترة القيد مقفلة.</td></tr>
     </tbody>
 </table>
-<p>اقرأ <a href="#draft-post-reset">المسودة والترحيل والإعادة إلى مسودة</a> لمعرفة الشاشات التي تترك مسودات ومتى تُرفض الإعادة.</p>
+<p>اقرأ <a href="#draft-post-reset">المسودة والترحيل والإعادة إلى مسودة</a> لمعرفة الشاشات التي تترك مسودات ومتى تُرفض الإعادة.
+والروابط في كل قيد تفتح القيد نفسه والمستند الأصلي الذي نشأ عنه.</p>
 
 <div class="box ok">
     <div class="box-title">عادة جيدة في نهاية اليوم</div>
@@ -36,11 +37,18 @@
     <thead><tr><th style="width:36%">نوع المصدر</th><th>يُنشئه</th></tr></thead>
     <tbody>
         <tr><td><code>CustomerInvoice</code></td><td>ترحيل فاتورة عميل</td></tr>
+        <tr><td><code>CustomerCreditNote</code></td><td>ترحيل إشعار دائن</td></tr>
         <tr><td><code>CustomerReceipt</code></td><td>حفظ سند قبض عميل</td></tr>
         <tr><td><code>PdcReceiptMemo</code> / <code>PdcDeposit</code> / <code>PdcClearance</code> / <code>PdcBounce</code> / <code>PdcWithdrawal</code></td><td>استلام شيك مؤجل وإيداعه وتحصيله وارتجاعه وسحبه</td></tr>
         <tr><td><code>SecurityDeposit</code></td><td>حفظ مبلغ تأمين</td></tr>
         <tr><td><code>RevenueRecognitionSchedule</code></td><td>معالجة الاعتراف بالإيرادات</td></tr>
-        <tr><td><code>VendorBill</code> / <code>VendorPayment</code></td><td>ترحيل فاتورة مورد أو حفظ دفعة</td></tr>
+        <tr><td><code>VendorBill</code> / <code>VendorPayment</code> / <code>VendorAdvanceClearing</code></td><td>ترحيل فاتورة مورد، وحفظ دفعة أو دفعة مقدمة، وتطبيق دفعة مقدمة على الفواتير</td></tr>
+        <tr><td><code>OwnerCommissionInvoice</code> / <code>OwnerSettlement</code></td><td>فاتورة العمولة الضريبية الشهرية للمالك، والدفع للمالك</td></tr>
+        <tr><td><code>OwnerWithdrawal</code></td><td>تسجيل مسحوبات المالك</td></tr>
+        <tr><td><code>DevelopmentCost</code> / <code>DevelopmentTransfer</code></td><td>تكلفة على مشروع تطوير، وتحويله عند الإنجاز</td></tr>
+        <tr><td><code>UnitSaleReceipt</code> / <code>UnitSaleHandover</code></td><td>دفعة المشتري، وتسليم الوحدة المباعة</td></tr>
+        <tr><td><code>PayrollRun</code> / <code>PayrollPayment</code> / <code>EmployeeAdvance</code></td><td>اعتماد كشف الرواتب، ودفع الرواتب، ودفع سلفة راتب</td></tr>
+        <tr><td><code>CapitalAssetVatAdjustment</code></td><td>تسوية سنوية لنظام الأصول الرأسمالية</td></tr>
         <tr><td><code>PettyCashExpense</code> / <code>PettyCashReplenishment</code></td><td>سندات النثرية وتعبئتها</td></tr>
         <tr><td><code>FixedAsset…</code></td><td>الاقتناء والرسملة والإهلاك</td></tr>
         <tr><td><code>PrepaymentSchedule</code> / <code>PrepaymentRecognition</code></td><td>إعداد المدفوعات المقدمة وإطفاؤها</td></tr>

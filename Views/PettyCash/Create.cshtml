@@ -122,9 +122,10 @@
                         <option value="">@T["No cost center"]</option>
                         @foreach (var unit in units)
                         {
-                            <option value="@unit.Id">@unit.Property?.Code - @unit.UnitNumber</option>
+                            <option value="@unit.Id" data-property="@unit.PropertyId">@unit.Property?.Code - @unit.UnitNumber</option>
                         }
                     </select>
+                    <div class="form-text">@T["Only the units of the property chosen are offered. Choosing a unit first fills in its property."]</div>
                 </div>
             </div>
         </div>
@@ -137,6 +138,30 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // The unit follows the property: only that property's units are offered, and
+        // choosing a unit with no property yet fills the property in.
+        (function () {
+            var property = document.getElementById('PropertyId'), unit = document.getElementById('UnitId');
+            if (!property || !unit) { return; }
+            function narrow() {
+                Array.prototype.forEach.call(unit.options, function (option) {
+                    var show = !option.value || !property.value || option.getAttribute('data-property') === property.value;
+                    option.hidden = !show;
+                    option.disabled = !show;
+                    if (!show && option.selected) { unit.value = ''; }
+                });
+            }
+            property.addEventListener('change', narrow);
+            unit.addEventListener('change', function () {
+                var option = unit.options[unit.selectedIndex];
+                if (unit.value && option && property.value !== option.getAttribute('data-property')) {
+                    property.value = option.getAttribute('data-property');
+                    narrow();
+                }
+            });
+            narrow();
+        })();
+
         // Keep the "available to spend" figure honest when the custodian switches float.
         document.getElementById("pettyCashAccountId").addEventListener("change", function () {
             var id = this.value;

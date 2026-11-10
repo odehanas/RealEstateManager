@@ -28,15 +28,32 @@ namespace RealEstateManager.Services
             if (user.IsInRole("SystemAdmin"))
                 return false;
 
+            // A technician, a maintenance manager, or both - and nothing else.
             var permissions = await GetUserPermissionsAsync(user);
-            if (!permissions.Contains(AppPermissions.MaintenanceExecute) ||
-                permissions.Any(p => p != AppPermissions.MaintenanceExecute && p != AppPermissions.AssistantUse))
+            if (!(permissions.Contains(AppPermissions.MaintenanceExecute) || permissions.Contains(AppPermissions.MaintenanceManage)) ||
+                permissions.Any(p => p != AppPermissions.MaintenanceExecute && p != AppPermissions.MaintenanceManage && p != AppPermissions.AssistantUse))
                 return false;
 
             var userId = user.GetAppUserId();
             var companyId = user.GetCurrentCompanyId();
             return !(userId.HasValue && companyId.HasValue &&
                      await _db.AppUserCompanies.AnyAsync(x => x.AppUserId == userId.Value && x.CompanyId == companyId.Value && x.IsCompanyAdmin));
+        }
+
+        /// <summary>
+        /// An administrator of the company the user is working in. Read from the database on
+        /// every call, so taking the rights away takes effect at once. False for a System
+        /// Admin, who has everything anyway.
+        /// </summary>
+        public async Task<bool> IsCurrentCompanyAdminAsync(ClaimsPrincipal user)
+        {
+            if (user.IsInRole("SystemAdmin"))
+                return false;
+
+            var userId = user.GetAppUserId();
+            var companyId = user.GetCurrentCompanyId();
+            return userId.HasValue && companyId.HasValue &&
+                   await UserManagerAuthorizationHandler.IsCompanyAdminAsync(_db, userId.Value, companyId.Value);
         }
 
         public async Task<bool> HasPermissionAsync(ClaimsPrincipal user, string permissionKey)

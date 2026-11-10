@@ -2,8 +2,10 @@
 the Profit &amp; Loss faithful to the period rather than to the billing cycle.</p>
 
 <h3>How the schedule is built</h3>
-<p>When a lease is saved, one planned entry is created for the last day of every month in the lease term,
-each for one-twelfth of the annual rent. Every entry starts with status <strong>Planned</strong>.</p>
+<p>When a contract takes effect — on activation or approval — one planned entry is created for the last day of every
+month in its term. For an owned property each is one-twelfth of the annual rent; for a managed property each is
+one-twelfth of the annual rent multiplied by the property's commission %, because only the commission is your income.
+Every entry starts with status <strong>Planned</strong>.</p>
 
 <h3>Running the recognition</h3>
 <ol class="steps">
@@ -18,7 +20,8 @@ each for one-twelfth of the annual rent. Every entry starts with status <strong>
     <div class="box-title">These buttons create draft journals</div>
     <p>They reach the Profit &amp; Loss only once posted from <span class="path">Operations ▸ Journal Inquiry</span> —
     filter the Source Type to <code>RevenueRecognitionSchedule</code> and use <strong>Post All Drafts</strong>. See
-    <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>.</p>
+    <a href="#draft-post-reset">Draft, Post &amp; Reset to Draft</a>. <strong>Run recognition</strong> in the
+    <a href="#closing">Closing Cockpit</a> creates and posts the month's entries in one step.</p>
 </div>
 
 <h4>Owned property</h4>

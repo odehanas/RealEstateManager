@@ -53,7 +53,12 @@ namespace RealEstateManager.Services.Push
         }
 
         /// <summary>Everyone active in the company who holds the permission, except the person who acted.</summary>
-        public async Task ToPermissionAsync(int companyId, string permissionKey, int? exceptAppUserId,
+        public Task ToPermissionAsync(int companyId, string permissionKey, int? exceptAppUserId,
+            string title, object?[] titleValues, string body, object?[] bodyValues, string url, string tag) =>
+            ToAnyPermissionAsync(companyId, new[] { permissionKey }, exceptAppUserId, title, titleValues, body, bodyValues, url, tag);
+
+        /// <summary>Everyone holding any of these permissions, each once.</summary>
+        public async Task ToAnyPermissionAsync(int companyId, string[] permissionKeys, int? exceptAppUserId,
             string title, object?[] titleValues, string body, object?[] bodyValues, string url, string tag)
         {
             if (!IsEnabled)
@@ -61,8 +66,9 @@ namespace RealEstateManager.Services.Push
 
             var ids = await _db.AppUserCompanies.AsNoTracking().IgnoreQueryFilters()
                 .Where(x => x.CompanyId == companyId && x.AppUser!.IsActive &&
-                            x.AppUser.Permissions.Any(p => p.PermissionKey == permissionKey))
+                            x.AppUser.Permissions.Any(p => permissionKeys.Contains(p.PermissionKey)))
                 .Select(x => x.AppUserId)
+                .Distinct()
                 .ToListAsync();
 
             ToStaff(ids.Where(x => x != exceptAppUserId), title, titleValues, body, bodyValues, url, tag);

@@ -44,7 +44,8 @@ namespace RealEstateManager.Services
                         CompanyName = context.User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value,
                         HttpMethod = context.Request.Method.ToUpperInvariant(),
                         RequestPath = context.Request.Path.HasValue ? context.Request.Path.Value! : context.Request.GetDisplayUrl(),
-                        QueryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : null,
+                        // Meta quotes the verify token in the address when it registers the webhook.
+                        QueryString = context.Request.QueryString.HasValue && controllerName != "WhatsAppWebhook" ? context.Request.QueryString.Value : null,
                         ControllerName = controllerName,
                         ActionName = actionName,
                         ActivityName = controllerName != null && actionName != null ? $"{controllerName}/{actionName}" : endpoint.DisplayName,

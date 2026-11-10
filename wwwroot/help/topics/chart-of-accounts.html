@@ -28,8 +28,8 @@ current balance. Group rows are shown in bold and have no <strong>Edit</strong> 
     <li>Enter the <strong>Name</strong>, choose the <strong>Account Type</strong> and the
         <strong>Reporting Group</strong>. These two drive how the account behaves in the reports.</li>
     <li>Choose the <strong>Parent Account</strong> so the account appears in the right branch of the tree.</li>
-    <li>Leave <strong>Is Postable</strong> ticked for a detail account; untick it (and tick <strong>Is Group</strong>)
-        for a heading.</li>
+    <li>Leave <strong>Postable</strong> at <em>Yes</em> and <strong>Group</strong> at <em>No</em> for a detail account;
+        reverse them for a heading.</li>
     <li>Set the <strong>Opening Balance</strong> only if you are migrating from another system — see <a href="#opening-balances">Opening Balances</a>.</li>
     <li><strong>Save</strong>.</li>
 </ol>
@@ -41,8 +41,8 @@ current balance. Group rows are shown in bold and have no <strong>Edit</strong> 
         <tr><td><strong>Account Type</strong></td><td>Asset, Liability, Equity, Revenue or Expense. Determines the account's natural balance side and whether it appears on the Balance Sheet or the P&amp;L.</td></tr>
         <tr><td><strong>Reporting Group</strong></td><td>Assets, Liabilities, Equity, Revenue, DirectExpense or GeneralExpense. Controls the section the account is presented in.</td></tr>
         <tr><td><strong>Income statement line</strong></td><td>Revenue and expense accounts only: the line of the <a href="#profit-and-loss">Profit &amp; Loss</a> the account appears on &mdash; rental income, management commission, property sales, other income, cost of revenue, <strong>fixed costs</strong>, <strong>recurring costs</strong> or finance costs. Left empty, the account takes its parent group's line, or the standard default shown in the list. A classification of its own: it changes the layout of the report, never the account type.</td></tr>
-        <tr><td><strong>Is Control Account</strong></td><td>Marks an account whose balance is owned by a sub-ledger (Accounts Receivable, Accounts Payable, Fixed Assets). See the warning below.</td></tr>
-        <tr><td><strong>Is Group / Is Postable</strong></td><td>A group account is a heading and cannot receive journal lines. A postable account can.</td></tr>
+        <tr><td><strong>Sub-ledger Control</strong> <span class="small muted">(badge in the tree)</span></td><td>Marks an account whose balance is owned by a sub-ledger (Accounts Receivable, Accounts Payable, Fixed Assets). See the warning below.</td></tr>
+        <tr><td><strong>Group / Postable</strong></td><td>A group account is a heading and cannot receive journal lines. A postable account can.</td></tr>
         <tr><td><strong>Owner Account</strong> <span class="small muted">(Edit screen)</span></td><td>Equity accounts only. Set to <em>Yes</em> for an owner's current account, so its journal lines can carry an <a href="#owner-withdrawals">owner withdrawal category</a>.</td></tr>
         <tr><td><strong>Petty Cash Float</strong> <span class="small muted">(Edit screen)</span></td><td>Asset accounts only. Set to <em>Yes</em> for a petty cash float, so it appears on the <a href="#petty-cash">Petty Cash</a> screen.</td></tr>
         <tr><td><strong>Is Active</strong></td><td>Untick to retire an account without deleting its history.</td></tr>

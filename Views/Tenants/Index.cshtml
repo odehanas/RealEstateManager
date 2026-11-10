@@ -6,6 +6,7 @@
 
     // Master data is centralised - most users may look it up but not change it.
     var canEdit = await PermissionService.HasPermissionAsync(User, AppPermissions.MasterDataManage);
+    var portalLogins = ViewBag.PortalLogins as Dictionary<int, (string Username, bool IsActive, DateTime? LastLoginAt)> ?? new();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -33,6 +34,7 @@
             <th>@T["Nationality"]</th>
             <th>@T["ID Number"]</th>
             <th>@T["Status"]</th>
+            <th>@T["Portal login"]</th>
             <th>@T["Actions"]</th>
         </tr>
     </thead>
@@ -47,6 +49,18 @@
                 <td>@item.Nationality</td>
                 <td>@item.IdNumber</td>
                 <td>@(item.IsActive ? T["Active"] : T["Inactive"])</td>
+                <td>
+                    @if (portalLogins.TryGetValue(item.Id, out var login))
+                    {
+                        <span class="badge @(login.IsActive ? "bg-success" : "bg-secondary")">@(login.IsActive ? T["Can sign in"] : T["Suspended"])</span>
+                        <div class="small text-muted">@login.Username</div>
+                        <div class="small text-muted">@(login.LastLoginAt.HasValue ? T.Format("Last signed in {0}", login.LastLoginAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")) : T["Has not signed in yet"])</div>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">@T["No login"]</span>
+                    }
+                </td>
                 <td>
                     @if (canEdit)
                     {

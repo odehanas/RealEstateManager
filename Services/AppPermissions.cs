@@ -81,6 +81,13 @@ namespace RealEstateManager.Services
         /// go to these users automatically, the least busy first.
         /// </summary>
         public const string MaintenanceExecute = "Maintenance.Execute";
+
+        /// <summary>
+        /// The maintenance manager: every maintenance job, who does it, jobs raised by
+        /// management, the planned maintenance programme and the maintenance dashboard.
+        /// Not the rest of the tenant requests (payment postponements, complaints...).
+        /// </summary>
+        public const string MaintenanceManage = "Maintenance.Manage";
     }
 
     public sealed class PermissionDefinition
@@ -144,6 +151,16 @@ namespace RealEstateManager.Services
                 Description =
                     "For maintenance engineers and technicians only: new maintenance requests are assigned to them, " +
                     "and they see just their own jobs, record the work and materials used, and resolve them."
+            },
+            new()
+            {
+                Key = AppPermissions.MaintenanceManage,
+                Group = "Operations",
+                Name = "Manage Maintenance",
+                Description =
+                    "For the maintenance manager: sees every maintenance job, assigns and reassigns them, closes them, " +
+                    "raises jobs no tenant asked for (make-ready, inspections), runs the planned maintenance programme " +
+                    "and watches the maintenance dashboard. Gives no access to other tenant requests or the accounts."
             },
             new()
             {
@@ -241,6 +258,7 @@ namespace RealEstateManager.Services
                 ["Properties"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
                 ["Units"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
                 ["Tenants"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
+                ["Landlords"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight, AppPermissions.AccountingManage },
 
                 // An accountant entering a bill must be able to find the supplier, so
                 // Accounting.Manage carries read access - but not the right to create
@@ -288,15 +306,21 @@ namespace RealEstateManager.Services
                 ["PaymentApprovals"] = new[] { AppPermissions.PaymentsApprove, AppPermissions.OwnerOversight },
                 ["EmployeeRequests"] = new[] { AppPermissions.HrManage },
                 ["ServiceRequests"] = new[] { AppPermissions.ServiceRequestsManage },
-                ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage },
+                ["WhatsAppInbox"] = new[] { AppPermissions.ServiceRequestsManage },
+                // The company's WhatsApp credentials: the owners' seat, not whoever answers tenants.
+                ["WhatsAppSettings"] = new[] { AppPermissions.OwnerOversight },
+                ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
+                ["MaintenancePlans"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
                 ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
                 ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
                 ["ChartOfAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["AccountMappings"] = new[] { AppPermissions.AccountingManage },
                 ["OwnerWithdrawalCategories"] = new[] { AppPermissions.AccountingManage },
+                ["OwnerWithdrawalLocations"] = new[] { AppPermissions.AccountingManage },
                 ["PettyCash"] = new[] { AppPermissions.AccountingManage },
                 ["VatSettings"] = new[] { AppPermissions.AccountingManage },
+                ["BankAccounts"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerInvoices"] = new[] { AppPermissions.AccountingManage },
                 ["CustomerCreditNotes"] = new[] { AppPermissions.AccountingManage },
                 ["EInvoicing"] = new[] { AppPermissions.AccountingManage },
@@ -341,8 +365,9 @@ namespace RealEstateManager.Services
                 ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
 
                 // The owner's view of the maintenance operation.
-                ["MaintenanceJobs.Dashboard"] = new[] { AppPermissions.OwnerOversight, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
-                ["MaintenanceJobs.Details"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
+                ["MaintenanceJobs.Dashboard"] = new[] { AppPermissions.OwnerOversight, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
+                ["MaintenanceJobs.DashboardExcel"] = new[] { AppPermissions.OwnerOversight, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
+                ["MaintenanceJobs.Details"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
 
                 // Typing opening balances is the same right as on the chart of accounts.
                 ["OpeningBalances.Save"] = new[] { AppPermissions.AccountingManage },
@@ -350,6 +375,7 @@ namespace RealEstateManager.Services
                 // The approver's desk for reopening closed periods. An approver need not
                 // be an accountant, so these do not require Accounting.Manage.
                 ["Closing.ReopenRequests"] = new[] { AppPermissions.PeriodReopenApprove, AppPermissions.AccountingManage },
+                ["MaintenanceJobs.Create"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
                 ["Closing.ApproveReopen"] = new[] { AppPermissions.PeriodReopenApprove },
                 ["Closing.RejectReopen"] = new[] { AppPermissions.PeriodReopenApprove },
 
@@ -381,6 +407,37 @@ namespace RealEstateManager.Services
         public static bool IsMasterDataController(string? controllerName) =>
             !string.IsNullOrWhiteSpace(controllerName) &&
             MasterDataReadPermissions.ContainsKey(controllerName);
+
+        /// <summary>
+        /// The System Setup screens. Besides whoever holds their permission, an administrator
+        /// of the company may open them for that company: setting the company up is what an
+        /// administrator is for. Approving a period reopening is not setup, and stays with
+        /// the people given that right.
+        /// </summary>
+        private static readonly HashSet<string> CompanySetupControllers =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                "ChartOfAccounts", "AccountMappings", "OpeningBalances", "OwnerWithdrawalCategories",
+                "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing", "BankAccounts"
+            };
+
+        private static readonly HashSet<string> CompanySetupActions =
+            new(StringComparer.OrdinalIgnoreCase) { "EInvoicing.Settings" };
+
+        private static readonly HashSet<string> NotCompanySetupActions =
+            new(StringComparer.OrdinalIgnoreCase) { "Closing.ReopenRequests", "Closing.ApproveReopen", "Closing.RejectReopen" };
+
+        public static bool IsCompanySetupScreen(string? controllerName, string? actionName)
+        {
+            if (string.IsNullOrWhiteSpace(controllerName))
+                return false;
+
+            var key = $"{controllerName}.{actionName}";
+            if (NotCompanySetupActions.Contains(key))
+                return false;
+
+            return CompanySetupActions.Contains(key) || CompanySetupControllers.Contains(controllerName);
+        }
 
         public static IReadOnlyList<string> ResolvePermissions(string? controllerName, string? actionName)
         {

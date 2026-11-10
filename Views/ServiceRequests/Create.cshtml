@@ -1,0 +1,244 @@
+@model RealEstateManager.Models.ServiceRequestCreateViewModel
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Log a Request for a Tenant"];
+    var tenants = ViewBag.Tenants as List<RealEstateManager.Models.ServiceRequestTenantOption> ?? new();
+    var tenantId = ViewBag.TenantId as int?;
+    var whatsAppMessage = ViewBag.WhatsAppMessage as WhatsAppInboundMessage;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">@T["Log a Request for a Tenant"]</h2>
+        <p class="text-muted mb-0 small">@T["For a request that reached the office by WhatsApp, phone, a visit or email. It joins the tenant's record and is handled like one from the portal."]</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to queue"]</a>
+</div>
+
+<div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+
+@if (whatsAppMessage != null)
+{
+    <div class="alert alert-info small">
+        <div class="fw-semibold mb-1">@T["From the WhatsApp review list"]: <span dir="ltr">@RealEstateManager.Services.WhatsApp.WhatsAppPhoneNumbers.Display(whatsAppMessage.Sender)</span>@(whatsAppMessage.ProfileName != null ? $" ({whatsAppMessage.ProfileName})" : "")</div>
+        @T["Check this is the right tenant. If the number is theirs, add it to their record so the next message finds them by itself."]
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <form method="get" class="card shadow-sm mb-3">
+            @if (whatsAppMessage != null)
+            {
+                <input type="hidden" name="whatsAppMessageId" value="@whatsAppMessage.Id" />
+            }
+            <div class="card-body">
+                <label class="form-label fw-semibold" for="tenantFilter">@T["Which tenant?"]</label>
+                <input id="tenantFilter" type="search" class="form-control mb-2" autocomplete="off"
+                       placeholder="@T["Type a name, code or phone number"]" />
+                <select id="tenantId" name="tenantId" class="form-select" size="@(tenantId.HasValue ? 1 : 8)" aria-label="@T["Tenant"]">
+                    @foreach (var tenant in tenants)
+                    {
+                        <option value="@tenant.Id" selected="@(tenant.Id == tenantId ? "selected" : null)" data-phone="@tenant.Phone">@tenant.Display</option>
+                    }
+                </select>
+                @if (tenants.Count == 0)
+                {
+                    <div class="text-muted small mt-2">@T["No active tenants."]</div>
+                }
+                <noscript><button class="btn btn-sm btn-outline-dark mt-2">@T["Show"]</button></noscript>
+            </div>
+        </form>
+
+        @if (tenantId.HasValue)
+        {
+            @if (ViewBag.MaintenanceHold is string hold)
+            {
+                <div class="alert alert-warning small">
+                    @T.HtmlFormat("<strong>On the portal this tenant cannot raise maintenance requests.</strong> {0} You can still log one here.", hold)
+                </div>
+            }
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="tenantId" value="@tenantId" />
+                @if (whatsAppMessage != null)
+                {
+                    <input type="hidden" name="whatsAppMessageId" value="@whatsAppMessage.Id" />
+                }
+
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Source" class="form-label fw-semibold">@T["Received by"]</label>
+                                <select asp-for="Source" class="form-select">
+                                    @foreach (var source in ServiceRequestSources.StaffLogged)
+                                    {
+                                        <option value="@source" selected="@(source == Model.Source ? "selected" : null)">@T[ServiceRequestSources.Describe(source)]</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="ReceivedAt">@T["When it came in"]</label>
+                                <input id="ReceivedAt" name="ReceivedAt" type="datetime-local" class="form-control"
+                                       value="@Model.ReceivedAt?.ToString("yyyy-MM-ddTHH:mm")" />
+                                <div class="form-text">@T["Response times are measured from this moment."]</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RequestType" class="form-label fw-semibold">@T["Kind of request"]</label>
+                            <select asp-for="RequestType" class="form-select" id="requestType">
+                                @foreach (var type in ServiceRequestTypes.All)
+                                {
+                                    <option value="@type" selected="@(type == Model.RequestType ? "selected" : null)">@T[ServiceRequestTypes.Describe(type)]</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3 type-maintenance">
+                            <label asp-for="Category" class="form-label">@T["What kind of problem?"]</label>
+                            <select asp-for="Category" class="form-select">
+                                <option value="">@T["-- choose --"]</option>
+                                @foreach (var category in ServiceRequestCategories.Maintenance)
+                                {
+                                    <option value="@category" selected="@(category == Model.Category ? "selected" : null)">@category</option>
+                                }
+                            </select>
+                        </div>
+
+                        @if (Model.Leases.Count > 0)
+                        {
+                            <div class="mb-3">
+                                <label asp-for="LeaseId" class="form-label">@T["Which property?"]</label>
+                                <select asp-for="LeaseId" class="form-select">
+                                    <option value="">@T["-- not about a specific property --"]</option>
+                                    @foreach (var lease in Model.Leases)
+                                    {
+                                        <option value="@lease.LeaseId" selected="@(lease.LeaseId == Model.LeaseId ? "selected" : null)">@lease.Description (@lease.ContractNumber)</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="Subject" class="form-label fw-semibold">@T["Short title"]</label>
+                            <input asp-for="Subject" class="form-control" maxlength="200" placeholder="@T["e.g. Kitchen tap is leaking"]" />
+                            <span asp-validation-for="Subject" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold">@T["What the tenant asked for"]</label>
+                            <textarea asp-for="Description" class="form-control" rows="5" maxlength="4000"
+                                      placeholder="@T["Paste the tenant's message here, or write down what they said."]"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Priority" class="form-label">@T["How urgent is it?"]</label>
+                            <select asp-for="Priority" class="form-select">
+                                @foreach (var priority in ServiceRequestPriorities.All)
+                                {
+                                    <option value="@priority" selected="@(priority == Model.Priority ? "selected" : null)">@priority</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3 type-maintenance">
+                            <label asp-for="PreferredVisitDate" class="form-label">@T["Preferred visit date"]</label>
+                            <input asp-for="PreferredVisitDate" type="date" class="form-control" />
+                            <span asp-validation-for="PreferredVisitDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="type-postponement">
+                            <hr />
+                            @if (Model.OutstandingInvoices.Count == 0)
+                            {
+                                <div class="alert alert-info mb-0">@T["This tenant has no unpaid invoices, so there is nothing to postpone."]</div>
+                            }
+                            else
+                            {
+                                <div class="mb-3">
+                                    <label asp-for="RelatedInvoiceId" class="form-label fw-semibold">@T["Which invoice?"]</label>
+                                    <select asp-for="RelatedInvoiceId" class="form-select">
+                                        <option value="">@T["-- choose the invoice --"]</option>
+                                        @foreach (var invoice in Model.OutstandingInvoices)
+                                        {
+                                            <option value="@invoice.InvoiceId" selected="@(invoice.InvoiceId == Model.RelatedInvoiceId ? "selected" : null)">@invoice.Display</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-0">
+                                    <label asp-for="RequestedNewDueDate" class="form-label fw-semibold">@T["The date the tenant asks to pay by"]</label>
+                                    <input asp-for="RequestedNewDueDate" type="date" class="form-control" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dark">@T["Log the request"]</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            // Find the tenant from what is in front of you: a WhatsApp message shows a phone
+            // number, written +971 50 123 4567 there and 050 123 4567 on the tenant's record.
+            var select = document.getElementById('tenantId');
+            var filter = document.getElementById('tenantFilter');
+            var all = Array.prototype.slice.call(select.options);
+
+            function digits(value) {
+                return (value || '').replace(/\D/g, '').replace(/^(00)?971/, '').replace(/^0+/, '');
+            }
+
+            filter.addEventListener('input', function () {
+                var text = filter.value.trim().toLowerCase();
+                var number = digits(text);
+                select.size = 8;
+                select.innerHTML = '';
+                all.forEach(function (option) {
+                    var matches = option.text.toLowerCase().indexOf(text) !== -1 ||
+                        (number.length >= 3 && digits(option.dataset.phone).indexOf(number) !== -1);
+                    if (matches) select.appendChild(option);
+                });
+            });
+
+            // Enter in the search box takes the only match, and never reloads with no tenant.
+            filter.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter') return;
+                e.preventDefault();
+                if (select.options.length === 1) {
+                    select.selectedIndex = 0;
+                    select.form.submit();
+                }
+            });
+
+            select.addEventListener('change', function () {
+                if (select.value) select.form.submit();
+            });
+
+            // Only the fields that belong to this kind of request.
+            var typeSelect = document.getElementById('requestType');
+            if (!typeSelect) return;
+
+            function sync() {
+                document.querySelectorAll('.type-maintenance').forEach(function (el) {
+                    el.style.display = typeSelect.value === 'Maintenance' ? '' : 'none';
+                });
+                document.querySelectorAll('.type-postponement').forEach(function (el) {
+                    el.style.display = typeSelect.value === 'PaymentPostponement' ? '' : 'none';
+                });
+            }
+
+            typeSelect.addEventListener('change', sync);
+            sync();
+        })();
+    </script>
+}

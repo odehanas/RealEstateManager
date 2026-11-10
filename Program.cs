@@ -57,14 +57,18 @@ builder.Services.AddScoped<PortalBoundaryFilter>();
 builder.Services.AddScoped<TenantPortalAuthService>();
 builder.Services.AddScoped<TenantPortalService>();
 builder.Services.AddScoped<ServiceRequestService>();
+builder.Services.AddScoped<RealEstateManager.Services.WhatsApp.WhatsAppConnectionService>();
+builder.Services.AddScoped<RealEstateManager.Services.WhatsApp.WhatsAppIntakeService>();
 builder.Services.AddScoped<RealEstateManager.Services.Import.MasterDataImportService>();
 // Singleton: the help files only change on deployment, which restarts the app.
 builder.Services.AddSingleton<HelpCatalogService>();
 // English / Arabic screens: the dictionary, and the labels written by asp-for.
 builder.Services.AddSingleton<RealEstateManager.Services.Localization.UiText>();
 builder.Services.AddScoped<RealEstateManager.Services.Localization.UiMessageTranslationFilter>();
+// PostConfigure, not Configure: it must come after MVC's own data annotations provider,
+// which otherwise runs later and puts the English [Display(Name)] back on every label.
 builder.Services.AddOptions<Microsoft.AspNetCore.Mvc.MvcOptions>()
-    .Configure<RealEstateManager.Services.Localization.UiText>((options, text) =>
+    .PostConfigure<RealEstateManager.Services.Localization.UiText>((options, text) =>
         options.ModelMetadataDetailsProviders.Add(new RealEstateManager.Services.Localization.LocalizedDisplayMetadataProvider(text)));
 // Phone and browser notifications (Web Push). The keys are secrets: Push:PublicKey and
 // Push:PrivateKey from the hosting environment or user-secrets. Without them nothing is sent.
@@ -238,6 +242,8 @@ builder.Services.AddScoped<CodeGenerationService>();
 builder.Services.AddScoped<MasterDataUniquenessService>();
 builder.Services.AddScoped<VendorBillService>();
 builder.Services.AddScoped<ContractQrService>();
+builder.Services.AddScoped<CollectionAccountService>();
+builder.Services.AddScoped<LandlordService>();
 builder.Services.AddScoped<AccountingPostingService>();
 builder.Services.AddScoped<EInvoiceService>();
 builder.Services.AddScoped<CreditNoteService>();
@@ -299,6 +305,7 @@ builder.Services.AddSingleton<SchemaUpdateStatus>();
 builder.Services.AddSingleton<SchemaScriptRunner>();
 builder.Services.AddSingleton<SampleDataQueue>();
 builder.Services.AddHostedService<SampleDataWorker>();
+builder.Services.AddHostedService<MaintenancePlanWorker>();
 
 var app = builder.Build();
 

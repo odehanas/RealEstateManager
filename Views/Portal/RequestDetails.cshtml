@@ -100,6 +100,47 @@
     </div>
 }
 
+@if (Model.CanBeRated)
+{
+    <div class="card shadow-sm mb-3 border-primary" id="rateJob">
+        <div class="card-header bg-white">@T.Html("<strong>How did we do?</strong>")</div>
+        <div class="card-body">
+            <form asp-action="RateRequest" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <fieldset class="mb-3">
+                    <legend class="form-label fs-6">@T["Rate this job from 1 (poor) to 10 (excellent)"]</legend>
+                    <div class="d-flex flex-wrap gap-1">
+                        @for (var score = ServiceRequestRatings.Lowest; score <= ServiceRequestRatings.Highest; score++)
+                        {
+                            <input type="radio" class="btn-check" name="rating" id="rating@(score)" value="@score" required />
+                            <label class="btn btn-outline-dark" style="min-width:2.75rem" for="rating@(score)">@score</label>
+                        }
+                    </div>
+                </fieldset>
+                <div class="mb-3">
+                    <label class="form-label" for="ratingFeedback">@T["Your feedback (optional)"]</label>
+                    <textarea id="ratingFeedback" name="feedback" class="form-control" rows="3" maxlength="@ServiceRequestRatings.MaxFeedbackLength"
+                              placeholder="@T["Tell us what went well or what we could do better."]"></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark">@T["Send my rating"]</button>
+            </form>
+        </div>
+    </div>
+}
+else if (Model.Rating.HasValue)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="small text-uppercase text-muted mb-1">@T["Your rating"]</div>
+            <span class="badge @ServiceRequestRatings.BadgeClass(Model.Rating.Value) fs-6">@Model.Rating / @ServiceRequestRatings.Highest</span>
+            @if (!string.IsNullOrWhiteSpace(Model.RatingFeedback))
+            {
+                <div class="mt-2" style="white-space: pre-wrap">@Model.RatingFeedback</div>
+            }
+        </div>
+    </div>
+}
+
 <div class="card shadow-sm mb-3">
     <div class="card-header bg-white">@T.Html("<strong>Messages</strong>")</div>
     <div class="card-body">

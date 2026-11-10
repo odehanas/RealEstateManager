@@ -43,6 +43,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("Name")]
         public async Task<IActionResult> Create(Vendor model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
@@ -77,6 +78,7 @@ namespace RealEstateManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequireFormFields("Name")]
         public async Task<IActionResult> Edit(int id, Vendor model)
         {
             var companyId = User.GetRequiredCurrentCompanyId();

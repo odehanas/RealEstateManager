@@ -706,7 +706,7 @@ Prepare tenancy contracts and send them for approval
 Prepare the monthly payroll, print payslips and pay salaries by WPS file, bank transfer or cheque.
 Prepayment amortisation run
 Prepayment amount must be greater than zero.
-Prepayment schedule created and initial prepaid entry posted successfully.
+Prepayment schedule created. Its initial entry is saved as a draft: post it from Journal Inquiry.
 Prepayment schedule line was not found.
 Project management and supervision
 Project marked complete. The completion date is now on the property record.

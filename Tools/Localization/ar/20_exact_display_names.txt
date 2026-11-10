@@ -1,0 +1,31 @@
+# Sheet 20: field names given in [Display(Name = "...")] that had no Arabic yet (whole texts).
+Account name ||| اسم الحساب
+Activation Code ||| رمز التفعيل
+Address Line 1 ||| سطر العنوان 1
+Address Line 2 ||| سطر العنوان 2
+Address line 2 ||| سطر العنوان 2
+Admin Username ||| اسم مستخدم المسؤول
+Appointed on ||| تاريخ التعيين
+Base Currency ||| العملة الأساسية
+Category Name ||| اسم الفئة
+City / Emirate ||| المدينة / الإمارة
+Code Notes ||| ملاحظات الرمز
+Company Name ||| اسم الشركة
+Confirm Password ||| تأكيد كلمة المرور
+Current password ||| كلمة المرور الحالية
+Feedback Details ||| تفاصيل الملاحظات
+Funded From ||| مصدر التمويل
+Intended use ||| الاستخدام المقصود
+Issuing authority ||| جهة الإصدار
+Mortgage details ||| تفاصيل الرهن
+Mortgaged ||| مرهون
+Ownership share % ||| نسبة الملكية %
+Paid To ||| مدفوع إلى
+Portal username ||| اسم مستخدم البوابة
+Property (plot) ||| العقار (قطعة الأرض)
+Receipt / Reference ||| الإيصال / المرجع
+Registration notes ||| ملاحظات التسجيل
+Registration type ||| نوع التسجيل
+Revenue band ||| فئة الإيرادات
+Valuation date ||| تاريخ التقييم
+Voucher Date ||| تاريخ السند

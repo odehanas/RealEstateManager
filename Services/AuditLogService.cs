@@ -27,15 +27,21 @@ namespace RealEstateManager.Services
             }
         }
 
-        public async Task<AuditLogListViewModel> GetLogsAsync(AuditLogFilterViewModel filter)
+        /// <param name="onlyCompanyId">A company administrator's own company; null for a System Admin, who sees them all.</param>
+        public async Task<AuditLogListViewModel> GetLogsAsync(AuditLogFilterViewModel filter, int? onlyCompanyId = null)
         {
             var fromDate = filter.FromDate?.Date;
             var toDateExclusive = filter.ToDate?.Date.AddDays(1);
 
-            var query = _db.AuditLogs
+            var logs = _db.AuditLogs
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .AsQueryable();
+
+            if (onlyCompanyId.HasValue)
+                logs = logs.Where(x => x.CompanyId == onlyCompanyId.Value);
+
+            var query = logs;
 
             if (fromDate.HasValue)
                 query = query.Where(x => x.OccurredAt >= fromDate.Value);
@@ -87,9 +93,7 @@ namespace RealEstateManager.Services
                 })
                 .ToListAsync();
 
-            var controllers = await _db.AuditLogs
-                .IgnoreQueryFilters()
-                .AsNoTracking()
+            var controllers = await logs
                 .Where(x => x.ControllerName != null && x.ControllerName != string.Empty)
                 .Select(x => x.ControllerName!)
                 .Distinct()

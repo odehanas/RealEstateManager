@@ -1,0 +1,93 @@
+# Sheet 18: tenants' ratings of maintenance jobs, owner withdrawal locations, and requests logged by staff (whole texts; {0} are values).
+Owner Withdrawal Locations ||| مواقع مسحوبات المالك
+Owner Withdrawal Location ||| موقع سحب المالك
+Where the owner's money was spent: the house, the farm, the private office. Any category can be used at any location. ||| أين أُنفقت أموال المالك: المنزل، المزرعة، المكتب الخاص. ويمكن استخدام أي فئة في أي موقع.
+New Location ||| موقع جديد
+No locations have been created yet. ||| لم يُنشأ أي موقع بعد.
+A location that has been used stays in the reports. Deactivate it when it is no longer needed: it leaves the selection lists and its history stays intact. ||| يبقى الموقع المستخدم في التقارير. عطّله عندما لا تعود بحاجة إليه: فيختفي من قوائم الاختيار ويبقى سجله كما هو.
+Location ||| الموقع
+New Owner Withdrawal Location ||| موقع جديد لمسحوبات المالك
+Edit Owner Withdrawal Location ||| تعديل موقع مسحوبات المالك
+Beach House ||| بيت الشاطئ
+Location Name ||| اسم الموقع
+-- location -- ||| -- الموقع --
+<strong>Breakdown by Category and Location</strong> ||| <strong>التوزيع حسب الفئة والموقع</strong>
+No location ||| بدون موقع
+Location code already exists. ||| رمز الموقع موجود مسبقاً.
+Choose where the money was spent. ||| اختر مكان إنفاق المبلغ.
+An owner withdrawal category or location can only be used on an owner's current account. Remove it from: {0}. ||| لا يمكن استخدام فئة أو موقع مسحوبات المالك إلا على الحساب الجاري للمالك. أزلها من: {0}.
+One or more selected owner withdrawal locations were not found. ||| لم يُعثر على موقع أو أكثر من مواقع مسحوبات المالك المحددة.
+<strong>How did we do?</strong> ||| <strong>كيف كان أداؤنا؟</strong>
+Rate this job from 1 (poor) to 10 (excellent) ||| قيّم هذا العمل من 1 (ضعيف) إلى 10 (ممتاز)
+Your feedback (optional) ||| ملاحظاتك (اختياري)
+Tell us what went well or what we could do better. ||| أخبرنا بما سار جيداً أو بما يمكننا تحسينه.
+Send my rating ||| إرسال تقييمي
+Your rating ||| تقييمك
+Rate this job ||| قيّم هذا العمل
+Received by ||| ورد عبر
+<strong>Tenant's rating</strong> ||| <strong>تقييم المستأجر</strong>
+Recorded for the tenant by {0} ||| سجّله للمستأجر {0}
+The tenant has not rated this job yet. They can rate it on their portal. ||| لم يقيّم المستأجر هذا العمل بعد. ويمكنه تقييمه من بوابته.
+The tenant gave a rating by WhatsApp or phone? Record it here. ||| هل قدّم المستأجر تقييمه عبر واتساب أو الهاتف؟ سجّله هنا.
+-- rating -- ||| -- التقييم --
+What the tenant said ||| ما قاله المستأجر
+Record rating ||| تسجيل التقييم
+Rating ||| التقييم
+Technician's rating ||| تقييم الفني
+Team rating ||| تقييم الفريق
+average of this technician's rated jobs ||| متوسط الأعمال المقيّمة لهذا الفني
+the maintenance manager's score: the average of all rated jobs ||| درجة مدير الصيانة: متوسط جميع الأعمال المقيّمة
+Jobs rated ||| الأعمال المقيّمة
+{0}% of the jobs done ||| {0}% من الأعمال المنجزة
+no completed jobs ||| لا توجد أعمال منجزة
+Low ratings ||| التقييمات المنخفضة
+rated {0} or below ||| بتقييم {0} أو أقل
+How requests reached us ||| كيف وصلتنا الطلبات
+Tenants' ratings and feedback ||| تقييمات المستأجرين وملاحظاتهم
+lowest first ||| الأقل أولاً
+Feedback ||| الملاحظات
+{0} rated jobs ||| {0} من الأعمال المقيّمة
+Thank you. Your rating has been recorded. ||| شكراً لك. تم تسجيل تقييمك.
+The tenant's rating has been recorded. ||| تم تسجيل تقييم المستأجر.
+This job has been rated, so it cannot move to someone else. ||| تم تقييم هذا العمل، فلا يمكن نقله إلى شخص آخر.
+This job has already been rated. ||| تم تقييم هذا العمل مسبقاً.
+A job can be rated once it is done. ||| يمكن تقييم العمل بعد إنجازه.
+Choose a rating from 1 to 10. ||| اختر تقييماً من 1 إلى 10.
+You carried out this job, so someone else must record its rating. ||| أنت من نفّذ هذا العمل، لذا يجب أن يسجل تقييمه شخص آخر.
+Sign in with your own user to record a rating. ||| سجّل الدخول بمستخدمك الخاص لتسجيل التقييم.
+The job is done. Open it to read our reply and rate the work. ||| تم إنجاز العمل. افتحه لقراءة ردنا وتقييم العمل.
+Low rating on job {0} ||| تقييم منخفض للعمل {0}
+The tenant rated it {0} out of 10. ||| قيّمه المستأجر بـ {0} من 10.
+Tenant portal ||| بوابة المستأجر
+WhatsApp ||| واتساب
+Phone call ||| مكالمة هاتفية
+Office visit ||| زيارة للمكتب
+Email ||| البريد الإلكتروني
+Other source ||| مصدر آخر
+Maintenance / repair ||| صيانة / إصلاح
+Request more time to pay ||| طلب مهلة للسداد
+Contract renewal ||| تجديد العقد
+Complaint ||| شكوى
+Other request ||| طلب آخر
+Everything tenants have asked for, through the portal or by WhatsApp, phone or a visit. ||| كل ما طلبه المستأجرون، عبر البوابة أو واتساب أو الهاتف أو بالزيارة.
+Log a Request for a Tenant ||| تسجيل طلب لمستأجر
+Not rated yet. ||| لم يُقيّم بعد.
+Open the job to record a rating the tenant gave by WhatsApp or phone. ||| افتح العمل لتسجيل تقييم قدّمه المستأجر عبر واتساب أو الهاتف.
+For a request that reached the office by WhatsApp, phone, a visit or email. It joins the tenant's record and is handled like one from the portal. ||| لطلب وصل إلى المكتب عبر واتساب أو الهاتف أو بالزيارة أو البريد الإلكتروني. ينضم إلى سجل المستأجر ويُعالج مثل الطلب الوارد من البوابة.
+Which tenant? ||| أي مستأجر؟
+Type a name, code or phone number ||| اكتب الاسم أو الرمز أو رقم الهاتف
+No active tenants. ||| لا يوجد مستأجرون نشطون.
+<strong>On the portal this tenant cannot raise maintenance requests.</strong> {0} You can still log one here. ||| <strong>لا يستطيع هذا المستأجر تقديم طلبات صيانة من البوابة.</strong> {0} ويمكنك مع ذلك تسجيل طلب هنا.
+When it came in ||| وقت وروده
+Response times are measured from this moment. ||| تُقاس أوقات الاستجابة من هذه اللحظة.
+Kind of request ||| نوع الطلب
+What the tenant asked for ||| ما طلبه المستأجر
+Paste the tenant's message here, or write down what they said. ||| الصق رسالة المستأجر هنا، أو اكتب ما قاله.
+This tenant has no unpaid invoices, so there is nothing to postpone. ||| لا توجد فواتير غير مسددة لهذا المستأجر، فلا يوجد ما يؤجَّل.
+The date the tenant asks to pay by ||| التاريخ الذي يطلب المستأجر السداد فيه
+Log the request ||| تسجيل الطلب
+Say how the request reached you. ||| اذكر كيف وصلك الطلب.
+The time it was received cannot be in the future. ||| لا يمكن أن يكون وقت الورود في المستقبل.
+Choose the tenant the request belongs to. ||| اختر المستأجر صاحب الطلب.
+Request {0} logged for the tenant. ||| تم تسجيل الطلب {0} للمستأجر.
+We have logged your request. You can follow it here. ||| سجّلنا طلبك. ويمكنك متابعته من هنا.
