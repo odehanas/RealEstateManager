@@ -74,7 +74,7 @@ namespace RealEstateManager.Controllers
             {
                 var companyId = User.GetRequiredCurrentCompanyId();
                 await _postingService.CreatePrepaymentScheduleAsync(companyId, model);
-                TempData["SuccessMessage"] = "Prepayment schedule created and initial prepaid entry posted successfully.";
+                TempData["SuccessMessage"] = "Prepayment schedule created. Its initial entry is saved as a draft: post it from Journal Inquiry.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

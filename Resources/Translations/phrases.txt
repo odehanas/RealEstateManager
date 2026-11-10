@@ -2280,7 +2280,7 @@ Save Notes
 Save Prepayment Setup
 Save Review
 Save VAT Settings
-Save a prepayment once and the system will post the initial prepaid entry immediately, then release the expense automatically at each month-end.
+Save a prepayment once and the system prepares the initial prepaid entry as a draft for you to post, then schedules the expense to be released at each month-end.
 Save and Activate
 Save and Post
 Save and Post Payment
