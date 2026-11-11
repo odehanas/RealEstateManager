@@ -359,8 +359,15 @@ namespace RealEstateManager.Services
 
             // Who holds the rent of the property decides where the money lands: the company's
             // bank, the owners' funds bank, or - paid to the landlord - Due to Landlords.
-            receipt.CollectionMode = CollectionAccountService.ModeFor(invoice.Lease!.Unit!.Property!, invoice.IsCharge);
-            var cashAccount = await _collection.ReceivingAccountAsync(receipt.CompanyId, invoice.Lease.Unit.Property!, receipt.CollectionMode);
+            // At a handover no money comes in at all: the tenant's security deposit, which
+            // the company already holds, pays the invoice, so the debit is to the deposit.
+            var fromDeposit = receipt.PaymentMethod == ReceiptMethods.SecurityDeposit;
+            receipt.CollectionMode = fromDeposit
+                ? CollectionModes.Company
+                : CollectionAccountService.ModeFor(invoice.Lease!.Unit!.Property!, invoice.IsCharge);
+            var cashAccount = fromDeposit
+                ? await GetMappedAccountAsync(receipt.CompanyId, settings.TenantSecurityDepositLiabilityAccountId, "Tenant Security Deposit Liability")
+                : await _collection.ReceivingAccountAsync(receipt.CompanyId, invoice.Lease!.Unit!.Property!, receipt.CollectionMode);
 
             var receivableAccount = await GetMappedAccountAsync(
                 receipt.CompanyId,
@@ -379,9 +386,11 @@ namespace RealEstateManager.Services
                     AccountId = cashAccount.Id,
                     Debit = receipt.Amount,
                     Credit = 0m,
-                    Description = receipt.CollectionMode == CollectionModes.Owner
-                        ? $"Receipt {receipt.ReceiptNumber} - paid to the owner directly"
-                        : $"Receipt {receipt.ReceiptNumber}",
+                    Description = fromDeposit
+                        ? $"Security deposit applied to invoice {invoice.InvoiceNumber} at the handover"
+                        : receipt.CollectionMode == CollectionModes.Owner
+                            ? $"Receipt {receipt.ReceiptNumber} - paid to the owner directly"
+                            : $"Receipt {receipt.ReceiptNumber}",
                     PropertyId = propertyId,
                     UnitId = unitId,
                     TenantId = tenantId,
@@ -1078,6 +1087,53 @@ namespace RealEstateManager.Services
             settlement.JournalEntryId = journalEntry.Id;
             await _db.SaveChangesAsync();
             return journalEntry;
+        }
+
+        /// <summary>
+        /// The part of a security deposit that goes back to the tenant when the unit is
+        /// handed over: out of the deposit liability, out of the account the deposit was
+        /// received into.
+        /// </summary>
+        public async Task<JournalEntry> PostHandoverRefundAsync(int leaseHandoverId, decimal amount, DateTime date)
+        {
+            var handover = await _db.LeaseHandovers.IgnoreQueryFilters()
+                .Include(x => x.Lease)!.ThenInclude(x => x!.Unit)
+                .FirstOrDefaultAsync(x => x.Id == leaseHandoverId)
+                ?? throw new InvalidOperationException("The handover was not found.");
+            if (amount <= 0m)
+                throw new InvalidOperationException("There is nothing to refund.");
+
+            var settings = await GetCompanyAccountSettingAsync(handover.CompanyId);
+            var cashAccount = await GetMappedAccountAsync(handover.CompanyId, settings.DefaultCashAccountId, "Default Cash");
+            var depositLiabilityAccount = await GetMappedAccountAsync(
+                handover.CompanyId, settings.TenantSecurityDepositLiabilityAccountId, "Tenant Security Deposit Liability");
+
+            var lease = handover.Lease!;
+            var text = $"Security deposit refunded at handover {handover.HandoverNumber}, contract {lease.ContractNumber}";
+            var lines = new List<JournalEntryLine>
+            {
+                new()
+                {
+                    AccountId = depositLiabilityAccount.Id, Debit = amount, Credit = 0m, Description = text,
+                    PropertyId = lease.Unit!.PropertyId, UnitId = lease.UnitId, TenantId = lease.TenantId, LeaseId = lease.Id
+                },
+                new()
+                {
+                    AccountId = cashAccount.Id, Debit = 0m, Credit = amount, Description = text,
+                    PropertyId = lease.Unit.PropertyId, UnitId = lease.UnitId, TenantId = lease.TenantId, LeaseId = lease.Id
+                }
+            };
+
+            return await CreateJournalEntryAsync(
+                handover.CompanyId,
+                date,
+                $"Security deposit refund, handover {handover.HandoverNumber}",
+                "LeaseHandover",
+                handover.Id,
+                lines,
+                journalType: "Auto",
+                documentNumber: handover.HandoverNumber,
+                referenceNumber: lease.ContractNumber);
         }
 
         public async Task<JournalEntry> PostSecurityDepositAsync(int securityDepositId)

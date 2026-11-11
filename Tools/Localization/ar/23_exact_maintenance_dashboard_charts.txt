@@ -242,3 +242,139 @@ The invoice for this service has already been issued. ||| صدرت فاتورة 
 Give the price of the service, before VAT. ||| أدخل سعر الخدمة قبل الضريبة.
 Give the number of the subcontractor's bill. ||| أدخل رقم فاتورة المقاول من الباطن.
 Your invoice for this service is ready. Open it to see the amount. ||| فاتورة هذه الخدمة جاهزة. افتحها لمعرفة المبلغ.
+# Lease handover: checklist, charges, deposit settlement and report.
+Lease Handovers ||| تسليم الوحدات
+When a contract ends: the unit is inspected against the checklist, the Maintenance Manager prices any damage, and the accounts settle the security deposit - applied to what the tenant still owes, the rest refunded. Settling closes the contract and frees the unit. ||| عند انتهاء العقد: تُعاين الوحدة وفق قائمة الفحص، ويسعّر مدير الصيانة أي ضرر، وتسوّي الحسابات مبلغ التأمين - يُخصم منه ما على المستأجر ويُرد الباقي. التسوية تغلق العقد وتخلي الوحدة.
+Open a handover ||| فتح تسليم
+-- choose the contract -- ||| -- اختر العقد --
+Handover date ||| تاريخ التسليم
+A date before the contract's end date makes it an early termination. ||| تاريخ قبل نهاية العقد يجعله إنهاءً مبكراً.
+No handovers yet. ||| لا توجد عمليات تسليم بعد.
+Where it stands ||| الحالة الحالية
+Deposit refunded ||| التأمين المردود
+Report ||| التقرير
+Settled ||| تمت التسوية
+Waiting for the inspection ||| بانتظار المعاينة
+Waiting for the Maintenance Manager ||| بانتظار مدير الصيانة
+Waiting for the accounts ||| بانتظار الحسابات
+End of contract ||| نهاية العقد
+Early termination ||| إنهاء مبكر
+Handover Checklist ||| قائمة فحص التسليم
+What is checked when a tenant hands a unit back. Each new handover takes a copy of the lines switched on here; handovers already opened keep the checklist they started with. ||| ما يُفحص عند إعادة المستأجر للوحدة. يأخذ كل تسليم جديد نسخة من البنود المفعّلة هنا؛ وعمليات التسليم المفتوحة تحتفظ بالقائمة التي بدأت بها.
+e.g. Curtains and blinds in good condition ||| مثال: الستائر بحالة جيدة
+What is checked ||| بند الفحص
+Move up ||| تحريك لأعلى
+Move down ||| تحريك لأسفل
+Handover {0} ||| تسليم {0}
+handover date {0} ||| تاريخ التسليم {0}
+contract {0} to {1} ||| العقد من {0} إلى {1}
+Handover report ||| تقرير التسليم
+Accounts and deposit ||| الحسابات والتأمين
+<strong>1. Inspection</strong> ||| <strong>1. المعاينة</strong>
+completed by {0}, {1} ||| أكملها {0}، {1}
+OK ||| سليم
+Problem found ||| وُجدت مشكلة
+Not checked yet ||| لم يُفحص بعد
+Keys returned ||| المفاتيح المعادة
+Electricity meter reading ||| قراءة عداد الكهرباء
+Water meter reading ||| قراءة عداد الماء
+Inspection notes ||| ملاحظات المعاينة
+Save, continue later ||| حفظ والمتابعة لاحقاً
+Save changes ||| حفظ التغييرات
+Complete the inspection ||| إكمال المعاينة
+<strong>2. Maintenance Manager: charges to the tenant</strong> ||| <strong>2. مدير الصيانة: ما يُحمَّل على المستأجر</strong>
+signed by {0}, {1} ||| وقّعه {0}، {1}
+Opens when the inspection is completed. ||| يُفتح عند إكمال المعاينة.
+Charge for ||| سبب التحميل
+Amount (before VAT) ||| المبلغ (قبل الضريبة)
+No charges: nothing found that the tenant must pay for. ||| لا توجد مبالغ: لم يُعثر على ما يجب أن يدفعه المستأجر.
+e.g. Repaint living room, damaged beyond fair wear ||| مثال: إعادة دهان غرفة المعيشة، ضرر يتجاوز الاستهلاك العادي
+Add charge ||| إضافة مبلغ
+Maintenance Manager's notes ||| ملاحظات مدير الصيانة
+Signing passes the handover to the accounts with these charges, or with none. ||| التوقيع يحيل التسليم إلى الحسابات بهذه المبالغ أو من دونها.
+Sign and pass to the accounts ||| توقيع وإحالة إلى الحسابات
+Waiting for the Maintenance Manager to enter any charges and sign. ||| بانتظار مدير الصيانة لإدخال أي مبالغ والتوقيع.
+Reopen to correct the charges ||| إعادة الفتح لتصحيح المبالغ
+<strong>3. Accounts: the tenant's account and the deposit</strong> ||| <strong>3. الحسابات: حساب المستأجر والتأمين</strong>
+settled by {0}, {1} ||| سوّاه {0}، {1}
+Deposit held ||| التأمين المحتفظ به
+Applied to what the tenant owed ||| خُصم مقابل ما كان على المستأجر
+Refunded to the tenant ||| رُدّ إلى المستأجر
+Still owed by the tenant ||| ما زال على المستأجر
+What the tenant owes ||| ما على المستأجر
+Nothing: every invoice up to the handover date is paid. ||| لا شيء: كل الفواتير حتى تاريخ التسليم مدفوعة.
+due {0} ||| تستحق {0}
+Handover charges ||| مبالغ التسليم
+{0} + VAT {1}, invoiced at settlement ||| {0} + ضريبة {1}، تُفوتر عند التسوية
+Total owed ||| إجمالي المستحق
+The deposit ||| التأمين
+Applied to what the tenant owes ||| يُخصم مقابل ما على المستأجر
+To refund to the tenant ||| يُرد إلى المستأجر
+Still owed after the deposit ||| يبقى مستحقاً بعد التأمين
+A deposit of {0} is recorded but its entry is not posted, so it is not counted. Post it from Journal Inquiry first. ||| تأمين بمبلغ {0} مسجل لكن قيده غير مرحّل فلا يُحتسب. رحّله أولاً من استعلام القيود.
+{0} invoice(s) dated up to the handover are not posted ({1}), so they are not counted. Post them, or cancel them, first. ||| {0} فاتورة حتى تاريخ التسليم غير مرحّلة ({1}) فلا تُحتسب. رحّلها أو ألغها أولاً.
+{0} invoice(s) are dated after the handover ({1}). They are not deducted from the deposit: cancel the drafts, or issue credit notes for those posted. ||| {0} فاتورة بتاريخ بعد التسليم ({1}). لا تُخصم من التأمين: ألغِ المسودات أو أصدر إشعارات دائنة للمرحّلة.
+{0} cheque(s) of this contract are still in hand ({1}). Return them to the tenant from PDC Receipts, or wait for those deposited to clear. ||| {0} شيك لهذا العقد ما زال لدينا ({1}). أعدها إلى المستأجر من الشيكات الآجلة، أو انتظر تحصيل المودعة.
+{0} request(s) of this contract are still open. ||| {0} طلب لهذا العقد ما زال مفتوحاً.
+This handover was cancelled. ||| أُلغي هذا التسليم.
+The settlement opens when the Maintenance Manager has signed. The figures above are as they stand now. ||| تُفتح التسوية بعد توقيع مدير الصيانة. الأرقام أعلاه كما هي الآن.
+Settle the handover? The charges are invoiced, the deposit is applied and refunded in the accounts, the contract is closed and the unit becomes vacant. ||| تسوية التسليم؟ تُفوتر المبالغ، ويُخصم التأمين ويُرد في الحسابات، ويُغلق العقد وتصبح الوحدة شاغرة.
+Accounts notes ||| ملاحظات الحسابات
+e.g. Refund by bank transfer to the tenant's account ||| مثال: الرد بتحويل بنكي إلى حساب المستأجر
+Settle and close the contract ||| تسوية وإغلاق العقد
+Waiting for the accounts to settle the deposit. ||| بانتظار الحسابات لتسوية التأمين.
+Cancel this handover? The contract stays in force and nothing is posted. ||| إلغاء هذا التسليم؟ يبقى العقد سارياً ولا يُرحَّل شيء.
+Cancel this handover ||| إلغاء هذا التسليم
+Hand the unit back and settle the deposit ||| إعادة الوحدة وتسوية التأمين
+Unit Handover Report ||| تقرير تسليم الوحدة
+Contract period ||| مدة العقد
+Inspected by ||| المعاين
+Charges to the tenant ||| ما يُحمَّل على المستأجر
+Not signed by the Maintenance Manager yet. ||| لم يوقّعه مدير الصيانة بعد.
+Total charges ||| إجمالي المبالغ
+Settlement of the security deposit ||| تسوية مبلغ التأمين
+unpaid invoices and the charges above ||| الفواتير غير المدفوعة والمبالغ أعلاه
+Not settled yet: the figures are as they stand today and may change. ||| لم تتم التسوية بعد: الأرقام كما هي اليوم وقد تتغير.
+Name, signature and date ||| الاسم والتوقيع والتاريخ
+All keys and access cards returned ||| إعادة جميع المفاتيح وبطاقات الدخول
+Parking cards and remote controls returned ||| إعادة بطاقات المواقف وأجهزة التحكم
+Electricity and water final bills settled by the tenant ||| سداد المستأجر لفواتير الكهرباء والماء النهائية
+Electricity and water meter readings taken ||| أخذ قراءات عدادي الكهرباء والماء
+Walls and paint in good condition ||| الجدران والدهان بحالة جيدة
+Floors, tiles and carpets in good condition ||| الأرضيات والبلاط والسجاد بحالة جيدة
+Doors, windows and locks working ||| الأبواب والنوافذ والأقفال تعمل
+Kitchen cabinets, worktop and sink in good condition ||| خزائن المطبخ وسطح العمل والحوض بحالة جيدة
+Bathrooms and sanitary ware in good condition ||| الحمامات والأدوات الصحية بحالة جيدة
+Air conditioning units working and clean ||| وحدات التكييف تعمل ونظيفة
+Lights, switches and sockets working ||| الإنارة والمفاتيح والمقابس تعمل
+Unit cleaned and free of the tenant's belongings ||| الوحدة نظيفة وخالية من أغراض المستأجر
+Handover cancelled. The contract stays in force. ||| أُلغي التسليم. يبقى العقد سارياً.
+Added to the checklist. ||| أُضيف إلى قائمة الفحص.
+Type what is to be checked. ||| اكتب ما يجب فحصه.
+That is already on the checklist. ||| هذا موجود في قائمة الفحص.
+Choose the contract. ||| اختر العقد.
+Only a contract in force is handed over. ||| لا يُسلَّم إلا عقد سارٍ.
+The handover cannot be before the contract started. ||| لا يمكن أن يكون التسليم قبل بدء العقد.
+This contract already has a handover. ||| لهذا العقد تسليم مفتوح من قبل.
+The handover was not found. ||| التسليم غير موجود.
+This handover is closed. ||| هذا التسليم مغلق.
+Only a handover still open can be cancelled. ||| لا يُلغى إلا تسليم ما زال مفتوحاً.
+The settlement has started in the accounts, so this handover can no longer be cancelled. Finish settling it. ||| بدأت التسوية في الحسابات فلا يمكن إلغاء هذا التسليم. أكمل تسويته.
+The Maintenance Manager has signed, so the inspection can no longer be changed. ||| وقّع مدير الصيانة فلا يمكن تعديل المعاينة.
+Give the number of keys returned. ||| أدخل عدد المفاتيح المعادة.
+Saved. Add a note to each line marked as a problem, saying what was found, then complete the inspection. ||| تم الحفظ. أضف ملاحظة لكل بند فيه مشكلة تبيّن ما وُجد، ثم أكمل المعاينة.
+Inspection completed. It now goes to the Maintenance Manager. ||| اكتملت المعاينة. تنتقل الآن إلى مدير الصيانة.
+Inspection saved. Complete it when every line is checked. ||| حُفظت المعاينة. أكملها عند فحص كل البنود.
+The charges are signed off and can no longer be changed. ||| وُقّعت المبالغ ولا يمكن تعديلها.
+Complete the inspection first. ||| أكمل المعاينة أولاً.
+Say what the charge is for. ||| اذكر سبب المبلغ.
+Give the amount of the charge. ||| أدخل قيمة المبلغ.
+Charge added. ||| أُضيف المبلغ.
+Charge removed. ||| أُزيل المبلغ.
+The Maintenance Manager has already signed. ||| وقّع مدير الصيانة من قبل.
+Signed: nothing to charge the tenant. It now goes to the accounts. ||| تم التوقيع: لا شيء يُحمَّل على المستأجر. تنتقل الآن إلى الحسابات.
+The charges have been invoiced, so they can no longer be changed. ||| فُوترت المبالغ فلا يمكن تعديلها.
+Reopened: the charges can be corrected and signed again. ||| أُعيد الفتح: يمكن تصحيح المبالغ والتوقيع من جديد.
+This handover is already closed. ||| هذا التسليم مغلق من قبل.
+The inspection and the Maintenance Manager's sign-off come first. ||| المعاينة وتوقيع مدير الصيانة أولاً.
+The invoice for the charges is not posted yet. Post it from Journal Inquiry, then settle again. ||| فاتورة المبالغ غير مرحّلة بعد. رحّلها من استعلام القيود ثم أعد التسوية.

@@ -314,6 +314,9 @@ namespace RealEstateManager.Services
                 ["MaintenanceCategories"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
                 // The price list and what the services earned: the office and the accounts, not the technicians.
                 ["ServiceCatalog"] = new[] { AppPermissions.ServiceRequestsManage, AppPermissions.AccountingManage },
+                // A handover is opened and inspected by whoever looks after contracts or tenants; the
+                // Maintenance Manager and the accounts each have their own step (see ActionPermissionMap).
+                ["LeaseHandovers"] = new[] { AppPermissions.LeasesManage, AppPermissions.ServiceRequestsManage, AppPermissions.MaintenanceManage, AppPermissions.AccountingManage },
                 ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
                 ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
@@ -370,6 +373,15 @@ namespace RealEstateManager.Services
                 // The owner's view of the maintenance operation.
                 ["MaintenanceJobs.Dashboard"] = new[] { AppPermissions.OwnerOversight, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
                 ["MaintenanceJobs.DashboardExcel"] = new[] { AppPermissions.OwnerOversight, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.ReportsView },
+                // Lease handovers: the owner may look; the charges are the Maintenance Manager's, the settlement the accounts'.
+                ["LeaseHandovers.Index"] = new[] { AppPermissions.LeasesManage, AppPermissions.ServiceRequestsManage, AppPermissions.MaintenanceManage, AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
+                ["LeaseHandovers.Details"] = new[] { AppPermissions.LeasesManage, AppPermissions.ServiceRequestsManage, AppPermissions.MaintenanceManage, AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
+                ["LeaseHandovers.Report"] = new[] { AppPermissions.LeasesManage, AppPermissions.ServiceRequestsManage, AppPermissions.MaintenanceManage, AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
+                ["LeaseHandovers.AddCharge"] = new[] { AppPermissions.MaintenanceManage },
+                ["LeaseHandovers.RemoveCharge"] = new[] { AppPermissions.MaintenanceManage },
+                ["LeaseHandovers.SignMaintenance"] = new[] { AppPermissions.MaintenanceManage },
+                ["LeaseHandovers.ReopenMaintenance"] = new[] { AppPermissions.MaintenanceManage },
+                ["LeaseHandovers.Settle"] = new[] { AppPermissions.AccountingManage },
                 ["MaintenanceJobs.Details"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
 
                 // Typing opening balances is the same right as on the chart of accounts.

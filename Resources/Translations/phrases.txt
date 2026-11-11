@@ -3281,3 +3281,138 @@ The invoice for this service has already been issued.
 Give the price of the service, before VAT.
 Give the number of the subcontractor's bill.
 Your invoice for this service is ready. Open it to see the amount.
+Lease Handovers
+When a contract ends: the unit is inspected against the checklist, the Maintenance Manager prices any damage, and the accounts settle the security deposit - applied to what the tenant still owes, the rest refunded. Settling closes the contract and frees the unit.
+Open a handover
+-- choose the contract --
+Handover date
+A date before the contract's end date makes it an early termination.
+No handovers yet.
+Where it stands
+Deposit refunded
+Report
+Settled
+Waiting for the inspection
+Waiting for the Maintenance Manager
+Waiting for the accounts
+End of contract
+Early termination
+Handover Checklist
+What is checked when a tenant hands a unit back. Each new handover takes a copy of the lines switched on here; handovers already opened keep the checklist they started with.
+e.g. Curtains and blinds in good condition
+What is checked
+Move up
+Move down
+Handover {0}
+handover date {0}
+contract {0} to {1}
+Handover report
+Accounts and deposit
+<strong>1. Inspection</strong>
+completed by {0}, {1}
+OK
+Problem found
+Not checked yet
+Keys returned
+Electricity meter reading
+Water meter reading
+Inspection notes
+Save, continue later
+Save changes
+Complete the inspection
+<strong>2. Maintenance Manager: charges to the tenant</strong>
+signed by {0}, {1}
+Opens when the inspection is completed.
+Charge for
+Amount (before VAT)
+No charges: nothing found that the tenant must pay for.
+e.g. Repaint living room, damaged beyond fair wear
+Add charge
+Maintenance Manager's notes
+Signing passes the handover to the accounts with these charges, or with none.
+Sign and pass to the accounts
+Waiting for the Maintenance Manager to enter any charges and sign.
+Reopen to correct the charges
+<strong>3. Accounts: the tenant's account and the deposit</strong>
+settled by {0}, {1}
+Deposit held
+Applied to what the tenant owed
+Refunded to the tenant
+Still owed by the tenant
+What the tenant owes
+Nothing: every invoice up to the handover date is paid.
+due {0}
+Handover charges
+{0} + VAT {1}, invoiced at settlement
+Total owed
+The deposit
+Applied to what the tenant owes
+To refund to the tenant
+Still owed after the deposit
+A deposit of {0} is recorded but its entry is not posted, so it is not counted. Post it from Journal Inquiry first.
+{0} invoice(s) dated up to the handover are not posted ({1}), so they are not counted. Post them, or cancel them, first.
+{0} invoice(s) are dated after the handover ({1}). They are not deducted from the deposit: cancel the drafts, or issue credit notes for those posted.
+{0} cheque(s) of this contract are still in hand ({1}). Return them to the tenant from PDC Receipts, or wait for those deposited to clear.
+{0} request(s) of this contract are still open.
+This handover was cancelled.
+The settlement opens when the Maintenance Manager has signed. The figures above are as they stand now.
+Settle the handover? The charges are invoiced, the deposit is applied and refunded in the accounts, the contract is closed and the unit becomes vacant.
+Accounts notes
+e.g. Refund by bank transfer to the tenant's account
+Settle and close the contract
+Waiting for the accounts to settle the deposit.
+Cancel this handover? The contract stays in force and nothing is posted.
+Cancel this handover
+Hand the unit back and settle the deposit
+Unit Handover Report
+Contract period
+Inspected by
+Charges to the tenant
+Not signed by the Maintenance Manager yet.
+Total charges
+Settlement of the security deposit
+unpaid invoices and the charges above
+Not settled yet: the figures are as they stand today and may change.
+Name, signature and date
+All keys and access cards returned
+Parking cards and remote controls returned
+Electricity and water final bills settled by the tenant
+Electricity and water meter readings taken
+Walls and paint in good condition
+Floors, tiles and carpets in good condition
+Doors, windows and locks working
+Kitchen cabinets, worktop and sink in good condition
+Bathrooms and sanitary ware in good condition
+Air conditioning units working and clean
+Lights, switches and sockets working
+Unit cleaned and free of the tenant's belongings
+Handover cancelled. The contract stays in force.
+Added to the checklist.
+Type what is to be checked.
+That is already on the checklist.
+Choose the contract.
+Only a contract in force is handed over.
+The handover cannot be before the contract started.
+This contract already has a handover.
+The handover was not found.
+This handover is closed.
+Only a handover still open can be cancelled.
+The settlement has started in the accounts, so this handover can no longer be cancelled. Finish settling it.
+The Maintenance Manager has signed, so the inspection can no longer be changed.
+Give the number of keys returned.
+Saved. Add a note to each line marked as a problem, saying what was found, then complete the inspection.
+Inspection completed. It now goes to the Maintenance Manager.
+Inspection saved. Complete it when every line is checked.
+The charges are signed off and can no longer be changed.
+Complete the inspection first.
+Say what the charge is for.
+Give the amount of the charge.
+Charge added.
+Charge removed.
+The Maintenance Manager has already signed.
+Signed: nothing to charge the tenant. It now goes to the accounts.
+The charges have been invoiced, so they can no longer be changed.
+Reopened: the charges can be corrected and signed again.
+This handover is already closed.
+The inspection and the Maintenance Manager's sign-off come first.
+The invoice for the charges is not posted yet. Post it from Journal Inquiry, then settle again.

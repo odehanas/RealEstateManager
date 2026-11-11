@@ -1,0 +1,159 @@
+@model RealEstateManager.Domain.LeaseHandover
+@using RealEstateManager.Domain
+@using RealEstateManager.Services.Localization
+@{
+    Layout = null;
+    var summary = (LeaseHandoverService.Summary)ViewBag.Summary;
+    var lease = Model.Lease!;
+    var settled = Model.Status == HandoverStatuses.Settled;
+    var rtl = UiLanguages.IsArabic;
+
+    // Settled: the figures as they were settled. Before that: as they stand today.
+    var depositHeld = settled ? Model.DepositHeld : summary.DepositHeld;
+    var applied = settled ? Model.DepositApplied : summary.ToApply;
+    var refund = settled ? Model.DepositRefunded : summary.ToRefund;
+    var stillDue = settled ? Model.BalanceStillDue : summary.StillDue;
+
+    string Local(DateTime? utc) => utc.HasValue ? utc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "";
+}
+<!DOCTYPE html>
+<html lang="@UiLanguages.Current" dir="@(rtl ? "rtl" : "ltr")">
+<head>
+<meta charset="utf-8" />
+<title>@T["Unit Handover Report"] @Model.HandoverNumber</title>
+<style>
+    @@page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-size: 10pt; color: #1f2933; background: #f2f4f7; }
+    .sheet { max-width: 190mm; margin: 0 auto; background: #fff; padding: 14mm 14mm; box-shadow: 0 0 18px rgba(15,39,64,.12); }
+    h1 { font-size: 17pt; color: #0f2740; margin: 0 0 2px; }
+    h2 { font-size: 10.5pt; color: #0f2740; margin: 16px 0 6px; padding-bottom: 3px; border-bottom: 2px solid #0f2740; break-after: avoid; }
+    .muted { color: #5b6774; }
+    .small { font-size: 8.5pt; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 3px solid #0f2740; padding-bottom: 10px; }
+    .status { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 8.5pt; font-weight: 700; background: #fff3cd; color: #664d03; }
+    .status.done { background: #d1e7dd; color: #0f5132; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #d8dee6; padding: 4px 7px; text-align: start; vertical-align: top; }
+    th { background: #f2f4f7; font-size: 8.5pt; }
+    .num { text-align: end; white-space: nowrap; }
+    .facts td:nth-child(odd) { background: #f8f9fb; color: #5b6774; width: 18%; }
+    .issue td { background: #fff8e1; }
+    .total td { font-weight: 700; }
+    .signs { display: flex; gap: 10px; margin-top: 22px; break-inside: avoid; }
+    .sign { flex: 1; border: 1px solid #d8dee6; border-radius: 6px; padding: 8px 10px; min-height: 30mm; display: flex; flex-direction: column; justify-content: space-between; }
+    .sign .who { font-weight: 700; font-size: 8.5pt; text-transform: uppercase; color: #5b6774; }
+    .sign .line { border-top: 1px solid #1f2933; padding-top: 3px; font-size: 8.5pt; }
+    .bar { max-width: 190mm; margin: 0 auto 10px; text-align: end; }
+    .bar button { padding: 6px 16px; font-size: 10pt; cursor: pointer; }
+    tr { break-inside: avoid; }
+    @@media print { body { background: #fff; padding: 0; } .sheet { box-shadow: none; padding: 0; max-width: none; } .bar { display: none; } }
+</style>
+</head>
+<body>
+<div class="bar"><button type="button" onclick="window.print()">@T["Print / Save as PDF"]</button></div>
+<div class="sheet">
+    <div class="head">
+        <div>
+            <div class="muted small">@ViewBag.CompanyName</div>
+            <h1>@T["Unit Handover Report"]</h1>
+            <div class="muted">@Model.HandoverNumber &middot; @T[HandoverReasons.Describe(Model.Reason)]</div>
+        </div>
+        <div style="text-align:end">
+            <span class="status @(settled ? "done" : "")">@(settled ? T["Settled"] : Model.Status == HandoverStatuses.Cancelled ? T["Cancelled"] : T["In progress"])</span>
+            <div class="small muted" style="margin-top:6px">@T.Format("Printed {0}", DateTime.Now.ToString("dd/MM/yyyy HH:mm"))</div>
+        </div>
+    </div>
+
+    <h2>@T["Contract"]</h2>
+    <table class="facts">
+        <tr><td>@T["Tenant"]</td><td>@lease.Tenant?.FullName</td><td>@T["Contract"]</td><td>@lease.ContractNumber</td></tr>
+        <tr><td>@T["Property"]</td><td>@lease.Unit?.Property?.Name</td><td>@T["Unit"]</td><td>@lease.Unit?.UnitNumber</td></tr>
+        <tr><td>@T["Contract period"]</td><td>@lease.StartDate.ToString("dd/MM/yyyy") - @lease.EndDate.ToString("dd/MM/yyyy")</td><td>@T["Handover date"]</td><td>@Model.HandoverDate.ToString("dd/MM/yyyy")</td></tr>
+    </table>
+
+    <h2>1. @T["Inspection"]</h2>
+    <table>
+        <thead><tr><th style="width:5%">#</th><th>@T["What is checked"]</th><th style="width:18%">@T["Result"]</th><th style="width:34%">@T["Note"]</th></tr></thead>
+        <tbody>
+            @for (var i = 0; i < Model.Items.Count; i++)
+            {
+                var item = Model.Items[i];
+                <tr class="@(item.Result == HandoverItemResults.Issue ? "issue" : "")">
+                    <td>@(i + 1)</td><td>@T[item.Name]</td><td>@T[HandoverItemResults.Describe(item.Result)]</td><td>@item.Notes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <table class="facts" style="margin-top:6px">
+        <tr>
+            <td>@T["Keys returned"]</td><td>@Model.KeysReturned</td>
+            <td>@T["Electricity meter reading"]</td><td>@Model.ElectricityReading</td>
+        </tr>
+        <tr>
+            <td>@T["Water meter reading"]</td><td>@Model.WaterReading</td>
+            <td>@T["Inspected by"]</td><td>@Model.InspectedByName <span class="muted small">@Local(Model.InspectedAt)</span></td>
+        </tr>
+        @if (!string.IsNullOrWhiteSpace(Model.InspectionNotes))
+        {
+            <tr><td>@T["Inspection notes"]</td><td colspan="3">@Model.InspectionNotes</td></tr>
+        }
+    </table>
+
+    <h2>2. @T["Charges to the tenant"]</h2>
+    @if (Model.Charges.Count == 0)
+    {
+        <div class="muted">@(Model.IsMaintenanceSigned ? T["No charges: nothing found that the tenant must pay for."] : T["Not signed by the Maintenance Manager yet."])</div>
+    }
+    else
+    {
+        <table>
+            <thead><tr><th>@T["Charge for"]</th><th class="num" style="width:22%">@T["Amount (before VAT)"]</th></tr></thead>
+            <tbody>
+                @foreach (var charge in Model.Charges)
+                {
+                    <tr><td>@charge.Description</td><td class="num">@charge.Amount.ToString("N2")</td></tr>
+                }
+                <tr><td>@T["VAT"]</td><td class="num">@summary.ChargesVat.ToString("N2")</td></tr>
+                <tr class="total"><td>@T["Total charges"]</td><td class="num">@summary.ChargesTotal.ToString("N2")</td></tr>
+            </tbody>
+        </table>
+    }
+    @if (Model.IsMaintenanceSigned)
+    {
+        <div class="small muted" style="margin-top:4px">
+            @T.Format("signed by {0}, {1}", Model.MaintenanceSignedByName ?? "-", Local(Model.MaintenanceSignedAt))
+            @if (!string.IsNullOrWhiteSpace(Model.MaintenanceNotes)) { <span>&middot; @Model.MaintenanceNotes</span> }
+        </div>
+    }
+
+    <h2>3. @T["Settlement of the security deposit"]</h2>
+    <table>
+        <tbody>
+            <tr><td>@T["Deposit held"]</td><td class="num" style="width:22%">@depositHeld.ToString("N2")</td></tr>
+            <tr><td>@T["Applied to what the tenant owed"] <span class="muted small">(@T["unpaid invoices and the charges above"])</span></td><td class="num">@applied.ToString("N2")</td></tr>
+            <tr class="total"><td>@T["Refunded to the tenant"]</td><td class="num">@refund.ToString("N2")</td></tr>
+            <tr class="@(stillDue > 0m ? "total" : "")"><td>@T["Still owed by the tenant"]</td><td class="num">@stillDue.ToString("N2")</td></tr>
+        </tbody>
+    </table>
+    @if (!settled)
+    {
+        <div class="small muted" style="margin-top:4px">@T["Not settled yet: the figures are as they stand today and may change."]</div>
+    }
+    else
+    {
+        <div class="small muted" style="margin-top:4px">
+            @T.Format("settled by {0}, {1}", Model.SettledByName ?? "-", Local(Model.SettledAt))
+            @if (!string.IsNullOrWhiteSpace(Model.AccountsNotes)) { <span>&middot; @Model.AccountsNotes</span> }
+        </div>
+    }
+
+    <div class="signs">
+        <div class="sign"><div class="who">@T["Tenant"]</div><div class="line">@T["Name, signature and date"]</div></div>
+        <div class="sign"><div class="who">@T["Inspected by"]</div><div class="line">@T["Name, signature and date"]</div></div>
+        <div class="sign"><div class="who">@T["Maintenance Manager"]</div><div class="line">@T["Name, signature and date"]</div></div>
+        <div class="sign"><div class="who">@T["Accounts"]</div><div class="line">@T["Name, signature and date"]</div></div>
+    </div>
+</div>
+</body>
+</html>

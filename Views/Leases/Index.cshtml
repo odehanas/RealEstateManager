@@ -121,6 +121,10 @@
                         {
                             <a asp-action="Edit" asp-route-id="@lease.Id" class="btn btn-sm btn-outline-primary">@T["Notes"]</a>
                         }
+                        @if (lease.Status == LeaseStatuses.Active)
+                        {
+                            <a asp-controller="LeaseHandovers" asp-action="Index" class="btn btn-sm btn-outline-warning" title="@T["Hand the unit back and settle the deposit"]">@T["Handover"]</a>
+                        }
                         <a asp-action="ContractLabel" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-dark">@T["QR Label"]</a>
                         <a asp-action="ContractDraft" asp-route-id="@lease.Id" target="_blank" class="btn btn-sm btn-outline-secondary">@T["Draft Contract"]</a>
                     </div>

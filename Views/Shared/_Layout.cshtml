@@ -365,6 +365,9 @@
                                         <li>
                                             <a class="sidebar-link" asp-controller="Leases" asp-action="Index">@T["Leases"]</a>
                                         </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="LeaseHandovers" asp-action="Index">@T["Lease Handovers"]</a>
+                                        </li>
                                     }
                                     @if (canApproveContracts)
                                     {
@@ -443,6 +446,12 @@
                                             <a class="sidebar-link" asp-controller="ServiceCatalog" asp-action="Index">@T["Paid Services"]</a>
                                         </li>
                                         }
+                                        @if (!canManageLeases)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="LeaseHandovers" asp-action="Index">@T["Lease Handovers"]</a>
+                                        </li>
+                                        }
                                         }
                                         @if (canManageMaintenance)
                                         {
@@ -471,6 +480,12 @@
                                     <li>
                                         <a class="sidebar-link" asp-controller="SecurityDeposits" asp-action="Index">@T["Security Deposits"]</a>
                                     </li>
+                                    @if (!canManageLeases && !canHandleServiceRequests && !canManageMaintenance)
+                                    {
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="LeaseHandovers" asp-action="Index">@T["Lease Handovers"]</a>
+                                    </li>
+                                    }
 
                                     <li class="sidebar-divider" role="separator"></li>
                                     <li class="sidebar-heading">@T["E-Invoicing"]</li>
