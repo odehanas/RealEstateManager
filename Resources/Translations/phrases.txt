@@ -3428,3 +3428,12 @@ English translation, written in {0}
 Translation needs the AI assistant's key, which is not set up on this server.
 The translation service could not be reached. The request shows as the tenant wrote it; try again in a moment.
 The request is already in English.
+<strong>Photos</strong>
+Photo {0}
+Add photos (up to {0} more)
+Photos (optional)
+Only the first {0} photos will be sent.
+Up to {0} photos of the problem. You can add them later too, from the request.
+Photo added.
+Choose a photo first.
+The request is closed, so photos can no longer be added.

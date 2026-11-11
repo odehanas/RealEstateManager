@@ -472,6 +472,29 @@ namespace RealEstateManager.Domain
         public const int MaxFeedbackLength = 1000;
     }
 
+    /// <summary>A photo attached to a request, usually by the tenant to show the problem.</summary>
+    public class ServiceRequestPhoto
+    {
+        public int Id { get; set; }
+
+        public int CompanyId { get; set; }
+        public Company? Company { get; set; }
+
+        public int TenantServiceRequestId { get; set; }
+        public TenantServiceRequest? TenantServiceRequest { get; set; }
+
+        public string FileName { get; set; } = string.Empty;
+        public string ContentType { get; set; } = "image/jpeg";
+        public long SizeBytes { get; set; }
+
+        /// <summary>The picture. Loaded only when the picture itself is asked for.</summary>
+        public byte[] Content { get; set; } = Array.Empty<byte>();
+
+        public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
+        public string? UploadedByName { get; set; }
+        public bool UploadedByTenant { get; set; } = true;
+    }
+
     /// <summary>Where the English translation of a tenant's words stands.</summary>
     public static class TranslationStatuses
     {

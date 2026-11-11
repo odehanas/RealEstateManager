@@ -1,0 +1,58 @@
+@model (int RequestId, string Mode, bool CanAdd)
+@inject ServiceRequestPhotoService Photos
+@*
+    The photos on a request, as thumbnails that open full size. Mode "portal" is the
+    tenant's own page (its own address for the picture, and the form to add more);
+    "staff" is the office's and the maintenance team's pages.
+*@
+@{
+    var photos = await Photos.ListAsync(Model.RequestId);
+    var portal = Model.Mode == "portal";
+    var room = ServiceRequestPhotoService.MaxPerRequest - photos.Count;
+    if (photos.Count == 0 && !(portal && Model.CanAdd))
+    {
+        return;
+    }
+    string Url(int photoId) => portal
+        ? $"/portal/requests/{Model.RequestId}/photos/{photoId}"
+        : $"/MaintenanceJobs/Photo/{Model.RequestId}?photoId={photoId}";
+}
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span>@T.Html("<strong>Photos</strong>")</span>
+        <span class="small text-muted">@T.Format("{0} of {1}", photos.Count, ServiceRequestPhotoService.MaxPerRequest)</span>
+    </div>
+    <div class="card-body">
+        @if (photos.Count == 0)
+        {
+            <p class="text-muted small mb-2">@T["No photos yet."]</p>
+        }
+        else
+        {
+            <div class="d-flex flex-wrap gap-2 @(portal && Model.CanAdd && room > 0 ? "mb-3" : "")">
+                @foreach (var photo in photos)
+                {
+                    <a href="@Url(photo.Id)" target="_blank" rel="noopener" title="@photo.FileName">
+                        <img src="@Url(photo.Id)" alt="@T.Format("Photo {0}", photos.IndexOf(photo) + 1)" loading="lazy"
+                             class="rounded border" style="width:110px;height:110px;object-fit:cover" />
+                    </a>
+                }
+            </div>
+        }
+
+        @if (portal && Model.CanAdd && room > 0)
+        {
+            <form action="/portal/requests/@Model.RequestId/photos" method="post" enctype="multipart/form-data" class="request-photos-form">
+                @Html.AntiForgeryToken()
+                <label class="form-label small mb-1" for="morePhotos">@T.Format("Add photos (up to {0} more)", room)</label>
+                <div class="input-group input-group-sm">
+                    <input id="morePhotos" name="photos" type="file" class="form-control request-photos" accept="image/jpeg,image/png,image/webp" multiple
+                           data-max="@room" />
+                    <button type="submit" class="btn btn-dark">@T["Upload"]</button>
+                </div>
+                <div class="form-text request-photos-note"></div>
+            </form>
+        }
+    </div>
+</div>

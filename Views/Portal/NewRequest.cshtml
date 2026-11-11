@@ -17,7 +17,7 @@
     </div>
 }
 
-<form asp-action="NewRequest" method="post" id="requestForm">
+<form asp-action="NewRequest" method="post" id="requestForm" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="All" class="alert alert-danger" style="display:@(ViewData.ModelState.IsValid ? "none" : "block")"></div>
@@ -128,6 +128,15 @@
                 <span asp-validation-for="PreferredVisitDate" class="text-danger small"></span>
             </div>
 
+            <div class="mb-3">
+                <label class="form-label" for="photos">@T["Photos (optional)"]</label>
+                <input id="photos" name="photos" type="file" class="form-control request-photos" accept="image/jpeg,image/png,image/webp" multiple
+                       data-max="@ServiceRequestPhotoService.MaxPerRequest"
+                       data-too-many="@T.Format("Only the first {0} photos will be sent.", ServiceRequestPhotoService.MaxPerRequest)" />
+                <div class="form-text">@T.Format("Up to {0} photos of the problem. You can add them later too, from the request.", ServiceRequestPhotoService.MaxPerRequest)</div>
+                <div class="form-text text-danger request-photos-note"></div>
+            </div>
+
             @* Payment postponement only. *@
             <div class="type-postponement">
                 <hr />
@@ -174,6 +183,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/request-photos.js" asp-append-version="true"></script>
     <script>
         (function () {
             // Show only the fields that belong to the chosen kind of request, so the

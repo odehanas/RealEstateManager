@@ -172,6 +172,7 @@
 
     <div class="col-lg-4">
         <partial name="_PaidService" model="@((Model.Id, "staff"))" />
+        <partial name="_RequestPhotos" model="@((Model.Id, "staff", false))" />
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white">@T.Html("<strong>Tenant</strong>")</div>
             <div class="card-body small">

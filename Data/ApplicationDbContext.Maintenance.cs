@@ -10,6 +10,7 @@ namespace RealEstateManager.Data
         public DbSet<OwnerRecharge> OwnerRecharges => Set<OwnerRecharge>();
         public DbSet<MaintenanceCategory> MaintenanceCategories => Set<MaintenanceCategory>();
         public DbSet<ServiceCatalogItem> ServiceCatalogItems => Set<ServiceCatalogItem>();
+        public DbSet<ServiceRequestPhoto> ServiceRequestPhotos => Set<ServiceRequestPhoto>();
         public DbSet<LeaseHandover> LeaseHandovers => Set<LeaseHandover>();
         public DbSet<LeaseHandoverItem> LeaseHandoverItems => Set<LeaseHandoverItem>();
         public DbSet<LeaseHandoverCharge> LeaseHandoverCharges => Set<LeaseHandoverCharge>();
@@ -77,6 +78,18 @@ namespace RealEstateManager.Data
             {
                 entity.Property(x => x.OriginalLanguage).HasMaxLength(40);
                 entity.Property(x => x.TranslationStatus).HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<ServiceRequestPhoto>(entity =>
+            {
+                entity.Property(x => x.FileName).HasMaxLength(260);
+                entity.Property(x => x.ContentType).HasMaxLength(100);
+                entity.Property(x => x.UploadedByName).HasMaxLength(200);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.TenantServiceRequest).WithMany().HasForeignKey(x => x.TenantServiceRequestId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.TenantServiceRequestId, x.Id });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
             });
 
             modelBuilder.Entity<LeaseHandover>(entity =>
