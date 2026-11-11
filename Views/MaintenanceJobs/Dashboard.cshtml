@@ -217,6 +217,64 @@
     </div>
 </div>
 
+@{
+    var paidOrders = Model.PaidOrders;
+    var paidInvoiced = paidOrders.Where(x => x.InvoiceId.HasValue).ToList();
+}
+<div class="card shadow-sm mb-3 mnt-block border-primary">
+    <div class="card-header bg-white mnt-section-title d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span><strong>@T["Paid services"]</strong> <span class="text-muted small">@T["ordered and paid for by tenants; not counted in the maintenance figures above"]</span></span>
+        <span class="no-print d-flex gap-2">
+            <a asp-action="Index" asp-route-kind="Paid" class="btn btn-sm btn-outline-primary">@T["Open the jobs"]</a>
+            <a asp-controller="ServiceCatalog" asp-action="Orders" asp-route-fromDate="@Model.From.ToString("yyyy-MM-dd")" asp-route-toDate="@Model.To.ToString("yyyy-MM-dd")" class="btn btn-sm btn-outline-primary">@T["Orders and margin"]</a>
+        </span>
+    </div>
+    @if (paidOrders.Count == 0)
+    {
+        <div class="card-body text-muted small">@T["No paid services were ordered in this period."]</div>
+    }
+    else
+    {
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-6 col-md"><div class="label text-muted small">@T["Orders"]</div><div class="fs-4 fw-semibold">@paidOrders.Count</div>
+                    <div class="small text-muted">@T.Format("{0} done", paidOrders.Count(x => x.RequestStatus is ServiceRequestStatuses.Resolved or ServiceRequestStatuses.Closed))</div></div>
+                <div class="col-6 col-md"><div class="label text-muted small">@T["Invoiced (before VAT)"]</div><div class="fs-4 fw-semibold">@paidInvoiced.Sum(x => x.Net).ToString("N2")</div>
+                    <div class="small text-muted">@T.Format("{0} not invoiced yet", paidOrders.Count(x => !x.InvoiceId.HasValue))</div></div>
+                <div class="col-6 col-md"><div class="label text-muted small">@T["Collected"]</div><div class="fs-4 fw-semibold">@paidInvoiced.Sum(x => x.Paid).ToString("N2")</div>
+                    <div class="small @(paidInvoiced.Any(x => !x.IsPaid) ? "text-danger" : "text-muted")">@T.Format("{0} awaiting payment", paidInvoiced.Count(x => !x.IsPaid))</div></div>
+                <div class="col-6 col-md"><div class="label text-muted small">@T["Cost recorded"]</div><div class="fs-4 fw-semibold">@paidInvoiced.Sum(x => x.ActualCost).ToString("N2")</div>
+                    <div class="small text-muted">@T.Format("expected {0}", paidInvoiced.Sum(x => x.ExpectedCost).ToString("N2"))</div></div>
+                <div class="col-6 col-md"><div class="label text-muted small">@T["Margin"]</div><div class="fs-4 fw-semibold @(paidInvoiced.Sum(x => x.Margin) < 0m ? "text-danger" : "")">@paidInvoiced.Sum(x => x.Margin).ToString("N2")</div>
+                    <div class="small text-muted">@(paidInvoiced.Sum(x => x.Net) > 0m ? (paidInvoiced.Sum(x => x.Margin) / paidInvoiced.Sum(x => x.Net)).ToString("P0") : "-")</div></div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0 align-middle">
+                <thead class="table-light">
+                    <tr><th>@T["Service"]</th><th class="text-end">@T["Orders"]</th><th class="text-end">@T["Done"]</th><th class="text-end">@T["Invoiced (before VAT)"]</th><th class="text-end">@T["Collected"]</th><th class="text-end">@T["Cost recorded"]</th><th class="text-end">@T["Margin"]</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var service in paidOrders.GroupBy(x => x.Name).OrderByDescending(g => g.Sum(x => x.Net)))
+                    {
+                        var invoiced = service.Where(x => x.InvoiceId.HasValue).ToList();
+                        <tr>
+                            <td>@service.Key <span class="text-muted small">@T[ServiceKinds.Describe(service.First().Kind)]</span></td>
+                            <td class="text-end">@service.Count()</td>
+                            <td class="text-end">@service.Count(x => x.RequestStatus is ServiceRequestStatuses.Resolved or ServiceRequestStatuses.Closed)</td>
+                            <td class="text-end">@invoiced.Sum(x => x.Net).ToString("N2")</td>
+                            <td class="text-end">@invoiced.Sum(x => x.Paid).ToString("N2")</td>
+                            <td class="text-end">@invoiced.Sum(x => x.ActualCost).ToString("N2")</td>
+                            <td class="text-end @(invoiced.Sum(x => x.Margin) < 0m ? "text-danger" : "")">@invoiced.Sum(x => x.Margin).ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-body small text-muted py-2">@T["Orders raised in the period. Invoiced, cost and margin are before VAT; Collected includes VAT."]</div>
+    }
+</div>
+
 <div class="card shadow-sm mb-3 mnt-block">
     <div class="card-header bg-white mnt-section-title"><strong>@T["Jobs and cost by unit"]</strong> <span class="text-muted small">@T["highest cost first"]</span></div>
     @if (costUnits.Count == 0)

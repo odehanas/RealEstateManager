@@ -29,11 +29,12 @@ namespace RealEstateManager.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? show, int? technicianId)
+        public async Task<IActionResult> Index(string? show, int? technicianId, string? kind)
         {
             var companyId = User.GetRequiredCurrentCompanyId();
             var seesAll = await SeesAllAsync();
             show ??= "Open";
+            kind = kind is "Planned" or "Paid" ? kind : "Normal";
 
             var query = _db.TenantServiceRequests.AsNoTracking()
                 .Where(x => x.RequestType == ServiceRequestTypes.Maintenance && x.Status != ServiceRequestStatuses.Cancelled);
@@ -41,6 +42,24 @@ namespace RealEstateManager.Controllers
                 query = query.Where(x => x.AssignedToAppUserId == User.GetAppUserId());
             else if (technicianId.HasValue)
                 query = query.Where(x => x.AssignedToAppUserId == technicianId.Value);
+
+            // Three kinds of job, each on its own tab: what the planned programme opened,
+            // what a tenant ordered and pays for, and everything else (tenants' requests and
+            // jobs management raised). The number on a tab is the jobs still open.
+            var stillOpen = query.Where(x => x.Status == ServiceRequestStatuses.Submitted ||
+                                             x.Status == ServiceRequestStatuses.Acknowledged ||
+                                             x.Status == ServiceRequestStatuses.InProgress);
+            ViewBag.OpenPlanned = await stillOpen.CountAsync(x => x.ServiceCatalogItemId == null && x.Source == ServiceRequestSources.Planned);
+            ViewBag.OpenPaid = await stillOpen.CountAsync(x => x.ServiceCatalogItemId != null);
+            ViewBag.OpenNormal = await stillOpen.CountAsync(x => x.ServiceCatalogItemId == null && x.Source != ServiceRequestSources.Planned);
+            ViewBag.Kind = kind;
+
+            query = kind switch
+            {
+                "Paid" => query.Where(x => x.ServiceCatalogItemId != null),
+                "Planned" => query.Where(x => x.ServiceCatalogItemId == null && x.Source == ServiceRequestSources.Planned),
+                _ => query.Where(x => x.ServiceCatalogItemId == null && x.Source != ServiceRequestSources.Planned)
+            };
 
             query = show switch
             {
@@ -335,7 +354,9 @@ namespace RealEstateManager.Controllers
 
             ViewBag.TechnicianId = technicianId;
             ViewBag.Technicians = await MaintenanceService.TechniciansAsync(_db, companyId);
-            return View(await _maintenance.GetDashboardAsync(companyId, from, to, technicianId));
+            var dashboard = await _maintenance.GetDashboardAsync(companyId, from, to, technicianId);
+            dashboard.PaidServices = await HttpContext.RequestServices.GetRequiredService<PaidServiceService>().OrdersAsync(companyId, from, to);
+            return View(dashboard);
         }
 
         /// <summary>
@@ -354,6 +375,7 @@ namespace RealEstateManager.Controllers
                 (from, to) = (to, from);
 
             var d = await _maintenance.GetDashboardAsync(companyId, from, to, technicianId);
+            d.PaidServices = await HttpContext.RequestServices.GetRequiredService<PaidServiceService>().OrdersAsync(companyId, from, to);
             var materials = await _maintenance.GetMaterialLinesAsync(d.Jobs.Select(x => x.Id).ToList());
             var company = User.FindFirst(AppClaimTypes.CurrentCompanyName)?.Value ?? string.Empty;
             var technician = technicianId.HasValue
@@ -519,6 +541,16 @@ namespace RealEstateManager.Controllers
             Sheet("By month",
                 new[] { "Month", "Jobs raised", "Jobs completed", "Materials on jobs raised" },
                 d.ByMonth.Select(x => new object?[] { x.Month.ToString("MMM yyyy"), x.Raised, x.Completed, x.Materials }), 4);
+
+            // Paid services are kept apart from the maintenance figures above: the tenant pays for them.
+            Sheet("Paid services",
+                new[] { "Request", "Date", "Tenant", "Unit", "Service", "Type", "Job status", "Invoice", "Payment", "Price before VAT", "Paid", "Cost", "Margin" },
+                d.PaidOrders.Select(x => new object?[]
+                {
+                    x.RequestNumber, x.SubmittedAt.ToLocalTime().Date, x.Tenant, x.Unit, x.Name, ServiceKinds.Describe(x.Kind),
+                    ServiceRequestStatuses.Describe(x.RequestStatus), x.InvoiceNumber, PaidServiceService.Stages.Describe(x.Stage),
+                    x.Net, x.Paid, x.ActualCost, x.InvoiceId.HasValue ? x.Margin : null
+                }), 10, 11, 12, 13);
 
             Sheet("Materials",
                 new[] { "Date", "Job", "Property", "Unit", "Material", "Quantity", "Unit cost", "Amount", "From", "Reference", "Charged to" },

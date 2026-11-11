@@ -230,6 +230,14 @@ namespace RealEstateManager.Services
             public DateTime To { get; set; }
             public List<JobRow> Jobs { get; set; } = new();
             public decimal StockBalance { get; set; }
+
+            /// <summary>Paid services ordered in the period, kept apart from the maintenance jobs above.</summary>
+            public List<PaidServiceService.State> PaidServices { get; set; } = new();
+
+            /// <summary>The orders that stand: not withdrawn by the tenant, not declined.</summary>
+            public List<PaidServiceService.State> PaidOrders => PaidServices
+                .Where(x => x.RequestStatus != ServiceRequestStatuses.Cancelled && x.RequestStatus != ServiceRequestStatuses.Rejected)
+                .ToList();
             public bool HasTechnicians { get; set; }
 
             public IEnumerable<JobRow> Open => Jobs.Where(x => x.IsOpen).OrderBy(x => ServiceRequestPriorities.Weight(x.Priority)).ThenBy(x => x.SubmittedAt);
@@ -372,8 +380,12 @@ namespace RealEstateManager.Services
             var fromUtc = from.Date.ToUniversalTime();
             var toUtc = to.Date.AddDays(1).ToUniversalTime();
 
+            // Maintenance the company or the owner bears. A service a tenant ordered and pays
+            // for is not part of it: it is shown on its own (PaidServices), so it neither
+            // swells the job counts nor hides in the maintenance cost.
             var query = _db.TenantServiceRequests.AsNoTracking()
                 .Where(x => x.RequestType == ServiceRequestTypes.Maintenance && x.Status != ServiceRequestStatuses.Cancelled)
+                .Where(x => x.ServiceCatalogItemId == null)
                 .Where(x => (x.SubmittedAt >= fromUtc && x.SubmittedAt < toUtc) ||
                             x.Status == ServiceRequestStatuses.Submitted || x.Status == ServiceRequestStatuses.Acknowledged ||
                             x.Status == ServiceRequestStatuses.InProgress);
