@@ -378,3 +378,16 @@ Reopened: the charges can be corrected and signed again. ||| أُعيد الفت
 This handover is already closed. ||| هذا التسليم مغلق من قبل.
 The inspection and the Maintenance Manager's sign-off come first. ||| المعاينة وتوقيع مدير الصيانة أولاً.
 The invoice for the charges is not posted yet. Post it from Journal Inquiry, then settle again. ||| فاتورة المبالغ غير مرحّلة بعد. رحّلها من استعلام القيود ثم أعد التسوية.
+# English translation of tenants' requests.
+English translation ||| الترجمة الإنجليزية
+written in {0} ||| كُتب بـ {0}
+translated automatically; the tenant's own words are above ||| تُرجم آلياً؛ كلمات المستأجر نفسها أعلاه
+Written in English: no translation needed. ||| مكتوب بالإنجليزية: لا حاجة إلى ترجمة.
+The English translation could not be made. ||| تعذّر إعداد الترجمة الإنجليزية.
+The English translation is being made. Refresh in a moment, or ask for it now. ||| الترجمة الإنجليزية قيد الإعداد. حدّث الصفحة بعد لحظات أو اطلبها الآن.
+Not translated yet. ||| لم يُترجم بعد.
+Translate to English ||| ترجمة إلى الإنجليزية
+English translation, written in {0} ||| الترجمة الإنجليزية، كُتب بـ {0}
+Translation needs the AI assistant's key, which is not set up on this server. ||| الترجمة تحتاج مفتاح المساعد الذكي، وهو غير معدّ على هذا الخادم.
+The translation service could not be reached. The request shows as the tenant wrote it; try again in a moment. ||| تعذّر الوصول إلى خدمة الترجمة. يظهر الطلب كما كتبه المستأجر؛ حاول بعد لحظات.
+The request is already in English. ||| الطلب مكتوب بالإنجليزية.

@@ -309,6 +309,10 @@ builder.Services.AddSingleton<SchemaUpdateStatus>();
 builder.Services.AddSingleton<SchemaScriptRunner>();
 builder.Services.AddSingleton<SampleDataQueue>();
 builder.Services.AddHostedService<SampleDataWorker>();
+// Tenants' requests are put into English in the background, after they are saved.
+builder.Services.AddScoped<RequestTranslationService>();
+builder.Services.AddSingleton<RequestTranslationQueue>();
+builder.Services.AddHostedService<RequestTranslationWorker>();
 builder.Services.AddHostedService<MaintenancePlanWorker>();
 
 var app = builder.Build();

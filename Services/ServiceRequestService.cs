@@ -29,11 +29,13 @@ namespace RealEstateManager.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly Push.PushNotifier _push;
+        private readonly RequestTranslationQueue _translations;
 
-        public ServiceRequestService(ApplicationDbContext db, Push.PushNotifier push)
+        public ServiceRequestService(ApplicationDbContext db, Push.PushNotifier push, RequestTranslationQueue translations)
         {
             _db = db;
             _push = push;
+            _translations = translations;
         }
 
         // =====================================================================
@@ -289,8 +291,12 @@ namespace RealEstateManager.Services
                     CreatedAt = DateTime.UtcNow
                 });
 
+            // Whatever language it is in, the office reads it in English too (in the background).
+            request.TranslationStatus = TranslationStatuses.Pending;
+
             _db.TenantServiceRequests.Add(request);
             await _db.SaveChangesAsync();
+            _translations.Enqueue(request.Id);
 
             if (request.AssignedToAppUserId.HasValue)
                 NotifyTechnician(request, request.AssignedToAppUserId.Value);
@@ -616,11 +622,13 @@ namespace RealEstateManager.Services
                 AuthorName = request.Tenant?.FullName ?? "Tenant",
                 TenantPortalUserId = portalUserId,
                 Body = body.Trim(),
+                TranslationStatus = TranslationStatuses.Pending,
                 IsInternal = false,
                 CreatedAt = DateTime.UtcNow
             });
 
             await _db.SaveChangesAsync();
+            _translations.Enqueue(request.Id);
 
             // The person working it hears of the reply; with nobody on it yet, whoever handles requests.
             const string title = "{0} replied on {1}";
@@ -1151,6 +1159,11 @@ namespace RealEstateManager.Services
                 AssignedToAppUserId = request.AssignedToAppUserId,
                 CanTenantCancel = request.CanTenantCancel,
                 AwaitingPostponementAction = request.AwaitingPostponementAction,
+                // The English reading is for staff: the tenant sees only what they wrote.
+                OriginalLanguage = includeInternal ? request.OriginalLanguage : null,
+                SubjectEnglish = includeInternal ? request.SubjectEnglish : null,
+                DescriptionEnglish = includeInternal ? request.DescriptionEnglish : null,
+                TranslationStatus = includeInternal ? request.TranslationStatus : null,
                 Comments = request.Comments
                     .Where(x => includeInternal || !x.IsInternal)
                     .OrderBy(x => x.CreatedAt)
@@ -1159,6 +1172,8 @@ namespace RealEstateManager.Services
                         AuthorType = x.AuthorType,
                         AuthorName = x.AuthorName,
                         Body = x.Body,
+                        BodyEnglish = includeInternal ? x.BodyEnglish : null,
+                        OriginalLanguage = includeInternal ? x.OriginalLanguage : null,
                         CreatedAt = x.CreatedAt,
                         IsInternal = x.IsInternal
                     })

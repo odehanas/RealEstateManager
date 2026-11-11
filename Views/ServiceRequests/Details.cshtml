@@ -45,6 +45,7 @@
             <div class="card-body">
                 <h3 class="h6">@Model.Subject</h3>
                 <p class="mb-0" style="white-space: pre-wrap">@Model.Description</p>
+                <partial name="_RequestTranslation" model="Model" />
 
                 @if (Model.PreferredVisitDate.HasValue)
                 {
@@ -135,6 +136,13 @@
                                 &middot; @comment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
                             </div>
                             <div style="white-space: pre-wrap">@comment.Body</div>
+                            @if (!string.IsNullOrWhiteSpace(comment.BodyEnglish))
+                            {
+                                <div class="border-start border-primary border-3 ps-2 mt-1" dir="ltr">
+                                    <div class="small text-muted">@T.Format("English translation, written in {0}", comment.OriginalLanguage ?? "-")</div>
+                                    <div style="white-space: pre-wrap">@comment.BodyEnglish</div>
+                                </div>
+                            }
                         </div>
                     }
                 }

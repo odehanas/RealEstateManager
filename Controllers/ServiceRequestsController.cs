@@ -131,6 +131,19 @@ namespace RealEstateManager.Controllers
         }
 
         /// <summary>Says what a request that WhatsApp opened by itself is really about.</summary>
+        /// <summary>Asks again for the English translation of what the tenant wrote.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Translate(int id, [FromServices] RequestTranslationService translator)
+        {
+            if (await _serviceRequestService.GetStaffRequestAsync(User.GetRequiredCurrentCompanyId(), id) == null)
+                return NotFound();
+
+            var (ok, message) = await translator.TranslateRequestAsync(id, again: true);
+            TempData[ok ? "RequestSuccess" : "RequestError"] = message;
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Classify(int id, string requestType, string? category, int? leaseId)
