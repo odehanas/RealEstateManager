@@ -56,6 +56,9 @@ namespace RealEstateManager.Controllers
                 .Select(x => new MaintenanceService.JobRow
                 {
                     Id = x.Id, Number = x.RequestNumber, Subject = x.Subject, Category = x.Category, Priority = x.Priority, Status = x.Status,
+                    IsPaidService = x.ServiceCatalogItemId != null,
+                    PaidServiceOnHold = x.ServiceCatalogItemId != null && x.ServicePayFirst &&
+                        !_db.CustomerInvoices.Any(i => i.Id == x.ServiceInvoiceId && i.Status != "Cancelled" && i.AmountPaid >= i.TotalAmount),
                     Tenant = x.Tenant != null ? x.Tenant.FullName : null,
                     Purpose = x.Purpose,
                     DueDate = x.PreferredVisitDate,

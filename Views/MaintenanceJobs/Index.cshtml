@@ -115,7 +115,14 @@ else
                             <td>
                                 <span class="badge @(job.Priority == ServiceRequestPriorities.Urgent ? "bg-danger" : job.Priority == ServiceRequestPriorities.High ? "bg-warning text-dark" : "bg-secondary")">@job.Priority</span>
                             </td>
-                            <td>@job.Subject @if (!string.IsNullOrWhiteSpace(job.Category)) { <span class="text-muted small">(@job.Category)</span> }</td>
+                            <td>
+                                @job.Subject @if (!string.IsNullOrWhiteSpace(job.Category)) { <span class="text-muted small">(@job.Category)</span> }
+                                @if (job.IsPaidService)
+                                {
+                                    <span class="badge bg-primary">@T["Paid service"]</span>
+                                    if (job.PaidServiceOnHold) { <span class="badge bg-warning text-dark">@T["On hold until paid"]</span> }
+                                }
+                            </td>
                             <td>@job.Place</td>
                             <td>
                                 @if (job.Tenant != null) { @job.Tenant }

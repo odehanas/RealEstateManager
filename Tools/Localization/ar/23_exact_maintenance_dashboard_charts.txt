@@ -425,3 +425,8 @@ Send the order ||| إرسال الطلب
 Looking for cleaning or another service you pay for? ||| تبحث عن تنظيف أو خدمة أخرى مدفوعة؟
 See the paid services ||| اطّلع على الخدمات المدفوعة
 Order this service ||| اطلب هذه الخدمة
+Paid service orders ||| طلبات الخدمات المدفوعة
+To invoice ||| بانتظار الفاتورة
+{0} paid service order(s) are waiting for their invoice. Open each one and press Issue invoice. ||| {0} طلب خدمة مدفوعة بانتظار الفاتورة. افتح كل طلب واضغط «إصدار الفاتورة».
+Show them ||| عرضها
+On hold until paid ||| معلّق حتى الدفع

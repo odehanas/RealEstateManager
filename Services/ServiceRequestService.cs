@@ -786,7 +786,11 @@ namespace RealEstateManager.Services
                     : query.Where(x => x.Status == status);
             }
 
-            if (!string.IsNullOrWhiteSpace(type))
+            // Orders for paid services are maintenance jobs that carry a service; the list
+            // can show them alone.
+            if (type == ServiceRequestCreateViewModel.PaidServiceType)
+                query = query.Where(x => x.ServiceCatalogItemId != null);
+            else if (!string.IsNullOrWhiteSpace(type))
                 query = query.Where(x => x.RequestType == type);
 
             var rows = await query
@@ -807,6 +811,8 @@ namespace RealEstateManager.Services
                         : null,
                     MessageCount = x.Comments.Count,
                     Source = x.Source,
+                    ServiceName = x.ServiceCatalogItemId != null ? x.ServiceName : null,
+                    AwaitingServiceInvoice = x.ServiceCatalogItemId != null && x.ServiceInvoiceId == null,
                     AwaitingPostponementAction =
                         x.RequestType == ServiceRequestTypes.PaymentPostponement &&
                         x.Status == ServiceRequestStatuses.Resolved &&
@@ -832,7 +838,8 @@ namespace RealEstateManager.Services
                     x.RequestType,
                     x.RelatedInvoiceId,
                     x.RequestedNewDueDate,
-                    x.PostponementApplied
+                    x.PostponementApplied,
+                    AwaitingServiceInvoice = x.ServiceCatalogItemId != null && x.ServiceInvoiceId == null
                 })
                 .ToListAsync();
 
@@ -851,7 +858,11 @@ namespace RealEstateManager.Services
                     x.Status == ServiceRequestStatuses.Resolved &&
                     x.RelatedInvoiceId != null &&
                     x.RequestedNewDueDate != null &&
-                    !x.PostponementApplied)
+                    !x.PostponementApplied),
+                AwaitingServiceInvoiceCount = all.Count(x => x.AwaitingServiceInvoice &&
+                    x.Status != ServiceRequestStatuses.Closed &&
+                    x.Status != ServiceRequestStatuses.Cancelled &&
+                    x.Status != ServiceRequestStatuses.Rejected)
             };
         }
 

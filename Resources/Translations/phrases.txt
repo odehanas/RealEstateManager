@@ -3460,3 +3460,8 @@ Send the order
 Looking for cleaning or another service you pay for?
 See the paid services
 Order this service
+Paid service orders
+To invoice
+{0} paid service order(s) are waiting for their invoice. Open each one and press Issue invoice.
+Show them
+On hold until paid

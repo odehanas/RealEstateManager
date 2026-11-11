@@ -95,6 +95,12 @@ namespace RealEstateManager.Models
 
         public string Source { get; set; } = ServiceRequestSources.Portal;
 
+        /// <summary>The paid service this request is an order for; empty for an ordinary request.</summary>
+        public string? ServiceName { get; set; }
+
+        /// <summary>A paid service order whose invoice has not been issued yet.</summary>
+        public bool AwaitingServiceInvoice { get; set; }
+
         /// <summary>Tenant list only: a finished job still waiting for their rating.</summary>
         public bool CanBeRated { get; set; }
 
@@ -200,5 +206,8 @@ namespace RealEstateManager.Models
         public int SubmittedCount { get; set; }
         public int InProgressCount { get; set; }
         public int AwaitingPostponementCount { get; set; }
+
+        /// <summary>Open orders for paid services that nobody has invoiced yet.</summary>
+        public int AwaitingServiceInvoiceCount { get; set; }
     }
 }
