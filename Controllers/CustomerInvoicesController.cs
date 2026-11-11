@@ -102,7 +102,7 @@ namespace RealEstateManager.Controllers
                 UnitNumber = unit.UnitNumber,
                 ContractNumber = lease.ContractNumber,
                 LeasePeriod = $"{lease.StartDate:dd/MM/yyyy} to {lease.EndDate:dd/MM/yyyy}",
-                LineDescription = invoice.ChargeType ?? "Rent for leased premises",
+                LineDescription = invoice.ChargeType ?? invoice.LineDescription ?? "Rent for leased premises",
                 LineDetail = $"{property.Name}, unit {unit.UnitNumber} — contract {lease.ContractNumber}",
 
                 VatCategory = invoice.VatCategory,

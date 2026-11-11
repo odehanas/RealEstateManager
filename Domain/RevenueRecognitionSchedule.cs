@@ -10,6 +10,9 @@
         public int LeaseId { get; set; }
         public Lease? Lease { get; set; }
 
+        /// <summary>Set on a month's parking income; empty for the rent of the unit.</summary>
+        public int? ParkingAssignmentId { get; set; }
+
         public DateTime RecognitionDate { get; set; }
         public decimal Amount { get; set; } = 0m;
 

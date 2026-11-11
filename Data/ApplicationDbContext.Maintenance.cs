@@ -11,6 +11,8 @@ namespace RealEstateManager.Data
         public DbSet<MaintenanceCategory> MaintenanceCategories => Set<MaintenanceCategory>();
         public DbSet<ServiceCatalogItem> ServiceCatalogItems => Set<ServiceCatalogItem>();
         public DbSet<ServiceRequestPhoto> ServiceRequestPhotos => Set<ServiceRequestPhoto>();
+        public DbSet<ParkingBay> ParkingBays => Set<ParkingBay>();
+        public DbSet<ParkingAssignment> ParkingAssignments => Set<ParkingAssignment>();
         public DbSet<LeaseHandover> LeaseHandovers => Set<LeaseHandover>();
         public DbSet<LeaseHandoverItem> LeaseHandoverItems => Set<LeaseHandoverItem>();
         public DbSet<LeaseHandoverCharge> LeaseHandoverCharges => Set<LeaseHandoverCharge>();
@@ -79,6 +81,37 @@ namespace RealEstateManager.Data
                 entity.Property(x => x.OriginalLanguage).HasMaxLength(40);
                 entity.Property(x => x.TranslationStatus).HasMaxLength(20);
             });
+
+            modelBuilder.Entity<ParkingBay>(entity =>
+            {
+                entity.Property(x => x.BayNumber).HasMaxLength(ParkingBay.MaxNumberLength);
+                entity.Property(x => x.BayType).HasMaxLength(30);
+                entity.Property(x => x.Notes).HasMaxLength(300);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Property).WithMany().HasForeignKey(x => x.PropertyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(x => x.Assignments).WithOne(x => x.ParkingBay).HasForeignKey(x => x.ParkingBayId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.PropertyId, x.BayNumber }).IsUnique();
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<ParkingAssignment>(entity =>
+            {
+                entity.Property(x => x.AnnualCharge).HasPrecision(18, 2);
+                entity.Property(x => x.VatCategory).HasMaxLength(20);
+                entity.Property(x => x.VehiclePlate).HasMaxLength(30);
+                entity.Property(x => x.Notes).HasMaxLength(300);
+                entity.Property(x => x.Status).HasMaxLength(20);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Lease).WithMany().HasForeignKey(x => x.LeaseId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.ParkingBayId, x.Status });
+                entity.HasIndex(x => x.LeaseId);
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<CustomerInvoice>().Property(x => x.LineDescription).HasMaxLength(200);
 
             modelBuilder.Entity<ServiceRequestPhoto>(entity =>
             {

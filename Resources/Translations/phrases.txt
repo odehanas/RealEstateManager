@@ -3474,3 +3474,51 @@ ordered and paid for by tenants; not counted in the maintenance figures above
 Open the jobs
 {0} done
 Orders raised in the period. Invoiced, cost and margin are before VAT; Collected includes VAT.
+Car Parking
+Each property's numbered parking bays: which are taken, by which tenant and unit, and which are free. A bay is given to a contract for a charge billed in one payment or in instalments, as the rent is.
+Bays
+Parking charges a year
+before VAT, bays now taken
+Give bay {0} to a contract
+This property has no contract in force, so there is nobody to give the bay to.
+Vehicle plate
+Charge a year (before VAT)
+0 = the bay comes with the unit, free.
+Payment terms
+One payment
+One payment bills the whole period at once, for the months it covers.
+Starts as the contract's own VAT treatment.
+Give the bay
+Add parking bays
+Number or prefix
+Kind of bay
+-- any --
+Covered
+Basement
+Visitor
+One bay: type its number and leave From and To empty. A run: a prefix with From and To, e.g. B1- from 1 to 40 makes B1-01 to B1-40.
+No parking bays yet. Add the bays of a property above.
+{0} occupied
+{0} closed
+Unit {0}
+until {0}
+{0} a year
+free
+Release this bay? Draft invoices dated after that day are removed.
+Released on
+Release
+Give to a contract
+Open again
+The contract ends
+Choose the kind of bay from the list.
+Type the bay number, or the first and last number of a run.
+The property already has that bay.
+1 bay added.
+The bay was not found.
+Choose the bay.
+Choose a contract that is in force.
+The contract is for a unit in another property.
+The start date is after the contract ends.
+Choose the payment terms from the list.
+The bay has already been released.
+Uncovered

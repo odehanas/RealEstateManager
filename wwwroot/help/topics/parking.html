@@ -1,0 +1,64 @@
+<p><strong>Car Parking</strong> keeps each property's numbered parking bays, who has each one, and which are free. A bay is
+given to a <strong>contract</strong>, and so to that contract's unit and tenant, for a charge billed on the payment terms you
+choose.</p>
+
+<h3>Step 1: add the bays of a property</h3>
+<p>Open <strong>Master Data ▸ Car Parking</strong>. Under <strong>Add parking bays</strong> choose the property, then either:</p>
+<ul>
+    <li><strong>One bay:</strong> type its number (for example <code>P-7</code>) and leave From and To empty.</li>
+    <li><strong>A run of bays:</strong> type a prefix and the first and last number. <code>B1-</code> from 1 to 40 makes
+    <code>B1-01</code> to <code>B1-40</code>. Numbers the property already has are skipped.</li>
+</ul>
+<p>The kind of bay (Covered, Uncovered, Basement, Visitor) is optional.</p>
+
+<h3>Step 2: give a bay to a contract</h3>
+<ol>
+    <li>On a vacant bay press <strong>Give to a contract</strong>.</li>
+    <li>Choose the <strong>contract</strong>. Only contracts in force on that property are offered.</li>
+    <li>Set the date it starts <strong>from</strong>. The bay runs until the contract ends.</li>
+    <li>Enter the <strong>charge a year</strong> before VAT, or 0 when the bay comes with the unit free of charge.</li>
+    <li>Choose the <strong>payment terms</strong>: <em>One payment</em>, or Monthly, Every 2 Months, Quarterly, Every 4 Months,
+    Semi-Annual or Annual, the same choices as a contract's rent.</li>
+    <li>Check the <strong>VAT</strong>. It starts as the contract's own treatment and can be changed.</li>
+    <li>Add the vehicle plate if you record it, and press <strong>Give the bay</strong>.</li>
+</ol>
+
+<h3>How the charge is billed</h3>
+<table class="t-compact">
+    <tr><th>Payment terms</th><th>What is created</th></tr>
+    <tr><td>One payment</td><td>One invoice on the start date for the whole period: the yearly charge for the months it covers.</td></tr>
+    <tr><td>Monthly, Quarterly and the others</td><td>An invoice on the start date and then every so many months until the
+    contract ends, each for the yearly charge divided by the number of payments in a year.</td></tr>
+    <tr><td>Charge of 0</td><td>No invoice. The bay shows as occupied and free.</td></tr>
+</table>
+<p>The invoices are numbered <code>PRK-</code>, read <em>Car parking, bay …</em>, and are created as <strong>drafts</strong>,
+like a contract's rent invoices: post each from <strong>Customer Invoices</strong> when it falls due. The tenant sees them in
+the portal and on their statement.</p>
+
+<div class="box">
+    <div class="box-title">Parking is rent of the property</div>
+    <p>A parking charge is accounted for exactly as rent is. For a property the company owns it is the company's rental
+    income, earned month by month. For a property managed for an owner it is the <strong>owner's</strong> money: it enters the
+    owner's settlement and profitability, and the company earns its commission on it.</p>
+</div>
+
+<h3>The board</h3>
+<p>Each property shows its bays as tiles: <strong>green</strong> for vacant, <strong>blue</strong> for occupied (with the
+tenant, unit, vehicle plate, end date and yearly charge) and <strong>grey</strong> for closed. The figures at the top count
+the bays, how many are occupied and vacant, and the parking charges a year for the bays now taken. Use the property filter to
+see one building, and <strong>Print</strong> for a paper copy.</p>
+
+<h3>Taking a bay back</h3>
+<ul>
+    <li><strong>Release</strong> on an occupied bay frees it from the date you choose. Draft parking invoices dated after
+    that day are removed. Invoices already posted stay; issue a credit note if the tenant is owed a refund.</li>
+    <li>When a contract is closed through a <strong>Lease Handover</strong>, its bays are released automatically from the
+    handover date.</li>
+    <li><strong>Close</strong> takes a vacant bay out of use without deleting it; <strong>Open again</strong> brings it back.</li>
+</ul>
+
+<div class="box">
+    <div class="box-title">Who can do what</div>
+    <p>Users who manage leases or master data add bays and give or release them. Users who can view master data, and the
+    owner, can open the board.</p>
+</div>

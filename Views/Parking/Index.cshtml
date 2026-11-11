@@ -1,0 +1,266 @@
+@model List<RealEstateManager.Services.ParkingService.PropertyBoard>
+@using RealEstateManager.Domain
+@inject PermissionService PermissionService
+
+@{
+    ViewData["Title"] = T["Car Parking"];
+    var properties = ViewBag.Properties as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+    var propertyId = ViewBag.PropertyId as int?;
+    var assignBay = ViewBag.AssignBay as ParkingService.BayRow;
+    var leases = ViewBag.Leases as List<ParkingService.LeaseOption> ?? new();
+    var canChange = await PermissionService.HasAnyPermissionAsync(User, AppPermissions.LeasesManage, AppPermissions.MasterDataManage);
+    var total = Model.Sum(x => x.Total);
+    var occupied = Model.Sum(x => x.Occupied);
+}
+
+<style>
+    .bay-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .6rem; }
+    .bay { border: 1px solid #d8dee6; border-radius: 8px; padding: .55rem .7rem; background: #fff; border-inline-start-width: 5px; }
+    .bay.vacant { border-inline-start-color: #198754; }
+    .bay.occupied { border-inline-start-color: #2a78d6; }
+    .bay.closed { border-inline-start-color: #adb5bd; background: #f6f7f9; color: #6c757d; }
+    .bay .no { font-weight: 700; font-size: 1.05rem; }
+    @@media print { .no-print { display: none !important; } .bay { break-inside: avoid; } }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Car Parking"]</h2>
+        <p class="text-muted mb-0" style="max-width:820px">
+            @T["Each property's numbered parking bays: which are taken, by which tenant and unit, and which are free. A bay is given to a contract for a charge billed in one payment or in instalments, as the rent is."]
+        </p>
+    </div>
+    <button type="button" class="btn btn-outline-dark no-print" onclick="window.print()">@T["Print"]</button>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted small">@T["Bays"]</div><div class="fs-4 fw-semibold">@total</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted small">@T["Occupied"]</div><div class="fs-4 fw-semibold">@occupied</div><div class="small text-muted">@(total > 0 ? ((decimal)occupied / total).ToString("P0") : "-")</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted small">@T["Vacant"]</div><div class="fs-4 fw-semibold @(total - occupied > 0 ? "text-success" : "")">@(total - occupied)</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body"><div class="text-muted small">@T["Parking charges a year"]</div><div class="fs-4 fw-semibold">@Model.Sum(x => x.AnnualIncome).ToString("N2")</div><div class="small text-muted">@T["before VAT, bays now taken"]</div></div></div></div>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3 no-print">
+    <div class="col-auto">
+        <label class="form-label small mb-0" for="propertyId">@T["Property"]</label>
+        <select id="propertyId" name="propertyId" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">@T["All properties"]</option>
+            @foreach (var property in properties)
+            {
+                <option value="@property.Id" selected="@((int)property.Id == propertyId ? "selected" : null)">@property.Name</option>
+            }
+        </select>
+    </div>
+</form>
+
+@if (assignBay != null && canChange)
+{
+    <form asp-action="Assign" method="post" class="card border-primary mb-4" id="assignForm">
+        <div class="card-header bg-white fw-semibold">@T.Format("Give bay {0} to a contract", assignBay.Number) <span class="text-muted fw-normal small">@ViewBag.AssignProperty</span></div>
+        <div class="card-body row g-3">
+            <input type="hidden" name="BayId" value="@assignBay.Id" />
+            <input type="hidden" name="propertyId" value="@propertyId" />
+            @if (leases.Count == 0)
+            {
+                <div class="col-12"><div class="alert alert-warning mb-0">@T["This property has no contract in force, so there is nobody to give the bay to."]</div></div>
+            }
+            else
+            {
+                <div class="col-md-6">
+                    <label class="form-label" for="LeaseId">@T["Contract"]</label>
+                    <select id="LeaseId" name="LeaseId" class="form-select" required>
+                        <option value="">@T["-- choose the contract --"]</option>
+                        @foreach (var lease in leases)
+                        {
+                            <option value="@lease.Id" data-vat="@lease.VatCategory" data-end="@lease.EndDate.ToString("dd/MM/yyyy")">@lease.Label</option>
+                        }
+                    </select>
+                    <div class="form-text" id="leaseEnd"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="StartDate">@T["From"]</label>
+                    <input id="StartDate" name="StartDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="VehiclePlate">@T["Vehicle plate"]</label>
+                    <input id="VehiclePlate" name="VehiclePlate" class="form-control" maxlength="30" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="AnnualCharge">@T["Charge a year (before VAT)"]</label>
+                    <input id="AnnualCharge" name="AnnualCharge" type="number" step="0.01" min="0" value="0.00" class="form-control" required />
+                    <div class="form-text">@T["0 = the bay comes with the unit, free."]</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="BillingFrequencyMonths">@T["Payment terms"]</label>
+                    <select id="BillingFrequencyMonths" name="BillingFrequencyMonths" class="form-select">
+                        @foreach (var months in ParkingAssignment.Frequencies)
+                        {
+                            <option value="@months">@T[ParkingAssignment.DescribeFrequency(months)]</option>
+                        }
+                    </select>
+                    <div class="form-text">@T["One payment bills the whole period at once, for the months it covers."]</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="VatCategory">@T["VAT"]</label>
+                    <select id="VatCategory" name="VatCategory" class="form-select">
+                        @foreach (var category in VatCategories.All)
+                        {
+                            <option value="@category">@T[VatCategories.Describe(category)]</option>
+                        }
+                    </select>
+                    <div class="form-text">@T["Starts as the contract's own VAT treatment."]</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="Notes">@T["Note"]</label>
+                    <input id="Notes" name="Notes" class="form-control" maxlength="300" />
+                </div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">@T["Give the bay"]</button>
+                    <a asp-action="Index" asp-route-propertyId="@propertyId" class="btn btn-outline-secondary">@T["Cancel"]</a>
+                </div>
+            }
+        </div>
+    </form>
+}
+
+@if (canChange)
+{
+    <form asp-action="AddBays" method="post" class="card mb-4 no-print">
+        <div class="card-header bg-white fw-semibold">@T["Add parking bays"]</div>
+        <div class="card-body row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small mb-0" for="addProperty">@T["Property"]</label>
+                <select id="addProperty" name="propertyId" class="form-select form-select-sm" required>
+                    <option value="">@T["-- choose --"]</option>
+                    @foreach (var property in properties)
+                    {
+                        <option value="@property.Id" selected="@((int)property.Id == propertyId ? "selected" : null)">@property.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-0" for="prefix">@T["Number or prefix"]</label>
+                <input id="prefix" name="prefix" class="form-control form-control-sm" maxlength="20" placeholder="B1-" />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small mb-0" for="from">@T["From"]</label>
+                <input id="from" name="from" type="number" min="0" class="form-control form-control-sm" placeholder="1" />
+            </div>
+            <div class="col-md-1">
+                <label class="form-label small mb-0" for="to">@T["To"]</label>
+                <input id="to" name="to" type="number" min="0" class="form-control form-control-sm" placeholder="40" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-0" for="type">@T["Kind of bay"]</label>
+                <select id="type" name="type" class="form-select form-select-sm">
+                    <option value="">@T["-- any --"]</option>
+                    @foreach (var type in ParkingBayTypes.All)
+                    {
+                        <option value="@type">@T[type]</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2"><button type="submit" class="btn btn-sm btn-dark w-100">@T["Add"]</button></div>
+            <div class="col-12 form-text">@T["One bay: type its number and leave From and To empty. A run: a prefix with From and To, e.g. B1- from 1 to 40 makes B1-01 to B1-40."]</div>
+        </div>
+    </form>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">@T["No parking bays yet. Add the bays of a property above."]</div>
+}
+
+@foreach (var property in Model)
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <strong>@property.Property</strong>
+            <span class="small">
+                <span class="badge bg-primary">@T.Format("{0} occupied", property.Occupied)</span>
+                <span class="badge bg-success">@T.Format("{0} vacant", property.Vacant)</span>
+                @if (property.Closed > 0)
+                {
+                    <span class="badge bg-secondary">@T.Format("{0} closed", property.Closed)</span>
+                }
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="bay-grid">
+                @foreach (var bay in property.Bays)
+                {
+                    <div class="bay @(!bay.IsActive ? "closed" : bay.IsOccupied ? "occupied" : "vacant")">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <span class="no">@bay.Number</span>
+                            <span class="badge @(!bay.IsActive ? "bg-secondary" : bay.IsOccupied ? "bg-primary" : "bg-success")">
+                                @(!bay.IsActive ? T["Closed"] : bay.IsOccupied ? T["Occupied"] : T["Vacant"])
+                            </span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(bay.Type))
+                        {
+                            <div class="small text-muted">@T[bay.Type]</div>
+                        }
+                        @if (bay.IsOccupied)
+                        {
+                            <div class="small fw-semibold mt-1">@bay.Tenant</div>
+                            <div class="small">@T.Format("Unit {0}", bay.Unit)@(string.IsNullOrWhiteSpace(bay.VehiclePlate) ? "" : " · " + bay.VehiclePlate)</div>
+                            <div class="small text-muted">
+                                @T.Format("until {0}", bay.Until?.ToString("dd/MM/yyyy"))
+                                &middot; @(bay.AnnualCharge > 0m ? T.Format("{0} a year", bay.AnnualCharge.ToString("N2")) : T["free"])
+                            </div>
+                            @if (canChange)
+                            {
+                                <form asp-action="Release" method="post" class="mt-2 d-grid gap-1 no-print"
+                                      onsubmit="return confirm('@T["Release this bay? Draft invoices dated after that day are removed."]');">
+                                    <input type="hidden" name="id" value="@bay.AssignmentId" />
+                                    <input type="hidden" name="propertyId" value="@propertyId" />
+                                    <input type="date" name="on" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control form-control-sm" aria-label="@T["Released on"]" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@T["Release"]</button>
+                                </form>
+                            }
+                        }
+                        else if (canChange)
+                        {
+                            <div class="mt-2 d-flex flex-wrap gap-1 no-print">
+                                @if (bay.IsActive)
+                                {
+                                    <a asp-action="Index" asp-route-propertyId="@propertyId" asp-route-assign="@bay.Id" asp-fragment="assignForm" class="btn btn-sm btn-outline-primary">@T["Give to a contract"]</a>
+                                }
+                                <form asp-action="ToggleBay" method="post">
+                                    <input type="hidden" name="id" value="@bay.Id" />
+                                    <input type="hidden" name="propertyId" value="@propertyId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">@(bay.IsActive ? T["Close"] : T["Open again"])</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            // The contract chosen sets the VAT treatment the bay starts with, and shows when it ends.
+            var lease = document.getElementById('LeaseId');
+            if (!lease) return;
+            lease.addEventListener('change', function () {
+                var option = lease.selectedOptions[0];
+                var vat = document.getElementById('VatCategory');
+                if (option && option.dataset.vat && vat) vat.value = option.dataset.vat;
+                document.getElementById('leaseEnd').textContent = option && option.dataset.end ? '@T["The contract ends"] ' + option.dataset.end : '';
+            });
+        })();
+    </script>
+}
