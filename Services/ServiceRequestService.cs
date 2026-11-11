@@ -84,6 +84,11 @@ namespace RealEstateManager.Services
                     Outstanding = x.TotalAmount - x.AmountPaid
                 })
                 .ToListAsync();
+
+            var companyId = await _db.Tenants.IgnoreQueryFilters().AsNoTracking().Where(x => x.Id == tenantId).Select(x => (int?)x.CompanyId).FirstOrDefaultAsync();
+            model.Services = companyId.HasValue
+                ? await PaidServiceService.OptionsAsync(_db, companyId.Value)
+                : new();
         }
 
         /// <summary>
@@ -110,6 +115,37 @@ namespace RealEstateManager.Services
             {
                 modelState.AddModelError(string.Empty, "Your tenant record could not be found.");
                 return null;
+            }
+
+            // An order for a paid service is saved as a maintenance job that carries the
+            // service. Its title and text default to the service's own, so a tenant need
+            // only pick it.
+            ServiceCatalogItem? ordered = null;
+            if (model.RequestType == ServiceRequestCreateViewModel.PaidServiceType)
+            {
+                model.RequestType = ServiceRequestTypes.Maintenance;
+                ordered = model.ServiceCatalogItemId.HasValue
+                    ? await _db.ServiceCatalogItems.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(x =>
+                        x.Id == model.ServiceCatalogItemId.Value && x.CompanyId == tenant.CompanyId && x.IsActive)
+                    : null;
+
+                if (ordered == null)
+                {
+                    modelState.AddModelError(nameof(model.ServiceCatalogItemId), "Choose the service from the list.");
+                }
+                else
+                {
+                    if (string.IsNullOrWhiteSpace(model.Subject))
+                        model.Subject = ordered.Name;
+                    if (string.IsNullOrWhiteSpace(model.Description))
+                        model.Description = $"Service ordered: {ordered.Name}.";
+                    if (!model.LeaseId.HasValue)
+                        modelState.AddModelError(nameof(model.LeaseId), "Choose the property the service is for.");
+                }
+            }
+            else
+            {
+                model.ServiceCatalogItemId = null;
             }
 
             if (string.IsNullOrWhiteSpace(model.Subject))
@@ -234,6 +270,12 @@ namespace RealEstateManager.Services
                     ? await MaintenanceService.PickTechnicianAsync(_db, tenant.CompanyId)
                     : null
             };
+
+            if (ordered != null && await PaidServiceService.AttachAsync(_db, request, ordered.Id) is { } notOrdered)
+            {
+                modelState.AddModelError(string.Empty, notOrdered);
+                return null;
+            }
 
             // The thread is the audit trail: it says who typed this in for the tenant.
             if (loggedByStaff)
@@ -877,6 +919,11 @@ namespace RealEstateManager.Services
 
             if (request.Status == ServiceRequestStatuses.Cancelled)
                 return (false, "The tenant withdrew this request, so it cannot be reopened.");
+
+            // A service the tenant pays for first is not started, or signed off, unpaid.
+            if ((newStatus == ServiceRequestStatuses.InProgress || newStatus == ServiceRequestStatuses.Resolved) &&
+                await PaidServiceService.WorkHoldAsync(_db, request) is { } hold)
+                return (false, hold);
 
             if ((newStatus == ServiceRequestStatuses.Resolved ||
                  newStatus == ServiceRequestStatuses.Rejected) &&

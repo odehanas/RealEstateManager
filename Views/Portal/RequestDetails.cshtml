@@ -55,6 +55,8 @@
     </div>
 </div>
 
+<partial name="_PaidService" model="@((Model.Id, "portal"))" />
+
 @if (Model.RequestType == ServiceRequestTypes.PaymentPostponement && Model.RelatedInvoiceNumber != null)
 {
     <div class="card shadow-sm mb-3">

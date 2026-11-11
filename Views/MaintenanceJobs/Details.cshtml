@@ -32,6 +32,7 @@
 
 <div class="row g-3">
     <div class="col-lg-7">
+        <partial name="_PaidService" model="@((Model.Id, "job"))" />
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white">@T.Html("<strong>The request</strong>")</div>
             <div class="card-body">
@@ -89,6 +90,7 @@
                                             <span>@T["Store"]</span>
                                             if (m.JournalEntryId.HasValue) { <a asp-controller="Documents" asp-action="Entry" asp-route-id="@m.JournalEntryId" class="small">@T["entry"]</a> }
                                         }
+                                        else if (m.Source == MaintenanceMaterialSources.Subcontractor) { <span>@T.Format("Subcontractor ({0})", m.Reference)</span> }
                                         else { <span>@T.Format("Bought ({0})", m.Reference)</span> }
                                     </td>
                                     <td class="text-end">@m.Quantity.ToString("0.###")</td>
@@ -117,6 +119,7 @@
                         <select id="matSource" name="Source" class="form-select form-select-sm">
                             <option value="Stock">@T["Maintenance store"]</option>
                             <option value="Purchased">@T["Bought for the job"]</option>
+                            <option value="Subcontractor">@T["Subcontractor's charge"]</option>
                         </select>
                     </div>
                     <div class="col-md-2"><label class="form-label small mb-0" for="matRef">@T["Bill / receipt"]</label><input id="matRef" name="Reference" class="form-control form-control-sm" maxlength="100" placeholder="@T["if bought"]" /></div>

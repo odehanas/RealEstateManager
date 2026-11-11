@@ -96,8 +96,10 @@ namespace RealEstateManager.Services
             if (string.IsNullOrWhiteSpace(entry.Description)) return (false, "Say what the material is.");
             if (entry.Quantity <= 0m || entry.UnitCost < 0m) return (false, "Quantity must be above zero and the cost cannot be negative.");
             if (!MaintenanceMaterialSources.All.Contains(entry.Source)) return (false, "Choose where the material came from.");
-            if (entry.Source == MaintenanceMaterialSources.Purchased && string.IsNullOrWhiteSpace(entry.Reference))
-                return (false, "Give the bill or receipt number the item was bought on.");
+            if (entry.Source != MaintenanceMaterialSources.Stock && string.IsNullOrWhiteSpace(entry.Reference))
+                return (false, entry.Source == MaintenanceMaterialSources.Subcontractor
+                    ? "Give the number of the subcontractor's bill."
+                    : "Give the bill or receipt number the item was bought on.");
 
             var amount = Math.Round(entry.Quantity * entry.UnitCost, 2);
             if (entry.Source == MaintenanceMaterialSources.Stock && amount <= 0m)
@@ -114,7 +116,9 @@ namespace RealEstateManager.Services
                 Amount = amount,
                 Source = entry.Source,
                 Reference = string.IsNullOrWhiteSpace(entry.Reference) ? null : entry.Reference.Trim(),
-                ChargedTo = job.Property?.OwnershipType == "Managed" ? "Owner" : "Company",
+                // A service the tenant pays the company for is the company's cost to bear,
+                // whoever owns the building: the owner neither earns from it nor pays for it.
+                ChargedTo = job.Property?.OwnershipType == "Managed" && !job.ServiceCatalogItemId.HasValue ? "Owner" : "Company",
                 CreatedAt = DateTime.UtcNow,
                 CreatedByName = userName
             };

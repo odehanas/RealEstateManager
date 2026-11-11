@@ -437,6 +437,12 @@
                                         <li>
                                             <a class="sidebar-link" asp-controller="MaintenanceCategories" asp-action="Index">@T["Kinds of Maintenance Work"]</a>
                                         </li>
+                                        @if (canHandleServiceRequests)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="ServiceCatalog" asp-action="Index">@T["Paid Services"]</a>
+                                        </li>
+                                        }
                                         }
                                         @if (canManageMaintenance)
                                         {

@@ -64,7 +64,7 @@ namespace RealEstateManager.Services
             var billedForOwner = invoice.Lease.Unit.Property.BillsInOwnerName && !invoice.IsCharge;
 
             var offsetAccount = invoice.IsCharge
-                ? await GetMappedAccountAsync(invoice.CompanyId, settings.PdcChargeIncomeAccountId ?? settings.OtherIncomeAccountId, "Cheque charges income")
+                ? await GetMappedAccountAsync(invoice.CompanyId, invoice.IncomeAccountId ?? settings.PdcChargeIncomeAccountId ?? settings.OtherIncomeAccountId, "Charges income")
                 : ownershipType == "Managed"
                     ? await GetMappedAccountAsync(invoice.CompanyId, settings.DueToLandlordsAccountId, "Due To Landlords")
                     : await GetMappedAccountAsync(invoice.CompanyId, settings.UnearnedRevenueAccountId, "Unearned Revenue");
@@ -232,7 +232,7 @@ namespace RealEstateManager.Services
 
             var netAccountId = note.DebitAccountId
                                ?? (invoice.IsCharge
-                                   ? settings.PdcChargeIncomeAccountId ?? settings.OtherIncomeAccountId
+                                   ? invoice.IncomeAccountId ?? settings.PdcChargeIncomeAccountId ?? settings.OtherIncomeAccountId
                                    : await GetInvoiceNetAccountIdAsync(note.CompanyId, lease.Unit!.Property!.OwnershipType));
             var netAccount = await GetMappedAccountAsync(note.CompanyId, netAccountId, "Credit note account");
 

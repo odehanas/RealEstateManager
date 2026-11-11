@@ -43,7 +43,17 @@ namespace RealEstateManager.Domain
         public const string Stock = "Stock";
         public const string Purchased = "Purchased";
 
-        public static readonly string[] All = { Stock, Purchased };
+        /// <summary>An outside supplier's charge for doing the job, booked by the supplier's bill.</summary>
+        public const string Subcontractor = "Subcontractor";
+
+        public static readonly string[] All = { Stock, Purchased, Subcontractor };
+
+        public static string Describe(string source) => source switch
+        {
+            Stock => "Maintenance store",
+            Subcontractor => "Subcontractor",
+            _ => "Bought for the job"
+        };
     }
 
     /// <summary>

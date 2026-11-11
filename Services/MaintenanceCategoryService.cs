@@ -17,11 +17,28 @@ namespace RealEstateManager.Services
 
         private readonly ApplicationDbContext _db;
         private readonly ICurrentCompanyAccessor _company;
+        private readonly IHttpContextAccessor _http;
 
-        public MaintenanceCategoryService(ApplicationDbContext db, ICurrentCompanyAccessor company)
+        public MaintenanceCategoryService(ApplicationDbContext db, ICurrentCompanyAccessor company, IHttpContextAccessor http)
         {
             _db = db;
             _company = company;
+            _http = http;
+        }
+
+        /// <summary>
+        /// The company whose list applies: the one a member of staff is working in, or,
+        /// in the tenant portal (where nobody carries a company), the tenant's own.
+        /// </summary>
+        private async Task<int?> CompanyIdAsync()
+        {
+            if (_company.CompanyId.HasValue)
+                return _company.CompanyId;
+
+            var tenantId = _http.HttpContext?.User.FindFirst(AppClaimTypes.PortalTenantId)?.Value;
+            return int.TryParse(tenantId, out var id)
+                ? await _db.Tenants.IgnoreQueryFilters().AsNoTracking().Where(x => x.Id == id).Select(x => (int?)x.CompanyId).FirstOrDefaultAsync()
+                : null;
         }
 
         /// <summary>
@@ -31,8 +48,9 @@ namespace RealEstateManager.Services
         /// </summary>
         public async Task<List<string>> NamesAsync(string? include = null)
         {
-            var names = _company.CompanyId.HasValue
-                ? await NamesAsync(_db, _company.CompanyId.Value)
+            var companyId = await CompanyIdAsync();
+            var names = companyId.HasValue
+                ? await NamesAsync(_db, companyId.Value)
                 : ServiceRequestCategories.Maintenance.ToList();
 
             if (!string.IsNullOrWhiteSpace(include) && !names.Contains(include, StringComparer.OrdinalIgnoreCase))

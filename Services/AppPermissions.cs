@@ -312,6 +312,8 @@ namespace RealEstateManager.Services
                 ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
                 ["MaintenancePlans"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
                 ["MaintenanceCategories"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
+                // The price list and what the services earned: the office and the accounts, not the technicians.
+                ["ServiceCatalog"] = new[] { AppPermissions.ServiceRequestsManage, AppPermissions.AccountingManage },
                 ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
                 ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
@@ -420,7 +422,7 @@ namespace RealEstateManager.Services
             {
                 "ChartOfAccounts", "AccountMappings", "OpeningBalances", "OwnerWithdrawalCategories",
                 "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing", "BankAccounts",
-                "MaintenanceCategories"
+                "MaintenanceCategories", "ServiceCatalog"
             };
 
         private static readonly HashSet<string> CompanySetupActions =

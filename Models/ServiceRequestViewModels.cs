@@ -5,8 +5,17 @@ namespace RealEstateManager.Models
     /// <summary>What the tenant fills in to raise a request.</summary>
     public class ServiceRequestCreateViewModel
     {
+        /// <summary>
+        /// What the form sends as the kind of request when the tenant is ordering a paid
+        /// service. It is not a stored type: the order is saved as a maintenance job.
+        /// </summary>
+        public const string PaidServiceType = "PaidService";
+
         public string RequestType { get; set; } = ServiceRequestTypes.Maintenance;
         public string? Category { get; set; }
+
+        /// <summary>The service ordered from the company's price list, for a paid service.</summary>
+        public int? ServiceCatalogItemId { get; set; }
 
         public string Subject { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -31,6 +40,9 @@ namespace RealEstateManager.Models
         // ---- Options for the form -------------------------------------------
         public List<ServiceRequestLeaseOption> Leases { get; set; } = new();
         public List<ServiceRequestInvoiceOption> OutstandingInvoices { get; set; } = new();
+
+        /// <summary>The paid services on offer; empty when the company has none.</summary>
+        public List<RealEstateManager.Services.PaidServiceService.Option> Services { get; set; } = new();
     }
 
     /// <summary>A tenant in the list staff choose from when logging a request.</summary>

@@ -3187,3 +3187,97 @@ Another kind of work already has that name.
 Keep at least one kind of work switched on.
 Type the name of the kind of work.
 That kind of work was not found.
+Paid Services
+Paid Services Price List
+Services a tenant asks for and pays for: special maintenance that is not the landlord's to do free of charge, and special requests such as cleaning that the company may give to a subcontractor. A tenant orders from this list in the portal, or staff order for them; the tenant is invoiced, and the work waits for the payment where the service says so.
+Orders and margin
+Add a service
+Change: {0}
+Service
+e.g. Deep cleaning - one bedroom
+Special maintenance
+Special request
+Paid service
+What is included
+The tenant reads this when choosing the service.
+Selling price (before VAT)
+0 = priced when the invoice is issued.
+Expected cost
+The subcontractor's price, or materials and time.
+Income account
+-- the company's Other Income account --
+Where the price is credited when the invoice is posted.
+The tenant pays before the work starts
+Done by a subcontractor
+Offered to tenants
+Add service
+No services yet. Add the first one above; tenants see the list as soon as it has an entry.
+Selling price
+Expected margin
+Terms
+on quotation
+Paid before the work
+Invoiced, work not held
+Subcontracted
+The price is charged to the tenant as a tax invoice in the company's own name, with VAT where the company is registered. It is the company's income whoever owns the building, and is never part of what an owner is paid. An order keeps the price it was made at: changing the list does not change orders already made.
+Paid Service Orders
+What tenants ordered, what they were charged and paid, and what each service cost the company.
+Price list
+Orders
+{0} awaiting payment
+Invoiced (before VAT)
+{0} not invoiced yet
+Cost recorded
+expected {0}
+Margin
+No paid services were ordered in this period.
+By service
+Price
+Price and margin are before VAT; Paid includes VAT. Cost is what was recorded on the job: materials from the store, items bought, and the subcontractor's bill. Margin = price - cost.
+Not invoiced yet
+Invoice awaiting posting
+Awaiting payment
+Partly paid
+to be quoted
+including VAT {0}
+Paid, thank you. We will carry out the service and keep you posted here.
+We have your order. We will confirm it and send you the invoice here.
+Please pay invoice {0}: {1} is due. The work starts once it is paid. You will find the invoice under Invoices.
+Invoice {0}: {1} is due. You will find it under Invoices.
+{0} + VAT {1}
+priced when the invoice is issued
+{0} of {1}
+Cost recorded on the job
+Work on hold: this service is paid for before the work starts. The job can be started once the invoice is paid in full.
+Paid in full: the work can go ahead.
+This order names no contract, so it cannot be invoiced.
+Issue the invoice to the tenant? It is posted to the accounts.
+Price before VAT
+Issue invoice
+Record the tenant's payment
+The invoice's entry is still a draft. Post it from Journal Inquiry; the tenant can then pay it.
+Which service?
+-- choose the service --
+{0} including VAT
+price on quotation
+This is a paid service. We confirm the order and send the invoice; where the service is paid in advance, the work starts once the invoice is paid.
+Order a paid service
+Subcontractor's charge
+Subcontractor ({0})
+Subcontractor
+Service added to the price list.
+Service saved.
+Give the service a name.
+Choose whether it is special maintenance or a special request.
+The price and the cost cannot be negative.
+Choose one of the company's income accounts.
+Another service already has that name.
+That service was not found.
+Choose the service from the list.
+Choose the property the service is for.
+This request is not an order for a paid service.
+The request is closed, so no invoice can be issued for it.
+The invoice for this service has already been issued.
+Give the price of the service, before VAT.
+Give the number of the subcontractor's bill.
+Your invoice for this service is ready. Open it to see the amount.

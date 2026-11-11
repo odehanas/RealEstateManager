@@ -147,3 +147,98 @@ Another kind of work already has that name. ||| يوجد نوع عمل آخر ب
 Keep at least one kind of work switched on. ||| أبقِ نوع عمل واحداً على الأقل مفعّلاً.
 Type the name of the kind of work. ||| اكتب اسم نوع العمل.
 That kind of work was not found. ||| نوع العمل غير موجود.
+# Paid services: the price list, orders, invoice and margin.
+Paid Services ||| الخدمات المدفوعة
+Paid Services Price List ||| قائمة أسعار الخدمات المدفوعة
+Services a tenant asks for and pays for: special maintenance that is not the landlord's to do free of charge, and special requests such as cleaning that the company may give to a subcontractor. A tenant orders from this list in the portal, or staff order for them; the tenant is invoiced, and the work waits for the payment where the service says so. ||| خدمات يطلبها المستأجر ويدفع ثمنها: صيانة خاصة ليست على المالك مجاناً، وطلبات خاصة مثل التنظيف قد تسندها الشركة إلى مقاول من الباطن. يطلب المستأجر من هذه القائمة في البوابة أو يطلب له الموظفون؛ تصدر له فاتورة، وينتظر العمل الدفع حيث تنص الخدمة على ذلك.
+Orders and margin ||| الطلبات والهامش
+Add a service ||| إضافة خدمة
+Change: {0} ||| تعديل: {0}
+Service ||| الخدمة
+e.g. Deep cleaning - one bedroom ||| مثال: تنظيف عميق - غرفة نوم واحدة
+Special maintenance ||| صيانة خاصة
+Special request ||| طلب خاص
+Paid service ||| خدمة مدفوعة
+What is included ||| ما تشمله الخدمة
+The tenant reads this when choosing the service. ||| يقرأ المستأجر هذا عند اختيار الخدمة.
+Selling price (before VAT) ||| سعر البيع (قبل الضريبة)
+0 = priced when the invoice is issued. ||| 0 = يُسعَّر عند إصدار الفاتورة.
+Expected cost ||| التكلفة المتوقعة
+The subcontractor's price, or materials and time. ||| سعر المقاول من الباطن، أو المواد والوقت.
+Income account ||| حساب الإيراد
+-- the company's Other Income account -- ||| -- حساب الإيرادات الأخرى للشركة --
+Where the price is credited when the invoice is posted. ||| الحساب الذي يُقيَّد فيه السعر دائناً عند ترحيل الفاتورة.
+The tenant pays before the work starts ||| يدفع المستأجر قبل بدء العمل
+Done by a subcontractor ||| ينفذها مقاول من الباطن
+Offered to tenants ||| معروضة للمستأجرين
+Add service ||| إضافة الخدمة
+No services yet. Add the first one above; tenants see the list as soon as it has an entry. ||| لا توجد خدمات بعد. أضف الأولى أعلاه؛ يرى المستأجرون القائمة فور إضافة أول خدمة.
+Selling price ||| سعر البيع
+Expected margin ||| الهامش المتوقع
+Terms ||| الشروط
+on quotation ||| حسب عرض السعر
+Paid before the work ||| تُدفع قبل العمل
+Invoiced, work not held ||| تُفوتر، والعمل لا ينتظر
+Subcontracted ||| مقاول من الباطن
+The price is charged to the tenant as a tax invoice in the company's own name, with VAT where the company is registered. It is the company's income whoever owns the building, and is never part of what an owner is paid. An order keeps the price it was made at: changing the list does not change orders already made. ||| يُحمَّل السعر على المستأجر بفاتورة ضريبية باسم الشركة، مع الضريبة إذا كانت الشركة مسجلة. هو إيراد للشركة أياً كان مالك المبنى، ولا يدخل أبداً في ما يُدفع للمالك. يحتفظ الطلب بالسعر الذي أُنشئ به: تغيير القائمة لا يغيّر الطلبات السابقة.
+Paid Service Orders ||| طلبات الخدمات المدفوعة
+What tenants ordered, what they were charged and paid, and what each service cost the company. ||| ما طلبه المستأجرون، وما حُمّل عليهم وما دفعوه، وما كلّفته كل خدمة للشركة.
+Price list ||| قائمة الأسعار
+Orders ||| الطلبات
+{0} awaiting payment ||| {0} بانتظار الدفع
+Invoiced (before VAT) ||| المفوتر (قبل الضريبة)
+{0} not invoiced yet ||| {0} لم تُفوتر بعد
+Cost recorded ||| التكلفة المسجلة
+expected {0} ||| المتوقع {0}
+Margin ||| الهامش
+No paid services were ordered in this period. ||| لم تُطلب خدمات مدفوعة في هذه الفترة.
+By service ||| حسب الخدمة
+Price ||| السعر
+Price and margin are before VAT; Paid includes VAT. Cost is what was recorded on the job: materials from the store, items bought, and the subcontractor's bill. Margin = price - cost. ||| السعر والهامش قبل الضريبة؛ والمدفوع يشمل الضريبة. التكلفة هي ما سُجّل على العمل: مواد من المخزن، ومشتريات، وفاتورة المقاول من الباطن. الهامش = السعر - التكلفة.
+Not invoiced yet ||| لم تُفوتر بعد
+Invoice awaiting posting ||| الفاتورة بانتظار الترحيل
+Awaiting payment ||| بانتظار الدفع
+Partly paid ||| مدفوعة جزئياً
+to be quoted ||| يُحدَّد بعرض سعر
+including VAT {0} ||| شاملاً الضريبة {0}
+Paid, thank you. We will carry out the service and keep you posted here. ||| تم الدفع، شكراً لك. سننفذ الخدمة ونبقيك على اطلاع هنا.
+We have your order. We will confirm it and send you the invoice here. ||| استلمنا طلبك. سنؤكده ونرسل لك الفاتورة هنا.
+Please pay invoice {0}: {1} is due. The work starts once it is paid. You will find the invoice under Invoices. ||| يرجى دفع الفاتورة {0}: المستحق {1}. يبدأ العمل فور الدفع. تجد الفاتورة ضمن الفواتير.
+Invoice {0}: {1} is due. You will find it under Invoices. ||| الفاتورة {0}: المستحق {1}. تجدها ضمن الفواتير.
+{0} + VAT {1} ||| {0} + ضريبة {1}
+priced when the invoice is issued ||| يُسعَّر عند إصدار الفاتورة
+{0} of {1} ||| {0} من {1}
+Cost recorded on the job ||| التكلفة المسجلة على العمل
+Work on hold: this service is paid for before the work starts. The job can be started once the invoice is paid in full. ||| العمل معلّق: هذه الخدمة تُدفع قبل بدء العمل. يمكن بدء العمل بعد دفع الفاتورة كاملة.
+Paid in full: the work can go ahead. ||| مدفوعة بالكامل: يمكن تنفيذ العمل.
+This order names no contract, so it cannot be invoiced. ||| هذا الطلب لا يحدد عقداً، فلا يمكن إصدار فاتورة له.
+Issue the invoice to the tenant? It is posted to the accounts. ||| إصدار الفاتورة للمستأجر؟ ستُرحَّل إلى الحسابات.
+Price before VAT ||| السعر قبل الضريبة
+Issue invoice ||| إصدار الفاتورة
+Record the tenant's payment ||| تسجيل دفعة المستأجر
+The invoice's entry is still a draft. Post it from Journal Inquiry; the tenant can then pay it. ||| قيد الفاتورة ما زال مسودة. رحّله من استعلام القيود؛ بعدها يستطيع المستأجر دفعها.
+Which service? ||| أي خدمة؟
+-- choose the service -- ||| -- اختر الخدمة --
+{0} including VAT ||| {0} شاملاً الضريبة
+price on quotation ||| السعر حسب عرض السعر
+This is a paid service. We confirm the order and send the invoice; where the service is paid in advance, the work starts once the invoice is paid. ||| هذه خدمة مدفوعة. نؤكد الطلب ونرسل الفاتورة؛ وإذا كانت الخدمة تُدفع مقدماً يبدأ العمل فور دفع الفاتورة.
+Order a paid service ||| طلب خدمة مدفوعة
+Subcontractor's charge ||| أجرة مقاول من الباطن
+Subcontractor ({0}) ||| مقاول من الباطن ({0})
+Subcontractor ||| مقاول من الباطن
+Service added to the price list. ||| تمت إضافة الخدمة إلى قائمة الأسعار.
+Service saved. ||| تم حفظ الخدمة.
+Give the service a name. ||| أدخل اسم الخدمة.
+Choose whether it is special maintenance or a special request. ||| اختر: صيانة خاصة أم طلب خاص.
+The price and the cost cannot be negative. ||| لا يمكن أن يكون السعر أو التكلفة سالباً.
+Choose one of the company's income accounts. ||| اختر أحد حسابات إيرادات الشركة.
+Another service already has that name. ||| توجد خدمة أخرى بهذا الاسم.
+That service was not found. ||| الخدمة غير موجودة.
+Choose the service from the list. ||| اختر الخدمة من القائمة.
+Choose the property the service is for. ||| اختر العقار الذي تُطلب له الخدمة.
+This request is not an order for a paid service. ||| هذا الطلب ليس طلب خدمة مدفوعة.
+The request is closed, so no invoice can be issued for it. ||| الطلب مغلق، فلا يمكن إصدار فاتورة له.
+The invoice for this service has already been issued. ||| صدرت فاتورة هذه الخدمة من قبل.
+Give the price of the service, before VAT. ||| أدخل سعر الخدمة قبل الضريبة.
+Give the number of the subcontractor's bill. ||| أدخل رقم فاتورة المقاول من الباطن.
+Your invoice for this service is ready. Open it to see the amount. ||| فاتورة هذه الخدمة جاهزة. افتحها لمعرفة المبلغ.

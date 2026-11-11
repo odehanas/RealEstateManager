@@ -57,6 +57,12 @@
         public bool IsCharge => ChargeType != null;
 
         /// <summary>
+        /// On a charge, the income account it is credited to: a paid service names its
+        /// own. Empty for the company's cheque charges / other income account.
+        /// </summary>
+        public int? IncomeAccountId { get; set; }
+
+        /// <summary>
         /// The rental period this invoice bills. Shown on the e-invoice as the invoicing
         /// period. Null on invoices raised before it was recorded; it is then derived
         /// from the lease's billing frequency.

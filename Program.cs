@@ -253,6 +253,7 @@ builder.Services.AddScoped<FinancialReportService>();
 builder.Services.AddScoped<GeneralJournalReportService>();
 builder.Services.AddScoped<MaintenanceService>();
 builder.Services.AddScoped<MaintenanceCategoryService>();
+builder.Services.AddScoped<PaidServiceService>();
 builder.Services.AddScoped<OwnerRechargeService>();
 builder.Services.AddScoped<OwnerProfitabilityService>();
 builder.Services.AddScoped<OwnerCombinedService>();

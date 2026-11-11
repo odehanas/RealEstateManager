@@ -33,6 +33,25 @@ namespace RealEstateManager.Domain
         public int? MaintenancePlanId { get; set; }
         public MaintenancePlan? MaintenancePlan { get; set; }
 
+        // ---------------------------------------------------------------------
+        //  PAID SERVICE (see ServiceCatalogItem and PaidServiceService)
+        // ---------------------------------------------------------------------
+
+        /// <summary>The service on the company's price list this request is an order for; empty for an ordinary request.</summary>
+        public int? ServiceCatalogItemId { get; set; }
+
+        /// <summary>The service's name, kind, price before VAT and expected cost as they were when ordered.</summary>
+        public string? ServiceName { get; set; }
+        public string? ServiceKind { get; set; }
+        public decimal? ServicePrice { get; set; }
+        public decimal? ServiceExpectedCost { get; set; }
+
+        /// <summary>The work waits until the invoice is paid.</summary>
+        public bool ServicePayFirst { get; set; }
+
+        /// <summary>The invoice raised to the tenant for the service, once staff have issued it.</summary>
+        public int? ServiceInvoiceId { get; set; }
+
         /// <summary>The contract this concerns. Optional - a tenant may ask a general question.</summary>
         public int? LeaseId { get; set; }
         public Lease? Lease { get; set; }
@@ -154,8 +173,11 @@ namespace RealEstateManager.Domain
         /// cost money.
         /// </summary>
         public bool CanTenantCancel =>
-            Status == ServiceRequestStatuses.Submitted ||
-            Status == ServiceRequestStatuses.Acknowledged;
+            (Status == ServiceRequestStatuses.Submitted ||
+             Status == ServiceRequestStatuses.Acknowledged) &&
+            // An order that has been invoiced is in the accounts: the office cancels it
+            // with a credit note, the tenant does not make it vanish.
+            !ServiceInvoiceId.HasValue;
 
         /// <summary>A postponement that was agreed but not yet carried out on the invoice.</summary>
         public bool AwaitingPostponementAction =>

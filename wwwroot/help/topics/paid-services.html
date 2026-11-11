@@ -1,0 +1,78 @@
+<p>A <strong>paid service</strong> is work a tenant asks for and pays for. There are two kinds:</p>
+<ul>
+    <li><strong>Special maintenance</strong>: work that is not the landlord's to do free of charge, such as an extra access card,
+    a repair to the tenant's own appliance, or repainting to the tenant's taste.</li>
+    <li><strong>Special request</strong>: a service the company may give to a subcontractor, such as deep cleaning, pest control
+    or help with moving.</li>
+</ul>
+<p>The company keeps a <strong>price list</strong>. The tenant orders from it, is sent a tax invoice, and, where the service
+says so, pays before the work is done. The job is then worked like any maintenance job, and the system shows what the service
+earned against what it cost.</p>
+
+<h3>Step 1: set up the price list</h3>
+<p>Open <strong>Operations ▸ Tenant Services ▸ Paid Services</strong>. For each service enter:</p>
+<table class="t-compact">
+    <tr><th>Field</th><th>What it is for</th></tr>
+    <tr><td>Service</td><td>The name the tenant sees and that prints on the invoice.</td></tr>
+    <tr><td>Type</td><td>Special maintenance or Special request.</td></tr>
+    <tr><td>Kind of work</td><td>The kind of maintenance work its jobs are sorted under, for example Cleaning.</td></tr>
+    <tr><td>What is included</td><td>A line the tenant reads when choosing.</td></tr>
+    <tr><td>Selling price (before VAT)</td><td>What the tenant is charged. VAT is added where the company is registered.
+    Enter 0 for a service priced on quotation: the price is then typed when the invoice is issued.</td></tr>
+    <tr><td>Expected cost</td><td>What the company expects to pay: the subcontractor's price, or materials and time.
+    The list shows the expected margin.</td></tr>
+    <tr><td>Income account</td><td>The account the price is credited to. Left empty, the company's Other Income account is used.</td></tr>
+    <tr><td>The tenant pays before the work starts</td><td>When ticked, the job cannot be started or marked as done until the
+    invoice is paid in full.</td></tr>
+    <tr><td>Done by a subcontractor</td><td>A note for the office that an outside supplier does the work.</td></tr>
+    <tr><td>Offered to tenants</td><td>Untick to take a service off the list without deleting it.</td></tr>
+</table>
+
+<h3>Step 2: the order</h3>
+<ul>
+    <li><strong>The tenant, in the portal:</strong> Requests ▸ New Request ▸ <em>Order a paid service</em>, then the service
+    and the property. The price including VAT shows beside each service.</li>
+    <li><strong>Staff, for a tenant who called or wrote:</strong> Tenant Requests ▸ Log a Request for a Tenant ▸ kind of request
+    <em>Order a paid service</em>.</li>
+</ul>
+<p>The order appears in Tenant Requests and in Maintenance Jobs with a <strong>Paid service</strong> box. It keeps the price it
+was made at: changing the price list later does not change it. An order changes nothing in the accounts.</p>
+
+<h3>Step 3: the invoice</h3>
+<p>Open the request. In the <strong>Paid service</strong> box check the price and press <strong>Issue invoice</strong>. The
+system raises a tax invoice to the tenant on their contract, numbered <code>SRV-</code>, and posts it:</p>
+<table class="je">
+    <tr><th>Account</th><th>Debit</th><th>Credit</th></tr>
+    <tr><td>Accounts Receivable (the tenant)</td><td>Price + VAT</td><td></td></tr>
+    <tr><td>The service's income account</td><td></td><td>Price</td></tr>
+    <tr><td>VAT Payable</td><td></td><td>VAT</td></tr>
+</table>
+<p>The invoice is in the company's own name and is the company's income whoever owns the building. It is never part of an
+owner's rent, settlement or profitability. The tenant sees the invoice and the amount due in the portal, and it is on their
+statement.</p>
+
+<h3>Step 4: the payment</h3>
+<p>Record the payment as for any invoice: <strong>Record the tenant's payment</strong> in the box opens Customer Receipts with
+the invoice chosen. Until the invoice is paid in full, a service that is paid before the work shows
+<strong>Work on hold</strong>, and <em>Start work</em> and <em>Mark as done</em> are refused with the reason.</p>
+
+<h3>Step 5: the work and its cost</h3>
+<p>Once paid, the maintenance team works the job as usual. Record what it cost on the job, under Materials:</p>
+<ul>
+    <li><strong>Maintenance store</strong> or <strong>Bought for the job</strong> for materials, as on any job.</li>
+    <li><strong>Subcontractor's charge</strong> for the supplier who did the work: the amount and the number of their bill.</li>
+</ul>
+<p>The cost of a paid service is the company's, even in an owner's building, because the company earns the price. The
+subcontractor's bill itself is entered in <strong>Vendor Bills</strong> as usual; the line on the job is what links the cost to
+the service.</p>
+
+<h3>Orders and margin</h3>
+<p><strong>Paid Services ▸ Orders and margin</strong> lists every order in a period with its invoice, what was paid, the cost
+recorded and the margin (price before VAT less cost), with totals by service.</p>
+
+<div class="box">
+    <div class="box-title">Who can do what</div>
+    <p>The price list, the invoice and the orders report are open to users who manage tenant requests or the accounts, and to
+    the company's administrator. The maintenance team sees the Paid service box on the job, with whether it is paid, but not
+    the margin.</p>
+</div>

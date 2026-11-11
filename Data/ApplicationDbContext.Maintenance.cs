@@ -9,6 +9,7 @@ namespace RealEstateManager.Data
         public DbSet<MaintenanceMaterial> MaintenanceMaterials => Set<MaintenanceMaterial>();
         public DbSet<OwnerRecharge> OwnerRecharges => Set<OwnerRecharge>();
         public DbSet<MaintenanceCategory> MaintenanceCategories => Set<MaintenanceCategory>();
+        public DbSet<ServiceCatalogItem> ServiceCatalogItems => Set<ServiceCatalogItem>();
 
         private void ConfigureMaintenance(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,30 @@ namespace RealEstateManager.Data
                 entity.HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
 
                 entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<ServiceCatalogItem>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(ServiceCatalogItem.MaxNameLength);
+                entity.Property(x => x.Kind).HasMaxLength(30);
+                entity.Property(x => x.Category).HasMaxLength(MaintenanceCategory.MaxNameLength);
+                entity.Property(x => x.Description).HasMaxLength(500);
+                entity.Property(x => x.SellingPrice).HasPrecision(18, 2);
+                entity.Property(x => x.ExpectedCost).HasPrecision(18, 2);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.IncomeAccount).WithMany().HasForeignKey(x => x.IncomeAccountId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<TenantServiceRequest>(entity =>
+            {
+                entity.Property(x => x.ServiceName).HasMaxLength(ServiceCatalogItem.MaxNameLength);
+                entity.Property(x => x.ServiceKind).HasMaxLength(30);
+                entity.Property(x => x.ServicePrice).HasPrecision(18, 2);
+                entity.Property(x => x.ServiceExpectedCost).HasPrecision(18, 2);
             });
 
             modelBuilder.Entity<OwnerRecharge>(entity =>

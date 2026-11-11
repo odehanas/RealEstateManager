@@ -172,7 +172,7 @@ namespace RealEstateManager.Controllers
                 .OrderBy(x => x.MaterialDate).ThenBy(x => x.Id)
                 .ToListAsync();
             ViewBag.ChargedTo = await _db.TenantServiceRequests.Where(x => x.Id == id)
-                .Select(x => x.Property != null && x.Property.OwnershipType == "Managed" ? "the owner" : "the company").FirstOrDefaultAsync();
+                .Select(x => x.Property != null && x.Property.OwnershipType == "Managed" && x.ServiceCatalogItemId == null ? "the owner" : "the company").FirstOrDefaultAsync();
             ViewBag.SeesAll = await SeesAllAsync();
             ViewBag.Technicians = await MaintenanceService.TechniciansAsync(_db, companyId);
             return View(model);
@@ -492,7 +492,7 @@ namespace RealEstateManager.Controllers
                 materials.Select(x => new object?[]
                 {
                     x.Date, x.Job, x.Property, x.Unit, x.Description, x.Quantity, x.UnitCost, x.Amount,
-                    x.Source == MaintenanceMaterialSources.Stock ? "Maintenance store" : "Bought for the job", x.Reference,
+                    MaintenanceMaterialSources.Describe(x.Source), x.Reference,
                     x.ChargedTo == "Owner" ? "The owner" : "The company"
                 }), 6, 7, 8);
 
