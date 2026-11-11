@@ -172,6 +172,10 @@ namespace RealEstateManager.Services
             public string Number { get; set; } = string.Empty;
             public string Subject { get; set; } = string.Empty;
             public string? Category { get; set; }
+
+            /// <summary>An order for a paid service, and whether the work must wait for its payment.</summary>
+            public bool IsPaidService { get; set; }
+            public bool PaidServiceOnHold { get; set; }
             public string Priority { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
             /// <summary>Empty on a job no tenant asked for.</summary>
