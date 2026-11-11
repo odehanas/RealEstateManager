@@ -440,3 +440,52 @@ ordered and paid for by tenants; not counted in the maintenance figures above ||
 Open the jobs ||| فتح الأعمال
 {0} done ||| {0} منجز
 Orders raised in the period. Invoiced, cost and margin are before VAT; Collected includes VAT. ||| الطلبات المنشأة في الفترة. المفوتر والتكلفة والهامش قبل الضريبة؛ والمحصَّل يشمل الضريبة.
+# Car parking.
+Car Parking ||| مواقف السيارات
+Each property's numbered parking bays: which are taken, by which tenant and unit, and which are free. A bay is given to a contract for a charge billed in one payment or in instalments, as the rent is. ||| مواقف كل عقار المرقمة: أيها مشغول، ومن أي مستأجر ووحدة، وأيها شاغر. يُعطى الموقف لعقد مقابل رسم يُفوتر دفعة واحدة أو على أقساط، مثل الإيجار.
+Bays ||| المواقف
+Parking charges a year ||| رسوم المواقف في السنة
+before VAT, bays now taken ||| قبل الضريبة، للمواقف المشغولة حالياً
+Give bay {0} to a contract ||| إعطاء الموقف {0} لعقد
+This property has no contract in force, so there is nobody to give the bay to. ||| لا يوجد في هذا العقار عقد سارٍ، فلا أحد يُعطى له الموقف.
+Vehicle plate ||| لوحة المركبة
+Charge a year (before VAT) ||| الرسم في السنة (قبل الضريبة)
+0 = the bay comes with the unit, free. ||| 0 = الموقف يأتي مع الوحدة مجاناً.
+Payment terms ||| شروط الدفع
+One payment ||| دفعة واحدة
+One payment bills the whole period at once, for the months it covers. ||| الدفعة الواحدة تفوتر المدة كلها مرة واحدة عن الأشهر التي تغطيها.
+Starts as the contract's own VAT treatment. ||| تبدأ بمعاملة الضريبة الخاصة بالعقد.
+Give the bay ||| إعطاء الموقف
+Add parking bays ||| إضافة مواقف
+Number or prefix ||| الرقم أو البادئة
+Kind of bay ||| نوع الموقف
+-- any -- ||| -- أي نوع --
+Covered ||| مغطى
+Basement ||| قبو
+Visitor ||| زوار
+One bay: type its number and leave From and To empty. A run: a prefix with From and To, e.g. B1- from 1 to 40 makes B1-01 to B1-40. ||| موقف واحد: اكتب رقمه واترك «من» و«إلى» فارغين. سلسلة: بادئة مع «من» و«إلى»، مثل B1- من 1 إلى 40 تنشئ B1-01 إلى B1-40.
+No parking bays yet. Add the bays of a property above. ||| لا توجد مواقف بعد. أضف مواقف عقار من الأعلى.
+{0} occupied ||| {0} مشغول
+{0} closed ||| {0} مغلق
+Unit {0} ||| الوحدة {0}
+until {0} ||| حتى {0}
+{0} a year ||| {0} في السنة
+free ||| مجاناً
+Release this bay? Draft invoices dated after that day are removed. ||| تحرير هذا الموقف؟ تُحذف مسودات الفواتير المؤرخة بعد ذلك اليوم.
+Released on ||| تاريخ التحرير
+Release ||| تحرير
+Give to a contract ||| إعطاء لعقد
+Open again ||| فتح من جديد
+The contract ends ||| ينتهي العقد
+Choose the kind of bay from the list. ||| اختر نوع الموقف من القائمة.
+Type the bay number, or the first and last number of a run. ||| اكتب رقم الموقف، أو أول وآخر رقم في السلسلة.
+The property already has that bay. ||| هذا الموقف موجود في العقار.
+1 bay added. ||| أُضيف موقف واحد.
+The bay was not found. ||| الموقف غير موجود.
+Choose the bay. ||| اختر الموقف.
+Choose a contract that is in force. ||| اختر عقداً سارياً.
+The contract is for a unit in another property. ||| العقد لوحدة في عقار آخر.
+The start date is after the contract ends. ||| تاريخ البدء بعد نهاية العقد.
+Choose the payment terms from the list. ||| اختر شروط الدفع من القائمة.
+The bay has already been released. ||| حُرّر الموقف من قبل.
+Uncovered ||| مكشوف

@@ -138,7 +138,9 @@ namespace RealEstateManager.Services
                     TransactionDate = x.InvoiceDate.Date,
                     TransactionType = "Invoice",
                     ReferenceNumber = x.InvoiceNumber,
-                    Description = x.ChargeType != null ? $"{x.ChargeType} - {BuildLeaseDisplay(x.Lease)}" : BuildInvoiceDescription(x.Lease),
+                    Description = x.ChargeType != null ? $"{x.ChargeType} - {BuildLeaseDisplay(x.Lease)}"
+                        : x.LineDescription != null ? $"{x.LineDescription} - {BuildLeaseDisplay(x.Lease)}"
+                        : BuildInvoiceDescription(x.Lease),
                     Debit = x.TotalAmount,
                     Credit = 0m
                 }));

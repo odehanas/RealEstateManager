@@ -57,6 +57,16 @@
         public bool IsCharge => ChargeType != null;
 
         /// <summary>
+        /// What a rent invoice is for when it is not the unit's rent itself - "Car parking,
+        /// bay B1-014". It is still rent of the property (the owner's, for a managed one),
+        /// unlike a charge. Empty for ordinary rent.
+        /// </summary>
+        public string? LineDescription { get; set; }
+
+        /// <summary>The parking assignment the invoice was raised for.</summary>
+        public int? ParkingAssignmentId { get; set; }
+
+        /// <summary>
         /// On a charge, the income account it is credited to: a paid service names its
         /// own. Empty for the company's cheque charges / other income account.
         /// </summary>

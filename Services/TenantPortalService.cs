@@ -211,7 +211,7 @@ namespace RealEstateManager.Services
                             && x.JournalEntry.IsPosted
                             && x.Status != "Cancelled"
                             && x.InvoiceDate <= toDate)
-                .Select(x => new { x.InvoiceDate, x.InvoiceNumber, x.TotalAmount, x.ChargeType, ContractNumber = x.Lease!.ContractNumber })
+                .Select(x => new { x.InvoiceDate, x.InvoiceNumber, x.TotalAmount, x.ChargeType, x.LineDescription, ContractNumber = x.Lease!.ContractNumber })
                 .ToListAsync();
 
             var receipts = await _db.CustomerReceipts
@@ -272,7 +272,9 @@ namespace RealEstateManager.Services
             {
                 Date = x.InvoiceDate,
                 Reference = x.InvoiceNumber,
-                Description = x.ChargeType != null ? $"{x.ChargeType} - contract {x.ContractNumber}" : $"Rent invoice - contract {x.ContractNumber}",
+                Description = x.ChargeType != null ? $"{x.ChargeType} - contract {x.ContractNumber}"
+                    : x.LineDescription != null ? $"{x.LineDescription} - contract {x.ContractNumber}"
+                    : $"Rent invoice - contract {x.ContractNumber}",
                 Charge = x.TotalAmount
             }));
 

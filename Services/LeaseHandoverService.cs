@@ -21,12 +21,14 @@ namespace RealEstateManager.Services
         private readonly ApplicationDbContext _db;
         private readonly AccountingPostingService _posting;
         private readonly JournalWorkflowService _workflow;
+        private readonly ParkingService _parking;
 
-        public LeaseHandoverService(ApplicationDbContext db, AccountingPostingService posting, JournalWorkflowService workflow)
+        public LeaseHandoverService(ApplicationDbContext db, AccountingPostingService posting, JournalWorkflowService workflow, ParkingService parking)
         {
             _db = db;
             _posting = posting;
             _workflow = workflow;
+            _parking = parking;
         }
 
         // =====================================================================
@@ -541,6 +543,9 @@ namespace RealEstateManager.Services
             handover.SettledByName = byName;
 
             lease.Status = handover.Reason == HandoverReasons.EarlyTermination ? LeaseStatuses.Terminated : LeaseStatuses.Expired;
+
+            // The tenant's parking bays are free again from the handover day.
+            await _parking.ReleaseForLeaseAsync(lease.Id, handover.HandoverDate);
             if (lease.Unit != null &&
                 !await _db.Leases.IgnoreQueryFilters().AnyAsync(x => x.Id != lease.Id && x.UnitId == lease.UnitId &&
                                                                      (x.Status == LeaseStatuses.Active || x.Status == LeaseStatuses.PendingApproval)))
