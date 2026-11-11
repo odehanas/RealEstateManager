@@ -99,6 +99,80 @@ namespace RealEstateManager.Controllers
         //  SERVICE REQUESTS
         // =====================================================================
 
+        // =====================================================================
+        //  PAID SERVICES - their own page, apart from ordinary requests: they are
+        //  ordered from the price list and paid for, so the hold that stops free
+        //  maintenance for a tenant behind on payments does not apply to them.
+        // =====================================================================
+
+        [HttpGet("services")]
+        public async Task<IActionResult> Services([FromServices] PaidServiceService paidServices)
+        {
+            var tenantId = User.GetRequiredPortalTenantId();
+            ViewBag.Orders = await paidServices.OrdersForTenantAsync(tenantId);
+            ViewBag.HasContract = (await _serviceRequestService.BuildCreateModelAsync(tenantId)).Leases.Count > 0;
+            return View(await paidServices.OptionsForTenantAsync(tenantId));
+        }
+
+        [HttpGet("services/{id:int}")]
+        public async Task<IActionResult> OrderService(int id, [FromServices] PaidServiceService paidServices)
+        {
+            var tenantId = User.GetRequiredPortalTenantId();
+            var service = (await paidServices.OptionsForTenantAsync(tenantId)).FirstOrDefault(x => x.Id == id);
+            if (service == null)
+                return NotFound();
+
+            var model = await _serviceRequestService.BuildCreateModelAsync(tenantId);
+            if (model.Leases.Count == 0)
+                return RedirectToAction(nameof(Services));
+
+            model.Description = string.Empty;
+            ViewBag.Service = service;
+            return View(model);
+        }
+
+        [HttpPost("services/{id:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OrderService(
+            int id, int? leaseId, DateTime? preferredVisitDate, string? description, List<IFormFile>? photos,
+            [FromServices] PaidServiceService paidServices,
+            [FromServices] ServiceRequestPhotoService photoService)
+        {
+            var tenantId = User.GetRequiredPortalTenantId();
+            var service = (await paidServices.OptionsForTenantAsync(tenantId)).FirstOrDefault(x => x.Id == id);
+            if (service == null)
+                return NotFound();
+
+            // Only what the tenant chose comes off the form; the rest is the service's own.
+            var model = new ServiceRequestCreateViewModel
+            {
+                RequestType = ServiceRequestCreateViewModel.PaidServiceType,
+                ServiceCatalogItemId = service.Id,
+                LeaseId = leaseId,
+                PreferredVisitDate = preferredVisitDate,
+                Subject = service.Name,
+                Description = string.IsNullOrWhiteSpace(description) ? $"Service ordered: {service.Name}." : description.Trim()
+            };
+
+            ModelState.Clear();
+            var request = await _serviceRequestService.CreateAsync(ModelState, tenantId, User.GetPortalUserId(), model);
+            if (request == null)
+            {
+                await _serviceRequestService.PopulateOptionsAsync(model, tenantId);
+                model.Description = description ?? string.Empty;
+                ViewBag.Service = service;
+                return View(model);
+            }
+
+            TempData["PortalSuccess"] = $"Your order {request.RequestNumber} has been sent. We will confirm it and send you the invoice here.";
+
+            var (_, problems) = await photoService.AddAsync(request.Id, photos, User.Identity?.Name, byTenant: true);
+            if (problems.Count > 0)
+                TempData["PortalError"] = string.Join(" ", problems);
+
+            return RedirectToAction(nameof(RequestDetails), new { id = request.Id });
+        }
+
         [HttpGet("requests")]
         public async Task<IActionResult> Requests()
         {

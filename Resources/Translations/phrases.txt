@@ -3437,3 +3437,26 @@ Up to {0} photos of the problem. You can add them later too, from the request.
 Photo added.
 Choose a photo first.
 The request is closed, so photos can no longer be added.
+Paid services
+Services
+Extra services you can order for your unit. Each shows its price; we send you the invoice, and where a service is paid in advance the work starts once it is paid.
+No paid services are offered at the moment.
+A service is ordered for a unit you rent. You have no contract in force, so please contact the office to order.
+including VAT
+no VAT
+On quotation
+Paid in advance
+Invoiced; paid after the order
+Your orders
+Order a service
+We will confirm the price with you and send the invoice here.
+We will confirm your order and send the invoice here. The work starts once the invoice is paid.
+We will confirm your order and send the invoice here.
+Preferred date
+Anything we should know? (optional)
+e.g. The best time to come, or what exactly you need.
+Order for {0}
+Send the order
+Looking for cleaning or another service you pay for?
+See the paid services
+Order this service

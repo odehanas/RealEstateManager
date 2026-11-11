@@ -1,0 +1,99 @@
+@model List<RealEstateManager.Services.PaidServiceService.Option>
+@using RealEstateManager.Domain
+@using Stages = RealEstateManager.Services.PaidServiceService.Stages
+@{
+    Layout = "_PortalLayout";
+    ViewData["Title"] = T["Paid services"];
+    var orders = ViewBag.Orders as List<PaidServiceService.State> ?? new();
+    var hasContract = ViewBag.HasContract as bool? == true;
+}
+
+@if (TempData["PortalError"] != null)
+{
+    <div class="alert alert-danger">@TempData["PortalError"]</div>
+}
+
+<div class="mb-3">
+    <h1 class="h5 mb-1">@T["Paid services"]</h1>
+    <p class="text-muted small mb-0">
+        @T["Extra services you can order for your unit. Each shows its price; we send you the invoice, and where a service is paid in advance the work starts once it is paid."]
+    </p>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card shadow-sm"><div class="card-body text-center text-muted py-5">@T["No paid services are offered at the moment."]</div></div>
+}
+else
+{
+    @if (!hasContract)
+    {
+        <div class="alert alert-warning small">@T["A service is ordered for a unit you rent. You have no contract in force, so please contact the office to order."]</div>
+    }
+
+    @foreach (var group in Model.GroupBy(x => x.Kind))
+    {
+        <div class="small text-uppercase text-muted mt-3 mb-2">@T[ServiceKinds.Describe(group.Key)]</div>
+        @foreach (var service in group)
+        {
+            <div class="card shadow-sm mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <div class="fw-semibold">@service.Name</div>
+                            @if (!string.IsNullOrWhiteSpace(service.Description))
+                            {
+                                <div class="small text-muted">@service.Description</div>
+                            }
+                        </div>
+                        <div class="text-end text-nowrap">
+                            @if (service.Price > 0m)
+                            {
+                                <div class="fw-bold">@service.PriceWithVat.ToString("N2")</div>
+                                <div class="small text-muted">@(service.PriceWithVat > service.Price ? T["including VAT"] : T["no VAT"])</div>
+                            }
+                            else
+                            {
+                                <div class="fw-semibold">@T["On quotation"]</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
+                        <span class="small text-muted">@(service.PayBeforeWork ? T["Paid in advance"] : T["Invoiced; paid after the order"])</span>
+                        @if (hasContract)
+                        {
+                            <a asp-action="OrderService" asp-route-id="@service.Id" class="btn btn-dark btn-sm">@T["Order this service"]</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+@if (orders.Count > 0)
+{
+    <div class="small text-uppercase text-muted mt-4 mb-2">@T["Your orders"]</div>
+    <div class="card shadow-sm">
+        <div class="list-group list-group-flush">
+            @foreach (var order in orders)
+            {
+                <a asp-action="RequestDetails" asp-route-id="@order.RequestId" class="list-group-item list-group-item-action">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div>
+                            <div class="fw-semibold">@order.Name</div>
+                            <div class="small text-muted">@order.RequestNumber &middot; @order.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge @Stages.BadgeClass(order.Stage)">@T[Stages.Describe(order.Stage)]</span>
+                            @if (order.Total > 0m)
+                            {
+                                <div class="small">@order.Total.ToString("N2")</div>
+                            }
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+}

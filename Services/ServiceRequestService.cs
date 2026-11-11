@@ -216,7 +216,9 @@ namespace RealEstateManager.Services
 
             // A tenant behind on payments must contact the office before asking for
             // maintenance. Staff raising a request on a tenant's behalf are not stopped.
-            if (portalUserId.HasValue && model.RequestType == ServiceRequestTypes.Maintenance)
+            // A paid service is not held: the tenant pays for it, before the work where the
+            // service says so, whatever else they owe.
+            if (portalUserId.HasValue && model.RequestType == ServiceRequestTypes.Maintenance && ordered == null)
             {
                 var standing = await TenantStandingService.GetAsync(_db, tenantId);
                 if (!standing.IsHealthy)
