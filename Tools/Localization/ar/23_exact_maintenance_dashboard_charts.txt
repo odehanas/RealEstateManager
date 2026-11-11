@@ -65,3 +65,14 @@ A cost is shown against a unit when the bill line, petty cash voucher, journal l
 The unit this cost is for. Leave it empty for a cost of the whole building. ||| الوحدة التي تخصها هذه التكلفة. اتركها فارغة لتكلفة المبنى ككل.
 Whole building ||| المبنى ككل
 Only the units of the property chosen are offered. Choosing a unit first fills in its property. ||| تُعرض وحدات العقار المختار فقط. واختيار الوحدة أولاً يملأ عقارها.
+# The tenants list: unit, contract, balance and cheques.
+Unit and contract ||| الوحدة والعقد
+Balance due ||| الرصيد المستحق
+No contract ||| بلا عقد
+ended {0} ||| انتهى {0}
+{0} due to deposit: {1} ||| {0} مستحق الإيداع: {1}
+next {0} ||| التالي {0}
+Every invoice, receipt and cheque of this tenant ||| كل فواتير هذا المستأجر وسندات قبضه وشيكاته
+Statement ||| كشف الحساب
+Terminated ||| منتهٍ مبكراً
+Renewed ||| مجدَّد

@@ -3107,3 +3107,13 @@ A cost is shown against a unit when the bill line, petty cash voucher, journal l
 The unit this cost is for. Leave it empty for a cost of the whole building.
 Whole building
 Only the units of the property chosen are offered. Choosing a unit first fills in its property.
+Unit and contract
+Balance due
+No contract
+ended {0}
+{0} due to deposit: {1}
+next {0}
+Every invoice, receipt and cheque of this tenant
+Statement
+Terminated
+Renewed
