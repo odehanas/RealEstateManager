@@ -178,6 +178,20 @@ namespace RealEstateManager.Controllers
             return View(model);
         }
 
+        /// <summary>Asks again for the English translation of what the tenant wrote.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Translate(int id, [FromServices] RequestTranslationService translator)
+        {
+            // The job must be one of this company's, and one this user may open.
+            if (!await MayOpenAsync(id) || !await _db.TenantServiceRequests.AnyAsync(x => x.Id == id))
+                return NotFound();
+
+            var (ok, message) = await translator.TranslateRequestAsync(id, again: true);
+            TempData[ok ? "JobSuccess" : "JobError"] = message;
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
         /// <summary>The technician's steps: acknowledge, start, resolve.</summary>
         [HttpPost]
         [ValidateAntiForgeryToken]

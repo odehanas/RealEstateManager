@@ -68,6 +68,15 @@ namespace RealEstateManager.Data
                 entity.Property(x => x.ServiceKind).HasMaxLength(30);
                 entity.Property(x => x.ServicePrice).HasPrecision(18, 2);
                 entity.Property(x => x.ServiceExpectedCost).HasPrecision(18, 2);
+                entity.Property(x => x.OriginalLanguage).HasMaxLength(40);
+                entity.Property(x => x.SubjectEnglish).HasMaxLength(400);
+                entity.Property(x => x.TranslationStatus).HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<TenantServiceRequestComment>(entity =>
+            {
+                entity.Property(x => x.OriginalLanguage).HasMaxLength(40);
+                entity.Property(x => x.TranslationStatus).HasMaxLength(20);
             });
 
             modelBuilder.Entity<LeaseHandover>(entity =>

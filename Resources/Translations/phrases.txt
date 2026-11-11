@@ -3416,3 +3416,15 @@ Reopened: the charges can be corrected and signed again.
 This handover is already closed.
 The inspection and the Maintenance Manager's sign-off come first.
 The invoice for the charges is not posted yet. Post it from Journal Inquiry, then settle again.
+English translation
+written in {0}
+translated automatically; the tenant's own words are above
+Written in English: no translation needed.
+The English translation could not be made.
+The English translation is being made. Refresh in a moment, or ask for it now.
+Not translated yet.
+Translate to English
+English translation, written in {0}
+Translation needs the AI assistant's key, which is not set up on this server.
+The translation service could not be reached. The request shows as the tenant wrote it; try again in a moment.
+The request is already in English.

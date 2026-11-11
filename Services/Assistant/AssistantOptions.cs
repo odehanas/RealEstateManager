@@ -28,6 +28,12 @@ namespace RealEstateManager.Services.Assistant
         /// <summary>Model that searches the web for market data such as rent benchmarks. Uses the same key.</summary>
         public string ResearchModel { get; set; } = "gpt-5.4-mini";
 
+        /// <summary>Model that puts tenants' requests into English for the office. Uses the same key.</summary>
+        public string TranslationModel { get; set; } = "gpt-5.4-mini";
+
+        /// <summary>Where translation requests are sent; changed only to test without the real service.</summary>
+        public string TranslationEndpoint { get; set; } = "https://api.openai.com/v1/responses";
+
         public int MaxSessionMinutes { get; set; } = 15;
 
         public int MaxToolCallsPerSession { get; set; } = 60;

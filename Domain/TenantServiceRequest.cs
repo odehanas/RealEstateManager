@@ -34,6 +34,20 @@ namespace RealEstateManager.Domain
         public MaintenancePlan? MaintenancePlan { get; set; }
 
         // ---------------------------------------------------------------------
+        //  ENGLISH TRANSLATION (see RequestTranslationService)
+        // ---------------------------------------------------------------------
+
+        /// <summary>The language the tenant wrote in, as detected: "Arabic", "Hindi", "English"...</summary>
+        public string? OriginalLanguage { get; set; }
+
+        /// <summary>The title and text in English, kept beside the tenant's own words; empty when they wrote in English.</summary>
+        public string? SubjectEnglish { get; set; }
+        public string? DescriptionEnglish { get; set; }
+
+        /// <summary>See <see cref="TranslationStatuses"/>; empty when it has not been looked at.</summary>
+        public string? TranslationStatus { get; set; }
+
+        // ---------------------------------------------------------------------
         //  PAID SERVICE (see ServiceCatalogItem and PaidServiceService)
         // ---------------------------------------------------------------------
 
@@ -216,6 +230,11 @@ namespace RealEstateManager.Domain
         public int? TenantPortalUserId { get; set; }
 
         public string Body { get; set; } = string.Empty;
+
+        /// <summary>A tenant's message in English, beside what they wrote; empty when it was in English.</summary>
+        public string? BodyEnglish { get; set; }
+        public string? OriginalLanguage { get; set; }
+        public string? TranslationStatus { get; set; }
 
         /// <summary>
         /// A note staff write to each other. NEVER sent to the portal - the portal
@@ -451,6 +470,18 @@ namespace RealEstateManager.Domain
             rating <= LowAtOrBelow ? "bg-danger" : rating < 8 ? "bg-warning text-dark" : "bg-success";
 
         public const int MaxFeedbackLength = 1000;
+    }
+
+    /// <summary>Where the English translation of a tenant's words stands.</summary>
+    public static class TranslationStatuses
+    {
+        /// <summary>Saved and waiting for the translation.</summary>
+        public const string Pending = "Pending";
+        public const string Done = "Done";
+
+        /// <summary>Written in English already.</summary>
+        public const string NotNeeded = "NotNeeded";
+        public const string Failed = "Failed";
     }
 
     public static class ServiceRequestAuthorTypes

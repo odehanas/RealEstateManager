@@ -1,0 +1,45 @@
+@model RealEstateManager.Models.ServiceRequestDetailViewModel
+@using RealEstateManager.Domain
+@inject RequestTranslationService Translator
+@*
+    The English reading of a request a tenant wrote in another language, shown under the
+    tenant's own words on the staff pages. Shows nothing for a job no tenant raised.
+*@
+@{
+    if (Model.IsInternal)
+    {
+        return;
+    }
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var canAsk = Translator.IsAvailable;
+}
+
+@if (Model.TranslationStatus == TranslationStatuses.Done)
+{
+    <div class="border rounded p-2 mt-3 bg-light">
+        <div class="small text-muted mb-1">
+            <span class="badge bg-primary">@T["English translation"]</span>
+            @T.Format("written in {0}", Model.OriginalLanguage ?? "-") &middot; @T["translated automatically; the tenant's own words are above"]
+        </div>
+        <div class="fw-semibold" dir="ltr">@Model.SubjectEnglish</div>
+        <div style="white-space: pre-wrap" dir="ltr">@Model.DescriptionEnglish</div>
+    </div>
+}
+else if (Model.TranslationStatus == TranslationStatuses.NotNeeded)
+{
+    <div class="small text-muted mt-2">@T["Written in English: no translation needed."]</div>
+}
+else if (canAsk)
+{
+    <form asp-controller="@controller" asp-action="Translate" method="post" class="mt-3 d-flex flex-wrap align-items-center gap-2">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <span class="small text-muted">
+            @(Model.TranslationStatus == TranslationStatuses.Failed
+                ? T["The English translation could not be made."]
+                : Model.TranslationStatus == TranslationStatuses.Pending
+                    ? T["The English translation is being made. Refresh in a moment, or ask for it now."]
+                    : T["Not translated yet."])
+        </span>
+        <button type="submit" class="btn btn-sm btn-outline-primary">@T["Translate to English"]</button>
+    </form>
+}

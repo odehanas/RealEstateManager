@@ -32,6 +32,23 @@
         "--environment=Development"
       ],
       "port": 5199
+    },
+    {
+      "name": "rem-translate",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "C:\\Users\\anas\\OneDrive - ega.rak.ae\\Documents\\Applications\\RealEstateManager\\RealEstateManager.csproj",
+        "--no-launch-profile",
+        "--",
+        "--ConnectionStrings:DefaultConnection=Server=(localdb)\\ClaudeREM;Database=RemDemo;Trusted_Connection=True;TrustServerCertificate=True",
+        "--Assistant:OpenAIApiKey=test-dummy-key-not-real",
+        "--Assistant:TranslationEndpoint=http://localhost:5198/v1/responses",
+        "--urls=http://localhost:5199",
+        "--environment=Development"
+      ],
+      "port": 5199
     }
   ]
 }

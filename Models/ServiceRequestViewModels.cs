@@ -136,6 +136,12 @@ namespace RealEstateManager.Models
 
         public bool IsInternal => ServiceRequestSources.IsInternal(Source);
 
+        // ---- English translation, staff only ---------------------------------
+        public string? OriginalLanguage { get; set; }
+        public string? SubjectEnglish { get; set; }
+        public string? DescriptionEnglish { get; set; }
+        public string? TranslationStatus { get; set; }
+
         // ---- Rating of a maintenance job -------------------------------------
         public int? Rating { get; set; }
         public string? RatingFeedback { get; set; }
@@ -172,6 +178,10 @@ namespace RealEstateManager.Models
         public string AuthorType { get; set; } = string.Empty;
         public string AuthorName { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
+
+        /// <summary>Staff only: a tenant's message in English, when it was written in another language.</summary>
+        public string? BodyEnglish { get; set; }
+        public string? OriginalLanguage { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsInternal { get; set; }
 

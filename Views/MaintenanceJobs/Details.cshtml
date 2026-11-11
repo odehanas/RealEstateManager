@@ -37,6 +37,7 @@
             <div class="card-header bg-white">@T.Html("<strong>The request</strong>")</div>
             <div class="card-body">
                 <p style="white-space:pre-wrap">@Model.Description</p>
+                <div class="mb-3"><partial name="_RequestTranslation" model="Model" /></div>
                 <dl class="row mb-0 small">
                     <dt class="col-sm-4">@T["Unit"]</dt><dd class="col-sm-8">@(Model.UnitDisplay ?? "-") @if (Model.PropertyName != null) { <span class="text-muted">(@Model.PropertyName)</span> }</dd>
                     @if (Model.IsInternal)
@@ -251,6 +252,13 @@
                             <span>@c.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
                         </div>
                         <div style="white-space:pre-wrap">@c.Body</div>
+                        @if (!string.IsNullOrWhiteSpace(c.BodyEnglish))
+                        {
+                            <div class="border-start border-primary border-3 ps-2 mt-1" dir="ltr">
+                                <div class="small text-muted">@T.Format("English translation, written in {0}", c.OriginalLanguage ?? "-")</div>
+                                <div style="white-space: pre-wrap">@c.BodyEnglish</div>
+                            </div>
+                        }
                     </li>
                 }
             </ul>
