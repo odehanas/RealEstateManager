@@ -65,3 +65,316 @@ A cost is shown against a unit when the bill line, petty cash voucher, journal l
 The unit this cost is for. Leave it empty for a cost of the whole building. ||| الوحدة التي تخصها هذه التكلفة. اتركها فارغة لتكلفة المبنى ككل.
 Whole building ||| المبنى ككل
 Only the units of the property chosen are offered. Choosing a unit first fills in its property. ||| تُعرض وحدات العقار المختار فقط. واختيار الوحدة أولاً يملأ عقارها.
+# The tenants list: unit, contract, balance and cheques.
+Unit and contract ||| الوحدة والعقد
+Balance due ||| الرصيد المستحق
+No contract ||| بلا عقد
+ended {0} ||| انتهى {0}
+{0} due to deposit: {1} ||| {0} مستحق الإيداع: {1}
+next {0} ||| التالي {0}
+Every invoice, receipt and cheque of this tenant ||| كل فواتير هذا المستأجر وسندات قبضه وشيكاته
+Statement ||| كشف الحساب
+Terminated ||| منتهٍ مبكراً
+Renewed ||| مجدَّد
+# Two-step sign-in, and the kinds of maintenance work.
+Two-step sign-in ||| تسجيل الدخول بخطوتين
+Step 2 of 2 ||| الخطوة 2 من 2
+Enter your sign-in code ||| أدخل رمز الدخول
+Your password is correct. Now open the authenticator app on your phone and type the six-digit code it shows for RealEstateManager. ||| كلمة المرور صحيحة. افتح الآن تطبيق المصادقة على هاتفك واكتب الرمز المكوّن من ستة أرقام الذي يعرضه لـ RealEstateManager.
+Sign-in code ||| رمز الدخول
+Lost your phone? Type one of your recovery codes instead, or ask your administrator to reset two-step sign-in. ||| فقدت هاتفك؟ اكتب أحد رموز الاسترداد بدلاً منه، أو اطلب من المسؤول إعادة ضبط تسجيل الدخول بخطوتين.
+Sign in as someone else ||| الدخول بمستخدم آخر
+With two-step sign-in, your password alone does not open your account: after the password you type a six-digit code from an app on your phone. Somebody who learns your password still cannot sign in without your phone. ||| مع تسجيل الدخول بخطوتين لا تكفي كلمة المرور وحدها لفتح حسابك: بعد كلمة المرور تكتب رمزاً من ستة أرقام من تطبيق على هاتفك. من يعرف كلمة مرورك لا يستطيع الدخول من دون هاتفك.
+Your recovery codes ||| رموز الاسترداد
+Keep these somewhere safe, away from your phone: print them or write them down. Each one signs you in once if you lose your phone. They are shown this once only. ||| احفظ هذه الرموز في مكان آمن بعيداً عن هاتفك: اطبعها أو اكتبها. كل رمز يُدخلك مرة واحدة إذا فقدت هاتفك. تُعرض هذه المرة فقط.
+Two-step sign-in is on ||| تسجيل الدخول بخطوتين مفعّل
+Switched on {0}. ||| فُعّل في {0}.
+Recovery codes left: {0}. ||| رموز الاسترداد المتبقية: {0}.
+New recovery codes ||| رموز استرداد جديدة
+Makes a new set of codes. The old ones stop working. ||| ينشئ مجموعة رموز جديدة. الرموز القديمة تتوقف عن العمل.
+Code from your app ||| الرمز من تطبيقك
+Make new codes ||| إنشاء رموز جديدة
+Switch off, or move to a new phone ||| الإيقاف أو الانتقال إلى هاتف جديد
+Your company requires two-step sign-in. If you switch it off here, you set it up again straight away: that is how you move it to a new phone. ||| شركتك تشترط تسجيل الدخول بخطوتين. إذا أوقفته هنا فستعيد إعداده مباشرة: هكذا تنقله إلى هاتف جديد.
+After this your password alone signs you in. To move to a new phone, switch off and set it up again. ||| بعد ذلك تكفي كلمة المرور للدخول. للانتقال إلى هاتف جديد أوقفه ثم أعد إعداده.
+Code from your app, or a recovery code ||| الرمز من تطبيقك أو رمز استرداد
+Switch off ||| إيقاف
+Switch on ||| تفعيل
+Your company requires two-step sign-in. Set it up now to continue: it takes about a minute. ||| شركتك تشترط تسجيل الدخول بخطوتين. أعدّه الآن للمتابعة: يستغرق نحو دقيقة.
+Set it up ||| الإعداد
+On your phone, install an authenticator app: Google Authenticator or Microsoft Authenticator, free from the App Store or Google Play. ||| ثبّت على هاتفك تطبيق مصادقة: Google Authenticator أو Microsoft Authenticator، مجاناً من App Store أو Google Play.
+In the app choose to add an account, then scan this QR code. ||| في التطبيق اختر إضافة حساب ثم امسح رمز QR هذا.
+Cannot scan? Type this key into the app instead: ||| لا تستطيع المسح؟ اكتب هذا المفتاح في التطبيق:
+Type the six-digit code the app now shows, and press Switch on. ||| اكتب الرمز المكوّن من ستة أرقام الذي يعرضه التطبيق الآن ثم اضغط «تفعيل».
+QR code for your authenticator app ||| رمز QR لتطبيق المصادقة
+2-step ||| خطوتان
+Required ||| إلزامي
+Optional ||| اختياري
+After the password, the user types a six-digit code from an authenticator app on their phone. Each user can switch it on for themselves; here you can require it of everyone who works in {0}. ||| بعد كلمة المرور يكتب المستخدم رمزاً من ستة أرقام من تطبيق مصادقة على هاتفه. يستطيع كل مستخدم تفعيله لنفسه؛ ومن هنا يمكنك اشتراطه على كل من يعمل في {0}.
+Make it optional ||| اجعله اختيارياً
+Require it for all users ||| اشترطه على جميع المستخدمين
+Off ||| متوقف
+Reset two-step sign-in for this user? They will sign in with the password alone until they set it up again. ||| إعادة ضبط تسجيل الدخول بخطوتين لهذا المستخدم؟ سيدخل بكلمة المرور وحدها حتى يعيد إعداده.
+For a user who lost their phone ||| لمستخدم فقد هاتفه
+Reset two-step ||| إعادة ضبط الخطوتين
+Kinds of Maintenance Work ||| أنواع أعمال الصيانة
+The list staff and tenants choose from when a maintenance job is raised, and that the maintenance dashboard sorts jobs and costs by. Add the kinds of work your company does; switch off the ones you do not use. ||| القائمة التي يختار منها الموظفون والمستأجرون عند فتح أمر صيانة، وبها تصنّف لوحة الصيانة الأعمال والتكاليف. أضف أنواع الأعمال التي تنفذها شركتك وأوقف ما لا تستخدمه.
+Add a kind of work ||| إضافة نوع عمل
+e.g. Lifts, Painting, Swimming pool ||| مثال: المصاعد، الدهان، المسبح
+Kind of work ||| نوع العمل
+Rename ||| إعادة تسمية
+Offered ||| معروض
+Switched off ||| متوقف
+Renaming a kind of work renames it on the jobs and planned maintenance that already have it. A kind that is switched off is no longer offered for new jobs; jobs that have it keep it, so nothing is deleted. ||| إعادة تسمية نوع العمل تغيّر اسمه في أوامر الصيانة والصيانة المخططة التي تحمله. النوع المتوقف لا يُعرض للأوامر الجديدة؛ والأوامر التي تحمله تحتفظ به، فلا يُحذف شيء.
+That took too long. Please sign in again. ||| استغرق ذلك وقتاً طويلاً. يرجى تسجيل الدخول من جديد.
+That code is not right. Type the six digits your authenticator app shows now, or one of your recovery codes. ||| الرمز غير صحيح. اكتب الأرقام الستة التي يعرضها تطبيق المصادقة الآن، أو أحد رموز الاسترداد.
+That code is not right. Check the time on your phone is correct and type the code the app shows now. ||| الرمز غير صحيح. تأكد من صحة الوقت على هاتفك واكتب الرمز الذي يعرضه التطبيق الآن.
+That code is not right. Type the six digits your authenticator app shows now. ||| الرمز غير صحيح. اكتب الأرقام الستة التي يعرضها تطبيق المصادقة الآن.
+That code is not right. Type the six digits your authenticator app shows now, or a recovery code. ||| الرمز غير صحيح. اكتب الأرقام الستة التي يعرضها تطبيق المصادقة الآن، أو رمز استرداد.
+Two-step sign-in is on. Keep the recovery codes below, then carry on from the menu. ||| تم تفعيل تسجيل الدخول بخطوتين. احفظ رموز الاسترداد أدناه ثم تابع من القائمة.
+Two-step sign-in is on. From your next sign-in you will be asked for a code from your phone. ||| تم تفعيل تسجيل الدخول بخطوتين. من دخولك القادم سيُطلب منك رمز من هاتفك.
+New recovery codes made. The old ones no longer work. ||| تم إنشاء رموز استرداد جديدة. الرموز القديمة لم تعد تعمل.
+Two-step sign-in is off. ||| تم إيقاف تسجيل الدخول بخطوتين.
+Two-step sign-in is already on. ||| تسجيل الدخول بخطوتين مفعّل من قبل.
+Start again: scan the QR code shown on this page. ||| ابدأ من جديد: امسح رمز QR المعروض في هذه الصفحة.
+Two-step sign-in is now required. From their next sign-in, each user who has not set it up is taken to set it up first. ||| أصبح تسجيل الدخول بخطوتين إلزامياً. من الدخول القادم يُنقل كل مستخدم لم يعدّه إلى إعداده أولاً.
+Two-step sign-in is now optional: each user decides for themselves. ||| أصبح تسجيل الدخول بخطوتين اختيارياً: كل مستخدم يقرر لنفسه.
+Kind of work added. ||| تمت إضافة نوع العمل.
+Kind of work renamed, on its jobs too. ||| تمت إعادة تسمية نوع العمل، وفي أوامره أيضاً.
+That kind of work is already in the list. ||| نوع العمل هذا موجود في القائمة.
+That kind of work is in the list but switched off. Switch it on again instead. ||| نوع العمل هذا موجود في القائمة لكنه متوقف. فعّله من جديد.
+Another kind of work already has that name. ||| يوجد نوع عمل آخر بهذا الاسم.
+Keep at least one kind of work switched on. ||| أبقِ نوع عمل واحداً على الأقل مفعّلاً.
+Type the name of the kind of work. ||| اكتب اسم نوع العمل.
+That kind of work was not found. ||| نوع العمل غير موجود.
+# Paid services: the price list, orders, invoice and margin.
+Paid Services ||| الخدمات المدفوعة
+Paid Services Price List ||| قائمة أسعار الخدمات المدفوعة
+Services a tenant asks for and pays for: special maintenance that is not the landlord's to do free of charge, and special requests such as cleaning that the company may give to a subcontractor. A tenant orders from this list in the portal, or staff order for them; the tenant is invoiced, and the work waits for the payment where the service says so. ||| خدمات يطلبها المستأجر ويدفع ثمنها: صيانة خاصة ليست على المالك مجاناً، وطلبات خاصة مثل التنظيف قد تسندها الشركة إلى مقاول من الباطن. يطلب المستأجر من هذه القائمة في البوابة أو يطلب له الموظفون؛ تصدر له فاتورة، وينتظر العمل الدفع حيث تنص الخدمة على ذلك.
+Orders and margin ||| الطلبات والهامش
+Add a service ||| إضافة خدمة
+Change: {0} ||| تعديل: {0}
+Service ||| الخدمة
+e.g. Deep cleaning - one bedroom ||| مثال: تنظيف عميق - غرفة نوم واحدة
+Special maintenance ||| صيانة خاصة
+Special request ||| طلب خاص
+Paid service ||| خدمة مدفوعة
+What is included ||| ما تشمله الخدمة
+The tenant reads this when choosing the service. ||| يقرأ المستأجر هذا عند اختيار الخدمة.
+Selling price (before VAT) ||| سعر البيع (قبل الضريبة)
+0 = priced when the invoice is issued. ||| 0 = يُسعَّر عند إصدار الفاتورة.
+Expected cost ||| التكلفة المتوقعة
+The subcontractor's price, or materials and time. ||| سعر المقاول من الباطن، أو المواد والوقت.
+Income account ||| حساب الإيراد
+-- the company's Other Income account -- ||| -- حساب الإيرادات الأخرى للشركة --
+Where the price is credited when the invoice is posted. ||| الحساب الذي يُقيَّد فيه السعر دائناً عند ترحيل الفاتورة.
+The tenant pays before the work starts ||| يدفع المستأجر قبل بدء العمل
+Done by a subcontractor ||| ينفذها مقاول من الباطن
+Offered to tenants ||| معروضة للمستأجرين
+Add service ||| إضافة الخدمة
+No services yet. Add the first one above; tenants see the list as soon as it has an entry. ||| لا توجد خدمات بعد. أضف الأولى أعلاه؛ يرى المستأجرون القائمة فور إضافة أول خدمة.
+Selling price ||| سعر البيع
+Expected margin ||| الهامش المتوقع
+Terms ||| الشروط
+on quotation ||| حسب عرض السعر
+Paid before the work ||| تُدفع قبل العمل
+Invoiced, work not held ||| تُفوتر، والعمل لا ينتظر
+Subcontracted ||| مقاول من الباطن
+The price is charged to the tenant as a tax invoice in the company's own name, with VAT where the company is registered. It is the company's income whoever owns the building, and is never part of what an owner is paid. An order keeps the price it was made at: changing the list does not change orders already made. ||| يُحمَّل السعر على المستأجر بفاتورة ضريبية باسم الشركة، مع الضريبة إذا كانت الشركة مسجلة. هو إيراد للشركة أياً كان مالك المبنى، ولا يدخل أبداً في ما يُدفع للمالك. يحتفظ الطلب بالسعر الذي أُنشئ به: تغيير القائمة لا يغيّر الطلبات السابقة.
+Paid Service Orders ||| طلبات الخدمات المدفوعة
+What tenants ordered, what they were charged and paid, and what each service cost the company. ||| ما طلبه المستأجرون، وما حُمّل عليهم وما دفعوه، وما كلّفته كل خدمة للشركة.
+Price list ||| قائمة الأسعار
+Orders ||| الطلبات
+{0} awaiting payment ||| {0} بانتظار الدفع
+Invoiced (before VAT) ||| المفوتر (قبل الضريبة)
+{0} not invoiced yet ||| {0} لم تُفوتر بعد
+Cost recorded ||| التكلفة المسجلة
+expected {0} ||| المتوقع {0}
+Margin ||| الهامش
+No paid services were ordered in this period. ||| لم تُطلب خدمات مدفوعة في هذه الفترة.
+By service ||| حسب الخدمة
+Price ||| السعر
+Price and margin are before VAT; Paid includes VAT. Cost is what was recorded on the job: materials from the store, items bought, and the subcontractor's bill. Margin = price - cost. ||| السعر والهامش قبل الضريبة؛ والمدفوع يشمل الضريبة. التكلفة هي ما سُجّل على العمل: مواد من المخزن، ومشتريات، وفاتورة المقاول من الباطن. الهامش = السعر - التكلفة.
+Not invoiced yet ||| لم تُفوتر بعد
+Invoice awaiting posting ||| الفاتورة بانتظار الترحيل
+Awaiting payment ||| بانتظار الدفع
+Partly paid ||| مدفوعة جزئياً
+to be quoted ||| يُحدَّد بعرض سعر
+including VAT {0} ||| شاملاً الضريبة {0}
+Paid, thank you. We will carry out the service and keep you posted here. ||| تم الدفع، شكراً لك. سننفذ الخدمة ونبقيك على اطلاع هنا.
+We have your order. We will confirm it and send you the invoice here. ||| استلمنا طلبك. سنؤكده ونرسل لك الفاتورة هنا.
+Please pay invoice {0}: {1} is due. The work starts once it is paid. You will find the invoice under Invoices. ||| يرجى دفع الفاتورة {0}: المستحق {1}. يبدأ العمل فور الدفع. تجد الفاتورة ضمن الفواتير.
+Invoice {0}: {1} is due. You will find it under Invoices. ||| الفاتورة {0}: المستحق {1}. تجدها ضمن الفواتير.
+{0} + VAT {1} ||| {0} + ضريبة {1}
+priced when the invoice is issued ||| يُسعَّر عند إصدار الفاتورة
+{0} of {1} ||| {0} من {1}
+Cost recorded on the job ||| التكلفة المسجلة على العمل
+Work on hold: this service is paid for before the work starts. The job can be started once the invoice is paid in full. ||| العمل معلّق: هذه الخدمة تُدفع قبل بدء العمل. يمكن بدء العمل بعد دفع الفاتورة كاملة.
+Paid in full: the work can go ahead. ||| مدفوعة بالكامل: يمكن تنفيذ العمل.
+This order names no contract, so it cannot be invoiced. ||| هذا الطلب لا يحدد عقداً، فلا يمكن إصدار فاتورة له.
+Issue the invoice to the tenant? It is posted to the accounts. ||| إصدار الفاتورة للمستأجر؟ ستُرحَّل إلى الحسابات.
+Price before VAT ||| السعر قبل الضريبة
+Issue invoice ||| إصدار الفاتورة
+Record the tenant's payment ||| تسجيل دفعة المستأجر
+The invoice's entry is still a draft. Post it from Journal Inquiry; the tenant can then pay it. ||| قيد الفاتورة ما زال مسودة. رحّله من استعلام القيود؛ بعدها يستطيع المستأجر دفعها.
+Which service? ||| أي خدمة؟
+-- choose the service -- ||| -- اختر الخدمة --
+{0} including VAT ||| {0} شاملاً الضريبة
+price on quotation ||| السعر حسب عرض السعر
+This is a paid service. We confirm the order and send the invoice; where the service is paid in advance, the work starts once the invoice is paid. ||| هذه خدمة مدفوعة. نؤكد الطلب ونرسل الفاتورة؛ وإذا كانت الخدمة تُدفع مقدماً يبدأ العمل فور دفع الفاتورة.
+Order a paid service ||| طلب خدمة مدفوعة
+Subcontractor's charge ||| أجرة مقاول من الباطن
+Subcontractor ({0}) ||| مقاول من الباطن ({0})
+Subcontractor ||| مقاول من الباطن
+Service added to the price list. ||| تمت إضافة الخدمة إلى قائمة الأسعار.
+Service saved. ||| تم حفظ الخدمة.
+Give the service a name. ||| أدخل اسم الخدمة.
+Choose whether it is special maintenance or a special request. ||| اختر: صيانة خاصة أم طلب خاص.
+The price and the cost cannot be negative. ||| لا يمكن أن يكون السعر أو التكلفة سالباً.
+Choose one of the company's income accounts. ||| اختر أحد حسابات إيرادات الشركة.
+Another service already has that name. ||| توجد خدمة أخرى بهذا الاسم.
+That service was not found. ||| الخدمة غير موجودة.
+Choose the service from the list. ||| اختر الخدمة من القائمة.
+Choose the property the service is for. ||| اختر العقار الذي تُطلب له الخدمة.
+This request is not an order for a paid service. ||| هذا الطلب ليس طلب خدمة مدفوعة.
+The request is closed, so no invoice can be issued for it. ||| الطلب مغلق، فلا يمكن إصدار فاتورة له.
+The invoice for this service has already been issued. ||| صدرت فاتورة هذه الخدمة من قبل.
+Give the price of the service, before VAT. ||| أدخل سعر الخدمة قبل الضريبة.
+Give the number of the subcontractor's bill. ||| أدخل رقم فاتورة المقاول من الباطن.
+Your invoice for this service is ready. Open it to see the amount. ||| فاتورة هذه الخدمة جاهزة. افتحها لمعرفة المبلغ.
+# Lease handover: checklist, charges, deposit settlement and report.
+Lease Handovers ||| تسليم الوحدات
+When a contract ends: the unit is inspected against the checklist, the Maintenance Manager prices any damage, and the accounts settle the security deposit - applied to what the tenant still owes, the rest refunded. Settling closes the contract and frees the unit. ||| عند انتهاء العقد: تُعاين الوحدة وفق قائمة الفحص، ويسعّر مدير الصيانة أي ضرر، وتسوّي الحسابات مبلغ التأمين - يُخصم منه ما على المستأجر ويُرد الباقي. التسوية تغلق العقد وتخلي الوحدة.
+Open a handover ||| فتح تسليم
+-- choose the contract -- ||| -- اختر العقد --
+Handover date ||| تاريخ التسليم
+A date before the contract's end date makes it an early termination. ||| تاريخ قبل نهاية العقد يجعله إنهاءً مبكراً.
+No handovers yet. ||| لا توجد عمليات تسليم بعد.
+Where it stands ||| الحالة الحالية
+Deposit refunded ||| التأمين المردود
+Report ||| التقرير
+Settled ||| تمت التسوية
+Waiting for the inspection ||| بانتظار المعاينة
+Waiting for the Maintenance Manager ||| بانتظار مدير الصيانة
+Waiting for the accounts ||| بانتظار الحسابات
+End of contract ||| نهاية العقد
+Early termination ||| إنهاء مبكر
+Handover Checklist ||| قائمة فحص التسليم
+What is checked when a tenant hands a unit back. Each new handover takes a copy of the lines switched on here; handovers already opened keep the checklist they started with. ||| ما يُفحص عند إعادة المستأجر للوحدة. يأخذ كل تسليم جديد نسخة من البنود المفعّلة هنا؛ وعمليات التسليم المفتوحة تحتفظ بالقائمة التي بدأت بها.
+e.g. Curtains and blinds in good condition ||| مثال: الستائر بحالة جيدة
+What is checked ||| بند الفحص
+Move up ||| تحريك لأعلى
+Move down ||| تحريك لأسفل
+Handover {0} ||| تسليم {0}
+handover date {0} ||| تاريخ التسليم {0}
+contract {0} to {1} ||| العقد من {0} إلى {1}
+Handover report ||| تقرير التسليم
+Accounts and deposit ||| الحسابات والتأمين
+<strong>1. Inspection</strong> ||| <strong>1. المعاينة</strong>
+completed by {0}, {1} ||| أكملها {0}، {1}
+OK ||| سليم
+Problem found ||| وُجدت مشكلة
+Not checked yet ||| لم يُفحص بعد
+Keys returned ||| المفاتيح المعادة
+Electricity meter reading ||| قراءة عداد الكهرباء
+Water meter reading ||| قراءة عداد الماء
+Inspection notes ||| ملاحظات المعاينة
+Save, continue later ||| حفظ والمتابعة لاحقاً
+Save changes ||| حفظ التغييرات
+Complete the inspection ||| إكمال المعاينة
+<strong>2. Maintenance Manager: charges to the tenant</strong> ||| <strong>2. مدير الصيانة: ما يُحمَّل على المستأجر</strong>
+signed by {0}, {1} ||| وقّعه {0}، {1}
+Opens when the inspection is completed. ||| يُفتح عند إكمال المعاينة.
+Charge for ||| سبب التحميل
+Amount (before VAT) ||| المبلغ (قبل الضريبة)
+No charges: nothing found that the tenant must pay for. ||| لا توجد مبالغ: لم يُعثر على ما يجب أن يدفعه المستأجر.
+e.g. Repaint living room, damaged beyond fair wear ||| مثال: إعادة دهان غرفة المعيشة، ضرر يتجاوز الاستهلاك العادي
+Add charge ||| إضافة مبلغ
+Maintenance Manager's notes ||| ملاحظات مدير الصيانة
+Signing passes the handover to the accounts with these charges, or with none. ||| التوقيع يحيل التسليم إلى الحسابات بهذه المبالغ أو من دونها.
+Sign and pass to the accounts ||| توقيع وإحالة إلى الحسابات
+Waiting for the Maintenance Manager to enter any charges and sign. ||| بانتظار مدير الصيانة لإدخال أي مبالغ والتوقيع.
+Reopen to correct the charges ||| إعادة الفتح لتصحيح المبالغ
+<strong>3. Accounts: the tenant's account and the deposit</strong> ||| <strong>3. الحسابات: حساب المستأجر والتأمين</strong>
+settled by {0}, {1} ||| سوّاه {0}، {1}
+Deposit held ||| التأمين المحتفظ به
+Applied to what the tenant owed ||| خُصم مقابل ما كان على المستأجر
+Refunded to the tenant ||| رُدّ إلى المستأجر
+Still owed by the tenant ||| ما زال على المستأجر
+What the tenant owes ||| ما على المستأجر
+Nothing: every invoice up to the handover date is paid. ||| لا شيء: كل الفواتير حتى تاريخ التسليم مدفوعة.
+due {0} ||| تستحق {0}
+Handover charges ||| مبالغ التسليم
+{0} + VAT {1}, invoiced at settlement ||| {0} + ضريبة {1}، تُفوتر عند التسوية
+Total owed ||| إجمالي المستحق
+The deposit ||| التأمين
+Applied to what the tenant owes ||| يُخصم مقابل ما على المستأجر
+To refund to the tenant ||| يُرد إلى المستأجر
+Still owed after the deposit ||| يبقى مستحقاً بعد التأمين
+A deposit of {0} is recorded but its entry is not posted, so it is not counted. Post it from Journal Inquiry first. ||| تأمين بمبلغ {0} مسجل لكن قيده غير مرحّل فلا يُحتسب. رحّله أولاً من استعلام القيود.
+{0} invoice(s) dated up to the handover are not posted ({1}), so they are not counted. Post them, or cancel them, first. ||| {0} فاتورة حتى تاريخ التسليم غير مرحّلة ({1}) فلا تُحتسب. رحّلها أو ألغها أولاً.
+{0} invoice(s) are dated after the handover ({1}). They are not deducted from the deposit: cancel the drafts, or issue credit notes for those posted. ||| {0} فاتورة بتاريخ بعد التسليم ({1}). لا تُخصم من التأمين: ألغِ المسودات أو أصدر إشعارات دائنة للمرحّلة.
+{0} cheque(s) of this contract are still in hand ({1}). Return them to the tenant from PDC Receipts, or wait for those deposited to clear. ||| {0} شيك لهذا العقد ما زال لدينا ({1}). أعدها إلى المستأجر من الشيكات الآجلة، أو انتظر تحصيل المودعة.
+{0} request(s) of this contract are still open. ||| {0} طلب لهذا العقد ما زال مفتوحاً.
+This handover was cancelled. ||| أُلغي هذا التسليم.
+The settlement opens when the Maintenance Manager has signed. The figures above are as they stand now. ||| تُفتح التسوية بعد توقيع مدير الصيانة. الأرقام أعلاه كما هي الآن.
+Settle the handover? The charges are invoiced, the deposit is applied and refunded in the accounts, the contract is closed and the unit becomes vacant. ||| تسوية التسليم؟ تُفوتر المبالغ، ويُخصم التأمين ويُرد في الحسابات، ويُغلق العقد وتصبح الوحدة شاغرة.
+Accounts notes ||| ملاحظات الحسابات
+e.g. Refund by bank transfer to the tenant's account ||| مثال: الرد بتحويل بنكي إلى حساب المستأجر
+Settle and close the contract ||| تسوية وإغلاق العقد
+Waiting for the accounts to settle the deposit. ||| بانتظار الحسابات لتسوية التأمين.
+Cancel this handover? The contract stays in force and nothing is posted. ||| إلغاء هذا التسليم؟ يبقى العقد سارياً ولا يُرحَّل شيء.
+Cancel this handover ||| إلغاء هذا التسليم
+Hand the unit back and settle the deposit ||| إعادة الوحدة وتسوية التأمين
+Unit Handover Report ||| تقرير تسليم الوحدة
+Contract period ||| مدة العقد
+Inspected by ||| المعاين
+Charges to the tenant ||| ما يُحمَّل على المستأجر
+Not signed by the Maintenance Manager yet. ||| لم يوقّعه مدير الصيانة بعد.
+Total charges ||| إجمالي المبالغ
+Settlement of the security deposit ||| تسوية مبلغ التأمين
+unpaid invoices and the charges above ||| الفواتير غير المدفوعة والمبالغ أعلاه
+Not settled yet: the figures are as they stand today and may change. ||| لم تتم التسوية بعد: الأرقام كما هي اليوم وقد تتغير.
+Name, signature and date ||| الاسم والتوقيع والتاريخ
+All keys and access cards returned ||| إعادة جميع المفاتيح وبطاقات الدخول
+Parking cards and remote controls returned ||| إعادة بطاقات المواقف وأجهزة التحكم
+Electricity and water final bills settled by the tenant ||| سداد المستأجر لفواتير الكهرباء والماء النهائية
+Electricity and water meter readings taken ||| أخذ قراءات عدادي الكهرباء والماء
+Walls and paint in good condition ||| الجدران والدهان بحالة جيدة
+Floors, tiles and carpets in good condition ||| الأرضيات والبلاط والسجاد بحالة جيدة
+Doors, windows and locks working ||| الأبواب والنوافذ والأقفال تعمل
+Kitchen cabinets, worktop and sink in good condition ||| خزائن المطبخ وسطح العمل والحوض بحالة جيدة
+Bathrooms and sanitary ware in good condition ||| الحمامات والأدوات الصحية بحالة جيدة
+Air conditioning units working and clean ||| وحدات التكييف تعمل ونظيفة
+Lights, switches and sockets working ||| الإنارة والمفاتيح والمقابس تعمل
+Unit cleaned and free of the tenant's belongings ||| الوحدة نظيفة وخالية من أغراض المستأجر
+Handover cancelled. The contract stays in force. ||| أُلغي التسليم. يبقى العقد سارياً.
+Added to the checklist. ||| أُضيف إلى قائمة الفحص.
+Type what is to be checked. ||| اكتب ما يجب فحصه.
+That is already on the checklist. ||| هذا موجود في قائمة الفحص.
+Choose the contract. ||| اختر العقد.
+Only a contract in force is handed over. ||| لا يُسلَّم إلا عقد سارٍ.
+The handover cannot be before the contract started. ||| لا يمكن أن يكون التسليم قبل بدء العقد.
+This contract already has a handover. ||| لهذا العقد تسليم مفتوح من قبل.
+The handover was not found. ||| التسليم غير موجود.
+This handover is closed. ||| هذا التسليم مغلق.
+Only a handover still open can be cancelled. ||| لا يُلغى إلا تسليم ما زال مفتوحاً.
+The settlement has started in the accounts, so this handover can no longer be cancelled. Finish settling it. ||| بدأت التسوية في الحسابات فلا يمكن إلغاء هذا التسليم. أكمل تسويته.
+The Maintenance Manager has signed, so the inspection can no longer be changed. ||| وقّع مدير الصيانة فلا يمكن تعديل المعاينة.
+Give the number of keys returned. ||| أدخل عدد المفاتيح المعادة.
+Saved. Add a note to each line marked as a problem, saying what was found, then complete the inspection. ||| تم الحفظ. أضف ملاحظة لكل بند فيه مشكلة تبيّن ما وُجد، ثم أكمل المعاينة.
+Inspection completed. It now goes to the Maintenance Manager. ||| اكتملت المعاينة. تنتقل الآن إلى مدير الصيانة.
+Inspection saved. Complete it when every line is checked. ||| حُفظت المعاينة. أكملها عند فحص كل البنود.
+The charges are signed off and can no longer be changed. ||| وُقّعت المبالغ ولا يمكن تعديلها.
+Complete the inspection first. ||| أكمل المعاينة أولاً.
+Say what the charge is for. ||| اذكر سبب المبلغ.
+Give the amount of the charge. ||| أدخل قيمة المبلغ.
+Charge added. ||| أُضيف المبلغ.
+Charge removed. ||| أُزيل المبلغ.
+The Maintenance Manager has already signed. ||| وقّع مدير الصيانة من قبل.
+Signed: nothing to charge the tenant. It now goes to the accounts. ||| تم التوقيع: لا شيء يُحمَّل على المستأجر. تنتقل الآن إلى الحسابات.
+The charges have been invoiced, so they can no longer be changed. ||| فُوترت المبالغ فلا يمكن تعديلها.
+Reopened: the charges can be corrected and signed again. ||| أُعيد الفتح: يمكن تصحيح المبالغ والتوقيع من جديد.
+This handover is already closed. ||| هذا التسليم مغلق من قبل.
+The inspection and the Maintenance Manager's sign-off come first. ||| المعاينة وتوقيع مدير الصيانة أولاً.
+The invoice for the charges is not posted yet. Post it from Journal Inquiry, then settle again. ||| فاتورة المبالغ غير مرحّلة بعد. رحّلها من استعلام القيود ثم أعد التسوية.

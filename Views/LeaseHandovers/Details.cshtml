@@ -1,0 +1,340 @@
+@model RealEstateManager.Domain.LeaseHandover
+@using RealEstateManager.Domain
+@inject PermissionService PermissionService
+
+@{
+    ViewData["Title"] = Model.HandoverNumber;
+    var summary = (LeaseHandoverService.Summary)ViewBag.Summary;
+    var lease = Model.Lease!;
+    var canMaintain = await PermissionService.HasAnyPermissionAsync(User, AppPermissions.MaintenanceManage);
+    var canAccount = await PermissionService.HasAnyPermissionAsync(User, AppPermissions.AccountingManage);
+    var inspectionOpen = Model.IsOpen && !Model.IsMaintenanceSigned;
+    var chargesOpen = Model.IsOpen && Model.IsInspected && !Model.IsMaintenanceSigned;
+    var settled = Model.Status == HandoverStatuses.Settled;
+
+    string Local(DateTime? utc) => utc.HasValue ? utc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm") : "";
+    string StepBadge(bool done, bool current) => done ? "bg-success" : current ? "bg-warning text-dark" : "bg-secondary";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">
+            @T.Format("Handover {0}", Model.HandoverNumber)
+            <span class="badge @HandoverStatuses.BadgeClass(Model.Status) align-middle">@T[Model.Status]</span>
+        </h2>
+        <div class="text-muted">
+            @lease.Tenant?.FullName &middot; @lease.Unit?.UnitNumber (@lease.Unit?.Property?.Name) &middot; @lease.ContractNumber
+        </div>
+        <div class="small text-muted">
+            @T[HandoverReasons.Describe(Model.Reason)] &middot;
+            @T.Format("handover date {0}", Model.HandoverDate.ToString("dd/MM/yyyy")) &middot;
+            @T.Format("contract {0} to {1}", lease.StartDate.ToString("dd/MM/yyyy"), lease.EndDate.ToString("dd/MM/yyyy"))
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="Report" asp-route-id="@Model.Id" target="_blank" class="btn btn-outline-dark">@T["Handover report"]</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <span class="badge @StepBadge(Model.IsInspected, Model.IsOpen && !Model.IsInspected) fs-6 fw-normal">1. @T["Inspection"]</span>
+    <span class="badge @StepBadge(Model.IsMaintenanceSigned, Model.IsOpen && Model.IsInspected && !Model.IsMaintenanceSigned) fs-6 fw-normal">2. @T["Maintenance Manager"]</span>
+    <span class="badge @StepBadge(settled, Model.IsOpen && Model.IsMaintenanceSigned) fs-6 fw-normal">3. @T["Accounts and deposit"]</span>
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-7">
+        @* ------------------------------------------------ 1. inspection *@
+        <form asp-action="SaveInspection" method="post" class="card shadow-sm mb-3">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span>@T.Html("<strong>1. Inspection</strong>")</span>
+                @if (Model.IsInspected)
+                {
+                    <span class="small text-muted">@T.Format("completed by {0}, {1}", Model.InspectedByName ?? "-", Local(Model.InspectedAt))</span>
+                }
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>@T["What is checked"]</th><th style="width:11rem">@T["Result"]</th><th>@T["Note"]</th></tr>
+                    </thead>
+                    <tbody>
+                        @for (var i = 0; i < Model.Items.Count; i++)
+                        {
+                            var item = Model.Items[i];
+                            <tr class="@(item.Result == HandoverItemResults.Issue ? "table-warning" : "")">
+                                <td>
+                                    <input type="hidden" name="Items[@i].Id" value="@item.Id" />
+                                    @T[item.Name]
+                                </td>
+                                <td>
+                                    @if (inspectionOpen)
+                                    {
+                                        <select name="Items[@i].Result" class="form-select form-select-sm" aria-label="@T["Result"]">
+                                            @foreach (var result in HandoverItemResults.All)
+                                            {
+                                                <option value="@result" selected="@(result == item.Result ? "selected" : null)">@T[HandoverItemResults.Describe(result)]</option>
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <span>@T[HandoverItemResults.Describe(item.Result)]</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (inspectionOpen)
+                                    {
+                                        <input name="Items[@i].Notes" value="@item.Notes" class="form-control form-control-sm" maxlength="500" aria-label="@T["Note"]" />
+                                    }
+                                    else
+                                    {
+                                        <span class="small">@item.Notes</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-body border-top row g-2">
+                <div class="col-md-3">
+                    <label class="form-label small mb-0" for="keys">@T["Keys returned"]</label>
+                    <input id="keys" name="KeysReturned" type="number" min="0" max="99" value="@Model.KeysReturned" class="form-control form-control-sm" disabled="@(inspectionOpen ? null : "disabled")" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small mb-0" for="elec">@T["Electricity meter reading"]</label>
+                    <input id="elec" name="ElectricityReading" value="@Model.ElectricityReading" maxlength="50" class="form-control form-control-sm" disabled="@(inspectionOpen ? null : "disabled")" />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small mb-0" for="water">@T["Water meter reading"]</label>
+                    <input id="water" name="WaterReading" value="@Model.WaterReading" maxlength="50" class="form-control form-control-sm" disabled="@(inspectionOpen ? null : "disabled")" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label small mb-0" for="inspNotes">@T["Inspection notes"]</label>
+                    <textarea id="inspNotes" name="InspectionNotes" rows="2" maxlength="2000" class="form-control form-control-sm" disabled="@(inspectionOpen ? null : "disabled")">@Model.InspectionNotes</textarea>
+                </div>
+                @if (inspectionOpen)
+                {
+                    <div class="col-12 d-flex flex-wrap gap-2 justify-content-end">
+                        <button type="submit" name="Complete" value="false" class="btn btn-sm btn-outline-primary">@T["Save, continue later"]</button>
+                        <button type="submit" name="Complete" value="true" class="btn btn-sm btn-primary">@(Model.IsInspected ? T["Save changes"] : T["Complete the inspection"])</button>
+                    </div>
+                }
+            </div>
+        </form>
+
+        @* ------------------------------------------------ 2. maintenance *@
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span>@T.Html("<strong>2. Maintenance Manager: charges to the tenant</strong>")</span>
+                @if (Model.IsMaintenanceSigned)
+                {
+                    <span class="small text-muted">@T.Format("signed by {0}, {1}", Model.MaintenanceSignedByName ?? "-", Local(Model.MaintenanceSignedAt))</span>
+                }
+            </div>
+            @if (!Model.IsInspected)
+            {
+                <div class="card-body text-muted small">@T["Opens when the inspection is completed."]</div>
+            }
+            else
+            {
+                @if (Model.Charges.Count > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light"><tr><th>@T["Charge for"]</th><th class="text-end">@T["Amount (before VAT)"]</th><th></th></tr></thead>
+                            <tbody>
+                                @foreach (var charge in Model.Charges)
+                                {
+                                    <tr>
+                                        <td>@charge.Description</td>
+                                        <td class="text-end">@charge.Amount.ToString("N2")</td>
+                                        <td class="text-end">
+                                            @if (chargesOpen && canMaintain)
+                                            {
+                                                <form asp-action="RemoveCharge" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="chargeId" value="@charge.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">@T["Remove"]</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot><tr class="fw-semibold"><td class="text-end">@T["Total"]</td><td class="text-end">@Model.Charges.Sum(x => x.Amount).ToString("N2")</td><td></td></tr></tfoot>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-body text-muted small py-2">@T["No charges: nothing found that the tenant must pay for."]</div>
+                }
+
+                @if (chargesOpen && canMaintain)
+                {
+                    <form asp-action="AddCharge" method="post" class="card-body border-top row g-2 align-items-end">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div class="col-md-7"><label class="form-label small mb-0" for="chargeFor">@T["Charge for"]</label><input id="chargeFor" name="description" class="form-control form-control-sm" maxlength="300" required placeholder="@T["e.g. Repaint living room, damaged beyond fair wear"]" /></div>
+                        <div class="col-md-3"><label class="form-label small mb-0" for="chargeAmount">@T["Amount (before VAT)"]</label><input id="chargeAmount" name="amount" type="number" step="0.01" min="0.01" class="form-control form-control-sm" required /></div>
+                        <div class="col-md-2"><button type="submit" class="btn btn-sm btn-dark w-100">@T["Add charge"]</button></div>
+                    </form>
+                    <form asp-action="SignMaintenance" method="post" class="card-body border-top">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <label class="form-label small mb-0" for="mntNotes">@T["Maintenance Manager's notes"]</label>
+                        <textarea id="mntNotes" name="notes" rows="2" maxlength="2000" class="form-control form-control-sm mb-2">@Model.MaintenanceNotes</textarea>
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <span class="small text-muted">@T["Signing passes the handover to the accounts with these charges, or with none."]</span>
+                            <button type="submit" class="btn btn-sm btn-primary">@T["Sign and pass to the accounts"]</button>
+                        </div>
+                    </form>
+                }
+                else if (chargesOpen)
+                {
+                    <div class="card-body border-top small text-muted">@T["Waiting for the Maintenance Manager to enter any charges and sign."]</div>
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.MaintenanceNotes))
+                {
+                    <div class="card-body border-top small">@Model.MaintenanceNotes</div>
+                }
+
+                @if (Model.IsOpen && Model.IsMaintenanceSigned && !Model.ChargesInvoiceId.HasValue && canMaintain)
+                {
+                    <form asp-action="ReopenMaintenance" method="post" class="card-body border-top text-end py-2">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Reopen to correct the charges"]</button>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        @* ------------------------------------------------ 3. accounts *@
+        <div class="card shadow-sm mb-3 @(Model.IsOpen && Model.IsMaintenanceSigned ? "border-primary" : "")">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span>@T.Html("<strong>3. Accounts: the tenant's account and the deposit</strong>")</span>
+                @if (settled)
+                {
+                    <span class="small text-muted">@T.Format("settled by {0}, {1}", Model.SettledByName ?? "-", Local(Model.SettledAt))</span>
+                }
+            </div>
+            <div class="card-body">
+                @if (settled)
+                {
+                    <dl class="row small mb-0">
+                        <dt class="col-7">@T["Deposit held"]</dt><dd class="col-5 text-end">@Model.DepositHeld.ToString("N2")</dd>
+                        <dt class="col-7">@T["Applied to what the tenant owed"]</dt><dd class="col-5 text-end">@Model.DepositApplied.ToString("N2")</dd>
+                        <dt class="col-7">@T["Refunded to the tenant"]</dt><dd class="col-5 text-end fw-semibold">@Model.DepositRefunded.ToString("N2")</dd>
+                        <dt class="col-7">@T["Still owed by the tenant"]</dt><dd class="col-5 text-end @(Model.BalanceStillDue > 0m ? "text-danger fw-semibold" : "")">@Model.BalanceStillDue.ToString("N2")</dd>
+                    </dl>
+                    @if (!string.IsNullOrWhiteSpace(Model.AccountsNotes))
+                    {
+                        <div class="small border-top mt-2 pt-2">@Model.AccountsNotes</div>
+                    }
+                }
+                else
+                {
+                    <div class="small fw-semibold mb-1">@T["What the tenant owes"]</div>
+                    @if (summary.Owed.Count == 0 && summary.ChargesTotal == 0m)
+                    {
+                        <div class="small text-muted mb-2">@T["Nothing: every invoice up to the handover date is paid."]</div>
+                    }
+                    else
+                    {
+                        <table class="table table-sm small mb-2">
+                            <tbody>
+                                @foreach (var owed in summary.Owed)
+                                {
+                                    <tr><td>@owed.Number <span class="text-muted">@T[owed.What], @T.Format("due {0}", owed.DueDate.ToString("dd/MM/yyyy"))</span></td><td class="text-end">@owed.Outstanding.ToString("N2")</td></tr>
+                                }
+                                @if (!summary.ChargesInvoiced && summary.ChargesTotal > 0m)
+                                {
+                                    <tr><td>@T["Handover charges"] <span class="text-muted">@T.Format("{0} + VAT {1}, invoiced at settlement", summary.ChargesNet.ToString("N2"), summary.ChargesVat.ToString("N2"))</span></td><td class="text-end">@summary.ChargesTotal.ToString("N2")</td></tr>
+                                }
+                            </tbody>
+                            <tfoot><tr class="fw-semibold"><td>@T["Total owed"]</td><td class="text-end">@summary.OwedTotal.ToString("N2")</td></tr></tfoot>
+                        </table>
+                    }
+
+                    <div class="small fw-semibold mb-1">@T["The deposit"]</div>
+                    <dl class="row small mb-2">
+                        <dt class="col-7 fw-normal">@T["Deposit held"]</dt><dd class="col-5 text-end">@summary.DepositHeld.ToString("N2")</dd>
+                        <dt class="col-7 fw-normal">@T["Applied to what the tenant owes"]</dt><dd class="col-5 text-end">@summary.ToApply.ToString("N2")</dd>
+                        <dt class="col-7">@T["To refund to the tenant"]</dt><dd class="col-5 text-end fw-semibold">@summary.ToRefund.ToString("N2")</dd>
+                        @if (summary.StillDue > 0m)
+                        {
+                            <dt class="col-7 text-danger">@T["Still owed after the deposit"]</dt><dd class="col-5 text-end text-danger fw-semibold">@summary.StillDue.ToString("N2")</dd>
+                        }
+                    </dl>
+
+                    @if (summary.DepositNotPosted > 0m)
+                    {
+                        <div class="alert alert-warning small py-2">@T.Format("A deposit of {0} is recorded but its entry is not posted, so it is not counted. Post it from Journal Inquiry first.", summary.DepositNotPosted.ToString("N2"))</div>
+                    }
+                    @if (summary.NotPosted.Count > 0)
+                    {
+                        <div class="alert alert-warning small py-2">@T.Format("{0} invoice(s) dated up to the handover are not posted ({1}), so they are not counted. Post them, or cancel them, first.", summary.NotPosted.Count, summary.NotPosted.Sum(x => x.Outstanding).ToString("N2"))</div>
+                    }
+                    @if (summary.AfterHandover.Count > 0)
+                    {
+                        <div class="alert alert-warning small py-2">@T.Format("{0} invoice(s) are dated after the handover ({1}). They are not deducted from the deposit: cancel the drafts, or issue credit notes for those posted.", summary.AfterHandover.Count, summary.AfterHandover.Sum(x => x.Outstanding).ToString("N2"))</div>
+                    }
+                    @if (summary.ChequesInHand.Count > 0)
+                    {
+                        <div class="alert alert-warning small py-2">
+                            @T.Format("{0} cheque(s) of this contract are still in hand ({1}). Return them to the tenant from PDC Receipts, or wait for those deposited to clear.", summary.ChequesInHand.Count, summary.ChequesInHand.Sum(x => x.Amount).ToString("N2"))
+                        </div>
+                    }
+                    @if (summary.OpenRequests > 0)
+                    {
+                        <div class="alert alert-info small py-2">@T.Format("{0} request(s) of this contract are still open.", summary.OpenRequests)</div>
+                    }
+
+                    @if (!Model.IsOpen)
+                    {
+                        <div class="small text-muted">@T["This handover was cancelled."]</div>
+                    }
+                    else if (!Model.IsMaintenanceSigned)
+                    {
+                        <div class="small text-muted">@T["The settlement opens when the Maintenance Manager has signed. The figures above are as they stand now."]</div>
+                    }
+                    else if (canAccount)
+                    {
+                        <form asp-action="Settle" method="post"
+                              onsubmit="return confirm('@T["Settle the handover? The charges are invoiced, the deposit is applied and refunded in the accounts, the contract is closed and the unit becomes vacant."]');">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <label class="form-label small mb-0" for="accNotes">@T["Accounts notes"]</label>
+                            <textarea id="accNotes" name="notes" rows="2" maxlength="2000" class="form-control form-control-sm mb-2" placeholder="@T["e.g. Refund by bank transfer to the tenant's account"]">@Model.AccountsNotes</textarea>
+                            <button type="submit" class="btn btn-primary w-100">@T["Settle and close the contract"]</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="small text-muted">@T["Waiting for the accounts to settle the deposit."]</div>
+                    }
+                }
+            </div>
+        </div>
+
+        @if (Model.IsOpen)
+        {
+            <form asp-action="Cancel" method="post" class="text-end"
+                  onsubmit="return confirm('@T["Cancel this handover? The contract stays in force and nothing is posted."]');">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-sm btn-outline-danger" disabled="@(Model.ChargesInvoiceId.HasValue || Model.DepositApplied > 0m ? "disabled" : null)">@T["Cancel this handover"]</button>
+            </form>
+        }
+    </div>
+</div>

@@ -1,0 +1,148 @@
+@model List<RealEstateManager.Services.PaidServiceService.State>
+@using RealEstateManager.Domain
+@using Stages = RealEstateManager.Services.PaidServiceService.Stages
+
+@{
+    ViewData["Title"] = T["Paid Service Orders"];
+    var from = (DateTime)ViewBag.From;
+    var to = (DateTime)ViewBag.To;
+    var live = Model.Where(x => x.RequestStatus != ServiceRequestStatuses.Cancelled && x.RequestStatus != ServiceRequestStatuses.Rejected).ToList();
+    var invoiced = live.Where(x => x.InvoiceId.HasValue).ToList();
+    var byService = invoiced.GroupBy(x => x.Name).OrderByDescending(g => g.Sum(x => x.Net)).ToList();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Paid Service Orders"]</h2>
+        <p class="text-muted mb-0">@T["What tenants ordered, what they were charged and paid, and what each service cost the company."]</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-dark">@T["Price list"]</a>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-auto">
+        <label class="form-label small mb-0" for="fromDate">@T["From"]</label>
+        <input id="fromDate" name="fromDate" type="date" class="form-control form-control-sm" value="@from.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label small mb-0" for="toDate">@T["To"]</label>
+        <input id="toDate" name="toDate" type="date" class="form-control form-control-sm" value="@to.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-sm btn-primary">@T["Show"]</button></div>
+</form>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="text-muted small">@T["Orders"]</div>
+        <div class="fs-4 fw-semibold">@live.Count</div>
+        <div class="small text-muted">@T.Format("{0} awaiting payment", live.Count(x => x.OnHold && x.InvoiceId.HasValue))</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="text-muted small">@T["Invoiced (before VAT)"]</div>
+        <div class="fs-4 fw-semibold">@invoiced.Sum(x => x.Net).ToString("N2")</div>
+        <div class="small text-muted">@T.Format("{0} not invoiced yet", live.Count(x => !x.InvoiceId.HasValue))</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="text-muted small">@T["Cost recorded"]</div>
+        <div class="fs-4 fw-semibold">@invoiced.Sum(x => x.ActualCost).ToString("N2")</div>
+        <div class="small text-muted">@T.Format("expected {0}", invoiced.Sum(x => x.ExpectedCost).ToString("N2"))</div>
+    </div></div></div>
+    <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+        <div class="text-muted small">@T["Margin"]</div>
+        <div class="fs-4 fw-semibold @(invoiced.Sum(x => x.Margin) < 0m ? "text-danger" : "")">@invoiced.Sum(x => x.Margin).ToString("N2")</div>
+        <div class="small text-muted">@(invoiced.Sum(x => x.Net) > 0m ? (invoiced.Sum(x => x.Margin) / invoiced.Sum(x => x.Net)).ToString("P0") : "-")</div>
+    </div></div></div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">@T["No paid services were ordered in this period."]</div>
+}
+else
+{
+    @if (byService.Count > 0)
+    {
+        <div class="card mb-3">
+            <div class="card-header bg-white fw-semibold">@T["By service"]</div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@T["Service"]</th>
+                            <th class="text-end">@T["Orders"]</th>
+                            <th class="text-end">@T["Invoiced (before VAT)"]</th>
+                            <th class="text-end">@T["Cost recorded"]</th>
+                            <th class="text-end">@T["Margin"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var group in byService)
+                        {
+                            <tr>
+                                <td>@group.Key</td>
+                                <td class="text-end">@group.Count()</td>
+                                <td class="text-end">@group.Sum(x => x.Net).ToString("N2")</td>
+                                <td class="text-end">@group.Sum(x => x.ActualCost).ToString("N2")</td>
+                                <td class="text-end @(group.Sum(x => x.Margin) < 0m ? "text-danger" : "")">@group.Sum(x => x.Margin).ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header bg-white fw-semibold">@T["Orders"]</div>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>@T["Request"]</th>
+                        <th>@T["Date"]</th>
+                        <th>@T["Tenant"]</th>
+                        <th>@T["Unit"]</th>
+                        <th>@T["Service"]</th>
+                        <th>@T["Job"]</th>
+                        <th>@T["Invoice"]</th>
+                        <th class="text-end">@T["Price"]</th>
+                        <th class="text-end">@T["Paid"]</th>
+                        <th class="text-end">@T["Cost"]</th>
+                        <th class="text-end">@T["Margin"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td><a asp-controller="ServiceRequests" asp-action="Details" asp-route-id="@order.RequestId">@order.RequestNumber</a></td>
+                            <td>@order.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td>@order.Tenant</td>
+                            <td>@order.Unit</td>
+                            <td>
+                                @order.Name
+                                <div class="small text-muted">@T[ServiceKinds.Describe(order.Kind)]</div>
+                            </td>
+                            <td><span class="badge @ServiceRequestStatuses.BadgeClass(order.RequestStatus)">@T[ServiceRequestStatuses.Describe(order.RequestStatus)]</span></td>
+                            <td>
+                                @if (order.InvoiceId.HasValue)
+                                {
+                                    <a asp-controller="CustomerInvoices" asp-action="TaxInvoice" asp-route-id="@order.InvoiceId">@order.InvoiceNumber</a>
+                                }
+                                <div><span class="badge @Stages.BadgeClass(order.Stage)">@T[Stages.Describe(order.Stage)]</span></div>
+                            </td>
+                            <td class="text-end">@order.Net.ToString("N2")</td>
+                            <td class="text-end">@order.Paid.ToString("N2")</td>
+                            <td class="text-end">@order.ActualCost.ToString("N2")</td>
+                            <td class="text-end @(order.InvoiceId.HasValue && order.Margin < 0m ? "text-danger" : "")">@(order.InvoiceId.HasValue ? order.Margin.ToString("N2") : "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-2">
+        @T["Price and margin are before VAT; Paid includes VAT. Cost is what was recorded on the job: materials from the store, items bought, and the subcontractor's bill. Margin = price - cost."]
+    </p>
+}

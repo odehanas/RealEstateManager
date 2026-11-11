@@ -1,0 +1,79 @@
+@model List<RealEstateManager.Services.MaintenanceCategoryService.Row>
+
+@{
+    ViewData["Title"] = T["Kinds of Maintenance Work"];
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h2 class="mb-1">@T["Kinds of Maintenance Work"]</h2>
+        <p class="text-muted mb-0" style="max-width:760px">
+            @T["The list staff and tenants choose from when a maintenance job is raised, and that the maintenance dashboard sorts jobs and costs by. Add the kinds of work your company does; switch off the ones you do not use."]
+        </p>
+    </div>
+    <a asp-controller="MaintenanceJobs" asp-action="Index" class="btn btn-outline-secondary">@T["Maintenance Jobs"]</a>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<form asp-action="Add" method="post" class="card mb-4" style="max-width:760px">
+    <div class="card-body">
+        <label class="form-label fw-semibold" for="newName">@T["Add a kind of work"]</label>
+        <div class="input-group">
+            <input id="newName" name="name" class="form-control" maxlength="@RealEstateManager.Domain.MaintenanceCategory.MaxNameLength"
+                   placeholder="@T["e.g. Lifts, Painting, Swimming pool"]" required />
+            <button type="submit" class="btn btn-primary">@T["Add"]</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-striped table-bordered align-middle" style="max-width:960px">
+    <thead>
+        <tr>
+            <th>@T["Kind of work"]</th>
+            <th class="text-end">@T["Jobs"]</th>
+            <th class="text-end">@T["Planned maintenance"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(item.IsActive ? "" : "text-muted")">
+                <td>
+                    <form asp-action="Rename" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input name="name" value="@item.Name" class="form-control form-control-sm" maxlength="@RealEstateManager.Domain.MaintenanceCategory.MaxNameLength"
+                               aria-label="@T["Kind of work"]" required />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Rename"]</button>
+                    </form>
+                </td>
+                <td class="text-end">@item.Jobs</td>
+                <td class="text-end">@item.Plans</td>
+                <td>
+                    <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">@(item.IsActive ? T["Offered"] : T["Switched off"])</span>
+                </td>
+                <td>
+                    <form asp-action="Toggle" method="post">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                            @(item.IsActive ? T["Switch off"] : T["Switch on"])
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p class="text-muted small" style="max-width:760px">
+    @T["Renaming a kind of work renames it on the jobs and planned maintenance that already have it. A kind that is switched off is no longer offered for new jobs; jobs that have it keep it, so nothing is deleted."]
+</p>

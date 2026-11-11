@@ -33,15 +33,40 @@
                             @ServiceRequestTypes.Describe(type)
                         </option>
                     }
+                    @if (Model.Services.Count > 0)
+                    {
+                        <option value="@ServiceRequestCreateViewModel.PaidServiceType" selected="@(Model.ServiceCatalogItemId.HasValue ? "selected" : null)">@T["Order a paid service"]</option>
+                    }
                 </select>
             </div>
+
+            @if (Model.Services.Count > 0)
+            {
+                <div class="mb-3 type-service">
+                    <label asp-for="ServiceCatalogItemId" class="form-label fw-semibold">@T["Which service?"]</label>
+                    <select asp-for="ServiceCatalogItemId" class="form-select" id="serviceSelect">
+                        <option value="">@T["-- choose the service --"]</option>
+                        @foreach (var service in Model.Services)
+                        {
+                            <option value="@service.Id" selected="@(service.Id == Model.ServiceCatalogItemId ? "selected" : null)" data-about="@service.Description" data-name="@service.Name">
+                                @service.Name - @(service.Price > 0m ? T.Format("{0} including VAT", service.PriceWithVat.ToString("N2")) : T["price on quotation"])
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="ServiceCatalogItemId" class="text-danger small"></span>
+                    <div class="form-text" id="serviceAbout"></div>
+                    <div class="alert alert-info small mt-2 mb-0">
+                        @T["This is a paid service. We confirm the order and send the invoice; where the service is paid in advance, the work starts once the invoice is paid."]
+                    </div>
+                </div>
+            }
 
             @* Shown only for maintenance. *@
             <div class="mb-3 type-maintenance">
                 <label asp-for="Category" class="form-label">@T["What kind of problem?"]</label>
                 <select asp-for="Category" class="form-select">
                     <option value="">@T["-- choose --"]</option>
-                    @foreach (var category in ServiceRequestCategories.Maintenance)
+                    @foreach (var category in await MaintenanceCategories.NamesAsync(Model.Category))
                     {
                         <option value="@category" selected="@(category == Model.Category ? "selected" : null)">
                             @category
@@ -95,8 +120,8 @@
                 </div>
             </div>
 
-            @* Maintenance only. *@
-            <div class="mb-3 type-maintenance">
+            @* Maintenance and paid services. *@
+            <div class="mb-3 type-visit">
                 <label asp-for="PreferredVisitDate" class="form-label">@T["Preferred visit date"]</label>
                 <input asp-for="PreferredVisitDate" type="date" class="form-control" />
                 <div class="form-text">@T["We will do our best, but cannot promise this exact day."]</div>
@@ -165,6 +190,36 @@
                 document.querySelectorAll('.type-postponement').forEach(function (el) {
                     el.style.display = (type === 'PaymentPostponement') ? '' : 'none';
                 });
+
+                // A paid service: the service list in place of the kind of problem.
+                document.querySelectorAll('.type-service').forEach(function (el) {
+                    el.style.display = (typeSelect.value === 'PaidService') ? '' : 'none';
+                });
+                document.querySelectorAll('.type-visit').forEach(function (el) {
+                    el.style.display = (typeSelect.value === 'Maintenance' || typeSelect.value === 'PaidService') ? '' : 'none';
+                });
+                var chosen = document.getElementById('serviceSelect');
+                var about = document.getElementById('serviceAbout');
+                if (chosen && about) {
+                    about.textContent = chosen.selectedOptions.length ? (chosen.selectedOptions[0].getAttribute('data-about') || '') : '';
+                    chosen.onchange = function () {
+                        // Picking a service is enough: its name fills the title and the text
+                        // unless something has been typed there.
+                        var option = chosen.selectedOptions[0];
+                        var name = option ? (option.getAttribute('data-name') || '') : '';
+                        var subject = document.getElementById('Subject');
+                        var text = document.getElementById('Description');
+                        if (name && subject && (!subject.value || subject.dataset.filled === subject.value)) {
+                            subject.value = name;
+                            subject.dataset.filled = name;
+                        }
+                        if (name && text && (!text.value || text.dataset.filled === text.value)) {
+                            text.value = (option.getAttribute('data-about') || name);
+                            text.dataset.filled = text.value;
+                        }
+                        sync();
+                    };
+                }
             }
 
             typeSelect.addEventListener('change', sync);

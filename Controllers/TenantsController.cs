@@ -120,7 +120,85 @@ namespace RealEstateManager.Controllers
                 .GroupBy(x => x.TenantId)
                 .ToDictionary(g => g.Key, g => (g.First().Username, g.First().IsActive, g.First().LastLoginAt));
 
+            ViewBag.TenantOverview = await BuildOverviewAsync();
+
             return View(tenants);
+        }
+
+        /// <summary>One tenant's unit, contract, money owed and cheques held, for the list.</summary>
+        public sealed class TenantOverview
+        {
+            public List<(string Unit, string Status, DateTime EndDate, bool Current)> Contracts { get; } = new();
+            public decimal BalanceDue { get; set; }
+            public decimal Overdue { get; set; }
+            public int Cheques { get; set; }
+            public decimal ChequesAmount { get; set; }
+
+            /// <summary>Cheques in hand whose date has come and that have not been deposited yet.</summary>
+            public int ChequesDue { get; set; }
+            public decimal ChequesDueAmount { get; set; }
+            public DateTime? NextChequeDate { get; set; }
+        }
+
+        /// <summary>
+        /// What the list shows beside each tenant so nobody has to open three screens to
+        /// answer "which unit, is the contract live, do they owe us, are cheques due":
+        /// figures from posted invoices and from cheques not yet cleared.
+        /// </summary>
+        private async Task<Dictionary<int, TenantOverview>> BuildOverviewAsync()
+        {
+            var today = DateTime.Today;
+            var result = new Dictionary<int, TenantOverview>();
+            TenantOverview For(int tenantId) => result.TryGetValue(tenantId, out var o) ? o : result[tenantId] = new TenantOverview();
+
+            var leases = await _db.Leases.AsNoTracking()
+                .Where(x => x.Status != LeaseStatuses.Draft)
+                .Select(x => new { x.TenantId, x.Status, x.StartDate, x.EndDate, Unit = x.Unit!.UnitNumber })
+                .ToListAsync();
+            foreach (var group in leases.GroupBy(x => x.TenantId))
+            {
+                // The contracts in force or awaiting approval; a tenant with none shows their last one.
+                var current = group.Where(x => x.Status == LeaseStatuses.Active || x.Status == LeaseStatuses.PendingApproval)
+                    .OrderBy(x => x.EndDate).ToList();
+                var shown = current.Count > 0 ? current : group.OrderByDescending(x => x.EndDate).Take(1).ToList();
+                foreach (var lease in shown)
+                    For(group.Key).Contracts.Add((lease.Unit, lease.Status, lease.EndDate, current.Count > 0));
+            }
+
+            var invoices = await _db.CustomerInvoices.AsNoTracking()
+                .Where(x => x.JournalEntry != null && x.JournalEntry.IsPosted && x.Status != "Cancelled" && x.TotalAmount > x.AmountPaid)
+                .Select(x => new { x.Lease!.TenantId, Open = x.TotalAmount - x.AmountPaid, x.DueDate })
+                .ToListAsync();
+            foreach (var invoice in invoices)
+            {
+                var overview = For(invoice.TenantId);
+                overview.BalanceDue += invoice.Open;
+                if (invoice.DueDate.Date < today)
+                    overview.Overdue += invoice.Open;
+            }
+
+            var cheques = await _db.PdcReceipts.AsNoTracking()
+                .Where(x => x.Status == PdcStatuses.Received || x.Status == PdcStatuses.Deposited)
+                .Select(x => new { x.Lease!.TenantId, x.Amount, x.ChequeDate, x.Status })
+                .ToListAsync();
+            foreach (var cheque in cheques)
+            {
+                var overview = For(cheque.TenantId);
+                overview.Cheques++;
+                overview.ChequesAmount += cheque.Amount;
+                if (cheque.Status == PdcStatuses.Received && cheque.ChequeDate.Date <= today)
+                {
+                    overview.ChequesDue++;
+                    overview.ChequesDueAmount += cheque.Amount;
+                }
+                else if (cheque.Status == PdcStatuses.Received &&
+                         (overview.NextChequeDate == null || cheque.ChequeDate.Date < overview.NextChequeDate))
+                {
+                    overview.NextChequeDate = cheque.ChequeDate.Date;
+                }
+            }
+
+            return result;
         }
 
         [HttpGet]

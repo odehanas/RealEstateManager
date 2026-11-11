@@ -1,0 +1,166 @@
+@model (int RequestId, string Mode)
+@using RealEstateManager.Domain
+@using Stages = RealEstateManager.Services.PaidServiceService.Stages
+@inject PaidServiceService PaidServices
+@inject PermissionService PermissionService
+@*
+    The paid service a request is an order for: its price, its invoice and whether it
+    is paid. Mode "staff" is the office's request page, "job" the maintenance team's
+    (no margin), "portal" the tenant's own. Shows nothing for an ordinary request.
+*@
+@{
+    var state = await PaidServices.StateAsync(Model.RequestId);
+    if (state == null)
+    {
+        return;
+    }
+    var portal = Model.Mode == "portal";
+}
+
+@if (portal)
+{
+    <div class="card shadow-sm mb-3 border-primary">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div class="small text-uppercase text-muted">@T["Paid service"]</div>
+                <span class="badge @Stages.BadgeClass(state.Stage)">@T[Stages.Describe(state.Stage)]</span>
+            </div>
+            <div class="d-flex justify-content-between"><span>@state.Name</span><strong>@(state.Total > 0m ? state.Total.ToString("N2") : T["to be quoted"])</strong></div>
+            @if (state.Vat > 0m)
+            {
+                <div class="small text-muted text-end">@T.Format("including VAT {0}", state.Vat.ToString("N2"))</div>
+            }
+            @if (state.InvoiceNumber != null && state.Stage != Stages.InvoiceNotPosted)
+            {
+                <div class="d-flex justify-content-between mt-2"><span>@T["Invoice"]</span><strong>@state.InvoiceNumber</strong></div>
+                <div class="d-flex justify-content-between"><span>@T["Paid"]</span><strong>@state.Paid.ToString("N2")</strong></div>
+            }
+            <div class="alert @(state.IsPaid ? "alert-success" : "alert-info") small mb-0 mt-3">
+                @if (state.IsPaid)
+                {
+                    @T["Paid, thank you. We will carry out the service and keep you posted here."]
+                }
+                else if (state.InvoiceNumber == null || state.Stage == Stages.InvoiceNotPosted)
+                {
+                    @T["We have your order. We will confirm it and send you the invoice here."]
+                }
+                else if (state.PayFirst)
+                {
+                    @T.Format("Please pay invoice {0}: {1} is due. The work starts once it is paid. You will find the invoice under Invoices.", state.InvoiceNumber, (state.Total - state.Paid).ToString("N2"))
+                }
+                else
+                {
+                    @T.Format("Invoice {0}: {1} is due. You will find it under Invoices.", state.InvoiceNumber, (state.Total - state.Paid).ToString("N2"))
+                }
+            </div>
+        </div>
+    </div>
+    return;
+}
+
+@{
+    var mayInvoice = await PermissionService.HasAnyPermissionAsync(User, AppPermissions.AccountingManage, AppPermissions.ServiceRequestsManage);
+    var mayReceive = await PermissionService.HasAnyPermissionAsync(User, AppPermissions.AccountingManage);
+    var showMoney = Model.Mode == "staff";
+}
+
+<div class="card shadow-sm mb-3 border-primary">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span>@T.Html("<strong>Paid service</strong>") <span class="text-muted small">&middot; @T[ServiceKinds.Describe(state.Kind)]</span></span>
+        <span class="badge @Stages.BadgeClass(state.Stage)">@T[Stages.Describe(state.Stage)]</span>
+    </div>
+    <div class="card-body">
+        @if (TempData["ServiceSuccess"] is string serviceSuccess)
+        {
+            <div class="alert alert-success small">@serviceSuccess</div>
+        }
+        @if (TempData["ServiceError"] is string serviceError)
+        {
+            <div class="alert alert-danger small">@serviceError</div>
+        }
+
+        <dl class="row small mb-2">
+            <dt class="col-sm-5">@T["Service"]</dt>
+            <dd class="col-sm-7">@state.Name</dd>
+            <dt class="col-sm-5">@T["Price"]</dt>
+            <dd class="col-sm-7">
+                @if (state.Total > 0m)
+                {
+                    <span>@state.Total.ToString("N2")</span>
+                    <span class="text-muted">(@T.Format("{0} + VAT {1}", state.Net.ToString("N2"), state.Vat.ToString("N2")))</span>
+                }
+                else
+                {
+                    <span class="text-muted">@T["priced when the invoice is issued"]</span>
+                }
+            </dd>
+            @if (state.InvoiceId.HasValue)
+            {
+                <dt class="col-sm-5">@T["Invoice"]</dt>
+                <dd class="col-sm-7">
+                    @if (mayReceive)
+                    {
+                        <a asp-controller="CustomerInvoices" asp-action="TaxInvoice" asp-route-id="@state.InvoiceId">@state.InvoiceNumber</a>
+                    }
+                    else
+                    {
+                        <span>@state.InvoiceNumber</span>
+                    }
+                </dd>
+                <dt class="col-sm-5">@T["Paid"]</dt>
+                <dd class="col-sm-7">@T.Format("{0} of {1}", state.Paid.ToString("N2"), state.Total.ToString("N2"))</dd>
+            }
+            @if (showMoney)
+            {
+                <dt class="col-sm-5">@T["Cost recorded on the job"]</dt>
+                <dd class="col-sm-7">@state.ActualCost.ToString("N2") <span class="text-muted">(@T.Format("expected {0}", state.ExpectedCost.ToString("N2")))</span></dd>
+                @if (state.InvoiceId.HasValue)
+                {
+                    <dt class="col-sm-5">@T["Margin"]</dt>
+                    <dd class="col-sm-7 @(state.Margin < 0m ? "text-danger" : "")">@state.Margin.ToString("N2")</dd>
+                }
+            }
+        </dl>
+
+        @if (state.OnHold && state.RequestIsOpen)
+        {
+            <div class="alert alert-warning small mb-2">
+                @T["Work on hold: this service is paid for before the work starts. The job can be started once the invoice is paid in full."]
+            </div>
+        }
+        else if (state.IsPaid)
+        {
+            <div class="alert alert-success small mb-2">@T["Paid in full: the work can go ahead."]</div>
+        }
+
+        @if (!state.InvoiceId.HasValue && state.RequestIsOpen && mayInvoice)
+        {
+            @if (!state.HasLease)
+            {
+                <div class="alert alert-danger small mb-0">@T["This order names no contract, so it cannot be invoiced."]</div>
+            }
+            else
+            {
+                <form asp-controller="ServiceCatalog" asp-action="IssueInvoice" method="post" class="row g-2 align-items-end"
+                      onsubmit="return confirm('@T["Issue the invoice to the tenant? It is posted to the accounts."]');">
+                    <input type="hidden" name="requestId" value="@state.RequestId" />
+                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                    <div class="col-7">
+                        <label class="form-label small mb-0" for="servicePrice">@T["Price before VAT"]</label>
+                        <input id="servicePrice" name="price" type="number" step="0.01" min="0.01" class="form-control form-control-sm" required
+                               value="@(state.Net > 0m ? state.Net.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : "")" />
+                    </div>
+                    <div class="col-5"><button type="submit" class="btn btn-sm btn-primary w-100">@T["Issue invoice"]</button></div>
+                </form>
+            }
+        }
+        else if (state.InvoiceId.HasValue && !state.IsPaid && state.Stage != Stages.InvoiceNotPosted && mayReceive)
+        {
+            <a asp-controller="CustomerReceipts" asp-action="Create" asp-route-invoiceId="@state.InvoiceId" class="btn btn-sm btn-outline-primary">@T["Record the tenant's payment"]</a>
+        }
+        else if (state.Stage == Stages.InvoiceNotPosted)
+        {
+            <div class="small text-muted">@T["The invoice's entry is still a draft. Post it from Journal Inquiry; the tenant can then pay it."]</div>
+        }
+    </div>
+</div>

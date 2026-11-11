@@ -1,0 +1,100 @@
+@model List<RealEstateManager.Domain.LeaseHandover>
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = T["Lease Handovers"];
+    var leases = ViewBag.Leases as List<LeaseHandoverService.LeaseOption> ?? new();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Lease Handovers"]</h2>
+        <p class="text-muted mb-0" style="max-width:820px">
+            @T["When a contract ends: the unit is inspected against the checklist, the Maintenance Manager prices any damage, and the accounts settle the security deposit - applied to what the tenant still owes, the rest refunded. Settling closes the contract and frees the unit."]
+        </p>
+    </div>
+    <a asp-action="Checklist" class="btn btn-outline-dark">@T["Checklist"]</a>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<form asp-action="Start" method="post" class="card mb-4">
+    <div class="card-header bg-white fw-semibold">@T["Open a handover"]</div>
+    <div class="card-body row g-3 align-items-end">
+        <div class="col-md-7">
+            <label class="form-label" for="leaseId">@T["Contract"]</label>
+            <select id="leaseId" name="leaseId" class="form-select" required>
+                <option value="">@T["-- choose the contract --"]</option>
+                @foreach (var lease in leases)
+                {
+                    <option value="@lease.Id">@lease.ContractNumber - @lease.Tenant - @lease.Unit (@T.Format("ends {0}", lease.EndDate.ToString("dd/MM/yyyy")))</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="handoverDate">@T["Handover date"]</label>
+            <input id="handoverDate" name="handoverDate" type="date" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+        </div>
+        <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">@T["Open"]</button></div>
+        <div class="col-12 form-text mt-0">@T["A date before the contract's end date makes it an early termination."]</div>
+    </div>
+</form>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">@T["No handovers yet."]</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>@T["Handover"]</th>
+                    <th>@T["Date"]</th>
+                    <th>@T["Contract"]</th>
+                    <th>@T["Tenant"]</th>
+                    <th>@T["Unit"]</th>
+                    <th>@T["Where it stands"]</th>
+                    <th class="text-end">@T["Deposit refunded"]</th>
+                    <th>@T["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var stage = item.Status == HandoverStatuses.Settled ? "Settled"
+                        : item.Status == HandoverStatuses.Cancelled ? "Cancelled"
+                        : !item.IsInspected ? "Waiting for the inspection"
+                        : !item.IsMaintenanceSigned ? "Waiting for the Maintenance Manager"
+                        : "Waiting for the accounts";
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="fw-semibold">@item.HandoverNumber</a>
+                            <div class="small text-muted">@T[HandoverReasons.Describe(item.Reason)]</div>
+                        </td>
+                        <td>@item.HandoverDate.ToString("dd/MM/yyyy")</td>
+                        <td>@item.Lease?.ContractNumber</td>
+                        <td>@item.Lease?.Tenant?.FullName</td>
+                        <td>@item.Lease?.Unit?.UnitNumber</td>
+                        <td><span class="badge @HandoverStatuses.BadgeClass(item.Status)">@T[stage]</span></td>
+                        <td class="text-end">@(item.Status == HandoverStatuses.Settled ? item.DepositRefunded.ToString("N2") : "-")</td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">@T["Open"]</a>
+                                <a asp-action="Report" asp-route-id="@item.Id" target="_blank" class="btn btn-sm btn-outline-secondary">@T["Report"]</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

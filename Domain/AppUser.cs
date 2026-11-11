@@ -21,6 +21,20 @@ namespace RealEstateManager.Domain
         public bool MustChangePassword { get; set; }
         public DateTime? PasswordChangedAt { get; set; }
 
+        // Two-step sign-in: after the password, a code from the authenticator app on the
+        // user's phone. See TwoStepSignInService.
+        public bool TwoFactorEnabled { get; set; }
+
+        /// <summary>The key shared with the user's authenticator app, encrypted.</summary>
+        public string? TwoFactorSecret { get; set; }
+        public DateTime? TwoFactorEnabledAt { get; set; }
+
+        /// <summary>Hashes of the recovery codes not yet used, separated by ';'.</summary>
+        public string? TwoFactorRecoveryCodes { get; set; }
+
+        /// <summary>The time step of the last code accepted, so a code cannot be used twice.</summary>
+        public long? TwoFactorLastStep { get; set; }
+
         /// <summary>Screen language, "en" or "ar"; null until the user chooses. Applied at sign-in.</summary>
         public string? PreferredLanguage { get; set; }
 

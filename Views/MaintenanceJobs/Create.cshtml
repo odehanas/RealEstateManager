@@ -62,7 +62,7 @@
             <label class="form-label" for="Category">@T["What kind of problem?"]</label>
             <select id="Category" name="Category" class="form-select">
                 <option value="">@T["-- choose --"]</option>
-                @foreach (var category in ServiceRequestCategories.Maintenance)
+                @foreach (var category in await MaintenanceCategories.NamesAsync(Model.Category))
                 {
                     <option value="@category" selected="@(category == Model.Category ? "selected" : null)">@category</option>
                 }

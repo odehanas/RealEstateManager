@@ -186,6 +186,7 @@
                             <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
 
                             <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">@T["Password"]</a>
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="TwoStep" title="@T["Two-step sign-in"]">@T["2-step"]</a>
 
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
@@ -364,6 +365,9 @@
                                         <li>
                                             <a class="sidebar-link" asp-controller="Leases" asp-action="Index">@T["Leases"]</a>
                                         </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="LeaseHandovers" asp-action="Index">@T["Lease Handovers"]</a>
+                                        </li>
                                     }
                                     @if (canApproveContracts)
                                     {
@@ -433,6 +437,21 @@
                                         <li>
                                             <a class="sidebar-link" asp-controller="MaintenancePlans" asp-action="Index">@T["Planned Maintenance"]</a>
                                         </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenanceCategories" asp-action="Index">@T["Kinds of Maintenance Work"]</a>
+                                        </li>
+                                        @if (canHandleServiceRequests)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="ServiceCatalog" asp-action="Index">@T["Paid Services"]</a>
+                                        </li>
+                                        }
+                                        @if (!canManageLeases)
+                                        {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="LeaseHandovers" asp-action="Index">@T["Lease Handovers"]</a>
+                                        </li>
+                                        }
                                         }
                                         @if (canManageMaintenance)
                                         {
@@ -461,6 +480,12 @@
                                     <li>
                                         <a class="sidebar-link" asp-controller="SecurityDeposits" asp-action="Index">@T["Security Deposits"]</a>
                                     </li>
+                                    @if (!canManageLeases && !canHandleServiceRequests && !canManageMaintenance)
+                                    {
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="LeaseHandovers" asp-action="Index">@T["Lease Handovers"]</a>
+                                    </li>
+                                    }
 
                                     <li class="sidebar-divider" role="separator"></li>
                                     <li class="sidebar-heading">@T["E-Invoicing"]</li>

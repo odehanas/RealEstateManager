@@ -1,0 +1,136 @@
+@model RealEstateManager.Models.TwoStepPageViewModel
+
+@{
+    ViewData["Title"] = T["Two-step sign-in"];
+}
+
+<h2>@T["Two-step sign-in"]</h2>
+<p class="text-muted" style="max-width:760px">
+    @T["With two-step sign-in, your password alone does not open your account: after the password you type a six-digit code from an app on your phone. Somebody who learns your password still cannot sign in without your phone."]
+</p>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (Model.NewRecoveryCodes.Count > 0)
+{
+    <div class="card border-warning mb-4" style="max-width:760px">
+        <div class="card-body">
+            <h3 class="h5">@T["Your recovery codes"]</h3>
+            <p class="mb-2">
+                @T["Keep these somewhere safe, away from your phone: print them or write them down. Each one signs you in once if you lose your phone. They are shown this once only."]
+            </p>
+            <div class="row row-cols-2 row-cols-md-4 g-2 mb-3" dir="ltr">
+                @foreach (var code in Model.NewRecoveryCodes)
+                {
+                    <div class="col"><code class="d-block border rounded text-center py-2 fs-6">@code</code></div>
+                }
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
+        </div>
+    </div>
+}
+
+@if (Model.Enabled)
+{
+    <div class="card mb-4" style="max-width:760px">
+        <div class="card-body">
+            <h3 class="h5">
+                <span class="badge bg-success">@T["On"]</span>
+                @T["Two-step sign-in is on"]
+            </h3>
+            <p class="text-muted mb-0">
+                @if (Model.EnabledAt.HasValue)
+                {
+                    @T.Format("Switched on {0}.", Model.EnabledAt.Value.ToLocalTime().ToString("dd/MM/yyyy"))
+                }
+                @T.Format("Recovery codes left: {0}.", Model.RecoveryCodesLeft)
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3" style="max-width:760px">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">@T["New recovery codes"]</h3>
+                    <p class="small text-muted">@T["Makes a new set of codes. The old ones stop working."]</p>
+                    <form asp-action="NewRecoveryCodes" method="post" autocomplete="off">
+                        <label class="form-label small" for="codeNew">@T["Code from your app"]</label>
+                        <div class="input-group">
+                            <input id="codeNew" name="code" class="form-control" inputmode="numeric" maxlength="20" required />
+                            <button type="submit" class="btn btn-outline-primary">@T["Make new codes"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6">@T["Switch off, or move to a new phone"]</h3>
+                    @if (Model.Required)
+                    {
+                        <p class="small text-muted">@T["Your company requires two-step sign-in. If you switch it off here, you set it up again straight away: that is how you move it to a new phone."]</p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted">@T["After this your password alone signs you in. To move to a new phone, switch off and set it up again."]</p>
+                    }
+                    <form asp-action="DisableTwoStep" method="post" autocomplete="off">
+                        <label class="form-label small" for="codeOff">@T["Code from your app, or a recovery code"]</label>
+                        <div class="input-group">
+                            <input id="codeOff" name="code" class="form-control" maxlength="20" required />
+                            <button type="submit" class="btn btn-outline-danger">@T["Switch off"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @if (Model.Required)
+    {
+        <div class="alert alert-info" style="max-width:760px">
+            @T["Your company requires two-step sign-in. Set it up now to continue: it takes about a minute."]
+        </div>
+    }
+
+    <div class="card" style="max-width:760px">
+        <div class="card-body">
+            <h3 class="h5 mb-3">@T["Set it up"]</h3>
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <ol class="ps-3 mb-0">
+                        <li class="mb-2">@T["On your phone, install an authenticator app: Google Authenticator or Microsoft Authenticator, free from the App Store or Google Play."]</li>
+                        <li class="mb-2">@T["In the app choose to add an account, then scan this QR code."]</li>
+                        <li class="mb-2">
+                            @T["Cannot scan? Type this key into the app instead:"]
+                            <div dir="ltr"><code class="user-select-all">@Model.Key</code></div>
+                        </li>
+                        <li>@T["Type the six-digit code the app now shows, and press Switch on."]</li>
+                    </ol>
+                </div>
+                <div class="col-md-5 text-center">
+                    <img src="@Model.QrDataUri" alt="@T["QR code for your authenticator app"]" class="border rounded p-2 bg-white" style="width:200px;height:200px" />
+                </div>
+            </div>
+
+            <form asp-action="EnableTwoStep" method="post" class="mt-4" autocomplete="off" style="max-width:380px">
+                <label class="form-label" for="codeOn">@T["Code from your app"]</label>
+                <div class="input-group">
+                    <input id="codeOn" name="code" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required />
+                    <button type="submit" class="btn btn-primary">@T["Switch on"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

@@ -1,0 +1,89 @@
+<p>A <strong>handover</strong> is what happens when a contract ends and the tenant gives the unit back. Three people have a say,
+in order, and the system keeps each one's part:</p>
+<ol>
+    <li><strong>The inspection</strong>: the unit is checked against the company's checklist.</li>
+    <li><strong>The Maintenance Manager</strong>: prices anything the tenant must pay for, or signs that there is nothing.</li>
+    <li><strong>The accounts</strong>: check what the tenant still owes and settle the security deposit. The deposit pays what is
+    owed and the rest is refunded.</li>
+</ol>
+<p>Settling closes the contract, makes the unit vacant and produces the <strong>Unit Handover Report</strong> for signature.
+Nothing reaches the accounts before the settlement.</p>
+
+<h3>The checklist</h3>
+<p>Open <strong>Master Data ▸ Lease Handovers ▸ Checklist</strong>. The system starts with a standard list (keys, meter readings,
+walls and paint, floors, doors, kitchen, bathrooms, air conditioning, lights, cleaning). Add your own lines, rename them, move
+them up or down, or switch off the ones you do not use. Each new handover takes a copy of the lines switched on; a handover
+already opened keeps the checklist it started with.</p>
+
+<h3>Step 1: open the handover and inspect</h3>
+<ol>
+    <li>Open <strong>Lease Handovers</strong>, choose the contract and the handover date, and press <strong>Open</strong>.
+    A date before the contract's end date makes it an <em>early termination</em>.</li>
+    <li>For each checklist line choose <strong>OK</strong>, <strong>Problem found</strong> or <strong>Not applicable</strong>.
+    A line marked as a problem needs a note saying what was found.</li>
+    <li>Enter the keys returned and the electricity and water meter readings.</li>
+    <li><strong>Save, continue later</strong> keeps what is entered. <strong>Complete the inspection</strong> signs it off
+    with your name and the time; it is refused while a line is still unchecked.</li>
+</ol>
+
+<h3>Step 2: the Maintenance Manager's charges</h3>
+<p>After the inspection, a user with <em>Manage Maintenance</em> opens the handover and, for each thing the tenant must pay for,
+enters what it is for and the amount before VAT (for example repainting a room damaged beyond fair wear, or a missing access
+card). Then <strong>Sign and pass to the accounts</strong>. With no charges entered, signing records that nothing is charged.
+Until the accounts settle, <strong>Reopen to correct the charges</strong> takes the signature back.</p>
+
+<h3>Step 3: the accounts settle the deposit</h3>
+<p>The third box shows the tenant's account as it stands:</p>
+<table class="t-compact">
+    <tr><th>Line</th><th>What it means</th></tr>
+    <tr><td>What the tenant owes</td><td>Posted invoices dated up to the handover that are not fully paid, plus the handover
+    charges with VAT.</td></tr>
+    <tr><td>Deposit held</td><td>Security deposits of the contract that are posted and still held.</td></tr>
+    <tr><td>Applied</td><td>The part of the deposit that pays what is owed.</td></tr>
+    <tr><td>To refund</td><td>What is left of the deposit, to go back to the tenant.</td></tr>
+    <tr><td>Still owed after the deposit</td><td>What the tenant owes beyond the deposit, if it does not cover everything.</td></tr>
+</table>
+<p>The box also warns about things to deal with first: a deposit or an invoice whose entry is not posted, invoices dated after
+the handover (rent for a period the tenant will not be there, to cancel or credit), cheques of the contract still in hand, and
+requests still open. These warnings do not stop the settlement.</p>
+<p>A user with <em>Manage Accounting</em> presses <strong>Settle and close the contract</strong>. The system then:</p>
+<ol>
+    <li>Raises a tax invoice to the tenant for the charges, numbered <code>HNC-</code>, credited to Other Income.</li>
+    <li>Applies the deposit to each invoice owed, oldest first, as a receipt paid from the deposit.</li>
+    <li>Posts the refund of what is left.</li>
+    <li>Marks the deposit as applied or refunded, the contract as <em>Expired</em> (or <em>Terminated</em> for an early
+    termination) and the unit as <em>Vacant</em>.</li>
+</ol>
+<table class="je">
+    <thead><tr><th>Entry</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+    <tbody>
+        <tr><td>Charges invoice: Accounts Receivable</td><td class="num dr">Charges + VAT</td><td class="num">—</td></tr>
+        <tr><td>Charges invoice: Other Income / VAT Payable</td><td class="num">—</td><td class="num cr">Charges / VAT</td></tr>
+        <tr><td>Deposit applied: Tenant Security Deposit Liability</td><td class="num dr">Amount applied</td><td class="num">—</td></tr>
+        <tr><td>Deposit applied: Accounts Receivable</td><td class="num">—</td><td class="num cr">Amount applied</td></tr>
+        <tr><td>Refund: Tenant Security Deposit Liability</td><td class="num dr">Amount refunded</td><td class="num">—</td></tr>
+        <tr><td>Refund: the company's default cash or bank account</td><td class="num">—</td><td class="num cr">Amount refunded</td></tr>
+    </tbody>
+</table>
+<p>If one of these entries is left as a draft (for example the period is closed), the settlement stops and says why. Post the
+entry from Journal Inquiry and press <strong>Settle</strong> again: it carries on from where it stopped and does nothing twice.</p>
+
+<h3>The report</h3>
+<p><strong>Handover report</strong> opens a page to print or save as PDF: the contract, the checklist with its results and
+notes, the keys and meter readings, the charges, the deposit settlement, and four signature boxes for the tenant, the inspector,
+the Maintenance Manager and the accounts. Before the settlement it is marked <em>In progress</em> and shows the figures as they
+stand that day.</p>
+
+<div class="box warn">
+    <div class="box-title">Points to agree with your accountant</div>
+    <p>The charges are invoiced with VAT where the company is registered, and are credited to the company's Other Income, also
+    for an owner's building. If your company treats damage recoveries differently, or passes them to the owner, tell your
+    service provider so the handover follows your practice.</p>
+</div>
+
+<div class="box">
+    <div class="box-title">Who can do what</div>
+    <p>Users who manage leases, tenant requests, maintenance or accounting can open a handover and record the inspection. Only
+    <em>Manage Maintenance</em> enters and signs the charges. Only <em>Manage Accounting</em> settles. The owner can look at
+    handovers and their reports.</p>
+</div>

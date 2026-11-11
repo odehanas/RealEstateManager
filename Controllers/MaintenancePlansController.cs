@@ -117,7 +117,12 @@ namespace RealEstateManager.Controllers
                 ModelState.AddModelError(nameof(model.LeadDays), "Open the job between 0 and 60 days before it is due.");
             if (!ServiceRequestPriorities.All.Contains(model.Priority))
                 ModelState.AddModelError(nameof(model.Priority), "Choose how urgent the work is.");
-            if (!string.IsNullOrWhiteSpace(model.Category) && !ServiceRequestCategories.Maintenance.Contains(model.Category))
+            // A plan being edited keeps the kind of work it has, even one since switched off.
+            var categoryBefore = model.Id == 0
+                ? null
+                : await _db.MaintenancePlans.AsNoTracking().Where(x => x.Id == model.Id).Select(x => x.Category).FirstOrDefaultAsync();
+            if (!string.IsNullOrWhiteSpace(model.Category) && model.Category != categoryBefore &&
+                !await MaintenanceCategoryService.IsOfferedAsync(_db, companyId, model.Category))
                 ModelState.AddModelError(nameof(model.Category), "Choose the kind of work from the list.");
             if (model.AssignToAppUserId.HasValue &&
                 (await MaintenanceService.TechniciansAsync(_db, companyId)).All(x => x.Id != model.AssignToAppUserId.Value))

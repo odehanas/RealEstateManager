@@ -1,0 +1,75 @@
+@model List<RealEstateManager.Domain.HandoverChecklistItem>
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = T["Handover Checklist"];
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Handover Checklist"]</h2>
+        <p class="text-muted mb-0" style="max-width:760px">
+            @T["What is checked when a tenant hands a unit back. Each new handover takes a copy of the lines switched on here; handovers already opened keep the checklist they started with."]
+        </p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Lease Handovers"]</a>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<form asp-action="AddChecklistItem" method="post" class="card mb-4" style="max-width:860px">
+    <div class="card-body">
+        <label class="form-label fw-semibold" for="newLine">@T["Add a line"]</label>
+        <div class="input-group">
+            <input id="newLine" name="name" class="form-control" maxlength="@HandoverChecklistItem.MaxNameLength" required
+                   placeholder="@T["e.g. Curtains and blinds in good condition"]" />
+            <button type="submit" class="btn btn-primary">@T["Add"]</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-striped table-bordered align-middle" style="max-width:960px">
+    <thead>
+        <tr>
+            <th style="width:3rem">#</th>
+            <th>@T["What is checked"]</th>
+            <th>@T["Status"]</th>
+            <th>@T["Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+            <tr class="@(item.IsActive ? "" : "text-muted")">
+                <td>@(i + 1)</td>
+                <td>
+                    <form asp-action="ChangeChecklistItem" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input name="name" value="@item.Name" class="form-control form-control-sm" maxlength="@HandoverChecklistItem.MaxNameLength"
+                               aria-label="@T["What is checked"]" required />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Rename"]</button>
+                    </form>
+                </td>
+                <td><span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">@(item.IsActive ? T["On"] : T["Off"])</span></td>
+                <td>
+                    <form asp-action="ChangeChecklistItem" method="post" class="d-flex flex-wrap gap-1">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" name="move" value="up" class="btn btn-sm btn-outline-secondary" disabled="@(i == 0 ? "disabled" : null)" title="@T["Move up"]" aria-label="@T["Move up"]">&uarr;</button>
+                        <button type="submit" name="move" value="down" class="btn btn-sm btn-outline-secondary" disabled="@(i == Model.Count - 1 ? "disabled" : null)" title="@T["Move down"]" aria-label="@T["Move down"]">&darr;</button>
+                        <button type="submit" name="toggle" value="true" class="btn btn-sm @(item.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                            @(item.IsActive ? T["Switch off"] : T["Switch on"])
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

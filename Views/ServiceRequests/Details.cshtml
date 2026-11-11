@@ -163,6 +163,7 @@
     </div>
 
     <div class="col-lg-4">
+        <partial name="_PaidService" model="@((Model.Id, "staff"))" />
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white">@T.Html("<strong>Tenant</strong>")</div>
             <div class="card-body small">
@@ -276,7 +277,7 @@
                             <label class="form-label" for="classifyCategory">@T["What kind of problem?"]</label>
                             <select id="classifyCategory" name="category" class="form-select form-select-sm">
                                 <option value="">@T["-- choose --"]</option>
-                                @foreach (var category in ServiceRequestCategories.Maintenance)
+                                @foreach (var category in await MaintenanceCategories.NamesAsync(classify.Category))
                                 {
                                     <option value="@category" selected="@(category == classify.Category ? "selected" : null)">@category</option>
                                 }

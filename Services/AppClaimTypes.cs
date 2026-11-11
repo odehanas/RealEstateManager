@@ -12,6 +12,9 @@ namespace RealEstateManager.Services
         /// <summary>Present while a staff user is on a temporary or default password.</summary>
         public const string MustChangePassword = "must_change_password";
 
+        /// <summary>Present while the company requires two-step sign-in and the user has not set it up.</summary>
+        public const string MustSetUpTwoStep = "must_set_up_two_step";
+
         // Tenant self-service portal. A principal carrying PortalTenantId is a TENANT,
         // never a member of staff.
         public const string PortalUserId = "portal_user_id";
