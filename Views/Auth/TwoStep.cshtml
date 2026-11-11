@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = T["Two-step sign-in"];
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5 col-xl-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <span class="badge bg-primary-subtle text-primary mb-3">@T["Step 2 of 2"]</span>
+                <h1 class="h4 mb-2">@T["Enter your sign-in code"]</h1>
+                <p class="text-muted small mb-4">
+                    @T["Your password is correct. Now open the authenticator app on your phone and type the six-digit code it shows for RealEstateManager."]
+                </p>
+
+                <form asp-action="TwoStep" method="post" autocomplete="off">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="code">@T["Sign-in code"]</label>
+                        <input id="code" name="code" class="form-control form-control-lg text-center" style="letter-spacing:.3em"
+                               inputmode="numeric" autocomplete="one-time-code" maxlength="20" autofocus required />
+                        <div class="form-text">@T["Lost your phone? Type one of your recovery codes instead, or ask your administrator to reset two-step sign-in."]</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">@T["Sign In"]</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a asp-action="Login" class="small">@T["Sign in as someone else"]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -265,6 +265,7 @@ namespace RealEstateManager.Services
                 IsSystemAdmin = x.IsSystemAdmin,
                 CreatedAt = x.CreatedAt,
                 LastLoginAt = x.LastLoginAt,
+                TwoStepOn = x.TwoFactorEnabled,
                 CompaniesDisplay = string.Join(", ",
                     x.CompanyAccesses
                         .OrderByDescending(link => link.IsDefault)
@@ -282,6 +283,45 @@ namespace RealEstateManager.Services
                             .OrderBy(p => p.PermissionKey)
                             .Select(p => PermissionCatalog.All.FirstOrDefault(def => def.Key == p.PermissionKey)?.Name ?? p.PermissionKey))
             }).ToList();
+        }
+
+        /// <summary>
+        /// Takes two-step sign-in off a user who lost the phone and the recovery codes, so
+        /// they can sign in with the password and set it up again.
+        /// </summary>
+        public async Task<string> ResetTwoStepAsync(int id, bool actingUserIsOwner, UserAdminScope scope)
+        {
+            var user = await _db.AppUsers
+                .IgnoreQueryFilters()
+                .Include(x => x.CompanyAccesses)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null || !CanManage(scope, user))
+                throw new InvalidOperationException("User was not found.");
+            if (!actingUserIsOwner && _platformOwnerService.IsOwnerUsername(user.Username))
+                throw new InvalidOperationException("Only the platform owner can change the owner account.");
+
+            TwoStepSignInService.Clear(user);
+            await _db.SaveChangesAsync();
+            return user.Username;
+        }
+
+        public async Task<bool> GetRequireTwoStepAsync(int companyId) =>
+            await _db.Companies.IgnoreQueryFilters().AsNoTracking()
+                .Where(x => x.Id == companyId)
+                .Select(x => x.RequireTwoFactor)
+                .FirstOrDefaultAsync();
+
+        /// <summary>Makes two-step sign-in compulsory, or optional again, for a company's users.</summary>
+        public async Task SetRequireTwoStepAsync(int companyId, bool require, UserAdminScope scope)
+        {
+            if (!scope.CoversAll(new[] { companyId }))
+                throw new InvalidOperationException("You do not administer this company.");
+
+            var company = await _db.Companies.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == companyId)
+                ?? throw new InvalidOperationException("Company was not found.");
+            company.RequireTwoFactor = require;
+            await _db.SaveChangesAsync();
         }
 
         public async Task<AppUserFormViewModel> BuildUserFormAsync(UserAdminScope scope, int? id = null)

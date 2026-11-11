@@ -16,6 +16,9 @@ namespace RealEstateManager.Models
 
         /// <summary>The standard role the permissions amount to, e.g. Manager (Approver), or Custom.</summary>
         public string RoleDisplay { get; set; } = string.Empty;
+
+        /// <summary>The user signs in with a code from their phone as well as the password.</summary>
+        public bool TwoStepOn { get; set; }
     }
 
     public class AppUserFormViewModel

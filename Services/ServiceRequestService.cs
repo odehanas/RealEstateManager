@@ -418,7 +418,7 @@ namespace RealEstateManager.Services
                 return (null, "Choose what the job is for.");
             if (!ServiceRequestPriorities.All.Contains(input.Priority))
                 return (null, "Choose how urgent the job is.");
-            if (!string.IsNullOrWhiteSpace(input.Category) && !ServiceRequestCategories.Maintenance.Contains(input.Category))
+            if (!string.IsNullOrWhiteSpace(input.Category) && !await MaintenanceCategoryService.IsOfferedAsync(_db, companyId, input.Category))
                 return (null, "Choose the kind of work from the list.");
 
             var technicians = await MaintenanceService.TechniciansAsync(_db, companyId);

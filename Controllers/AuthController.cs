@@ -13,6 +13,7 @@ namespace RealEstateManager.Controllers
         private readonly AppAuthService _appAuthService;
         private readonly AdminManagementService _adminManagementService;
         private readonly SampleDataQueue _sampleDataQueue;
+        private readonly TwoStepSignInService _twoStep;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
@@ -20,8 +21,10 @@ namespace RealEstateManager.Controllers
             AppAuthService appAuthService,
             AdminManagementService adminManagementService,
             SampleDataQueue sampleDataQueue,
+            TwoStepSignInService twoStep,
             ILogger<AuthController> logger)
         {
+            _twoStep = twoStep;
             _db = db;
             _appAuthService = appAuthService;
             _adminManagementService = adminManagementService;
@@ -168,7 +171,31 @@ namespace RealEstateManager.Controllers
                 return View(model);
             }
 
-            await _appAuthService.SignInAsync(HttpContext, user, companyId.Value);
+            // Two-step sign-in: the password was right, but nobody is signed in until the
+            // code from the user's phone has been checked too. The browser carries a sealed
+            // note of who passed the password check, good for ten minutes.
+            if (user.TwoFactorEnabled)
+            {
+                Response.Cookies.Append(
+                    TwoStepSignInService.PendingCookie,
+                    _twoStep.SealPending(user.Id, model.ReturnUrl),
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        IsEssential = true,
+                        SameSite = SameSiteMode.Lax,
+                        Secure = Request.IsHttps,
+                        Expires = DateTimeOffset.UtcNow.Add(TwoStepSignInService.PendingLifetime)
+                    });
+                return RedirectToAction(nameof(TwoStep));
+            }
+
+            return await CompleteSignInAsync(user, companyId.Value, model.ReturnUrl);
+        }
+
+        private async Task<IActionResult> CompleteSignInAsync(Domain.AppUser user, int companyId, string? returnUrl)
+        {
+            await _appAuthService.SignInAsync(HttpContext, user, companyId);
 
             if (user.MustChangePassword)
             {
@@ -176,12 +203,58 @@ namespace RealEstateManager.Controllers
                 return RedirectToAction("ChangePassword", "Profile");
             }
 
-            if (!string.IsNullOrWhiteSpace(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
-                return Redirect(model.ReturnUrl);
+                return Redirect(returnUrl);
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        /// <summary>The second step of signing in: the code from the user's authenticator app.</summary>
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult TwoStep()
+        {
+            return _twoStep.OpenPending(Request.Cookies[TwoStepSignInService.PendingCookie]) == null
+                ? RedirectToAction(nameof(Login))
+                : View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TwoStep(string? code)
+        {
+            var pending = _twoStep.OpenPending(Request.Cookies[TwoStepSignInService.PendingCookie]);
+            if (pending == null)
+            {
+                TempData["SuccessMessage"] = "That took too long. Please sign in again.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _db.AppUsers.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(x => x.Id == pending.Value.UserId && x.IsActive);
+            if (user == null || !user.TwoFactorEnabled)
+            {
+                Response.Cookies.Delete(TwoStepSignInService.PendingCookie);
+                return RedirectToAction(nameof(Login));
+            }
+
+            var (ok, error) = await _twoStep.CheckAtSignInAsync(user, code);
+            if (!ok)
+            {
+                ModelState.AddModelError(string.Empty, error!);
+                return View();
+            }
+
+            Response.Cookies.Delete(TwoStepSignInService.PendingCookie);
+
+            var companyId = await _appAuthService.GetDefaultCompanyIdAsync(user.Id);
+            if (!companyId.HasValue)
+                return RedirectToAction(nameof(Login));
+
+            return await CompleteSignInAsync(user, companyId.Value, pending.Value.ReturnUrl);
         }
 
         [HttpPost]

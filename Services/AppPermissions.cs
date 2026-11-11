@@ -311,6 +311,7 @@ namespace RealEstateManager.Services
                 ["WhatsAppSettings"] = new[] { AppPermissions.OwnerOversight },
                 ["MaintenanceJobs"] = new[] { AppPermissions.MaintenanceExecute, AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
                 ["MaintenancePlans"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage, AppPermissions.OwnerOversight },
+                ["MaintenanceCategories"] = new[] { AppPermissions.MaintenanceManage, AppPermissions.ServiceRequestsManage },
                 ["OwnerRecharges"] = new[] { AppPermissions.AccountingManage, AppPermissions.OwnerOversight },
                 // Tenant and contract documents: uploading needs the record's own manage right (checked in the controller).
                 ["RecordDocuments"] = new[] { AppPermissions.MasterDataView, AppPermissions.MasterDataManage, AppPermissions.LeasesManage, AppPermissions.OwnerOversight },
@@ -418,7 +419,8 @@ namespace RealEstateManager.Services
             new(StringComparer.OrdinalIgnoreCase)
             {
                 "ChartOfAccounts", "AccountMappings", "OpeningBalances", "OwnerWithdrawalCategories",
-                "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing", "BankAccounts"
+                "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing", "BankAccounts",
+                "MaintenanceCategories"
             };
 
         private static readonly HashSet<string> CompanySetupActions =

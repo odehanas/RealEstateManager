@@ -30,8 +30,53 @@ namespace RealEstateManager.Controllers
         {
             var scope = await ScopeAsync();
             ViewBag.Scope = scope;
+            var companyId = User.GetCurrentCompanyId();
+            ViewBag.CanSetTwoStep = companyId.HasValue && scope.CoversAll(new[] { companyId.Value });
+            ViewBag.RequireTwoStep = companyId.HasValue && await _adminManagementService.GetRequireTwoStepAsync(companyId.Value);
             var model = await _adminManagementService.GetUsersAsync(scope);
             return View(model);
+        }
+
+        /// <summary>Makes two-step sign-in compulsory (or optional) for the company being worked in.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequireTwoStep(bool require)
+        {
+            var companyId = User.GetCurrentCompanyId();
+            if (!companyId.HasValue)
+                return Forbid();
+
+            try
+            {
+                await _adminManagementService.SetRequireTwoStepAsync(companyId.Value, require, await ScopeAsync());
+                TempData["SuccessMessage"] = require
+                    ? "Two-step sign-in is now required. From their next sign-in, each user who has not set it up is taken to set it up first."
+                    : "Two-step sign-in is now optional: each user decides for themselves.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>For a user who lost the phone: back to the password alone, to set it up again.</summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetTwoStep(int id)
+        {
+            try
+            {
+                var username = await _adminManagementService.ResetTwoStepAsync(id, _platformOwnerService.IsOwner(User), await ScopeAsync());
+                TempData["SuccessMessage"] = $"Two-step sign-in was reset for {username}. They sign in with the password and set it up again.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]

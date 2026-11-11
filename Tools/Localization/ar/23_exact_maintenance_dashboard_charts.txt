@@ -76,3 +76,74 @@ Every invoice, receipt and cheque of this tenant ||| كل فواتير هذا ا
 Statement ||| كشف الحساب
 Terminated ||| منتهٍ مبكراً
 Renewed ||| مجدَّد
+# Two-step sign-in, and the kinds of maintenance work.
+Two-step sign-in ||| تسجيل الدخول بخطوتين
+Step 2 of 2 ||| الخطوة 2 من 2
+Enter your sign-in code ||| أدخل رمز الدخول
+Your password is correct. Now open the authenticator app on your phone and type the six-digit code it shows for RealEstateManager. ||| كلمة المرور صحيحة. افتح الآن تطبيق المصادقة على هاتفك واكتب الرمز المكوّن من ستة أرقام الذي يعرضه لـ RealEstateManager.
+Sign-in code ||| رمز الدخول
+Lost your phone? Type one of your recovery codes instead, or ask your administrator to reset two-step sign-in. ||| فقدت هاتفك؟ اكتب أحد رموز الاسترداد بدلاً منه، أو اطلب من المسؤول إعادة ضبط تسجيل الدخول بخطوتين.
+Sign in as someone else ||| الدخول بمستخدم آخر
+With two-step sign-in, your password alone does not open your account: after the password you type a six-digit code from an app on your phone. Somebody who learns your password still cannot sign in without your phone. ||| مع تسجيل الدخول بخطوتين لا تكفي كلمة المرور وحدها لفتح حسابك: بعد كلمة المرور تكتب رمزاً من ستة أرقام من تطبيق على هاتفك. من يعرف كلمة مرورك لا يستطيع الدخول من دون هاتفك.
+Your recovery codes ||| رموز الاسترداد
+Keep these somewhere safe, away from your phone: print them or write them down. Each one signs you in once if you lose your phone. They are shown this once only. ||| احفظ هذه الرموز في مكان آمن بعيداً عن هاتفك: اطبعها أو اكتبها. كل رمز يُدخلك مرة واحدة إذا فقدت هاتفك. تُعرض هذه المرة فقط.
+Two-step sign-in is on ||| تسجيل الدخول بخطوتين مفعّل
+Switched on {0}. ||| فُعّل في {0}.
+Recovery codes left: {0}. ||| رموز الاسترداد المتبقية: {0}.
+New recovery codes ||| رموز استرداد جديدة
+Makes a new set of codes. The old ones stop working. ||| ينشئ مجموعة رموز جديدة. الرموز القديمة تتوقف عن العمل.
+Code from your app ||| الرمز من تطبيقك
+Make new codes ||| إنشاء رموز جديدة
+Switch off, or move to a new phone ||| الإيقاف أو الانتقال إلى هاتف جديد
+Your company requires two-step sign-in. If you switch it off here, you set it up again straight away: that is how you move it to a new phone. ||| شركتك تشترط تسجيل الدخول بخطوتين. إذا أوقفته هنا فستعيد إعداده مباشرة: هكذا تنقله إلى هاتف جديد.
+After this your password alone signs you in. To move to a new phone, switch off and set it up again. ||| بعد ذلك تكفي كلمة المرور للدخول. للانتقال إلى هاتف جديد أوقفه ثم أعد إعداده.
+Code from your app, or a recovery code ||| الرمز من تطبيقك أو رمز استرداد
+Switch off ||| إيقاف
+Switch on ||| تفعيل
+Your company requires two-step sign-in. Set it up now to continue: it takes about a minute. ||| شركتك تشترط تسجيل الدخول بخطوتين. أعدّه الآن للمتابعة: يستغرق نحو دقيقة.
+Set it up ||| الإعداد
+On your phone, install an authenticator app: Google Authenticator or Microsoft Authenticator, free from the App Store or Google Play. ||| ثبّت على هاتفك تطبيق مصادقة: Google Authenticator أو Microsoft Authenticator، مجاناً من App Store أو Google Play.
+In the app choose to add an account, then scan this QR code. ||| في التطبيق اختر إضافة حساب ثم امسح رمز QR هذا.
+Cannot scan? Type this key into the app instead: ||| لا تستطيع المسح؟ اكتب هذا المفتاح في التطبيق:
+Type the six-digit code the app now shows, and press Switch on. ||| اكتب الرمز المكوّن من ستة أرقام الذي يعرضه التطبيق الآن ثم اضغط «تفعيل».
+QR code for your authenticator app ||| رمز QR لتطبيق المصادقة
+2-step ||| خطوتان
+Required ||| إلزامي
+Optional ||| اختياري
+After the password, the user types a six-digit code from an authenticator app on their phone. Each user can switch it on for themselves; here you can require it of everyone who works in {0}. ||| بعد كلمة المرور يكتب المستخدم رمزاً من ستة أرقام من تطبيق مصادقة على هاتفه. يستطيع كل مستخدم تفعيله لنفسه؛ ومن هنا يمكنك اشتراطه على كل من يعمل في {0}.
+Make it optional ||| اجعله اختيارياً
+Require it for all users ||| اشترطه على جميع المستخدمين
+Off ||| متوقف
+Reset two-step sign-in for this user? They will sign in with the password alone until they set it up again. ||| إعادة ضبط تسجيل الدخول بخطوتين لهذا المستخدم؟ سيدخل بكلمة المرور وحدها حتى يعيد إعداده.
+For a user who lost their phone ||| لمستخدم فقد هاتفه
+Reset two-step ||| إعادة ضبط الخطوتين
+Kinds of Maintenance Work ||| أنواع أعمال الصيانة
+The list staff and tenants choose from when a maintenance job is raised, and that the maintenance dashboard sorts jobs and costs by. Add the kinds of work your company does; switch off the ones you do not use. ||| القائمة التي يختار منها الموظفون والمستأجرون عند فتح أمر صيانة، وبها تصنّف لوحة الصيانة الأعمال والتكاليف. أضف أنواع الأعمال التي تنفذها شركتك وأوقف ما لا تستخدمه.
+Add a kind of work ||| إضافة نوع عمل
+e.g. Lifts, Painting, Swimming pool ||| مثال: المصاعد، الدهان، المسبح
+Kind of work ||| نوع العمل
+Rename ||| إعادة تسمية
+Offered ||| معروض
+Switched off ||| متوقف
+Renaming a kind of work renames it on the jobs and planned maintenance that already have it. A kind that is switched off is no longer offered for new jobs; jobs that have it keep it, so nothing is deleted. ||| إعادة تسمية نوع العمل تغيّر اسمه في أوامر الصيانة والصيانة المخططة التي تحمله. النوع المتوقف لا يُعرض للأوامر الجديدة؛ والأوامر التي تحمله تحتفظ به، فلا يُحذف شيء.
+That took too long. Please sign in again. ||| استغرق ذلك وقتاً طويلاً. يرجى تسجيل الدخول من جديد.
+That code is not right. Type the six digits your authenticator app shows now, or one of your recovery codes. ||| الرمز غير صحيح. اكتب الأرقام الستة التي يعرضها تطبيق المصادقة الآن، أو أحد رموز الاسترداد.
+That code is not right. Check the time on your phone is correct and type the code the app shows now. ||| الرمز غير صحيح. تأكد من صحة الوقت على هاتفك واكتب الرمز الذي يعرضه التطبيق الآن.
+That code is not right. Type the six digits your authenticator app shows now. ||| الرمز غير صحيح. اكتب الأرقام الستة التي يعرضها تطبيق المصادقة الآن.
+That code is not right. Type the six digits your authenticator app shows now, or a recovery code. ||| الرمز غير صحيح. اكتب الأرقام الستة التي يعرضها تطبيق المصادقة الآن، أو رمز استرداد.
+Two-step sign-in is on. Keep the recovery codes below, then carry on from the menu. ||| تم تفعيل تسجيل الدخول بخطوتين. احفظ رموز الاسترداد أدناه ثم تابع من القائمة.
+Two-step sign-in is on. From your next sign-in you will be asked for a code from your phone. ||| تم تفعيل تسجيل الدخول بخطوتين. من دخولك القادم سيُطلب منك رمز من هاتفك.
+New recovery codes made. The old ones no longer work. ||| تم إنشاء رموز استرداد جديدة. الرموز القديمة لم تعد تعمل.
+Two-step sign-in is off. ||| تم إيقاف تسجيل الدخول بخطوتين.
+Two-step sign-in is already on. ||| تسجيل الدخول بخطوتين مفعّل من قبل.
+Start again: scan the QR code shown on this page. ||| ابدأ من جديد: امسح رمز QR المعروض في هذه الصفحة.
+Two-step sign-in is now required. From their next sign-in, each user who has not set it up is taken to set it up first. ||| أصبح تسجيل الدخول بخطوتين إلزامياً. من الدخول القادم يُنقل كل مستخدم لم يعدّه إلى إعداده أولاً.
+Two-step sign-in is now optional: each user decides for themselves. ||| أصبح تسجيل الدخول بخطوتين اختيارياً: كل مستخدم يقرر لنفسه.
+Kind of work added. ||| تمت إضافة نوع العمل.
+Kind of work renamed, on its jobs too. ||| تمت إعادة تسمية نوع العمل، وفي أوامره أيضاً.
+That kind of work is already in the list. ||| نوع العمل هذا موجود في القائمة.
+That kind of work is in the list but switched off. Switch it on again instead. ||| نوع العمل هذا موجود في القائمة لكنه متوقف. فعّله من جديد.
+Another kind of work already has that name. ||| يوجد نوع عمل آخر بهذا الاسم.
+Keep at least one kind of work switched on. ||| أبقِ نوع عمل واحداً على الأقل مفعّلاً.
+Type the name of the kind of work. ||| اكتب اسم نوع العمل.
+That kind of work was not found. ||| نوع العمل غير موجود.

@@ -172,6 +172,11 @@ namespace RealEstateManager.Services
                 claims.Add(new Claim(AppClaimTypes.MustChangePassword, "true"));
             }
 
+            if (company.RequireTwoFactor && !user.TwoFactorEnabled)
+            {
+                claims.Add(new Claim(AppClaimTypes.MustSetUpTwoStep, "true"));
+            }
+
             return claims;
         }
     }

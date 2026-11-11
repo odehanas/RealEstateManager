@@ -3117,3 +3117,73 @@ Every invoice, receipt and cheque of this tenant
 Statement
 Terminated
 Renewed
+Two-step sign-in
+Step 2 of 2
+Enter your sign-in code
+Your password is correct. Now open the authenticator app on your phone and type the six-digit code it shows for RealEstateManager.
+Sign-in code
+Lost your phone? Type one of your recovery codes instead, or ask your administrator to reset two-step sign-in.
+Sign in as someone else
+With two-step sign-in, your password alone does not open your account: after the password you type a six-digit code from an app on your phone. Somebody who learns your password still cannot sign in without your phone.
+Your recovery codes
+Keep these somewhere safe, away from your phone: print them or write them down. Each one signs you in once if you lose your phone. They are shown this once only.
+Two-step sign-in is on
+Switched on {0}.
+Recovery codes left: {0}.
+New recovery codes
+Makes a new set of codes. The old ones stop working.
+Code from your app
+Make new codes
+Switch off, or move to a new phone
+Your company requires two-step sign-in. If you switch it off here, you set it up again straight away: that is how you move it to a new phone.
+After this your password alone signs you in. To move to a new phone, switch off and set it up again.
+Code from your app, or a recovery code
+Switch off
+Switch on
+Your company requires two-step sign-in. Set it up now to continue: it takes about a minute.
+Set it up
+On your phone, install an authenticator app: Google Authenticator or Microsoft Authenticator, free from the App Store or Google Play.
+In the app choose to add an account, then scan this QR code.
+Cannot scan? Type this key into the app instead:
+Type the six-digit code the app now shows, and press Switch on.
+QR code for your authenticator app
+2-step
+Required
+Optional
+After the password, the user types a six-digit code from an authenticator app on their phone. Each user can switch it on for themselves; here you can require it of everyone who works in {0}.
+Make it optional
+Require it for all users
+Off
+Reset two-step sign-in for this user? They will sign in with the password alone until they set it up again.
+For a user who lost their phone
+Reset two-step
+Kinds of Maintenance Work
+The list staff and tenants choose from when a maintenance job is raised, and that the maintenance dashboard sorts jobs and costs by. Add the kinds of work your company does; switch off the ones you do not use.
+Add a kind of work
+e.g. Lifts, Painting, Swimming pool
+Kind of work
+Rename
+Offered
+Switched off
+Renaming a kind of work renames it on the jobs and planned maintenance that already have it. A kind that is switched off is no longer offered for new jobs; jobs that have it keep it, so nothing is deleted.
+That took too long. Please sign in again.
+That code is not right. Type the six digits your authenticator app shows now, or one of your recovery codes.
+That code is not right. Check the time on your phone is correct and type the code the app shows now.
+That code is not right. Type the six digits your authenticator app shows now.
+That code is not right. Type the six digits your authenticator app shows now, or a recovery code.
+Two-step sign-in is on. Keep the recovery codes below, then carry on from the menu.
+Two-step sign-in is on. From your next sign-in you will be asked for a code from your phone.
+New recovery codes made. The old ones no longer work.
+Two-step sign-in is off.
+Two-step sign-in is already on.
+Start again: scan the QR code shown on this page.
+Two-step sign-in is now required. From their next sign-in, each user who has not set it up is taken to set it up first.
+Two-step sign-in is now optional: each user decides for themselves.
+Kind of work added.
+Kind of work renamed, on its jobs too.
+That kind of work is already in the list.
+That kind of work is in the list but switched off. Switch it on again instead.
+Another kind of work already has that name.
+Keep at least one kind of work switched on.
+Type the name of the kind of work.
+That kind of work was not found.

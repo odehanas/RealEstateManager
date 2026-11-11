@@ -31,6 +31,13 @@ namespace RealEstateManager.Domain
         public bool RequirePaymentApproval { get; set; }
 
         /// <summary>
+        /// When on, every staff user of the company must sign in with a code from their
+        /// phone as well as the password; one who has not set it up yet is taken to set it
+        /// up before anything else.
+        /// </summary>
+        public bool RequireTwoFactor { get; set; }
+
+        /// <summary>
         /// Whether the person who enters a payment may release it themselves when it is within
         /// their own limit. Petty cash is never self-released: someone else always checks it.
         /// </summary>

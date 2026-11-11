@@ -186,6 +186,7 @@
                             <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
 
                             <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="ChangePassword">@T["Password"]</a>
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Profile" asp-action="TwoStep" title="@T["Two-step sign-in"]">@T["2-step"]</a>
 
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 @Html.AntiForgeryToken()
@@ -432,6 +433,9 @@
                                         {
                                         <li>
                                             <a class="sidebar-link" asp-controller="MaintenancePlans" asp-action="Index">@T["Planned Maintenance"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="MaintenanceCategories" asp-action="Index">@T["Kinds of Maintenance Work"]</a>
                                         </li>
                                         }
                                         @if (canManageMaintenance)

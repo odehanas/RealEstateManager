@@ -8,6 +8,7 @@ namespace RealEstateManager.Data
     {
         public DbSet<MaintenanceMaterial> MaintenanceMaterials => Set<MaintenanceMaterial>();
         public DbSet<OwnerRecharge> OwnerRecharges => Set<OwnerRecharge>();
+        public DbSet<MaintenanceCategory> MaintenanceCategories => Set<MaintenanceCategory>();
 
         private void ConfigureMaintenance(ModelBuilder modelBuilder)
         {
@@ -26,6 +27,16 @@ namespace RealEstateManager.Data
                 entity.HasOne(x => x.ServiceRequest).WithMany().HasForeignKey(x => x.TenantServiceRequestId).OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(x => x.JournalEntry).WithMany().HasForeignKey(x => x.JournalEntryId).OnDelete(DeleteBehavior.Restrict);
                 entity.HasIndex(x => new { x.CompanyId, x.TenantServiceRequestId });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<MaintenanceCategory>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(MaintenanceCategory.MaxNameLength);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
 
                 entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
             });
