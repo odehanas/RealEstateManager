@@ -401,3 +401,27 @@ Up to {0} photos of the problem. You can add them later too, from the request. |
 Photo added. ||| أُضيفت الصورة.
 Choose a photo first. ||| اختر صورة أولاً.
 The request is closed, so photos can no longer be added. ||| الطلب مغلق فلا يمكن إضافة صور.
+# The tenant portal's own Paid services page.
+Paid services ||| الخدمات المدفوعة
+Services ||| الخدمات
+Extra services you can order for your unit. Each shows its price; we send you the invoice, and where a service is paid in advance the work starts once it is paid. ||| خدمات إضافية يمكنك طلبها لوحدتك. مع كل منها سعرها؛ نرسل لك الفاتورة، وإذا كانت الخدمة تُدفع مقدماً يبدأ العمل فور الدفع.
+No paid services are offered at the moment. ||| لا توجد خدمات مدفوعة معروضة حالياً.
+A service is ordered for a unit you rent. You have no contract in force, so please contact the office to order. ||| تُطلب الخدمة لوحدة تستأجرها. لا يوجد لديك عقد سارٍ، فيرجى التواصل مع المكتب للطلب.
+including VAT ||| شاملاً الضريبة
+no VAT ||| بلا ضريبة
+On quotation ||| حسب عرض السعر
+Paid in advance ||| تُدفع مقدماً
+Invoiced; paid after the order ||| تُفوتر؛ وتُدفع بعد الطلب
+Your orders ||| طلباتك
+Order a service ||| طلب خدمة
+We will confirm the price with you and send the invoice here. ||| سنؤكد السعر معك ونرسل الفاتورة هنا.
+We will confirm your order and send the invoice here. The work starts once the invoice is paid. ||| سنؤكد طلبك ونرسل الفاتورة هنا. يبدأ العمل فور دفع الفاتورة.
+We will confirm your order and send the invoice here. ||| سنؤكد طلبك ونرسل الفاتورة هنا.
+Preferred date ||| التاريخ المفضل
+Anything we should know? (optional) ||| هل من شيء يجب أن نعرفه؟ (اختياري)
+e.g. The best time to come, or what exactly you need. ||| مثال: أنسب وقت للحضور، أو ما تحتاجه بالتحديد.
+Order for {0} ||| اطلب بـ {0}
+Send the order ||| إرسال الطلب
+Looking for cleaning or another service you pay for? ||| تبحث عن تنظيف أو خدمة أخرى مدفوعة؟
+See the paid services ||| اطّلع على الخدمات المدفوعة
+Order this service ||| اطلب هذه الخدمة

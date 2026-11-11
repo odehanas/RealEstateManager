@@ -222,6 +222,23 @@ namespace RealEstateManager.Services
         public async Task<State?> StateAsync(int requestId) =>
             (await StatesAsync(_db.TenantServiceRequests.IgnoreQueryFilters().Where(x => x.Id == requestId))).FirstOrDefault();
 
+        /// <summary>The services a tenant can order: their company's price list.</summary>
+        public async Task<List<Option>> OptionsForTenantAsync(int tenantId)
+        {
+            var companyId = await _db.Tenants.IgnoreQueryFilters().AsNoTracking()
+                .Where(x => x.Id == tenantId).Select(x => (int?)x.CompanyId).FirstOrDefaultAsync();
+            return companyId.HasValue ? await OptionsAsync(_db, companyId.Value) : new List<Option>();
+        }
+
+        /// <summary>Whether the tenant's company offers any paid service; decides if the portal shows the tab.</summary>
+        public Task<bool> AnyForTenantAsync(int tenantId) =>
+            _db.ServiceCatalogItems.IgnoreQueryFilters()
+                .AnyAsync(x => x.IsActive && _db.Tenants.IgnoreQueryFilters().Any(t => t.Id == tenantId && t.CompanyId == x.CompanyId));
+
+        /// <summary>A tenant's own orders, newest first.</summary>
+        public Task<List<State>> OrdersForTenantAsync(int tenantId) =>
+            StatesAsync(_db.TenantServiceRequests.IgnoreQueryFilters().Where(x => x.TenantId == tenantId));
+
         /// <summary>Every order raised in a period, newest first, for the report.</summary>
         public Task<List<State>> OrdersAsync(int companyId, DateTime from, DateTime to)
         {

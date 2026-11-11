@@ -33,31 +33,14 @@
                             @ServiceRequestTypes.Describe(type)
                         </option>
                     }
-                    @if (Model.Services.Count > 0)
-                    {
-                        <option value="@ServiceRequestCreateViewModel.PaidServiceType" selected="@(Model.ServiceCatalogItemId.HasValue ? "selected" : null)">@T["Order a paid service"]</option>
-                    }
                 </select>
             </div>
 
             @if (Model.Services.Count > 0)
             {
-                <div class="mb-3 type-service">
-                    <label asp-for="ServiceCatalogItemId" class="form-label fw-semibold">@T["Which service?"]</label>
-                    <select asp-for="ServiceCatalogItemId" class="form-select" id="serviceSelect">
-                        <option value="">@T["-- choose the service --"]</option>
-                        @foreach (var service in Model.Services)
-                        {
-                            <option value="@service.Id" selected="@(service.Id == Model.ServiceCatalogItemId ? "selected" : null)" data-about="@service.Description" data-name="@service.Name">
-                                @service.Name - @(service.Price > 0m ? T.Format("{0} including VAT", service.PriceWithVat.ToString("N2")) : T["price on quotation"])
-                            </option>
-                        }
-                    </select>
-                    <span asp-validation-for="ServiceCatalogItemId" class="text-danger small"></span>
-                    <div class="form-text" id="serviceAbout"></div>
-                    <div class="alert alert-info small mt-2 mb-0">
-                        @T["This is a paid service. We confirm the order and send the invoice; where the service is paid in advance, the work starts once the invoice is paid."]
-                    </div>
+                <div class="alert alert-light border small py-2">
+                    @T["Looking for cleaning or another service you pay for?"]
+                    <a asp-action="Services">@T["See the paid services"]</a>
                 </div>
             }
 
