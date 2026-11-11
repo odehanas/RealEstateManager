@@ -4,6 +4,13 @@
     var seesAll = ViewBag.SeesAll as bool? ?? false;
     var show = ViewBag.Show as string ?? "Open";
     var technicianId = ViewBag.TechnicianId as int?;
+    var kind = ViewBag.Kind as string ?? "Normal";
+    var kinds = new[]
+    {
+        (Key: "Normal", Label: "Requests and repairs", Open: ViewBag.OpenNormal as int? ?? 0),
+        (Key: "Planned", Label: "Planned maintenance", Open: ViewBag.OpenPlanned as int? ?? 0),
+        (Key: "Paid", Label: "Paid services", Open: ViewBag.OpenPaid as int? ?? 0)
+    };
     var technicians = ViewBag.Technicians as List<RealEstateManager.Services.MaintenanceService.Technician> ?? new();
     var awaiting = ViewBag.AwaitingMakeReady as List<RealEstateManager.Services.MaintenanceService.VacantUnit> ?? new();
     ViewData["Title"] = seesAll ? "Maintenance Jobs" : "My Maintenance Jobs";
@@ -56,11 +63,31 @@
 
 <partial name="_AppInstallPanel" model="true" />
 
+<ul class="nav nav-tabs mb-3">
+    @foreach (var tab in kinds)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(kind == tab.Key ? "active fw-semibold" : "")" asp-action="Index" asp-route-kind="@tab.Key" asp-route-show="@show" asp-route-technicianId="@technicianId">
+                @T[tab.Label]
+                <span class="badge @(tab.Open > 0 ? (tab.Key == "Paid" ? "bg-primary" : "bg-dark") : "bg-secondary")" title="@T["still open"]">@tab.Open</span>
+            </a>
+        </li>
+    }
+</ul>
+<p class="text-muted small">
+    @(kind == "Paid"
+        ? T["Services a tenant ordered from the price list and pays for. A job marked On hold until paid waits for its invoice to be paid."]
+        : kind == "Planned"
+            ? T["Jobs the planned maintenance programme opened on their due dates."]
+            : T["Repairs tenants asked for, and jobs management raised: make-ready, inspections and repairs."])
+</p>
+
 <form method="get" class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <input type="hidden" name="kind" value="@kind" />
     <div class="btn-group" role="group" aria-label="@T["Which jobs"]">
         @foreach (var option in new[] { "Open", "Done", "All" })
         {
-            <a asp-action="Index" asp-route-show="@option" asp-route-technicianId="@technicianId"
+            <a asp-action="Index" asp-route-kind="@kind" asp-route-show="@option" asp-route-technicianId="@technicianId"
                class="btn btn-sm @(show == option ? "btn-dark" : "btn-outline-dark")">@option</a>
         }
     </div>

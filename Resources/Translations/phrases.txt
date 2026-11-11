@@ -3465,3 +3465,12 @@ To invoice
 {0} paid service order(s) are waiting for their invoice. Open each one and press Issue invoice.
 Show them
 On hold until paid
+Requests and repairs
+still open
+Services a tenant ordered from the price list and pays for. A job marked On hold until paid waits for its invoice to be paid.
+Jobs the planned maintenance programme opened on their due dates.
+Repairs tenants asked for, and jobs management raised: make-ready, inspections and repairs.
+ordered and paid for by tenants; not counted in the maintenance figures above
+Open the jobs
+{0} done
+Orders raised in the period. Invoiced, cost and margin are before VAT; Collected includes VAT.

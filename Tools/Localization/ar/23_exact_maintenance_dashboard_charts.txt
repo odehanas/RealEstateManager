@@ -430,3 +430,13 @@ To invoice ||| بانتظار الفاتورة
 {0} paid service order(s) are waiting for their invoice. Open each one and press Issue invoice. ||| {0} طلب خدمة مدفوعة بانتظار الفاتورة. افتح كل طلب واضغط «إصدار الفاتورة».
 Show them ||| عرضها
 On hold until paid ||| معلّق حتى الدفع
+# Maintenance jobs in three tabs; paid services apart on the dashboard.
+Requests and repairs ||| الطلبات والإصلاحات
+still open ||| ما زالت مفتوحة
+Services a tenant ordered from the price list and pays for. A job marked On hold until paid waits for its invoice to be paid. ||| خدمات طلبها المستأجر من قائمة الأسعار ويدفع ثمنها. العمل المعلَّم بـ «معلّق حتى الدفع» ينتظر دفع فاتورته.
+Jobs the planned maintenance programme opened on their due dates. ||| أعمال فتحها برنامج الصيانة المخططة في مواعيد استحقاقها.
+Repairs tenants asked for, and jobs management raised: make-ready, inspections and repairs. ||| إصلاحات طلبها المستأجرون وأعمال أنشأتها الإدارة: التجهيز والمعاينات والإصلاحات.
+ordered and paid for by tenants; not counted in the maintenance figures above ||| يطلبها المستأجرون ويدفعون ثمنها؛ غير محتسبة في أرقام الصيانة أعلاه
+Open the jobs ||| فتح الأعمال
+{0} done ||| {0} منجز
+Orders raised in the period. Invoiced, cost and margin are before VAT; Collected includes VAT. ||| الطلبات المنشأة في الفترة. المفوتر والتكلفة والهامش قبل الضريبة؛ والمحصَّل يشمل الضريبة.
