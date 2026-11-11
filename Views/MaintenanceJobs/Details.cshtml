@@ -33,6 +33,7 @@
 <div class="row g-3">
     <div class="col-lg-7">
         <partial name="_PaidService" model="@((Model.Id, "job"))" />
+        <partial name="_RequestPhotos" model="@((Model.Id, "staff", false))" />
         <div class="card shadow-sm mb-3">
             <div class="card-header bg-white">@T.Html("<strong>The request</strong>")</div>
             <div class="card-body">

@@ -192,6 +192,22 @@ namespace RealEstateManager.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        /// <summary>A photo on a request: for whoever may open the job, of this company only.</summary>
+        [HttpGet]
+        public async Task<IActionResult> Photo(int id, int photoId, [FromServices] ServiceRequestPhotoService photoService)
+        {
+            if (!await MayOpenAsync(id) || !await _db.TenantServiceRequests.AnyAsync(x => x.Id == id))
+                return NotFound();
+
+            var photo = await photoService.GetAsync(id, photoId);
+            if (photo == null)
+                return NotFound();
+
+            Response.Headers["X-Content-Type-Options"] = "nosniff";
+            Response.Headers["Cache-Control"] = "private, max-age=3600";
+            return File(photo.Content, photo.ContentType);
+        }
+
         /// <summary>The technician's steps: acknowledge, start, resolve.</summary>
         [HttpPost]
         [ValidateAntiForgeryToken]

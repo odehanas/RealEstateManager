@@ -391,3 +391,13 @@ English translation, written in {0} ||| الترجمة الإنجليزية، ك
 Translation needs the AI assistant's key, which is not set up on this server. ||| الترجمة تحتاج مفتاح المساعد الذكي، وهو غير معدّ على هذا الخادم.
 The translation service could not be reached. The request shows as the tenant wrote it; try again in a moment. ||| تعذّر الوصول إلى خدمة الترجمة. يظهر الطلب كما كتبه المستأجر؛ حاول بعد لحظات.
 The request is already in English. ||| الطلب مكتوب بالإنجليزية.
+# Photos on a tenant's request.
+<strong>Photos</strong> ||| <strong>الصور</strong>
+Photo {0} ||| صورة {0}
+Add photos (up to {0} more) ||| إضافة صور (حتى {0} أخرى)
+Photos (optional) ||| صور (اختياري)
+Only the first {0} photos will be sent. ||| ستُرسل أول {0} صور فقط.
+Up to {0} photos of the problem. You can add them later too, from the request. ||| حتى {0} صور للمشكلة. يمكنك إضافتها لاحقاً أيضاً من الطلب.
+Photo added. ||| أُضيفت الصورة.
+Choose a photo first. ||| اختر صورة أولاً.
+The request is closed, so photos can no longer be added. ||| الطلب مغلق فلا يمكن إضافة صور.

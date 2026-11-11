@@ -118,7 +118,10 @@ namespace RealEstateManager.Controllers
 
         [HttpPost("requests/new")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> NewRequest(ServiceRequestCreateViewModel model)
+        public async Task<IActionResult> NewRequest(
+            ServiceRequestCreateViewModel model,
+            List<IFormFile>? photos,
+            [FromServices] ServiceRequestPhotoService photoService)
         {
             var tenantId = User.GetRequiredPortalTenantId();
 
@@ -136,7 +139,49 @@ namespace RealEstateManager.Controllers
             TempData["PortalSuccess"] =
                 $"Request {request.RequestNumber} has been sent. You will see replies here.";
 
+            // The request is in whatever happens to a photo: one that is refused is named, not fatal.
+            var (_, problems) = await photoService.AddAsync(request.Id, photos, User.Identity?.Name, byTenant: true);
+            if (problems.Count > 0)
+                TempData["PortalError"] = string.Join(" ", problems);
+
             return RedirectToAction(nameof(RequestDetails), new { id = request.Id });
+        }
+
+        /// <summary>More photos on a request the tenant has already sent, while it is open.</summary>
+        [HttpPost("requests/{id:int}/photos")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddRequestPhotos(int id, List<IFormFile>? photos, [FromServices] ServiceRequestPhotoService photoService)
+        {
+            var tenantId = User.GetRequiredPortalTenantId();
+            if (await _serviceRequestService.GetTenantRequestAsync(tenantId, id) == null)
+                return NotFound();
+
+            var (added, problems) = await photoService.AddAsync(id, photos, User.Identity?.Name, byTenant: true);
+            if (added > 0)
+                TempData["PortalSuccess"] = added == 1 ? "Photo added." : $"{added} photos added.";
+            if (problems.Count > 0)
+                TempData["PortalError"] = string.Join(" ", problems);
+            else if (added == 0)
+                TempData["PortalError"] = "Choose a photo first.";
+
+            return RedirectToAction(nameof(RequestDetails), new { id });
+        }
+
+        /// <summary>One photo of the tenant's own request.</summary>
+        [HttpGet("requests/{id:int}/photos/{photoId:int}")]
+        public async Task<IActionResult> RequestPhoto(int id, int photoId, [FromServices] ServiceRequestPhotoService photoService)
+        {
+            var tenantId = User.GetRequiredPortalTenantId();
+            if (await _serviceRequestService.GetTenantRequestAsync(tenantId, id) == null)
+                return NotFound();
+
+            var photo = await photoService.GetAsync(id, photoId);
+            if (photo == null)
+                return NotFound();
+
+            Response.Headers["X-Content-Type-Options"] = "nosniff";
+            Response.Headers["Cache-Control"] = "private, max-age=3600";
+            return File(photo.Content, photo.ContentType);
         }
 
         [HttpGet("requests/{id:int}")]

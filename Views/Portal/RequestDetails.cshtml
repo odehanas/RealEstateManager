@@ -56,6 +56,7 @@
 </div>
 
 <partial name="_PaidService" model="@((Model.Id, "portal"))" />
+<partial name="_RequestPhotos" model="@((Model.Id, "portal", !isFinished && Model.Status != ServiceRequestStatuses.Rejected))" />
 
 @if (Model.RequestType == ServiceRequestTypes.PaymentPostponement && Model.RelatedInvoiceNumber != null)
 {
@@ -187,4 +188,8 @@ else if (Model.Rating.HasValue)
         @Html.AntiForgeryToken()
         <button type="submit" class="btn btn-outline-danger btn-sm">@T["Withdraw this request"]</button>
     </form>
+}
+
+@section Scripts {
+    <script src="~/js/request-photos.js" asp-append-version="true"></script>
 }
