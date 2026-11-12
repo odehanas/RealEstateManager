@@ -32,6 +32,9 @@ namespace RealEstateManager.Models
         /// <summary>Periods that have started and are not closed yet; null when the user does not keep the books.</summary>
         public UnclosedPeriodsSummary? UnclosedPeriods { get; set; }
 
+        /// <summary>Depreciation of months already ended that was never posted; null when the user does not keep the books.</summary>
+        public FixedAssetOverdueSummary? OverdueDepreciation { get; set; }
+
         /// <summary>HR alerts; null when the user does not handle HR or payroll.</summary>
         public HrDashboardAlerts? HrAlerts { get; set; }
 

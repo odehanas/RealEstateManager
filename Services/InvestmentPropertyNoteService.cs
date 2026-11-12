@@ -57,12 +57,15 @@ namespace RealEstateManager.Services
                 ToDate = to,
                 OpeningCost = costAccount.OpeningBalance + cost.Where(x => x.EntryDate < from).Sum(x => x.Debit - x.Credit),
                 // Allocating the opening balance to buildings moves nothing - it is left out of the movement.
-                Additions = cost.Where(x => x.EntryDate >= from && x.SourceType != DevelopmentTransferService.SourceType && x.SourceType != InvestmentPropertySetupService.SourceType).Sum(x => x.Debit),
+                Additions = cost.Where(x => x.EntryDate >= from && x.SourceType != DevelopmentTransferService.SourceType && x.SourceType != InvestmentPropertySetupService.SourceType && x.SourceType != FixedAssetService.RevaluationSourceType).Sum(x => x.Debit),
+                // Net of the accumulated depreciation a revaluation eliminates against the gross amount.
+                Revaluation = cost.Where(x => x.EntryDate >= from && x.SourceType == FixedAssetService.RevaluationSourceType).Sum(x => x.Debit - x.Credit),
                 TransfersFromDevelopment = cost.Where(x => x.EntryDate >= from && x.SourceType == DevelopmentTransferService.SourceType).Sum(x => x.Debit - x.Credit),
-                Disposals = cost.Where(x => x.EntryDate >= from && x.SourceType != DevelopmentTransferService.SourceType && x.SourceType != InvestmentPropertySetupService.SourceType).Sum(x => x.Credit),
+                Disposals = cost.Where(x => x.EntryDate >= from && x.SourceType != DevelopmentTransferService.SourceType && x.SourceType != InvestmentPropertySetupService.SourceType && x.SourceType != FixedAssetService.RevaluationSourceType).Sum(x => x.Credit),
                 OpeningDepreciation = -depreciationAccount.OpeningBalance + depreciation.Where(x => x.EntryDate < from).Sum(x => x.Credit - x.Debit),
                 DepreciationCharge = depreciation.Where(x => x.EntryDate >= from && x.SourceType == "FixedAssetDepreciation").Sum(x => x.Credit - x.Debit),
-                DepreciationOther = depreciation.Where(x => x.EntryDate >= from && x.SourceType != "FixedAssetDepreciation").Sum(x => x.Credit - x.Debit)
+                DepreciationEliminated = depreciation.Where(x => x.EntryDate >= from && x.SourceType == FixedAssetService.RevaluationSourceType).Sum(x => x.Credit - x.Debit),
+                DepreciationOther = depreciation.Where(x => x.EntryDate >= from && x.SourceType != "FixedAssetDepreciation" && x.SourceType != FixedAssetService.RevaluationSourceType).Sum(x => x.Credit - x.Debit)
             };
 
             var properties = await _db.Properties.AsNoTracking()
@@ -117,12 +120,18 @@ namespace RealEstateManager.Services
         public decimal Additions { get; set; }
         public decimal TransfersFromDevelopment { get; set; }
         public decimal Disposals { get; set; }
-        public decimal ClosingCost => OpeningCost + Additions + TransfersFromDevelopment - Disposals;
+
+        /// <summary>Revaluations to fair value: the change in the gross amount, after eliminating accumulated depreciation.</summary>
+        public decimal Revaluation { get; set; }
+        public decimal ClosingCost => OpeningCost + Additions + TransfersFromDevelopment - Disposals + Revaluation;
 
         public decimal OpeningDepreciation { get; set; }
         public decimal DepreciationCharge { get; set; }
         public decimal DepreciationOther { get; set; }
-        public decimal ClosingDepreciation => OpeningDepreciation + DepreciationCharge + DepreciationOther;
+
+        /// <summary>Accumulated depreciation eliminated on revaluation (negative).</summary>
+        public decimal DepreciationEliminated { get; set; }
+        public decimal ClosingDepreciation => OpeningDepreciation + DepreciationCharge + DepreciationEliminated + DepreciationOther;
 
         public decimal OpeningCarryingAmount => OpeningCost - OpeningDepreciation;
         public decimal ClosingCarryingAmount => ClosingCost - ClosingDepreciation;

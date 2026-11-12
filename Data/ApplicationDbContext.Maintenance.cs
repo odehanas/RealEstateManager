@@ -18,8 +18,56 @@ namespace RealEstateManager.Data
         public DbSet<LeaseHandoverCharge> LeaseHandoverCharges => Set<LeaseHandoverCharge>();
         public DbSet<HandoverChecklistItem> HandoverChecklistItems => Set<HandoverChecklistItem>();
 
+        public DbSet<FixedAssetCategory> FixedAssetCategories => Set<FixedAssetCategory>();
+        public DbSet<FixedAssetRevaluation> FixedAssetRevaluations => Set<FixedAssetRevaluation>();
+
         private void ConfigureMaintenance(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FixedAssetCategory>(entity =>
+            {
+                entity.Property(x => x.Name).HasMaxLength(FixedAssetCategory.MaxNameLength);
+                entity.Property(x => x.AssetClass).HasMaxLength(20);
+                entity.Property(x => x.DepreciationMethod).HasMaxLength(30);
+                entity.Property(x => x.DecliningRatePercent).HasPrecision(9, 4);
+                entity.Property(x => x.ResidualPercent).HasPrecision(9, 4);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.AssetAccount).WithMany().HasForeignKey(x => x.AssetAccountId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.AccumulatedDepreciationAccount).WithMany().HasForeignKey(x => x.AccumulatedDepreciationAccountId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.DepreciationExpenseAccount).WithMany().HasForeignKey(x => x.DepreciationExpenseAccountId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.CompanyId, x.Name }).IsUnique();
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
+            modelBuilder.Entity<FixedAsset>(entity =>
+            {
+                entity.Property(x => x.AssetClass).HasMaxLength(20);
+                entity.Property(x => x.DecliningRatePercent).HasPrecision(9, 4);
+                entity.Property(x => x.RevaluationEliminatedDepreciation).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<FixedAssetRevaluation>(entity =>
+            {
+                entity.Property(x => x.CostBefore).HasPrecision(18, 2);
+                entity.Property(x => x.AccumulatedDepreciationBefore).HasPrecision(18, 2);
+                entity.Property(x => x.FairValue).HasPrecision(18, 2);
+                entity.Property(x => x.Difference).HasPrecision(18, 2);
+                entity.Property(x => x.SurplusAmount).HasPrecision(18, 2);
+                entity.Property(x => x.ProfitOrLossAmount).HasPrecision(18, 2);
+                entity.Property(x => x.ResidualValue).HasPrecision(18, 2);
+                entity.Property(x => x.Treatment).HasMaxLength(20);
+                entity.Property(x => x.ValuerName).HasMaxLength(200);
+                entity.Property(x => x.Notes).HasMaxLength(1000);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.Ignore(x => x.CarryingAmountBefore);
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.FixedAsset).WithMany().HasForeignKey(x => x.FixedAssetId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.JournalEntry).WithMany().HasForeignKey(x => x.JournalEntryId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => new { x.FixedAssetId, x.RevaluationDate });
+
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
+
             modelBuilder.Entity<MaintenanceMaterial>(entity =>
             {
                 entity.Property(x => x.Description).HasMaxLength(300);

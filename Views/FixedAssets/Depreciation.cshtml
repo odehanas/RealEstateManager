@@ -8,8 +8,17 @@
     <div>
         <h2 class="mb-1">@T["Asset Depreciation"]</h2>
         <div class="text-muted">@Model.AssetCode - @Model.AssetName</div>
+        <div class="text-muted small">
+            @T[Model.DepreciationMethod == RealEstateManager.Domain.DepreciationMethods.None
+                ? (Model.AssetClass == RealEstateManager.Domain.FixedAssetClasses.Intangible ? "Intangible asset" : "Tangible asset")
+                : (Model.AssetClass == RealEstateManager.Domain.FixedAssetClasses.Intangible ? "Intangible asset - amortized" : "Tangible asset - depreciated")]:
+            @T[RealEstateManager.Domain.DepreciationMethods.Label(Model.DepreciationMethod)]@(Model.DecliningRatePercent.HasValue ? $" {Model.DecliningRatePercent.Value:0.##}%" : "")@(Model.UsefulLifeMonths > 0 ? " - " + T.Format("{0} months", Model.UsefulLifeMonths) : "")
+        </div>
     </div>
-    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to Register"]</a>
+    <div class="d-flex gap-2">
+        <a asp-action="Revalue" asp-route-id="@Model.FixedAssetId" class="btn btn-outline-secondary">@T["Revalue"]</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to Register"]</a>
+    </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -62,7 +71,11 @@
         @if (Model.Schedules.Count == 0)
         {
             <tr>
-                <td colspan="6" class="text-center text-muted py-4">@T["No depreciation schedules found."]</td>
+                <td colspan="6" class="text-center text-muted py-4">
+                    @T[Model.DepreciationMethod == RealEstateManager.Domain.DepreciationMethods.None
+                        ? "This asset is not depreciated: it is carried at cost and has no schedule."
+                        : "No depreciation schedules found."]
+                </td>
             </tr>
         }
         else

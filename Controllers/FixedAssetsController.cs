@@ -11,11 +11,13 @@ namespace RealEstateManager.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly FixedAssetService _fixedAssetService;
+        private readonly FixedAssetCategoryService _categories;
 
-        public FixedAssetsController(ApplicationDbContext db, FixedAssetService fixedAssetService)
+        public FixedAssetsController(ApplicationDbContext db, FixedAssetService fixedAssetService, FixedAssetCategoryService categories)
         {
             _db = db;
             _fixedAssetService = fixedAssetService;
+            _categories = categories;
         }
 
         [HttpGet]
@@ -79,7 +81,7 @@ namespace RealEstateManager.Controllers
                 ModelState.AddModelError(nameof(model.ResidualValue), "Residual value cannot be negative.");
             }
 
-            if (model.Cost > 0m && model.ResidualValue >= model.Cost)
+            if (model.Cost > 0m && model.DepreciationMethod != DepreciationMethods.None && model.ResidualValue >= model.Cost)
             {
                 ModelState.AddModelError(nameof(model.ResidualValue), "Residual value must be less than the initial acquisition cost.");
             }
@@ -98,9 +100,22 @@ namespace RealEstateManager.Controllers
                 ModelState.AddModelError(nameof(model.InitialVendorId), "Select the vendor when the source account is Accounts Payable.");
             }
 
-            if (model.UsefulLifeMonths <= 0)
+            if (string.IsNullOrWhiteSpace(model.AssetCategory))
             {
-                ModelState.AddModelError(nameof(model.UsefulLifeMonths), "Useful life in months must be greater than zero.");
+                ModelState.AddModelError(nameof(model.AssetCategory), "Choose the asset's category.");
+            }
+
+            if (!DepreciationMethods.All.Contains(model.DepreciationMethod))
+            {
+                ModelState.AddModelError(nameof(model.DepreciationMethod), "Choose the depreciation method.");
+            }
+            else if (FixedAssetCategoryService.ValidateProgramme(model.DepreciationMethod, model.UsefulLifeMonths, model.DecliningRatePercent) is { } programmeError)
+            {
+                ModelState.AddModelError(
+                    model.DepreciationMethod == DepreciationMethods.DecliningBalance && model.UsefulLifeMonths > 0
+                        ? nameof(model.DecliningRatePercent)
+                        : nameof(model.UsefulLifeMonths),
+                    programmeError);
             }
 
             if (model.OpeningCost < 0m)
@@ -219,6 +234,38 @@ namespace RealEstateManager.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Revalue(int id)
+        {
+            try
+            {
+                return View(await _fixedAssetService.GetRevaluationViewAsync(id));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Revalue(FixedAssetRevaluationViewModel model)
+        {
+            try
+            {
+                var revaluation = await _fixedAssetService.RevalueAsync(model, User.Identity?.Name);
+                TempData["SuccessMessage"] = revaluation.Difference >= 0m
+                    ? $"Revaluation posted: the asset now stands at {revaluation.FairValue:N2}, an increase of {revaluation.Difference:N2}."
+                    : $"Revaluation posted: the asset now stands at {revaluation.FairValue:N2}, a decrease of {-revaluation.Difference:N2}.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Revalue), new { id = model.FixedAssetId });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RunMonthly(DateTime postingDate)
@@ -271,6 +318,8 @@ namespace RealEstateManager.Controllers
                 .Where(x => x.IsActive)
                 .OrderBy(x => x.Code)
                 .ToListAsync();
+
+            ViewBag.Categories = await _categories.ActiveAsync(User.GetRequiredCurrentCompanyId());
         }
     }
 }

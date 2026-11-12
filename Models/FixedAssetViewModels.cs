@@ -9,6 +9,39 @@ namespace RealEstateManager.Models
         public int PendingDepreciationCount { get; set; }
         public decimal PendingDepreciationAmount { get; set; }
         public List<FixedAssetRegisterItemViewModel> Assets { get; set; } = new();
+
+        /// <summary>Months already ended whose depreciation run has not been done.</summary>
+        public FixedAssetOverdueSummary Overdue { get; set; } = new();
+    }
+
+    /// <summary>The monthly depreciation / amortization run that is still owed.</summary>
+    public class FixedAssetOverdueSummary
+    {
+        public List<FixedAssetOverdueMonth> Months { get; set; } = new();
+
+        /// <summary>Active assets in service with a depreciation method but no schedule at all.</summary>
+        public List<string> AssetsWithoutSchedule { get; set; } = new();
+
+        /// <summary>The last day of last month: the date to post the owed run up to.</summary>
+        public DateTime LastMonthEnd { get; set; }
+
+        public int Lines => Months.Sum(x => x.Lines);
+        public decimal Amount => Months.Sum(x => x.Amount);
+        public bool HasAny => Months.Count > 0 || AssetsWithoutSchedule.Count > 0;
+    }
+
+    public class FixedAssetOverdueMonth
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int Lines { get; set; }
+        public int Assets { get; set; }
+        public decimal Amount { get; set; }
+
+        /// <summary>Open, Closed or NoPeriod - a closed or missing period must be dealt with before the month can be posted.</summary>
+        public string PeriodState { get; set; } = "Open";
+
+        public string Name => $"{Year}-{Month:D2}";
     }
 
     public class FixedAssetRegisterItemViewModel
@@ -17,6 +50,10 @@ namespace RealEstateManager.Models
         public string AssetCode { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string AssetCategory { get; set; } = string.Empty;
+        public string AssetClass { get; set; } = string.Empty;
+        public string DepreciationMethod { get; set; } = string.Empty;
+        public decimal? DecliningRatePercent { get; set; }
+        public bool IsRevalued { get; set; }
         public string? PropertyDisplay { get; set; }
         public DateTime AcquisitionDate { get; set; }
         public DateTime InServiceDate { get; set; }
@@ -43,6 +80,8 @@ namespace RealEstateManager.Models
         public decimal Cost { get; set; }
         public decimal ResidualValue { get; set; }
         public int UsefulLifeMonths { get; set; }
+        public string DepreciationMethod { get; set; } = "StraightLine";
+        public decimal? DecliningRatePercent { get; set; }
         public int? AssetAccountId { get; set; }
         public int? AccumulatedDepreciationAccountId { get; set; }
         public int? DepreciationExpenseAccountId { get; set; }
@@ -130,6 +169,10 @@ namespace RealEstateManager.Models
         public decimal Cost { get; set; }
         public decimal ResidualValue { get; set; }
         public decimal MonthlyDepreciation { get; set; }
+        public string AssetClass { get; set; } = string.Empty;
+        public string DepreciationMethod { get; set; } = string.Empty;
+        public decimal? DecliningRatePercent { get; set; }
+        public int UsefulLifeMonths { get; set; }
         public decimal PostedDepreciation { get; set; }
         public decimal NetBookValue { get; set; }
         public List<FixedAssetDepreciationItemViewModel> Schedules { get; set; } = new();
@@ -143,6 +186,51 @@ namespace RealEstateManager.Models
         public string Status { get; set; } = string.Empty;
         public string? JournalEntryNumber { get; set; }
         public DateTime? PostedAt { get; set; }
+    }
+
+    /// <summary>The revaluation screen: where the asset stands, the new valuation to enter, and the past ones.</summary>
+    public class FixedAssetRevaluationViewModel
+    {
+        public int FixedAssetId { get; set; }
+        public string AssetCode { get; set; } = string.Empty;
+        public string AssetName { get; set; } = string.Empty;
+        public string AssetCategory { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string? PropertyDisplay { get; set; }
+        public bool IsDepreciated { get; set; }
+        public bool CanRevalue { get; set; }
+
+        public decimal Cost { get; set; }
+        public decimal AccumulatedDepreciation { get; set; }
+        public decimal CarryingAmount { get; set; }
+        public decimal SurplusBalance { get; set; }
+        public DateTime? LastPostedDate { get; set; }
+
+        // The valuation being entered.
+        public DateTime RevaluationDate { get; set; } = DateTime.Today;
+        public decimal FairValue { get; set; }
+        public string Treatment { get; set; } = string.Empty;
+        public int RemainingLifeMonths { get; set; }
+        public decimal ResidualValue { get; set; }
+        public string? ValuerName { get; set; }
+        public string? Notes { get; set; }
+
+        public List<FixedAssetRevaluationItemViewModel> History { get; set; } = new();
+    }
+
+    public class FixedAssetRevaluationItemViewModel
+    {
+        public DateTime RevaluationDate { get; set; }
+        public decimal CarryingAmountBefore { get; set; }
+        public decimal FairValue { get; set; }
+        public decimal Difference { get; set; }
+        public string Treatment { get; set; } = string.Empty;
+        public decimal SurplusAmount { get; set; }
+        public decimal ProfitOrLossAmount { get; set; }
+        public int RemainingLifeMonths { get; set; }
+        public string? ValuerName { get; set; }
+        public string? JournalEntryNumber { get; set; }
+        public string? CreatedByName { get; set; }
     }
 
     public class FixedAssetDepreciationRunResult

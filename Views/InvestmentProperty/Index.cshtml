@@ -52,11 +52,19 @@
         <tr><td>@T["Additions"]</td><td class="num">@N(Model.Additions)</td></tr>
         <tr><td>@T["Transferred from properties under construction"]</td><td class="num">@N(Model.TransfersFromDevelopment)</td></tr>
         <tr><td>@T["Disposals and other reductions"]</td><td class="num">@N(-Model.Disposals)</td></tr>
+        @if (Model.Revaluation != 0)
+        {
+            <tr><td>@T["Revaluation to fair value (net of accumulated depreciation eliminated)"]</td><td class="num">@N(Model.Revaluation)</td></tr>
+        }
         <tr class="fw-bold"><td>At @Model.ToDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.ClosingCost)</td></tr>
 
         <tr class="table-light"><td colspan="2">@T.Html("<strong>Accumulated depreciation</strong>")</td></tr>
         <tr><td>At @Model.FromDate.ToString("dd/MM/yyyy")</td><td class="num">@N(Model.OpeningDepreciation)</td></tr>
         <tr><td>@T["Charge for the period"]</td><td class="num">@N(Model.DepreciationCharge)</td></tr>
+        @if (Model.DepreciationEliminated != 0)
+        {
+            <tr><td>@T["Eliminated on revaluation"]</td><td class="num">@N(Model.DepreciationEliminated)</td></tr>
+        }
         @if (Model.DepreciationOther != 0)
         {
             <tr><td>@T["Other movements (disposals, adjustments)"]</td><td class="num">@N(Model.DepreciationOther)</td></tr>

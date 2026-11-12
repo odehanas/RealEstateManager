@@ -190,6 +190,24 @@
     </div>
 }
 
+@if (Model.OverdueDepreciation is { HasAny: true } overdueDepreciation)
+{
+    <div class="alert alert-danger d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 dashboard-no-print">
+        <div>
+            <strong>@T["Monthly depreciation has not been run."]</strong>
+            @if (overdueDepreciation.Months.Count > 0)
+            {
+                <span>@T.Format("{0} schedule line(s) totalling {1} are unposted for {2}.", overdueDepreciation.Lines, overdueDepreciation.Amount.ToString("N2"), string.Join(", ", overdueDepreciation.Months.Select(x => x.Name)))</span>
+            }
+            @if (overdueDepreciation.AssetsWithoutSchedule.Count > 0)
+            {
+                <span>@T.Format("{0} asset(s) in service have no depreciation schedule.", overdueDepreciation.AssetsWithoutSchedule.Count)</span>
+            }
+        </div>
+        <a asp-controller="FixedAssets" asp-action="Index" asp-route-postingDate="@overdueDepreciation.LastMonthEnd.ToString("yyyy-MM-dd")" class="btn btn-sm btn-danger">@T["Open Fixed Assets"]</a>
+    </div>
+}
+
 @if (Model.UnclosedPeriods is { } unclosed)
 {
     var needsAttention = unclosed.OverdueCount > 0 || unclosed.UnclosedFiscalYears.Count > 0 || unclosed.PendingReopenRequests > 0;
