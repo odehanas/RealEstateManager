@@ -21,6 +21,21 @@
         public decimal AnnualRent { get; set; } = 0m;
         public int BillingFrequencyMonths { get; set; } = 1;
 
+        /// <summary>
+        /// Annual for an ordinary tenancy; Monthly, Weekly or Daily for a stay priced at
+        /// <see cref="RentRate"/> and billed for exactly its days. See <see cref="RentBases"/>.
+        /// For a stay, AnnualRent holds the rate as a yearly figure, for the rent reports.
+        /// </summary>
+        public string RentBasis { get; set; } = RentBases.Annual;
+
+        /// <summary>The rate per day, week or month of a stay; 0 for an annual contract.</summary>
+        public decimal RentRate { get; set; } = 0m;
+
+        /// <summary>"60,000.00 per year" or "350.00 per day".</summary>
+        public string RentDescription() => RentBases.IsStay(RentBasis)
+            ? $"{RentRate:N2} per {RentBases.Unit(RentBasis)}"
+            : $"{AnnualRent:N2} per year";
+
         // VAT treatment for this lease. Derived from the unit (falling back to the
         // property) when the lease is created, and overridable with a recorded reason.
         public string VatCategory { get; set; } = VatCategories.Standard;

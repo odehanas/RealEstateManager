@@ -46,6 +46,12 @@ namespace RealEstateManager.Data
                 entity.Property(x => x.RevaluationEliminatedDepreciation).HasPrecision(18, 2);
             });
 
+            modelBuilder.Entity<Lease>(entity =>
+            {
+                entity.Property(x => x.RentBasis).HasMaxLength(10);
+                entity.Property(x => x.RentRate).HasPrecision(18, 2);
+            });
+
             modelBuilder.Entity<FixedAssetRevaluation>(entity =>
             {
                 entity.Property(x => x.CostBefore).HasPrecision(18, 2);

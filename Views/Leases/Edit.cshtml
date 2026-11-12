@@ -77,6 +77,23 @@ else if (termsLocked)
         </div>
 
         <div class="col-md-3">
+            <label asp-for="RentBasis" class="form-label">@T["Rent Agreed As"]</label>
+            <select asp-for="RentBasis" class="form-select" id="RentBasis">
+                <option value="Annual">@T["Annual rent (tenancy)"]</option>
+                <option value="Monthly">@T["Monthly rate (short stay)"]</option>
+                <option value="Weekly">@T["Weekly rate (short stay)"]</option>
+                <option value="Daily">@T["Daily rate (short stay)"]</option>
+            </select>
+        </div>
+
+        <div class="col-md-3" data-rent="stay">
+            <label asp-for="RentRate" class="form-label" id="rentRateLabel">@T["Rate"]</label>
+            <input asp-for="RentRate" class="form-control" id="RentRate" />
+            <span asp-validation-for="RentRate" class="text-danger"></span>
+            <div class="form-text">@T["Billed for the days of the stay, both dates included."]</div>
+        </div>
+
+        <div class="col-md-3">
             <label asp-for="AnnualRent" class="form-label"></label>
             <input asp-for="AnnualRent" class="form-control" />
         </div>
@@ -102,8 +119,9 @@ else if (termsLocked)
                 <option value="ZeroRated">@T["Override — Zero rated (0%)"]</option>
             </select>
             <div class="form-text">
-                @T.Html("Changing this affects invoices generated <strong>from now on</strong>. Invoices already raised keep the treatment they were issued under.")
+                @T.Html("Changing this affects invoices generated <strong>from now on</strong>. Invoices already raised keep the treatment they were issued under. A residential lease of <strong>less than six months</strong> is a taxable supply, standard rated at 5%.")
             </div>
+            <div id="vatPreview" class="alert py-2 px-3 mt-2 mb-0 d-none" data-url="@Url.Action("VatPreview", "Leases")" data-lease-id="@ViewContext.RouteData.Values["id"]"></div>
         </div>
 
         <div class="col-md-6">
@@ -175,4 +193,80 @@ else if (termsLocked)
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var basis = document.getElementById('RentBasis');
+            var annual = document.getElementById('AnnualRent');
+            var billing = document.getElementById('BillingFrequencyMonths');
+            var rate = document.getElementById('RentRate');
+            if (!basis || !annual) { return; }
+            var labels = { Monthly: '@T["Rate per Month"]', Weekly: '@T["Rate per Week"]', Daily: '@T["Rate per Day"]' };
+
+            function apply() {
+                var stay = basis.value !== 'Annual';
+                document.querySelectorAll('[data-rent="stay"]').forEach(function (el) { el.style.display = stay ? '' : 'none'; });
+                [annual, billing].forEach(function (el) {
+                    var box = el && el.closest('[class*="col-"]');
+                    if (box) { box.style.display = stay ? 'none' : ''; }
+                });
+                if (stay) {
+                    // The yearly figure is worked out from the rate when the contract is saved.
+                    if (!annual.value) { annual.value = '0'; }
+                    document.getElementById('rentRateLabel').textContent = labels[basis.value];
+                } else if (!rate.value) {
+                    rate.value = '0';
+                }
+            }
+
+            basis.addEventListener('change', apply);
+            apply();
+        })();
+    </script>
+    <script>
+        (function () {
+            var box = document.getElementById('vatPreview');
+            var unit = document.getElementById('UnitId');
+            var start = document.getElementById('StartDate');
+            var end = document.getElementById('EndDate');
+            var rentBasis = document.getElementById('RentBasis');
+            var rentRate = document.getElementById('RentRate');
+            if (!box || !start || !end) { return; }
+            var unitId = function () { return unit ? unit.value : box.dataset.unitId; };
+
+            function refresh() {
+                if (!unitId() || !start.value || !end.value) { box.classList.add('d-none'); return; }
+                var url = box.dataset.url + '?unitId=' + encodeURIComponent(unitId()) +
+                    '&startDate=' + encodeURIComponent(start.value) + '&endDate=' + encodeURIComponent(end.value) +
+                    (box.dataset.leaseId ? '&leaseId=' + encodeURIComponent(box.dataset.leaseId) : '') +
+                    (rentBasis ? '&rentBasis=' + encodeURIComponent(rentBasis.value) + '&rentRate=' + encodeURIComponent(rentRate.value || '0') : '');
+                fetch(url, { credentials: 'same-origin' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        if (!d.ok) { box.classList.add('d-none'); return; }
+                        box.className = 'alert py-2 px-3 mt-2 mb-0 ' + (d.shortTerm ? 'alert-warning' : 'alert-secondary');
+                        box.textContent = '';
+                        var strong = document.createElement('strong');
+                        strong.textContent = d.label + '. ';
+                        box.appendChild(strong);
+                        box.appendChild(document.createTextNode(d.reason));
+                        if (d.stay) {
+                            var stayLine = document.createElement('div');
+                            stayLine.className = 'mt-1 fw-semibold';
+                            stayLine.textContent = d.stay;
+                            box.appendChild(stayLine);
+                        }
+                        if (d.warning) {
+                            var extra = document.createElement('div');
+                            extra.className = 'mt-1';
+                            extra.textContent = d.warning;
+                            box.appendChild(extra);
+                        }
+                    })
+                    .catch(function () { box.classList.add('d-none'); });
+            }
+
+            [unit, start, end, rentBasis, rentRate].forEach(function (el) { if (el) { el.addEventListener('change', refresh); } });
+            refresh();
+        })();
+    </script>
 }

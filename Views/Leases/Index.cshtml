@@ -52,8 +52,19 @@
                 <td>@lease.Tenant?.FullName</td>
                 <td>@lease.StartDate.ToString("dd/MM/yyyy")</td>
                 <td>@lease.EndDate.ToString("dd/MM/yyyy")</td>
-                <td class="text-end">@lease.AnnualRent.ToString("N2")</td>
-                <td>@T.Format("{0} month(s)", lease.BillingFrequencyMonths)</td>
+                @if (RealEstateManager.Domain.RentBases.IsStay(lease.RentBasis))
+                {
+                    <td class="text-end">
+                        @lease.RentRate.ToString("N2")
+                        <div class="small text-muted">@T["per " + RealEstateManager.Domain.RentBases.Unit(lease.RentBasis)]</div>
+                    </td>
+                    <td>@T["Short stay"]</td>
+                }
+                else
+                {
+                    <td class="text-end">@lease.AnnualRent.ToString("N2")</td>
+                    <td>@T.Format("{0} month(s)", lease.BillingFrequencyMonths)</td>
+                }
                 <td>
                     @switch (lease.Status)
                     {

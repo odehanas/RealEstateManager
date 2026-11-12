@@ -111,6 +111,8 @@ namespace RealEstateManager.Services
                     StartDate = x.StartDate,
                     EndDate = x.EndDate,
                     AnnualRent = x.AnnualRent,
+                    RentBasis = x.RentBasis,
+                    RentRate = x.RentRate,
                     BillingFrequencyMonths = x.BillingFrequencyMonths,
                     VatCategory = x.VatCategory,
                     SecurityDepositAmount = x.SecurityDepositAmount,

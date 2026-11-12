@@ -659,9 +659,12 @@ namespace RealEstateManager.Services.Assistant
                     var errors = await service.ValidateAsync(ctx.CompanyId, model);
                     if (errors.Count > 0) return AssistantProposal.Refused(string.Join(" ", errors.Select(e => e.Message)));
 
-                    var vat = await service.DerivedVatCategoryAsync(unit.Id, model.StartDate);
+                    var vatDecision = await service.DerivedVatDecisionAsync(unit.Id, model.StartDate, model.EndDate);
+                    var vat = vatDecision.Category;
                     var instalments = 12 / model.BillingFrequencyMonths;
                     var warnings = new List<string>();
+                    if (vatDecision.ShortTerm)
+                        warnings.Add(vatDecision.Warning ?? vatDecision.Reason);
                     if (unit.StandardAnnualRent > 0 && model.AnnualRent < unit.StandardAnnualRent)
                         warnings.Add($"The rent is below the unit's standard rent of {unit.StandardAnnualRent:N2} {ctx.Currency}.");
                     if (unit.Status != "Vacant")

@@ -8,6 +8,9 @@ namespace RealEstateManager.Services
     /// The UAE VAT treatment of a supply of real estate - a sale or a lease of a unit:
     ///
     ///   Commercial (standard rated unit or property)        standard rated, 5%
+    ///   Residential, let for LESS THAN SIX MONTHS            standard rated, 5%
+    ///     (daily, weekly, monthly: a short stay is a taxable
+    ///     supply, not the exempt letting of a home)
     ///   Residential, the unit's FIRST supply, made within    zero rated
     ///     three years of the building's completion
     ///     (or before completion, off plan)
@@ -27,23 +30,59 @@ namespace RealEstateManager.Services
             _db = db;
         }
 
-        public sealed record VatDecision(string Category, string Reason);
+        /// <param name="ShortTerm">A residential let of less than six months - a taxable supply.</param>
+        /// <param name="Warning">Something the person saving the contract must be told, e.g. that the owner may have to register.</param>
+        public sealed record VatDecision(string Category, string Reason, bool ShortTerm = false, string? Warning = null);
 
-        public async Task<VatDecision> DetermineAsync(int unitId, DateTime supplyDate, int? excludeLeaseId = null, int? excludeSaleId = null)
+        /// <summary>The length below which a residential let is a taxable supply.</summary>
+        public const int ShortTermMonths = 6;
+
+        /// <summary>A person making taxable supplies above this in twelve months must register for VAT.</summary>
+        public const decimal MandatoryRegistrationThreshold = 375_000m;
+
+        /// <summary>
+        /// Whether a contract runs for less than six months. 1 January to 30 June is six
+        /// months and is not short; 1 January to 29 June is.
+        /// </summary>
+        public static bool IsShortTerm(DateTime startDate, DateTime endDate) =>
+            endDate.Date < startDate.Date.AddMonths(ShortTermMonths).AddDays(-1);
+
+        /// <param name="leaseEndDate">For a lease: its end date, so a let of less than six months is recognised as taxable. Leave empty for a sale.</param>
+        public async Task<VatDecision> DetermineAsync(int unitId, DateTime supplyDate, int? excludeLeaseId = null, int? excludeSaleId = null, DateTime? leaseEndDate = null)
         {
             var unit = await _db.Units.AsNoTracking().Include(x => x.Property).FirstOrDefaultAsync(x => x.Id == unitId)
                        ?? throw new InvalidOperationException("The unit was not found.");
             var property = unit.Property!;
 
+            var category = VatDeterminationService.ResolveCategory(property, unit);
+            var shortTerm = leaseEndDate.HasValue && category != VatCategories.Standard && IsShortTerm(supplyDate, leaseEndDate.Value);
+
             // Invoiced in the name of an owner who is not registered for VAT: no VAT can
             // be charged on the rent at all.
             if (property.BillsInOwnerName && string.IsNullOrWhiteSpace(property.OwnerTrn))
+            {
+                // A short let is still a taxable supply of the owner's: it counts towards
+                // the turnover at which they must register.
+                if (shortTerm)
+                    return new VatDecision(VatCategories.Exempt,
+                        $"Short-term residential let (less than {ShortTermMonths} months) - a taxable supply, but it is invoiced in the owner's name and {property.OwnerName} is not registered for VAT, so no VAT is charged.",
+                        ShortTerm: true,
+                        Warning: $"Short-term rent is a taxable supply of {property.OwnerName}. It counts towards the AED {MandatoryRegistrationThreshold:N0} of taxable supplies in twelve months at which the owner must register for VAT; once registered, record the TRN on the property and VAT is charged at 5%.");
+
                 return new VatDecision(VatCategories.Exempt,
                     $"Invoiced in the owner's name, and {property.OwnerName} is not registered for VAT - no VAT is charged.");
+            }
 
-            var category = VatDeterminationService.ResolveCategory(property, unit);
             if (category == VatCategories.Standard)
                 return new VatDecision(VatCategories.Standard, "Commercial property - standard rated at 5%.");
+
+            // A stay of less than six months is taxed whatever the building: this comes
+            // before the zero rating of a first supply and the exemption of a home.
+            if (shortTerm)
+                return new VatDecision(VatCategories.Standard,
+                    $"Short-term residential let (less than {ShortTermMonths} months) - a taxable supply, standard rated at 5%.",
+                    ShortTerm: true);
+
             if (category == VatCategories.ZeroRated)
                 return new VatDecision(VatCategories.ZeroRated, "Zero rated as set on the unit or property.");
 

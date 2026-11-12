@@ -125,7 +125,7 @@ namespace RealEstateManager.Services
             await _db.SaveChangesAsync();
 
             var summary = $"{lease.Tenant?.FullName} - {lease.Unit?.Property?.Code}/{lease.Unit?.UnitNumber} - " +
-                          $"{lease.AnnualRent:N2} a year, {lease.StartDate:dd/MM/yyyy} to {lease.EndDate:dd/MM/yyyy}";
+                          $"{lease.RentDescription()}, {lease.StartDate:dd/MM/yyyy} to {lease.EndDate:dd/MM/yyyy}";
 
             await _approvals.SubmitAsync(lease.CompanyId, DocumentType, lease.Id, lease.ContractNumber, summary,
                 lease.CreatedByAppUserId, userId, userName);
@@ -173,10 +173,13 @@ namespace RealEstateManager.Services
             {
                 var isSystemAdmin = _http.HttpContext?.User.IsInRole("SystemAdmin") == true;
                 var authority = await _authority.GetAuthorityAsync(_currentCompany.UserId.Value, lease.CompanyId, isSystemAdmin);
-                if (authority == null || !authority.Covers(lease.AnnualRent))
+                // A short stay is judged on what it comes to, not on its rate taken over a year.
+                var isStay = RentBases.IsStay(lease.RentBasis);
+                var value = isStay ? StayRentCalculator.Total(lease) : lease.AnnualRent;
+                if (authority == null || !authority.Covers(value))
                 {
-                    var needed = await _authority.RequiredLevelAsync(lease.CompanyId, lease.AnnualRent);
-                    return $"This contract's annual rent of {lease.AnnualRent:N2} is above your approval authority " +
+                    var needed = await _authority.RequiredLevelAsync(lease.CompanyId, value);
+                    return $"This contract's {(isStay ? "rent" : "annual rent")} of {value:N2} is above your approval authority " +
                            $"({authority?.Describe() ?? "none"}). It needs {needed} level or above.";
                 }
             }

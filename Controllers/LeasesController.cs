@@ -159,6 +159,46 @@ namespace RealEstateManager.Controllers
             return await AfterSaveAsync(lease, nextStep);
         }
 
+        /// <summary>
+        /// The VAT treatment a contract for this unit and these dates would get, for the
+        /// contract form to show before saving - above all that a let of less than six
+        /// months is taxed.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> VatPreview(int unitId, DateTime? startDate, DateTime? endDate, int? leaseId, string? rentBasis, decimal? rentRate)
+        {
+            if (unitId <= 0 || !startDate.HasValue || !endDate.HasValue || endDate < startDate ||
+                !await _db.Units.AnyAsync(x => x.Id == unitId))
+                return Json(new { ok = false });
+
+            var decision = await _leaseCreation.DerivedVatDecisionAsync(unitId, startDate.Value, endDate.Value, leaseId);
+
+            // For a stay priced per day, week or month: what it comes to.
+            string? stay = null;
+            var basis = RentBases.Clean(rentBasis);
+            if (RentBases.IsStay(basis) && rentRate > 0m)
+            {
+                var periods = StayRentCalculator.Periods(basis, rentRate.Value, startDate.Value, endDate.Value);
+                var rent = periods.Sum(x => x.Amount);
+                var vat = periods.Sum(x => VatDeterminationService.CalculateTax(x.Amount, decision.Category));
+                var days = StayRentCalculator.Days(startDate.Value, endDate.Value);
+                stay = $"Stay of {days} day(s), both dates included, at {rentRate:N2} per {RentBases.Unit(basis)}: rent {rent:N2}" +
+                       (vat > 0m ? $" + VAT {vat:N2} = {rent + vat:N2}" : ", no VAT") +
+                       $", in {periods.Count} invoice(s).";
+            }
+
+            return Json(new
+            {
+                ok = true,
+                stay,
+                category = decision.Category,
+                label = VatCategories.Describe(decision.Category),
+                reason = decision.Reason,
+                shortTerm = decision.ShortTerm,
+                warning = decision.Warning
+            });
+        }
+
         private async Task LoadCreateListsAsync()
         {
             ViewBag.Units = await _db.Units
@@ -280,6 +320,8 @@ namespace RealEstateManager.Controllers
                 EndDate = lease.EndDate,
                 AnnualRent = lease.AnnualRent,
                 BillingFrequencyMonths = lease.BillingFrequencyMonths,
+                RentBasis = lease.RentBasis,
+                RentRate = lease.RentRate,
                 IsVatApplicable = lease.IsVatApplicable,
                 VatRate = lease.VatRate,
                 // Only show it as an override if a reason was recorded; otherwise the
@@ -344,9 +386,9 @@ namespace RealEstateManager.Controllers
                 ModelState.AddModelError(nameof(model.TenantId), "Selected tenant was not found.");
             }
 
-            if (model.StartDate >= model.EndDate)
+            foreach (var error in LeaseCreationService.ApplyRentBasis(model))
             {
-                ModelState.AddModelError(nameof(model.EndDate), "End date must be later than start date.");
+                ModelState.AddModelError(error.Field, error.Message);
             }
 
             if (model.BillingFrequencyMonths <= 0 || 12 % model.BillingFrequencyMonths != 0)
@@ -369,8 +411,10 @@ namespace RealEstateManager.Controllers
             lease.EndDate = model.EndDate;
             lease.AnnualRent = model.AnnualRent;
             lease.BillingFrequencyMonths = model.BillingFrequencyMonths;
+            lease.RentBasis = model.RentBasis;
+            lease.RentRate = model.RentRate;
 
-            var derivedCategory = (await _realEstateVat.DetermineAsync(unit!.Id, model.StartDate, excludeLeaseId: lease.Id)).Category;
+            var derivedCategory = (await _realEstateVat.DetermineAsync(unit!.Id, model.StartDate, excludeLeaseId: lease.Id, leaseEndDate: model.EndDate)).Category;
             var effectiveCategory = string.IsNullOrWhiteSpace(model.VatCategoryOverride)
                 ? derivedCategory
                 : model.VatCategoryOverride!;
