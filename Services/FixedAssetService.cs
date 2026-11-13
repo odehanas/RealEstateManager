@@ -5,7 +5,7 @@ using RealEstateManager.Models;
 
 namespace RealEstateManager.Services
 {
-    public class FixedAssetService
+    public partial class FixedAssetService
     {
         private readonly ApplicationDbContext _db;
 
@@ -19,21 +19,35 @@ namespace RealEstateManager.Services
             if (await _db.FixedAssets.AnyAsync(x => x.CompanyId == companyId && x.AssetCode == model.AssetCode.Trim()))
                 throw new InvalidOperationException("Asset code already exists.");
 
+            var method = DepreciationMethods.All.Contains(model.DepreciationMethod) ? model.DepreciationMethod : DepreciationMethods.StraightLine;
+            var programmeError = FixedAssetCategoryService.ValidateProgramme(method, model.UsefulLifeMonths, model.DecliningRatePercent);
+            if (programmeError != null)
+                throw new InvalidOperationException(programmeError);
+
+            // Tangible or intangible comes from the asset's category.
+            var categoryName = string.IsNullOrWhiteSpace(model.AssetCategory) ? "General" : model.AssetCategory.Trim();
+            var assetClass = await _db.FixedAssetCategories.AsNoTracking()
+                .Where(x => x.CompanyId == companyId && x.Name == categoryName)
+                .Select(x => x.AssetClass)
+                .FirstOrDefaultAsync() ?? FixedAssetClasses.Tangible;
+
             var asset = new FixedAsset
             {
                 CompanyId = companyId,
                 PropertyId = model.PropertyId,
                 AssetCode = model.AssetCode.Trim(),
                 Name = model.Name.Trim(),
-                AssetCategory = string.IsNullOrWhiteSpace(model.AssetCategory) ? "General" : model.AssetCategory.Trim(),
+                AssetCategory = categoryName,
+                AssetClass = assetClass,
                 AcquisitionDate = model.AcquisitionDate.Date,
                 InServiceDate = model.InServiceDate.Date,
                 Cost = 0m,
-                ResidualValue = model.ResidualValue,
-                UsefulLifeMonths = model.UsefulLifeMonths,
+                ResidualValue = method == DepreciationMethods.None ? 0m : model.ResidualValue,
+                UsefulLifeMonths = method == DepreciationMethods.None ? 0 : model.UsefulLifeMonths,
                 OpeningCost = model.OpeningCost,
                 OpeningAccumulatedDepreciation = model.OpeningAccumulatedDepreciation,
-                DepreciationMethod = "StraightLine",
+                DepreciationMethod = method,
+                DecliningRatePercent = method == DepreciationMethods.DecliningBalance ? model.DecliningRatePercent : null,
                 Status = "Draft",
                 AssetAccountId = model.AssetAccountId!.Value,
                 AccumulatedDepreciationAccountId = model.AccumulatedDepreciationAccountId!.Value,
@@ -90,23 +104,24 @@ namespace RealEstateManager.Services
                 _db.FixedAssetDepreciations.RemoveRange(existingSchedules);
             }
 
-            var depreciableAmount = asset.Cost - asset.ResidualValue;
-            var monthlyAmount = Math.Round(depreciableAmount / asset.UsefulLifeMonths, 2, MidpointRounding.AwayFromZero);
-            var accumulated = 0m;
-
-            for (var i = 0; i < asset.UsefulLifeMonths; i++)
+            // Land, work in progress, goodwill: carried at cost, nothing to schedule.
+            if (asset.DepreciationMethod == DepreciationMethods.None)
             {
+                await _db.SaveChangesAsync();
+                return;
+            }
+
+            var amounts = BuildMonthlyAmounts(asset);
+            for (var i = 0; i < amounts.Count; i++)
+            {
+                if (amounts[i] <= 0m)
+                    continue;
+
                 var periodDate = asset.InServiceDate.Date.AddMonths(i);
                 var depreciationDate = new DateTime(
                     periodDate.Year,
                     periodDate.Month,
                     DateTime.DaysInMonth(periodDate.Year, periodDate.Month));
-
-                var amount = i == asset.UsefulLifeMonths - 1
-                    ? depreciableAmount - accumulated
-                    : monthlyAmount;
-
-                accumulated += amount;
 
                 _db.FixedAssetDepreciations.Add(new FixedAssetDepreciation
                 {
@@ -114,7 +129,7 @@ namespace RealEstateManager.Services
                     PeriodYear = depreciationDate.Year,
                     PeriodMonth = depreciationDate.Month,
                     DepreciationDate = depreciationDate,
-                    Amount = amount,
+                    Amount = amounts[i],
                     Status = "Planned"
                 });
             }
@@ -413,20 +428,21 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.AssetCode)
                 .ToListAsync();
 
+            var revaluedIds = (await _db.FixedAssetRevaluations.AsNoTracking()
+                .Select(x => x.FixedAssetId)
+                .Distinct()
+                .ToListAsync()).ToHashSet();
+
             var rows = assets.Select(asset =>
             {
-                var postedAmount = asset.DepreciationSchedules
-                    .Where(x => x.Status == "Posted")
-                    .Sum(x => x.Amount);
+                var postedAmount = AccumulatedDepreciation(asset);
 
                 var pendingSchedules = asset.DepreciationSchedules
                     .Where(x => x.Status == "Planned" && x.DepreciationDate.Date <= postingDate.Date)
                     .ToList();
 
                 var netBookValue = asset.Cost - postedAmount;
-                var monthlyAmount = asset.UsefulLifeMonths > 0
-                    ? Math.Round((asset.Cost - asset.ResidualValue) / asset.UsefulLifeMonths, 2, MidpointRounding.AwayFromZero)
-                    : 0m;
+                var monthlyAmount = CurrentMonthlyAmount(asset);
 
                 return new FixedAssetRegisterItemViewModel
                 {
@@ -434,6 +450,10 @@ namespace RealEstateManager.Services
                     AssetCode = asset.AssetCode,
                     Name = asset.Name,
                     AssetCategory = asset.AssetCategory,
+                    AssetClass = asset.AssetClass,
+                    DepreciationMethod = asset.DepreciationMethod,
+                    DecliningRatePercent = asset.DecliningRatePercent,
+                    IsRevalued = asset.RevaluationEliminatedDepreciation != 0m || revaluedIds.Contains(asset.Id),
                     PropertyDisplay = asset.Property != null ? $"{asset.Property.Code} - {asset.Property.Name}" : "-",
                     AcquisitionDate = asset.AcquisitionDate,
                     InServiceDate = asset.InServiceDate,
@@ -450,8 +470,11 @@ namespace RealEstateManager.Services
                 };
             }).ToList();
 
+            var companyId = assets.Select(x => (int?)x.CompanyId).FirstOrDefault();
+
             return new FixedAssetRegisterViewModel
             {
+                Overdue = companyId.HasValue ? await GetOverdueAsync(companyId.Value, DateTime.Today) : new FixedAssetOverdueSummary(),
                 PostingDate = postingDate.Date,
                 TotalCost = rows.Sum(x => x.Cost),
                 TotalAccumulatedDepreciation = rows.Sum(x => x.AccumulatedDepreciation),
@@ -473,9 +496,7 @@ namespace RealEstateManager.Services
             if (asset == null)
                 throw new InvalidOperationException("Fixed asset was not found.");
 
-            var postedAmount = asset.DepreciationSchedules
-                .Where(x => x.Status == "Posted")
-                .Sum(x => x.Amount);
+            var postedAmount = AccumulatedDepreciation(asset);
 
             return new FixedAssetDepreciationViewModel
             {
@@ -484,9 +505,11 @@ namespace RealEstateManager.Services
                 AssetName = asset.Name,
                 Cost = asset.Cost,
                 ResidualValue = asset.ResidualValue,
-                MonthlyDepreciation = asset.UsefulLifeMonths > 0
-                    ? Math.Round((asset.Cost - asset.ResidualValue) / asset.UsefulLifeMonths, 2, MidpointRounding.AwayFromZero)
-                    : 0m,
+                MonthlyDepreciation = CurrentMonthlyAmount(asset),
+                AssetClass = asset.AssetClass,
+                DepreciationMethod = asset.DepreciationMethod,
+                DecliningRatePercent = asset.DecliningRatePercent,
+                UsefulLifeMonths = asset.UsefulLifeMonths,
                 PostedDepreciation = postedAmount,
                 NetBookValue = asset.Cost - postedAmount,
                 Schedules = asset.DepreciationSchedules
@@ -503,6 +526,80 @@ namespace RealEstateManager.Services
                     })
                     .ToList()
             };
+        }
+
+        /// <summary>
+        /// The monthly run that has not been done: schedule lines of months already ended
+        /// that are still unposted, month by month, and assets in service that have no
+        /// schedule at all. Shown on the register and on the dashboard.
+        /// </summary>
+        public async Task<FixedAssetOverdueSummary> GetOverdueAsync(int companyId, DateTime today)
+        {
+            var monthStart = new DateTime(today.Year, today.Month, 1);
+
+            var lines = await _db.FixedAssetDepreciations.AsNoTracking()
+                .Where(x => x.FixedAsset != null && x.FixedAsset.CompanyId == companyId &&
+                            x.FixedAsset.Status != "Disposed" &&
+                            x.Status == "Planned" && x.DepreciationDate < monthStart)
+                .Select(x => new { x.PeriodYear, x.PeriodMonth, x.FixedAssetId, x.Amount })
+                .ToListAsync();
+
+            var summary = new FixedAssetOverdueSummary { LastMonthEnd = monthStart.AddDays(-1) };
+
+            if (lines.Count > 0)
+            {
+                var periods = await _db.AccountingPeriods.AsNoTracking()
+                    .Where(x => x.CompanyId == companyId && x.StartDate < monthStart)
+                    .Select(x => new { x.StartDate, x.EndDate, x.IsClosed })
+                    .ToListAsync();
+
+                summary.Months = lines
+                    .GroupBy(x => new { x.PeriodYear, x.PeriodMonth })
+                    .OrderBy(g => g.Key.PeriodYear).ThenBy(g => g.Key.PeriodMonth)
+                    .Select(g =>
+                    {
+                        var monthEnd = new DateTime(g.Key.PeriodYear, g.Key.PeriodMonth, DateTime.DaysInMonth(g.Key.PeriodYear, g.Key.PeriodMonth));
+                        var period = periods.FirstOrDefault(p => p.StartDate <= monthEnd && p.EndDate >= monthEnd);
+                        return new FixedAssetOverdueMonth
+                        {
+                            Year = g.Key.PeriodYear,
+                            Month = g.Key.PeriodMonth,
+                            Lines = g.Count(),
+                            Assets = g.Select(x => x.FixedAssetId).Distinct().Count(),
+                            Amount = g.Sum(x => x.Amount),
+                            PeriodState = period == null ? "NoPeriod" : period.IsClosed ? "Closed" : "Open"
+                        };
+                    })
+                    .ToList();
+            }
+
+            summary.AssetsWithoutSchedule = await _db.FixedAssets.AsNoTracking()
+                .Where(x => x.CompanyId == companyId && x.Status == "Active" &&
+                            x.DepreciationMethod != DepreciationMethods.None &&
+                            x.InServiceDate < monthStart && !x.DepreciationSchedules.Any())
+                .OrderBy(x => x.AssetCode)
+                .Select(x => x.AssetCode)
+                .ToListAsync();
+
+            return summary;
+        }
+
+        /// <summary>The charge of the next month still to post; for a straight line asset, its fixed monthly amount.</summary>
+        private static decimal CurrentMonthlyAmount(FixedAsset asset)
+        {
+            if (asset.DepreciationMethod == DepreciationMethods.None || asset.UsefulLifeMonths <= 0)
+                return 0m;
+
+            if (asset.DepreciationMethod == DepreciationMethods.DecliningBalance || asset.DepreciationSchedules.Any(x => x.Status == "Planned"))
+            {
+                return asset.DepreciationSchedules
+                    .Where(x => x.Status == "Planned")
+                    .OrderBy(x => x.DepreciationDate)
+                    .Select(x => x.Amount)
+                    .FirstOrDefault();
+            }
+
+            return Math.Round((asset.Cost - asset.ResidualValue) / asset.UsefulLifeMonths, 2, MidpointRounding.AwayFromZero);
         }
 
         /// <param name="fromDate">
@@ -541,6 +638,10 @@ namespace RealEstateManager.Services
                 var expenseAccount = await GetAccountAsync(asset.DepreciationExpenseAccountId, "Depreciation Expense");
                 var accumulatedDepreciationAccount = await GetAccountAsync(asset.AccumulatedDepreciationAccountId, "Accumulated Depreciation");
 
+                // "depreciation" for a tangible asset, "amortization" for an intangible one.
+                var word = FixedAssetClasses.ChargeWord(asset.AssetClass);
+                var wordCapital = char.ToUpperInvariant(word[0]) + word[1..];
+
                 var lines = new List<JournalEntryLine>
                 {
                     new()
@@ -548,7 +649,7 @@ namespace RealEstateManager.Services
                         AccountId = expenseAccount.Id,
                         Debit = schedule.Amount,
                         Credit = 0m,
-                        Description = $"Depreciation expense for asset {asset.AssetCode}",
+                        Description = $"{wordCapital} expense for asset {asset.AssetCode}",
                         PropertyId = asset.PropertyId
                     },
                     new()
@@ -556,7 +657,7 @@ namespace RealEstateManager.Services
                         AccountId = accumulatedDepreciationAccount.Id,
                         Debit = 0m,
                         Credit = schedule.Amount,
-                        Description = $"Accumulated depreciation for asset {asset.AssetCode}",
+                        Description = $"Accumulated {word} for asset {asset.AssetCode}",
                         PropertyId = asset.PropertyId
                     }
                 };
@@ -564,7 +665,7 @@ namespace RealEstateManager.Services
                 var journalEntry = await CreateJournalEntryAsync(
                     asset.CompanyId,
                     schedule.DepreciationDate,
-                    $"Monthly depreciation for asset {asset.AssetCode}",
+                    $"Monthly {word} for asset {asset.AssetCode}",
                     "FixedAssetDepreciation",
                     schedule.Id,
                     lines,
@@ -600,6 +701,48 @@ namespace RealEstateManager.Services
             return result;
         }
 
+        /// <summary>
+        /// The charge of each month of the asset's life, adding up exactly to cost less
+        /// residual value. Straight line: the same every month. Declining balance: the
+        /// yearly rate on the carrying amount at the start of each year of life, spread
+        /// over that year's months, never below residual value - switching to a straight
+        /// line over the remaining life from the year that gives the higher charge, so
+        /// the asset is written down to its residual value without a jump at the end.
+        /// </summary>
+        public static List<decimal> BuildMonthlyAmounts(FixedAsset asset) =>
+            BuildMonthlyAmounts(asset.DepreciationMethod, asset.Cost, asset.ResidualValue, asset.UsefulLifeMonths, asset.DecliningRatePercent);
+
+        /// <summary>The same, from any starting amount - used when a revaluation re-schedules the remaining life.</summary>
+        public static List<decimal> BuildMonthlyAmounts(string method, decimal cost, decimal residualValue, int lifeMonths, decimal? decliningRatePercent)
+        {
+            var amounts = new List<decimal>();
+            var depreciable = cost - residualValue;
+            if (method == DepreciationMethods.None || lifeMonths <= 0 || depreciable <= 0m)
+                return amounts;
+
+            var accumulated = 0m;
+            var monthly = Math.Round(depreciable / lifeMonths, 2, MidpointRounding.AwayFromZero);
+
+            for (var i = 0; i < lifeMonths; i++)
+            {
+                if (method == DepreciationMethods.DecliningBalance && i % 12 == 0)
+                {
+                    var carrying = cost - accumulated;
+                    var byRate = carrying * (decliningRatePercent ?? 0m) / 100m / 12m;
+                    var byStraightLine = (depreciable - accumulated) / (lifeMonths - i);
+                    monthly = Math.Round(Math.Max(byRate, byStraightLine), 2, MidpointRounding.AwayFromZero);
+                }
+
+                var remaining = depreciable - accumulated;
+                var amount = i == lifeMonths - 1 ? remaining : Math.Min(monthly, remaining);
+
+                amounts.Add(amount);
+                accumulated += amount;
+            }
+
+            return amounts;
+        }
+
         private static void ValidateAssetForSchedule(FixedAsset asset)
         {
             if (asset.Status != "Active")
@@ -608,17 +751,21 @@ namespace RealEstateManager.Services
             if (asset.Cost <= 0m)
                 throw new InvalidOperationException("Fixed asset cost must be greater than zero.");
 
+            if (!DepreciationMethods.All.Contains(asset.DepreciationMethod))
+                throw new InvalidOperationException($"Depreciation method '{asset.DepreciationMethod}' is not supported.");
+
+            if (asset.DepreciationMethod == DepreciationMethods.None)
+                return;
+
             if (asset.ResidualValue < 0m)
                 throw new InvalidOperationException("Residual value cannot be negative.");
 
             if (asset.ResidualValue >= asset.Cost)
                 throw new InvalidOperationException("Residual value must be less than cost.");
 
-            if (asset.UsefulLifeMonths <= 0)
-                throw new InvalidOperationException("Useful life in months must be greater than zero.");
-
-            if (asset.DepreciationMethod != "StraightLine")
-                throw new InvalidOperationException("Only straight-line depreciation is supported in the current batch.");
+            var programmeError = FixedAssetCategoryService.ValidateProgramme(asset.DepreciationMethod, asset.UsefulLifeMonths, asset.DecliningRatePercent);
+            if (programmeError != null)
+                throw new InvalidOperationException(programmeError);
         }
 
         private async Task<Account> GetAccountAsync(int accountId, string mappingName)

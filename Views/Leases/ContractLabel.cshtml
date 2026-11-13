@@ -94,8 +94,8 @@
             <td>@Model.StartDate.ToString("dd/MM/yyyy") &ndash; @Model.EndDate.ToString("dd/MM/yyyy")</td>
         </tr>
         <tr>
-            <th>Annual Rent</th>
-            <td>@Model.AnnualRent.ToString("N2")</td>
+            <th>@(RealEstateManager.Domain.RentBases.IsStay(Model.RentBasis) ? "Rent" : "Annual Rent")</th>
+            <td>@(RealEstateManager.Domain.RentBases.IsStay(Model.RentBasis) ? Model.RentDescription() : Model.AnnualRent.ToString("N2"))</td>
         </tr>
         <tr>
             <th>Billing</th>

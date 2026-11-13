@@ -51,9 +51,9 @@ namespace RealEstateManager.Services
                 errors.Add(new(nameof(model.TenantId), "Selected tenant was not found."));
             }
 
-            if (model.StartDate >= model.EndDate)
+            foreach (var error in ApplyRentBasis(model))
             {
-                errors.Add(new(nameof(model.EndDate), "End date must be later than start date."));
+                errors.Add(error);
             }
 
             if (model.BillingFrequencyMonths <= 0 || 12 % model.BillingFrequencyMonths != 0)
@@ -80,18 +80,51 @@ namespace RealEstateManager.Services
             return errors;
         }
 
+        /// <summary>
+        /// Settles the rent fields for the basis chosen, and says what is wrong with them.
+        /// A stay priced per day, week or month is billed monthly from its first day, and
+        /// its AnnualRent becomes the rate as a yearly figure; it may be a single day.
+        /// </summary>
+        public static List<ValidationError> ApplyRentBasis(LeaseCreateViewModel model)
+        {
+            var errors = new List<ValidationError>();
+            model.RentBasis = RentBases.Clean(model.RentBasis);
+
+            if (RentBases.IsStay(model.RentBasis))
+            {
+                if (model.RentRate <= 0m)
+                    errors.Add(new(nameof(model.RentRate), $"Enter the rate per {RentBases.Unit(model.RentBasis)}."));
+                if (model.StartDate > model.EndDate)
+                    errors.Add(new(nameof(model.EndDate), "The last day of the stay cannot be before the first."));
+
+                model.AnnualRent = RentBases.Annualise(model.RentBasis, model.RentRate);
+                model.BillingFrequencyMonths = 1;
+                return errors;
+            }
+
+            model.RentRate = 0m;
+            if (model.StartDate >= model.EndDate)
+                errors.Add(new(nameof(model.EndDate), "End date must be later than start date."));
+            return errors;
+        }
+
         /// <summary>The VAT treatment the contract will get unless overridden.</summary>
-        public async Task<string> DerivedVatCategoryAsync(int unitId, DateTime startDate) =>
-            (await _realEstateVat.DetermineAsync(unitId, startDate)).Category;
+        public async Task<string> DerivedVatCategoryAsync(int unitId, DateTime startDate, DateTime? endDate = null) =>
+            (await DerivedVatDecisionAsync(unitId, startDate, endDate)).Category;
+
+        /// <summary>The same, with the reason - and whether the contract is a short-term let, which is taxed.</summary>
+        public Task<RealEstateVatService.VatDecision> DerivedVatDecisionAsync(int unitId, DateTime startDate, DateTime? endDate, int? excludeLeaseId = null) =>
+            _realEstateVat.DetermineAsync(unitId, startDate, excludeLeaseId: excludeLeaseId, leaseEndDate: endDate);
 
         /// <summary>Saves a validated draft contract with its generated contract number.</summary>
         public async Task<Lease> CreateDraftAsync(int companyId, int? createdByUserId, LeaseCreateViewModel model)
         {
-            // VAT treatment comes from the unit, falling back to the property, and for a new
-            // residential building from whether this is the unit's first supply (zero rated
-            // within three years of completion, exempt afterwards). It is never typed in
-            // freehand: an override must be a deliberate choice with a reason.
-            var derivedCategory = await DerivedVatCategoryAsync(model.UnitId, model.StartDate);
+            // VAT treatment comes from the unit, falling back to the property; a residential
+            // let of less than six months is taxed at 5%; and for a new residential building
+            // it depends on whether this is the unit's first supply (zero rated within three
+            // years of completion, exempt afterwards). It is never typed in freehand: an
+            // override must be a deliberate choice with a reason.
+            var derivedCategory = await DerivedVatCategoryAsync(model.UnitId, model.StartDate, model.EndDate);
             var effectiveCategory = string.IsNullOrWhiteSpace(model.VatCategoryOverride)
                 ? derivedCategory
                 : model.VatCategoryOverride!;
@@ -107,6 +140,8 @@ namespace RealEstateManager.Services
                 EndDate = model.EndDate,
                 AnnualRent = model.AnnualRent,
                 BillingFrequencyMonths = model.BillingFrequencyMonths,
+                RentBasis = RentBases.Clean(model.RentBasis),
+                RentRate = model.RentRate,
                 SecurityDepositAmount = model.SecurityDepositAmount,
                 // Every contract starts as a draft: no invoices, no effect on the unit.
                 // It takes effect when activated, or when approved if the company requires it.

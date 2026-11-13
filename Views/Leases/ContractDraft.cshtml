@@ -160,9 +160,19 @@
     <table class="parties">
         <tr><td>Commencement</td><td>@Model.StartDate.ToString("dd MMMM yyyy")</td></tr>
         <tr><td>Expiry</td><td>@Model.EndDate.ToString("dd MMMM yyyy")</td></tr>
-        <tr><td>Duration</td><td>@months month(s)</td></tr>
-        <tr><td>Annual rent</td><td><strong>@Model.AnnualRent.ToString("N2")</strong></td></tr>
-        <tr><td>Payable</td><td>Every @Model.BillingFrequencyMonths month(s), in advance</td></tr>
+        @if (RealEstateManager.Domain.RentBases.IsStay(Model.RentBasis))
+        {
+            <tr><td>Duration</td><td>@RealEstateManager.Services.StayRentCalculator.Days(Model.StartDate, Model.EndDate) day(s), both dates included</td></tr>
+            <tr><td>@RealEstateManager.Domain.RentBases.Label(Model.RentBasis)</td><td><strong>@Model.RentRate.ToString("N2")</strong> per @RealEstateManager.Domain.RentBases.Unit(Model.RentBasis)</td></tr>
+            <tr><td>Rent for the stay</td><td><strong>@RealEstateManager.Services.StayRentCalculator.Total(Model).ToString("N2")</strong></td></tr>
+            <tr><td>Payable</td><td>In advance, at the start of each month of the stay</td></tr>
+        }
+        else
+        {
+            <tr><td>Duration</td><td>@months month(s)</td></tr>
+            <tr><td>Annual rent</td><td><strong>@Model.AnnualRent.ToString("N2")</strong></td></tr>
+            <tr><td>Payable</td><td>Every @Model.BillingFrequencyMonths month(s), in advance</td></tr>
+        }
         <tr>
             <td>VAT treatment</td>
             <td>

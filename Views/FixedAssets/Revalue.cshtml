@@ -1,0 +1,187 @@
+@model RealEstateManager.Models.FixedAssetRevaluationViewModel
+@using RealEstateManager.Domain
+
+@{
+    ViewData["Title"] = T["Asset Revaluation"];
+    string N(decimal v) => v < 0 ? "(" + (-v).ToString("N2") + ")" : v.ToString("N2");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-1">@T["Asset Revaluation"]</h2>
+        <div class="text-muted">@Model.AssetCode - @Model.AssetName</div>
+        <div class="text-muted small">@Model.AssetCategory@(Model.PropertyDisplay != null ? " - " + Model.PropertyDisplay : "")</div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Depreciation" asp-route-id="@Model.FixedAssetId" class="btn btn-outline-secondary">@T["Depreciation"]</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back to Register"]</a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">@T[Model.History.Count > 0 ? "Revalued Amount" : "Cost"]</div>
+            <div class="fs-4 fw-bold">@Model.Cost.ToString("N2")</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">@T["Accumulated Depreciation"]</div>
+            <div class="fs-4 fw-bold">@Model.AccumulatedDepreciation.ToString("N2")</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">@T["Carrying Amount"]</div>
+            <div class="fs-4 fw-bold" id="carryingAmount" data-value="@Model.CarryingAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Model.CarryingAmount.ToString("N2")</div>
+        </div></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <div class="text-muted small">@T["Revaluation Surplus Held"]</div>
+            <div class="fs-4 fw-bold">@Model.SurplusBalance.ToString("N2")</div>
+        </div></div>
+    </div>
+</div>
+
+@if (!Model.CanRevalue)
+{
+    <div class="alert alert-warning">@T["Only an asset in use can be revalued. Capitalize this asset first."]</div>
+}
+else
+{
+    <form asp-action="Revalue" method="post" class="card shadow-sm mb-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="FixedAssetId" />
+        <div class="card-header bg-light">@T.Html("<strong>New Valuation</strong>")</div>
+        <div class="card-body row g-3">
+            <div class="col-12">
+                <div class="alert alert-info mb-0">
+                    @T["The depreciation accumulated to the date is cleared against the asset, the asset is restated to the fair value, and the months still to come are scheduled again from that value. Post the monthly depreciation up to the revaluation date first."]
+                    @if (Model.LastPostedDate.HasValue)
+                    {
+                        <span>@T.Format("Depreciation is posted up to {0}.", Model.LastPostedDate.Value.ToString("dd/MM/yyyy"))</span>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="RevaluationDate" class="form-label">@T["Revaluation Date"]</label>
+                <input asp-for="RevaluationDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="FairValue" class="form-label">@T["Fair Value"]</label>
+                <input asp-for="FairValue" type="number" step="0.01" min="0" class="form-control" id="fairValue" />
+                <div class="form-text" id="differenceText"></div>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Treatment" class="form-label">@T["Change in Value Goes To"]</label>
+                <select asp-for="Treatment" class="form-select">
+                    @foreach (var treatment in RevaluationTreatments.All)
+                    {
+                        <option value="@treatment">@T[RevaluationTreatments.Label(treatment)]</option>
+                    }
+                </select>
+                <div class="form-text">@T["Revaluation surplus: property the company uses itself (IAS 16) - an increase goes to equity, a decrease beyond the asset's surplus is a loss. Profit or loss: investment property on the fair value model (IAS 40)."]</div>
+            </div>
+
+            @if (Model.IsDepreciated)
+            {
+                <div class="col-md-3">
+                    <label asp-for="RemainingLifeMonths" class="form-label">@T["Remaining Useful Life (Months)"]</label>
+                    <input asp-for="RemainingLifeMonths" type="number" min="1" max="1200" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="ResidualValue" class="form-label">@T["Residual Value"]</label>
+                    <input asp-for="ResidualValue" type="number" step="0.01" min="0" class="form-control" />
+                </div>
+            }
+            else
+            {
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="text-muted">@T["This asset is not depreciated, so it simply stands at the fair value until the next valuation."]</div>
+                </div>
+            }
+
+            <div class="col-md-6">
+                <label asp-for="ValuerName" class="form-label">@T["Valuer"]</label>
+                <input asp-for="ValuerName" class="form-control" maxlength="200" />
+            </div>
+            <div class="col-12">
+                <label asp-for="Notes" class="form-label">@T["Notes"]</label>
+                <textarea asp-for="Notes" class="form-control" rows="2" maxlength="1000"></textarea>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-dark" onclick="return confirm('@T["Post this revaluation to the ledger?"]');">@T["Post Revaluation"]</button>
+            </div>
+        </div>
+    </form>
+}
+
+<h5>@T["Revaluation History"]</h5>
+<table class="table table-bordered table-striped align-middle">
+    <thead>
+        <tr>
+            <th>@T["Date"]</th>
+            <th class="text-end">@T["Carrying Amount Before"]</th>
+            <th class="text-end">@T["Fair Value"]</th>
+            <th class="text-end">@T["Change"]</th>
+            <th class="text-end">@T["To Surplus (Equity)"]</th>
+            <th class="text-end">@T["To Profit or Loss"]</th>
+            <th>@T["Valuer"]</th>
+            <th>@T["Journal Entry"]</th>
+            <th>@T["By"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.History.Count == 0)
+        {
+            <tr><td colspan="9" class="text-center text-muted py-4">@T["This asset has not been revalued: it is carried at cost."]</td></tr>
+        }
+        @foreach (var item in Model.History)
+        {
+            <tr>
+                <td>@item.RevaluationDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-end">@N(item.CarryingAmountBefore)</td>
+                <td class="text-end">@N(item.FairValue)</td>
+                <td class="text-end">@N(item.Difference)</td>
+                <td class="text-end">@N(item.SurplusAmount)</td>
+                <td class="text-end">@N(item.ProfitOrLossAmount)</td>
+                <td>@(item.ValuerName ?? "-")</td>
+                <td>@(item.JournalEntryNumber ?? "-")</td>
+                <td>@(item.CreatedByName ?? "-")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        (function () {
+            var input = document.getElementById('fairValue');
+            var carrying = document.getElementById('carryingAmount');
+            var text = document.getElementById('differenceText');
+            if (!input || !text) { return; }
+            var increase = '@T["Increase of"]', decrease = '@T["Decrease of"]';
+            function show() {
+                var value = parseFloat(input.value || '0');
+                if (!(value > 0)) { text.textContent = ''; return; }
+                var difference = value - parseFloat(carrying.dataset.value);
+                text.textContent = (difference >= 0 ? increase : decrease) + ' ' +
+                    Math.abs(difference).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            input.addEventListener('input', show);
+            show();
+        })();
+    </script>
+}

@@ -13,6 +13,10 @@
         public decimal AnnualRent { get; set; }
         public int BillingFrequencyMonths { get; set; } = 1;
 
+        /// <summary>Annual, or Monthly / Weekly / Daily for a short stay priced at <see cref="RentRate"/>.</summary>
+        public string RentBasis { get; set; } = RealEstateManager.Domain.RentBases.Annual;
+        public decimal RentRate { get; set; }
+
         // VAT is derived from the unit / property. These two exist only to record a
         // deliberate exception, and the reason is mandatory when one is used.
         public string? VatCategoryOverride { get; set; }

@@ -1012,6 +1012,9 @@ namespace RealEstateManager.Services
         /// <summary>Total rent over the whole term of the lease (BTAE-05).</summary>
         public static decimal ContractValue(Lease lease)
         {
+            if (RentBases.IsStay(lease.RentBasis))
+                return StayRentCalculator.Total(lease);
+
             var months = (lease.EndDate.Year - lease.StartDate.Year) * 12 + lease.EndDate.Month - lease.StartDate.Month;
             if (lease.EndDate.Day >= lease.StartDate.Day - 1) months++;
             months = Math.Max(1, months);

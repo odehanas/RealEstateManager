@@ -310,6 +310,7 @@ namespace RealEstateManager.Services
                 new() { CompanyId = company.Id, Code = "32100", Name = "Retained Earnings - Prior Years", AccountType = "Equity", ReportingGroup = "Equity", ParentAccountId = accountsByCode["30000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 32100 },
                 new() { CompanyId = company.Id, Code = "33100", Name = "Current Year Profit or Loss", AccountType = "Equity", ReportingGroup = "Equity", ParentAccountId = accountsByCode["30000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 33100 },
                 new() { CompanyId = company.Id, Code = "34100", Name = "Owner's Current Account", AccountType = "Equity", ReportingGroup = "Equity", ParentAccountId = accountsByCode["30000"].Id, IsGroup = false, IsPostable = true, IsActive = true, IsOwnerAccount = true, SortOrder = 34100 },
+                new() { CompanyId = company.Id, Code = "35100", Name = "Revaluation Surplus", AccountType = "Equity", ReportingGroup = "Equity", ParentAccountId = accountsByCode["30000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 35100 },
                 // Opening balance suspense. Its balance is DERIVED as the contra of every
                 // other opening balance, so it is deliberately not postable: journals must
                 // never touch it, and its own OpeningBalance field is ignored.
@@ -319,6 +320,8 @@ namespace RealEstateManager.Services
                 new() { CompanyId = company.Id, Code = "41200", Name = "Revenue from Sale of Properties", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 41200 },
                 new() { CompanyId = company.Id, Code = "42100", Name = "Management Fee Revenue", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 42100 },
                 new() { CompanyId = company.Id, Code = "43100", Name = "Other Income", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 43100 },
+
+                new() { CompanyId = company.Id, Code = "44100", Name = "Gain on Revaluation of Property and Assets", AccountType = "Revenue", ReportingGroup = "Revenue", ParentAccountId = accountsByCode["40000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 44100 },
 
                 new() { CompanyId = company.Id, Code = "51100", Name = "Property Operating Expenses", AccountType = "Expense", ReportingGroup = "DirectExpense", ParentAccountId = accountsByCode["50000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 51100 },
                 new() { CompanyId = company.Id, Code = "51200", Name = "Cost of Properties Sold", AccountType = "Expense", ReportingGroup = "DirectExpense", ParentAccountId = accountsByCode["50000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 51200 },
@@ -331,7 +334,8 @@ namespace RealEstateManager.Services
                 new() { CompanyId = company.Id, Code = "64100", Name = "Basic Salaries", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 64100 },
                 new() { CompanyId = company.Id, Code = "64200", Name = "Staff Allowances", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 64200 },
                 new() { CompanyId = company.Id, Code = "64300", Name = "Overtime and Bonuses", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 64300 },
-                new() { CompanyId = company.Id, Code = "64400", Name = "End of Service Benefits Expense", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 64400 }
+                new() { CompanyId = company.Id, Code = "64400", Name = "End of Service Benefits Expense", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 64400 },
+                new() { CompanyId = company.Id, Code = "65100", Name = "Loss on Revaluation of Property and Assets", AccountType = "Expense", ReportingGroup = "GeneralExpense", ParentAccountId = accountsByCode["60000"].Id, IsGroup = false, IsPostable = true, IsActive = true, SortOrder = 65100 }
             };
 
             var missingChildAccounts = childAccounts

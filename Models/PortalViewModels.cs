@@ -80,6 +80,9 @@ namespace RealEstateManager.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal AnnualRent { get; set; }
+        public string RentBasis { get; set; } = RealEstateManager.Domain.RentBases.Annual;
+        public decimal RentRate { get; set; }
+        public bool IsStay => RealEstateManager.Domain.RentBases.IsStay(RentBasis);
         public int BillingFrequencyMonths { get; set; }
         public string VatCategory { get; set; } = string.Empty;
         public decimal SecurityDepositAmount { get; set; }

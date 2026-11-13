@@ -1,0 +1,114 @@
+@model RealEstateManager.Domain.FixedAssetCategory
+@using RealEstateManager.Domain
+
+@{
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? T["Add Category"] : T["Edit Category"];
+    var accounts = ViewBag.Accounts as List<Account> ?? new();
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (ViewBag.Error is string error)
+{
+    <div class="alert alert-danger">@T.Message(error)</div>
+}
+
+<form asp-action="Save" method="post" style="max-width:960px">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">@T.Html("<strong>Category</strong>")</div>
+        <div class="card-body row g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="name">@T["Category Name"]</label>
+                <input id="name" name="name" value="@Model.Name" class="form-control" maxlength="@FixedAssetCategory.MaxNameLength" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="assetClass">@T["Type"]</label>
+                <select id="assetClass" name="assetClass" class="form-select">
+                    <option value="@FixedAssetClasses.Tangible" selected="@(Model.AssetClass != FixedAssetClasses.Intangible)">@T["Tangible - depreciated"]</option>
+                    <option value="@FixedAssetClasses.Intangible" selected="@(Model.AssetClass == FixedAssetClasses.Intangible)">@T["Intangible - amortized"]</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">@T.Html("<strong>Depreciation / Amortization Programme</strong>")</div>
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label class="form-label" for="depreciationMethod">@T["Method"]</label>
+                <select id="depreciationMethod" name="depreciationMethod" class="form-select">
+                    @foreach (var method in DepreciationMethods.All)
+                    {
+                        <option value="@method" selected="@(Model.DepreciationMethod == method)">@T[DepreciationMethods.Label(method)]</option>
+                    }
+                </select>
+                <div class="form-text">@T["Not depreciated is for land, work in progress and goodwill."]</div>
+            </div>
+            <div class="col-md-3" data-needs="charge">
+                <label class="form-label" for="usefulLifeMonths">@T["Useful Life (Months)"]</label>
+                <input id="usefulLifeMonths" name="usefulLifeMonths" type="number" min="0" max="1200" value="@Model.UsefulLifeMonths" class="form-control" />
+            </div>
+            <div class="col-md-3" data-needs="declining">
+                <label class="form-label" for="decliningRatePercent">@T["Rate per Year (%)"]</label>
+                <input id="decliningRatePercent" name="decliningRatePercent" type="number" step="0.01" min="0" max="100" value="@(Model.DecliningRatePercent?.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture))" class="form-control" />
+            </div>
+            <div class="col-md-2" data-needs="charge">
+                <label class="form-label" for="residualPercent">@T["Residual %"]</label>
+                <input id="residualPercent" name="residualPercent" type="number" step="0.01" min="0" max="99.99" value="@Model.ResidualPercent.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture)" class="form-control" />
+            </div>
+            <div class="col-12" data-needs="declining">
+                <div class="form-text">@T["Declining balance: each year of the asset's life is charged the yearly rate on its carrying amount at the start of that year, spread evenly over the months. From the year a straight line over the remaining life would charge more, the straight line is used, so the asset reaches its residual value at the end of its useful life."]</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">@T.Html("<strong>Account Mapping</strong>")</div>
+        <div class="card-body row g-3">
+            <div class="col-12">
+                <div class="form-text mt-0">@T["Leave an account empty to use the company's default from Account Mapping Setup."]</div>
+            </div>
+            @foreach (var (field, label, value) in new[]
+            {
+                ("assetAccountId", "Asset Account", Model.AssetAccountId),
+                ("accumulatedDepreciationAccountId", "Accumulated Depreciation Account", Model.AccumulatedDepreciationAccountId),
+                ("depreciationExpenseAccountId", "Depreciation Expense Account", Model.DepreciationExpenseAccountId)
+            })
+            {
+                <div class="col-md-4">
+                    <label class="form-label" for="@field">@T[label]</label>
+                    <select id="@field" name="@field" class="form-select">
+                        <option value="">@T["Company default"]</option>
+                        @foreach (var account in accounts)
+                        {
+                            <option value="@account.Id" selected="@(value == account.Id)">@account.Code - @account.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">@T["Save"]</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            var method = document.getElementById('depreciationMethod');
+            function apply() {
+                var charged = method.value !== '@DepreciationMethods.None';
+                var declining = method.value === '@DepreciationMethods.DecliningBalance';
+                document.querySelectorAll('[data-needs="charge"]').forEach(function (el) { el.style.display = charged ? '' : 'none'; });
+                document.querySelectorAll('[data-needs="declining"]').forEach(function (el) { el.style.display = declining ? '' : 'none'; });
+            }
+            method.addEventListener('change', apply);
+            apply();
+        })();
+    </script>
+}

@@ -48,8 +48,8 @@ else
                         <div class="fw-semibold">@contract.StartDate.ToString("dd/MM/yyyy") &ndash; @contract.EndDate.ToString("dd/MM/yyyy")</div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="text-muted">@T["Annual rent"]</div>
-                        <div class="fw-semibold">@contract.AnnualRent.ToString("N2")</div>
+                        <div class="text-muted">@T[RealEstateManager.Domain.RentBases.Label(contract.RentBasis)]</div>
+                        <div class="fw-semibold">@((contract.IsStay ? contract.RentRate : contract.AnnualRent).ToString("N2"))</div>
                     </div>
                     <div class="col-6 col-md-3">
                         <div class="text-muted">@T["Billing"]</div>

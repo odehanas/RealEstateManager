@@ -50,8 +50,16 @@ else
                         <tr><th>@T["Property"]</th><td>@lease.Unit?.Property?.Name (@lease.Unit?.Property?.OwnershipType)</td></tr>
                         <tr><th>@T["Unit"]</th><td>@lease.Unit?.UnitNumber</td></tr>
                         <tr><th>@T["Period"]</th><td>@lease.StartDate.ToString("dd/MM/yyyy") to @lease.EndDate.ToString("dd/MM/yyyy")</td></tr>
-                        <tr><th>@T["Annual rent"]</th><td>@lease.AnnualRent.ToString("N2")</td></tr>
-                        <tr><th>@T["Billing"]</th><td>@T.Format("Every {0} month(s)", lease.BillingFrequencyMonths)</td></tr>
+                        @if (RealEstateManager.Domain.RentBases.IsStay(lease.RentBasis))
+                        {
+                            <tr><th>@T[RealEstateManager.Domain.RentBases.Label(lease.RentBasis)]</th><td>@lease.RentRate.ToString("N2")</td></tr>
+                            <tr><th>@T["Rent for the stay"]</th><td>@RealEstateManager.Services.StayRentCalculator.Total(lease).ToString("N2") (@T.Format("{0} day(s)", RealEstateManager.Services.StayRentCalculator.Days(lease.StartDate, lease.EndDate)))</td></tr>
+                        }
+                        else
+                        {
+                            <tr><th>@T["Annual rent"]</th><td>@lease.AnnualRent.ToString("N2")</td></tr>
+                            <tr><th>@T["Billing"]</th><td>@T.Format("Every {0} month(s)", lease.BillingFrequencyMonths)</td></tr>
+                        }
                         <tr>
                             <th>@T["VAT"]</th>
                             <td>

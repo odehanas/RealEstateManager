@@ -264,6 +264,7 @@ namespace RealEstateManager.Services
             var scheduledAssetIds = schedules.Select(x => x.FixedAssetId).Distinct().ToList();
             var unscheduledAssets = await _db.FixedAssets.AsNoTracking()
                 .Where(x => x.CompanyId == companyId && x.Status == "Active" && x.InServiceDate <= end &&
+                            x.DepreciationMethod != DepreciationMethods.None &&
                             !scheduledAssetIds.Contains(x.Id) &&
                             (!x.DepreciationSchedules.Any() || x.DepreciationSchedules.Any(d => d.DepreciationDate > end)))
                 .Select(x => x.AssetCode)

@@ -29,19 +29,40 @@ USAGE
     python Tools/VideoCapture/record_videos.py --show           # watch it work
     python Tools/VideoCapture/record_videos.py --publish-only   # re-publish existing recordings
 
+WITH A VOICE-OVER
+    python Tools/VideoCapture/record_videos.py --only 01 --voice en-US-BrianNeural --no-publish
+
+    --voice names a text-to-speech voice. Every caption and title card is then spoken, each
+    step stays on screen for as long as its line takes to say, and the result is saved as
+    output/<number>-<key>-voice.webm with the sound mixed in. Spoken lines are kept in
+    output/voice, so a second run does not fetch them again (and has no gaps while it does).
+    --voice-rate "-5%" slows the voice a little; "+10%" quickens it.
+    Leave out --no-publish to put the narrated videos into the help, or publish ones
+    already recorded with:  --publish-only --voice en-US-BrianNeural
+    Other voices: en-US-GuyNeural, en-GB-RyanNeural, en-US-AvaNeural, ar-AE-HamdanNeural, ar-AE-FatimaNeural
+    (the captions are English; an Arabic voice needs Arabic captions).
+
+    The voice comes from Microsoft Edge's read-aloud service through the edge-tts package:
+    no account or key, good for trying it out. Check its terms before publishing videos made
+    with it, or switch speak() to a paid service (Azure AI Speech, ElevenLabs).
+
 Requires:  pip install playwright   and Google Chrome or Microsoft Edge installed.
            python -m playwright install ffmpeg   (Playwright's own video encoder)
+           for --voice:  pip install edge-tts imageio-ffmpeg
 """
 import argparse
 import asyncio
 import base64
 import datetime as dt
+import hashlib
 import json
 import pathlib
 import re
 import shutil
+import subprocess
 import sys
 import tempfile
+import time
 import urllib.parse
 
 from playwright.async_api import async_playwright, Locator, Page
@@ -150,13 +171,77 @@ OVERLAY_JS = r"""
 """
 
 
+class Narrator:
+    """The voice-over of one video: turns each line into speech, remembers when it was
+    said, and at the end mixes the lines into the recording."""
+
+    def __init__(self, voice: str, rate: str):
+        import edge_tts            # only needed with --voice
+        import imageio_ffmpeg      # a full ffmpeg; Playwright's own cannot encode sound
+        self.tts = edge_tts
+        self.ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        self.voice = voice
+        self.rate = rate
+        self.folder = OUT_DIR / "voice"
+        self.folder.mkdir(parents=True, exist_ok=True)
+        self.started = time.monotonic()
+        self.cues = []             # (seconds into the video, sound file)
+
+    def start(self):
+        """Call when the recording starts: cue times are counted from here."""
+        self.started = time.monotonic()
+        self.cues = []
+
+    @staticmethod
+    def spoken(text: str) -> str:
+        # "...and your password." is said without the dots.
+        return re.sub(r"\s+", " ", text.replace("...", " ")).strip()
+
+    async def line(self, text: str):
+        """The sound file of a line and its length in seconds, fetched once and kept."""
+        words = self.spoken(text)
+        name = hashlib.sha1(f"{self.voice}|{self.rate}|{words}".encode("utf-8")).hexdigest()[:16]
+        sound = self.folder / f"{name}.mp3"
+        if not sound.exists() or sound.stat().st_size == 0:
+            await self.tts.Communicate(words, self.voice, rate=self.rate).save(str(sound))
+        probe = subprocess.run([self.ffmpeg, "-hide_banner", "-i", str(sound)],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        found = re.search(r"Duration: (\d+):(\d+):(\d+\.\d+)", probe.stderr)
+        if not found:
+            raise RuntimeError(f"Could not read the length of the spoken line: {words}")
+        hours, minutes, seconds = found.groups()
+        return sound, int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+
+    def cue(self, sound: pathlib.Path):
+        self.cues.append((time.monotonic() - self.started, sound))
+
+    def mix(self, video: pathlib.Path, target: pathlib.Path):
+        """Writes the recording again with every line laid in at its moment."""
+        if not self.cues:
+            shutil.copyfile(video, target)
+            return
+        command = [self.ffmpeg, "-y", "-hide_banner", "-loglevel", "error", "-i", str(video)]
+        parts, names = [], []
+        for index, (at, sound) in enumerate(self.cues, start=1):
+            command += ["-i", str(sound)]
+            parts.append(f"[{index}:a]adelay={int(at * 1000)}:all=1[a{index}]")
+            names.append(f"[a{index}]")
+        parts.append(f"{''.join(names)}amix=inputs={len(names)}:normalize=0[voice]")
+        command += ["-filter_complex", ";".join(parts), "-map", "0:v", "-map", "[voice]",
+                    "-c:v", "copy", "-c:a", "libopus", "-b:a", "96k", str(target)]
+        done = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if done.returncode != 0:
+            raise RuntimeError("Mixing the voice into the video failed:\n" + done.stderr[-800:])
+
+
 class Director:
     """Plays one video: moves the pointer, shows captions and does the clicking."""
 
-    def __init__(self, page: Page, site: str, pace: float):
+    def __init__(self, page: Page, site: str, pace: float, narrator: "Narrator | None" = None):
         self.page = page
         self.site = site
         self.pace = pace
+        self.narrator = narrator
 
     async def js(self, script: str, arg=None):
         """Runs a snippet in the page. A page that is reloading (after a form submits)
@@ -178,14 +263,32 @@ class Director:
         return max(2.2, len(text.split()) / 3.0)
 
     # ---- the layers ----------------------------------------------------------
+    async def speak(self, text: str, at_least: float):
+        """Says a line and waits until it has been said - or, with no voice-over, waits
+        the time it takes to read."""
+        if not self.narrator:
+            await self.pause(at_least)
+            return
+        self.narrator.cue(self.pending_sound)
+        # The line's own length plus a breath; never scaled by --pace, or the next
+        # line would start over this one.
+        await self.page.wait_for_timeout(int((self.pending_seconds + 0.45) * 1000))
+
+    async def prepare_line(self, text: str):
+        """Fetches the line before anything is shown, so the words and the voice start together."""
+        if self.narrator:
+            self.pending_sound, self.pending_seconds = await self.narrator.line(text)
+
     async def card(self, number: str, title: str, subtitle: str, seconds: float = 3.8):
+        await self.prepare_line(f"{title}. {subtitle}")
         await self.js("([n,t,s]) => __demo.card(n,t,s)", [number, title, subtitle])
-        await self.pause(seconds)
+        await self.speak(f"{title}. {subtitle}", seconds)
         await self.js("() => __demo.hideCard()")
 
     async def say(self, text: str, step: str | None = None, seconds: float | None = None):
+        await self.prepare_line(text)
         await self.js("([t,s]) => __demo.caption(t,s)", [text, step])
-        await self.pause(seconds if seconds is not None else self.reading_time(text))
+        await self.speak(text, seconds if seconds is not None else self.reading_time(text))
 
     async def clear_caption(self):
         await self.js("() => __demo.caption(null)")
@@ -270,10 +373,23 @@ class Director:
         """Clicks the submit button of the form posting to the given address."""
         await self.click(f"form[action*='{action}'] button[type=submit]", text, step)
 
+    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 1.5):
+        """Opens a group of the side menu (sb-masterData, sb-operations...), shows it
+        for a moment and closes it again."""
+        toggle = f"#appSidebar [data-bs-target='#{name}']"
+        await self.click(toggle, text, step, navigates=False)
+        await self.pause(seconds)
+        await self.loc(toggle).click()
+        await self.pause(0.5)
+
     async def menu(self, dropdown_id: str, href: str, text: str | None = None, step: str | None = None):
-        """Opens a menu at the top, then the item in it."""
-        await self.click(f"#{dropdown_id}", navigates=False)
-        await self.click(f".dropdown-menu.show a[href='{href}']", text, step)
+        """Opens the item with this address in the side menu, opening its group first.
+        (dropdown_id is the old top menu's name; the item is found by its address.)"""
+        link = self.page.locator(f"#appSidebar a.sidebar-link[href='{href}']").first
+        group = await link.evaluate("e => { const g = e.closest('ul.collapse'); return g ? g.id : null; }")
+        if group and not await self.page.locator(f"#{group}").evaluate("e => e.classList.contains('show')"):
+            await self.click(f"#appSidebar [data-bs-target='#{group}']", navigates=False)
+        await self.click(link, text, step)
 
     async def scroll(self, pixels: int, seconds: float = 1.2):
         await self.page.mouse.wheel(0, pixels)
@@ -325,18 +441,11 @@ async def v01_sign_in(d: Director):
                   "The current accounting period, and how many leases are active.")
     await d.scroll(600, 2.5)
     await d.scroll(-600, 1)
-    await d.click("#masterDataDropdown", "Master Data holds properties, units, tenants and vendors.", "Menus", navigates=False)
-    await d.pause(1.5)
-    await d.page.keyboard.press("Escape")
-    await d.click("#operationsDropdown", "Operations is the daily work: leases, invoices, receipts, cheques, bills and petty cash.", "Menus", navigates=False)
-    await d.pause(1.5)
-    await d.page.keyboard.press("Escape")
-    await d.click("#reportingDropdown", "Reporting has the financial statements and the property reports.", "Menus", navigates=False)
-    await d.pause(1.5)
-    await d.page.keyboard.press("Escape")
-    await d.click("#setupDropdown", "And this menu holds accounting set-up, month-end, subscription and help.", "Menus", navigates=False)
-    await d.pause(1.5)
-    await d.page.keyboard.press("Escape")
+    await d.group("sb-masterData", "The menu is on the left. Master Data holds properties, units, tenants and leases.", "Menus")
+    await d.group("sb-operations", "Operations is the daily work: invoices, receipts, cheques, bills and petty cash.", "Menus")
+    await d.group("sb-controls", "Controls has the approvals and the management dashboards.", "Menus")
+    await d.group("sb-reporting", "Reporting has the financial statements and the property reports.", "Menus")
+    await d.group("sb-setup", "And System Setup holds accounting set-up, month-end closing, subscription and help.", "Menus")
     await d.clear_caption()
     await d.card("Done", "You can now find your way around", "Next: adding a property, a unit and a tenant.", 3)
 
@@ -509,7 +618,9 @@ async def v06_supplier(d: Director):
     await d.menu("operationsDropdown", "/VendorBills", "Open Operations, then Vendor Bills.", "Step 1")
     await d.click("a[href='/VendorBills/Create']", "Click Create.", "Step 1")
     await d.fill("#vendorSelect", "CoolTech", "Choose the supplier. The system knows whether it can charge VAT.", "Step 2")
-    await d.fill("#VendorReference", f"CT-{TODAY:%m%d}-77", "Their invoice number.")
+    # The time keeps the number new when the video is recorded again the same day.
+    reference = f"CT-{TODAY:%m%d}-{dt.datetime.now():%H%M}"
+    await d.fill("#VendorReference", reference, "Their invoice number.")
     await d.fill("#BillDate", iso(TODAY), "The bill date...", "Step 2")
     await d.fill("#AccountingDate", iso(TODAY))
     await d.fill("#DueDate", iso(TODAY + dt.timedelta(days=30)), "...and when it is due.")
@@ -530,15 +641,14 @@ async def v06_supplier(d: Director):
 
     await d.menu("operationsDropdown", "/VendorPayments", "Now pay it. Open Vendor Payments.", "Step 5")
     await d.click("a[href='/VendorPayments/Create']", "Click Create.", "Step 5")
-    newest = await d.page.locator("#VendorBillId").evaluate(
-        """e => { const o = [...e.options].filter(o => o.text.includes('CoolTech'))
-                    .sort((a, b) => Number(b.value) - Number(a.value))[0]; return o ? [o.value, o.text] : null; }""")
-    await d.fill("#VendorBillId", newest[0], "Choose the bill. Only posted bills with a balance appear.", "Step 6")
-    amount = re.search(r"Outstanding:\s*([\d,.]+)", newest[1]).group(1).replace(",", "")
+    await d.fill("#VendorId", "CoolTech", "Choose the supplier. Their open bills are listed below.", "Step 6")
+    bill = d.page.locator("#itemsBody tr[data-bill]", has_text=reference).first
+    await bill.wait_for()
+    await d.fill(bill.locator("input[type=checkbox]"), "true",
+                 "Tick the bill to pay. The open amount is filled in; change it for a part payment.", "Step 6")
+    await d.point("#total", "The total to pay is shown here.")
     await d.fill("#PaymentDate", iso(TODAY))
-    await d.fill("#Amount", amount, "Pay the full amount.", "Step 6")
-    await d.fill("#PaymentMethod", "Transfer")
-    await d.submit("/VendorPayments/Create", "Click Save and Post.", "Step 7")
+    await d.click("#submitBtn", "Click Save and Post.", "Step 7")
     await d.say("The supplier is paid and the bill is closed.")
     await d.clear_caption()
     await d.card("Done", "Bill entered, posted and paid", "Next: petty cash.", 3)
@@ -588,15 +698,23 @@ async def v08_month_end(d: Director):
 
     await d.goto(f"/Journal?fromDate={iso(MONTH_START)}&toDate={iso(MONTH_END)}&postedOnly=false",
                  "Both runs created draft journals. Review them here...", "Step 4")
-    await d.click("form[action*='/Journal/PostAllDrafts'] button[type=submit]",
-                  "...and click Post All Drafts.", "Step 4")
+    post_all = "form[action*='/Journal/PostAllDrafts'] button[type=submit]"
+    if await d.page.locator(post_all).count():
+        await d.click(post_all, "...and click Post All Drafts.", "Step 4")
+    else:
+        await d.say("Here they are already posted. Any that were still drafts would be posted with Post All Drafts.", "Step 4")
 
-    await d.menu("setupDropdown", "/Closing", "Finally, close the period. Open Period Closing.", "Step 5")
+    await d.menu("setupDropdown", "/Closing", "Finally, close the period. Open the Closing Cockpit.", "Step 5")
+    await d.say("Each month shows its checks. Green is done, amber is to review, and red blocks the close.")
     await d.say("Closed months are locked: nothing can be posted into them or reset out of them.")
-    open_row = d.page.locator("tr", has=d.page.locator("button", has_text="Close Period")).first
-    await d.click(open_row.locator("button", has_text="Close Period"),
-                  "Close the oldest open month once its figures are final.", "Step 5")
-    await d.say("That month is now closed and its reports are final.")
+    close = d.page.locator("form[action*='/Closing/ClosePeriod'] button[type=submit]").first
+    if await d.page.locator("#ack").count():
+        await d.fill("#ack", "true", "Confirm that you have reviewed the amber warnings.", "Step 5")
+    if await close.is_disabled():
+        await d.point(close, "A red check still blocks this month. Resolve it, then close the month here.", "Step 5")
+    else:
+        await d.click(close, "Close the oldest open month once its figures are final.", "Step 5")
+        await d.say("That month is now closed and its reports are final.")
     await d.clear_caption()
     await d.card("Done", "The month is closed", "Next: the reports.", 3)
 
@@ -776,10 +894,13 @@ async def record(browser, state_file, number, key, title, play):
         viewport=SIZE, storage_state=signed_in,
         record_video_dir=str(temp_dir), record_video_size=SIZE)
     await context.add_init_script(OVERLAY_JS)
+    narrator = Narrator(ARGS.voice, ARGS.voice_rate) if ARGS.voice else None
     page = await context.new_page()
+    if narrator:
+        narrator.start()   # the recording begins with the page
     page.set_default_timeout(20_000)
     page.on("dialog", lambda dialog: asyncio.ensure_future(dialog.accept()))
-    DIRECTOR = Director(page, ARGS.site, ARGS.pace)
+    DIRECTOR = Director(page, ARGS.site, ARGS.pace, narrator)
 
     ok = True
     try:
@@ -792,8 +913,12 @@ async def record(browser, state_file, number, key, title, play):
 
     video = page.video
     await context.close()
-    target = OUT_DIR / f"{number}-{key}.webm"
-    if ok:
+    # A narrated video is kept beside the silent one, not over it.
+    target = OUT_DIR / f"{number}-{key}{'-voice' if narrator else ''}.webm"
+    if ok and narrator:
+        narrator.mix(pathlib.Path(await video.path()), target)
+        print(f"  voice-over: {len(narrator.cues)} lines, voice {narrator.voice}")
+    elif ok:
         shutil.move(await video.path(), target)
     shutil.rmtree(temp_dir, ignore_errors=True)
     return ok, target
@@ -872,7 +997,17 @@ async def main():
     parser.add_argument("--show", action="store_true", help="show the browser while recording")
     parser.add_argument("--publish-only", action="store_true",
                         help="do not record; copy the videos already recorded into the help")
+    parser.add_argument("--voice", help="speak the captions with this voice, e.g. en-US-BrianNeural")
+    parser.add_argument("--voice-rate", default="+0%", help='speed of the voice, e.g. "-5%%" or "+10%%"')
+    parser.add_argument("--no-publish", action="store_true",
+                        help="record into Tools/VideoCapture/output only; leave the help as it is")
     ARGS = parser.parse_args()
+
+    if ARGS.voice:
+        try:
+            import edge_tts, imageio_ffmpeg  # noqa: F401
+        except ImportError:
+            sys.exit("--voice needs two packages:  pip install edge-tts imageio-ffmpeg")
 
     wanted = {x.strip() for x in ARGS.only.split(",")} if ARGS.only else None
     selected = [v for v in VIDEOS if not wanted or v[0] in wanted or v[1] in wanted]
@@ -881,7 +1016,9 @@ async def main():
     manifest_file = OUT_DIR / "videos.json"
 
     if ARGS.publish_only:
-        recorded = [{"number": n, "key": k, "title": t, "file": f"{n}-{k}.webm"} for n, k, t, _ in selected]
+        # With --voice, the narrated recordings are the ones published.
+        suffix = "-voice" if ARGS.voice else ""
+        recorded = [{"number": n, "key": k, "title": t, "file": f"{n}-{k}{suffix}.webm"} for n, k, t, _ in selected]
         async with async_playwright() as p:
             browser = await launch(p)
             await publish(browser, recorded)
@@ -906,6 +1043,11 @@ async def main():
             if ok:
                 print(f"  saved {path.relative_to(PROJECT)} ({path.stat().st_size // 1024} KB)")
                 manifest.append({"number": number, "key": key, "title": title, "file": path.name})
+
+        if ARGS.no_publish:
+            await browser.close()
+            print(f"done: {len(manifest)} of {len(selected)} recorded into {OUT_DIR.relative_to(PROJECT)} (not published)")
+            return
 
         print("publishing into the help...")
         await publish(browser, manifest)

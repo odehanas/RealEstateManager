@@ -282,6 +282,7 @@ builder.Services.AddScoped<BuildingViewService>();
 builder.Services.AddScoped<BuildingPhotoService>();
 builder.Services.AddScoped<OwnerWithdrawalService>();
 builder.Services.AddScoped<FixedAssetService>();
+builder.Services.AddScoped<FixedAssetCategoryService>();
 builder.Services.AddScoped<PeriodClosingService>();
 builder.Services.AddScoped<HrService>();
 builder.Services.AddScoped<PayrollService>();

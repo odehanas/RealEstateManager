@@ -9,7 +9,10 @@
         <h2 class="mb-1">@T["Fixed Asset Register"]</h2>
         <div class="text-muted">@T["Maintain depreciable assets and run monthly depreciation posting."]</div>
     </div>
-    <a asp-action="Create" class="btn btn-dark">@T["Add Fixed Asset"]</a>
+    <div class="d-flex gap-2">
+        <a asp-controller="FixedAssetCategories" asp-action="Index" class="btn btn-outline-secondary">@T["Asset Categories"]</a>
+        <a asp-action="Create" class="btn btn-dark">@T["Add Fixed Asset"]</a>
+    </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -20,6 +23,75 @@
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (Model.Overdue.HasAny)
+{
+    var blocked = Model.Overdue.Months.Any(x => x.PeriodState != "Open");
+    <div class="card shadow-sm mb-4 border-start border-4 border-danger">
+        <div class="card-header bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <strong>@T["Monthly run not done"]</strong>
+            @if (Model.Overdue.Months.Count > 0)
+            {
+                <span class="badge bg-danger">@T.Format("{0} month(s), {1} unposted", Model.Overdue.Months.Count, Model.Overdue.Amount.ToString("N2"))</span>
+            }
+        </div>
+        <div class="card-body">
+            @if (Model.Overdue.Months.Count > 0)
+            {
+                <p class="mb-2">@T["These months have ended, but their depreciation / amortization has not been posted to the ledger:"]</p>
+                <table class="table table-sm align-middle" style="max-width:760px">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@T["Period"]</th>
+                            <th class="text-end">@T["Assets"]</th>
+                            <th class="text-end">@T["Schedule lines"]</th>
+                            <th class="text-end">@T["Amount"]</th>
+                            <th>@T["Accounting period"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var month in Model.Overdue.Months)
+                        {
+                            <tr>
+                                <td>@month.Name</td>
+                                <td class="text-end">@month.Assets</td>
+                                <td class="text-end">@month.Lines</td>
+                                <td class="text-end">@month.Amount.ToString("N2")</td>
+                                <td>
+                                    @if (month.PeriodState == "Closed")
+                                    {
+                                        <span class="badge bg-secondary">@T["Closed"]</span>
+                                    }
+                                    else if (month.PeriodState == "NoPeriod")
+                                    {
+                                        <span class="badge bg-warning text-dark">@T["No period"]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@T["Open"]</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (blocked)
+                {
+                    <div class="text-danger small mb-2">@T["A month whose accounting period is closed or missing cannot be posted: reopen or create the period first. The run stops at the first such month."]</div>
+                }
+                <form asp-action="RunMonthly" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="postingDate" value="@Model.Overdue.LastMonthEnd.ToString("yyyy-MM-dd")" />
+                    <button type="submit" class="btn btn-danger">@T.Format("Post the missed months up to {0}", Model.Overdue.LastMonthEnd.ToString("dd/MM/yyyy"))</button>
+                </form>
+            }
+            @if (Model.Overdue.AssetsWithoutSchedule.Count > 0)
+            {
+                <div class="mt-3">@T.Format("In service but with no schedule at all, so nothing will ever be posted for them: {0}", string.Join(", ", Model.Overdue.AssetsWithoutSchedule))</div>
+            }
+        </div>
+    </div>
 }
 
 <div class="row g-3 mb-4">
@@ -118,11 +190,26 @@
                         <div>@asset.AssetCode - @asset.Name</div>
                         <small class="text-muted">@T.Format("Acquired {0}", asset.AcquisitionDate.ToString("dd/MM/yyyy"))</small>
                     </td>
-                    <td>@asset.AssetCategory</td>
+                    <td>
+                        <div>@asset.AssetCategory</div>
+                        <small class="text-muted">
+                            @if (asset.DepreciationMethod != RealEstateManager.Domain.DepreciationMethods.None)
+                            {
+                                @T[asset.AssetClass == RealEstateManager.Domain.FixedAssetClasses.Intangible ? "Amortized" : "Depreciated"]<text>: </text>
+                            }
+                            @T[RealEstateManager.Domain.DepreciationMethods.Label(asset.DepreciationMethod)]@(asset.DecliningRatePercent.HasValue ? $" {asset.DecliningRatePercent.Value:0.##}%" : "")
+                        </small>
+                    </td>
                     <td>@asset.PropertyDisplay</td>
                     <td>@asset.InServiceDate.ToString("dd/MM/yyyy")</td>
                     <td>@(asset.CapitalizationDate.HasValue ? asset.CapitalizationDate.Value.ToString("dd/MM/yyyy") : "-")</td>
-                    <td><span class="badge @badgeClass">@asset.Status</span></td>
+                    <td>
+                        <span class="badge @badgeClass">@asset.Status</span>
+                        @if (asset.IsRevalued)
+                        {
+                            <span class="badge bg-info text-dark">@T["Revalued"]</span>
+                        }
+                    </td>
                     <td class="text-end">@asset.Cost.ToString("N2")</td>
                     <td class="text-end">@asset.AccumulatedDepreciation.ToString("N2")</td>
                     <td class="text-end">@asset.NetBookValue.ToString("N2")</td>
@@ -131,6 +218,10 @@
                     <td>
                         <a asp-action="Acquisition" asp-route-id="@asset.FixedAssetId" class="btn btn-outline-dark btn-sm">@T["Acquisition"]</a>
                         <a asp-action="Depreciation" asp-route-id="@asset.FixedAssetId" class="btn btn-outline-secondary btn-sm">@T["Depreciation"]</a>
+                        @if (asset.Status is "Active" or "FullyDepreciated")
+                        {
+                            <a asp-action="Revalue" asp-route-id="@asset.FixedAssetId" class="btn btn-outline-secondary btn-sm">@T["Revalue"]</a>
+                        }
                     </td>
                 </tr>
             }

@@ -96,8 +96,8 @@ else if (Model.IsSettled)
                             </div>
                         </div>
                         <div class="text-end">
-                            <div class="fw-semibold">@contract.AnnualRent.ToString("N2")</div>
-                            <div class="small text-muted">@T["per year"]</div>
+                            <div class="fw-semibold">@((contract.IsStay ? contract.RentRate : contract.AnnualRent).ToString("N2"))</div>
+                            <div class="small text-muted">@T["per " + RealEstateManager.Domain.RentBases.Unit(contract.RentBasis)]</div>
                             @if (contract.IsExpiringSoon)
                             {
                                 <span class="badge bg-warning text-dark mt-1">@T.Format("Expires in {0} days", contract.DaysToExpiry)</span>

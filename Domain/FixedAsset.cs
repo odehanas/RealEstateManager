@@ -30,7 +30,21 @@ namespace RealEstateManager.Domain
         public decimal OpeningCost { get; set; } = 0m;
         public decimal OpeningAccumulatedDepreciation { get; set; } = 0m;
 
+        /// <summary>See <see cref="DepreciationMethods"/>: StraightLine, DecliningBalance or None.</summary>
         public string DepreciationMethod { get; set; } = "StraightLine";
+
+        /// <summary>
+        /// Depreciation posted before a revaluation and eliminated by it. After a
+        /// revaluation Cost is the fair value, and accumulated depreciation is what
+        /// has been posted less this.
+        /// </summary>
+        public decimal RevaluationEliminatedDepreciation { get; set; }
+
+        /// <summary>Yearly rate for the declining balance method, e.g. 25 for 25% a year.</summary>
+        public decimal? DecliningRatePercent { get; set; }
+
+        /// <summary>Tangible (depreciated) or Intangible (amortized). See <see cref="FixedAssetClasses"/>.</summary>
+        public string AssetClass { get; set; } = FixedAssetClasses.Tangible;
 
         // Draft, Active, FullyDepreciated, Disposed
         public string Status { get; set; } = "Draft";

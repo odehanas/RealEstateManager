@@ -18,6 +18,37 @@ namespace RealEstateManager.Services
         public static List<CustomerInvoice> PlanInvoices(int companyId, Lease lease)
         {
             var invoices = new List<CustomerInvoice>();
+
+            // A stay priced per day, week or month: one invoice for each month of the
+            // stay, counted from its first day, for the rent of the days it holds.
+            if (RentBases.IsStay(lease.RentBasis))
+            {
+                foreach (var period in StayRentCalculator.Periods(lease))
+                {
+                    var vat = VatDeterminationService.CalculateTax(period.Amount, lease.VatCategory);
+                    invoices.Add(new CustomerInvoice
+                    {
+                        CompanyId = companyId,
+                        LeaseId = lease.Id,
+                        InvoiceNumber = $"INV-{lease.ContractNumber}-{period.Start:yyyyMMdd}",
+                        InvoiceDate = period.Start,
+                        DueDate = period.Start,
+                        DateOfSupply = period.Start,
+                        PeriodStart = period.Start,
+                        PeriodEnd = period.End,
+                        Subtotal = period.Amount,
+                        VatAmount = vat,
+                        TotalAmount = period.Amount + vat,
+                        AmountPaid = 0m,
+                        VatCategory = lease.VatCategory,
+                        VatRate = lease.VatRate,
+                        Status = "Draft"
+                    });
+                }
+
+                return invoices;
+            }
+
             var billingMonths = lease.BillingFrequencyMonths;
             if (billingMonths <= 0 || 12 % billingMonths != 0)
                 return invoices;
@@ -79,6 +110,30 @@ namespace RealEstateManager.Services
         /// </summary>
         public static void GenerateRevenueRecognitionSchedules(ApplicationDbContext db, int companyId, Lease lease, Property property)
         {
+            // A stay: each calendar month earns the rent of the days of the stay in it.
+            if (RentBases.IsStay(lease.RentBasis))
+            {
+                foreach (var (month, rent) in StayRentCalculator.ByCalendarMonth(lease))
+                {
+                    var amount = property.OwnershipType == "Managed"
+                        ? Math.Round(rent * property.CommissionPercentage / 100m, 2)
+                        : rent;
+                    if (amount == 0m)
+                        continue;
+
+                    db.RevenueRecognitionSchedules.Add(new RevenueRecognitionSchedule
+                    {
+                        CompanyId = companyId,
+                        LeaseId = lease.Id,
+                        RecognitionDate = new DateTime(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month)),
+                        Amount = amount,
+                        Status = "Planned"
+                    });
+                }
+
+                return;
+            }
+
             var monthlyRent = property.OwnershipType == "Managed"
                 ? Math.Round(lease.AnnualRent / 12m * property.CommissionPercentage / 100m, 2)
                 : Math.Round(lease.AnnualRent / 12m, 2);

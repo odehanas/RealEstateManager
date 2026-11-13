@@ -19,6 +19,7 @@ namespace RealEstateManager.Controllers
         private readonly PeriodClosingService _closing;
         private readonly PermissionService _permissions;
         private readonly HrService _hr;
+        private readonly FixedAssetService _fixedAssets;
 
         public HomeController(
             ApplicationDbContext db,
@@ -26,9 +27,11 @@ namespace RealEstateManager.Controllers
             ManagementReportService reports,
             PeriodClosingService closing,
             PermissionService permissions,
-            HrService hr)
+            HrService hr,
+            FixedAssetService fixedAssets)
         {
             _hr = hr;
+            _fixedAssets = fixedAssets;
             _db = db;
             _openingBalanceService = openingBalanceService;
             _reports = reports;
@@ -113,6 +116,13 @@ namespace RealEstateManager.Controllers
                 await _permissions.HasAnyPermissionAsync(User, AppPermissions.AccountingManage, AppPermissions.PeriodReopenApprove))
             {
                 model.UnclosedPeriods = await _closing.GetUnclosedPeriodsAsync(dashboardCompanyId.Value, today);
+            }
+
+            // A monthly depreciation run that was never done, for whoever keeps the books.
+            if (dashboardCompanyId.HasValue &&
+                await _permissions.HasAnyPermissionAsync(User, AppPermissions.AccountingManage))
+            {
+                model.OverdueDepreciation = await _fixedAssets.GetOverdueAsync(dashboardCompanyId.Value, today);
             }
 
             // Documents running out and a payroll still to do, for HR and payroll staff.

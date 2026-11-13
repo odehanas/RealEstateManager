@@ -6,6 +6,8 @@
     var properties = ViewBag.Properties as List<Property> ?? new();
     var accounts = ViewBag.Accounts as List<Account> ?? new();
     var vendors = ViewBag.Vendors as List<Vendor> ?? new();
+    var categories = ViewBag.Categories as List<FixedAssetCategory> ?? new();
+    var inv = System.Globalization.CultureInfo.InvariantCulture;
 }
 
 <h2>@T["Add Fixed Asset"]</h2>
@@ -36,7 +38,25 @@
 
             <div class="col-md-4">
                 <label asp-for="AssetCategory" class="form-label">@T["Category"]</label>
-                <input asp-for="AssetCategory" class="form-control" placeholder="@T["Furniture, Equipment, Vehicles..."]" />
+                <select asp-for="AssetCategory" class="form-select" id="assetCategory">
+                    <option value="">@T["Select Category"]</option>
+                    @foreach (var category in categories)
+                    {
+                        <option value="@category.Name"
+                                data-class="@category.AssetClass"
+                                data-method="@category.DepreciationMethod"
+                                data-life="@category.UsefulLifeMonths"
+                                data-rate="@(category.DecliningRatePercent?.ToString("0.####", inv))"
+                                data-residual="@category.ResidualPercent.ToString("0.####", inv)"
+                                data-asset="@category.AssetAccountId"
+                                data-accumulated="@category.AccumulatedDepreciationAccountId"
+                                data-expense="@category.DepreciationExpenseAccountId">@category.Name</option>
+                    }
+                </select>
+                <div class="form-text">
+                    @T["Sets the method, useful life and accounts below."]
+                    <a asp-controller="FixedAssetCategories" asp-action="Index">@T["Asset Categories"]</a>
+                </div>
             </div>
 
             <div class="col-md-6">
@@ -89,14 +109,33 @@
                 <div class="form-text">@T["Required when the source account is Accounts Payable."]</div>
             </div>
 
-            <div class="col-md-4">
-                <label asp-for="ResidualValue" class="form-label">@T["Residual Value"]</label>
-                <input asp-for="ResidualValue" class="form-control" />
+            <div class="col-md-3">
+                <label asp-for="DepreciationMethod" class="form-label" id="methodLabel">@T["Depreciation Method"]</label>
+                <select asp-for="DepreciationMethod" class="form-select" id="depreciationMethod">
+                    @foreach (var method in DepreciationMethods.All)
+                    {
+                        <option value="@method">@T[DepreciationMethods.Label(method)]</option>
+                    }
+                </select>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3" data-needs="charge">
                 <label asp-for="UsefulLifeMonths" class="form-label">@T["Useful Life (Months)"]</label>
-                <input asp-for="UsefulLifeMonths" class="form-control" />
+                <input asp-for="UsefulLifeMonths" class="form-control" id="usefulLifeMonths" />
+            </div>
+
+            <div class="col-md-3" data-needs="declining">
+                <label asp-for="DecliningRatePercent" class="form-label">@T["Rate per Year (%)"]</label>
+                <input asp-for="DecliningRatePercent" type="number" step="0.01" min="0" max="100" class="form-control" id="decliningRatePercent" />
+            </div>
+
+            <div class="col-md-3" data-needs="charge">
+                <label asp-for="ResidualValue" class="form-label">@T["Residual Value"]</label>
+                <input asp-for="ResidualValue" class="form-control" id="residualValue" />
+            </div>
+
+            <div class="col-12 d-none" id="notDepreciatedNote">
+                <div class="alert alert-secondary mb-0">@T["Assets of this kind are not depreciated: the asset is carried at cost and no monthly schedule is created."]</div>
             </div>
 
             <div class="col-12">
@@ -177,4 +216,60 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var category = document.getElementById('assetCategory');
+            var method = document.getElementById('depreciationMethod');
+            var life = document.getElementById('usefulLifeMonths');
+            var rate = document.getElementById('decliningRatePercent');
+            var residual = document.getElementById('residualValue');
+            var cost = document.getElementById('Cost');
+            var accounts = {
+                asset: document.getElementById('AssetAccountId'),
+                accumulated: document.getElementById('AccumulatedDepreciationAccountId'),
+                expense: document.getElementById('DepreciationExpenseAccountId')
+            };
+            // What the company's Account Mapping gave, to go back to when a category names no account.
+            var defaults = {};
+            Object.keys(accounts).forEach(function (key) { defaults[key] = accounts[key].value; });
+
+            function showFields() {
+                var charged = method.value !== '@DepreciationMethods.None';
+                var declining = method.value === '@DepreciationMethods.DecliningBalance';
+                document.querySelectorAll('[data-needs="charge"]').forEach(function (el) { el.style.display = charged ? '' : 'none'; });
+                document.querySelectorAll('[data-needs="declining"]').forEach(function (el) { el.style.display = declining ? '' : 'none'; });
+                document.getElementById('notDepreciatedNote').classList.toggle('d-none', charged);
+            }
+
+            function applyResidual() {
+                var option = category.options[category.selectedIndex];
+                var percent = option ? parseFloat(option.dataset.residual || '0') : 0;
+                var amount = parseFloat(cost.value || '0');
+                if (percent > 0 && amount > 0) {
+                    residual.value = (amount * percent / 100).toFixed(2);
+                }
+            }
+
+            function applyCategory() {
+                var option = category.options[category.selectedIndex];
+                if (!option || !option.value) { return; }
+                method.value = option.dataset.method;
+                if (option.dataset.method !== '@DepreciationMethods.None') {
+                    life.value = option.dataset.life;
+                }
+                rate.value = option.dataset.rate || '';
+                Object.keys(accounts).forEach(function (key) {
+                    accounts[key].value = option.dataset[key] || defaults[key];
+                });
+                residual.value = '0';
+                applyResidual();
+                showFields();
+            }
+
+            category.addEventListener('change', applyCategory);
+            method.addEventListener('change', showFields);
+            cost.addEventListener('change', applyResidual);
+            showFields();
+        })();
+    </script>
 }

@@ -426,6 +426,9 @@ namespace RealEstateManager.Services
         /// <summary>The annual rent spread over the full months of the contract term.</summary>
         private static decimal AgreementRent(Lease lease)
         {
+            if (RentBases.IsStay(lease.RentBasis))
+                return StayRentCalculator.Total(lease);
+
             var endExclusive = lease.EndDate.Date.AddDays(1);
             var months = (endExclusive.Year - lease.StartDate.Year) * 12 + endExclusive.Month - lease.StartDate.Month;
             if (endExclusive.Day < lease.StartDate.Day)

@@ -338,6 +338,7 @@ namespace RealEstateManager.Services
                 ["VendorPayments"] = new[] { AppPermissions.AccountingManage },
                 ["SecurityDeposits"] = new[] { AppPermissions.AccountingManage },
                 ["FixedAssets"] = new[] { AppPermissions.AccountingManage },
+                ["FixedAssetCategories"] = new[] { AppPermissions.AccountingManage },
                 ["Prepayments"] = new[] { AppPermissions.AccountingManage },
                 ["RevenueRecognition"] = new[] { AppPermissions.AccountingManage },
                 ["ManualJournals"] = new[] { AppPermissions.AccountingManage },
@@ -438,7 +439,7 @@ namespace RealEstateManager.Services
             {
                 "ChartOfAccounts", "AccountMappings", "OpeningBalances", "OwnerWithdrawalCategories",
                 "OwnerWithdrawalLocations", "VatSettings", "RevenueRecognition", "Prepayments", "Closing", "BankAccounts",
-                "MaintenanceCategories", "ServiceCatalog"
+                "MaintenanceCategories", "ServiceCatalog", "FixedAssetCategories"
             };
 
         private static readonly HashSet<string> CompanySetupActions =
