@@ -5,8 +5,8 @@
     "title": "Signing in and finding your way",
     "file": "sign-in.webm",
     "poster": "sign-in.jpg",
-    "seconds": 78,
-    "version": 1794747235
+    "seconds": 105,
+    "version": 1794755018
   },
   {
     "key": "master-data",
@@ -14,8 +14,8 @@
     "title": "Adding a property, a unit and a tenant",
     "file": "master-data.webm",
     "poster": "master-data.jpg",
-    "seconds": 93,
-    "version": 1794748079
+    "seconds": 138,
+    "version": 1794755157
   },
   {
     "key": "lease",
@@ -23,8 +23,8 @@
     "title": "Creating a lease",
     "file": "lease.webm",
     "poster": "lease.jpg",
-    "seconds": 59,
-    "version": 1794748134
+    "seconds": 81,
+    "version": 1794755233
   },
   {
     "key": "invoice-and-receipt",
@@ -32,8 +32,8 @@
     "title": "Posting an invoice and receiving the rent",
     "file": "invoice-and-receipt.webm",
     "poster": "invoice-and-receipt.jpg",
-    "seconds": 76,
-    "version": 1794748208
+    "seconds": 106,
+    "version": 1794755336
   },
   {
     "key": "cheques",
@@ -41,8 +41,8 @@
     "title": "Post-dated cheques",
     "file": "cheques.webm",
     "poster": "cheques.jpg",
-    "seconds": 73,
-    "version": 1794747534
+    "seconds": 107,
+    "version": 1794755441
   },
   {
     "key": "supplier-bill",
@@ -50,8 +50,8 @@
     "title": "Entering a supplier bill and paying it",
     "file": "supplier-bill.webm",
     "poster": "supplier-bill.jpg",
-    "seconds": 72,
-    "version": 1794747605
+    "seconds": 106,
+    "version": 1794755546
   },
   {
     "key": "petty-cash",
@@ -59,8 +59,8 @@
     "title": "Petty cash",
     "file": "petty-cash.webm",
     "poster": "petty-cash.jpg",
-    "seconds": 51,
-    "version": 1794747657
+    "seconds": 79,
+    "version": 1794755626
   },
   {
     "key": "month-end",
@@ -68,8 +68,8 @@
     "title": "Month-end",
     "file": "month-end.webm",
     "poster": "month-end.jpg",
-    "seconds": 67,
-    "version": 1794747723
+    "seconds": 95,
+    "version": 1794755720
   },
   {
     "key": "reports",
@@ -77,8 +77,8 @@
     "title": "The reports",
     "file": "reports.webm",
     "poster": "reports.jpg",
-    "seconds": 64,
-    "version": 1794747787
+    "seconds": 91,
+    "version": 1794755809
   },
   {
     "key": "tenant-portal",
@@ -86,7 +86,7 @@
     "title": "The tenant portal",
     "file": "tenant-portal.webm",
     "poster": "tenant-portal.jpg",
-    "seconds": 97,
-    "version": 1794747885
+    "seconds": 156,
+    "version": 1794755967
   }
 ]

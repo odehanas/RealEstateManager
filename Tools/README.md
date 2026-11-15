@@ -99,7 +99,7 @@ site.** The tool refuses any address other than localhost.
    python Tools/VideoCapture/record_videos.py
    python Tools/VideoCapture/record_videos.py --only 05,09     # just some
    python Tools/VideoCapture/record_videos.py --show           # watch it work
-   python Tools/VideoCapture/record_videos.py --pace 1.3       # slower
+   python Tools/VideoCapture/record_videos.py --pace 1.5       # slower still
    ```
    The first run opens a practice company, "Al Waha Properties", and loads a year of
    sample data into it. Every video works inside that company.
@@ -121,7 +121,18 @@ videos into the help again without recording.
 
 For a voice-over, add `--voice en-US-BrianNeural`: every caption is spoken while its click
 or typing happens, and the narrated recording is saved as `<number>-<key>-voice.webm`. Add
-`--mp4` for an `.mp4` copy of each recording, the format to upload to YouTube. The spoken
+`--mp4` for an `.mp4` copy of each recording, the format to upload to YouTube.
+
+The videos run at an unhurried pace: the voice just under its natural speed, a slow pointer, typing
+you can follow, and a breath between one line and the next. Two settings change it, and the
+voice stays in step with the clicks at any value:
+
+| Setting | What it changes | Default |
+|---|---|---|
+| `--pace` | The pointer, the typing, the wait before a click and the pause between lines. `1.5` is slower, `1` quicker. | `1.3` |
+| `--voice-rate` | The speed of the voice itself. `"-10%"` is slower, `"+0%"` is its natural speed. | `"-4%"` |
+
+With the defaults the ten videos run from about a minute and a quarter to two and a half minutes each. The spoken
 lines are fetched before recording starts, so fetching them never holds up a video. The
 notes at the top of the script list the voices and the terms to check before publishing.
 

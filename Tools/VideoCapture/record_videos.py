@@ -38,7 +38,12 @@ WITH A VOICE-OVER
     typing happens while it is being said, and the next line waits only for this one to end.
     The lines are fetched before recording starts and kept in output/voice, so fetching
     them never holds up a video and a second run does not fetch them again.
-    --voice-rate sets the speed of the voice (default "+8%"; "+0%" is its natural speed).
+    --voice-rate sets the speed of the voice (default "-4%", just under its natural "+0%"; "+8%" is
+    quicker, "-10%" slower).
+    --pace sets the speed of everything else - the pointer, the typing, the wait before a
+    click and the breath between two lines (default 1.3; 1.5 is slower, 1 quicker). The
+    voice and the action stay together at any pace, because each line still starts with
+    its own pointer move and the next line still waits for it to end.
     --mp4 also writes an .mp4 copy (H.264 with AAC sound), the format YouTube prefers.
     Leave out --no-publish to put the narrated videos into the help, or publish ones
     already recorded with:  --publish-only --voice en-US-BrianNeural
@@ -127,7 +132,7 @@ OVERLAY_JS = r"""
     padding:1px 11px;margin-right:12px;font-size:15px;vertical-align:2px}
   #__cur{position:fixed;width:22px;height:22px;border-radius:50%;background:rgba(240,180,41,.5);
     border:2px solid #f0b429;z-index:2147483647;pointer-events:none;transform:translate(-50%,-50%);
-    transition:left .6s ease,top .6s ease}
+    transition:left 1.1s ease,top 1.1s ease}
   #__cur.click{animation:__pulse .5s}
   @keyframes __pulse{0%{box-shadow:0 0 0 0 rgba(240,180,41,.85)}100%{box-shadow:0 0 0 24px rgba(240,180,41,0)}}
   #__ring{position:fixed;border:3px solid #f0b429;border-radius:8px;z-index:2147483645;
@@ -305,9 +310,9 @@ class Director:
     # A line and what it describes run together. begin() starts a line and returns at
     # once, so the click or the typing happens while it is being said; settle() waits for
     # it to end. Every new line settles the one before, so two lines never overlap.
-    async def settle(self, gap: float = 0.25):
-        """Waits until the current line has been said, plus a short breath."""
-        wait = self.line_ends + gap - time.monotonic()
+    async def settle(self, gap: float = 0.6):
+        """Waits until the current line has been said, plus a breath before the next."""
+        wait = self.line_ends + gap * self.pace - time.monotonic()
         if wait > 0:
             await self.page.wait_for_timeout(int(wait * 1000))
 
@@ -330,7 +335,7 @@ class Director:
         """The moment between a line starting and the action it describes: long enough
         for the pointer to arrive and the first words to be heard."""
         left = self.line_ends - time.monotonic()
-        await self.page.wait_for_timeout(int(min(max(0.65, left * 0.5), 1.4) * 1000))
+        await self.page.wait_for_timeout(int(min(max(1.0 * self.pace, left * 0.5), 1.9 * self.pace) * 1000))
 
     async def caption(self, text: str, step: str | None = None, seconds: float | None = None):
         """Starts a caption without waiting for it to be said."""
@@ -339,7 +344,7 @@ class Director:
     async def card(self, number: str, title: str, subtitle: str, seconds: float = 3.8):
         await self.begin(f"{title}. {subtitle}", "([n,t,s]) => __demo.card(n,t,s)",
                          [number, title, subtitle], seconds)
-        await self.settle(0.35)
+        await self.settle(0.9)
         await self.js("() => __demo.hideCard()")
 
     async def say(self, text: str, step: str | None = None, seconds: float | None = None):
@@ -379,7 +384,7 @@ class Director:
         if text and hold:
             await self.settle()
         elif hold:
-            await self.pause(0.6)
+            await self.pause(0.9)
 
     async def click(self, target, text: str | None = None, step: str | None = None, navigates: bool = True):
         locator = self.loc(target)
@@ -389,13 +394,13 @@ class Director:
         if box:
             await self.js("([x,y]) => __demo.cursor(x,y,true)",
                                      [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2])
-        await self.pause(0.3)
+        await self.pause(0.5)
         await self.ring(None)
         await locator.click()
         if navigates:
             await self.page.wait_for_timeout(300)
             await self.page.wait_for_load_state("load")
-        await self.pause(0.45)
+        await self.pause(0.8)
 
     async def fill(self, target, value, text: str | None = None, step: str | None = None):
         """Types into a box, or picks from a list: a select is chosen by value or by
@@ -429,15 +434,15 @@ class Director:
         else:
             await locator.click()
             await locator.fill("")
-            await locator.type(value, delay=int(26 * self.pace))
+            await locator.type(value, delay=int(48 * self.pace))
         await self.ring(None)
-        await self.pause(0.25)
+        await self.pause(0.5)
 
     async def submit(self, action: str, text: str | None = None, step: str | None = None):
         """Clicks the submit button of the form posting to the given address."""
         await self.click(f"form[action*='{action}'] button[type=submit]", text, step)
 
-    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 0.5):
+    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 0.9):
         """Opens a group of the side menu (sb-masterData, sb-operations...), shows it
         while its line is said and closes it again."""
         toggle = f"#appSidebar [data-bs-target='#{name}']"
@@ -445,7 +450,7 @@ class Director:
         await self.settle()
         await self.pause(seconds)
         await self.loc(toggle).click()
-        await self.pause(0.3)
+        await self.pause(0.5)
 
     async def menu(self, dropdown_id: str, href: str, text: str | None = None, step: str | None = None):
         """Opens the item with this address in the side menu, opening its group first.
@@ -498,7 +503,7 @@ async def v01_sign_in(d: Director):
     await d.point("select[name=companyId]",
                   "If you work for more than one company, choose the one to work in from this list.", "Step 3")
     await d.fill("select[name=companyId]", COMPANY)
-    await d.pause(0.4)
+    await d.pause(0.8)
     await d.say(f"Now you are in {COMPANY}, a practice company full of sample data.")
     await d.point(d.page.locator(".card", has_text="Receivables").first,
                   "Receivables: how much tenants owe, and how much of it is overdue.")
@@ -506,8 +511,8 @@ async def v01_sign_in(d: Director):
                   "Occupancy: how many of your units are let.")
     await d.point(d.page.locator(".card", has_text="Accounting Period").first,
                   "The current accounting period, and how many leases are active.")
-    await d.scroll(600, 1.4)
-    await d.scroll(-600, 0.6)
+    await d.scroll(600, 2.2)
+    await d.scroll(-600, 1.0)
     await d.group("sb-masterData", "The menu is on the left. Master Data holds properties, units, tenants and leases.", "Menus")
     await d.group("sb-operations", "Operations is the daily work: invoices, receipts, cheques, bills and petty cash.", "Menus")
     await d.group("sb-controls", "Controls has the approvals and the management dashboards.", "Menus")
@@ -1140,12 +1145,13 @@ async def main():
     parser.add_argument("--username", default="admin", help="the demo owner account")
     parser.add_argument("--password", default="Admin@123", help="the demo owner's password")
     parser.add_argument("--only", help="comma-separated video numbers or keys, e.g. 01,09")
-    parser.add_argument("--pace", type=float, default=1.0, help="slower above 1, faster below 1")
+    parser.add_argument("--pace", type=float, default=1.3,
+                        help="speed of the pointer, typing and pauses: higher is slower (default 1.3)")
     parser.add_argument("--show", action="store_true", help="show the browser while recording")
     parser.add_argument("--publish-only", action="store_true",
                         help="do not record; copy the videos already recorded into the help")
     parser.add_argument("--voice", help="speak the captions with this voice, e.g. en-US-BrianNeural")
-    parser.add_argument("--voice-rate", default="+8%", help='speed of the voice, e.g. "+0%%" or "+15%%"')
+    parser.add_argument("--voice-rate", default="-4%", help='speed of the voice, e.g. "-10%%" or "+8%%"')
     parser.add_argument("--mp4", action="store_true",
                         help="also write an .mp4 copy of each recording, for YouTube")
     parser.add_argument("--no-publish", action="store_true",
