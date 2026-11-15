@@ -291,6 +291,7 @@ builder.Services.AddScoped<ApprovalAuthorityService>();
 builder.Services.AddScoped<PaymentApprovalService>();
 builder.Services.AddScoped<EmployeePortalService>();
 builder.Services.AddScoped<CustomerReceiptService>();
+builder.Services.AddScoped<CustomerSettlementService>();
 builder.Services.AddScoped<MasterDataCreationService>();
 builder.Services.AddScoped<LeaseCreationService>();
 builder.Services.AddScoped<PdcReceiptEntryService>();

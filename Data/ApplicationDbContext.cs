@@ -49,6 +49,7 @@ namespace RealEstateManager.Data
         public DbSet<Vendor> Vendors => Set<Vendor>();
         public DbSet<CustomerInvoice> CustomerInvoices => Set<CustomerInvoice>();
         public DbSet<CustomerReceipt> CustomerReceipts => Set<CustomerReceipt>();
+        public DbSet<CustomerSettlement> CustomerSettlements => Set<CustomerSettlement>();
         public DbSet<VendorBill> VendorBills => Set<VendorBill>();
         public DbSet<VendorBillLine> VendorBillLines => Set<VendorBillLine>();
         public DbSet<VendorPayment> VendorPayments => Set<VendorPayment>();
@@ -280,6 +281,24 @@ namespace RealEstateManager.Data
                 .HasOne(x => x.Landlord).WithMany().HasForeignKey(x => x.LandlordId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<PdcReceipt>().Property(x => x.CollectionMode).HasMaxLength(20);
             modelBuilder.Entity<CustomerReceipt>().Property(x => x.CollectionMode).HasMaxLength(20);
+            modelBuilder.Entity<CustomerReceipt>().Property(x => x.OutstandingBefore).HasPrecision(18, 2);
+            modelBuilder.Entity<CustomerReceipt>()
+                .HasOne(x => x.CustomerSettlement).WithMany(x => x.Receipts)
+                .HasForeignKey(x => x.CustomerSettlementId).OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomerSettlement>(entity =>
+            {
+                entity.Property(x => x.SettlementNumber).HasMaxLength(100);
+                entity.Property(x => x.Amount).HasPrecision(18, 2);
+                entity.Property(x => x.PaymentMethod).HasMaxLength(30);
+                entity.Property(x => x.Reference).HasMaxLength(100);
+                entity.Property(x => x.Notes).HasMaxLength(500);
+                entity.Property(x => x.CreatedByName).HasMaxLength(200);
+                entity.HasIndex(x => new { x.CompanyId, x.SettlementNumber }).IsUnique();
+                entity.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(x => x.Tenant).WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(x => !IsCompanyFilterEnabled || x.CompanyId == CurrentCompanyIdValue);
+            });
 
             modelBuilder.Entity<Landlord>(entity =>
             {

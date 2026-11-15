@@ -613,13 +613,15 @@ async def v04_invoice_receipt(d: Director):
 
     await d.menu("operationsDropdown", "/CustomerReceipts", "The tenant pays. Open Customer Receipts.", "Step 3")
     await d.click("a[href='/CustomerReceipts/Create']", "Click Create.", "Step 3")
-    await d.fill("#CustomerInvoiceId", STATE["tenant"], "Choose the invoice being paid. The list shows only what is still owed.", "Step 4")
-    await d.fill("#ReceiptDate", iso(TODAY), "The date the money arrived.")
+    await d.fill("#tenantSelect", STATE["tenant"], "Choose the tenant who paid. You can also find them by number or phone.", "Step 4")
+    await d.point("#openInvoices", "Their open invoices are listed, nearest due date first.", "Step 4")
     await d.fill("#Amount", "18000", "The amount received: the full quarter.", "Step 4")
+    await d.point(d.page.locator("#openInvoices tbody tr").first,
+                  "The table shows where the money goes. A smaller amount would be a payment on account.")
     await d.fill("#PaymentMethod", "Transfer", "Paid by bank transfer.")
-    await d.point("#ReceiptNumber", "Leave the receipt number empty and the system numbers it for you.")
-    await d.submit("/CustomerReceipts/Create", "Click Save and Post.", "Step 5")
-    await d.point(d.page.locator("tr", has_text=STATE["tenant"]).first, "The receipt is recorded and posted.")
+    await d.click("#saveReceipt", "Click Save and Post.", "Step 5")
+    await d.point(".sheet", "This is the settlement document: the payment and the invoice it settled. Print it as the tenant's receipt.")
+    await d.click(".toolbar a[href$='/CustomerReceipts']", "Go back to the list of receipts.")
 
     await d.menu("reportingDropdown", "/TenantStatements", "Check the tenant's statement.", "Step 6")
     await d.fill("select[name=tenantId]", STATE["tenant"], "Choose the tenant...", "Step 6")

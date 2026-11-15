@@ -27,14 +27,29 @@
         @foreach (var receipt in Model)
         {
             <tr>
-                <td>@receipt.ReceiptNumber</td>
+                <td>
+                    @if (receipt.CustomerSettlementId.HasValue)
+                    {
+                        <a asp-action="Settlement" asp-route-id="@receipt.CustomerSettlementId" title="@T["Open the settlement document"]">@receipt.ReceiptNumber</a>
+                    }
+                    else
+                    {
+                        @receipt.ReceiptNumber
+                    }
+                </td>
                 <td>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</td>
                 <td>@receipt.CustomerInvoice?.InvoiceNumber</td>
                 <td>@receipt.CustomerInvoice?.Lease?.Unit?.Property?.Name</td>
                 <td>@receipt.CustomerInvoice?.Lease?.Unit?.UnitNumber</td>
                 <td>@receipt.CustomerInvoice?.Lease?.Tenant?.FullName</td>
                 <td>@receipt.PaymentMethod</td>
-                <td class="text-end">@receipt.Amount.ToString("N2")</td>
+                <td class="text-end">
+                    @receipt.Amount.ToString("N2")
+                    @if (receipt.IsOnAccount)
+                    {
+                        <div><span class="badge bg-warning text-dark">@T["Payment on account"]</span></div>
+                    }
+                </td>
                 <td>
                     @if (receipt.JournalEntryId.HasValue)
                     {

@@ -59,7 +59,7 @@
         { "selector": "a.badge.bg-success", "label": "Already booked as a vendor bill" },
         { "selector": "td .text-danger", "label": "No vendor with this TRN yet" } ] },
     { "key": "tax-invoice", "url": "/CustomerInvoices/TaxInvoice/11", "address": "Operations ▸ Customer Invoices ▸ Tax Invoice", "caption": "A full tax invoice — the tenant is VAT registered, so both TRNs are shown.", "maxHeight": 1150 },
-    { "key": "customer-receipt-create", "url": "/CustomerReceipts/Create?invoiceId=26", "address": "Operations ▸ Customer Receipts ▸ New Receipt", "caption": "Recording a receipt against an invoice. It is saved as a draft.", "maxHeight": 760 },
+    { "key": "customer-receipt-create", "url": "/CustomerReceipts/Create?invoiceId=26", "address": "Operations ▸ Customer Receipts ▸ New Receipt", "caption": "Receiving a payment: the tenant, the amount, and the open invoices it is matched to.", "maxHeight": 760 },
     { "key": "pdc-receipts", "url": "/PdcReceipts", "address": "Operations ▸ PDC Receipts", "caption": "The post-dated cheque register: received, cleared and still in hand.", "maxHeight": 760,
       "markers": [ { "selector": "a[href*='/PdcReceipts/Clear/']", "label": "Clear — when the bank honours the cheque" }, { "selector": "a[href*='/PdcReceipts/Edit/']", "label": "Edit — correct dates or cheque details" } ] },
     { "key": "security-deposits", "url": "/SecurityDeposits", "address": "Operations ▸ Security Deposits", "caption": "Security deposits held, each a liability until refunded or forfeited.", "maxHeight": 700 },

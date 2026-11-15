@@ -1,69 +1,252 @@
-﻿@model RealEstateManager.Models.CustomerReceiptCreateViewModel
-@using RealEstateManager.Domain
+﻿@model RealEstateManager.Models.CustomerSettlementPageViewModel
+@using System.Globalization
 
 @{
     ViewData["Title"] = T["Receive Payment"];
-    var invoices = ViewBag.Invoices as List<CustomerInvoice> ?? new();
-    var selectedInvoiceId = ViewBag.SelectedInvoiceId as int?;
+    var inv = CultureInfo.InvariantCulture;
+    var owed = Model.OpenInvoices.Sum(x => x.TotalAmount - x.AmountPaid);
 }
 
 <h2>@T["Receive Payment"]</h2>
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
-
-    <div asp-validation-summary="All" class="text-danger mb-3"></div>
-
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label asp-for="CustomerInvoiceId" class="form-label">@T["Invoice"]</label>
-            <select asp-for="CustomerInvoiceId" class="form-select">
-                <option value="">@T["Select Invoice"]</option>
-                @foreach (var invoice in invoices)
-                {
-                    var outstanding = invoice.TotalAmount - invoice.AmountPaid;
-                    var isSelected = Model.CustomerInvoiceId == invoice.Id || selectedInvoiceId == invoice.Id;
-
-                    <option value="@invoice.Id" selected="@(isSelected ? "selected" : null)">
-                        @T.Format("{0} - {1} - {2}/{3} - Outstanding: {4}", invoice.InvoiceNumber, invoice.Lease?.Tenant?.FullName, invoice.Lease?.Unit?.Property?.Code, invoice.Lease?.Unit?.UnitNumber, outstanding.ToString("N2"))
-                    </option>
-                }
-            </select>
+@* Step 1: who paid. Choosing a tenant reloads the page with their open invoices. *@
+<form asp-action="Create" method="get" class="card mb-3">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="tenantSearch" class="form-label">@T["Find the tenant"]</label>
+                <input type="search" id="tenantSearch" class="form-control" autocomplete="off"
+                       placeholder="@T["Name, tenant number or phone"]" />
+            </div>
+            <div class="col-md-8">
+                <label for="tenantSelect" class="form-label">@T["Tenant"]</label>
+                <select id="tenantSelect" name="tenantId" class="form-select" onchange="this.form.submit()">
+                    <option value="">@T["Select the tenant who paid"]</option>
+                    @foreach (var tenant in Model.Tenants)
+                    {
+                        <option value="@tenant.Id" selected="@(tenant.Id == Model.Form.TenantId ? "selected" : null)"
+                                data-find="@($"{tenant.Code} {tenant.FullName}".ToLowerInvariant())"
+                                data-phone="@(new string((tenant.Phone ?? "").Where(char.IsDigit).ToArray()))">
+                            @tenant.Code - @tenant.FullName@(string.IsNullOrWhiteSpace(tenant.Phone) ? "" : " - " + tenant.Phone)@(tenant.Outstanding > 0 ? " - " + T.Format("owes {0}", tenant.Outstanding.ToString("N2")) : "")
+                        </option>
+                    }
+                </select>
+                <div id="tenantNone" class="form-text text-danger d-none">@T["No tenant matches. Check the name, number or phone."]</div>
+            </div>
         </div>
-
-        <div class="col-md-3">
-            <label asp-for="ReceiptNumber" class="form-label"></label>
-            <input asp-for="ReceiptNumber" class="form-control" />
-            <small class="text-muted">@T["Leave blank to auto-generate."]</small>
-        </div>
-
-        <div class="col-md-3">
-            <label asp-for="ReceiptDate" class="form-label"></label>
-            <input asp-for="ReceiptDate" type="date" class="form-control" />
-        </div>
-
-        <div class="col-md-4">
-            <label asp-for="Amount" class="form-label"></label>
-            <input asp-for="Amount" class="form-control" />
-        </div>
-
-        <div class="col-md-4">
-            <label asp-for="PaymentMethod" class="form-label"></label>
-            <select asp-for="PaymentMethod" class="form-select">
-                <option value="Bank">@T["Bank"]</option>
-                <option value="Cash">@T["Cash"]</option>
-                <option value="Cheque">@T["Cheque"]</option>
-                <option value="Transfer">@T["Transfer"]</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="mt-4">
-        <button type="submit" class="btn btn-dark">@T["Save and Post"]</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
     </div>
 </form>
 
+@if (Model.Tenant == null)
+{
+    <div class="alert alert-info">@T["Choose the tenant first. Their open invoices are then listed, and you record what they paid."]</div>
+    <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
+}
+else
+{
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Form.TenantId" value="@Model.Tenant.Id" />
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-baseline mb-2">
+            <h5 class="mb-0">@Model.Tenant.Code - @Model.Tenant.FullName</h5>
+            <div>@T["Owed on posted invoices"]: <strong>@owed.ToString("N2") @Model.Currency</strong></div>
+        </div>
+
+        @if (Model.OpenInvoices.Count == 0)
+        {
+            <div class="alert alert-warning">
+                @T["This tenant has no posted invoice with a balance. An invoice still in draft must be posted from Customer Invoices before money can be received against it."]
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
+        }
+        else
+        {
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <label for="Amount" class="form-label">@T["Amount received"]</label>
+                    <input type="number" step="0.01" min="0" id="Amount" name="Form.Amount" class="form-control"
+                           value="@(Model.Form.Amount > 0 ? Model.Form.Amount.ToString("0.00", inv) : "")" />
+                </div>
+                <div class="col-md-3">
+                    <label for="ReceiptDate" class="form-label">@T["Receipt Date"]</label>
+                    <input type="date" id="ReceiptDate" name="Form.ReceiptDate" class="form-control"
+                           value="@Model.Form.ReceiptDate.ToString("yyyy-MM-dd", inv)" />
+                </div>
+                <div class="col-md-3">
+                    <label for="PaymentMethod" class="form-label">@T["Payment Method"]</label>
+                    <select id="PaymentMethod" name="Form.PaymentMethod" class="form-select">
+                        @foreach (var method in new[] { "Bank", "Cash", "Cheque", "Transfer" })
+                        {
+                            <option value="@method" selected="@(Model.Form.PaymentMethod == method ? "selected" : null)">@T[method]</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="ReceiptNumber" class="form-label">@T["Receipt Number"]</label>
+                    <input type="text" id="ReceiptNumber" name="Form.ReceiptNumber" class="form-control" maxlength="90" value="@Model.Form.ReceiptNumber" />
+                    <small class="text-muted">@T["Leave blank to auto-generate."]</small>
+                </div>
+                <div class="col-md-4">
+                    <label for="Reference" class="form-label">@T["Payment reference"]</label>
+                    <input type="text" id="Reference" name="Form.Reference" class="form-control" maxlength="100" value="@Model.Form.Reference" />
+                </div>
+                <div class="col-md-8">
+                    <label for="Notes" class="form-label">@T["Notes"]</label>
+                    <input type="text" id="Notes" name="Form.Notes" class="form-control" maxlength="500" value="@Model.Form.Notes" />
+                </div>
+            </div>
+
+            <p class="text-muted mb-2">
+                @T["Tick the invoices the tenant is paying. If none is ticked, or money is left over, it goes to the invoice nearest its due date. An invoice paid only in part is a payment on account."]
+            </p>
+
+            <table class="table table-bordered align-middle" id="openInvoices">
+                <thead>
+                    <tr>
+                        <th style="width:2.5rem"></th>
+                        <th>@T["Invoice"]</th>
+                        <th>@T["Property"] / @T["Unit"]</th>
+                        <th>@T["Due Date"]</th>
+                        <th class="text-end">@T["Total"]</th>
+                        <th class="text-end">@T["Outstanding"]</th>
+                        <th class="text-end">@T["This payment"]</th>
+                        <th class="text-end">@T["Left to pay"]</th>
+                        <th>@T["Result"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invoice in Model.OpenInvoices)
+                    {
+                        var outstanding = invoice.TotalAmount - invoice.AmountPaid;
+                        <tr data-invoice="@invoice.Id" data-outstanding="@outstanding.ToString("0.00", inv)">
+                            <td class="text-center">
+                                <input type="checkbox" class="form-check-input" name="Form.InvoiceIds" value="@invoice.Id"
+                                       id="invoice-@invoice.Id" checked="@(Model.Form.InvoiceIds.Contains(invoice.Id) ? "checked" : null)" />
+                            </td>
+                            <td>
+                                <label for="invoice-@invoice.Id" class="mb-0">@invoice.InvoiceNumber</label>
+                                @if (invoice.ChargeType != null || invoice.LineDescription != null)
+                                {
+                                    <div class="small text-muted">@(invoice.ChargeType ?? invoice.LineDescription)</div>
+                                }
+                            </td>
+                            <td>@invoice.Lease?.Unit?.Property?.Code / @invoice.Lease?.Unit?.UnitNumber</td>
+                            <td>
+                                @invoice.DueDate.ToString("dd/MM/yyyy")
+                                @if (invoice.DueDate.Date < DateTime.Today)
+                                {
+                                    <span class="badge bg-danger">@T["Overdue"]</span>
+                                }
+                            </td>
+                            <td class="text-end">@invoice.TotalAmount.ToString("N2")</td>
+                            <td class="text-end">@outstanding.ToString("N2")</td>
+                            <td class="text-end fw-semibold" data-cell="applied"></td>
+                            <td class="text-end" data-cell="left"></td>
+                            <td data-cell="result"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div id="overpaid" class="alert alert-danger d-none"></div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-dark" id="saveReceipt">@T["Save and Post"]</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">@T["Back"]</a>
+            </div>
+        }
+    </form>
+}
+
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            // ---- finding the tenant by name, number or phone ----
+            var search = document.getElementById('tenantSearch');
+            var select = document.getElementById('tenantSelect');
+            var none = document.getElementById('tenantNone');
+            if (search && select) {
+                var all = Array.prototype.slice.call(select.options, 1);
+                search.addEventListener('input', function () {
+                    var text = search.value.trim().toLowerCase();
+                    // A phone is matched on its digits, without the leading zero of a local number.
+                    var digits = text.replace(/\D/g, '').replace(/^0+/, '');
+                    var shown = [];
+                    all.forEach(function (option) {
+                        var match = !text
+                            || option.dataset.find.indexOf(text) >= 0
+                            || (digits.length >= 3 && option.dataset.phone.indexOf(digits) >= 0);
+                        option.hidden = !match;
+                        option.disabled = !match;
+                        if (match) shown.push(option);
+                    });
+                    none.classList.toggle('d-none', shown.length > 0);
+                    // One tenant left: that is the one.
+                    if (text && shown.length === 1 && select.value !== shown[0].value) {
+                        select.value = shown[0].value;
+                        select.form.submit();
+                    }
+                });
+            }
+
+            // ---- showing where the money will go, as the server will apply it ----
+            var table = document.getElementById('openInvoices');
+            var amountBox = document.getElementById('Amount');
+            if (!table || !amountBox) return;
+
+            var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr'));
+            var overpaid = document.getElementById('overpaid');
+            var typed = amountBox.value !== '';
+            var words = {
+                full: @Json.Serialize(T["Settled in full"].ToString()),
+                account: @Json.Serialize(T["Payment on account"].ToString()),
+                over: @Json.Serialize(T["The amount is {0} more than this tenant owes on posted invoices."].ToString())
+            };
+            var money = function (n) { return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+            var cents = function (text) { return Math.round(parseFloat(text || '0') * 100) || 0; };
+
+            function ticked(row) { return row.querySelector('input[type=checkbox]').checked; }
+
+            function show() {
+                var left = cents(amountBox.value);
+                var order = rows.filter(ticked).concat(rows.filter(function (r) { return !ticked(r); }));
+                var applied = {};
+                order.forEach(function (row) {
+                    var owes = cents(row.dataset.outstanding);
+                    var take = Math.min(owes, Math.max(left, 0));
+                    applied[row.dataset.invoice] = take;
+                    left -= take;
+                });
+                rows.forEach(function (row) {
+                    var owes = cents(row.dataset.outstanding);
+                    var take = applied[row.dataset.invoice] || 0;
+                    row.querySelector('[data-cell=applied]').textContent = take ? money(take / 100) : '';
+                    row.querySelector('[data-cell=left]').textContent = take ? money((owes - take) / 100) : '';
+                    row.querySelector('[data-cell=result]').innerHTML = !take ? ''
+                        : take === owes ? '<span class="badge bg-success">' + words.full + '</span>'
+                        : '<span class="badge bg-warning text-dark">' + words.account + '</span>';
+                    row.classList.toggle('table-active', take > 0);
+                });
+                overpaid.classList.toggle('d-none', left <= 0);
+                if (left > 0) overpaid.textContent = words.over.replace('{0}', money(left / 100));
+            }
+
+            amountBox.addEventListener('input', function () { typed = amountBox.value !== ''; show(); });
+            rows.forEach(function (row) {
+                row.querySelector('input[type=checkbox]').addEventListener('change', function () {
+                    // Until an amount is typed, it follows the invoices ticked.
+                    if (!typed) {
+                        var sum = rows.filter(ticked).reduce(function (s, r) { return s + cents(r.dataset.outstanding); }, 0);
+                        amountBox.value = sum ? (sum / 100).toFixed(2) : '';
+                    }
+                    show();
+                });
+            });
+            typed = amountBox.value !== '' && rows.filter(ticked).length === 0;
+            show();
+        })();
+    </script>
 }

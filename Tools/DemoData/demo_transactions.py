@@ -100,9 +100,10 @@ for inv_id, number, total, due_date, tenant in invoices:
     amount = round(total * (0.5 if (tenant == 2 and late_month) else 1.0), 2)
     n += 1
     pay_day = due_date[:8] + ("05" if tenant in (1, 3, 5) else "12")
-    post("/CustomerReceipts/Create", {"CustomerInvoiceId": inv_id, "ReceiptNumber": f"RCT-2026-{n:04d}",
-                                      "ReceiptDate": pay_day, "Amount": f"{amount:.2f}",
-                                      "PaymentMethod": "Bank Transfer" if tenant in (3, 4, 6, 8) else "Cheque"})
+    post("/CustomerReceipts/Create", {"Form.TenantId": tenant, "Form.InvoiceIds": inv_id,
+                                      "Form.ReceiptNumber": f"RCT-2026-{n:04d}",
+                                      "Form.ReceiptDate": pay_day, "Form.Amount": f"{amount:.2f}",
+                                      "Form.PaymentMethod": "Bank Transfer" if tenant in (3, 4, 6, 8) else "Cheque"})
 print("receipts:", n)
 
 # ---- PDCs -------------------------------------------------------------------------
@@ -197,8 +198,8 @@ post("/Journal/PostAllDrafts", {"fromDate": "2025-01-01", "toDate": "2027-12-31"
 # ---- a little work left in draft, so the draft screens have something to show ----------------
 khalid = sql("""SELECT TOP 1 i.Id, i.TotalAmount FROM CustomerInvoices i JOIN Leases l ON l.Id = i.LeaseId
                 WHERE l.TenantId = 7 AND i.InvoiceDate <= '2026-10-15' AND i.TotalAmount > i.AmountPaid ORDER BY i.DueDate""")[0]
-post("/CustomerReceipts/Create", {"CustomerInvoiceId": khalid[0], "ReceiptNumber": "RCT-2026-0099",
-                                  "ReceiptDate": "2026-10-14", "Amount": "11500.00", "PaymentMethod": "Cash"})
+post("/CustomerReceipts/Create", {"Form.TenantId": 7, "Form.InvoiceIds": khalid[0], "Form.ReceiptNumber": "RCT-2026-0099",
+                                  "Form.ReceiptDate": "2026-10-14", "Form.Amount": "11500.00", "Form.PaymentMethod": "Cash"})
 post("/PettyCash/Create", {"PettyCashAccountId": ACC["11150"], "VoucherDate": "2026-10-13", "PaidTo": "ACE Hardware",
                            "Description": "Light bulbs, common areas", "ExpenseAccountId": ACC["52100"], "PropertyId": 1,
                            "UnitId": "", "Amount": 165, "ReferenceNumber": "ACE-3390"})

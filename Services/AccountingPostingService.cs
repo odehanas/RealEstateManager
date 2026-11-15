@@ -402,7 +402,9 @@ namespace RealEstateManager.Services
                     AccountId = receivableAccount.Id,
                     Debit = 0m,
                     Credit = receipt.Amount,
-                    Description = $"Settlement of invoice {invoice.InvoiceNumber}",
+                    Description = receipt.IsOnAccount
+                        ? $"Payment on account against invoice {invoice.InvoiceNumber}"
+                        : $"Settlement of invoice {invoice.InvoiceNumber}",
                     PropertyId = propertyId,
                     UnitId = unitId,
                     TenantId = tenantId,
