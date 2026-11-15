@@ -119,7 +119,15 @@ on the server is enough to update one. The `.webm` files are kept out of git bec
 their size - re-create them with this tool. `--publish-only` copies already-recorded
 videos into the help again without recording.
 
-To add a voice-over or make an `.mp4` copy, open a video in Microsoft Clipchamp and export it.
+For a voice-over, add `--voice en-US-BrianNeural`: every caption is spoken while its click
+or typing happens, and the narrated recording is saved as `<number>-<key>-voice.webm`. Add
+`--mp4` for an `.mp4` copy of each recording, the format to upload to YouTube. The spoken
+lines are fetched before recording starts, so fetching them never holds up a video. The
+notes at the top of the script list the voices and the terms to check before publishing.
+
+A fresh demo database makes the owner choose a new password at the first sign-in. The
+recorder does that itself, off camera, and signs in with its own password from then on
+(`RECORDING_PASSWORD` in the script).
 
 Requirements: Google Chrome or Microsoft Edge, `pip install playwright`, and
 `python -m playwright install ffmpeg`.

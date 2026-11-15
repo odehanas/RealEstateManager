@@ -32,11 +32,14 @@ USAGE
 WITH A VOICE-OVER
     python Tools/VideoCapture/record_videos.py --only 01 --voice en-US-BrianNeural --no-publish
 
-    --voice names a text-to-speech voice. Every caption and title card is then spoken, each
-    step stays on screen for as long as its line takes to say, and the result is saved as
-    output/<number>-<key>-voice.webm with the sound mixed in. Spoken lines are kept in
-    output/voice, so a second run does not fetch them again (and has no gaps while it does).
-    --voice-rate "-5%" slows the voice a little; "+10%" quickens it.
+    --voice names a text-to-speech voice. Every caption and title card is then spoken, and
+    the result is saved as output/<number>-<key>-voice.webm with the sound mixed in. The
+    voice and the action run together: a line starts as the pointer moves, the click or
+    typing happens while it is being said, and the next line waits only for this one to end.
+    The lines are fetched before recording starts and kept in output/voice, so fetching
+    them never holds up a video and a second run does not fetch them again.
+    --voice-rate sets the speed of the voice (default "+8%"; "+0%" is its natural speed).
+    --mp4 also writes an .mp4 copy (H.264 with AAC sound), the format YouTube prefers.
     Leave out --no-publish to put the narrated videos into the help, or publish ones
     already recorded with:  --publish-only --voice en-US-BrianNeural
     Other voices: en-US-GuyNeural, en-GB-RyanNeural, en-US-AvaNeural, ar-AE-HamdanNeural, ar-AE-FatimaNeural
@@ -51,10 +54,12 @@ Requires:  pip install playwright   and Google Chrome or Microsoft Edge installe
            for --voice:  pip install edge-tts imageio-ffmpeg
 """
 import argparse
+import ast
 import asyncio
 import base64
 import datetime as dt
 import hashlib
+import inspect
 import json
 import pathlib
 import re
@@ -74,6 +79,10 @@ OUT_DIR = PROJECT / "Tools" / "VideoCapture" / "output"
 HELP_VIDEOS = PROJECT / "wwwroot" / "help" / "videos"
 
 COMPANY = "Al Waha Properties"
+# The application makes the owner choose a new password the first time they sign in with
+# the one a fresh demo database starts with. The recorder chooses this one, off camera,
+# and the videos then sign in with it. It only ever exists in the local demo database.
+RECORDING_PASSWORD = "Training#Waha2026"
 SIZE = {"width": 1280, "height": 720}
 
 TODAY = dt.date.today()
@@ -186,6 +195,14 @@ class Narrator:
         self.folder.mkdir(parents=True, exist_ok=True)
         self.started = time.monotonic()
         self.cues = []             # (seconds into the video, sound file)
+        # Where the speech starts in each clip and how long it lasts. Kept between runs:
+        # measuring a clip takes about a second, which would be a silence in the video.
+        self.measured = self.folder / "measured.json"
+        self.lines = {}
+        if self.measured.exists():
+            kept = json.loads(self.measured.read_text(encoding="utf-8"))
+            self.lines = {name: (self.folder / f"{name}.mp3", lead, length)
+                          for name, (lead, length) in kept.items() if (self.folder / f"{name}.mp3").exists()}
 
     def start(self):
         """Call when the recording starts: cue times are counted from here."""
@@ -197,23 +214,44 @@ class Narrator:
         # "...and your password." is said without the dots.
         return re.sub(r"\s+", " ", text.replace("...", " ")).strip()
 
+    def name(self, text: str) -> str:
+        return hashlib.sha1(f"{self.voice}|{self.rate}|{self.spoken(text)}".encode("utf-8")).hexdigest()[:16]
+
+    def known(self, text: str) -> bool:
+        return self.name(text) in self.lines
+
     async def line(self, text: str):
-        """The sound file of a line and its length in seconds, fetched once and kept."""
+        """The sound file of a line, fetched once and kept, with where the speech starts in
+        it and how long the speech lasts. The service pads every clip with silence at both
+        ends; waiting for that as well is what makes a video drag."""
         words = self.spoken(text)
-        name = hashlib.sha1(f"{self.voice}|{self.rate}|{words}".encode("utf-8")).hexdigest()[:16]
+        name = self.name(text)
+        if name in self.lines:
+            return self.lines[name]
         sound = self.folder / f"{name}.mp3"
         if not sound.exists() or sound.stat().st_size == 0:
             await self.tts.Communicate(words, self.voice, rate=self.rate).save(str(sound))
-        probe = subprocess.run([self.ffmpeg, "-hide_banner", "-i", str(sound)],
+        probe = subprocess.run([self.ffmpeg, "-hide_banner", "-i", str(sound),
+                                "-af", "silencedetect=noise=-45dB:d=0.12", "-f", "null", "-"],
                                capture_output=True, text=True, encoding="utf-8", errors="replace")
         found = re.search(r"Duration: (\d+):(\d+):(\d+\.\d+)", probe.stderr)
         if not found:
             raise RuntimeError(f"Could not read the length of the spoken line: {words}")
         hours, minutes, seconds = found.groups()
-        return sound, int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+        total = int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+        starts = [float(x) for x in re.findall(r"silence_start: (-?[\d.]+)", probe.stderr)]
+        ends = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", probe.stderr)]
+        lead = ends[0] if starts and ends and starts[0] <= 0.02 else 0.0
+        finish = total
+        if starts and starts[-1] > lead and (len(ends) < len(starts) or ends[-1] >= total - 0.06):
+            finish = starts[-1]
+        self.lines[name] = (sound, lead, max(0.3, finish - lead))
+        self.measured.write_text(json.dumps({n: [l[1], l[2]] for n, l in self.lines.items()}), encoding="utf-8")
+        return self.lines[name]
 
-    def cue(self, sound: pathlib.Path):
-        self.cues.append((time.monotonic() - self.started, sound))
+    def cue(self, sound: pathlib.Path, lead: float = 0.0):
+        # Laid in so that the first word, not the silence before it, lands on this moment.
+        self.cues.append((max(0.0, time.monotonic() - self.started - lead), sound))
 
     def mix(self, video: pathlib.Path, target: pathlib.Path):
         """Writes the recording again with every line laid in at its moment."""
@@ -242,6 +280,7 @@ class Director:
         self.site = site
         self.pace = pace
         self.narrator = narrator
+        self.line_ends = 0.0       # when the line now being said (or read) is over
 
     async def js(self, script: str, arg=None):
         """Runs a snippet in the page. A page that is reloading (after a form submits)
@@ -263,34 +302,52 @@ class Director:
         return max(2.2, len(text.split()) / 3.0)
 
     # ---- the layers ----------------------------------------------------------
-    async def speak(self, text: str, at_least: float):
-        """Says a line and waits until it has been said - or, with no voice-over, waits
-        the time it takes to read."""
-        if not self.narrator:
-            await self.pause(at_least)
-            return
-        self.narrator.cue(self.pending_sound)
-        # The line's own length plus a breath; never scaled by --pace, or the next
-        # line would start over this one.
-        await self.page.wait_for_timeout(int((self.pending_seconds + 0.45) * 1000))
+    # A line and what it describes run together. begin() starts a line and returns at
+    # once, so the click or the typing happens while it is being said; settle() waits for
+    # it to end. Every new line settles the one before, so two lines never overlap.
+    async def settle(self, gap: float = 0.25):
+        """Waits until the current line has been said, plus a short breath."""
+        wait = self.line_ends + gap - time.monotonic()
+        if wait > 0:
+            await self.page.wait_for_timeout(int(wait * 1000))
 
-    async def prepare_line(self, text: str):
-        """Fetches the line before anything is shown, so the words and the voice start together."""
+    async def begin(self, spoken: str, script: str, arg, seconds: float | None = None):
+        """Shows a caption or card and starts saying it, as soon as the line before is over."""
+        sound = None
         if self.narrator:
-            self.pending_sound, self.pending_seconds = await self.narrator.line(text)
+            # Fetched before anything is shown, so the words and the voice start together.
+            # Its length is never scaled by --pace: it takes as long as it takes to say.
+            sound, lead, length = await self.narrator.line(spoken)
+        else:
+            length = (seconds if seconds is not None else self.reading_time(spoken)) * self.pace
+        await self.settle()
+        await self.js(script, arg)
+        if sound:
+            self.narrator.cue(sound, lead)
+        self.line_ends = time.monotonic() + length
+
+    async def lead_in(self):
+        """The moment between a line starting and the action it describes: long enough
+        for the pointer to arrive and the first words to be heard."""
+        left = self.line_ends - time.monotonic()
+        await self.page.wait_for_timeout(int(min(max(0.65, left * 0.5), 1.4) * 1000))
+
+    async def caption(self, text: str, step: str | None = None, seconds: float | None = None):
+        """Starts a caption without waiting for it to be said."""
+        await self.begin(text, "([t,s]) => __demo.caption(t,s)", [text, step], seconds)
 
     async def card(self, number: str, title: str, subtitle: str, seconds: float = 3.8):
-        await self.prepare_line(f"{title}. {subtitle}")
-        await self.js("([n,t,s]) => __demo.card(n,t,s)", [number, title, subtitle])
-        await self.speak(f"{title}. {subtitle}", seconds)
+        await self.begin(f"{title}. {subtitle}", "([n,t,s]) => __demo.card(n,t,s)",
+                         [number, title, subtitle], seconds)
+        await self.settle(0.35)
         await self.js("() => __demo.hideCard()")
 
     async def say(self, text: str, step: str | None = None, seconds: float | None = None):
-        await self.prepare_line(text)
-        await self.js("([t,s]) => __demo.caption(t,s)", [text, step])
-        await self.speak(text, seconds if seconds is not None else self.reading_time(text))
+        await self.caption(text, step, seconds)
+        await self.settle()
 
     async def clear_caption(self):
+        await self.settle()
         await self.js("() => __demo.caption(null)")
 
     # ---- moving around ---------------------------------------------------------
@@ -306,39 +363,46 @@ class Director:
     async def ring(self, box):
         await self.js("r => __demo.ring(r)", box)
 
-    async def point(self, target, text: str | None = None, step: str | None = None, seconds: float | None = None):
-        """Moves the pointer to something and outlines it, without clicking."""
+    async def point(self, target, text: str | None = None, step: str | None = None,
+                    seconds: float | None = None, hold: bool = True):
+        """Moves the pointer to something and outlines it, without clicking. The line
+        starts as the pointer moves; with hold, it is heard out before anything else."""
         locator = self.loc(target)
         await locator.scroll_into_view_if_needed()
+        if text:
+            await self.caption(text, step, seconds)
         box = await locator.bounding_box()
         if box:
             await self.js("([x,y]) => __demo.cursor(x,y,false)",
                                      [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2])
             await self.ring({"x": box["x"], "y": box["y"], "w": box["width"], "h": box["height"]})
-        await self.pause(0.7)
-        if text:
-            await self.say(text, step, seconds)
+        if text and hold:
+            await self.settle()
+        elif hold:
+            await self.pause(0.6)
 
     async def click(self, target, text: str | None = None, step: str | None = None, navigates: bool = True):
         locator = self.loc(target)
-        await self.point(locator, text, step)
+        await self.point(locator, text, step, hold=False)
+        await self.lead_in()
         box = await locator.bounding_box()
         if box:
             await self.js("([x,y]) => __demo.cursor(x,y,true)",
                                      [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2])
-        await self.pause(0.35)
+        await self.pause(0.3)
         await self.ring(None)
         await locator.click()
         if navigates:
             await self.page.wait_for_timeout(300)
             await self.page.wait_for_load_state("load")
-        await self.pause(0.8)
+        await self.pause(0.45)
 
     async def fill(self, target, value, text: str | None = None, step: str | None = None):
         """Types into a box, or picks from a list: a select is chosen by value or by
         the start of any option's text."""
         locator = self.loc(target)
-        await self.point(locator, text, step)
+        await self.point(locator, text, step, hold=False)
+        await self.lead_in()
         tag = await locator.evaluate("e => e.tagName.toLowerCase()")
         kind = await locator.evaluate("e => (e.type || '').toLowerCase()")
         value = str(value)
@@ -365,30 +429,33 @@ class Director:
         else:
             await locator.click()
             await locator.fill("")
-            await locator.type(value, delay=int(38 * self.pace))
+            await locator.type(value, delay=int(26 * self.pace))
         await self.ring(None)
-        await self.pause(0.45)
+        await self.pause(0.25)
 
     async def submit(self, action: str, text: str | None = None, step: str | None = None):
         """Clicks the submit button of the form posting to the given address."""
         await self.click(f"form[action*='{action}'] button[type=submit]", text, step)
 
-    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 1.5):
+    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 0.5):
         """Opens a group of the side menu (sb-masterData, sb-operations...), shows it
-        for a moment and closes it again."""
+        while its line is said and closes it again."""
         toggle = f"#appSidebar [data-bs-target='#{name}']"
         await self.click(toggle, text, step, navigates=False)
+        await self.settle()
         await self.pause(seconds)
         await self.loc(toggle).click()
-        await self.pause(0.5)
+        await self.pause(0.3)
 
     async def menu(self, dropdown_id: str, href: str, text: str | None = None, step: str | None = None):
         """Opens the item with this address in the side menu, opening its group first.
-        (dropdown_id is the old top menu's name; the item is found by its address.)"""
+        (dropdown_id is the old top menu's name; the item is found by its address.)
+        The line starts with the first click and carries on over the second."""
         link = self.page.locator(f"#appSidebar a.sidebar-link[href='{href}']").first
         group = await link.evaluate("e => { const g = e.closest('ul.collapse'); return g ? g.id : null; }")
         if group and not await self.page.locator(f"#{group}").evaluate("e => e.classList.contains('show')"):
-            await self.click(f"#appSidebar [data-bs-target='#{group}']", navigates=False)
+            await self.click(f"#appSidebar [data-bs-target='#{group}']", text, step, navigates=False)
+            text = None
         await self.click(link, text, step)
 
     async def scroll(self, pixels: int, seconds: float = 1.2):
@@ -431,7 +498,7 @@ async def v01_sign_in(d: Director):
     await d.point("select[name=companyId]",
                   "If you work for more than one company, choose the one to work in from this list.", "Step 3")
     await d.fill("select[name=companyId]", COMPANY)
-    await d.pause(1)
+    await d.pause(0.4)
     await d.say(f"Now you are in {COMPANY}, a practice company full of sample data.")
     await d.point(d.page.locator(".card", has_text="Receivables").first,
                   "Receivables: how much tenants owe, and how much of it is overdue.")
@@ -439,8 +506,8 @@ async def v01_sign_in(d: Director):
                   "Occupancy: how many of your units are let.")
     await d.point(d.page.locator(".card", has_text="Accounting Period").first,
                   "The current accounting period, and how many leases are active.")
-    await d.scroll(600, 2.5)
-    await d.scroll(-600, 1)
+    await d.scroll(600, 1.4)
+    await d.scroll(-600, 0.6)
     await d.group("sb-masterData", "The menu is on the left. Master Data holds properties, units, tenants and leases.", "Menus")
     await d.group("sb-operations", "Operations is the daily work: invoices, receipts, cheques, bills and petty cash.", "Menus")
     await d.group("sb-controls", "Controls has the approvals and the management dashboards.", "Menus")
@@ -818,6 +885,50 @@ VIDEOS = [
 ARGS = None
 DIRECTOR = None
 
+# Which argument of each Director call is the line to say.
+LINE_ARGUMENT = {"say": 0, "goto": 1, "point": 1, "click": 1, "submit": 1, "group": 1, "fill": 2, "menu": 2}
+
+
+def scripted_lines(plays) -> list[str]:
+    """The lines the videos will say, read from their own code, so that they can all be
+    fetched before recording starts. A line built from something only known while
+    recording (a code the system has just issued) is left out and fetched when met."""
+    lines = []
+    for play in plays:
+        for call in ast.walk(ast.parse(inspect.getsource(play))):
+            if not (isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute)):
+                continue
+            name = call.func.attr
+            if name == "card" and len(call.args) >= 3:
+                parts = call.args[1:3]
+            elif name in LINE_ARGUMENT and len(call.args) > LINE_ARGUMENT[name]:
+                parts = [call.args[LINE_ARGUMENT[name]]]
+            else:
+                continue
+            try:
+                said = [eval(compile(ast.Expression(part), "<line>", "eval"), globals()) for part in parts]
+            except Exception:
+                continue
+            if all(isinstance(text, str) for text in said):
+                lines.append(". ".join(said))
+    return lines
+
+
+async def fetch_lines(plays):
+    """Fetches and measures every line of the chosen videos, a few at a time."""
+    narrator = Narrator(ARGS.voice, ARGS.voice_rate)
+    lines = list(dict.fromkeys(scripted_lines(plays)))
+    new = [line for line in lines if not narrator.known(line)]
+    if not new:
+        return
+    print(f"fetching {len(new)} spoken lines...")
+    several = asyncio.Semaphore(5)
+
+    async def fetch(line):
+        async with several:
+            await narrator.line(line)
+    await asyncio.gather(*(fetch(line) for line in new))
+
 
 # ===========================================================================
 #  SET-UP: a signed-in session inside the training company
@@ -830,14 +941,29 @@ async def prepare(browser, state_file: pathlib.Path):
     page = await context.new_page()
     site = ARGS.site
 
-    await page.goto(site + "/Auth/Login")
-    if "/Auth/Login" in page.url:
-        await page.fill("#Username", ARGS.username)
-        await page.fill("#Password", ARGS.password)
-        await page.click("form[action*='/Auth/Login'] button[type=submit]")
+    async def sign_in(password):
+        await page.goto(site + "/Auth/Login")
+        if "/Auth/Login" in page.url:
+            await page.fill("#Username", ARGS.username)
+            await page.fill("#Password", password)
+            await page.click("form[action*='/Auth/Login'] button[type=submit]")
+            await page.wait_for_load_state("load")
+        return "/Auth/Login" not in page.url
+
+    if not await sign_in(ARGS.password):
+        # An earlier recording on this database has already changed the password.
+        if not await sign_in(RECORDING_PASSWORD):
+            sys.exit("Could not sign in. Check --username and --password (the demo owner account).")
+        ARGS.password = RECORDING_PASSWORD
+    if "/Profile/ChangePassword" in page.url:
+        await page.fill("#CurrentPassword", ARGS.password)
+        await page.fill("#NewPassword", RECORDING_PASSWORD)
+        await page.fill("#ConfirmNewPassword", RECORDING_PASSWORD)
+        await page.click("form[action*='ChangePassword'] button[type=submit]")
         await page.wait_for_load_state("load")
-    if "/Auth/Login" in page.url:
-        sys.exit("Could not sign in. Check --username and --password (the demo owner account).")
+        if "/Profile/ChangePassword" in page.url:
+            sys.exit("The application asked for a new password and did not accept the recorder's.")
+        ARGS.password = RECORDING_PASSWORD
 
     await page.goto(site + "/Companies")
     if "/Companies" not in page.url:
@@ -905,6 +1031,7 @@ async def record(browser, state_file, number, key, title, play):
     ok = True
     try:
         await play(DIRECTOR)
+        await DIRECTOR.settle()
     except Exception as ex:  # keep going with the next video, but say what failed
         ok = False
         shot = OUT_DIR / f"{number}-{key}-FAILED.png"
@@ -920,8 +1047,26 @@ async def record(browser, state_file, number, key, title, play):
         print(f"  voice-over: {len(narrator.cues)} lines, voice {narrator.voice}")
     elif ok:
         shutil.move(await video.path(), target)
+    if ok and ARGS.mp4:
+        to_mp4(target)
     shutil.rmtree(temp_dir, ignore_errors=True)
     return ok, target
+
+
+def to_mp4(video: pathlib.Path) -> pathlib.Path:
+    """Writes an .mp4 copy beside a recording: H.264 picture and AAC sound, which is what
+    YouTube and most video editors take most readily."""
+    import imageio_ffmpeg
+    target = video.with_suffix(".mp4")
+    done = subprocess.run(
+        [imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
+         "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p",
+         "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", str(target)],
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if done.returncode != 0:
+        raise RuntimeError("Making the .mp4 copy failed:\n" + done.stderr[-800:])
+    print(f"  mp4 copy: {target.relative_to(PROJECT)} ({target.stat().st_size // 1024} KB)")
+    return target
 
 
 # ===========================================================================
@@ -998,7 +1143,9 @@ async def main():
     parser.add_argument("--publish-only", action="store_true",
                         help="do not record; copy the videos already recorded into the help")
     parser.add_argument("--voice", help="speak the captions with this voice, e.g. en-US-BrianNeural")
-    parser.add_argument("--voice-rate", default="+0%", help='speed of the voice, e.g. "-5%%" or "+10%%"')
+    parser.add_argument("--voice-rate", default="+8%", help='speed of the voice, e.g. "+0%%" or "+15%%"')
+    parser.add_argument("--mp4", action="store_true",
+                        help="also write an .mp4 copy of each recording, for YouTube")
     parser.add_argument("--no-publish", action="store_true",
                         help="record into Tools/VideoCapture/output only; leave the help as it is")
     ARGS = parser.parse_args()
@@ -1008,6 +1155,11 @@ async def main():
             import edge_tts, imageio_ffmpeg  # noqa: F401
         except ImportError:
             sys.exit("--voice needs two packages:  pip install edge-tts imageio-ffmpeg")
+    if ARGS.mp4:
+        try:
+            import imageio_ffmpeg  # noqa: F401
+        except ImportError:
+            sys.exit("--mp4 needs a package:  pip install imageio-ffmpeg")
 
     wanted = {x.strip() for x in ARGS.only.split(",")} if ARGS.only else None
     selected = [v for v in VIDEOS if not wanted or v[0] in wanted or v[1] in wanted]
@@ -1029,6 +1181,9 @@ async def main():
     host = urllib.parse.urlparse(ARGS.site).hostname
     if host not in ("localhost", "127.0.0.1", "::1"):
         sys.exit("Refusing to record from anything but localhost: the videos would show real data.")
+
+    if ARGS.voice:
+        await fetch_lines([play for _, _, _, play in selected])
 
     async with async_playwright() as p:
         browser = await launch(p)
