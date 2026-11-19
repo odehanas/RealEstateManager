@@ -84,9 +84,10 @@ Requirements: SQL Server LocalDB (installed with Visual Studio), Chrome or Edge,
 
 ## Recording the training videos
 
-`Tools/VideoCapture/record_videos.py` records ten short walkthroughs of the main tasks:
+`Tools/VideoCapture/record_videos.py` records fourteen short walkthroughs of the main tasks:
 signing in, master data, leases, invoices and receipts, post-dated cheques, supplier
-bills, petty cash, month-end, the reports and the tenant portal. A real browser does the
+bills, petty cash, month-end, the reports, the tenant portal, a short stay, a payment on
+account, a lease handover and maintenance jobs. A real browser does the
 clicking and typing, with a caption bar explaining each step and a pointer showing where
 to click. **Like the screenshots, always record from the local demo copy, never the live
 site.** The tool refuses any address other than localhost.
@@ -132,7 +133,7 @@ voice stays in step with the clicks at any value:
 | `--pace` | The pointer, the typing, the wait before a click and the pause between lines. `1.5` is slower, `1` quicker. | `1.3` |
 | `--voice-rate` | The speed of the voice itself. `"-10%"` is slower, `"+0%"` is its natural speed. | `"-4%"` |
 
-With the defaults the ten videos run from about a minute and a quarter to two and a half minutes each. The spoken
+With the defaults the videos run from about a minute and a quarter to two and a half minutes each. The spoken
 lines are fetched before recording starts, so fetching them never holds up a video. The
 notes at the top of the script list the voices and the terms to check before publishing.
 

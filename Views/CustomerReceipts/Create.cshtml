@@ -170,6 +170,7 @@ else
             var none = document.getElementById('tenantNone');
             if (search && select) {
                 var all = Array.prototype.slice.call(select.options, 1);
+                var pick = null;
                 search.addEventListener('input', function () {
                     var text = search.value.trim().toLowerCase();
                     // A phone is matched on its digits, without the leading zero of a local number.
@@ -184,10 +185,13 @@ else
                         if (match) shown.push(option);
                     });
                     none.classList.toggle('d-none', shown.length > 0);
-                    // One tenant left: that is the one.
+                    // One tenant left: that is the one - once the typing has stopped.
+                    clearTimeout(pick);
                     if (text && shown.length === 1 && select.value !== shown[0].value) {
-                        select.value = shown[0].value;
-                        select.form.submit();
+                        pick = setTimeout(function () {
+                            select.value = shown[0].value;
+                            select.form.submit();
+                        }, 800);
                     }
                 });
             }

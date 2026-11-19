@@ -21,7 +21,11 @@ BEFORE RECORDING (all local):
 The first run opens a training company, "Al Waha Properties", and fills it with a year of
 sample data from the Load Sample Data button. Every video then works inside that company.
 Some videos build on the one before (the lease in video 3 is for the tenant added in
-video 2), so record them all together, on a fresh demo database.
+video 2), so record them all together, on a fresh demo database. Videos 11 to 13 use only
+the sample data - a vacant studio, a tenant with a balance and a tenant who is leaving -
+but each changes it, so they too need a fresh database. Video 14 needs a maintenance
+engineer and some jobs: the recorder adds the engineer and loads the company's Maintenance
+Scenarios, off camera, before the first video.
 
 USAGE
     python Tools/VideoCapture/record_videos.py                  # all videos
@@ -113,6 +117,16 @@ STATE = {
     "tenant_email": "layla.hassan@mail.example",
     "lease_start": MONTH_START,
     "property_code": None,
+    # Videos 11 to 13 work on the sample data: a vacant studio for a guest, a tenant
+    # with a balance, and a tenant who is leaving.
+    "guest": "Daniel Weber",
+    "stay_unit": "OWN-R-0001-U05",
+    "leaver": "Omar Al Hashimi",
+    # Video 14: the maintenance engineer the recorder adds, and a request from the
+    # maintenance scenarios that nobody has been given yet.
+    "engineer": "Yusuf Rahman",
+    "engineer_username": "yusuf.rahman",
+    "job": "Toilet flush not working",
 }
 
 # ---------------------------------------------------------------------------
@@ -876,6 +890,175 @@ async def v10_portal(d: Director):
     await d.card("Done", "Request answered", "That completes the main tasks of the system.", 3.5)
 
 
+async def v11_short_stay(d: Director):
+    await d.goto("/")
+    await d.card("Video 11", "A short stay",
+                 "Letting a flat for days or weeks: a rate for the stay, and VAT on a short let.")
+    await d.menu("masterDataDropdown", "/Tenants", "A guest is a tenant like any other. Open Master Data, then Tenants.", "Step 1")
+    await d.click("a[href='/Tenants/Create']", "Click Create.", "Step 1")
+    await d.fill("#FullName", STATE["guest"], "The guest's name...", "Step 1")
+    await d.fill("#Phone", "+971 58 000 3311", "...their phone...")
+    await d.fill("#Nationality", "Germany")
+    await d.fill("#PassportNumber", "C4F7K2M9P", "...and their passport number.")
+    await d.submit("/Tenants/Create", "Click Save.", "Step 1")
+
+    await d.menu("masterDataDropdown", "/Leases", "Now the contract. Open Leases.", "Step 2")
+    await d.click("a[href='/Leases/Create']", "Click Create.", "Step 2")
+    await d.fill("#UnitId", STATE["stay_unit"], "Choose the flat: a vacant studio.", "Step 2")
+    await d.fill("#TenantId", STATE["guest"], "Choose the guest.", "Step 2")
+    start = TODAY
+    end = TODAY + dt.timedelta(days=13)
+    await d.fill("#StartDate", iso(start), "The stay starts today...", "Step 3")
+    await d.fill("#EndDate", iso(end), "...and ends two weeks later. Both days are counted.", "Step 3")
+    await d.fill("#RentBasis", "Weekly", "Rent Agreed As: choose a weekly rate. A daily or monthly rate works the same way.", "Step 4")
+    await d.fill("#RentRate", "1400", "The rate for one week.", "Step 4")
+    await d.fill("#SecurityDepositAmount", "1000", "A deposit against damage.", "Step 4")
+    await d.page.locator("#vatPreview:not(.d-none)").wait_for()
+    await d.point("#vatPreview",
+                  "The system works out the price of the stay. A residential let under six months is taxed at 5%, "
+                  "even in a building whose yearly leases are exempt.", "Step 5")
+    await d.click("button[name=nextStep][value=activate]", "Click Save and Activate.", "Step 6")
+    await d.point(d.page.locator("tr", has_text=STATE["guest"]).first,
+                  "The contract is active for the two weeks of the stay.")
+    await d.menu("operationsDropdown", "/CustomerInvoices", "Look at Customer Invoices.", "Step 7")
+    await d.point(d.page.locator("tr", has_text=STATE["guest"]).first,
+                  "One invoice for the whole stay: 2,800 for the two weeks plus 140 VAT. "
+                  "Post it and receive the payment as for any rent.")
+    await d.clear_caption()
+    await d.card("Done", "The short stay is let and invoiced", "Next: a payment on account.", 3)
+
+
+async def v12_payment_on_account(d: Director):
+    await d.goto("/")
+    await d.card("Video 12", "A payment on account",
+                 "A tenant pays part of what they owe, and the rest later.")
+    await d.menu("operationsDropdown", "/CustomerReceipts", "Open Operations, then Customer Receipts.", "Step 1")
+    await d.click("a[href='/CustomerReceipts/Create']", "Click New Receipt.", "Step 1")
+    await d.fill("#tenantSearch", "055 000 1002",
+                 "Find the tenant by name, by tenant number, or as here by phone number.", "Step 2")
+    await d.page.wait_for_url("**tenantId=**")
+    await d.page.wait_for_load_state("load")
+    await d.point("#openInvoices", "Her open invoices are listed with what is still owed on each.", "Step 2")
+    await d.fill("#Amount", "4000", "She owes 10,500 but pays 4,000 today. Type what was received.", "Step 3")
+    await d.point(d.page.locator("#openInvoices tbody tr").first,
+                  "The payment is accepted as a payment on account against the invoice nearest its due date. 6,500 is left to pay.", "Step 3")
+    await d.fill("#PaymentMethod", "Cash", "Paid in cash.")
+    await d.click("#saveReceipt", "Click Save and Post.", "Step 4")
+    await d.point(".sheet", "The settlement document says it in writing: 4,000 on account against the invoice, 6,500 still due.", "Step 4")
+    await d.click(".toolbar a[href$='/CustomerReceipts/Create']", "Later she pays the rest. Click New Receipt.", "Step 5")
+    await d.fill("#tenantSelect", "Priya", "This time choose her from the list.", "Step 5")
+    await d.fill(d.page.locator("#openInvoices input[type=checkbox]").first, "true",
+                 "Tick the invoice she is paying. The amount fills in with what is left on it.", "Step 6")
+    await d.point(d.page.locator("#openInvoices tbody tr").first, "Now the invoice will be settled in full.")
+    await d.click("#saveReceipt", "Click Save and Post.", "Step 6")
+    await d.point(".sheet", "The second document shows the invoice settled in full.")
+    await d.click(".toolbar a[href$='/CustomerReceipts']", "Go back to the list.", "Step 7")
+    await d.point(d.page.locator("tbody tr").nth(1),
+                  "Both receipts are in the list. The first is marked as a payment on account.")
+    await d.say("If a payment is larger than one invoice, the rest goes to the next invoice by due date.")
+    await d.clear_caption()
+    await d.card("Done", "Part payment and balance received", "Next: handing a unit back.", 3)
+
+
+async def v13_handover(d: Director):
+    await d.goto("/")
+    await d.card("Video 13", "Handing a unit back",
+                 "The inspection, the charges for damage, and settling the security deposit.")
+    await d.goto("/LeaseHandovers", "Lease Handovers is under Master Data. A tenant is leaving, so open a handover.", "Step 1")
+    await d.fill("#leaseId", STATE["leaver"], "Choose the contract.", "Step 1")
+    await d.point("#handoverDate", "The handover date is today. Before the contract's end date, it is an early termination.")
+    await d.click("form[action*='/LeaseHandovers/Start'] button[type=submit]", "Click Open.", "Step 1")
+
+    await d.say("Step one is the inspection. Every line of the checklist gets an answer.", "Step 2")
+    results = d.page.locator("select[name$='.Result']")
+    count = await results.count()
+    await d.fill(results.nth(0), "Ok", "Mark what is in order as OK.", "Step 2")
+    for index in range(1, count - 1):
+        await results.nth(index).select_option("Ok")
+    await d.pause(0.6)
+    await d.fill(results.nth(count - 1), "Issue", "Mark a problem where one is found...", "Step 2")
+    await d.fill(d.page.locator("input[name$='.Notes']").nth(count - 1), "Deep scratches on the living room wall",
+                 "...and say what was found.")
+    await d.fill("#keys", "2", "Count the keys returned, and note the meter readings.", "Step 2")
+    await d.fill("#elec", "48210")
+    await d.fill("#water", "1936")
+    await d.click("button[name=Complete][value=true]", "Click Complete the inspection.", "Step 3")
+
+    await d.fill("#chargeFor", "Repair and repaint the living room wall",
+                 "Step two: the Maintenance Manager prices the damage the tenant must pay for.", "Step 4")
+    await d.fill("#chargeAmount", "600", "The amount before VAT.")
+    await d.click("form[action*='/LeaseHandovers/AddCharge'] button[type=submit]", "Click Add charge.", "Step 4")
+    await d.click("form[action*='/LeaseHandovers/SignMaintenance'] button[type=submit]",
+                  "Then sign, which passes the handover to the accounts.", "Step 5")
+
+    settle = "form[action*='/LeaseHandovers/Settle']"
+    await d.point(d.page.locator(settle).locator("xpath=ancestor::div[contains(@class,'card')][1]"),
+                  "Step three: the accounts. The charge with its VAT, 630, is taken from the deposit of 3,900, "
+                  "and 3,270 is to be refunded.", "Step 6")
+    await d.fill("#accNotes", "Refund by bank transfer", "Add a note on how the refund is paid.")
+    await d.click(f"{settle} button[type=submit]", "Click Settle and close the contract.", "Step 7")
+    await d.say("The charge is invoiced and paid from the deposit, the refund is recorded, "
+                "the contract is closed and the flat is vacant again.", "Step 7")
+    await d.goto("/LeaseHandovers", "The handover is settled. Its report can be printed for the tenant to sign.")
+    await d.clear_caption()
+    await d.card("Done", "Unit handed back and deposit settled", "Next: maintenance jobs.", 3.5)
+
+
+async def v14_maintenance(d: Director):
+    await d.goto("/")
+    await d.card("Video 14", "Maintenance jobs",
+                 "From a tenant's request to a finished job: who does it, what it cost, and how the team is doing.")
+    await d.menu("operationsDropdown", "/MaintenanceJobs", "Open Operations, then Maintenance Jobs.", "Step 1")
+    await d.point("ul.nav-tabs", "Jobs are on three tabs: requests and repairs, planned maintenance, and paid services.", "Step 1")
+    await d.point(d.page.locator("table tbody tr").first,
+                  "The open jobs, the most urgent first, each with its engineer and its age.", "Step 1")
+    row = d.page.locator("tr", has_text=STATE["job"]).first
+    await d.point(row, "This request came from a tenant's portal and nobody has it yet.", "Step 2")
+    await d.click(row.locator("a[href*='/MaintenanceJobs/Details']").first, "Open it.", "Step 2")
+    assign = "form[action*='/MaintenanceJobs/Assign']"
+    await d.fill(f"{assign} select", STATE["engineer"], "Choose the engineer...", "Step 2")
+    await d.click(f"{assign} button", "...and click Assign. They are told at once.", "Step 2")
+
+    step = "form[action*='/MaintenanceJobs/Step']"
+    await d.say("The engineer opens the job on their phone, under My Jobs, and works through these same steps.", "Step 3")
+    await d.click(f"{step}:has(input[value=acknowledge]) button", "Acknowledge: I have seen it.", "Step 3")
+    await d.click(f"{step}:has(input[value=start]) button", "Start work, on arriving.", "Step 3")
+    await d.fill("#matDesc", "Dual flush valve", "Record each material used: what it is...", "Step 4")
+    await d.fill("#matCost", "85", "...and its cost.")
+    await d.fill("#matSource", "Purchased", "It came from the store, or was bought for the job...", "Step 4")
+    await d.fill("#matRef", "Receipt 4471", "...with its receipt number.")
+    await d.click("form[action*='/MaintenanceJobs/AddMaterial'] button[type=submit]", "Click Add material.", "Step 4")
+    await d.point(d.page.locator(".card", has=d.page.locator("#matDesc")).first.locator("table"),
+                  "The cost is now on the job. This building is a managed one, so it is charged to its owner.")
+    await d.fill("#resolveNotes", "Replaced the flush valve and tested the cistern. Working normally.",
+                 "When the work is finished, say what was done. The tenant reads this.", "Step 5")
+    await d.click(f"{step}:has(input[value=resolve]) button", "Click Mark as done.", "Step 5")
+    await d.say("The tenant is told, and can rate the work on their portal.")
+    await d.click(f"{step}:has(input[value=close]) button", "A supervisor then closes the job.", "Step 6")
+
+    await d.click("a.btn[href$='/MaintenanceJobs']", "Not every job starts with a tenant. Go back to the jobs...", "Step 7")
+    await d.click("a[href='/MaintenanceJobs/Create']", "...and click Raise a Job.", "Step 7")
+    await d.fill("#Purpose", "Inspection", "What it is for: a repair, an inspection, or making a vacant unit ready.", "Step 7")
+    building = await d.page.locator("#PropertyId option").nth(1).get_attribute("value")
+    await d.fill("#PropertyId", building, "Choose the building. Leave the unit empty for work on the building itself.", "Step 8")
+    await d.fill("#Category", "Common Areas")
+    await d.fill("#DueDate", iso(TODAY + dt.timedelta(days=7)), "Give it a due date.", "Step 8")
+    await d.fill("#Subject", "Roof and water tank inspection", "A short title...", "Step 8")
+    await d.fill("#Description", "Check the roof waterproofing, the tank covers and the pump room before the rainy season.",
+                 "...and the work to be done.")
+    await d.click("form[action*='/MaintenanceJobs/Create'] button[type=submit]",
+                  "Click Raise the job. It goes to the least busy engineer.", "Step 9")
+
+    await d.menu("operationsDropdown", "/MaintenanceJobs/Dashboard", "Last, the Maintenance Dashboard.", "Step 10")
+    await d.point(".mnt-kpis", "How many jobs came in and how many are open, how fast the team responds and finishes, "
+                               "the tenants' ratings, and the cost of materials.", "Step 10")
+    await d.scroll(520, 2.5)
+    await d.say("Below are the charts by month, by engineer and by building. Export to Excel gives the figures behind them.")
+    await d.scroll(520, 2)
+    await d.clear_caption()
+    await d.card("Done", "Job assigned, done, costed and closed", "That completes maintenance.", 3.5)
+
+
 VIDEOS = [
     ("01", "sign-in", "Signing in and finding your way", v01_sign_in),
     ("02", "master-data", "Adding a property, a unit and a tenant", v02_master_data),
@@ -887,6 +1070,10 @@ VIDEOS = [
     ("08", "month-end", "Month-end", v08_month_end),
     ("09", "reports", "The reports", v09_reports),
     ("10", "tenant-portal", "The tenant portal", v10_portal),
+    ("11", "short-stay", "A short stay", v11_short_stay),
+    ("12", "payment-on-account", "A payment on account", v12_payment_on_account),
+    ("13", "lease-handover", "Handing a unit back", v13_handover),
+    ("14", "maintenance-jobs", "Maintenance jobs", v14_maintenance),
 ]
 
 ARGS = None
@@ -946,6 +1133,8 @@ async def prepare(browser, state_file: pathlib.Path):
     it, and saves the session so each video starts signed in."""
     context = await browser.new_context(viewport=SIZE)
     page = await context.new_page()
+    # The "this cannot be undone" questions of the sample data buttons.
+    page.on("dialog", lambda dialog: asyncio.ensure_future(dialog.accept()))
     site = ARGS.site
 
     async def sign_in(password):
@@ -986,8 +1175,33 @@ async def prepare(browser, state_file: pathlib.Path):
         await page.goto(site + "/Companies")
         edit = await page.locator("tr", has_text=COMPANY).first.locator("a[href*='/Companies/Edit']").get_attribute("href")
         await page.goto(site + edit)
-        page.on("dialog", lambda dialog: asyncio.ensure_future(dialog.accept()))
         await page.click("form[action*='LoadSampleData'] button[type=submit]", timeout=0)
+        await page.wait_for_load_state("load", timeout=600_000)
+        alerts = await page.locator(".alert").all_inner_texts()
+        print("  " + " | ".join(a.strip() for a in alerts))
+
+    # Video 14 needs someone to give the jobs to, and jobs: a maintenance engineer, then
+    # the Maintenance Scenarios, which are shared among the company's engineers.
+    await page.goto(site + "/Users")
+    if await page.locator("tr", has_text=STATE["engineer_username"]).count() == 0:
+        print(f"adding the maintenance engineer {STATE['engineer']} and loading the maintenance scenarios...")
+        await page.goto(site + "/Users/Create")
+        await page.fill("#Username", STATE["engineer_username"])
+        await page.fill("#DisplayName", STATE["engineer"])
+        await page.fill("#Password", RECORDING_PASSWORD)
+        await page.fill("#ConfirmPassword", RECORDING_PASSWORD)
+        await page.select_option("#DefaultCompanyId", label=COMPANY)
+        await page.get_by_label(COMPANY, exact=True).check()
+        await page.click("#rolePresets [data-role=MaintenanceEngineer]")
+        await page.click("form[action*='/Users/Create'] button[type=submit]")
+        await page.wait_for_load_state("load")
+        if "/Users/Create" in page.url:
+            sys.exit("The maintenance engineer could not be added: "
+                     + " | ".join(await page.locator(".text-danger").all_inner_texts()))
+        await page.goto(site + "/Companies")
+        edit = await page.locator("tr", has_text=COMPANY).first.locator("a[href*='/Companies/Edit']").get_attribute("href")
+        await page.goto(site + edit)
+        await page.click("form[action*='LoadMaintenanceScenarios'] button[type=submit]", timeout=0)
         await page.wait_for_load_state("load", timeout=600_000)
         alerts = await page.locator(".alert").all_inner_texts()
         print("  " + " | ".join(a.strip() for a in alerts))
