@@ -84,9 +84,10 @@ Requirements: SQL Server LocalDB (installed with Visual Studio), Chrome or Edge,
 
 ## Recording the training videos
 
-`Tools/VideoCapture/record_videos.py` records ten short walkthroughs of the main tasks:
+`Tools/VideoCapture/record_videos.py` records fourteen short walkthroughs of the main tasks:
 signing in, master data, leases, invoices and receipts, post-dated cheques, supplier
-bills, petty cash, month-end, the reports and the tenant portal. A real browser does the
+bills, petty cash, month-end, the reports, the tenant portal, a short stay, a payment on
+account, a lease handover and maintenance jobs. A real browser does the
 clicking and typing, with a caption bar explaining each step and a pointer showing where
 to click. **Like the screenshots, always record from the local demo copy, never the live
 site.** The tool refuses any address other than localhost.
@@ -99,7 +100,7 @@ site.** The tool refuses any address other than localhost.
    python Tools/VideoCapture/record_videos.py
    python Tools/VideoCapture/record_videos.py --only 05,09     # just some
    python Tools/VideoCapture/record_videos.py --show           # watch it work
-   python Tools/VideoCapture/record_videos.py --pace 1.3       # slower
+   python Tools/VideoCapture/record_videos.py --pace 1.5       # slower still
    ```
    The first run opens a practice company, "Al Waha Properties", and loads a year of
    sample data into it. Every video works inside that company.
@@ -119,7 +120,26 @@ on the server is enough to update one. The `.webm` files are kept out of git bec
 their size - re-create them with this tool. `--publish-only` copies already-recorded
 videos into the help again without recording.
 
-To add a voice-over or make an `.mp4` copy, open a video in Microsoft Clipchamp and export it.
+For a voice-over, add `--voice en-US-BrianNeural`: every caption is spoken while its click
+or typing happens, and the narrated recording is saved as `<number>-<key>-voice.webm`. Add
+`--mp4` for an `.mp4` copy of each recording, the format to upload to YouTube.
+
+The videos run at an unhurried pace: the voice just under its natural speed, a slow pointer, typing
+you can follow, and a breath between one line and the next. Two settings change it, and the
+voice stays in step with the clicks at any value:
+
+| Setting | What it changes | Default |
+|---|---|---|
+| `--pace` | The pointer, the typing, the wait before a click and the pause between lines. `1.5` is slower, `1` quicker. | `1.3` |
+| `--voice-rate` | The speed of the voice itself. `"-10%"` is slower, `"+0%"` is its natural speed. | `"-4%"` |
+
+With the defaults the videos run from about a minute and a quarter to two and a half minutes each. The spoken
+lines are fetched before recording starts, so fetching them never holds up a video. The
+notes at the top of the script list the voices and the terms to check before publishing.
+
+A fresh demo database makes the owner choose a new password at the first sign-in. The
+recorder does that itself, off camera, and signs in with its own password from then on
+(`RECORDING_PASSWORD` in the script).
 
 Requirements: Google Chrome or Microsoft Edge, `pip install playwright`, and
 `python -m playwright install ffmpeg`.

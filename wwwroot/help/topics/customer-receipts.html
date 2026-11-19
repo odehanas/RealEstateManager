@@ -1,5 +1,5 @@
-<p><strong>Workflow step 7.</strong> A customer receipt records money collected from a tenant against a specific
-invoice — cash, bank transfer, or a cheque you are banking directly. Cheques handled through the PDC register
+<p><strong>Workflow step 7.</strong> A customer receipt records money collected from a tenant — cash, bank transfer,
+or a cheque you are banking directly — and matches it to the invoices it pays. Cheques handled through the PDC register
 clear themselves and do <strong>not</strong> need a receipt.</p>
 
 <figure data-video="invoice-and-receipt"></figure>
@@ -8,12 +8,37 @@ clear themselves and do <strong>not</strong> need a receipt.</p>
 <h3>Recording a receipt</h3>
 <ol class="steps">
     <li>Select <strong>New Receipt</strong>, or <strong>Receive</strong> on the invoice in Customer Invoices.</li>
-    <li>Choose the <strong>Invoice</strong> being paid. Its outstanding balance is shown.</li>
+    <li>Choose the <strong>Tenant</strong> who paid. Pick from the list, or type part of the name, the tenant number
+    or the phone number in <strong>Find the tenant</strong>; when only one tenant matches, it is chosen for you.</li>
+    <li>The tenant's open invoices are listed, nearest due date first, each with its outstanding balance.</li>
+    <li>Enter the <strong>Amount received</strong> and the <strong>Receipt Date</strong> — the date the money actually arrived.</li>
+    <li>Tick the invoice or invoices the tenant is paying. This is optional: see <em>Where the money goes</em> below.</li>
     <li>Leave the <strong>Receipt Number</strong> blank to have one generated, or enter your own — it must be unique within the company.</li>
-    <li>Enter the <strong>Receipt Date</strong> — the date the money actually arrived.</li>
-    <li>Enter the <strong>Amount</strong>. Part payments are allowed.</li>
-    <li>Choose the <strong>Payment Method</strong> and select <strong>Save and Post</strong>.</li>
+    <li>Choose the <strong>Payment Method</strong>, add the bank's reference if there is one, and select <strong>Save and Post</strong>.</li>
 </ol>
+
+<h3>Where the money goes</h3>
+<figure data-video="payment-on-account"></figure>
+<p>The table shows, as you type, what each invoice receives from this payment and what will be left to pay on it.</p>
+<ul>
+    <li>The invoices you ticked are paid first, nearest due date first.</li>
+    <li>If nothing is ticked, or money is left over, it goes to the remaining invoices, again nearest due date first.</li>
+    <li>An invoice that receives all it owes is <strong>Settled in full</strong>.</li>
+    <li>An invoice that receives only part is a <strong>Payment on account</strong>: the payment is accepted, the invoice
+    is reduced, and the rest stays due. A tenant who owes 10,000 and pays 4,000 has 4,000 on account against that
+    invoice and 6,000 still to pay.</li>
+    <li>An amount greater than everything the tenant owes on posted invoices is refused. Receive what is owed, or post
+    the next invoice first.</li>
+</ul>
+
+<h3>The settlement document</h3>
+<p>After saving, the system opens the <strong>settlement document</strong> for the payment: who paid, how much, and
+each invoice it was matched to with the amount applied, what is left to pay, and whether it was settled in full or is
+a payment on account. Print it or save it as a PDF to give the tenant as their receipt. Open it again at any time by
+selecting the receipt number in the Customer Receipts list.</p>
+<p>A payment matched to several invoices is one settlement with a receipt line for each invoice, numbered
+<code>REC-…/1</code>, <code>REC-…/2</code>, and each line has its own journal. The tenant statement and the journal
+describe a part payment as <em>Payment on account against invoice …</em></p>
 
 <div class="box">
     <div class="box-title">Save and Post puts the receipt straight into the accounts</div>
@@ -25,9 +50,9 @@ clear themselves and do <strong>not</strong> need a receipt.</p>
 
 <div class="box">
     <div class="box-title">Only posted invoices can be received against</div>
-    <p>The invoice list shows posted invoices with a balance. A draft invoice is not yet a receivable, so a receipt
-    against one is refused with <em>"Invoice … has not been posted yet"</em>. Post the invoice first; the
-    <strong>Receive</strong> button on the invoice list only appears once it is posted.</p>
+    <p>The tenant's list shows posted invoices with a balance. A draft invoice is not yet a receivable, so it is not
+    listed and no money can be received against it. Post the invoice first; the <strong>Receive</strong> button on the
+    invoice list only appears once it is posted.</p>
 </div>
 
 <table class="je">
@@ -59,10 +84,9 @@ account. See <a href="#owner-settlements">Owner Settlements</a>.</p>
 to <strong>PartiallyPaid</strong> or <strong>Paid</strong>. Resetting the journal to draft takes it back off again.</p>
 
 <div class="box">
-    <div class="box-title">One receipt, one invoice</div>
-    <p>Each receipt settles a single invoice. If a tenant pays one amount covering three invoices, enter three
-    receipts with the same date and reference, splitting the amount. This keeps the tenant statement accurate at
-    invoice level.</p>
+    <div class="box-title">One payment, several invoices</div>
+    <p>A tenant who pays one amount covering three invoices is entered once. The system splits the amount over the
+    invoices and keeps a receipt line for each, so the tenant statement stays accurate at invoice level.</p>
 </div>
 
 <div class="box">

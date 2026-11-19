@@ -1,0 +1,171 @@
+@model RealEstateManager.Domain.CustomerSettlement
+@{
+    Layout = null;
+    var currency = Model.Company?.BaseCurrency ?? "AED";
+    var receipts = Model.Receipts.OrderBy(x => x.Id).ToList();
+    var allPosted = receipts.All(x => x.JournalEntry != null && x.JournalEntry.IsPosted);
+    var address = string.Join(", ", new[] { Model.Company?.AddressLine1, Model.Company?.AddressLine2 }.Where(x => !string.IsNullOrWhiteSpace(x)));
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>@T["Receipt"] @Model.SettlementNumber</title>
+<style>
+    @@page { size: A4 portrait; margin: 14mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 18px; font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; color: #1f2933; background: #f2f4f7; }
+    .sheet { max-width: 190mm; margin: 0 auto; background: #fff; padding: 18mm 16mm; box-shadow: 0 0 18px rgba(15,39,64,.12); }
+    h1 { font-size: 19pt; color: #0f2740; margin: 0 0 2px; }
+    .doc-type { font-size: 9pt; text-transform: uppercase; letter-spacing: 1.2pt; color: #1e6fd9; font-weight: 700; }
+    .muted { color: #5b6774; }
+    .small { font-size: 9pt; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 3px solid #0f2740; padding-bottom: 12px; margin-bottom: 16px; }
+    .parties { display: flex; gap: 18px; margin-bottom: 16px; }
+    .party { flex: 1; border: 1px solid #d8dee6; border-radius: 6px; padding: 10px 12px; }
+    .party h3 { margin: 0 0 6px; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .8pt; color: #5b6774; }
+    .party .nm { font-weight: 700; color: #0f2740; }
+    .amount { font-size: 15pt; font-weight: 700; color: #0f2740; }
+    table { width: 100%; border-collapse: collapse; }
+    table.lines th { background: #0f2740; color: #fff; font-size: 8.5pt; text-align: left; padding: 6px 7px; }
+    table.lines td { border-bottom: 1px solid #e3e8ee; padding: 6px 7px; vertical-align: top; font-size: 10pt; }
+    table.lines tfoot td { border-bottom: none; font-weight: 700; border-top: 2px solid #0f2740; }
+    .num { text-align: right !important; white-space: nowrap; }
+    .inv { font-size: 9pt; font-weight: 600; }
+    .tag { white-space: nowrap; display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 8.5pt; font-weight: 600; }
+    .full { background: #dcf5e6; color: #14693b; }
+    .account { background: #fff1cc; color: #7a5300; }
+    .toolbar { max-width: 190mm; margin: 0 auto 12px; display: flex; gap: 10px; }
+    .toolbar a, .toolbar button { font: inherit; padding: 6px 14px; border: 1px solid #0f2740; border-radius: 6px; background: #fff; color: #0f2740; text-decoration: none; cursor: pointer; }
+    .toolbar .main { background: #0f2740; color: #fff; }
+    .warn { max-width: 190mm; margin: 0 auto 12px; background: #fff1cc; border: 1px solid #e6c766; border-radius: 6px; padding: 9px 12px; }
+    .note { margin-top: 14px; }
+    .foot { margin-top: 26px; display: flex; justify-content: space-between; }
+    .sign { width: 42%; border-top: 1px solid #5b6774; padding-top: 5px; }
+    @@media print { body { background: #fff; padding: 0; } .sheet { box-shadow: none; max-width: none; padding: 0; } .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+    <a href="@Url.Action("Index", "CustomerReceipts")">@T["Back"]</a>
+    <a href="@Url.Action("Create", "CustomerReceipts")">@T["New Receipt"]</a>
+    <button type="button" class="main" onclick="window.print()">@T["Print / Save as PDF"]</button>
+</div>
+
+@if (!allPosted)
+{
+    <div class="warn no-print"><strong>@T["Draft."]</strong> @T["Part of this payment is not posted yet, so its invoice is not reduced. Post it from Journal Inquiry."]</div>
+}
+
+<div class="sheet">
+    <div class="head">
+        <div>
+            <div class="doc-type">@T["Receipt and settlement of invoices"]</div>
+            <h1>@Model.Company?.Name</h1>
+            <div class="small muted">@address</div>
+            @if (!string.IsNullOrWhiteSpace(Model.Company?.TrnNumber))
+            {
+                <div class="small muted">TRN @Model.Company.TrnNumber</div>
+            }
+        </div>
+        <div style="text-align:right">
+            <div class="small muted">@T["Receipt Number"]</div>
+            <div class="amount">@Model.SettlementNumber</div>
+            <div class="small muted">@Model.SettlementDate.ToString("dd/MM/yyyy")</div>
+        </div>
+    </div>
+
+    <div class="parties">
+        <div class="party">
+            <h3>@T["Received from"]</h3>
+            <div class="nm">@Model.Tenant?.FullName</div>
+            <div class="small">@T["Tenant"] @Model.Tenant?.Code</div>
+            @if (!string.IsNullOrWhiteSpace(Model.Tenant?.Phone))
+            {
+                <div class="small muted">@Model.Tenant.Phone</div>
+            }
+        </div>
+        <div class="party">
+            <h3>@T["Amount received"]</h3>
+            <div class="amount">@Model.Amount.ToString("N2") @currency</div>
+            <div class="small">@T[Model.PaymentMethod]@(string.IsNullOrWhiteSpace(Model.Reference) ? "" : " - " + Model.Reference)</div>
+        </div>
+    </div>
+
+    <table class="lines">
+        <thead>
+            <tr>
+                <th>@T["Invoice"]</th>
+                <th>@T["Due Date"]</th>
+                <th class="num">@T["Outstanding"]</th>
+                <th class="num">@T["This payment"]</th>
+                <th class="num">@T["Left to pay"]</th>
+                <th>@T["Result"] / @T["Journal"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var receipt in receipts)
+            {
+                var invoice = receipt.CustomerInvoice;
+                var before = receipt.OutstandingBefore ?? receipt.Amount;
+                <tr>
+                    <td>
+                        <div class="inv">@invoice?.InvoiceNumber</div>
+                        <div class="small muted">@invoice?.Lease?.Unit?.Property?.Name - @invoice?.Lease?.Unit?.UnitNumber</div>
+                    </td>
+                    <td>@invoice?.DueDate.ToString("dd/MM/yyyy")</td>
+                    <td class="num">@before.ToString("N2")</td>
+                    <td class="num">@receipt.Amount.ToString("N2")</td>
+                    <td class="num">@((before - receipt.Amount).ToString("N2"))</td>
+                    <td>
+                        @if (receipt.IsOnAccount)
+                        {
+                            <span class="tag account">@T["Payment on account"]</span>
+                        }
+                        else
+                        {
+                            <span class="tag full">@T["Settled in full"]</span>
+                        }
+                        <div class="small muted" style="white-space:nowrap">
+                            @receipt.JournalEntry?.EntryNumber
+                            @if (receipt.JournalEntry == null || !receipt.JournalEntry.IsPosted)
+                            {
+                                <span>(@T["Draft"])</span>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3">@T["Total"]</td>
+                <td class="num">@receipts.Sum(x => x.Amount).ToString("N2")</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    @foreach (var receipt in receipts.Where(x => x.IsOnAccount))
+    {
+        <div class="note small">
+            @T.Format("{0} {1} is a payment on account against invoice {2}; {3} {1} of it remains due.",
+                receipt.Amount.ToString("N2"), currency, receipt.CustomerInvoice?.InvoiceNumber,
+                ((receipt.OutstandingBefore ?? receipt.Amount) - receipt.Amount).ToString("N2"))
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Notes))
+    {
+        <div class="note small"><span class="muted">@T["Notes"]:</span> @Model.Notes</div>
+    }
+
+    <div class="foot small">
+        <div class="sign">@T["Receiver's signature"]@(string.IsNullOrWhiteSpace(Model.CreatedByName) ? "" : ": " + Model.CreatedByName)</div>
+        <div class="sign">@T["Payer's signature"]</div>
+    </div>
+</div>
+
+</body>
+</html>

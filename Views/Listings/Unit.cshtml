@@ -1,0 +1,215 @@
+@model RealEstateManager.Domain.Unit
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Unit Advertisement"];
+    var site = (ListingSite)ViewBag.Site;
+    var publicUrl = (string)ViewBag.PublicUrl;
+    var photos = (List<RealEstateManager.Services.ListingService.PhotoItem>)ViewBag.Photos;
+    var room = UnitPhoto.MaxPerUnit - photos.Count;
+    var isPublic = site.IsEnabled && Model.IsListed && Model.IsActive && Model.Status == "Vacant";
+}
+
+<style>
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .75rem; }
+    .photo-tile { border: 1px solid #d8dee6; border-radius: 8px; overflow: hidden; background: #fff; }
+    .photo-tile img { width: 100%; height: 130px; object-fit: cover; display: block; }
+    .photo-tile .bar { padding: .4rem .5rem; display: flex; gap: .35rem; justify-content: space-between; align-items: center; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Unit Advertisement"] — @Model.UnitNumber</h2>
+        <p class="text-muted mb-0">
+            @Model.Property?.Name · @(string.IsNullOrWhiteSpace(Model.UsageType) ? "" : T[Model.UsageType]) · @Model.AreaSqFt.ToString("N0") @T["sq ft"] · @T[Model.Status]
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (isPublic)
+        {
+            <a class="btn btn-outline-dark" href="@publicUrl/unit/@Model.Id" target="_blank" rel="noopener">@T["See it on the website"]</a>
+        }
+        <a class="btn btn-outline-secondary" asp-action="Index">@T["Back"]</a>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+@if (Model.IsListed && Model.Status != "Vacant")
+{
+    <div class="alert alert-info">@T["This unit is ticked for the website but is not vacant, so the public does not see it. It will return by itself when it is vacant again."]</div>
+}
+
+<form asp-action="SaveUnit" asp-route-id="@Model.Id" method="post" class="card mb-4">
+    @Html.AntiForgeryToken()
+    <div class="card-header"><strong>@T["What visitors read"]</strong></div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="IsListed" name="IsListed" value="true" @(Model.IsListed ? "checked" : "") />
+                    <label class="form-check-label" for="IsListed"><strong>@T["Advertise this unit on the website"]</strong> — @T["shown only while it is vacant."]</label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="Bedrooms">@T["Bedrooms"]</label>
+                <input class="form-control" type="number" id="Bedrooms" name="Bedrooms" value="@Model.Bedrooms" min="0" max="50" placeholder="@T["0 = studio"]" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="Bathrooms">@T["Bathrooms"]</label>
+                <input class="form-control" type="number" id="Bathrooms" name="Bathrooms" value="@Model.Bathrooms" min="0" max="50" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="AskingRent">@T["Asking rent (per year)"]</label>
+                <input class="form-control" type="number" step="0.01" min="0" id="AskingRent" name="AskingRent" value="@(Model.AskingRent?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" placeholder="@Model.StandardAnnualRent.ToString("N0")" />
+                <div class="form-text">@T["Empty: the unit's standard annual rent is shown."]</div>
+            </div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="IsFurnished" name="IsFurnished" value="true" @(Model.IsFurnished ? "checked" : "") />
+                    <label class="form-check-label" for="IsFurnished">@T["Furnished"]</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="ListingDescription">@T["Description (English)"]</label>
+                <textarea class="form-control" id="ListingDescription" name="ListingDescription" rows="5" maxlength="2000">@Model.ListingDescription</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="ListingDescriptionAr">@T["Description (Arabic)"]</label>
+                <textarea class="form-control" id="ListingDescriptionAr" name="ListingDescriptionAr" rows="5" maxlength="2000" dir="rtl">@Model.ListingDescriptionAr</textarea>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="Amenities">@T["Features"]</label>
+                <textarea class="form-control" id="Amenities" name="Amenities" rows="4" maxlength="600" placeholder="@T["One per line: Balcony, Sea view, Central A/C..."]">@Model.Amenities</textarea>
+                <div class="form-text">@T["One feature per line. Shown as a list on the unit's page."]</div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">@T["Taken from the unit and property records"]</label>
+                <ul class="small text-muted mb-0">
+                    <li>@T["Area"]: @Model.AreaSqFt.ToString("N0") @T["sq ft"]</li>
+                    <li>@T["Floor"]: @(Model.Floor ?? "—")</li>
+                    <li>@T["Parking bays"]: @(Model.ParkingBays?.ToString() ?? "—")</li>
+                    <li>@T["Location"]: @string.Join(", ", new[] { Model.Property?.AreaName, Model.Property?.Emirate }.Where(x => !string.IsNullOrWhiteSpace(x)))</li>
+                </ul>
+                <div class="form-text">@T["To change these, edit the unit or the property."]</div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <button type="submit" class="btn btn-dark">@T["Save"]</button>
+    </div>
+</form>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>@T["Photos"]</strong>
+        <span class="text-muted small">@T.Format("{0} of {1}", photos.Count, UnitPhoto.MaxPerUnit)</span>
+    </div>
+    <div class="card-body">
+        @if (photos.Count == 0)
+        {
+            <p class="text-muted">@T["No photos yet. Units with photos get far more enquiries; the first photo is the one shown on the unit's card."]</p>
+        }
+        else
+        {
+            <div class="photo-grid mb-3">
+                @for (var i = 0; i < photos.Count; i++)
+                {
+                    var photo = photos[i];
+                    <div class="photo-tile">
+                        <a href="@Url.Action("Photo", new { id = photo.Id })" target="_blank" rel="noopener">
+                            <img loading="lazy" alt="@photo.FileName" src="@Url.Action("Photo", new { id = photo.Id })" />
+                        </a>
+                        <div class="bar">
+                            @if (i == 0)
+                            {
+                                <span class="badge bg-dark">@T["Cover"]</span>
+                            }
+                            else
+                            {
+                                <form asp-action="MakeCover" asp-route-id="@photo.Id" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Make cover"]</button>
+                                </form>
+                            }
+                            <form asp-action="DeletePhoto" asp-route-id="@photo.Id" method="post" onsubmit="return confirm('@T["Delete this photo?"]');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete"]</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (room > 0)
+        {
+            <form asp-action="UploadPhotos" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" id="photoForm" class="d-flex flex-wrap gap-2 align-items-center">
+                @Html.AntiForgeryToken()
+                <input class="form-control" style="max-width:420px" type="file" id="photoInput" name="photos" accept="image/jpeg,image/png,image/webp" multiple required />
+                <button type="submit" class="btn btn-dark" id="photoButton">@T["Upload photos"]</button>
+                <span class="text-muted small" id="photoNote">@T.Format("Up to {0} more. Large photos are made smaller before they are sent.", room)</span>
+            </form>
+        }
+        else
+        {
+            <p class="text-muted mb-0">@T["The unit has all the photos it can take. Delete one to add another."]</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Phone photos are several megabytes each; a website needs about 1600 pixels across.
+        // Each photo is drawn smaller in the browser and sent as a JPEG, so uploads are quick
+        // and the public pages stay light. A browser that cannot do it sends the originals.
+        (function () {
+            var form = document.getElementById('photoForm');
+            if (!form || !window.HTMLCanvasElement || !window.DataTransfer) return;
+            var input = document.getElementById('photoInput');
+            var button = document.getElementById('photoButton');
+            var MAX = 1600;
+
+            function shrink(file) {
+                return new Promise(function (resolve) {
+                    var url = URL.createObjectURL(file);
+                    var image = new Image();
+                    image.onload = function () {
+                        URL.revokeObjectURL(url);
+                        var scale = Math.min(1, MAX / Math.max(image.width, image.height));
+                        if (scale === 1 && file.size < 900 * 1024) { resolve(file); return; }
+                        var canvas = document.createElement('canvas');
+                        canvas.width = Math.round(image.width * scale);
+                        canvas.height = Math.round(image.height * scale);
+                        canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(function (blob) {
+                            if (!blob) { resolve(file); return; }
+                            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }));
+                        }, 'image/jpeg', 0.85);
+                    };
+                    image.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+                    image.src = url;
+                });
+            }
+
+            var ready = false;
+            form.addEventListener('submit', function (event) {
+                if (ready || !input.files.length) return;
+                event.preventDefault();
+                button.disabled = true;
+                Promise.all(Array.prototype.map.call(input.files, shrink)).then(function (files) {
+                    var transfer = new DataTransfer();
+                    files.forEach(function (f) { transfer.items.add(f); });
+                    input.files = transfer.files;
+                    ready = true;
+                    form.submit();
+                }).catch(function () { ready = true; form.submit(); });
+            });
+        })();
+    </script>
+}

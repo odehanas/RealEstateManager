@@ -63,6 +63,35 @@ namespace RealEstateManager.Domain
         /// <summary>The contract number of the first supply.</summary>
         public string? FirstSupplyReference { get; set; }
 
+        // ---- The vacancy website ------------------------------------------------
+
+        public int? Bedrooms { get; set; }
+        public int? Bathrooms { get; set; }
+        public bool IsFurnished { get; set; }
+
+        /// <summary>The rent asked on the website. Empty means the standard annual rent.</summary>
+        public decimal? AskingRent { get; set; }
+
+        /// <summary>What the unit offers, one item per line: "Balcony", "Sea view", "Covered parking"...</summary>
+        public string? Amenities { get; set; }
+
+        public string? ListingDescription { get; set; }
+        public string? ListingDescriptionAr { get; set; }
+
+        /// <summary>
+        /// Ticked by the office to advertise the unit. It is shown to the public only while it
+        /// is also vacant and active, so a unit that is let leaves the website by itself and
+        /// comes back when it is vacant again.
+        /// </summary>
+        public bool IsListed { get; set; }
+
+        public DateTime? ListedAt { get; set; }
+
+        /// <summary>The rent a visitor is shown.</summary>
+        public decimal AdvertisedRent => AskingRent is > 0 ? AskingRent.Value : StandardAnnualRent;
+
+        public ICollection<UnitPhoto> Photos { get; set; } = new List<UnitPhoto>();
+
         public ICollection<Lease> Leases { get; set; } = new List<Lease>();
     }
 }

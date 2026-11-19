@@ -316,6 +316,8 @@ namespace RealEstateManager.Services
                 ["ServiceCatalog"] = new[] { AppPermissions.ServiceRequestsManage, AppPermissions.AccountingManage },
                 // Parking bays are given to contracts by whoever manages contracts or the properties' records.
                 ["Parking"] = new[] { AppPermissions.LeasesManage, AppPermissions.MasterDataManage },
+                // The vacancy website: advertising a unit and answering enquiries is leasing work.
+                ["Listings"] = new[] { AppPermissions.LeasesManage, AppPermissions.MasterDataManage },
                 // A handover is opened and inspected by whoever looks after contracts or tenants; the
                 // Maintenance Manager and the accounts each have their own step (see ActionPermissionMap).
                 ["LeaseHandovers"] = new[] { AppPermissions.LeasesManage, AppPermissions.ServiceRequestsManage, AppPermissions.MaintenanceManage, AppPermissions.AccountingManage },

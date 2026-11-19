@@ -21,7 +21,11 @@ BEFORE RECORDING (all local):
 The first run opens a training company, "Al Waha Properties", and fills it with a year of
 sample data from the Load Sample Data button. Every video then works inside that company.
 Some videos build on the one before (the lease in video 3 is for the tenant added in
-video 2), so record them all together, on a fresh demo database.
+video 2), so record them all together, on a fresh demo database. Videos 11 to 13 use only
+the sample data - a vacant studio, a tenant with a balance and a tenant who is leaving -
+but each changes it, so they too need a fresh database. Video 14 needs a maintenance
+engineer and some jobs: the recorder adds the engineer and loads the company's Maintenance
+Scenarios, off camera, before the first video.
 
 USAGE
     python Tools/VideoCapture/record_videos.py                  # all videos
@@ -32,11 +36,19 @@ USAGE
 WITH A VOICE-OVER
     python Tools/VideoCapture/record_videos.py --only 01 --voice en-US-BrianNeural --no-publish
 
-    --voice names a text-to-speech voice. Every caption and title card is then spoken, each
-    step stays on screen for as long as its line takes to say, and the result is saved as
-    output/<number>-<key>-voice.webm with the sound mixed in. Spoken lines are kept in
-    output/voice, so a second run does not fetch them again (and has no gaps while it does).
-    --voice-rate "-5%" slows the voice a little; "+10%" quickens it.
+    --voice names a text-to-speech voice. Every caption and title card is then spoken, and
+    the result is saved as output/<number>-<key>-voice.webm with the sound mixed in. The
+    voice and the action run together: a line starts as the pointer moves, the click or
+    typing happens while it is being said, and the next line waits only for this one to end.
+    The lines are fetched before recording starts and kept in output/voice, so fetching
+    them never holds up a video and a second run does not fetch them again.
+    --voice-rate sets the speed of the voice (default "-4%", just under its natural "+0%"; "+8%" is
+    quicker, "-10%" slower).
+    --pace sets the speed of everything else - the pointer, the typing, the wait before a
+    click and the breath between two lines (default 1.3; 1.5 is slower, 1 quicker). The
+    voice and the action stay together at any pace, because each line still starts with
+    its own pointer move and the next line still waits for it to end.
+    --mp4 also writes an .mp4 copy (H.264 with AAC sound), the format YouTube prefers.
     Leave out --no-publish to put the narrated videos into the help, or publish ones
     already recorded with:  --publish-only --voice en-US-BrianNeural
     Other voices: en-US-GuyNeural, en-GB-RyanNeural, en-US-AvaNeural, ar-AE-HamdanNeural, ar-AE-FatimaNeural
@@ -51,10 +63,12 @@ Requires:  pip install playwright   and Google Chrome or Microsoft Edge installe
            for --voice:  pip install edge-tts imageio-ffmpeg
 """
 import argparse
+import ast
 import asyncio
 import base64
 import datetime as dt
 import hashlib
+import inspect
 import json
 import pathlib
 import re
@@ -74,6 +88,10 @@ OUT_DIR = PROJECT / "Tools" / "VideoCapture" / "output"
 HELP_VIDEOS = PROJECT / "wwwroot" / "help" / "videos"
 
 COMPANY = "Al Waha Properties"
+# The application makes the owner choose a new password the first time they sign in with
+# the one a fresh demo database starts with. The recorder chooses this one, off camera,
+# and the videos then sign in with it. It only ever exists in the local demo database.
+RECORDING_PASSWORD = "Training#Waha2026"
 SIZE = {"width": 1280, "height": 720}
 
 TODAY = dt.date.today()
@@ -99,6 +117,16 @@ STATE = {
     "tenant_email": "layla.hassan@mail.example",
     "lease_start": MONTH_START,
     "property_code": None,
+    # Videos 11 to 13 work on the sample data: a vacant studio for a guest, a tenant
+    # with a balance, and a tenant who is leaving.
+    "guest": "Daniel Weber",
+    "stay_unit": "OWN-R-0001-U05",
+    "leaver": "Omar Al Hashimi",
+    # Video 14: the maintenance engineer the recorder adds, and a request from the
+    # maintenance scenarios that nobody has been given yet.
+    "engineer": "Yusuf Rahman",
+    "engineer_username": "yusuf.rahman",
+    "job": "Toilet flush not working",
 }
 
 # ---------------------------------------------------------------------------
@@ -118,7 +146,7 @@ OVERLAY_JS = r"""
     padding:1px 11px;margin-right:12px;font-size:15px;vertical-align:2px}
   #__cur{position:fixed;width:22px;height:22px;border-radius:50%;background:rgba(240,180,41,.5);
     border:2px solid #f0b429;z-index:2147483647;pointer-events:none;transform:translate(-50%,-50%);
-    transition:left .6s ease,top .6s ease}
+    transition:left 1.1s ease,top 1.1s ease}
   #__cur.click{animation:__pulse .5s}
   @keyframes __pulse{0%{box-shadow:0 0 0 0 rgba(240,180,41,.85)}100%{box-shadow:0 0 0 24px rgba(240,180,41,0)}}
   #__ring{position:fixed;border:3px solid #f0b429;border-radius:8px;z-index:2147483645;
@@ -186,6 +214,14 @@ class Narrator:
         self.folder.mkdir(parents=True, exist_ok=True)
         self.started = time.monotonic()
         self.cues = []             # (seconds into the video, sound file)
+        # Where the speech starts in each clip and how long it lasts. Kept between runs:
+        # measuring a clip takes about a second, which would be a silence in the video.
+        self.measured = self.folder / "measured.json"
+        self.lines = {}
+        if self.measured.exists():
+            kept = json.loads(self.measured.read_text(encoding="utf-8"))
+            self.lines = {name: (self.folder / f"{name}.mp3", lead, length)
+                          for name, (lead, length) in kept.items() if (self.folder / f"{name}.mp3").exists()}
 
     def start(self):
         """Call when the recording starts: cue times are counted from here."""
@@ -197,23 +233,44 @@ class Narrator:
         # "...and your password." is said without the dots.
         return re.sub(r"\s+", " ", text.replace("...", " ")).strip()
 
+    def name(self, text: str) -> str:
+        return hashlib.sha1(f"{self.voice}|{self.rate}|{self.spoken(text)}".encode("utf-8")).hexdigest()[:16]
+
+    def known(self, text: str) -> bool:
+        return self.name(text) in self.lines
+
     async def line(self, text: str):
-        """The sound file of a line and its length in seconds, fetched once and kept."""
+        """The sound file of a line, fetched once and kept, with where the speech starts in
+        it and how long the speech lasts. The service pads every clip with silence at both
+        ends; waiting for that as well is what makes a video drag."""
         words = self.spoken(text)
-        name = hashlib.sha1(f"{self.voice}|{self.rate}|{words}".encode("utf-8")).hexdigest()[:16]
+        name = self.name(text)
+        if name in self.lines:
+            return self.lines[name]
         sound = self.folder / f"{name}.mp3"
         if not sound.exists() or sound.stat().st_size == 0:
             await self.tts.Communicate(words, self.voice, rate=self.rate).save(str(sound))
-        probe = subprocess.run([self.ffmpeg, "-hide_banner", "-i", str(sound)],
+        probe = subprocess.run([self.ffmpeg, "-hide_banner", "-i", str(sound),
+                                "-af", "silencedetect=noise=-45dB:d=0.12", "-f", "null", "-"],
                                capture_output=True, text=True, encoding="utf-8", errors="replace")
         found = re.search(r"Duration: (\d+):(\d+):(\d+\.\d+)", probe.stderr)
         if not found:
             raise RuntimeError(f"Could not read the length of the spoken line: {words}")
         hours, minutes, seconds = found.groups()
-        return sound, int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+        total = int(hours) * 3600 + int(minutes) * 60 + float(seconds)
+        starts = [float(x) for x in re.findall(r"silence_start: (-?[\d.]+)", probe.stderr)]
+        ends = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", probe.stderr)]
+        lead = ends[0] if starts and ends and starts[0] <= 0.02 else 0.0
+        finish = total
+        if starts and starts[-1] > lead and (len(ends) < len(starts) or ends[-1] >= total - 0.06):
+            finish = starts[-1]
+        self.lines[name] = (sound, lead, max(0.3, finish - lead))
+        self.measured.write_text(json.dumps({n: [l[1], l[2]] for n, l in self.lines.items()}), encoding="utf-8")
+        return self.lines[name]
 
-    def cue(self, sound: pathlib.Path):
-        self.cues.append((time.monotonic() - self.started, sound))
+    def cue(self, sound: pathlib.Path, lead: float = 0.0):
+        # Laid in so that the first word, not the silence before it, lands on this moment.
+        self.cues.append((max(0.0, time.monotonic() - self.started - lead), sound))
 
     def mix(self, video: pathlib.Path, target: pathlib.Path):
         """Writes the recording again with every line laid in at its moment."""
@@ -242,6 +299,7 @@ class Director:
         self.site = site
         self.pace = pace
         self.narrator = narrator
+        self.line_ends = 0.0       # when the line now being said (or read) is over
 
     async def js(self, script: str, arg=None):
         """Runs a snippet in the page. A page that is reloading (after a form submits)
@@ -263,34 +321,52 @@ class Director:
         return max(2.2, len(text.split()) / 3.0)
 
     # ---- the layers ----------------------------------------------------------
-    async def speak(self, text: str, at_least: float):
-        """Says a line and waits until it has been said - or, with no voice-over, waits
-        the time it takes to read."""
-        if not self.narrator:
-            await self.pause(at_least)
-            return
-        self.narrator.cue(self.pending_sound)
-        # The line's own length plus a breath; never scaled by --pace, or the next
-        # line would start over this one.
-        await self.page.wait_for_timeout(int((self.pending_seconds + 0.45) * 1000))
+    # A line and what it describes run together. begin() starts a line and returns at
+    # once, so the click or the typing happens while it is being said; settle() waits for
+    # it to end. Every new line settles the one before, so two lines never overlap.
+    async def settle(self, gap: float = 0.6):
+        """Waits until the current line has been said, plus a breath before the next."""
+        wait = self.line_ends + gap * self.pace - time.monotonic()
+        if wait > 0:
+            await self.page.wait_for_timeout(int(wait * 1000))
 
-    async def prepare_line(self, text: str):
-        """Fetches the line before anything is shown, so the words and the voice start together."""
+    async def begin(self, spoken: str, script: str, arg, seconds: float | None = None):
+        """Shows a caption or card and starts saying it, as soon as the line before is over."""
+        sound = None
         if self.narrator:
-            self.pending_sound, self.pending_seconds = await self.narrator.line(text)
+            # Fetched before anything is shown, so the words and the voice start together.
+            # Its length is never scaled by --pace: it takes as long as it takes to say.
+            sound, lead, length = await self.narrator.line(spoken)
+        else:
+            length = (seconds if seconds is not None else self.reading_time(spoken)) * self.pace
+        await self.settle()
+        await self.js(script, arg)
+        if sound:
+            self.narrator.cue(sound, lead)
+        self.line_ends = time.monotonic() + length
+
+    async def lead_in(self):
+        """The moment between a line starting and the action it describes: long enough
+        for the pointer to arrive and the first words to be heard."""
+        left = self.line_ends - time.monotonic()
+        await self.page.wait_for_timeout(int(min(max(1.0 * self.pace, left * 0.5), 1.9 * self.pace) * 1000))
+
+    async def caption(self, text: str, step: str | None = None, seconds: float | None = None):
+        """Starts a caption without waiting for it to be said."""
+        await self.begin(text, "([t,s]) => __demo.caption(t,s)", [text, step], seconds)
 
     async def card(self, number: str, title: str, subtitle: str, seconds: float = 3.8):
-        await self.prepare_line(f"{title}. {subtitle}")
-        await self.js("([n,t,s]) => __demo.card(n,t,s)", [number, title, subtitle])
-        await self.speak(f"{title}. {subtitle}", seconds)
+        await self.begin(f"{title}. {subtitle}", "([n,t,s]) => __demo.card(n,t,s)",
+                         [number, title, subtitle], seconds)
+        await self.settle(0.9)
         await self.js("() => __demo.hideCard()")
 
     async def say(self, text: str, step: str | None = None, seconds: float | None = None):
-        await self.prepare_line(text)
-        await self.js("([t,s]) => __demo.caption(t,s)", [text, step])
-        await self.speak(text, seconds if seconds is not None else self.reading_time(text))
+        await self.caption(text, step, seconds)
+        await self.settle()
 
     async def clear_caption(self):
+        await self.settle()
         await self.js("() => __demo.caption(null)")
 
     # ---- moving around ---------------------------------------------------------
@@ -306,27 +382,33 @@ class Director:
     async def ring(self, box):
         await self.js("r => __demo.ring(r)", box)
 
-    async def point(self, target, text: str | None = None, step: str | None = None, seconds: float | None = None):
-        """Moves the pointer to something and outlines it, without clicking."""
+    async def point(self, target, text: str | None = None, step: str | None = None,
+                    seconds: float | None = None, hold: bool = True):
+        """Moves the pointer to something and outlines it, without clicking. The line
+        starts as the pointer moves; with hold, it is heard out before anything else."""
         locator = self.loc(target)
         await locator.scroll_into_view_if_needed()
+        if text:
+            await self.caption(text, step, seconds)
         box = await locator.bounding_box()
         if box:
             await self.js("([x,y]) => __demo.cursor(x,y,false)",
                                      [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2])
             await self.ring({"x": box["x"], "y": box["y"], "w": box["width"], "h": box["height"]})
-        await self.pause(0.7)
-        if text:
-            await self.say(text, step, seconds)
+        if text and hold:
+            await self.settle()
+        elif hold:
+            await self.pause(0.9)
 
     async def click(self, target, text: str | None = None, step: str | None = None, navigates: bool = True):
         locator = self.loc(target)
-        await self.point(locator, text, step)
+        await self.point(locator, text, step, hold=False)
+        await self.lead_in()
         box = await locator.bounding_box()
         if box:
             await self.js("([x,y]) => __demo.cursor(x,y,true)",
                                      [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2])
-        await self.pause(0.35)
+        await self.pause(0.5)
         await self.ring(None)
         await locator.click()
         if navigates:
@@ -338,7 +420,8 @@ class Director:
         """Types into a box, or picks from a list: a select is chosen by value or by
         the start of any option's text."""
         locator = self.loc(target)
-        await self.point(locator, text, step)
+        await self.point(locator, text, step, hold=False)
+        await self.lead_in()
         tag = await locator.evaluate("e => e.tagName.toLowerCase()")
         kind = await locator.evaluate("e => (e.type || '').toLowerCase()")
         value = str(value)
@@ -365,30 +448,33 @@ class Director:
         else:
             await locator.click()
             await locator.fill("")
-            await locator.type(value, delay=int(38 * self.pace))
+            await locator.type(value, delay=int(48 * self.pace))
         await self.ring(None)
-        await self.pause(0.45)
+        await self.pause(0.5)
 
     async def submit(self, action: str, text: str | None = None, step: str | None = None):
         """Clicks the submit button of the form posting to the given address."""
         await self.click(f"form[action*='{action}'] button[type=submit]", text, step)
 
-    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 1.5):
+    async def group(self, name: str, text: str | None = None, step: str | None = None, seconds: float = 0.9):
         """Opens a group of the side menu (sb-masterData, sb-operations...), shows it
-        for a moment and closes it again."""
+        while its line is said and closes it again."""
         toggle = f"#appSidebar [data-bs-target='#{name}']"
         await self.click(toggle, text, step, navigates=False)
+        await self.settle()
         await self.pause(seconds)
         await self.loc(toggle).click()
         await self.pause(0.5)
 
     async def menu(self, dropdown_id: str, href: str, text: str | None = None, step: str | None = None):
         """Opens the item with this address in the side menu, opening its group first.
-        (dropdown_id is the old top menu's name; the item is found by its address.)"""
+        (dropdown_id is the old top menu's name; the item is found by its address.)
+        The line starts with the first click and carries on over the second."""
         link = self.page.locator(f"#appSidebar a.sidebar-link[href='{href}']").first
         group = await link.evaluate("e => { const g = e.closest('ul.collapse'); return g ? g.id : null; }")
         if group and not await self.page.locator(f"#{group}").evaluate("e => e.classList.contains('show')"):
-            await self.click(f"#appSidebar [data-bs-target='#{group}']", navigates=False)
+            await self.click(f"#appSidebar [data-bs-target='#{group}']", text, step, navigates=False)
+            text = None
         await self.click(link, text, step)
 
     async def scroll(self, pixels: int, seconds: float = 1.2):
@@ -431,7 +517,7 @@ async def v01_sign_in(d: Director):
     await d.point("select[name=companyId]",
                   "If you work for more than one company, choose the one to work in from this list.", "Step 3")
     await d.fill("select[name=companyId]", COMPANY)
-    await d.pause(1)
+    await d.pause(0.8)
     await d.say(f"Now you are in {COMPANY}, a practice company full of sample data.")
     await d.point(d.page.locator(".card", has_text="Receivables").first,
                   "Receivables: how much tenants owe, and how much of it is overdue.")
@@ -439,8 +525,8 @@ async def v01_sign_in(d: Director):
                   "Occupancy: how many of your units are let.")
     await d.point(d.page.locator(".card", has_text="Accounting Period").first,
                   "The current accounting period, and how many leases are active.")
-    await d.scroll(600, 2.5)
-    await d.scroll(-600, 1)
+    await d.scroll(600, 2.2)
+    await d.scroll(-600, 1.0)
     await d.group("sb-masterData", "The menu is on the left. Master Data holds properties, units, tenants and leases.", "Menus")
     await d.group("sb-operations", "Operations is the daily work: invoices, receipts, cheques, bills and petty cash.", "Menus")
     await d.group("sb-controls", "Controls has the approvals and the management dashboards.", "Menus")
@@ -546,13 +632,15 @@ async def v04_invoice_receipt(d: Director):
 
     await d.menu("operationsDropdown", "/CustomerReceipts", "The tenant pays. Open Customer Receipts.", "Step 3")
     await d.click("a[href='/CustomerReceipts/Create']", "Click Create.", "Step 3")
-    await d.fill("#CustomerInvoiceId", STATE["tenant"], "Choose the invoice being paid. The list shows only what is still owed.", "Step 4")
-    await d.fill("#ReceiptDate", iso(TODAY), "The date the money arrived.")
+    await d.fill("#tenantSelect", STATE["tenant"], "Choose the tenant who paid. You can also find them by number or phone.", "Step 4")
+    await d.point("#openInvoices", "Their open invoices are listed, nearest due date first.", "Step 4")
     await d.fill("#Amount", "18000", "The amount received: the full quarter.", "Step 4")
+    await d.point(d.page.locator("#openInvoices tbody tr").first,
+                  "The table shows where the money goes. A smaller amount would be a payment on account.")
     await d.fill("#PaymentMethod", "Transfer", "Paid by bank transfer.")
-    await d.point("#ReceiptNumber", "Leave the receipt number empty and the system numbers it for you.")
-    await d.submit("/CustomerReceipts/Create", "Click Save and Post.", "Step 5")
-    await d.point(d.page.locator("tr", has_text=STATE["tenant"]).first, "The receipt is recorded and posted.")
+    await d.click("#saveReceipt", "Click Save and Post.", "Step 5")
+    await d.point(".sheet", "This is the settlement document: the payment and the invoice it settled. Print it as the tenant's receipt.")
+    await d.click(".toolbar a[href$='/CustomerReceipts']", "Go back to the list of receipts.")
 
     await d.menu("reportingDropdown", "/TenantStatements", "Check the tenant's statement.", "Step 6")
     await d.fill("select[name=tenantId]", STATE["tenant"], "Choose the tenant...", "Step 6")
@@ -802,6 +890,175 @@ async def v10_portal(d: Director):
     await d.card("Done", "Request answered", "That completes the main tasks of the system.", 3.5)
 
 
+async def v11_short_stay(d: Director):
+    await d.goto("/")
+    await d.card("Video 11", "A short stay",
+                 "Letting a flat for days or weeks: a rate for the stay, and VAT on a short let.")
+    await d.menu("masterDataDropdown", "/Tenants", "A guest is a tenant like any other. Open Master Data, then Tenants.", "Step 1")
+    await d.click("a[href='/Tenants/Create']", "Click Create.", "Step 1")
+    await d.fill("#FullName", STATE["guest"], "The guest's name...", "Step 1")
+    await d.fill("#Phone", "+971 58 000 3311", "...their phone...")
+    await d.fill("#Nationality", "Germany")
+    await d.fill("#PassportNumber", "C4F7K2M9P", "...and their passport number.")
+    await d.submit("/Tenants/Create", "Click Save.", "Step 1")
+
+    await d.menu("masterDataDropdown", "/Leases", "Now the contract. Open Leases.", "Step 2")
+    await d.click("a[href='/Leases/Create']", "Click Create.", "Step 2")
+    await d.fill("#UnitId", STATE["stay_unit"], "Choose the flat: a vacant studio.", "Step 2")
+    await d.fill("#TenantId", STATE["guest"], "Choose the guest.", "Step 2")
+    start = TODAY
+    end = TODAY + dt.timedelta(days=13)
+    await d.fill("#StartDate", iso(start), "The stay starts today...", "Step 3")
+    await d.fill("#EndDate", iso(end), "...and ends two weeks later. Both days are counted.", "Step 3")
+    await d.fill("#RentBasis", "Weekly", "Rent Agreed As: choose a weekly rate. A daily or monthly rate works the same way.", "Step 4")
+    await d.fill("#RentRate", "1400", "The rate for one week.", "Step 4")
+    await d.fill("#SecurityDepositAmount", "1000", "A deposit against damage.", "Step 4")
+    await d.page.locator("#vatPreview:not(.d-none)").wait_for()
+    await d.point("#vatPreview",
+                  "The system works out the price of the stay. A residential let under six months is taxed at 5%, "
+                  "even in a building whose yearly leases are exempt.", "Step 5")
+    await d.click("button[name=nextStep][value=activate]", "Click Save and Activate.", "Step 6")
+    await d.point(d.page.locator("tr", has_text=STATE["guest"]).first,
+                  "The contract is active for the two weeks of the stay.")
+    await d.menu("operationsDropdown", "/CustomerInvoices", "Look at Customer Invoices.", "Step 7")
+    await d.point(d.page.locator("tr", has_text=STATE["guest"]).first,
+                  "One invoice for the whole stay: 2,800 for the two weeks plus 140 VAT. "
+                  "Post it and receive the payment as for any rent.")
+    await d.clear_caption()
+    await d.card("Done", "The short stay is let and invoiced", "Next: a payment on account.", 3)
+
+
+async def v12_payment_on_account(d: Director):
+    await d.goto("/")
+    await d.card("Video 12", "A payment on account",
+                 "A tenant pays part of what they owe, and the rest later.")
+    await d.menu("operationsDropdown", "/CustomerReceipts", "Open Operations, then Customer Receipts.", "Step 1")
+    await d.click("a[href='/CustomerReceipts/Create']", "Click New Receipt.", "Step 1")
+    await d.fill("#tenantSearch", "055 000 1002",
+                 "Find the tenant by name, by tenant number, or as here by phone number.", "Step 2")
+    await d.page.wait_for_url("**tenantId=**")
+    await d.page.wait_for_load_state("load")
+    await d.point("#openInvoices", "Her open invoices are listed with what is still owed on each.", "Step 2")
+    await d.fill("#Amount", "4000", "She owes 10,500 but pays 4,000 today. Type what was received.", "Step 3")
+    await d.point(d.page.locator("#openInvoices tbody tr").first,
+                  "The payment is accepted as a payment on account against the invoice nearest its due date. 6,500 is left to pay.", "Step 3")
+    await d.fill("#PaymentMethod", "Cash", "Paid in cash.")
+    await d.click("#saveReceipt", "Click Save and Post.", "Step 4")
+    await d.point(".sheet", "The settlement document says it in writing: 4,000 on account against the invoice, 6,500 still due.", "Step 4")
+    await d.click(".toolbar a[href$='/CustomerReceipts/Create']", "Later she pays the rest. Click New Receipt.", "Step 5")
+    await d.fill("#tenantSelect", "Priya", "This time choose her from the list.", "Step 5")
+    await d.fill(d.page.locator("#openInvoices input[type=checkbox]").first, "true",
+                 "Tick the invoice she is paying. The amount fills in with what is left on it.", "Step 6")
+    await d.point(d.page.locator("#openInvoices tbody tr").first, "Now the invoice will be settled in full.")
+    await d.click("#saveReceipt", "Click Save and Post.", "Step 6")
+    await d.point(".sheet", "The second document shows the invoice settled in full.")
+    await d.click(".toolbar a[href$='/CustomerReceipts']", "Go back to the list.", "Step 7")
+    await d.point(d.page.locator("tbody tr").nth(1),
+                  "Both receipts are in the list. The first is marked as a payment on account.")
+    await d.say("If a payment is larger than one invoice, the rest goes to the next invoice by due date.")
+    await d.clear_caption()
+    await d.card("Done", "Part payment and balance received", "Next: handing a unit back.", 3)
+
+
+async def v13_handover(d: Director):
+    await d.goto("/")
+    await d.card("Video 13", "Handing a unit back",
+                 "The inspection, the charges for damage, and settling the security deposit.")
+    await d.goto("/LeaseHandovers", "Lease Handovers is under Master Data. A tenant is leaving, so open a handover.", "Step 1")
+    await d.fill("#leaseId", STATE["leaver"], "Choose the contract.", "Step 1")
+    await d.point("#handoverDate", "The handover date is today. Before the contract's end date, it is an early termination.")
+    await d.click("form[action*='/LeaseHandovers/Start'] button[type=submit]", "Click Open.", "Step 1")
+
+    await d.say("Step one is the inspection. Every line of the checklist gets an answer.", "Step 2")
+    results = d.page.locator("select[name$='.Result']")
+    count = await results.count()
+    await d.fill(results.nth(0), "Ok", "Mark what is in order as OK.", "Step 2")
+    for index in range(1, count - 1):
+        await results.nth(index).select_option("Ok")
+    await d.pause(0.6)
+    await d.fill(results.nth(count - 1), "Issue", "Mark a problem where one is found...", "Step 2")
+    await d.fill(d.page.locator("input[name$='.Notes']").nth(count - 1), "Deep scratches on the living room wall",
+                 "...and say what was found.")
+    await d.fill("#keys", "2", "Count the keys returned, and note the meter readings.", "Step 2")
+    await d.fill("#elec", "48210")
+    await d.fill("#water", "1936")
+    await d.click("button[name=Complete][value=true]", "Click Complete the inspection.", "Step 3")
+
+    await d.fill("#chargeFor", "Repair and repaint the living room wall",
+                 "Step two: the Maintenance Manager prices the damage the tenant must pay for.", "Step 4")
+    await d.fill("#chargeAmount", "600", "The amount before VAT.")
+    await d.click("form[action*='/LeaseHandovers/AddCharge'] button[type=submit]", "Click Add charge.", "Step 4")
+    await d.click("form[action*='/LeaseHandovers/SignMaintenance'] button[type=submit]",
+                  "Then sign, which passes the handover to the accounts.", "Step 5")
+
+    settle = "form[action*='/LeaseHandovers/Settle']"
+    await d.point(d.page.locator(settle).locator("xpath=ancestor::div[contains(@class,'card')][1]"),
+                  "Step three: the accounts. The charge with its VAT, 630, is taken from the deposit of 3,900, "
+                  "and 3,270 is to be refunded.", "Step 6")
+    await d.fill("#accNotes", "Refund by bank transfer", "Add a note on how the refund is paid.")
+    await d.click(f"{settle} button[type=submit]", "Click Settle and close the contract.", "Step 7")
+    await d.say("The charge is invoiced and paid from the deposit, the refund is recorded, "
+                "the contract is closed and the flat is vacant again.", "Step 7")
+    await d.goto("/LeaseHandovers", "The handover is settled. Its report can be printed for the tenant to sign.")
+    await d.clear_caption()
+    await d.card("Done", "Unit handed back and deposit settled", "Next: maintenance jobs.", 3.5)
+
+
+async def v14_maintenance(d: Director):
+    await d.goto("/")
+    await d.card("Video 14", "Maintenance jobs",
+                 "From a tenant's request to a finished job: who does it, what it cost, and how the team is doing.")
+    await d.menu("operationsDropdown", "/MaintenanceJobs", "Open Operations, then Maintenance Jobs.", "Step 1")
+    await d.point("ul.nav-tabs", "Jobs are on three tabs: requests and repairs, planned maintenance, and paid services.", "Step 1")
+    await d.point(d.page.locator("table tbody tr").first,
+                  "The open jobs, the most urgent first, each with its engineer and its age.", "Step 1")
+    row = d.page.locator("tr", has_text=STATE["job"]).first
+    await d.point(row, "This request came from a tenant's portal and nobody has it yet.", "Step 2")
+    await d.click(row.locator("a[href*='/MaintenanceJobs/Details']").first, "Open it.", "Step 2")
+    assign = "form[action*='/MaintenanceJobs/Assign']"
+    await d.fill(f"{assign} select", STATE["engineer"], "Choose the engineer...", "Step 2")
+    await d.click(f"{assign} button", "...and click Assign. They are told at once.", "Step 2")
+
+    step = "form[action*='/MaintenanceJobs/Step']"
+    await d.say("The engineer opens the job on their phone, under My Jobs, and works through these same steps.", "Step 3")
+    await d.click(f"{step}:has(input[value=acknowledge]) button", "Acknowledge: I have seen it.", "Step 3")
+    await d.click(f"{step}:has(input[value=start]) button", "Start work, on arriving.", "Step 3")
+    await d.fill("#matDesc", "Dual flush valve", "Record each material used: what it is...", "Step 4")
+    await d.fill("#matCost", "85", "...and its cost.")
+    await d.fill("#matSource", "Purchased", "It came from the store, or was bought for the job...", "Step 4")
+    await d.fill("#matRef", "Receipt 4471", "...with its receipt number.")
+    await d.click("form[action*='/MaintenanceJobs/AddMaterial'] button[type=submit]", "Click Add material.", "Step 4")
+    await d.point(d.page.locator(".card", has=d.page.locator("#matDesc")).first.locator("table"),
+                  "The cost is now on the job. This building is a managed one, so it is charged to its owner.")
+    await d.fill("#resolveNotes", "Replaced the flush valve and tested the cistern. Working normally.",
+                 "When the work is finished, say what was done. The tenant reads this.", "Step 5")
+    await d.click(f"{step}:has(input[value=resolve]) button", "Click Mark as done.", "Step 5")
+    await d.say("The tenant is told, and can rate the work on their portal.")
+    await d.click(f"{step}:has(input[value=close]) button", "A supervisor then closes the job.", "Step 6")
+
+    await d.click("a.btn[href$='/MaintenanceJobs']", "Not every job starts with a tenant. Go back to the jobs...", "Step 7")
+    await d.click("a[href='/MaintenanceJobs/Create']", "...and click Raise a Job.", "Step 7")
+    await d.fill("#Purpose", "Inspection", "What it is for: a repair, an inspection, or making a vacant unit ready.", "Step 7")
+    building = await d.page.locator("#PropertyId option").nth(1).get_attribute("value")
+    await d.fill("#PropertyId", building, "Choose the building. Leave the unit empty for work on the building itself.", "Step 8")
+    await d.fill("#Category", "Common Areas")
+    await d.fill("#DueDate", iso(TODAY + dt.timedelta(days=7)), "Give it a due date.", "Step 8")
+    await d.fill("#Subject", "Roof and water tank inspection", "A short title...", "Step 8")
+    await d.fill("#Description", "Check the roof waterproofing, the tank covers and the pump room before the rainy season.",
+                 "...and the work to be done.")
+    await d.click("form[action*='/MaintenanceJobs/Create'] button[type=submit]",
+                  "Click Raise the job. It goes to the least busy engineer.", "Step 9")
+
+    await d.menu("operationsDropdown", "/MaintenanceJobs/Dashboard", "Last, the Maintenance Dashboard.", "Step 10")
+    await d.point(".mnt-kpis", "How many jobs came in and how many are open, how fast the team responds and finishes, "
+                               "the tenants' ratings, and the cost of materials.", "Step 10")
+    await d.scroll(520, 2.5)
+    await d.say("Below are the charts by month, by engineer and by building. Export to Excel gives the figures behind them.")
+    await d.scroll(520, 2)
+    await d.clear_caption()
+    await d.card("Done", "Job assigned, done, costed and closed", "That completes maintenance.", 3.5)
+
+
 VIDEOS = [
     ("01", "sign-in", "Signing in and finding your way", v01_sign_in),
     ("02", "master-data", "Adding a property, a unit and a tenant", v02_master_data),
@@ -813,10 +1070,58 @@ VIDEOS = [
     ("08", "month-end", "Month-end", v08_month_end),
     ("09", "reports", "The reports", v09_reports),
     ("10", "tenant-portal", "The tenant portal", v10_portal),
+    ("11", "short-stay", "A short stay", v11_short_stay),
+    ("12", "payment-on-account", "A payment on account", v12_payment_on_account),
+    ("13", "lease-handover", "Handing a unit back", v13_handover),
+    ("14", "maintenance-jobs", "Maintenance jobs", v14_maintenance),
 ]
 
 ARGS = None
 DIRECTOR = None
+
+# Which argument of each Director call is the line to say.
+LINE_ARGUMENT = {"say": 0, "goto": 1, "point": 1, "click": 1, "submit": 1, "group": 1, "fill": 2, "menu": 2}
+
+
+def scripted_lines(plays) -> list[str]:
+    """The lines the videos will say, read from their own code, so that they can all be
+    fetched before recording starts. A line built from something only known while
+    recording (a code the system has just issued) is left out and fetched when met."""
+    lines = []
+    for play in plays:
+        for call in ast.walk(ast.parse(inspect.getsource(play))):
+            if not (isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute)):
+                continue
+            name = call.func.attr
+            if name == "card" and len(call.args) >= 3:
+                parts = call.args[1:3]
+            elif name in LINE_ARGUMENT and len(call.args) > LINE_ARGUMENT[name]:
+                parts = [call.args[LINE_ARGUMENT[name]]]
+            else:
+                continue
+            try:
+                said = [eval(compile(ast.Expression(part), "<line>", "eval"), globals()) for part in parts]
+            except Exception:
+                continue
+            if all(isinstance(text, str) for text in said):
+                lines.append(". ".join(said))
+    return lines
+
+
+async def fetch_lines(plays):
+    """Fetches and measures every line of the chosen videos, a few at a time."""
+    narrator = Narrator(ARGS.voice, ARGS.voice_rate)
+    lines = list(dict.fromkeys(scripted_lines(plays)))
+    new = [line for line in lines if not narrator.known(line)]
+    if not new:
+        return
+    print(f"fetching {len(new)} spoken lines...")
+    several = asyncio.Semaphore(5)
+
+    async def fetch(line):
+        async with several:
+            await narrator.line(line)
+    await asyncio.gather(*(fetch(line) for line in new))
 
 
 # ===========================================================================
@@ -828,16 +1133,33 @@ async def prepare(browser, state_file: pathlib.Path):
     it, and saves the session so each video starts signed in."""
     context = await browser.new_context(viewport=SIZE)
     page = await context.new_page()
+    # The "this cannot be undone" questions of the sample data buttons.
+    page.on("dialog", lambda dialog: asyncio.ensure_future(dialog.accept()))
     site = ARGS.site
 
-    await page.goto(site + "/Auth/Login")
-    if "/Auth/Login" in page.url:
-        await page.fill("#Username", ARGS.username)
-        await page.fill("#Password", ARGS.password)
-        await page.click("form[action*='/Auth/Login'] button[type=submit]")
+    async def sign_in(password):
+        await page.goto(site + "/Auth/Login")
+        if "/Auth/Login" in page.url:
+            await page.fill("#Username", ARGS.username)
+            await page.fill("#Password", password)
+            await page.click("form[action*='/Auth/Login'] button[type=submit]")
+            await page.wait_for_load_state("load")
+        return "/Auth/Login" not in page.url
+
+    if not await sign_in(ARGS.password):
+        # An earlier recording on this database has already changed the password.
+        if not await sign_in(RECORDING_PASSWORD):
+            sys.exit("Could not sign in. Check --username and --password (the demo owner account).")
+        ARGS.password = RECORDING_PASSWORD
+    if "/Profile/ChangePassword" in page.url:
+        await page.fill("#CurrentPassword", ARGS.password)
+        await page.fill("#NewPassword", RECORDING_PASSWORD)
+        await page.fill("#ConfirmNewPassword", RECORDING_PASSWORD)
+        await page.click("form[action*='ChangePassword'] button[type=submit]")
         await page.wait_for_load_state("load")
-    if "/Auth/Login" in page.url:
-        sys.exit("Could not sign in. Check --username and --password (the demo owner account).")
+        if "/Profile/ChangePassword" in page.url:
+            sys.exit("The application asked for a new password and did not accept the recorder's.")
+        ARGS.password = RECORDING_PASSWORD
 
     await page.goto(site + "/Companies")
     if "/Companies" not in page.url:
@@ -853,8 +1175,33 @@ async def prepare(browser, state_file: pathlib.Path):
         await page.goto(site + "/Companies")
         edit = await page.locator("tr", has_text=COMPANY).first.locator("a[href*='/Companies/Edit']").get_attribute("href")
         await page.goto(site + edit)
-        page.on("dialog", lambda dialog: asyncio.ensure_future(dialog.accept()))
         await page.click("form[action*='LoadSampleData'] button[type=submit]", timeout=0)
+        await page.wait_for_load_state("load", timeout=600_000)
+        alerts = await page.locator(".alert").all_inner_texts()
+        print("  " + " | ".join(a.strip() for a in alerts))
+
+    # Video 14 needs someone to give the jobs to, and jobs: a maintenance engineer, then
+    # the Maintenance Scenarios, which are shared among the company's engineers.
+    await page.goto(site + "/Users")
+    if await page.locator("tr", has_text=STATE["engineer_username"]).count() == 0:
+        print(f"adding the maintenance engineer {STATE['engineer']} and loading the maintenance scenarios...")
+        await page.goto(site + "/Users/Create")
+        await page.fill("#Username", STATE["engineer_username"])
+        await page.fill("#DisplayName", STATE["engineer"])
+        await page.fill("#Password", RECORDING_PASSWORD)
+        await page.fill("#ConfirmPassword", RECORDING_PASSWORD)
+        await page.select_option("#DefaultCompanyId", label=COMPANY)
+        await page.get_by_label(COMPANY, exact=True).check()
+        await page.click("#rolePresets [data-role=MaintenanceEngineer]")
+        await page.click("form[action*='/Users/Create'] button[type=submit]")
+        await page.wait_for_load_state("load")
+        if "/Users/Create" in page.url:
+            sys.exit("The maintenance engineer could not be added: "
+                     + " | ".join(await page.locator(".text-danger").all_inner_texts()))
+        await page.goto(site + "/Companies")
+        edit = await page.locator("tr", has_text=COMPANY).first.locator("a[href*='/Companies/Edit']").get_attribute("href")
+        await page.goto(site + edit)
+        await page.click("form[action*='LoadMaintenanceScenarios'] button[type=submit]", timeout=0)
         await page.wait_for_load_state("load", timeout=600_000)
         alerts = await page.locator(".alert").all_inner_texts()
         print("  " + " | ".join(a.strip() for a in alerts))
@@ -905,6 +1252,7 @@ async def record(browser, state_file, number, key, title, play):
     ok = True
     try:
         await play(DIRECTOR)
+        await DIRECTOR.settle()
     except Exception as ex:  # keep going with the next video, but say what failed
         ok = False
         shot = OUT_DIR / f"{number}-{key}-FAILED.png"
@@ -920,8 +1268,26 @@ async def record(browser, state_file, number, key, title, play):
         print(f"  voice-over: {len(narrator.cues)} lines, voice {narrator.voice}")
     elif ok:
         shutil.move(await video.path(), target)
+    if ok and ARGS.mp4:
+        to_mp4(target)
     shutil.rmtree(temp_dir, ignore_errors=True)
     return ok, target
+
+
+def to_mp4(video: pathlib.Path) -> pathlib.Path:
+    """Writes an .mp4 copy beside a recording: H.264 picture and AAC sound, which is what
+    YouTube and most video editors take most readily."""
+    import imageio_ffmpeg
+    target = video.with_suffix(".mp4")
+    done = subprocess.run(
+        [imageio_ffmpeg.get_ffmpeg_exe(), "-y", "-hide_banner", "-loglevel", "error", "-i", str(video),
+         "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p",
+         "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", str(target)],
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if done.returncode != 0:
+        raise RuntimeError("Making the .mp4 copy failed:\n" + done.stderr[-800:])
+    print(f"  mp4 copy: {target.relative_to(PROJECT)} ({target.stat().st_size // 1024} KB)")
+    return target
 
 
 # ===========================================================================
@@ -993,12 +1359,15 @@ async def main():
     parser.add_argument("--username", default="admin", help="the demo owner account")
     parser.add_argument("--password", default="Admin@123", help="the demo owner's password")
     parser.add_argument("--only", help="comma-separated video numbers or keys, e.g. 01,09")
-    parser.add_argument("--pace", type=float, default=1.0, help="slower above 1, faster below 1")
+    parser.add_argument("--pace", type=float, default=1.3,
+                        help="speed of the pointer, typing and pauses: higher is slower (default 1.3)")
     parser.add_argument("--show", action="store_true", help="show the browser while recording")
     parser.add_argument("--publish-only", action="store_true",
                         help="do not record; copy the videos already recorded into the help")
     parser.add_argument("--voice", help="speak the captions with this voice, e.g. en-US-BrianNeural")
-    parser.add_argument("--voice-rate", default="+0%", help='speed of the voice, e.g. "-5%%" or "+10%%"')
+    parser.add_argument("--voice-rate", default="-4%", help='speed of the voice, e.g. "-10%%" or "+8%%"')
+    parser.add_argument("--mp4", action="store_true",
+                        help="also write an .mp4 copy of each recording, for YouTube")
     parser.add_argument("--no-publish", action="store_true",
                         help="record into Tools/VideoCapture/output only; leave the help as it is")
     ARGS = parser.parse_args()
@@ -1008,6 +1377,11 @@ async def main():
             import edge_tts, imageio_ffmpeg  # noqa: F401
         except ImportError:
             sys.exit("--voice needs two packages:  pip install edge-tts imageio-ffmpeg")
+    if ARGS.mp4:
+        try:
+            import imageio_ffmpeg  # noqa: F401
+        except ImportError:
+            sys.exit("--mp4 needs a package:  pip install imageio-ffmpeg")
 
     wanted = {x.strip() for x in ARGS.only.split(",")} if ARGS.only else None
     selected = [v for v in VIDEOS if not wanted or v[0] in wanted or v[1] in wanted]
@@ -1029,6 +1403,9 @@ async def main():
     host = urllib.parse.urlparse(ARGS.site).hostname
     if host not in ("localhost", "127.0.0.1", "::1"):
         sys.exit("Refusing to record from anything but localhost: the videos would show real data.")
+
+    if ARGS.voice:
+        await fetch_lines([play for _, _, _, play in selected])
 
     async with async_playwright() as p:
         browser = await launch(p)

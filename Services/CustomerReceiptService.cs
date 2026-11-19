@@ -112,7 +112,11 @@ namespace RealEstateManager.Services
                     : model.ReceiptNumber.Trim(),
                 ReceiptDate = model.ReceiptDate,
                 Amount = model.Amount,
-                PaymentMethod = model.PaymentMethod
+                PaymentMethod = model.PaymentMethod,
+                OutstandingBefore = await _db.CustomerInvoices
+                    .Where(x => x.Id == model.CustomerInvoiceId)
+                    .Select(x => (decimal?)(x.TotalAmount - x.AmountPaid))
+                    .FirstOrDefaultAsync()
             };
 
             _db.CustomerReceipts.Add(receipt);

@@ -1,0 +1,119 @@
+@model List<RealEstateManager.Services.ListingService.EnquiryRow>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Website Enquiries"];
+    var status = ViewBag.Status as string;
+    string Tab(string? value) => string.Equals(status, value, StringComparison.OrdinalIgnoreCase) ? "btn-dark" : "btn-outline-dark";
+    string Badge(string value) => value switch
+    {
+        EnquiryStatuses.New => "bg-danger",
+        EnquiryStatuses.Contacted => "bg-primary",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Website Enquiries"]</h2>
+        <p class="text-muted mb-0" style="max-width:820px">
+            @T["What visitors of the vacancy website asked. Call them back, note what was agreed, and mark the enquiry so the next person knows where it stands."]
+        </p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index">@T["Back"]</a>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div class="btn-group mb-3">
+    <a class="btn btn-sm @Tab(null)" asp-action="Enquiries">@T["All"]</a>
+    @foreach (var s in EnquiryStatuses.All)
+    {
+        <a class="btn btn-sm @Tab(s)" asp-action="Enquiries" asp-route-status="@s">@T[s]</a>
+    }
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">@T["No enquiries here yet."]</div>
+}
+else
+{
+    @foreach (var enquiry in Model)
+    {
+        var digits = new string(enquiry.Phone.Where(char.IsDigit).ToArray());
+        // A local mobile number (05x xxx xxxx) needs the country code before WhatsApp will open it.
+        if (digits.StartsWith("00")) { digits = digits[2..]; }
+        else if (digits.Length == 10 && digits.StartsWith("0")) { digits = "971" + digits[1..]; }
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <div>
+                        <span class="badge @Badge(enquiry.Status)">@T[enquiry.Status]</span>
+                        <strong class="ms-1">@enquiry.Name</strong>
+                        <span class="text-muted small ms-1">@enquiry.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+                        @if (enquiry.Language == "ar")
+                        {
+                            <span class="badge bg-light text-dark border ms-1">@T["Arabic speaker"]</span>
+                        }
+                    </div>
+                    <div>
+                        @if (enquiry.UnitId.HasValue)
+                        {
+                            <a asp-action="Unit" asp-route-id="@enquiry.UnitId">@enquiry.PropertyName · @enquiry.UnitNumber</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">@T["General enquiry"]</span>
+                        }
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <a href="tel:@enquiry.Phone" dir="ltr">@enquiry.Phone</a>
+                    @if (digits.Length >= 8)
+                    {
+                        <span class="text-muted">·</span> <a href="https://wa.me/@digits" target="_blank" rel="noopener">WhatsApp</a>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(enquiry.Email))
+                    {
+                        <span class="text-muted">·</span> <a href="mailto:@enquiry.Email" dir="ltr">@enquiry.Email</a>
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(enquiry.Message))
+                {
+                    <p class="mt-2 mb-0" style="white-space:pre-wrap" dir="auto">@enquiry.Message</p>
+                }
+                <form asp-action="UpdateEnquiry" asp-route-id="@enquiry.Id" method="post" class="row g-2 align-items-end mt-2">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnStatus" value="@status" />
+                    <div class="col-md-7">
+                        <label class="form-label small mb-1">@T["Office note"]</label>
+                        <input class="form-control form-control-sm" name="notes" value="@enquiry.Notes" maxlength="1000" dir="auto" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small mb-1">@T["Status"]</label>
+                        <select class="form-select form-select-sm" name="status">
+                            @foreach (var s in EnquiryStatuses.All)
+                            {
+                                <option value="@s" selected="@(s == enquiry.Status)">@T[s]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-sm btn-dark w-100">@T["Save"]</button>
+                    </div>
+                </form>
+                @if (enquiry.HandledAt.HasValue)
+                {
+                    <div class="text-muted small mt-1">@T.Format("Handled by {0} on {1}", enquiry.HandledByName ?? "—", enquiry.HandledAt.Value.ToLocalTime().ToString("dd MMM yyyy HH:mm"))</div>
+                }
+            </div>
+        </div>
+    }
+}

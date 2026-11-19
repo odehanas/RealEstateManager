@@ -1,0 +1,251 @@
+@model List<RealEstateManager.Services.ListingService.BoardUnit>
+@using RealEstateManager.Domain
+@{
+    ViewData["Title"] = T["Vacancy Website"];
+    var site = (ListingSite)ViewBag.Site;
+    var publicUrl = (string)ViewBag.PublicUrl;
+    var newEnquiries = (int)ViewBag.NewEnquiries;
+    var onSite = Model.Count(x => x.IsPublic);
+    var vacant = Model.Count(x => x.Status == "Vacant");
+}
+
+<style>
+    .listing-thumb { width: 72px; height: 54px; object-fit: cover; border-radius: 6px; background: #e9ecef; display: block; }
+    .listing-thumb.empty { display: flex; align-items: center; justify-content: center; color: #8a94a0; font-size: .7rem; }
+    .site-link { font-family: Consolas, monospace; font-size: .9rem; word-break: break-all; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+        <h2 class="mb-1">@T["Vacancy Website"]</h2>
+        <p class="text-muted mb-0" style="max-width:820px">
+            @T["A public page, open to anyone without signing in, that shows the vacant units you choose to advertise. A unit leaves the page by itself when it is let, and visitors' enquiries arrive here."]
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-dark" asp-action="Enquiries">
+            @T["Enquiries"]
+            @if (newEnquiries > 0)
+            {
+                <span class="badge bg-danger">@newEnquiries</span>
+            }
+        </a>
+        @if (site.IsEnabled)
+        {
+            <a class="btn btn-dark" href="@publicUrl" target="_blank" rel="noopener">@T["Open the website"]</a>
+        }
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-warning">@errorMessage</div>
+}
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">@T["Website"]</div>
+            <div class="fs-5 fw-bold">
+                @if (site.IsEnabled)
+                {
+                    <span class="text-success">@T["Open to the public"]</span>
+                }
+                else
+                {
+                    <span class="text-secondary">@T["Switched off"]</span>
+                }
+            </div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">@T["Units on the website"]</div>
+            <div class="fs-5 fw-bold">@onSite <span class="text-muted fw-normal fs-6">@T.Format("of {0} vacant", vacant)</span></div>
+        </div></div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">@T["New enquiries"]</div>
+            <div class="fs-5 fw-bold">@newEnquiries</div>
+        </div></div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>@T["The public page"]</strong>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#siteForm">@T["Settings"]</button>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="text-muted">@T["Address"]:</span>
+            <span class="site-link" id="siteLink">@publicUrl</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="copyLink">@T["Copy"]</button>
+        </div>
+        @if (!site.IsEnabled)
+        {
+            <div class="form-text">@T["The address does not work until the website is switched on in Settings."]</div>
+        }
+
+        <form asp-action="SaveSite" method="post" class="collapse mt-3 @(site.IsEnabled ? "" : "show")" id="siteForm">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="IsEnabled" name="IsEnabled" value="true" @(site.IsEnabled ? "checked" : "") />
+                        <label class="form-check-label" for="IsEnabled"><strong>@T["Website switched on"]</strong> — @T["anyone with the address can see the advertised units."]</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="Slug">@T["Address name"]</label>
+                    <div class="input-group">
+                        <span class="input-group-text">/vacancies/</span>
+                        <input class="form-control" id="Slug" name="Slug" value="@site.Slug" maxlength="60" required pattern="[a-z0-9][a-z0-9\-]{1,58}[a-z0-9]" dir="ltr" />
+                    </div>
+                    <div class="form-text">@T["Small English letters, digits and hyphens. Changing it breaks links already shared."]</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="DisplayName">@T["Name shown (English)"]</label>
+                    <input class="form-control" id="DisplayName" name="DisplayName" value="@site.DisplayName" maxlength="200" placeholder="@T["The company's name when empty"]" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="DisplayNameAr">@T["Name shown (Arabic)"]</label>
+                    <input class="form-control" id="DisplayNameAr" name="DisplayNameAr" value="@site.DisplayNameAr" maxlength="200" dir="rtl" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="Intro">@T["Welcome text (English)"]</label>
+                    <textarea class="form-control" id="Intro" name="Intro" rows="2" maxlength="600">@site.Intro</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="IntroAr">@T["Welcome text (Arabic)"]</label>
+                    <textarea class="form-control" id="IntroAr" name="IntroAr" rows="2" maxlength="600" dir="rtl">@site.IntroAr</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="ContactPhone">@T["Phone to call"]</label>
+                    <input class="form-control" id="ContactPhone" name="ContactPhone" value="@site.ContactPhone" maxlength="30" dir="ltr" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="WhatsAppNumber">@T["WhatsApp number"]</label>
+                    <input class="form-control" id="WhatsAppNumber" name="WhatsAppNumber" value="@site.WhatsAppNumber" maxlength="30" placeholder="971501234567" dir="ltr" />
+                    <div class="form-text">@T["International format. Adds a \"Chat on WhatsApp\" button to every unit."]</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="ContactEmail">@T["Contact email"]</label>
+                    <input class="form-control" type="email" id="ContactEmail" name="ContactEmail" value="@site.ContactEmail" maxlength="200" dir="ltr" />
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ShowRent" name="ShowRent" value="true" @(site.ShowRent ? "checked" : "") />
+                        <label class="form-check-label" for="ShowRent">@T["Show the rent on the website"] <span class="text-muted">— @T["when off, visitors are asked to enquire for the price."]</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-dark">@T["Save"]</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h5 class="mb-2">@T["Vacant and advertised units"]</h5>
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">@T["There are no vacant units at the moment. A unit appears here when it becomes vacant."]</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th></th>
+                    <th>@T["Unit"]</th>
+                    <th>@T["Property"]</th>
+                    <th>@T["Usage"]</th>
+                    <th class="text-end">@T["Asking rent"]</th>
+                    <th>@T["Advertisement"]</th>
+                    <th>@T["On the website"]</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var unit in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (unit.CoverPhotoId.HasValue)
+                            {
+                                <img class="listing-thumb" loading="lazy" alt="" src="@Url.Action("Photo", new { id = unit.CoverPhotoId })" />
+                            }
+                            else
+                            {
+                                <span class="listing-thumb empty">@T["No photo"]</span>
+                            }
+                        </td>
+                        <td>
+                            <strong class="text-nowrap">@unit.UnitNumber</strong>
+                            @if (unit.OpenEnquiries > 0)
+                            {
+                                <a asp-action="Enquiries" asp-route-status="New" class="badge bg-danger text-decoration-none">@T.Format("{0} new", unit.OpenEnquiries)</a>
+                            }
+                        </td>
+                        <td>@unit.PropertyName</td>
+                        <td>@(string.IsNullOrWhiteSpace(unit.UsageType) ? "—" : T[unit.UsageType])</td>
+                        <td class="text-end">@(unit.Rent > 0 ? unit.Rent.ToString("N0") : "—")</td>
+                        <td>
+                            <span class="badge @(unit.PhotoCount > 0 ? "bg-light text-dark border" : "bg-warning text-dark")">@T.Format("{0} photo(s)", unit.PhotoCount)</span>
+                            @if (!unit.HasDescription)
+                            {
+                                <span class="badge bg-warning text-dark">@T["No description"]</span>
+                            }
+                            @if (unit.Rent <= 0)
+                            {
+                                <span class="badge bg-warning text-dark">@T["No rent"]</span>
+                            }
+                        </td>
+                        <td>
+                            @if (unit.IsPublic)
+                            {
+                                <span class="badge bg-success">@(site.IsEnabled ? T["Shown"] : T["Ready - website is off"])</span>
+                            }
+                            else if (unit.IsListed)
+                            {
+                                <span class="badge bg-secondary" title="@T["It will return to the website when it is vacant again."]">@T["Hidden - not vacant"]</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">@T["Not advertised"]</span>
+                            }
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-outline-dark" asp-action="Unit" asp-route-id="@unit.Id">@T["Edit advertisement"]</a>
+                            <form asp-action="Toggle" asp-route-id="@unit.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="listed" value="@(unit.IsListed ? "false" : "true")" />
+                                <button type="submit" class="btn btn-sm @(unit.IsListed ? "btn-outline-danger" : "btn-success")">@(unit.IsListed ? T["Take off"] : T["Put on website"])</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.getElementById('copyLink')?.addEventListener('click', function () {
+            var button = this;
+            navigator.clipboard.writeText(document.getElementById('siteLink').textContent.trim()).then(function () {
+                var old = button.textContent;
+                button.textContent = '✓';
+                setTimeout(function () { button.textContent = old; }, 1200);
+            });
+        });
+    </script>
+}

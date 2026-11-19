@@ -1,0 +1,117 @@
+@using RealEstateManager.Services.Localization
+@{
+    // The layout of a company's public vacancy website. No menu, no sign-in, nothing of the
+    // application around it: a visitor sees the company, its units and how to reach it.
+    var site = (RealEstateManager.Services.ListingService.PublicSite)ViewBag.Site;
+    var home = Url.Action("Index", "Vacancies", new { slug = site.Slug });
+    var description = ViewData["Description"] as string ?? site.Intro ?? site.Name;
+    var image = ViewData["Image"] as string;
+}
+<!DOCTYPE html>
+<html lang="@UiLanguages.Current" dir="@(UiLanguages.IsArabic ? "rtl" : "ltr")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · @site.Name</title>
+    <meta name="description" content="@description" />
+    <meta property="og:title" content="@ViewData["Title"] · @site.Name" />
+    <meta property="og:description" content="@description" />
+    <meta property="og:type" content="website" />
+    @if (!string.IsNullOrEmpty(image))
+    {
+        <meta property="og:image" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{image}")" />
+    }
+    <meta name="theme-color" content="#0f2740" />
+    @if (UiLanguages.IsArabic)
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    }
+    <style>
+        :root { --navy:#0f2740; --accent:#1e6fd9; --line:#dfe4ea; --ink:#1c2733; --soft:#5b6774; }
+        body { background:#f4f6f9; color:var(--ink); }
+        .v-bar { background:var(--navy); color:#fff; }
+        .v-bar .inner { max-width:1140px; margin:0 auto; padding:.8rem 1rem; display:flex; gap:.75rem; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+        .v-brand { color:#fff; text-decoration:none; font-weight:700; font-size:1.15rem; line-height:1.2; }
+        .v-brand small { display:block; font-weight:400; font-size:.75rem; opacity:.75; letter-spacing:.04em; }
+        .v-main { max-width:1140px; margin:0 auto; padding:1.25rem 1rem 3rem; }
+        .v-foot { border-top:1px solid var(--line); color:var(--soft); font-size:.85rem; }
+        .v-foot .inner { max-width:1140px; margin:0 auto; padding:1.25rem 1rem; display:flex; gap:1rem; flex-wrap:wrap; justify-content:space-between; }
+        .v-foot a { color:inherit; }
+
+        .v-hero { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1.4rem 1.5rem; margin-bottom:1rem; }
+        .v-hero h1 { font-size:1.6rem; font-weight:700; margin:0 0 .35rem; }
+        .v-hero p { color:var(--soft); margin:0; max-width:760px; }
+
+        .v-filter { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1rem; margin-bottom:1.25rem; }
+        .v-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:1.1rem; }
+        .v-card { background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; text-decoration:none; color:inherit; display:flex; flex-direction:column; transition:box-shadow .15s, transform .15s; }
+        .v-card:hover { box-shadow:0 8px 24px rgba(15,39,64,.12); transform:translateY(-2px); color:inherit; }
+        .v-card .pic { aspect-ratio:4/3; background:#e6ebf1; position:relative; }
+        .v-card .pic img { width:100%; height:100%; object-fit:cover; display:block; }
+        .v-card .pic .none { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#90a0b0; }
+        .v-card .pic .none svg, .v-gallery .none svg { width:56px; height:56px; stroke:currentColor; fill:none; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+        .v-card .tag { position:absolute; top:.6rem; inset-inline-start:.6rem; background:rgba(15,39,64,.85); color:#fff; font-size:.72rem; padding:.2rem .55rem; border-radius:999px; }
+        .v-card .body { padding:.9rem 1rem 1rem; display:flex; flex-direction:column; gap:.3rem; flex:1; }
+        .v-card h2 { font-size:1.05rem; font-weight:700; margin:0; }
+        .v-where { color:var(--soft); font-size:.88rem; }
+        .v-facts { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.25rem; }
+        .v-fact { background:#eef2f7; border-radius:999px; padding:.15rem .6rem; font-size:.8rem; color:#34424f; }
+        .v-rent { margin-top:auto; padding-top:.6rem; font-weight:700; font-size:1.15rem; color:var(--navy); }
+        .v-rent small { font-weight:400; font-size:.8rem; color:var(--soft); }
+
+        .v-panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1.2rem 1.3rem; }
+        .v-gallery .main { aspect-ratio:16/10; background:#e6ebf1; border-radius:14px; overflow:hidden; position:relative; }
+        .v-gallery .main img { width:100%; height:100%; object-fit:cover; display:block; }
+        .v-gallery .none { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#90a0b0; }
+        .v-thumbs { display:flex; gap:.5rem; margin-top:.6rem; overflow-x:auto; padding-bottom:.25rem; }
+        .v-thumbs button { border:2px solid transparent; border-radius:8px; padding:0; background:none; flex:0 0 auto; overflow:hidden; }
+        .v-thumbs button.on { border-color:var(--accent); }
+        .v-thumbs img { width:92px; height:68px; object-fit:cover; display:block; }
+        .v-features { columns:2; column-gap:1.5rem; padding-inline-start:1.1rem; margin:0; }
+        @@media (max-width:575px) { .v-features { columns:1; } .v-hero h1 { font-size:1.35rem; } }
+        .btn-wa { background:#1faa59; color:#fff; border:0; }
+        .btn-wa:hover { background:#17914a; color:#fff; }
+        /* Hidden where it stands: moving it off to one side widens a right-to-left page. */
+        .hp { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); opacity:0; pointer-events:none; }
+    </style>
+</head>
+<body>
+    <header class="v-bar">
+        <div class="inner">
+            <a class="v-brand" href="@home">@site.Name<small>@T["Units available for rent"]</small></a>
+            <div class="d-flex gap-2 align-items-center">
+                @if (!string.IsNullOrWhiteSpace(site.Phone))
+                {
+                    <a class="btn btn-light btn-sm" href="tel:@site.Phone" dir="ltr">@site.Phone</a>
+                }
+                <partial name="_LanguageSwitch" model="@("btn-outline-light btn-sm")" />
+            </div>
+        </div>
+    </header>
+
+    <main class="v-main">
+        @RenderBody()
+    </main>
+
+    <footer class="v-foot">
+        <div class="inner">
+            <span>© @DateTime.Today.Year @site.Name</span>
+            <span>
+                @if (!string.IsNullOrWhiteSpace(site.Phone))
+                {
+                    <a href="tel:@site.Phone" dir="ltr">@site.Phone</a>
+                }
+                @if (!string.IsNullOrWhiteSpace(site.Email))
+                {
+                    <span> · </span><a href="mailto:@site.Email" dir="ltr">@site.Email</a>
+                }
+            </span>
+        </div>
+    </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -5,8 +5,8 @@
     "title": "Signing in and finding your way",
     "file": "sign-in.webm",
     "poster": "sign-in.jpg",
-    "seconds": 126,
-    "version": 1794554920
+    "seconds": 109,
+    "version": 1794772523
   },
   {
     "key": "master-data",
@@ -14,8 +14,8 @@
     "title": "Adding a property, a unit and a tenant",
     "file": "master-data.webm",
     "poster": "master-data.jpg",
-    "seconds": 302,
-    "version": 1794555220
+    "seconds": 140,
+    "version": 1794772668
   },
   {
     "key": "lease",
@@ -23,8 +23,8 @@
     "title": "Creating a lease",
     "file": "lease.webm",
     "poster": "lease.jpg",
-    "seconds": 173,
-    "version": 1794555389
+    "seconds": 84,
+    "version": 1794772753
   },
   {
     "key": "invoice-and-receipt",
@@ -32,8 +32,8 @@
     "title": "Posting an invoice and receiving the rent",
     "file": "invoice-and-receipt.webm",
     "poster": "invoice-and-receipt.jpg",
-    "seconds": 228,
-    "version": 1794555616
+    "seconds": 112,
+    "version": 1794772867
   },
   {
     "key": "cheques",
@@ -41,8 +41,8 @@
     "title": "Post-dated cheques",
     "file": "cheques.webm",
     "poster": "cheques.jpg",
-    "seconds": 239,
-    "version": 1794555853
+    "seconds": 112,
+    "version": 1794772982
   },
   {
     "key": "supplier-bill",
@@ -50,8 +50,8 @@
     "title": "Entering a supplier bill and paying it",
     "file": "supplier-bill.webm",
     "poster": "supplier-bill.jpg",
-    "seconds": 164,
-    "version": 1794557073
+    "seconds": 114,
+    "version": 1794773100
   },
   {
     "key": "petty-cash",
@@ -59,8 +59,8 @@
     "title": "Petty cash",
     "file": "petty-cash.webm",
     "poster": "petty-cash.jpg",
-    "seconds": 152,
-    "version": 1794556185
+    "seconds": 83,
+    "version": 1794773185
   },
   {
     "key": "month-end",
@@ -68,8 +68,8 @@
     "title": "Month-end",
     "file": "month-end.webm",
     "poster": "month-end.jpg",
-    "seconds": 156,
-    "version": 1794557373
+    "seconds": 101,
+    "version": 1794773288
   },
   {
     "key": "reports",
@@ -77,8 +77,8 @@
     "title": "The reports",
     "file": "reports.webm",
     "poster": "reports.jpg",
-    "seconds": 180,
-    "version": 1794556526
+    "seconds": 96,
+    "version": 1794773386
   },
   {
     "key": "tenant-portal",
@@ -86,7 +86,43 @@
     "title": "The tenant portal",
     "file": "tenant-portal.webm",
     "poster": "tenant-portal.jpg",
-    "seconds": 322,
-    "version": 1794556847
+    "seconds": 164,
+    "version": 1794773556
+  },
+  {
+    "key": "short-stay",
+    "number": "11",
+    "title": "A short stay",
+    "file": "short-stay.webm",
+    "poster": "short-stay.jpg",
+    "seconds": 117,
+    "version": 1794773675
+  },
+  {
+    "key": "payment-on-account",
+    "number": "12",
+    "title": "A payment on account",
+    "file": "payment-on-account.webm",
+    "poster": "payment-on-account.jpg",
+    "seconds": 110,
+    "version": 1794773786
+  },
+  {
+    "key": "lease-handover",
+    "number": "13",
+    "title": "Handing a unit back",
+    "file": "lease-handover.webm",
+    "poster": "lease-handover.jpg",
+    "seconds": 124,
+    "version": 1794773910
+  },
+  {
+    "key": "maintenance-jobs",
+    "number": "14",
+    "title": "Maintenance jobs",
+    "file": "maintenance-jobs.webm",
+    "poster": "maintenance-jobs.jpg",
+    "seconds": 179,
+    "version": 1794774093
   }
 ]

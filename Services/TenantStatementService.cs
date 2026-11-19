@@ -154,7 +154,9 @@ namespace RealEstateManager.Services
                     TransactionDate = x.ReceiptDate.Date,
                     TransactionType = "Receipt",
                     ReferenceNumber = x.ReceiptNumber,
-                    Description = BuildReceiptDescription(x.CustomerInvoice?.Lease),
+                    Description = x.IsOnAccount
+                        ? $"Payment on account against invoice {x.CustomerInvoice?.InvoiceNumber} - {BuildLeaseDisplay(x.CustomerInvoice?.Lease)}"
+                        : BuildReceiptDescription(x.CustomerInvoice?.Lease),
                     Debit = 0m,
                     Credit = x.Amount
                 }));

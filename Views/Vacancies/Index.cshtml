@@ -1,0 +1,182 @@
+@model List<RealEstateManager.Services.ListingService.PublicUnit>
+@using RealEstateManager.Services
+@{
+    Layout = "_VacanciesLayout";
+    var site = (ListingService.PublicSite)ViewBag.Site;
+    var filter = (ListingService.PublicFilter)ViewBag.Filter;
+    var all = (List<ListingService.PublicUnit>)ViewBag.All;
+    ViewData["Title"] = T["Units available for rent"];
+
+    var buildings = all.GroupBy(x => x.PropertyId).Select(g => g.First()).OrderBy(x => x.PropertyName).ToList();
+    var usages = all.Select(x => x.UsageType).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(x => x).ToList();
+    var hasBedrooms = all.Any(x => x.Bedrooms.HasValue);
+    var filtered = filter.PropertyId.HasValue || !string.IsNullOrWhiteSpace(filter.Usage) || filter.Bedrooms.HasValue || filter.MaxRent is > 0;
+    string Where(ListingService.PublicUnit u) => string.Join(" · ", new[] { u.PropertyName, u.AreaName, u.Emirate }.Where(x => !string.IsNullOrWhiteSpace(x)));
+}
+
+<section class="v-hero">
+    <h1>@T["Units available for rent"]</h1>
+    <p>@(site.Intro ?? T["Browse the units we have available now. Send an enquiry on any of them and our leasing team will call you back."])</p>
+</section>
+
+@if (TempData["VacancyNote"] is string note)
+{
+    <div class="alert alert-info">@T[note]</div>
+}
+
+@if (all.Count == 0)
+{
+    <div class="v-panel text-center py-5">
+        <h2 class="h5">@T["Nothing is available right now"]</h2>
+        <p class="text-muted mb-0">@T["Leave your details below and we will call you as soon as a unit becomes available."]</p>
+    </div>
+}
+else
+{
+    <form method="get" class="v-filter">
+        <div class="row g-2 align-items-end">
+            @if (buildings.Count > 1)
+            {
+                <div class="col-6 col-md">
+                    <label class="form-label small mb-1" for="f-property">@T["Building"]</label>
+                    <select class="form-select" id="f-property" name="PropertyId">
+                        <option value="">@T["All buildings"]</option>
+                        @foreach (var b in buildings)
+                        {
+                            <option value="@b.PropertyId" selected="@(filter.PropertyId == b.PropertyId)">@b.PropertyName</option>
+                        }
+                    </select>
+                </div>
+            }
+            @if (usages.Count > 1)
+            {
+                <div class="col-6 col-md">
+                    <label class="form-label small mb-1" for="f-usage">@T["Type"]</label>
+                    <select class="form-select" id="f-usage" name="Usage">
+                        <option value="">@T["All types"]</option>
+                        @foreach (var u in usages)
+                        {
+                            <option value="@u" selected="@string.Equals(filter.Usage, u, StringComparison.OrdinalIgnoreCase)">@T[u!]</option>
+                        }
+                    </select>
+                </div>
+            }
+            @if (hasBedrooms)
+            {
+                <div class="col-6 col-md">
+                    <label class="form-label small mb-1" for="f-beds">@T["Bedrooms"]</label>
+                    <select class="form-select" id="f-beds" name="Bedrooms">
+                        <option value="">@T["Any"]</option>
+                        <option value="0" selected="@(filter.Bedrooms == 0)">@T["Studio"]</option>
+                        <option value="1" selected="@(filter.Bedrooms == 1)">1</option>
+                        <option value="2" selected="@(filter.Bedrooms == 2)">2</option>
+                        <option value="3" selected="@(filter.Bedrooms == 3)">3</option>
+                        <option value="4" selected="@(filter.Bedrooms >= 4)">4+</option>
+                    </select>
+                </div>
+            }
+            @if (site.ShowRent)
+            {
+                <div class="col-6 col-md">
+                    <label class="form-label small mb-1" for="f-rent">@T.Format("Rent up to ({0})", site.Currency)</label>
+                    <input class="form-control" id="f-rent" name="MaxRent" type="number" min="0" step="1000" value="@(filter.MaxRent is > 0 ? filter.MaxRent.Value.ToString("0") : "")" />
+                </div>
+            }
+            <div class="col-6 col-md">
+                <label class="form-label small mb-1" for="f-sort">@T["Sort by"]</label>
+                <select class="form-select" id="f-sort" name="Sort">
+                    <option value="">@T["Newest first"]</option>
+                    @if (site.ShowRent)
+                    {
+                        <option value="rent" selected="@(filter.Sort == "rent")">@T["Rent: low to high"]</option>
+                        <option value="rent-desc" selected="@(filter.Sort == "rent-desc")">@T["Rent: high to low"]</option>
+                    }
+                    <option value="area" selected="@(filter.Sort == "area")">@T["Largest first"]</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-auto d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">@T["Search"]</button>
+                @if (filtered)
+                {
+                    <a class="btn btn-outline-secondary" href="@Url.Action("Index", new { slug = site.Slug })">@T["Clear"]</a>
+                }
+            </div>
+        </div>
+    </form>
+
+    <p class="text-muted small mb-2">@T.Format("{0} unit(s) available", Model.Count)</p>
+
+    @if (Model.Count == 0)
+    {
+        <div class="v-panel text-center py-4">
+            <p class="mb-2">@T["No unit matches your search."]</p>
+            <a class="btn btn-outline-primary" href="@Url.Action("Index", new { slug = site.Slug })">@T["Show all units"]</a>
+        </div>
+    }
+    else
+    {
+        <div class="v-grid">
+            @foreach (var unit in Model)
+            {
+                <a class="v-card" href="@Url.Action("Unit", new { slug = site.Slug, id = unit.Id })">
+                    <div class="pic">
+                        @if (unit.PhotoIds.Count > 0)
+                        {
+                            <img loading="lazy" alt="@ListingService.Title(T, unit.UsageType, unit.Bedrooms)" src="@Url.Action("Photo", new { slug = site.Slug, id = unit.PhotoIds[0] })" />
+                        }
+                        else
+                        {
+                            <span class="none"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/></svg></span>
+                        }
+                        @if (unit.IsFurnished)
+                        {
+                            <span class="tag">@T["Furnished"]</span>
+                        }
+                    </div>
+                    <div class="body">
+                        <h2>@ListingService.Title(T, unit.UsageType, unit.Bedrooms)</h2>
+                        <div class="v-where">@Where(unit)</div>
+                        <div class="v-facts">
+                            @if (unit.Bedrooms > 0)
+                            {
+                                <span class="v-fact">@T.Format("{0} bed", unit.Bedrooms)</span>
+                            }
+                            @if (unit.Bathrooms > 0)
+                            {
+                                <span class="v-fact">@T.Format("{0} bath", unit.Bathrooms)</span>
+                            }
+                            @if (unit.AreaSqFt > 0)
+                            {
+                                <span class="v-fact">@unit.AreaSqFt.ToString("N0") @T["sq ft"]</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(unit.Floor))
+                            {
+                                <span class="v-fact">@T.Format("Floor {0}", unit.Floor)</span>
+                            }
+                        </div>
+                        <div class="v-rent">
+                            @if (site.ShowRent && unit.Rent > 0)
+                            {
+                                <span><span dir="ltr">@site.Currency @unit.Rent.ToString("N0")</span> <small>@T["/ year"]</small></span>
+                            }
+                            else
+                            {
+                                <small>@T["Ask for the price"]</small>
+                            }
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+}
+
+<section class="row justify-content-center mt-4">
+    <div class="col-lg-6">
+        <div class="v-panel">
+            <h2 class="h5 mb-1">@T["Looking for something else?"]</h2>
+            <p class="text-muted small">@T["Tell us what you need and we will call you when we have it."]</p>
+            <partial name="_EnquiryForm" model="@((int?)null)" />
+        </div>
+    </div>
+</section>
