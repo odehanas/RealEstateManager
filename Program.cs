@@ -256,6 +256,7 @@ builder.Services.AddScoped<MaintenanceCategoryService>();
 builder.Services.AddScoped<PaidServiceService>();
 builder.Services.AddScoped<LeaseHandoverService>();
 builder.Services.AddScoped<ParkingService>();
+builder.Services.AddScoped<ListingService>();
 builder.Services.AddScoped<OwnerRechargeService>();
 builder.Services.AddScoped<OwnerProfitabilityService>();
 builder.Services.AddScoped<OwnerCombinedService>();

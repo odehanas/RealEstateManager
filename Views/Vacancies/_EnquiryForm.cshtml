@@ -1,0 +1,45 @@
+@model int?
+@{
+    // The enquiry form of the vacancy website. The model is the unit asked about, or null
+    // for a general enquiry.
+    var site = (RealEstateManager.Services.ListingService.PublicSite)ViewBag.Site;
+}
+@if (TempData["VacancySent"] != null)
+{
+    <div class="alert alert-success mb-0" id="enquiry">
+        <strong>@T["Thank you."]</strong> @T["We have your details and will call you back shortly."]
+    </div>
+}
+else
+{
+    <form id="enquiry" method="post" action="@Url.Action("Enquire", "Vacancies", new { slug = site.Slug })" class="position-relative">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="UnitId" value="@Model" />
+        @if (TempData["VacancyError"] is string error)
+        {
+            <div class="alert alert-warning py-2">@error</div>
+        }
+        <div class="mb-2">
+            <label class="form-label small mb-1" for="enq-name">@T["Your name"]</label>
+            <input class="form-control" id="enq-name" name="Name" maxlength="150" required autocomplete="name" />
+        </div>
+        <div class="mb-2">
+            <label class="form-label small mb-1" for="enq-phone">@T["Phone"]</label>
+            <input class="form-control" id="enq-phone" name="Phone" type="tel" maxlength="30" required autocomplete="tel" dir="ltr" />
+        </div>
+        <div class="mb-2">
+            <label class="form-label small mb-1" for="enq-email">@T["Email (optional)"]</label>
+            <input class="form-control" id="enq-email" name="Email" type="email" maxlength="200" autocomplete="email" dir="ltr" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label small mb-1" for="enq-message">@T["Message (optional)"]</label>
+            <textarea class="form-control" id="enq-message" name="Message" rows="3" maxlength="1000" placeholder="@T["When would you like to view it?"]"></textarea>
+        </div>
+        <div class="hp" aria-hidden="true">
+            <label for="enq-website">Website</label>
+            <input id="enq-website" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">@T["Send enquiry"]</button>
+        <div class="form-text">@T["Your details are used only to answer this enquiry."]</div>
+    </form>
+}

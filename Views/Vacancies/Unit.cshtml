@@ -1,0 +1,151 @@
+@model RealEstateManager.Services.ListingService.PublicUnit
+@using RealEstateManager.Services
+@using RealEstateManager.Services.Localization
+@{
+    Layout = "_VacanciesLayout";
+    var site = (ListingService.PublicSite)ViewBag.Site;
+    var title = ListingService.Title(T, Model.UsageType, Model.Bedrooms);
+    var where = string.Join(" · ", new[] { Model.PropertyName, Model.AreaName, Model.Emirate }.Where(x => !string.IsNullOrWhiteSpace(x)));
+    var description = UiLanguages.IsArabic
+        ? Model.DescriptionAr ?? Model.Description
+        : Model.Description ?? Model.DescriptionAr;
+    var features = (Model.Amenities ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    string PhotoUrl(int id) => Url.Action("Photo", new { slug = site.Slug, id })!;
+
+    ViewData["Title"] = $"{title} · {Model.PropertyName}";
+    ViewData["Description"] = !string.IsNullOrWhiteSpace(description) ? (description.Length > 160 ? description[..160] : description) : where;
+    if (Model.PhotoIds.Count > 0) { ViewData["Image"] = PhotoUrl(Model.PhotoIds[0]); }
+
+    var waText = Uri.EscapeDataString(T.Format("Hello, I am interested in unit {0} at {1}.", Model.UnitNumber, Model.PropertyName));
+    var mapUrl = Model.Latitude.HasValue && Model.Longitude.HasValue
+        ? "https://www.google.com/maps?q=" + Model.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + Model.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)
+        : null;
+}
+
+<p class="mb-2"><a href="@Url.Action("Index", new { slug = site.Slug })" class="text-decoration-none">@(UiLanguages.IsArabic ? "→" : "←") @T["All available units"]</a></p>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="v-gallery">
+            <div class="main">
+                @if (Model.PhotoIds.Count > 0)
+                {
+                    <img id="mainPhoto" alt="@title" src="@PhotoUrl(Model.PhotoIds[0])" />
+                }
+                else
+                {
+                    <span class="none"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V6l7-3 7 3v15"/><path d="M9 21v-5h6v5"/><path d="M9 9h2M13 9h2M9 12.5h2M13 12.5h2"/></svg></span>
+                }
+            </div>
+            @if (Model.PhotoIds.Count > 1)
+            {
+                <div class="v-thumbs">
+                    @for (var i = 0; i < Model.PhotoIds.Count; i++)
+                    {
+                        <button type="button" class="@(i == 0 ? "on" : "")" data-photo="@PhotoUrl(Model.PhotoIds[i])" aria-label="@T.Format("Photo {0}", i + 1)">
+                            <img loading="lazy" alt="" src="@PhotoUrl(Model.PhotoIds[i])" />
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="v-panel mt-3">
+            <h1 class="h3 mb-1">@title</h1>
+            <div class="v-where mb-2">@where</div>
+            <div class="v-facts mb-3">
+                @if (Model.Bedrooms > 0)
+                {
+                    <span class="v-fact">@T.Format("{0} bed", Model.Bedrooms)</span>
+                }
+                @if (Model.Bathrooms > 0)
+                {
+                    <span class="v-fact">@T.Format("{0} bath", Model.Bathrooms)</span>
+                }
+                @if (Model.AreaSqFt > 0)
+                {
+                    <span class="v-fact">@Model.AreaSqFt.ToString("N0") @T["sq ft"]</span>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Floor))
+                {
+                    <span class="v-fact">@T.Format("Floor {0}", Model.Floor)</span>
+                }
+                @if (Model.ParkingBays > 0)
+                {
+                    <span class="v-fact">@T.Format("{0} parking", Model.ParkingBays)</span>
+                }
+                @if (Model.IsFurnished)
+                {
+                    <span class="v-fact">@T["Furnished"]</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(description))
+            {
+                <h2 class="h6">@T["About this unit"]</h2>
+                <p style="white-space:pre-line" dir="auto">@description</p>
+            }
+
+            @if (features.Length > 0)
+            {
+                <h2 class="h6 mt-3">@T["Features"]</h2>
+                <ul class="v-features">
+                    @foreach (var feature in features)
+                    {
+                        <li dir="auto">@feature</li>
+                    }
+                </ul>
+            }
+
+            <h2 class="h6 mt-3">@T["Location"]</h2>
+            <p class="mb-1">@where</p>
+            @if (!string.IsNullOrWhiteSpace(Model.Address))
+            {
+                <p class="text-muted mb-1" dir="auto">@Model.Address</p>
+            }
+            @if (mapUrl != null)
+            {
+                <a href="@mapUrl" target="_blank" rel="noopener">@T["Open in Google Maps"]</a>
+            }
+            <p class="text-muted small mt-3 mb-0">@T.Format("Reference: {0}", Model.UnitNumber)</p>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="v-panel" style="position:sticky; top:1rem">
+            <div class="v-rent pt-0 mb-3" style="font-size:1.5rem">
+                @if (site.ShowRent && Model.Rent > 0)
+                {
+                    <span><span dir="ltr">@site.Currency @Model.Rent.ToString("N0")</span> <small>@T["/ year"]</small></span>
+                }
+                else
+                {
+                    <small>@T["Ask for the price"]</small>
+                }
+            </div>
+            <div class="d-grid gap-2 mb-3">
+                @if (!string.IsNullOrWhiteSpace(site.WhatsApp))
+                {
+                    <a class="btn btn-wa" target="_blank" rel="noopener" href="https://wa.me/@site.WhatsApp?text=@waText">@T["Chat on WhatsApp"]</a>
+                }
+                @if (!string.IsNullOrWhiteSpace(site.Phone))
+                {
+                    <a class="btn btn-outline-dark" href="tel:@site.Phone">@T["Call"] <span dir="ltr">@site.Phone</span></a>
+                }
+            </div>
+            <h2 class="h6">@T["Ask about this unit"]</h2>
+            <partial name="_EnquiryForm" model="@((int?)Model.Id)" />
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.v-thumbs button').forEach(function (button) {
+            button.addEventListener('click', function () {
+                document.getElementById('mainPhoto').src = button.dataset.photo;
+                document.querySelectorAll('.v-thumbs button').forEach(function (b) { b.classList.toggle('on', b === button); });
+            });
+        });
+    </script>
+}
