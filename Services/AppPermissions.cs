@@ -373,6 +373,9 @@ namespace RealEstateManager.Services
         private static readonly Dictionary<string, string[]> ActionPermissionMap =
             new(StringComparer.OrdinalIgnoreCase)
             {
+                // Website enquiries are leads: the owners read and mark them too, without the rest of the screen.
+                ["Listings.Enquiries"] = new[] { AppPermissions.LeasesManage, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
+                ["Listings.UpdateEnquiry"] = new[] { AppPermissions.LeasesManage, AppPermissions.MasterDataManage, AppPermissions.OwnerOversight },
                 ["Journal.GeneralLedger"] = new[] { AppPermissions.ReportsView, AppPermissions.OwnerOversight },
 
                 // The owner's view of the maintenance operation.

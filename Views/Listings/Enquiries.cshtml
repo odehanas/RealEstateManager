@@ -1,8 +1,12 @@
 @model List<RealEstateManager.Services.ListingService.EnquiryRow>
 @using RealEstateManager.Domain
+@using RealEstateManager.Services
+@inject PermissionService PermissionService
 @{
     ViewData["Title"] = T["Website Enquiries"];
     var status = ViewBag.Status as string;
+    // The owners read the enquiries without the rest of the Vacancy Website screen.
+    var canManage = await PermissionService.HasAnyPermissionAsync(User, AppPermissions.LeasesManage, AppPermissions.MasterDataManage);
     string Tab(string? value) => string.Equals(status, value, StringComparison.OrdinalIgnoreCase) ? "btn-dark" : "btn-outline-dark";
     string Badge(string value) => value switch
     {
@@ -19,7 +23,14 @@
             @T["What visitors of the vacancy website asked. Call them back, note what was agreed, and mark the enquiry so the next person knows where it stands."]
         </p>
     </div>
-    <a class="btn btn-outline-secondary" asp-action="Index">@T["Back"]</a>
+    @if (canManage)
+    {
+        <a class="btn btn-outline-secondary" asp-action="Index">@T["Back"]</a>
+    }
+    else
+    {
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">@T["Back"]</a>
+    }
 </div>
 
 @if (TempData["ErrorMessage"] is string errorMessage)
@@ -64,7 +75,11 @@ else
                         }
                     </div>
                     <div>
-                        @if (enquiry.UnitId.HasValue)
+                        @if (enquiry.UnitId.HasValue && !canManage)
+                        {
+                            <span>@enquiry.PropertyName · @enquiry.UnitNumber</span>
+                        }
+                        else if (enquiry.UnitId.HasValue)
                         {
                             <a asp-action="Unit" asp-route-id="@enquiry.UnitId">@enquiry.PropertyName · @enquiry.UnitNumber</a>
                         }
