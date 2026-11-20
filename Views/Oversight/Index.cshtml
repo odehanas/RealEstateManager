@@ -6,6 +6,8 @@
     var large = Model.Postings.Where(x => x.Amount >= Model.LargeAmount).ToList();
 }
 
+<partial name="_NewEnquiriesPanel" />
+
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <div>
         <h2 class="mb-0">@T["Owner Monitor"]</h2>

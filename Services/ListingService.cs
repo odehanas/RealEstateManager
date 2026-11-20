@@ -336,7 +336,7 @@ namespace RealEstateManager.Services
             string Status, string? Notes, int? UnitId, string? UnitNumber, string? PropertyName,
             DateTime? HandledAt, string? HandledByName);
 
-        public async Task<List<EnquiryRow>> GetEnquiriesAsync(string? status)
+        public async Task<List<EnquiryRow>> GetEnquiriesAsync(string? status, int take = 500)
         {
             var query = _db.UnitEnquiries.AsNoTracking();
             if (!string.IsNullOrWhiteSpace(status))
@@ -347,7 +347,7 @@ namespace RealEstateManager.Services
 
             return (await query
                     .OrderByDescending(x => x.CreatedAt)
-                    .Take(500)
+                    .Take(take)
                     .Select(x => new
                     {
                         x.Id, x.CreatedAt, x.Name, x.Phone, x.Email, x.Message, x.Language, x.Status, x.Notes, x.UnitId,
