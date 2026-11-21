@@ -110,6 +110,25 @@
             </select>
         </div>
 
+        <div class="col-md-3">
+            <label asp-for="IsIntraGroup" class="form-label">@T["Intra-Group Account"]</label>
+            <select asp-for="IsIntraGroup" class="form-select">
+                @if (Model.IsIntraGroup)
+                {
+                    <option value="true" selected>@T["Yes"]</option>
+                    <option value="false">@T["No"]</option>
+                }
+                else
+                {
+                    <option value="true">@T["Yes"]</option>
+                    <option value="false" selected>@T["No"]</option>
+                }
+            </select>
+            <div class="form-text">
+                @T["Marks an account that holds what this company owes to, is owed by, charges or is charged by the mother company or another branch. The consolidated group report removes its balance. Only needed when the company has branches."]
+            </div>
+        </div>
+
         <div class="col-md-4">
             <label asp-for="OpeningBalance" class="form-label">@T["Opening Balance"]</label>
             <input asp-for="OpeningBalance" type="number" step="0.01" class="form-control" />

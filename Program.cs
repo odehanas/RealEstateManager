@@ -250,6 +250,7 @@ builder.Services.AddScoped<EInvoiceService>();
 builder.Services.AddScoped<CreditNoteService>();
 builder.Services.AddScoped<OpeningBalanceService>();
 builder.Services.AddScoped<FinancialReportService>();
+builder.Services.AddScoped<GroupReportService>();
 builder.Services.AddScoped<GeneralJournalReportService>();
 builder.Services.AddScoped<MaintenanceService>();
 builder.Services.AddScoped<MaintenanceCategoryService>();

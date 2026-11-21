@@ -17,6 +17,9 @@ namespace RealEstateManager.Models
         public DateTime? AccessEndDate { get; set; }
         public string? Notes { get; set; }
 
+        /// <summary>For a branch: the mother company whose subscription it works on.</summary>
+        public string? MotherCompanyName { get; set; }
+
         [Display(Name = "Activation Code")]
         public string ActivationCode { get; set; } = string.Empty;
 

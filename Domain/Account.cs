@@ -33,6 +33,11 @@ namespace RealEstateManager.Domain
         // is a separate float with its own custodian and its own running balance.
         public bool IsPettyCashAccount { get; set; } = false;
 
+        // Marks an account whose balance is with another company of the same group
+        // (the mother company or one of its branches): what they owe one another and
+        // what they charge one another. The consolidated group report removes it.
+        public bool IsIntraGroup { get; set; } = false;
+
         public bool IsGroup { get; set; } = false;
         public bool IsPostable { get; set; } = true;
         public bool IsActive { get; set; } = true;

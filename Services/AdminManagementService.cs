@@ -5,7 +5,7 @@ using RealEstateManager.Models;
 
 namespace RealEstateManager.Services
 {
-    public class AdminManagementService
+    public partial class AdminManagementService
     {
         private readonly ApplicationDbContext _db;
         private readonly PasswordHashingService _passwordHashingService;
@@ -37,6 +37,7 @@ namespace RealEstateManager.Services
                     BaseCurrency = x.BaseCurrency,
                     FiscalYearStartMonth = x.FiscalYearStartMonth,
                     CreatedAt = x.CreatedAt,
+                    MotherCompanyName = x.ParentCompany != null ? x.ParentCompany.Name : null,
                     UsersCount = _db.AppUserCompanies
                         .IgnoreQueryFilters()
                         .Count(link => link.CompanyId == x.Id)

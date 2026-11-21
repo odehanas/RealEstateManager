@@ -30,6 +30,10 @@
         // the Petty Cash journal and gives it its own running balance there.
         public bool IsPettyCashAccount { get; set; } = false;
 
+        // Marks an account whose balance is with another company of the group; the
+        // consolidated group report removes it.
+        public bool IsIntraGroup { get; set; } = false;
+
         public int SortOrder { get; set; } = 0;
 
         // Opening balance entered as a NATURAL value (debit-positive for Asset /

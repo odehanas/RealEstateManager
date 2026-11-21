@@ -1,13 +1,13 @@
 @model RealEstateManager.Models.CompanyFormViewModel
 
 @{
-    ViewData["Title"] = T["Add Internal Company"];
+    ViewData["Title"] = T["Add Company"];
 }
 
-<h2>@T["Add Internal Company"]</h2>
+<h2>@T["Add Company"]</h2>
 
 <div class="alert alert-info">
-    @T["Use this internal page only after sign-in for additional managed companies. Public new-company signup now starts from the login page and creates the first admin user automatically."]
+    @T["This adds a separate company with its own subscription, not a branch. A customer's branch is opened by the customer's own administrator under Company Administration, Branches, and works on the mother company's subscription."]
 </div>
 
 <form asp-action="Create" method="post" class="row g-3">

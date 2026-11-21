@@ -6,6 +6,7 @@
 @inject SubscriptionService SubscriptionService
 @inject HelpCatalogService HelpCatalog
 @inject PlatformOwnerService PlatformOwnerService
+@inject GroupReportService GroupReports
 @inject ApprovalService ApprovalService
 @inject PeriodClosingService PeriodClosingService
 @inject PaymentApprovalService PaymentApprovals
@@ -89,6 +90,9 @@
         showHrMenu = false;
         showControlsMenu = false;
     }
+    // The group reports only mean something for a mother company with branches, or a branch.
+    var showGroupReports = showReportsMenu && currentCompanyId.HasValue
+                           && await GroupReports.IsGroupAsync(currentCompanyId.Value);
     var companies = isAuthenticated && CurrentCompanyAccessor.UserId.HasValue
         ? await AppAuthService.GetAccessibleCompaniesAsync(CurrentCompanyAccessor.UserId.Value, currentCompanyId)
         : new List<CompanyOptionViewModel>();
@@ -289,6 +293,9 @@
                                         <a class="sidebar-link" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
                                     </li>
                                     <li>
+                                        <a class="sidebar-link" asp-controller="Branches" asp-action="Index">@T["Branches"]</a>
+                                    </li>
+                                    <li>
                                         <a class="sidebar-link" asp-controller="AuditLogs" asp-action="Index">@T["Audit Logs"]</a>
                                     </li>
                                     <li>
@@ -301,6 +308,9 @@
                                     <li class="sidebar-heading">@T["Company Administration"]</li>
                                     <li>
                                         <a class="sidebar-link" asp-controller="Users" asp-action="Index">@T["Users & Permissions"]</a>
+                                    </li>
+                                    <li>
+                                        <a class="sidebar-link" asp-controller="Branches" asp-action="Index">@T["Branches"]</a>
                                     </li>
                                     <li>
                                         <a class="sidebar-link" asp-controller="AuditLogs" asp-action="Index">@T["Audit Logs"]</a>
@@ -650,6 +660,15 @@
                                     <li>
                                         <a class="sidebar-link" asp-controller="Reports" asp-action="CashFlow">@T["Statement of Cash Flows"]</a>
                                     </li>
+                                    @if (showGroupReports)
+                                    {
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Reports" asp-action="GroupCombined">@T["Combined Group Statements"]</a>
+                                        </li>
+                                        <li>
+                                            <a class="sidebar-link" asp-controller="Reports" asp-action="GroupConsolidated">@T["Consolidated Group Statements"]</a>
+                                        </li>
+                                    }
                                     <li>
                                         <a class="sidebar-link" asp-controller="InvestmentProperty" asp-action="Index">@T["Investment Property Note"]</a>
                                     </li>

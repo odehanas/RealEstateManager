@@ -14,8 +14,39 @@ namespace RealEstateManager.Services
             _db = db;
         }
 
+        /// <summary>
+        /// The company whose subscription this company works on: a branch has none of its
+        /// own and follows its mother company's, so one activation code covers the group.
+        /// </summary>
+        public async Task<int> GetBillingCompanyIdAsync(int companyId)
+        {
+            var parentId = await _db.Companies
+                .IgnoreQueryFilters()
+                .Where(x => x.Id == companyId)
+                .Select(x => x.ParentCompanyId)
+                .FirstOrDefaultAsync();
+
+            return parentId ?? companyId;
+        }
+
+        /// <summary>Subscriptions are managed on the mother company, never on one of its branches.</summary>
+        private async Task RefuseBranchAsync(int companyId)
+        {
+            var mother = await _db.Companies
+                .IgnoreQueryFilters()
+                .Where(x => x.Id == companyId && x.ParentCompanyId != null)
+                .Select(x => x.ParentCompany!.Name)
+                .FirstOrDefaultAsync();
+
+            if (mother != null)
+                throw new InvalidOperationException(
+                    $"This company is a branch of {mother} and works on its subscription. Manage the subscription on {mother}.");
+        }
+
         public async Task EnsureTrialSubscriptionAsync(int companyId, int trialDays = 15)
         {
+            companyId = await GetBillingCompanyIdAsync(companyId);
+
             var subscription = await _db.CompanySubscriptions
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(x => x.CompanyId == companyId);
@@ -55,10 +86,17 @@ namespace RealEstateManager.Services
             if (company == null)
                 throw new InvalidOperationException("Company was not found.");
 
+            // A branch is open exactly as long as its mother company is.
+            var billingCompanyId = company.ParentCompanyId ?? companyId;
             var subscription = await _db.CompanySubscriptions
                 .IgnoreQueryFilters()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.CompanyId == companyId);
+                .FirstOrDefaultAsync(x => x.CompanyId == billingCompanyId);
+
+            var motherCompanyName = company.ParentCompanyId.HasValue
+                ? await _db.Companies.IgnoreQueryFilters()
+                    .Where(x => x.Id == billingCompanyId).Select(x => x.Name).FirstOrDefaultAsync()
+                : null;
 
             if (subscription == null)
             {
@@ -104,7 +142,8 @@ namespace RealEstateManager.Services
                 IsExpired = !isActive,
                 IsSuspended = subscription.IsSuspended,
                 StatusLabel = statusLabel,
-                Notes = subscription.Notes
+                Notes = subscription.Notes,
+                MotherCompanyName = motherCompanyName
             };
         }
 
@@ -131,6 +170,7 @@ namespace RealEstateManager.Services
                 SubscriptionEndDate = status.SubscriptionEndDate,
                 AccessEndDate = status.AccessEndDate,
                 Notes = status.Notes,
+                MotherCompanyName = status.MotherCompanyName,
                 ReturnUrl = returnUrl
             };
         }
@@ -170,6 +210,7 @@ namespace RealEstateManager.Services
             if (durationDays <= 0)
                 throw new InvalidOperationException("Activation code duration must be greater than zero.");
 
+            await RefuseBranchAsync(companyId);
             await EnsureTrialSubscriptionAsync(companyId);
 
             string code;
@@ -208,6 +249,7 @@ namespace RealEstateManager.Services
             if (string.IsNullOrWhiteSpace(reason))
                 throw new InvalidOperationException("Give the reason for suspending - it is kept on the company's record.");
 
+            await RefuseBranchAsync(companyId);
             await EnsureTrialSubscriptionAsync(companyId);
             var subscription = await _db.CompanySubscriptions
                 .IgnoreQueryFilters()
@@ -235,6 +277,8 @@ namespace RealEstateManager.Services
         /// <summary>Lifts a suspension without a new code. The company's dates are unchanged.</summary>
         public async Task ReactivateAsync(int companyId, string actingUser)
         {
+            await RefuseBranchAsync(companyId);
+
             var subscription = await _db.CompanySubscriptions
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(x => x.CompanyId == companyId);
@@ -310,6 +354,10 @@ namespace RealEstateManager.Services
             var normalizedCode = NormalizeCode(code);
             if (string.IsNullOrWhiteSpace(normalizedCode))
                 throw new InvalidOperationException("Activation code is required.");
+
+            // Entered while working in a branch, the mother company's code is applied to the
+            // mother company: that one subscription is what keeps the whole group open.
+            companyId = await GetBillingCompanyIdAsync(companyId);
 
             var subscription = await _db.CompanySubscriptions
                 .IgnoreQueryFilters()
@@ -400,6 +448,8 @@ namespace RealEstateManager.Services
             var companies = await _db.Companies
                 .IgnoreQueryFilters()
                 .AsNoTracking()
+                // A branch has no subscription of its own; its mother company is the one listed.
+                .Where(x => x.ParentCompanyId == null)
                 .OrderBy(x => x.Name)
                 .Select(x => new { x.Id, x.Name })
                 .ToListAsync();
@@ -454,5 +504,8 @@ namespace RealEstateManager.Services
         public bool IsSuspended { get; init; }
         public string StatusLabel { get; init; } = string.Empty;
         public string? Notes { get; init; }
+
+        /// <summary>For a branch: the mother company whose subscription these dates are.</summary>
+        public string? MotherCompanyName { get; init; }
     }
 }

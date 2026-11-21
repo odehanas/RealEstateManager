@@ -6,11 +6,11 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">@T["Companies / Branch Setup"]</h2>
-    <a asp-action="Create" class="btn btn-primary">@T["Add Internal Company"]</a>
+    <a asp-action="Create" class="btn btn-primary">@T["Add Company"]</a>
 </div>
 
 <div class="alert alert-info">
-    @T["New customer onboarding now starts from the login page. Use this internal screen only for additional company records under administration and future branch-style expansion."]
+    @T["Customers sign up from the login page and open their own branches under Company Administration, Branches. Use this screen for subscriptions, and to add a company yourself when one is needed."]
 </div>
 
 <div class="row g-3 mb-4">
@@ -101,7 +101,13 @@
         @foreach (var item in Model.Items)
         {
             <tr>
-                <td>@item.Name</td>
+                <td>
+                    @item.Name
+                    @if (item.MotherCompanyName != null)
+                    {
+                        <div class="small text-muted">@T.Format("Branch of {0}, on its subscription", item.MotherCompanyName)</div>
+                    }
+                </td>
                 <td>@item.BaseCurrency</td>
                 <td>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(item.FiscalYearStartMonth)</td>
                 <td>@item.SubscriptionStatus</td>
