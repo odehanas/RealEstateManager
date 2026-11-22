@@ -12,6 +12,16 @@ namespace RealEstateManager.Domain
         public decimal PdcBounceCharge { get; set; } = 0m;
 
         public int Id { get; set; }
+
+        /// <summary>
+        /// The mother company, when this company is a branch of it. A branch keeps its own
+        /// books but works on the mother company's subscription and is included in its
+        /// group reports. A branch has no branches of its own.
+        /// </summary>
+        public int? ParentCompanyId { get; set; }
+        public Company? ParentCompany { get; set; }
+        public ICollection<Company> Branches { get; set; } = new List<Company>();
+
         public string Name { get; set; } = string.Empty;
         public string BaseCurrency { get; set; } = "AED";
         public int FiscalYearStartMonth { get; set; } = 1;

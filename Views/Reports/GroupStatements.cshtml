@@ -1,0 +1,207 @@
+@model RealEstateManager.Services.GroupStatementsDto
+@using RealEstateManager.Services
+
+@{
+    var title = Model.IsConsolidated ? T["Consolidated Group Statements"] : T["Combined Group Statements"];
+    ViewData["Title"] = title;
+    var action = Model.IsConsolidated ? "GroupConsolidated" : "GroupCombined";
+    var members = Model.Members;
+    // Account, one column per company, the combined total, then eliminations and the consolidated figure.
+    var columns = 1 + members.Count + 1 + (Model.IsConsolidated ? 2 : 0);
+
+    string Money(decimal value) => value == 0m ? "-" : value < 0 ? $"({Math.Abs(value):N2})" : value.ToString("N2");
+}
+
+<style>
+    .grp-table td, .grp-table th { padding: .3rem .6rem; white-space: nowrap; }
+    .grp-table td:first-child, .grp-table th:first-child { white-space: normal; min-width: 16rem; }
+    .grp-table thead th { background: #0f2740; color: #fff; vertical-align: bottom; }
+    .grp-table .line-head td { font-weight: 600; background: #f6f8fa; }
+    .grp-table .acct td:first-child { padding-left: 1.6rem; }
+    .grp-table .subtotal td { font-weight: 600; border-top: 1px solid #adb5bd; }
+    .grp-table .result td { font-weight: 700; border-top: 2px solid #0f2740; background: #eef3f8; }
+    .grp-table .statement td { font-weight: 700; font-size: 1.05rem; padding-top: 1.2rem; border-bottom: 2px solid #0f2740; }
+    .grp-table .neg { color: #b42318; }
+    .grp-table .col-total { background: #f6f8fa; font-weight: 600; }
+    .grp-table .col-elim { color: #b42318; }
+    .grp-table .col-cons { background: #eef3f8; font-weight: 700; }
+    .grp-table .intra-tag { color: #b42318; font-size: .8em; white-space: nowrap; }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
+    <h2 class="mb-0">@title</h2>
+    <form method="get" asp-action="@action" class="d-flex flex-wrap gap-2 align-items-center">
+        <label for="startDate" class="small text-muted">@T["From"]</label>
+        <input type="date" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-control form-control-sm" style="width:auto" />
+        <label for="endDate" class="small text-muted">@T["To"]</label>
+        <input type="date" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control form-control-sm" style="width:auto" />
+        <button type="submit" class="btn btn-sm btn-dark">@T["Refresh"]</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">@T["Print"]</button>
+    </form>
+</div>
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-warning mt-3">@Model.ErrorMessage</div>
+    return;
+}
+
+<p class="text-muted mb-2">
+    @if (Model.IsConsolidated)
+    {
+        @T.Format("{0} and its branches as one entity, in {1}. Income statement {2} to {3}; financial position at {3}. What the companies of the group owe and charged one another is removed in the Eliminations column.", members[0].Name, Model.Currency, Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))
+    }
+    else
+    {
+        @T.Format("{0} and its branches side by side and added together, in {1}. Income statement {2} to {3}; financial position at {3}. Nothing is removed: what the companies did with one another is still counted.", members[0].Name, Model.Currency, Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))
+    }
+</p>
+
+<p class="small d-print-none">
+    @if (Model.IsConsolidated)
+    {
+        <a asp-action="GroupCombined" asp-route-startDate="@Model.StartDate.ToString("yyyy-MM-dd")" asp-route-endDate="@Model.EndDate.ToString("yyyy-MM-dd")">@T["Open the combined statements for the same period"]</a>
+    }
+    else
+    {
+        <a asp-action="GroupConsolidated" asp-route-startDate="@Model.StartDate.ToString("yyyy-MM-dd")" asp-route-endDate="@Model.EndDate.ToString("yyyy-MM-dd")">@T["Open the consolidated statements for the same period"]</a>
+    }
+</p>
+
+@if (Model.IsConsolidated)
+{
+    if (!Model.HasEliminations)
+    {
+        <div class="alert alert-info">
+            @T["Nothing was removed: no account marked intra-group has a balance in this period. Mark the accounts that hold what the companies owe and charge one another as intra-group in each company's chart of accounts (the standard ones are Due from Group Companies, Due to Group Companies, Intra-Group Revenue and Intra-Group Charges)."]
+        </div>
+    }
+    else if (Model.UnreconciledDifference != 0m || Model.IncomeDifference != 0m)
+    {
+        <div class="alert alert-danger">
+            <strong>@T["The intra-group accounts of the companies do not agree."]</strong>
+            @T["What one company shows as owed by or charged to the group, another must show as owed to or charged by it. Until both sides are posted, the consolidated figures below are not final."]
+            <ul class="mb-0 mt-2">
+                <li>@T.Format("Intra-group income {0} against intra-group expense {1}: difference {2}.", Model.IntraGroupRevenue.ToString("N2"), Model.IntraGroupExpenses.ToString("N2"), Model.IncomeDifference.ToString("N2"))</li>
+                <li>@T.Format("Intra-group assets {0} against intra-group liabilities and equity {1}.", Model.IntraGroupAssets.ToString("N2"), Model.IntraGroupLiabilitiesAndEquity.ToString("N2"))</li>
+                <li>@T.Format("Left unexplained on the consolidated statement of financial position: {0}.", Model.UnreconciledDifference.ToString("N2"))</li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success">
+            @T.Format("The intra-group accounts agree. Removed: income and expense of {0}, and balances of {1}.", Model.IntraGroupRevenue.ToString("N2"), Model.IntraGroupAssets.ToString("N2"))
+        </div>
+    }
+}
+
+@functions {
+    private string Cls(decimal value) => value < 0 ? "neg" : "";
+}
+
+<div class="table-responsive">
+    <table class="table table-sm grp-table">
+        <thead>
+            <tr>
+                <th>@T["Account"]</th>
+                @foreach (var member in members)
+                {
+                    <th class="text-end">@member.Name</th>
+                }
+                <th class="text-end">@T["Combined"]</th>
+                @if (Model.IsConsolidated)
+                {
+                    <th class="text-end">@T["Eliminations"]</th>
+                    <th class="text-end">@T["Consolidated"]</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                void Cells(decimal[] amounts, decimal combined, decimal eliminations, decimal consolidated)
+                {
+                    foreach (var amount in amounts)
+                    {
+                        <td class="text-end @Cls(amount)">@Money(amount)</td>
+                    }
+                    <td class="text-end col-total @Cls(combined)">@Money(combined)</td>
+                    if (Model.IsConsolidated)
+                    {
+                        <td class="text-end col-elim">@Money(eliminations)</td>
+                        <td class="text-end col-cons @Cls(consolidated)">@Money(consolidated)</td>
+                    }
+                }
+
+                void Rows(IEnumerable<GroupRowDto> rows)
+                {
+                    foreach (var row in rows)
+                    {
+                        <tr class="acct @(row.IsIntraGroup ? "intra" : "")">
+                            <td>
+                                @row.AccountCode @(row.AccountCode.Length == 0 ? T[row.AccountName] : row.AccountName)
+                                @if (row.IsIntraGroup)
+                                {
+                                    <span class="intra-tag">&bull; @T["intra-group"]</span>
+                                }
+                            </td>
+                            @{ Cells(row.Amounts, row.Combined, row.Eliminations, row.Consolidated); }
+                        </tr>
+                    }
+                }
+
+                void Total(string css, string label, GroupTotalsDto totals)
+                {
+                    <tr class="@css">
+                        <td>@label</td>
+                        @{ Cells(totals.Amounts, totals.Combined, totals.Eliminations, totals.Consolidated); }
+                    </tr>
+                }
+            }
+
+            @* ---------------- Income statement *@
+            <tr class="statement"><td colspan="@columns">@T.Format("Income statement, {0} to {1}", Model.StartDate.ToString("dd/MM/yyyy"), Model.EndDate.ToString("dd/MM/yyyy"))</td></tr>
+
+            <tr class="line-head"><td colspan="@columns">@T["Revenue"]</td></tr>
+            @{ Rows(Model.Revenue); Total("subtotal", T["Total revenue"], Model.TotalRevenue); }
+
+            <tr class="line-head"><td colspan="@columns">@T["Expenses"]</td></tr>
+            @{ Rows(Model.Expenses); Total("subtotal", T["Total expenses"], Model.TotalExpenses); }
+
+            @{ Total("result", T["Net profit / (loss)"], Model.NetProfit); }
+
+            @* ---------------- Statement of financial position *@
+            <tr class="statement"><td colspan="@columns">@T.Format("Statement of financial position at {0}", Model.EndDate.ToString("dd/MM/yyyy"))</td></tr>
+
+            <tr class="line-head"><td colspan="@columns">@T["Assets"]</td></tr>
+            @{ Rows(Model.Assets); Total("result", T["Total assets"], Model.TotalAssets); }
+
+            <tr class="line-head"><td colspan="@columns">@T["Liabilities"]</td></tr>
+            @{ Rows(Model.Liabilities); Total("subtotal", T["Total liabilities"], Model.TotalLiabilities); }
+
+            <tr class="line-head"><td colspan="@columns">@T["Equity"]</td></tr>
+            @{ Rows(Model.Equity); Total("subtotal", T["Total equity"], Model.TotalEquity); }
+
+            @{ Total("result", T["Total liabilities and equity"], Model.TotalLiabilitiesAndEquity); }
+
+            @if (Model.IsConsolidated && Model.UnreconciledDifference != 0m)
+            {
+                <tr class="subtotal">
+                    <td class="neg" colspan="@(columns - 1)">@T["Unreconciled intra-group difference (total assets less total liabilities and equity)"]</td>
+                    <td class="text-end neg">@Money(Model.UnreconciledDifference)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p class="small text-muted">
+    @if (Model.IsConsolidated)
+    {
+        @T["Each company's column is its own statements. Accounts are matched across the companies by account code. Eliminations remove the full balance of every account marked intra-group. Profit on property or other assets sold by one company of the group to another and still held by it is not removed by this report and needs a manual adjustment."]
+    }
+    else
+    {
+        @T["Each company's column is its own statements. Accounts are matched across the companies by account code."]
+    }
+</p>

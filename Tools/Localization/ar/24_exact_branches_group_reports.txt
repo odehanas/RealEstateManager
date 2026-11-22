@@ -1,0 +1,54 @@
+# Branches (a company's administrator opens a branch) and the group reports:
+# combined and consolidated statements. Each line is the whole English key.
+
+Branches ||| الفروع
+Combined Group Statements ||| القوائم المالية المجمّعة للمجموعة
+Consolidated Group Statements ||| القوائم المالية الموحّدة للمجموعة
+This company is a branch of {0} and works on its subscription. An activation code issued for {0} can be entered here. ||| هذه الشركة فرع تابع لـ {0} وتعمل على اشتراكها. يمكن إدخال رمز التفعيل الصادر لـ {0} هنا.
+{0} and its branches. Each keeps its own books; the group reports under Reporting add them together. ||| {0} وفروعها. لكل منها دفاتره المحاسبية الخاصة، وتقارير المجموعة ضمن قائمة التقارير تجمعها معاً.
+Open a Branch ||| فتح فرع
+A new branch is opened by an administrator of {0}. ||| يفتح الفرع الجديد أحد مسؤولي {0}.
+Opened ||| تاريخ الفتح
+Mother company ||| الشركة الأم
+Branch ||| فرع
+You are here ||| أنت هنا
+Switch to it ||| الانتقال إليه
+No access ||| لا توجد صلاحية دخول
+No branches yet. ||| لا توجد فروع حتى الآن.
+The branch is opened under {0}. It keeps its own properties, tenants and accounts, uses the same currency and financial year, and works on the same subscription. What the branch and {0} owe or charge one another is posted to the intra-group accounts, so the consolidated report can remove it. ||| يُفتح الفرع تحت {0}. يحتفظ الفرع بعقاراته ومستأجريه وحساباته الخاصة، ويستخدم العملة والسنة المالية نفسيهما، ويعمل على الاشتراك نفسه. ما يستحق بين الفرع و{0} أو ما يحمّله أحدهما على الآخر يُقيَّد في حسابات المعاملات الداخلية للمجموعة، ليتمكن التقرير الموحّد من استبعاده.
+Branch name ||| اسم الفرع
+This is the name shown in the company list at the top of the page. ||| هذا هو الاسم الذي يظهر في قائمة الشركات أعلى الصفحة.
+Give everyone who works in {0} the same access to the branch ||| منح جميع العاملين في {0} الصلاحيات نفسها في الفرع
+Leave it unticked to enter the branch alone and add its users afterwards under Users & Permissions. ||| اتركه دون تحديد لتدخل الفرع وحدك ثم تضيف مستخدميه لاحقاً من المستخدمين والصلاحيات.
+Open the Branch ||| فتح الفرع
+Intra-Group Account ||| حساب معاملات داخل المجموعة
+Marks an account that holds what this company owes to, is owed by, charges or is charged by the mother company or another branch. The consolidated group report removes its balance. Only needed when the company has branches. ||| يميّز الحساب الذي يحمل ما على هذه الشركة أو ما لها لدى الشركة الأم أو فرع آخر، أو ما تحمّله عليهما أو يحمّلانه عليها. يستبعد تقرير المجموعة الموحّد رصيده. يلزم فقط عندما يكون للشركة فروع.
+Add Company ||| إضافة شركة
+Customers sign up from the login page and open their own branches under Company Administration, Branches. Use this screen for subscriptions, and to add a company yourself when one is needed. ||| يسجّل العملاء من صفحة الدخول ويفتحون فروعهم بأنفسهم من إدارة الشركة ثم الفروع. استخدم هذه الشاشة للاشتراكات، ولإضافة شركة بنفسك عند الحاجة.
+Branch of {0}, on its subscription ||| فرع تابع لـ {0} ويعمل على اشتراكها
+This adds a separate company with its own subscription, not a branch. A customer's branch is opened by the customer's own administrator under Company Administration, Branches, and works on the mother company's subscription. ||| هذه الشاشة تضيف شركة مستقلة لها اشتراكها الخاص وليست فرعاً. فرع العميل يفتحه مسؤول شركة العميل نفسه من إدارة الشركة ثم الفروع، ويعمل على اشتراك الشركة الأم.
+{0} and its branches as one entity, in {1}. Income statement {2} to {3}; financial position at {3}. What the companies of the group owe and charged one another is removed in the Eliminations column. ||| {0} وفروعها كمنشأة واحدة، بعملة {1}. قائمة الدخل من {2} إلى {3}، والمركز المالي في {3}. ما يستحق بين شركات المجموعة وما حمّلته على بعضها مستبعد في عمود الاستبعادات.
+{0} and its branches side by side and added together, in {1}. Income statement {2} to {3}; financial position at {3}. Nothing is removed: what the companies did with one another is still counted. ||| {0} وفروعها جنباً إلى جنب ومجموعة معاً، بعملة {1}. قائمة الدخل من {2} إلى {3}، والمركز المالي في {3}. لم يُستبعد شيء: المعاملات بين شركات المجموعة ما زالت محتسبة.
+Open the combined statements for the same period ||| فتح القوائم المجمّعة للفترة نفسها
+Open the consolidated statements for the same period ||| فتح القوائم الموحّدة للفترة نفسها
+Nothing was removed: no account marked intra-group has a balance in this period. Mark the accounts that hold what the companies owe and charge one another as intra-group in each company's chart of accounts (the standard ones are Due from Group Companies, Due to Group Companies, Intra-Group Revenue and Intra-Group Charges). ||| لم يُستبعد شيء: لا يوجد رصيد في هذه الفترة لأي حساب مميّز كحساب معاملات داخل المجموعة. ميّز الحسابات التي تحمل ما يستحق بين الشركات وما تحمّله على بعضها كحسابات داخل المجموعة في دليل حسابات كل شركة (الحسابات القياسية هي: مستحق من شركات المجموعة، مستحق لشركات المجموعة، إيرادات داخل المجموعة، مصروفات محمّلة داخل المجموعة).
+The intra-group accounts of the companies do not agree. ||| حسابات المعاملات الداخلية بين شركات المجموعة غير متطابقة.
+What one company shows as owed by or charged to the group, another must show as owed to or charged by it. Until both sides are posted, the consolidated figures below are not final. ||| ما تظهره شركة كمستحق لها من المجموعة أو محمّل عليها يجب أن تظهره شركة أخرى كمستحق عليها أو محمّل منها. إلى أن يُقيَّد الطرفان، الأرقام الموحّدة أدناه غير نهائية.
+Intra-group income {0} against intra-group expense {1}: difference {2}. ||| إيرادات داخل المجموعة {0} مقابل مصروفات داخل المجموعة {1}: الفرق {2}.
+Intra-group assets {0} against intra-group liabilities and equity {1}. ||| أصول داخل المجموعة {0} مقابل التزامات وحقوق ملكية داخل المجموعة {1}.
+Left unexplained on the consolidated statement of financial position: {0}. ||| الفرق غير المفسَّر في قائمة المركز المالي الموحّدة: {0}.
+The intra-group accounts agree. Removed: income and expense of {0}, and balances of {1}. ||| حسابات المعاملات الداخلية متطابقة. المستبعد: إيرادات ومصروفات بمبلغ {0}، وأرصدة بمبلغ {1}.
+Eliminations ||| الاستبعادات
+Consolidated ||| موحّد
+Income statement, {0} to {1} ||| قائمة الدخل، من {0} إلى {1}
+Total expenses ||| إجمالي المصروفات
+Statement of financial position at {0} ||| قائمة المركز المالي في {0}
+Total assets ||| إجمالي الأصول
+Total liabilities ||| إجمالي الالتزامات
+Total equity ||| إجمالي حقوق الملكية
+Total liabilities and equity ||| إجمالي الالتزامات وحقوق الملكية
+Profit or loss for the current year ||| ربح أو خسارة السنة الحالية
+Unreconciled intra-group difference (total assets less total liabilities and equity) ||| فرق غير مطابق في المعاملات الداخلية للمجموعة (إجمالي الأصول ناقص إجمالي الالتزامات وحقوق الملكية)
+Each company's column is its own statements. Accounts are matched across the companies by account code. Eliminations remove the full balance of every account marked intra-group. Profit on property or other assets sold by one company of the group to another and still held by it is not removed by this report and needs a manual adjustment. ||| عمود كل شركة هو قوائمها الخاصة. تُطابَق الحسابات بين الشركات برمز الحساب. تستبعد الاستبعادات كامل رصيد كل حساب مميّز كحساب داخل المجموعة. الربح من عقار أو أصل آخر باعته شركة في المجموعة لشركة أخرى فيها وما زال بحوزتها لا يستبعده هذا التقرير ويحتاج إلى تسوية يدوية.
+Each company's column is its own statements. Accounts are matched across the companies by account code. ||| عمود كل شركة هو قوائمها الخاصة. تُطابَق الحسابات بين الشركات برمز الحساب.
+intra-group ||| داخل المجموعة

@@ -15,6 +15,9 @@ namespace RealEstateManager.Models
         public int DaysRemaining { get; set; }
         public int ActivationCodesIssued { get; set; }
         public int ActivationCodesUsed { get; set; }
+
+        /// <summary>For a branch: its mother company, whose subscription it works on.</summary>
+        public string? MotherCompanyName { get; set; }
     }
 
     public class CompanyListPageViewModel

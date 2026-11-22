@@ -151,6 +151,8 @@ namespace RealEstateManager.Controllers
                 IsOwnerAccount = model.IsOwnerAccount && model.AccountType == "Equity" && !model.IsGroup && model.IsPostable,
                 // Only a postable asset account can hold a petty cash float.
                 IsPettyCashAccount = model.IsPettyCashAccount && model.AccountType == "Asset" && !model.IsGroup && model.IsPostable,
+                // Only an account that is posted to can hold what group companies do with one another.
+                IsIntraGroup = model.IsIntraGroup && !model.IsGroup && model.IsPostable,
                 // Group accounts and not-postable accounts cannot carry an opening balance.
                 OpeningBalance = (model.IsGroup || !model.IsPostable) ? 0m : model.OpeningBalance
             };
@@ -192,6 +194,7 @@ namespace RealEstateManager.Controllers
                 IsActive = account.IsActive,
                 IsOwnerAccount = account.IsOwnerAccount,
                 IsPettyCashAccount = account.IsPettyCashAccount,
+                IsIntraGroup = account.IsIntraGroup,
                 SortOrder = account.SortOrder,
                 OpeningBalance = isControl
                     ? (openingInfo?.SubLedgerTotal ?? 0m)
@@ -280,6 +283,7 @@ namespace RealEstateManager.Controllers
             account.IsActive = model.IsActive;
             account.IsOwnerAccount = model.IsOwnerAccount && model.AccountType == "Equity" && !model.IsGroup && model.IsPostable;
             account.IsPettyCashAccount = model.IsPettyCashAccount && model.AccountType == "Asset" && !model.IsGroup && model.IsPostable;
+            account.IsIntraGroup = model.IsIntraGroup && !model.IsGroup && model.IsPostable;
             account.SortOrder = model.SortOrder;
 
             // Sub-ledger control accounts (AR / AP / Fixed Asset) keep the

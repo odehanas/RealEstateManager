@@ -1318,12 +1318,27 @@ namespace RealEstateManager.Services
                 .OrderBy(x => x.StartDate)
                 .ToListAsync();
 
-            var ids = periods.Select(x => x.Id).ToList();
+            // Closing starts with the company's first transaction. A company set up in
+            // November with a financial year from January has ten empty months behind it:
+            // they were never used, so they are not "overdue". Once a back-dated entry is
+            // made, the months from that entry onwards are listed again.
+            var firstEntryDate = await _db.JournalEntries.AsNoTracking()
+                .Where(x => x.CompanyId == companyId)
+                .MinAsync(x => (DateTime?)x.EntryDate);
+            var closingStartsOn = (firstEntryDate ?? today).Date;
+
+            var allIds = periods.Select(x => x.Id).ToList();
             var requests = await _db.PeriodReopenRequests.AsNoTracking()
                 .Where(x => x.CompanyId == companyId &&
-                            (x.Status == PeriodReopenStatuses.Pending || ids.Contains(x.AccountingPeriodId)))
+                            (x.Status == PeriodReopenStatuses.Pending || allIds.Contains(x.AccountingPeriodId)))
                 .Select(x => new { x.AccountingPeriodId, x.Status })
                 .ToListAsync();
+
+            // A period someone reopened or asked to reopen stays listed whatever its date.
+            periods = periods
+                .Where(x => x.EndDate.Date >= closingStartsOn || requests.Any(r => r.AccountingPeriodId == x.Id))
+                .ToList();
+            var ids = periods.Select(x => x.Id).ToList();
 
             var drafts = await _db.JournalEntries.AsNoTracking()
                 .Where(x => x.CompanyId == companyId && !x.IsPosted && x.AccountingPeriodId != null && ids.Contains(x.AccountingPeriodId.Value))

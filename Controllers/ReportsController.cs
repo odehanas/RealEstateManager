@@ -14,6 +14,7 @@ namespace RealEstateManager.Controllers
         private readonly OwnerReportService _ownerReportService;
         private readonly CashFlowService _cashFlowService;
         private readonly GeneralJournalReportService _generalJournal;
+        private readonly GroupReportService _groupReportService;
 
         public ReportsController(
             ApplicationDbContext db,
@@ -22,8 +23,10 @@ namespace RealEstateManager.Controllers
             VatReturnService vatReturnService,
             OwnerReportService ownerReportService,
             CashFlowService cashFlowService,
-            GeneralJournalReportService generalJournal)
+            GeneralJournalReportService generalJournal,
+            GroupReportService groupReportService)
         {
+            _groupReportService = groupReportService;
             _db = db;
             _financialReportService = financialReportService;
             _managementReportService = managementReportService;
@@ -80,6 +83,47 @@ namespace RealEstateManager.Controllers
                 .ToDictionaryAsync(x => x.Code, x => x.Id);
 
             return View(model);
+        }
+
+        /// <summary>
+        /// The mother company and its branches side by side and added together, with
+        /// nothing removed.
+        /// </summary>
+        [HttpGet]
+        public Task<IActionResult> GroupCombined(DateTime? startDate, DateTime? endDate) =>
+            GroupStatementsAsync(startDate, endDate, consolidated: false);
+
+        /// <summary>
+        /// The group as one entity: the combined figures less what the companies of the
+        /// group owe and charged one another.
+        /// </summary>
+        [HttpGet]
+        public Task<IActionResult> GroupConsolidated(DateTime? startDate, DateTime? endDate) =>
+            GroupStatementsAsync(startDate, endDate, consolidated: true);
+
+        private async Task<IActionResult> GroupStatementsAsync(DateTime? startDate, DateTime? endDate, bool consolidated)
+        {
+            var companyId = User.GetRequiredCurrentCompanyId();
+            var to = (endDate ?? DateTime.Today).Date;
+
+            GroupStatementsDto model;
+            try
+            {
+                model = await _groupReportService.BuildAsync(
+                    companyId, User.GetAppUserId(), User.IsInRole("SystemAdmin"), startDate?.Date, to, consolidated);
+            }
+            catch (InvalidOperationException ex)
+            {
+                model = new GroupStatementsDto
+                {
+                    IsConsolidated = consolidated,
+                    StartDate = startDate?.Date ?? to,
+                    EndDate = to,
+                    ErrorMessage = ex.Message
+                };
+            }
+
+            return View("GroupStatements", model);
         }
 
         /// <summary>

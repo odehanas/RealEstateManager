@@ -115,6 +115,12 @@ namespace RealEstateManager.Data
                 .Property(x => x.BaseCurrency)
                 .HasMaxLength(10);
 
+            modelBuilder.Entity<Company>()
+                .HasOne(x => x.ParentCompany)
+                .WithMany(x => x.Branches)
+                .HasForeignKey(x => x.ParentCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<AppUser>()
                 .Property(x => x.Username)
                 .HasMaxLength(100);

@@ -1,0 +1,41 @@
+@model RealEstateManager.Models.BranchFormViewModel
+
+@{
+    ViewData["Title"] = T["Open a Branch"];
+}
+
+<h2>@T["Open a Branch"]</h2>
+
+<div class="alert alert-info">
+    @T.Format("The branch is opened under {0}. It keeps its own properties, tenants and accounts, uses the same currency and financial year, and works on the same subscription. What the branch and {0} owe or charge one another is posted to the intra-group accounts, so the consolidated report can remove it.", Model.MotherCompanyName)
+</div>
+
+<form asp-action="Create" method="post" class="row g-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label">@T["Branch name"]</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+        <div class="form-text">@T["This is the name shown in the company list at the top of the page."]</div>
+    </div>
+
+    <div class="col-12">
+        <div class="form-check">
+            <input asp-for="GiveMotherCompanyUsersAccess" class="form-check-input" />
+            <label asp-for="GiveMotherCompanyUsersAccess" class="form-check-label">
+                @T.Format("Give everyone who works in {0} the same access to the branch", Model.MotherCompanyName)
+            </label>
+        </div>
+        <div class="form-text">@T["Leave it unticked to enter the branch alone and add its users afterwards under Users & Permissions."]</div>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">@T["Open the Branch"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@T["Back"]</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

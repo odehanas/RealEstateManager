@@ -45,6 +45,13 @@
             <div class="card-body">
                 <h4 class="mb-3">@Model.CompanyName</h4>
 
+                @if (!string.IsNullOrEmpty(Model.MotherCompanyName))
+                {
+                    <div class="alert alert-info">
+                        @T.Format("This company is a branch of {0} and works on its subscription. An activation code issued for {0} can be entered here.", Model.MotherCompanyName)
+                    </div>
+                }
+
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label">@T["Status"]</label>
